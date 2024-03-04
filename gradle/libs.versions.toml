@@ -1,0 +1,84 @@
+[versions]
+
+version-name = "0.2.4"
+
+java-compiler-version = "21"
+java-bytecode-version = "11"
+java-vendor = "amazon"
+
+android-build-tools-plugin = "8.0.0"
+versions-plugin = "0.47.0"
+
+androidx-collection = "1.3.0-alpha04"
+
+dependency-analysis="1.18.0"
+dokka="1.9.10"
+
+faker = "1.14.0"
+
+junit = "4.13.2"
+
+kotlin = "1.9.22"
+kotlinter = "4.2.0"
+kot-compile-testing = "1.5.0"
+
+kotlinx-atomic-fu = "0.23.1"
+kotlinx-benchmark = "0.4.10"
+kotlinx-coroutines = "1.7.3"
+kotlinx-datetime = "0.4.0"
+kotlinx-io = "0.3.0"
+kotlinx-serialization = "1.5.1"
+kotlinx-test-resources = "0.4.0"
+
+result = "1.1.18"
+
+[plugins]
+
+android = { id = "com.android.application", version.ref = "android-build-tools-plugin" }
+android-lib = { id = "com.android.library", version.ref = "android-build-tools-plugin" }
+android-test = { id = "com.android.test", version.ref = "android-build-tools-plugin" }
+dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref="dependency-analysis" }
+dokka = { id = "org.jetbrains.dokka", version.ref="dokka" }
+kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinx-benchmark" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-atomic-fu = { id = "org.jetbrains.kotlin.plugin.atomicfu", version.ref = "kotlin"  }
+kotlinx-test-resources = { id = "com.goncalossilva.resources", version.ref = "kotlinx-test-resources"}
+kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter"  }
+
+[libraries]
+
+androidx-collections-kmp = { module = "androidx.collection:collection", version.ref = "androidx-collection" }
+
+faker = { module = "io.github.serpro69:kotlin-faker", version.ref = "faker"}
+
+junit = { module = "junit:junit", version.ref = "junit"}
+
+kotlin-compile-testing-core = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kot-compile-testing"}
+kotlin-compile-testing-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kot-compile-testing"}
+kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin"}
+kotlin-reflection = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin"}
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin"}
+
+kotlinx-atomic-fu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomic-fu"}
+kotlinx-benchmark = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinx-benchmark"}
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime"}
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io"}
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization"}
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines"}
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines"}
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines"}
+kotlinx-test-resources = { module = "com.goncalossilva:resources", version.ref = "kotlinx-test-resources"}
+
+result = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref = "result"}
+
+dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+gradle-versions-plugin = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versions-plugin" }
+kotlinter-gradle-plugin = { module = "org.jmailen.gradle:kotlinter-gradle", version.ref = "kotlinter" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
+[bundles]

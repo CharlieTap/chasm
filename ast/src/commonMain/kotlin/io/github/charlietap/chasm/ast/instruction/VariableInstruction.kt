@@ -1,0 +1,22 @@
+package io.github.charlietap.chasm.ast.instruction
+
+import io.github.charlietap.chasm.ast.instruction.Index.GlobalIndex
+import io.github.charlietap.chasm.ast.instruction.Index.LocalIndex
+import kotlin.jvm.JvmInline
+
+sealed interface VariableInstruction : Instruction {
+    @JvmInline
+    value class LocalGet(val localIdx: LocalIndex) : VariableInstruction
+
+    @JvmInline
+    value class LocalSet(val localIdx: LocalIndex) : VariableInstruction
+
+    @JvmInline
+    value class LocalTee(val localIdx: LocalIndex) : VariableInstruction
+
+    @JvmInline
+    value class GlobalGet(val globalIdx: GlobalIndex) : VariableInstruction
+
+    @JvmInline
+    value class GlobalSet(val globalIdx: GlobalIndex) : VariableInstruction
+}
