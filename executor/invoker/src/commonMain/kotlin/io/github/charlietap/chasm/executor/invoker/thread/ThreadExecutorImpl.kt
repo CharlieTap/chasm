@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.thread
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.popValueOrError
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Configuration
@@ -35,22 +36,18 @@ fun ThreadExecutorImpl(
         instructionExecutor(instruction, configuration.store, stack).bind()
     }
 
-    val results = buildList {
-        repeat(thread.frame.arity.value) {
-            stack.popValue()?.let { entry ->
-                add(entry.value)
-            }
-        }
-    }
-
-    if (results.size != thread.frame.arity.value) {
-        Err(InvocationError.FunctionReturnArityMismatch).bind<List<ExecutionValue>>()
+    val results = List(thread.frame.arity.value) {
+        stack.popValueOrError().bind().value
     }
 
     val frame = stack.popFrame()
 
     if (frame != thread.frame) {
         Err(InvocationError.MissingStackFrame).bind<List<ExecutionValue>>()
+    }
+
+    if (stack.size() > 0) {
+        Err(InvocationError.ProgramFinishedInconsistentState).bind<List<ExecutionValue>>()
     }
 
     results

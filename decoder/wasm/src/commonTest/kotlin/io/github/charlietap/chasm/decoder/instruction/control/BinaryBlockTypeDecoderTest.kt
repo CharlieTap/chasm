@@ -82,14 +82,14 @@ class BinaryBlockTypeDecoderTest {
     fun `can decode signed type index block type`() {
 
         val expectedInt = 117u
-        val intReader = {
-            Ok(expectedInt.toInt())
+        val longReader = {
+            Ok(expectedInt.toLong())
         }
 
         val peekReader = FakeUByteReader {
             Ok(expectedInt.toInt().toSignedLeb128().first().toUByte())
         }
-        val reader = FakeWasmBinaryReader(fakePeekReader = { peekReader }, fakeIntReader = intReader)
+        val reader = FakeWasmBinaryReader(fakePeekReader = { peekReader }, fakeLongReader = longReader)
 
         val expected = Ok(BlockType.SignedTypeIndex(Index.TypeIndex(expectedInt)))
 

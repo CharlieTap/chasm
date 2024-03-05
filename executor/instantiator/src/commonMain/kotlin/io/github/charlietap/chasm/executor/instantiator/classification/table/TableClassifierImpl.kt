@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.executor.instantiator.classification.table
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.instantiator.classification.ClassifiedExternalValue
-import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.type.ExternalType
@@ -12,11 +11,9 @@ import io.github.charlietap.chasm.executor.runtime.type.ExternalType
 internal fun TableClassifierImpl(
     store: Store,
     value: ExternalValue.Table,
-): Result<ClassifiedExternalValue, InstantiationError.ImportLookupFailed> {
+): Result<ClassifiedExternalValue, ModuleRuntimeError> = binding {
     val address = value.address
-    val type = store.table(address)?.type ?: return Err(
-        InstantiationError.ImportLookupFailed(address.address),
-    )
+    val type = store.table(address).bind().type
 
-    return Ok(ClassifiedExternalValue(ExternalType.Table(type), value))
+    ClassifiedExternalValue(ExternalType.Table(type), value)
 }

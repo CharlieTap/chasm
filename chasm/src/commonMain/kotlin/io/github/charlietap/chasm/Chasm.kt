@@ -7,10 +7,12 @@ import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.ChasmResult.Error
 import io.github.charlietap.chasm.ChasmResult.Success
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.error.ChasmError.DecodeError
 import io.github.charlietap.chasm.error.ChasmError.ExecutionError
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiatorImpl
+import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.FunctionInvokerImpl
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
@@ -104,6 +106,18 @@ fun Chasm.invoke(
 fun Chasm.instance(sourceReader: SourceReader): ModuleInstance {
     TODO()
 }
+
+fun Chasm.function(store: Store, type: FunctionType, function: Function<*>): ExternalValue.Function {
+    // store alloc memory
+    TODO()
+}
+
+fun Chasm.function(
+    store: Store,
+    type: FunctionType,
+    function: Function<*>,
+    allocator: HostFunctionAllocator,
+): ExternalValue.Function = ExternalValue.Function(allocator(store, type, function))
 
 fun Chasm.memory(min: Int, max: Int): ExternalValue.Memory {
     // store alloc memory

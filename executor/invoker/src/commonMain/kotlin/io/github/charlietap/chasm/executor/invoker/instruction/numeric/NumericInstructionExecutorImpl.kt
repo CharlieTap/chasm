@@ -10,6 +10,11 @@ import io.github.charlietap.chasm.executor.invoker.ext.convertOperation
 import io.github.charlietap.chasm.executor.invoker.ext.countLeadingZero
 import io.github.charlietap.chasm.executor.invoker.ext.countTrailingZero
 import io.github.charlietap.chasm.executor.invoker.ext.eqz
+import io.github.charlietap.chasm.executor.invoker.ext.ge
+import io.github.charlietap.chasm.executor.invoker.ext.gt
+import io.github.charlietap.chasm.executor.invoker.ext.le
+import io.github.charlietap.chasm.executor.invoker.ext.lt
+import io.github.charlietap.chasm.executor.invoker.ext.relationalOperation
 import io.github.charlietap.chasm.executor.invoker.ext.testOperation
 import io.github.charlietap.chasm.executor.invoker.ext.unaryOperation
 import io.github.charlietap.chasm.executor.invoker.ext.wrap
@@ -59,8 +64,14 @@ internal fun NumericInstructionExecutorImpl(
         is NumericInstruction.I32Eqz -> stack.testOperation(Int::eqz).bind()
         is NumericInstruction.I64Eqz -> stack.testOperation(Long::eqz).bind()
 
+        is NumericInstruction.I32GeS -> stack.relationalOperation(Int::ge).bind()
+        is NumericInstruction.I32GtS -> stack.relationalOperation(Int::gt).bind()
+
+        is NumericInstruction.I32LeS -> stack.relationalOperation(Int::le).bind()
+        is NumericInstruction.I32LtS -> stack.relationalOperation(Int::lt).bind()
+
         is NumericInstruction.I32WrapI64 -> stack.convertOperation(::I32, Long::wrap).bind()
 
-        else -> Err(InvocationError.UnimplementedInstruction).bind<Unit>()
+        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
     }
 }

@@ -1,9 +1,40 @@
 package io.github.charlietap.chasm.executor.runtime.error
 
+import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import kotlin.jvm.JvmInline
 
 sealed interface InvocationError : ModuleRuntimeError {
+
+    @JvmInline
+    value class StoreLookupFailed(val address: Address) : InvocationError
+
+    @JvmInline
+    value class FunctionTypeLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class FunctionAddressLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class TableAddressLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class MemoryAddressLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class GlobalAddressLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class ElementAddressLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class DataAddressLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class ExportInstanceLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class TableElementLookupFailed(val index: Int) : InvocationError
 
     data class MemoryGrowExceedsLimits(
         val pagesRequested: Int,
@@ -27,14 +58,20 @@ sealed interface InvocationError : ModuleRuntimeError {
 
     data object MissingStackValue : InvocationError
 
-    @JvmInline
-    value class StoreLookupFailed(val address: Address) : InvocationError
-
     data object MissingLocal : InvocationError
 
     data object InstructionFailure : InvocationError
 
-    data object UnimplementedInstruction : InvocationError
+    data object IndirectCallOnANonFunctionReference : InvocationError
+
+    data object IndirectCallHasIncorrectFunctionType : InvocationError
+
+    data object ReferenceValueExpected : InvocationError
+
+    @JvmInline
+    value class UnimplementedInstruction(val instruction: Instruction) : InvocationError
+
+    data object ProgramFinishedInconsistentState : InvocationError
 
     sealed interface Trap : InvocationError {
         data object TrapEncountered : Trap

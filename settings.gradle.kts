@@ -46,6 +46,8 @@ include(":executor:instantiator")
 include(":executor:invoker")
 include(":executor:runtime")
 
+include(":test:fake:decoder")
+
 include(":test:fixture:ast")
 include(":test:fixture:executor:runtime")
 

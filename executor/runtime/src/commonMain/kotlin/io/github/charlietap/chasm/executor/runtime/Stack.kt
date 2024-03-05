@@ -39,15 +39,29 @@ data class Stack(
 
     fun peekLabel(): Entry.Label? = labels.lastOrNull()
 
+    fun peekNthLabel(n: Int): Entry.Label? = labels.getOrNull(labels.lastIndex - n)
+
     fun peekValue(): Entry.Value? = values.lastOrNull()
 
+    fun peekNthValue(n: Int): Entry.Value? = values.getOrNull(values.lastIndex - n)
+
     fun size() = frames.size + labels.size + values.size
+
+    fun framesDepth() = frames.size
+
+    fun labelsDepth() = labels.size
+
+    fun valuesDepth() = values.size
 
     fun empty() {
         frames.removeAll { true }
         labels.removeAll { true }
         values.removeAll { true }
     }
+
+    fun labels() = labels
+
+    fun values() = values
 
     fun fill(stack: Stack) {
         stack.frames.forEach { entry ->

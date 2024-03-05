@@ -21,6 +21,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.executor.runtime)
+                api(projects.test.fixture.ast)
             }
         }
     }

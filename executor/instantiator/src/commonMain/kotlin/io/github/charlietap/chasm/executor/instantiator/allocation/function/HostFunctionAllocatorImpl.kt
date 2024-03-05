@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-internal fun HostFunctionAllocatorImpl(
+fun HostFunctionAllocatorImpl(
     store: Store,
     type: FunctionType,
     function: Function<*>,

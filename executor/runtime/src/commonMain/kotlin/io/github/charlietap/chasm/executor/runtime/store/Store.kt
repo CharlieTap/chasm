@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.github.charlietap.chasm.executor.runtime.store
 
 import com.github.michaelbull.result.Err
@@ -19,19 +21,27 @@ data class Store(
     val elements: MutableList<ElementInstance> = mutableListOf(),
     val data: MutableList<DataInstance> = mutableListOf(),
 ) {
-    fun function(address: Address.Function): Result<FunctionInstance, InvocationError> {
+    inline fun function(address: Address.Function): Result<FunctionInstance, InvocationError.StoreLookupFailed> {
         return functions.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
     }
 
-    fun table(address: Address.Table): TableInstance? = tables.getOrNull(address.address)
+    inline fun table(address: Address.Table): Result<TableInstance, InvocationError.StoreLookupFailed> {
+        return tables.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
+    }
 
-    fun memory(address: Address.Memory): MemoryInstance? = memories.getOrNull(address.address)
+    inline fun memory(address: Address.Memory): Result<MemoryInstance, InvocationError.StoreLookupFailed> {
+        return memories.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
+    }
 
-    fun global(address: Address.Global): Result<GlobalInstance, InvocationError> {
+    inline fun global(address: Address.Global): Result<GlobalInstance, InvocationError.StoreLookupFailed> {
         return globals.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
     }
 
-    fun element(address: Address.Element): ElementInstance? = elements.getOrNull(address.address)
+    inline fun element(address: Address.Element): Result<ElementInstance, InvocationError.StoreLookupFailed> {
+        return elements.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
+    }
 
-    fun data(address: Address.Data): DataInstance? = data.getOrNull(address.address)
+    inline fun data(address: Address.Data): Result<DataInstance, InvocationError.StoreLookupFailed> {
+        return data.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
+    }
 }

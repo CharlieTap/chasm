@@ -195,8 +195,6 @@ class ModuleAllocatorImplTest {
             dataAllocator = dataAllocator,
         )
 
-        println(actual.component1()?.globalAddresses)
-
         assertEquals(Ok(expected), actual)
     }
 }

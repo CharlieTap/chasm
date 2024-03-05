@@ -32,7 +32,6 @@ internal fun BinaryBlockTypeDecoder(
             reader.byte() // consume it
             BlockType.Empty
         }
-
         in VALUE_TYPE_REFERENCE_EXTERNREF..VALUE_TYPE_REFERENCE_FUNCREF,
         in VALUE_TYPE_VECTOR_V128..VALUE_TYPE_NUMBER_I32,
         -> {
@@ -41,8 +40,8 @@ internal fun BinaryBlockTypeDecoder(
 
         else -> {
             // Not using TypeIndexDecoder here as it's stored in a signed leb
-            val idx = reader.int().bind().toUInt()
-            BlockType.SignedTypeIndex(Index.TypeIndex(idx))
+            val idx = reader.long().bind()
+            BlockType.SignedTypeIndex(Index.TypeIndex(idx.toUInt()))
         }
     }
 }

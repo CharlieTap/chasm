@@ -2,6 +2,7 @@
 
 package io.github.charlietap.chasm.executor.invoker.ext
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -12,6 +13,36 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 import kotlin.jvm.JvmName
+
+internal inline fun Stack.peekFrameOrError(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
+    return peekFrame()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
+}
+
+internal inline fun Stack.peekLabelOrError(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
+    return peekLabel()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
+}
+
+internal inline fun Stack.peekValueOrError(): Result<Stack.Entry.Value, InvocationError.MissingStackValue> {
+    return peekValue()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
+}
+
+internal inline fun Stack.popFrameOrError(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
+    return popFrame()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
+}
+
+internal inline fun Stack.popLabelOrError(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
+    return popLabel()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
+}
+
+internal inline fun Stack.popValueOrError(): Result<Stack.Entry.Value, InvocationError.MissingStackValue> {
+    return popValue()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
+}
+
+internal inline fun Stack.popI32(): Result<Int, InvocationError.MissingStackValue> {
+    return ((popValue()?.value as? I32)?.value)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
 
 internal inline fun Stack.constOperation(
     const: Int,

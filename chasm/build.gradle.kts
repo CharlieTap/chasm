@@ -39,6 +39,8 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation(projects.test.fake.decoder)
+
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.test.resources)
             }
