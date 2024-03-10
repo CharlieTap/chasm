@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.instance
 
 data class DataInstance(
     val bytes: UByteArray,
+    val dropped: Boolean = false,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

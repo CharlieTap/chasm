@@ -3,11 +3,13 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ControlInstructionExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.MemoryInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.NumericInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.parametric.ParametricInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.ReferenceInstructionExecutor
@@ -41,6 +43,38 @@ class InstructionExecutorImplTest {
             store = store,
             stack = stack,
             controlInstructionExecutor = controlInstructionExecutor,
+            memoryInstructionExecutor = memoryInstructionExecutor(),
+            numericInstructionExecutor = numericInstructionExecutor(),
+            parametricInstructionExecutor = parametricInstructionExecutor(),
+            referenceInstructionExecutor = referenceInstructionExecutor(),
+            variableInstructionExecutor = variableInstructionExecutor(),
+        )
+
+        assertEquals(Ok(Unit), actual)
+    }
+
+    @Test
+    fun `delegates to memory instruction executor when given a memory instruction`() {
+
+        val store = store()
+        val stack = stack()
+
+        val instruction = MemoryInstruction.MemoryGrow
+
+        val memoryInstructionExecutor: MemoryInstructionExecutor = { passedInstruction, passedStore, passedStack ->
+            assertEquals(instruction, passedInstruction)
+            assertEquals(store, passedStore)
+            assertEquals(stack, passedStack)
+
+            Ok(Unit)
+        }
+
+        val actual = InstructionExecutorImpl(
+            instruction = instruction,
+            store = store,
+            stack = stack,
+            controlInstructionExecutor = controlInstructionExecutor(),
+            memoryInstructionExecutor = memoryInstructionExecutor,
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor(),
@@ -70,6 +104,7 @@ class InstructionExecutorImplTest {
             store = store,
             stack = stack,
             controlInstructionExecutor = controlInstructionExecutor(),
+            memoryInstructionExecutor = memoryInstructionExecutor(),
             numericInstructionExecutor = numericInstructionExecutor,
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor(),
@@ -99,6 +134,7 @@ class InstructionExecutorImplTest {
             store = store,
             stack = stack,
             controlInstructionExecutor = controlInstructionExecutor(),
+            memoryInstructionExecutor = memoryInstructionExecutor(),
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor,
             referenceInstructionExecutor = referenceInstructionExecutor(),
@@ -128,6 +164,7 @@ class InstructionExecutorImplTest {
             store = store,
             stack = stack,
             controlInstructionExecutor = controlInstructionExecutor(),
+            memoryInstructionExecutor = memoryInstructionExecutor(),
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor,
@@ -158,6 +195,7 @@ class InstructionExecutorImplTest {
             store = store,
             stack = stack,
             controlInstructionExecutor = controlInstructionExecutor(),
+            memoryInstructionExecutor = memoryInstructionExecutor(),
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor(),
@@ -169,6 +207,10 @@ class InstructionExecutorImplTest {
 
     companion object {
         fun controlInstructionExecutor(): ControlInstructionExecutor = { _, _, _ ->
+            fail()
+        }
+
+        fun memoryInstructionExecutor(): MemoryInstructionExecutor = { _, _, _ ->
             fail()
         }
 

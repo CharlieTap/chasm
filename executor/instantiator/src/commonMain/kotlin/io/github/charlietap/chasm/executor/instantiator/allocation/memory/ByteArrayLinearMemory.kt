@@ -44,9 +44,19 @@ internal data class ByteArrayLinearMemory(
             memory.toIntLittleEndian(offset)
         }
 
+    override fun readInt(offset: Int, size: Int): Result<Int, InvocationError.MemoryOperationOutOfBounds> =
+        runWithBoundsChecking(offset, size) {
+            memory.sliceArray(offset..(offset + size)).toIntLittleEndian()
+        }
+
     override fun readLong(offset: Int): Result<Long, InvocationError.MemoryOperationOutOfBounds> =
         runWithBoundsChecking(offset, Long.SIZE_BYTES) {
             memory.toLongLittleEndian(offset)
+        }
+
+    override fun readLong(offset: Int, size: Int): Result<Long, InvocationError.MemoryOperationOutOfBounds> =
+        runWithBoundsChecking(offset, size) {
+            memory.sliceArray(offset..(offset + size)).toLongLittleEndian()
         }
 
     override fun readUInt(offset: Int): Result<UInt, InvocationError.MemoryOperationOutOfBounds> =
@@ -54,9 +64,19 @@ internal data class ByteArrayLinearMemory(
             memory.toUIntLittleEndian(offset)
         }
 
+    override fun readUInt(offset: Int, size: Int): Result<UInt, InvocationError.MemoryOperationOutOfBounds> =
+        runWithBoundsChecking(offset, size) {
+            memory.sliceArray(offset..(offset + size)).toUIntLittleEndian()
+        }
+
     override fun readULong(offset: Int): Result<ULong, InvocationError.MemoryOperationOutOfBounds> =
         runWithBoundsChecking(offset, ULong.SIZE_BYTES) {
             memory.toULongLittleEndian(offset)
+        }
+
+    override fun readULong(offset: Int, size: Int): Result<ULong, InvocationError.MemoryOperationOutOfBounds> =
+        runWithBoundsChecking(offset, size) {
+            memory.sliceArray(offset..(offset + size)).toULongLittleEndian()
         }
 
     override fun readFloat(offset: Int): Result<Float, InvocationError.MemoryOperationOutOfBounds> =
@@ -74,9 +94,19 @@ internal data class ByteArrayLinearMemory(
             value.copyInto(memory, offset)
         }
 
+    override fun writeInt(value: Int, offset: Int, size: Int): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
+        runWithBoundsChecking(offset, size) {
+            value.copyInto(memory, offset, size)
+        }
+
     override fun writeLong(value: Long, offset: Int): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
         runWithBoundsChecking(offset, Long.SIZE_BYTES) {
             value.copyInto(memory, offset)
+        }
+
+    override fun writeLong(value: Long, offset: Int, size: Int): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
+        runWithBoundsChecking(offset, size) {
+            value.copyInto(memory, offset, size)
         }
 
     override fun writeUInt(value: UInt, offset: Int): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
@@ -84,9 +114,19 @@ internal data class ByteArrayLinearMemory(
             value.copyInto(memory, offset)
         }
 
+    override fun writeUInt(value: UInt, offset: Int, size: Int): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
+        runWithBoundsChecking(offset, size) {
+            value.copyInto(memory, offset, size)
+        }
+
     override fun writeULong(value: ULong, offset: Int): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
         runWithBoundsChecking(offset, ULong.SIZE_BYTES) {
             value.copyInto(memory, offset)
+        }
+
+    override fun writeULong(value: ULong, offset: Int, size: Int): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
+        runWithBoundsChecking(offset, size) {
+            value.copyInto(memory, offset, size)
         }
 
     override fun writeFloat(value: Float, offset: Int): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =

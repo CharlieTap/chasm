@@ -12,3 +12,7 @@ internal inline fun Long.copyInto(buffer: ByteArray, offset: Int) {
     buffer[offset + 6] = (this shr 48 and 0xFF).toByte()
     buffer[offset + 7] = (this shr 56 and 0xFF).toByte()
 }
+
+internal inline fun Long.copyInto(buffer: ByteArray, offset: Int, size: Int) = repeat(size) { index ->
+    buffer[offset + index] = (this shr (8 * index) and 0xFFL).toByte()
+}

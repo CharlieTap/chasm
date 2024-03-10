@@ -44,6 +44,24 @@ internal inline fun Stack.popI32(): Result<Int, InvocationError.MissingStackValu
     } ?: Err(InvocationError.MissingStackValue)
 }
 
+internal inline fun Stack.popI64(): Result<Long, InvocationError.MissingStackValue> {
+    return ((popValue()?.value as? I64)?.value)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
+internal inline fun Stack.popF32(): Result<Float, InvocationError.MissingStackValue> {
+    return ((popValue()?.value as? F32)?.value)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
+internal inline fun Stack.popF64(): Result<Double, InvocationError.MissingStackValue> {
+    return ((popValue()?.value as? F64)?.value)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
 internal inline fun Stack.constOperation(
     const: Int,
 ) = push(Stack.Entry.Value(I32(const)))

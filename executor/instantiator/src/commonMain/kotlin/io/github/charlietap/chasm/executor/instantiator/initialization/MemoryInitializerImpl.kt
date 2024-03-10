@@ -51,6 +51,7 @@ internal fun MemoryInitializerImpl(
                 MemoryInstruction.DataDrop(segment.idx),
             ),
         )
+
         evaluator(store, instance, expression, Arity.SIDE_EFFECT).bind()
     }
 }
