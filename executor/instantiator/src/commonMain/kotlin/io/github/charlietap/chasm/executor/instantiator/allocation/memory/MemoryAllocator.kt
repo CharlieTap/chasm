@@ -4,4 +4,4 @@ import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-internal typealias MemoryAllocator = (Store, MemoryType) -> Address.Memory
+typealias MemoryAllocator = (Store, MemoryType) -> Address.Memory

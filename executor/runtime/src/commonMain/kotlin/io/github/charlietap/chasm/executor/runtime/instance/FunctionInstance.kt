@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.instance
 
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.type.FunctionType
+import io.github.charlietap.chasm.executor.runtime.instance.HostFunction as HostFunctionImpl
 
 sealed class FunctionInstance {
 
@@ -15,6 +16,6 @@ sealed class FunctionInstance {
 
     data class HostFunction(
         override val type: FunctionType,
-        val function: kotlin.Function<*>,
+        val function: HostFunctionImpl,
     ) : FunctionInstance()
 }

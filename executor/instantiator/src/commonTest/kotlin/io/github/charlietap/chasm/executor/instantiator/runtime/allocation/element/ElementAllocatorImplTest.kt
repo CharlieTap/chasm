@@ -21,8 +21,8 @@ class ElementAllocatorImplTest {
         val refType = ReferenceType.Funcref
 
         val expected = ElementInstance(
-            referenceType = refType,
-            references = mutableListOf(),
+            type = refType,
+            elements = mutableListOf(),
         )
 
         val address = ElementAllocatorImpl(store, refType, emptyList())

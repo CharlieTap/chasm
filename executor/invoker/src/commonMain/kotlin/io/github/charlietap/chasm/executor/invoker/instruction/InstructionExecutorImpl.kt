@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ControlInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ControlInstructionExecutorImpl
@@ -20,6 +21,8 @@ import io.github.charlietap.chasm.executor.invoker.instruction.parametric.Parame
 import io.github.charlietap.chasm.executor.invoker.instruction.parametric.ParametricInstructionExecutorImpl
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.ReferenceInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.ReferenceInstructionExecutorImpl
+import io.github.charlietap.chasm.executor.invoker.instruction.table.TableInstructionExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.table.TableInstructionExecutorImpl
 import io.github.charlietap.chasm.executor.invoker.instruction.variable.VariableInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.variable.VariableInstructionExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -39,6 +42,7 @@ internal fun InstructionExecutorImpl(
         memoryInstructionExecutor = ::MemoryInstructionExecutorImpl,
         numericInstructionExecutor = ::NumericInstructionExecutorImpl,
         parametricInstructionExecutor = ::ParametricInstructionExecutorImpl,
+        tableInstructionExecutor = ::TableInstructionExecutorImpl,
         referenceInstructionExecutor = ::ReferenceInstructionExecutorImpl,
         variableInstructionExecutor = ::VariableInstructionExecutorImpl,
     )
@@ -51,6 +55,7 @@ internal fun InstructionExecutorImpl(
     memoryInstructionExecutor: MemoryInstructionExecutor,
     numericInstructionExecutor: NumericInstructionExecutor,
     parametricInstructionExecutor: ParametricInstructionExecutor,
+    tableInstructionExecutor: TableInstructionExecutor,
     referenceInstructionExecutor: ReferenceInstructionExecutor,
     variableInstructionExecutor: VariableInstructionExecutor,
 ): Result<Unit, InvocationError> = binding {
@@ -59,6 +64,7 @@ internal fun InstructionExecutorImpl(
         is MemoryInstruction -> memoryInstructionExecutor(instruction, store, stack).bind()
         is NumericInstruction -> numericInstructionExecutor(instruction, stack).bind()
         is ParametricInstruction -> parametricInstructionExecutor(instruction, stack).bind()
+        is TableInstruction -> tableInstructionExecutor(instruction, store, stack).bind()
         is ReferenceInstruction -> referenceInstructionExecutor(instruction, stack).bind()
         is VariableInstruction -> variableInstructionExecutor(instruction, store, stack).bind()
         else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()

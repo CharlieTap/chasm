@@ -7,13 +7,16 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ControlInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.MemoryInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.NumericInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.parametric.ParametricInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.ReferenceInstructionExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.table.TableInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.variable.VariableInstructionExecutor
+import io.github.charlietap.chasm.fixture.instruction.tableIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
@@ -47,6 +50,7 @@ class InstructionExecutorImplTest {
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor(),
+            tableInstructionExecutor = tableInstructionExecutor(),
             variableInstructionExecutor = variableInstructionExecutor(),
         )
 
@@ -78,6 +82,7 @@ class InstructionExecutorImplTest {
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor(),
+            tableInstructionExecutor = tableInstructionExecutor(),
             variableInstructionExecutor = variableInstructionExecutor(),
         )
 
@@ -108,6 +113,7 @@ class InstructionExecutorImplTest {
             numericInstructionExecutor = numericInstructionExecutor,
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor(),
+            tableInstructionExecutor = tableInstructionExecutor(),
             variableInstructionExecutor = variableInstructionExecutor(),
         )
 
@@ -138,6 +144,7 @@ class InstructionExecutorImplTest {
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor,
             referenceInstructionExecutor = referenceInstructionExecutor(),
+            tableInstructionExecutor = tableInstructionExecutor(),
             variableInstructionExecutor = variableInstructionExecutor(),
         )
 
@@ -168,6 +175,39 @@ class InstructionExecutorImplTest {
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor,
+            tableInstructionExecutor = tableInstructionExecutor(),
+            variableInstructionExecutor = variableInstructionExecutor(),
+        )
+
+        assertEquals(Ok(Unit), actual)
+    }
+
+    @Test
+    fun `delegates to table instruction executor when given a reference instruction`() {
+
+        val store = store()
+        val stack = stack()
+
+        val instruction = TableInstruction.TableGet(tableIndex())
+
+        val tableInstructionExecutor: TableInstructionExecutor = { passedInstruction, passedStore, passedStack ->
+            assertEquals(instruction, passedInstruction)
+            assertEquals(store, passedStore)
+            assertEquals(stack, passedStack)
+
+            Ok(Unit)
+        }
+
+        val actual = InstructionExecutorImpl(
+            instruction = instruction,
+            store = store,
+            stack = stack,
+            controlInstructionExecutor = controlInstructionExecutor(),
+            memoryInstructionExecutor = memoryInstructionExecutor(),
+            numericInstructionExecutor = numericInstructionExecutor(),
+            parametricInstructionExecutor = parametricInstructionExecutor(),
+            referenceInstructionExecutor = referenceInstructionExecutor(),
+            tableInstructionExecutor = tableInstructionExecutor,
             variableInstructionExecutor = variableInstructionExecutor(),
         )
 
@@ -199,6 +239,7 @@ class InstructionExecutorImplTest {
             numericInstructionExecutor = numericInstructionExecutor(),
             parametricInstructionExecutor = parametricInstructionExecutor(),
             referenceInstructionExecutor = referenceInstructionExecutor(),
+            tableInstructionExecutor = tableInstructionExecutor(),
             variableInstructionExecutor = variableInstructionExecutor,
         )
 
@@ -207,27 +248,31 @@ class InstructionExecutorImplTest {
 
     companion object {
         fun controlInstructionExecutor(): ControlInstructionExecutor = { _, _, _ ->
-            fail()
+            fail("control instruction executor shouldn't be called")
         }
 
         fun memoryInstructionExecutor(): MemoryInstructionExecutor = { _, _, _ ->
-            fail()
+            fail("memory instruction executor shouldn't be called")
         }
 
         fun numericInstructionExecutor(): NumericInstructionExecutor = { _, _ ->
-            fail()
+            fail("numeric instruction executor shouldn't be called")
         }
 
         fun parametricInstructionExecutor(): ParametricInstructionExecutor = { _, _ ->
-            fail()
+            fail("parametric instruction executor shouldn't be called")
         }
 
         fun referenceInstructionExecutor(): ReferenceInstructionExecutor = { _, _ ->
-            fail()
+            fail("reference instruction executor shouldn't be called")
+        }
+
+        fun tableInstructionExecutor(): TableInstructionExecutor = { _, _, _ ->
+            fail("table instruction executor shouldn't be called")
         }
 
         fun variableInstructionExecutor(): VariableInstructionExecutor = { _, _, _ ->
-            fail()
+            fail("variable instruction executor shouldn't be called")
         }
     }
 }

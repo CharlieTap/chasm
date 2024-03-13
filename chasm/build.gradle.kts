@@ -40,6 +40,8 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.test.fake.decoder)
+                implementation(projects.test.fixture.ast)
+                implementation(projects.test.fixture.executor.runtime)
 
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.test.resources)

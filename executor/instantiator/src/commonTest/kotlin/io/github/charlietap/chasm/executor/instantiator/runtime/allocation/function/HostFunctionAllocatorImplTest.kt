@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.func
 
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -19,7 +20,7 @@ class HostFunctionAllocatorImplTest {
         )
 
         val type = functionType()
-        val hostFunction = {}
+        val hostFunction: HostFunction = { emptyList() }
 
         val expected = FunctionInstance.HostFunction(
             type = type,

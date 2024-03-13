@@ -33,10 +33,12 @@ internal fun MemoryFillExecutorImpl(
     val fillValue = stack.popI32().bind()
     val offset = stack.popI32().bind()
 
+    if (bytesToFill == 0) return@binding
+
     stack.push(Stack.Entry.Value(NumberValue.I32(offset)))
     stack.push(Stack.Entry.Value(NumberValue.I32(fillValue)))
 
-    storeSizedSignedExecutor(store, stack, MemArg(0u, 0u), bytesToFill).bind()
+    storeSizedSignedExecutor(store, stack, MemArg(0u, 0u), 1).bind()
 
     stack.push(Stack.Entry.Value(NumberValue.I32(offset + 1)))
     stack.push(Stack.Entry.Value(NumberValue.I32(fillValue)))

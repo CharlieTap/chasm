@@ -266,7 +266,7 @@ class BinaryPrefixInstructionDecoderTest {
 
         val expectedSrcTableIndex = Index.TableIndex(117u)
         val expectedDestTableIndex = Index.TableIndex(118u)
-        val tableIndexIter = sequenceOf(expectedSrcTableIndex, expectedDestTableIndex).iterator()
+        val tableIndexIter = sequenceOf(expectedDestTableIndex, expectedSrcTableIndex).iterator()
         val tableIndexDecoder: TableIndexDecoder = {
             Ok(tableIndexIter.next())
         }

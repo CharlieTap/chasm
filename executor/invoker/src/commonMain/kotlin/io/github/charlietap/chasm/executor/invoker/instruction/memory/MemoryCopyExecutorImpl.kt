@@ -22,14 +22,14 @@ internal inline fun MemoryCopyExecutorImpl(
     MemoryCopyExecutorImpl(
         store = store,
         stack = stack,
-        i32UnsignedLoadExecutor = ::I32SizedUnsignedLoadExecutorImpl,
+        i32SizedUnsignedLoadExecutor = ::I32SizedUnsignedLoadExecutorImpl,
         i32StoreSizedSignedExecutor = ::I32StoreSizedSignedExecutorImpl,
     )
 
 internal fun MemoryCopyExecutorImpl(
     store: Store,
     stack: Stack,
-    i32UnsignedLoadExecutor: I32SizedUnsignedLoadExecutor,
+    i32SizedUnsignedLoadExecutor: I32SizedUnsignedLoadExecutor,
     i32StoreSizedSignedExecutor: I32StoreSizedSignedExecutor,
 ): Result<Unit, InvocationError> = binding {
 
@@ -42,20 +42,20 @@ internal fun MemoryCopyExecutorImpl(
     if (destinationOffset <= sourceOffset) {
         stack.push(Stack.Entry.Value(NumberValue.I32(destinationOffset)))
         stack.push(Stack.Entry.Value(NumberValue.I32(sourceOffset)))
-        i32UnsignedLoadExecutor(store, stack, MemArg(0u, 0u), bytesToCopy).bind()
-        i32StoreSizedSignedExecutor(store, stack, MemArg(0u, 0u), bytesToCopy).bind()
+        i32SizedUnsignedLoadExecutor(store, stack, MemArg(0u, 0u), 1).bind()
+        i32StoreSizedSignedExecutor(store, stack, MemArg(0u, 0u), 1).bind()
         stack.push(Stack.Entry.Value(NumberValue.I32(destinationOffset + 1)))
         stack.push(Stack.Entry.Value(NumberValue.I32(sourceOffset + 1)))
     } else {
-        stack.push(Stack.Entry.Value(NumberValue.I32(destinationOffset + bytesToCopy + 1)))
+        stack.push(Stack.Entry.Value(NumberValue.I32(destinationOffset + bytesToCopy - 1)))
         stack.push(Stack.Entry.Value(NumberValue.I32(sourceOffset + bytesToCopy - 1)))
-        i32UnsignedLoadExecutor(store, stack, MemArg(0u, 0u), bytesToCopy).bind()
-        i32StoreSizedSignedExecutor(store, stack, MemArg(0u, 0u), bytesToCopy).bind()
+        i32SizedUnsignedLoadExecutor(store, stack, MemArg(0u, 0u), 1).bind()
+        i32StoreSizedSignedExecutor(store, stack, MemArg(0u, 0u), 1).bind()
         stack.push(Stack.Entry.Value(NumberValue.I32(destinationOffset)))
         stack.push(Stack.Entry.Value(NumberValue.I32(sourceOffset)))
     }
 
     stack.push(Stack.Entry.Value(NumberValue.I32(bytesToCopy - 1)))
 
-    MemoryCopyExecutorImpl(store, stack, i32UnsignedLoadExecutor, i32StoreSizedSignedExecutor).bind()
+    MemoryCopyExecutorImpl(store, stack, i32SizedUnsignedLoadExecutor, i32StoreSizedSignedExecutor).bind()
 }

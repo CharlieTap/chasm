@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-internal fun MemoryAllocatorImpl(
+fun MemoryAllocatorImpl(
     store: Store,
     type: MemoryType,
 ): Address.Memory = MemoryAllocatorImpl(

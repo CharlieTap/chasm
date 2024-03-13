@@ -26,7 +26,6 @@ internal inline fun <T> StoreSizedNumberValueExecutorImpl(
     val valueToStore = popper(stack).bind()
 
     val baseAddress = stack.popI32().bind()
-
     val effectiveAddress = baseAddress + memArg.offset.toInt()
 
     writer(memory.data, valueToStore, effectiveAddress, sizeInBytes).bind()

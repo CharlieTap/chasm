@@ -97,8 +97,8 @@ internal fun BinaryPrefixInstructionDecoder(
             TableInstruction.ElemDrop(elemIdx)
         }
         TABLE_COPY -> {
-            val srcTableIdx = tableIndexDecoder(reader).bind()
             val destTableIdx = tableIndexDecoder(reader).bind()
+            val srcTableIdx = tableIndexDecoder(reader).bind()
             TableInstruction.TableCopy(srcTableIdx, destTableIdx)
         }
         TABLE_GROW -> {

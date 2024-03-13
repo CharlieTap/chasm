@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import kotlin.jvm.JvmName
 
 internal inline fun Stack.peekFrameOrError(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
@@ -58,6 +59,12 @@ internal inline fun Stack.popF32(): Result<Float, InvocationError.MissingStackVa
 
 internal inline fun Stack.popF64(): Result<Double, InvocationError.MissingStackValue> {
     return ((popValue()?.value as? F64)?.value)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
+internal inline fun Stack.popReference(): Result<ReferenceValue, InvocationError.MissingStackValue> {
+    return (popValue()?.value as? ReferenceValue)?.let {
         Ok(it)
     } ?: Err(InvocationError.MissingStackValue)
 }
@@ -213,7 +220,11 @@ internal inline fun <S, A : NumberValue<S>, T, B : NumberValue<T>> Stack.convert
     crossinline operation: (S) -> T,
 ): Result<Unit, InvocationError> {
     val operand = popValue()?.value as A
-    val result = operation(operand.value)
+    val result = try {
+        operation(operand.value)
+    } catch (e: Throwable) {
+        return Err(InvocationError.Trap.TrapEncountered)
+    }
     push(Stack.Entry.Value(constructor(result)))
     return Ok(Unit)
 }
