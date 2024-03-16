@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.decoder.section.code
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.Local
 import io.github.charlietap.chasm.decoder.instruction.BinaryExpressionDecoder
 import io.github.charlietap.chasm.decoder.instruction.ExpressionDecoder
@@ -15,22 +16,31 @@ fun BinaryCodeEntryDecoder(
 ): Result<CodeEntry, WasmDecodeError> =
     BinaryCodeEntryDecoder(
         reader = reader,
-        localDecoder = ::BinaryLocalDecoder,
+        localEntryDecoder = ::BinaryLocalEntryDecoder,
         expressionDecoder = ::BinaryExpressionDecoder,
         vectorDecoder = ::BinaryVectorDecoder,
     )
 
 fun BinaryCodeEntryDecoder(
     reader: WasmBinaryReader,
-    localDecoder: LocalDecoder,
+    localEntryDecoder: LocalEntryDecoder,
     expressionDecoder: ExpressionDecoder,
-    vectorDecoder: VectorDecoder<Local>,
+    vectorDecoder: VectorDecoder<LocalEntry>,
 ): Result<CodeEntry, WasmDecodeError> = binding {
 
     val size = reader.uint().bind()
 
-    val locals = vectorDecoder(reader, localDecoder).bind()
+    val localEntries = vectorDecoder(reader, localEntryDecoder).bind()
+    var index = 0u
+    val locals = mutableListOf<Local>()
+    localEntries.vector.forEach { entry ->
+        repeat(entry.count.toInt()) {
+            locals.add(Local(Index.LocalIndex(index), entry.type))
+            index++
+        }
+    }
+
     val expression = expressionDecoder(reader).bind()
 
-    CodeEntry(size, locals.vector, expression)
+    CodeEntry(size, locals, expression)
 }

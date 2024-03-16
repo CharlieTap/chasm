@@ -2,7 +2,10 @@ package io.github.charlietap.chasm.decoder.section.code
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
+import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.Local
+import io.github.charlietap.chasm.ast.type.NumberType
+import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.instruction.ExpressionDecoder
 import io.github.charlietap.chasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.vector.VectorDecoder
@@ -19,7 +22,17 @@ class BinaryCodeEntryDecoderTest {
     fun `can decode a code entry`() {
 
         val size = 117u
-        val locals = emptyList<Local>()
+        val localEntries = listOf(
+            LocalEntry(3u, ValueType.Number(NumberType.I32)),
+            LocalEntry(2u, ValueType.Number(NumberType.I64)),
+        )
+        val locals = listOf(
+            Local(Index.LocalIndex(0u), ValueType.Number(NumberType.I32)),
+            Local(Index.LocalIndex(1u), ValueType.Number(NumberType.I32)),
+            Local(Index.LocalIndex(2u), ValueType.Number(NumberType.I32)),
+            Local(Index.LocalIndex(3u), ValueType.Number(NumberType.I64)),
+            Local(Index.LocalIndex(4u), ValueType.Number(NumberType.I64)),
+        )
         val expression = Expression(emptyList())
 
         val expected = Ok(CodeEntry(size, locals, expression))
@@ -28,7 +41,7 @@ class BinaryCodeEntryDecoderTest {
             Ok(size)
         }
 
-        val localDecoder: LocalDecoder = { _ ->
+        val localEntryDecoder: LocalEntryDecoder = { _ ->
             fail("Local decoder shouldn't be called directly")
         }
 
@@ -36,14 +49,14 @@ class BinaryCodeEntryDecoderTest {
             Ok(expression)
         }
 
-        val vectorDecoder: VectorDecoder<Local> = { _, sub ->
-            assertEquals(localDecoder, sub)
-            Ok(Vector(locals))
+        val vectorDecoder: VectorDecoder<LocalEntry> = { _, sub ->
+            assertEquals(localEntryDecoder, sub)
+            Ok(Vector(localEntries))
         }
 
         val actual = BinaryCodeEntryDecoder(
             reader = reader,
-            localDecoder = localDecoder,
+            localEntryDecoder = localEntryDecoder,
             expressionDecoder = expressionDecoder,
             vectorDecoder = vectorDecoder,
         )

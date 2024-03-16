@@ -5,12 +5,16 @@ import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.WasmModuleDecoder
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.module.Function
+import io.github.charlietap.chasm.ast.module.Local
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.FunctionType
+import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.reader.FakeSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,16 +30,37 @@ class FunctionModuleTest {
         val decoder = WasmModuleDecoder()
 
         val expectedFunctionType = FunctionType(
-            params = ResultType(emptyList()),
-            results = ResultType(emptyList()),
+            params = ResultType(
+                listOf(
+                    ValueType.Number(NumberType.I32),
+                    ValueType.Number(NumberType.I32),
+                ),
+            ),
+            results = ResultType(
+                listOf(
+                    ValueType.Number(NumberType.I32),
+                    ValueType.Number(NumberType.I64),
+                ),
+            ),
         )
         val expectedType = Type(Index.TypeIndex(0u), expectedFunctionType)
 
         val expectedFunction = Function(
             idx = Index.FunctionIndex(0u),
             typeIndex = Index.TypeIndex(0u),
-            locals = emptyList(),
-            body = Expression(emptyList()),
+            locals = listOf(
+                Local(Index.LocalIndex(0u), ValueType.Number(NumberType.I32)),
+                Local(Index.LocalIndex(1u), ValueType.Number(NumberType.I32)),
+                Local(Index.LocalIndex(2u), ValueType.Number(NumberType.I32)),
+                Local(Index.LocalIndex(3u), ValueType.Number(NumberType.I64)),
+                Local(Index.LocalIndex(4u), ValueType.Number(NumberType.F32)),
+            ),
+            body = Expression(
+                listOf(
+                    NumericInstruction.I32Const(0),
+                    NumericInstruction.I64Const(0),
+                ),
+            ),
         )
 
         val expected = Ok(
