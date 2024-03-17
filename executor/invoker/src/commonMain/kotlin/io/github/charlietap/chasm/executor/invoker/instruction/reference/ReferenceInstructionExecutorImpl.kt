@@ -17,6 +17,7 @@ internal fun ReferenceInstructionExecutorImpl(
         refNullExecutor = ::RefNullExecutorImpl,
         refIsNullExecutor = ::RefIsNullExecutorImpl,
         refFuncExecutor = ::RefFuncExecutorImpl,
+        refAsNonNullExecutor = ::RefAsNonNullExecutorImpl,
     )
 
 internal fun ReferenceInstructionExecutorImpl(
@@ -25,11 +26,13 @@ internal fun ReferenceInstructionExecutorImpl(
     refNullExecutor: RefNullExecutor,
     refIsNullExecutor: RefIsNullExecutor,
     refFuncExecutor: RefFuncExecutor,
+    refAsNonNullExecutor: RefAsNonNullExecutor,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is ReferenceInstruction.RefNull -> refNullExecutor(stack, instruction).bind()
         is ReferenceInstruction.RefIsNull -> refIsNullExecutor(stack).bind()
         is ReferenceInstruction.RefFunc -> refFuncExecutor(stack, instruction).bind()
+        is ReferenceInstruction.RefAsNonNull -> refAsNonNullExecutor(stack).bind()
 
         else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
     }

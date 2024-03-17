@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.memory
 
 import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
+import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactoryImpl
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -11,7 +13,7 @@ fun MemoryAllocatorImpl(
 ): Address.Memory = MemoryAllocatorImpl(
     store = store,
     type = type,
-    memoryFactory = ::ByteArrayLinearMemoryFactory,
+    memoryFactory = ::LinearMemoryFactoryImpl,
 )
 
 internal fun MemoryAllocatorImpl(

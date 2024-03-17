@@ -12,12 +12,89 @@
 
 ---
 
-Chasm is a WebAssembly runtime built on Kotlin Multiplatform
+Chasm is an experimental WebAssembly runtime built on Kotlin Multiplatform.
+
+The runtime targets the latest wasm [specification](https://webassembly.github.io/spec/core/index.html) and supports all instructions with the exception of VectorInstructions.
+
+Additionally, the runtime supports the following Stage 4 proposals
+
+- [x] Tail Call
+- [x] Extended Constant Expressions
+- [ ] Typed Function References (In progress)
+- [ ] Wasm GC (In progress)
 
 # Setup
 
+```kotlin
+dependencies {
+    implementation("io.github.charlietap.chasm:chasm:0.1.1")
+}
+```
+
 # Usage
 
+### Invoking functions
+
+Webassembly compilations output a [Module](./ast/src/commonMain/kotlin/io/github/charlietap/chasm/ast/module/Module.kt)
+encoded as either a .wasm or .wat file, currently chasm supports decoding only .wasm binaries
+
+```kotlin
+val wasmFileAsByteArray = ...
+val result = module(wasmFileAsByteArray)
+```
+
+Once a module has been decoded you'll need to instantiate it, and for that you'll need also need a store
+
+
+```kotlin
+val store = store()
+val result = instance(store, module)
+```
+
+Instances allow you to invoke functions that are exported from the module
+
+```kotlin
+val result = invoke(store, instance, "fibonacci")
+```
+
+### Imports
+
+Modules often depend on imports, which come in two flavours, either:
+
+- Host functions
+- Exported functions from other wasm modules
+
+Both are represented by [ExternalValue](executor/runtime/src/commonMain/kotlin/io/github/charlietap/chasm/executor/runtime/instance/ExternalValue.kt)'s and can be imported at instantiation time
+
+```kotlin
+val import = Import(
+    "import module name",
+    "import entity name",
+    externalValue,
+)
+val result = instance(store, module, listOf(import))
+```
+
+### Host functions
+
+Host functions are kotlin functions that can be called by wasm programs at runtime.
+The majority of host functions represent system calls, WASI for example is intended to be integrated as imports of host functions.
+
+Allocation of a host function requires a [FunctionType](ast/src/commonMain/kotlin/io/github/charlietap/chasm/ast/type/FunctionType.kt)
+
+The function type describes the inputs and outputs of your function so the runtime can call it and use its results
+
+Once you have function type you can allocate the host function like so
+
+```kotlin
+val functionType = FunctionType(ResultType(emptyList()), ResultType(emptyList()))
+val hostFunction: HostFunction = {
+    println("Hello world")
+    emptyList()
+}
+
+val result = function(store, funcType, hostFunction)
+```
 
 ## License
 

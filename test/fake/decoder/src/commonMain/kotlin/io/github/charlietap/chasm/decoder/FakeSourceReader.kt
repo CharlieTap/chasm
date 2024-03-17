@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.decoder
 
-import io.github.charlietap.chasm.SourceReader
-
 fun FakeSourceReader(
     bytes: ByteArray,
     startPosition: Int = 0,

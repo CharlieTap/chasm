@@ -29,6 +29,8 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation(projects.test.fixture.ast)
+
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.test.resources)
             }

@@ -3,15 +3,15 @@ package io.github.charlietap.chasm.executor.invoker.thread
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.ext.popValueOrError
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-fun ThreadExecutorImpl(
+internal fun ThreadExecutorImpl(
     configuration: Configuration,
 ): Result<List<ExecutionValue>, InvocationError> =
     ThreadExecutorImpl(
@@ -19,7 +19,7 @@ fun ThreadExecutorImpl(
         instructionExecutor = ::InstructionExecutorImpl,
     )
 
-fun ThreadExecutorImpl(
+internal fun ThreadExecutorImpl(
     configuration: Configuration,
     instructionExecutor: InstructionExecutor,
 ): Result<List<ExecutionValue>, InvocationError> = binding {

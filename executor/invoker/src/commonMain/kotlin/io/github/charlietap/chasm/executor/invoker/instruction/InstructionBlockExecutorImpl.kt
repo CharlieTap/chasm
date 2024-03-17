@@ -3,11 +3,11 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Instruction
-import io.github.charlietap.chasm.executor.invoker.ext.popLabelOrError
-import io.github.charlietap.chasm.executor.invoker.ext.popValueOrError
 import io.github.charlietap.chasm.executor.invoker.flow.BreakException
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.popLabelOrError
+import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 

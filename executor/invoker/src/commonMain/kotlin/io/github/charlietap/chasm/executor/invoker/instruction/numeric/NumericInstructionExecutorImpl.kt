@@ -4,14 +4,11 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.binaryOperation
 import io.github.charlietap.chasm.executor.invoker.ext.ceil
-import io.github.charlietap.chasm.executor.invoker.ext.constOperation
 import io.github.charlietap.chasm.executor.invoker.ext.convertF32s
 import io.github.charlietap.chasm.executor.invoker.ext.convertF32u
 import io.github.charlietap.chasm.executor.invoker.ext.convertF64s
 import io.github.charlietap.chasm.executor.invoker.ext.convertF64u
-import io.github.charlietap.chasm.executor.invoker.ext.convertOperation
 import io.github.charlietap.chasm.executor.invoker.ext.copySign
 import io.github.charlietap.chasm.executor.invoker.ext.countLeadingZero
 import io.github.charlietap.chasm.executor.invoker.ext.countOnePopulation
@@ -37,7 +34,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.max
 import io.github.charlietap.chasm.executor.invoker.ext.min
 import io.github.charlietap.chasm.executor.invoker.ext.ne
 import io.github.charlietap.chasm.executor.invoker.ext.nearest
-import io.github.charlietap.chasm.executor.invoker.ext.relationalOperation
 import io.github.charlietap.chasm.executor.invoker.ext.remu
 import io.github.charlietap.chasm.executor.invoker.ext.rotateLeft
 import io.github.charlietap.chasm.executor.invoker.ext.rotateRight
@@ -45,7 +41,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.shl
 import io.github.charlietap.chasm.executor.invoker.ext.shr
 import io.github.charlietap.chasm.executor.invoker.ext.shru
 import io.github.charlietap.chasm.executor.invoker.ext.sqrt
-import io.github.charlietap.chasm.executor.invoker.ext.testOperation
 import io.github.charlietap.chasm.executor.invoker.ext.trunc
 import io.github.charlietap.chasm.executor.invoker.ext.truncI32s
 import io.github.charlietap.chasm.executor.invoker.ext.truncI32sTrapping
@@ -55,10 +50,15 @@ import io.github.charlietap.chasm.executor.invoker.ext.truncI64s
 import io.github.charlietap.chasm.executor.invoker.ext.truncI64sTrapping
 import io.github.charlietap.chasm.executor.invoker.ext.truncI64u
 import io.github.charlietap.chasm.executor.invoker.ext.truncI64uTrapping
-import io.github.charlietap.chasm.executor.invoker.ext.unaryOperation
 import io.github.charlietap.chasm.executor.invoker.ext.wrap
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
+import io.github.charlietap.chasm.executor.runtime.ext.constOperation
+import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
+import io.github.charlietap.chasm.executor.runtime.ext.relationalOperation
+import io.github.charlietap.chasm.executor.runtime.ext.testOperation
+import io.github.charlietap.chasm.executor.runtime.ext.unaryOperation
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32

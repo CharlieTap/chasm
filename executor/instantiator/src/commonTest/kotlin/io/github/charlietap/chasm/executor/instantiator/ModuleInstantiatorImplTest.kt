@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
+import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.classification.ClassifiedExternalValue
@@ -15,6 +16,7 @@ import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.type.ExternalType
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.elementSegment
 import io.github.charlietap.chasm.fixture.module.function
@@ -22,8 +24,10 @@ import io.github.charlietap.chasm.fixture.module.global
 import io.github.charlietap.chasm.fixture.module.import
 import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.module.startFunction
+import io.github.charlietap.chasm.fixture.module.table
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.heapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -33,16 +37,21 @@ class ModuleInstantiatorImplTest {
     fun `can instantiate a module instance`() {
 
         val store = store()
-        val moduleImport = import()
-        val moduleGlobal = global()
-        val moduleElement = elementSegment()
+        val import = import()
+        val global = global()
+        val tableInitExpression = Expression(listOf(ReferenceInstruction.RefNull(heapType())))
+        val table = table(
+            initExpression = tableInitExpression,
+        )
+        val elementSegment = elementSegment()
         val function = function()
         val startFunction = startFunction(function.idx)
         val module = module(
             functions = listOf(function),
-            imports = listOf(moduleImport),
-            globals = listOf(moduleGlobal),
-            elementSegments = listOf(moduleElement),
+            imports = listOf(import),
+            globals = listOf(global),
+            tables = listOf(table),
+            elementSegments = listOf(elementSegment),
             startFunction = startFunction,
         )
         val imports = listOf(ExternalValue.Function(Address.Function(0)))
@@ -59,7 +68,7 @@ class ModuleInstantiatorImplTest {
 
         val validator: ImportValidator = { iModule, iImport, iClassifiedExtern ->
             assertEquals(module, iModule)
-            assertEquals(moduleImport, iImport)
+            assertEquals(import, iImport)
             assertEquals(classified, iClassifiedExtern)
 
             Ok(Unit)
@@ -76,12 +85,13 @@ class ModuleInstantiatorImplTest {
             Ok(partialInstance)
         }
 
-        val allocator: ModuleAllocator = { eStore, eModule, eInstance, eExterns, eGlobalInit, eElemRefs ->
+        val allocator: ModuleAllocator = { eStore, eModule, eInstance, eExterns, eGlobalInit, eTableInit, eElemRefs ->
             assertEquals(store, eStore)
             assertEquals(module, eModule)
             assertEquals(partialInstance, eInstance)
             assertEquals(imports, eExterns)
             assertEquals(emptyList(), eGlobalInit)
+            assertEquals(listOf(ReferenceValue.Null(heapType())), eTableInit)
             assertEquals(listOf(emptyList()), eElemRefs)
 
             Ok(partialInstance)
@@ -90,10 +100,13 @@ class ModuleInstantiatorImplTest {
         val evaluator: ExpressionEvaluator = { eStore, eInstance, eExpression, eArity ->
             assertEquals(store, eStore)
             assertEquals(partialInstance, eInstance)
-            assertEquals(Expression(emptyList()), eExpression)
             assertEquals(Arity(1), eArity)
 
-            Ok(null)
+            if (eExpression.instructions.isEmpty()) {
+                Ok(null)
+            } else {
+                Ok(ReferenceValue.Null(heapType()))
+            }
         }
 
         val invoker: FunctionInvoker = { eStore, eAddress, eLocals ->

@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.memory
 
-import io.github.charlietap.chasm.executor.instantiator.allocation.memory.LinearMemoryFactory
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocatorImpl
-import io.github.charlietap.chasm.executor.instantiator.fake.FakeLinearMemory
+import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.limits
@@ -25,7 +25,12 @@ class MemoryAllocatorImplTest {
         val limits = limits(min.toUInt())
         val type = memoryType(limits = limits)
 
-        val memory = FakeLinearMemory()
+        val memory = object : LinearMemory {
+            override val min: LinearMemory.Pages
+                get() = LinearMemory.Pages(min)
+            override val max: LinearMemory.Pages?
+                get() = null
+        }
         val memoryFactory: LinearMemoryFactory = { factoryMin, factoryMax ->
             assertEquals(min, factoryMin)
             assertEquals(null, factoryMax)

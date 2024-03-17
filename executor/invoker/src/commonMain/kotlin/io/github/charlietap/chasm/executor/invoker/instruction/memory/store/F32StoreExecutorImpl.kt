@@ -4,10 +4,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory.store
 
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.popF32
+import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceFloatWriterImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.executor.runtime.ext.popF32
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal inline fun F32StoreExecutorImpl(
@@ -31,6 +31,7 @@ internal inline fun F32StoreExecutorImpl(
     store,
     stack,
     instruction.memArg,
+    Float.SIZE_BYTES,
     Stack::popF32,
-    LinearMemory::writeFloat,
+    ::MemoryInstanceFloatWriterImpl,
 )

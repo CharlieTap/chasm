@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.table
 
-import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
@@ -25,7 +25,7 @@ class TableAllocatorImplTest {
         val limits = limits(min.toUInt())
         val type = tableType(limits = limits)
 
-        val refValue = ReferenceValue.Null(ReferenceType.Funcref)
+        val refValue = ReferenceValue.Null(HeapType.Func)
         val elements = MutableList<ReferenceValue>(min) {
             refValue
         }

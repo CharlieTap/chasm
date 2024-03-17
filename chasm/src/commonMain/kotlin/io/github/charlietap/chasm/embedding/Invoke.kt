@@ -17,7 +17,7 @@ fun invoke(
     store: Store,
     instance: ModuleInstance,
     name: String,
-    args: List<ExecutionValue>,
+    args: List<ExecutionValue> = emptyList(),
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> = invoke(
     store = store,
     instance = instance,

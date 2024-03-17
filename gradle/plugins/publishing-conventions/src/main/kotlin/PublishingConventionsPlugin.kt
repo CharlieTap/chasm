@@ -1,3 +1,4 @@
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -7,7 +8,6 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
@@ -20,6 +20,7 @@ import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningExtension
 import org.gradle.plugins.signing.SigningPlugin
 import org.jetbrains.dokka.gradle.DokkaPlugin
+import org.jetbrains.dokka.gradle.DokkaTask
 
 class PublishingConventionsPlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -30,7 +31,7 @@ class PublishingConventionsPlugin : Plugin<Project> {
 
         val extension = project.extensions.create<PublishingConventionsExtension>("publishing-convention-extension")
 
-        project.group = "io.github.charlietap"
+        project.group = "io.github.charlietap.chasm"
         project.version = project.extensions.getByType(VersionCatalogsExtension::class.java).find("libs").get().findVersion("version-name").get().requiredVersion
 
         val dokkaHtml by project.tasks.getting(DokkaTask::class)
@@ -79,7 +80,7 @@ class PublishingConventionsPlugin : Plugin<Project> {
             pom {
                 name.set(extension.name)
                 description.set(extension.description)
-                url.set("https://github.com/CharlieTap/cachemap")
+                url.set("https://github.com/CharlieTap/chasm")
                 licenses {
                     license {
                         name.set("Apache-2.0")
@@ -97,9 +98,9 @@ class PublishingConventionsPlugin : Plugin<Project> {
                     }
                 }
                 scm {
-                    connection.set("scm:git:https://github.com/CharlieTap/cachemap.git")
-                    developerConnection.set("scm:git:ssh://github.com/CharlieTap/cachemap.git")
-                    url.set("https://github.com/CharlieTap/cachemap")
+                    connection.set("scm:git:https://github.com/CharlieTap/chasm.git")
+                    developerConnection.set("scm:git:ssh://github.com/CharlieTap/chasm.git")
+                    url.set("https://github.com/CharlieTap/chasm")
                 }
             }
         }

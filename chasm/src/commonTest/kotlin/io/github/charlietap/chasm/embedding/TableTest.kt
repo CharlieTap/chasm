@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.referenceType
+import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.fixture.type.tableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,7 +16,7 @@ class TableTest {
 
         val store = store()
         val type = tableType()
-        val initialValue = ReferenceValue.Null(referenceType())
+        val initialValue = ReferenceValue.Null(heapType())
 
         val expected = ExternalValue.Table(Address.Table(0))
 

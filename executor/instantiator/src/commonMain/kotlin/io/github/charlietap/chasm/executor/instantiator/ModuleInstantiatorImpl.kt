@@ -82,13 +82,17 @@ internal fun ModuleInstantiatorImpl(
         evaluator(store, partialInstance, global.initExpression, Arity(1)).bind()
     }
 
+    val tableInitValues = module.tables.map { table ->
+        evaluator(store, partialInstance, table.initExpression, Arity(1)).bind() as ReferenceValue
+    }
+
     val elementSegmentReferences = module.elementSegments.map { segment ->
         segment.initExpressions.map { initExpression ->
             evaluator(store, partialInstance, initExpression, Arity(1)).bind() as ReferenceValue
         }
     }
 
-    val instance = allocator(store, module, partialInstance, imports, globalInitValues, elementSegmentReferences).bind()
+    val instance = allocator(store, module, partialInstance, imports, globalInitValues, tableInitValues, elementSegmentReferences).bind()
 
     tableInitializer(store, instance, module).bind()
     memoryInitializer(store, instance, module).bind()

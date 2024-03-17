@@ -4,10 +4,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory.store
 
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.popI64
+import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceLongWriterImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.executor.runtime.ext.popI64
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal inline fun I64StoreExecutorImpl(
@@ -31,6 +31,7 @@ internal inline fun I64StoreExecutorImpl(
     store,
     stack,
     instruction.memArg,
+    Long.SIZE_BYTES,
     Stack::popI64,
-    LinearMemory::writeLong,
+    ::MemoryInstanceLongWriterImpl,
 )

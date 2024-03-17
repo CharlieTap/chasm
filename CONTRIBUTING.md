@@ -1,4 +1,4 @@
-# Contributing to cachemap
+# Contributing to chasm
 
 
 ## License of Contributions

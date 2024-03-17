@@ -4,9 +4,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceFloatReaderImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 
@@ -31,6 +31,7 @@ internal inline fun F32LoadExecutorImpl(
     store,
     stack,
     instruction.memArg,
-    LinearMemory::readFloat,
+    Float.SIZE_BYTES,
+    ::MemoryInstanceFloatReaderImpl,
     ::F32,
 )

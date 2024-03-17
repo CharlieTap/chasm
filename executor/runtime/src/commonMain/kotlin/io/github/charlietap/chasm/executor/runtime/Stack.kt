@@ -59,6 +59,8 @@ data class Stack(
         values.removeAll { true }
     }
 
+    fun frames() = frames
+
     fun labels() = labels
 
     fun values() = values

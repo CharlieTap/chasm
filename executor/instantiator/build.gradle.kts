@@ -23,8 +23,11 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.executor.runtime)
+                api(projects.executor.runtimeExt)
                 api(projects.executor.invoker)
                 api(libs.result)
+
+                implementation(projects.executor.memory)
             }
         }
 

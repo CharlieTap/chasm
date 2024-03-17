@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -19,7 +19,7 @@ class ReferenceTest {
             fileDirectory = FILE_DIR,
         )
 
-        val expected = listOf(ReferenceValue.Null(ReferenceType.Funcref))
+        val expected = listOf(ReferenceValue.Null(HeapType.Func))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -48,6 +48,20 @@ class ReferenceTest {
         )
 
         val expected = listOf(ReferenceValue.FunctionAddress(Address.Function(0)))
+
+        assertEquals(ChasmResult.Success(expected), result)
+    }
+
+    // wasm-interp --enable-function-references ref_as_non_null.wasm -r ref_as_non_null
+    @Test
+    fun `can run a ref_as_non_null instruction and return a correct result`() {
+
+        val result = testRunner(
+            fileName = "ref_as_non_null.wasm",
+            fileDirectory = FILE_DIR,
+        )
+
+        val expected = listOf(NumberValue.I32(7))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

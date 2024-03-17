@@ -6,17 +6,22 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
+import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.executor.invoker.ext.index
-import io.github.charlietap.chasm.executor.invoker.ext.peekFrameOrError
-import io.github.charlietap.chasm.executor.invoker.ext.popI32
-import io.github.charlietap.chasm.executor.invoker.function.FunctionCall
-import io.github.charlietap.chasm.executor.invoker.function.FunctionCallImpl
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCallImpl
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.element
+import io.github.charlietap.chasm.executor.runtime.ext.function
+import io.github.charlietap.chasm.executor.runtime.ext.functionType
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.popI32
+import io.github.charlietap.chasm.executor.runtime.ext.table
+import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -29,30 +34,32 @@ internal inline fun CallIndirectExecutorImpl(
     CallIndirectExecutorImpl(
         store = store,
         stack = stack,
-        instruction = instruction,
+        tableIndex = instruction.tableIndex,
+        typeIndex = instruction.typeIndex,
+        tailRecursion = false,
         hostFunctionCall = ::HostFunctionCallImpl,
-        wasmFunctionCall = ::FunctionCallImpl,
+        wasmFunctionCall = ::WasmFunctionCallImpl,
     )
 
 internal inline fun CallIndirectExecutorImpl(
     store: Store,
     stack: Stack,
-    instruction: ControlInstruction.CallIndirect,
+    tableIndex: Index.TableIndex,
+    typeIndex: Index.TypeIndex,
+    tailRecursion: Boolean,
     crossinline hostFunctionCall: HostFunctionCall,
-    crossinline wasmFunctionCall: FunctionCall,
+    crossinline wasmFunctionCall: WasmFunctionCall,
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrameOrError().bind()
 
-    val tableAddress = frame.state.module.tableAddress(instruction.tableIndex.index()).bind()
+    val tableAddress = frame.state.module.tableAddress(tableIndex.index()).bind()
     val tableInstance = store.table(tableAddress).bind()
 
-    val functionType = frame.state.module.functionType(instruction.typeIndex.index()).bind()
+    val functionType = frame.state.module.functionType(typeIndex.index()).bind()
 
     val elementIndex = stack.popI32().bind()
-    val reference = tableInstance.elements.getOrNull(elementIndex).toResultOr {
-        InvocationError.TableElementLookupFailed(elementIndex)
-    }.bind()
+    val reference = tableInstance.element(elementIndex).bind()
 
     val address = when (reference) {
         is ReferenceValue.FunctionAddress -> Ok(reference.address)
@@ -67,6 +74,6 @@ internal inline fun CallIndirectExecutorImpl(
 
     when (functionInstance) {
         is FunctionInstance.HostFunction -> hostFunctionCall(store, stack, functionInstance).bind()
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, functionInstance).bind()
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, functionInstance, tailRecursion).bind()
     }
 }

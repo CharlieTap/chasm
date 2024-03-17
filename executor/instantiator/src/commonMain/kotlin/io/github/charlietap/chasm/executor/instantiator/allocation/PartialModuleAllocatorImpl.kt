@@ -7,6 +7,8 @@ import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
+import io.github.charlietap.chasm.executor.runtime.ext.addFunctionAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store

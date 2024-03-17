@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.type.referenceType
+import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.fixture.value
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,11 +15,11 @@ class RefNullExecutorImplTest {
     fun `can execute the refnull instruction and return a correct result`() {
 
         val stack = stack()
-        val refType = referenceType()
+        val heapType = heapType()
 
-        val instruction = ReferenceInstruction.RefNull(refType)
+        val instruction = ReferenceInstruction.RefNull(heapType)
 
-        val expected = value(ReferenceValue.Null(refType))
+        val expected = value(ReferenceValue.Null(heapType))
 
         val actual = RefNullExecutorImpl(stack, instruction)
 

@@ -9,4 +9,4 @@ import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
-internal typealias ModuleAllocator = (Store, Module, ModuleInstance, List<ExternalValue>, List<ExecutionValue>, List<List<ReferenceValue>>) -> Result<ModuleInstance, InstantiationError>
+internal typealias ModuleAllocator = (Store, Module, ModuleInstance, List<ExternalValue>, List<ExecutionValue>, List<ReferenceValue>, List<List<ReferenceValue>>) -> Result<ModuleInstance, InstantiationError>

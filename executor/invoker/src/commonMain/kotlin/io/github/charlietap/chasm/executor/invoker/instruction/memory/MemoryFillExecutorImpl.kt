@@ -5,11 +5,11 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemArg
-import io.github.charlietap.chasm.executor.invoker.ext.popI32
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedSignedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedSignedExecutorImpl
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
@@ -20,13 +20,13 @@ internal inline fun MemoryFillExecutorImpl(
     MemoryFillExecutorImpl(
         store = store,
         stack = stack,
-        storeSizedSignedExecutor = ::I32StoreSizedSignedExecutorImpl,
+        storeSizedSignedExecutor = ::I32StoreSizedExecutorImpl,
     )
 
 internal fun MemoryFillExecutorImpl(
     store: Store,
     stack: Stack,
-    storeSizedSignedExecutor: I32StoreSizedSignedExecutor,
+    storeSizedSignedExecutor: I32StoreSizedExecutor,
 ): Result<Unit, InvocationError> = binding {
 
     val bytesToFill = stack.popI32().bind()

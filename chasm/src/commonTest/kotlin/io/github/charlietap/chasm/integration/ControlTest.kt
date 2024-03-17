@@ -51,6 +51,96 @@ class ControlTest {
         assertEquals(ChasmResult.Success(expected), result)
     }
 
+    // wasm-interp --enable-tail-call return_call.wasm -r return_call -a i64:5
+    @Test
+    fun `can run a wasm file with the return call instruction and return a correct result`() {
+
+        val result = testRunner(
+            fileName = "return_call.wasm",
+            fileDirectory = FILE_DIR,
+            arguments = listOf(NumberValue.I64(5)),
+        )
+
+        val expected = listOf(NumberValue.I64(120))
+
+        assertEquals(ChasmResult.Success(expected), result)
+    }
+
+    // wasm-interp --enable-tail-call return_call_indirect.wasm -r return_call_indirect -a i64:5
+    @Test
+    fun `can run a wasm file with the return call indirect instruction and return a correct result`() {
+
+        val result = testRunner(
+            fileName = "return_call_indirect.wasm",
+            fileDirectory = FILE_DIR,
+            arguments = listOf(NumberValue.I64(5)),
+        )
+
+        val expected = listOf(NumberValue.I64(120))
+
+        assertEquals(ChasmResult.Success(expected), result)
+    }
+
+    // wasm-interp --enable-function-references call_ref.wasm -r call_ref -a i32:3
+    @Test
+    fun `can run a wasm file with the call ref instruction and return a correct result`() {
+
+        val result = testRunner(
+            fileName = "call_ref.wasm",
+            fileDirectory = FILE_DIR,
+            arguments = listOf(NumberValue.I32(3)),
+        )
+
+        val expected = listOf(NumberValue.I32(-9))
+
+        assertEquals(ChasmResult.Success(expected), result)
+    }
+
+    // wasm-interp --enable-function-references return_call_ref.wasm -r return_call_ref -a i64:5
+    @Test
+    fun `can run a wasm file with the return call ref instruction and return a correct result`() {
+
+        val result = testRunner(
+            fileName = "return_call_ref.wasm",
+            fileDirectory = FILE_DIR,
+            arguments = listOf(NumberValue.I64(5)),
+        )
+
+        val expected = listOf(NumberValue.I64(120))
+
+        assertEquals(ChasmResult.Success(expected), result)
+    }
+
+    // wasm-interp --enable-function-references br_on_null.wasm -r br_on_null
+    @Test
+    fun `can run a wasm file with the br_on_null instruction and return a correct result`() {
+
+        val result = testRunner(
+            fileName = "br_on_null.wasm",
+            fileDirectory = FILE_DIR,
+            arguments = listOf(),
+        )
+
+        val expected = listOf(NumberValue.I32(-1))
+
+        assertEquals(ChasmResult.Success(expected), result)
+    }
+
+    // wasm-interp --enable-function-references br_on_non_null.wasm -r br_on_non_null
+    @Test
+    fun `can run a wasm file with the br_on_non_null instruction and return a correct result`() {
+
+        val result = testRunner(
+            fileName = "br_on_non_null.wasm",
+            fileDirectory = FILE_DIR,
+            arguments = listOf(),
+        )
+
+        val expected = listOf(NumberValue.I32(-1))
+
+        assertEquals(ChasmResult.Success(expected), result)
+    }
+
     companion object {
         private const val FILE_DIR = "src/commonTest/resources/control/"
     }

@@ -6,9 +6,11 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.invoker.ext.index
-import io.github.charlietap.chasm.executor.invoker.ext.peekFrameOrError
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.global
+import io.github.charlietap.chasm.executor.runtime.ext.globalAddress
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal inline fun GlobalGetExecutorImpl(

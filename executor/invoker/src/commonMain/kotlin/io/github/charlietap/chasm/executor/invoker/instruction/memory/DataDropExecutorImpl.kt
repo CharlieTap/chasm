@@ -6,9 +6,10 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.ext.index
-import io.github.charlietap.chasm.executor.invoker.ext.peekFrameOrError
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 

@@ -33,10 +33,32 @@ sealed interface ControlInstruction : Instruction {
 
     data class BrTable(val labelIndices: List<Index.LabelIndex>, val defaultLabelIndex: Index.LabelIndex) : ControlInstruction
 
+    @JvmInline
+    value class BrOnNull(val labelIndex: Index.LabelIndex) : ControlInstruction
+
+    @JvmInline
+    value class BrOnNonNull(val labelIndex: Index.LabelIndex) : ControlInstruction
+
     data object Return : ControlInstruction
+
+    @JvmInline
+    value class ReturnCall(val functionIndex: Index.FunctionIndex) : ControlInstruction
+
+    @JvmInline
+    value class ReturnCallRef(val typeIndex: Index.TypeIndex) : ControlInstruction
 
     @JvmInline
     value class Call(val functionIndex: Index.FunctionIndex) : ControlInstruction
 
+    @JvmInline
+    value class CallRef(val typeIndex: Index.TypeIndex) : ControlInstruction
+
     data class CallIndirect(val typeIndex: Index.TypeIndex, val tableIndex: Index.TableIndex = Index.TableIndex(0u)) : ControlInstruction
+
+    data class ReturnCallIndirect(
+        val typeIndex: Index.TypeIndex,
+        val tableIndex: Index.TableIndex = Index.TableIndex(
+            0u,
+        ),
+    ) : ControlInstruction
 }

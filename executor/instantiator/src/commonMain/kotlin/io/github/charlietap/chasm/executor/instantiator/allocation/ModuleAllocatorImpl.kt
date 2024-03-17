@@ -15,6 +15,12 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.memory.Memory
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
+import io.github.charlietap.chasm.executor.runtime.ext.addDataAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addElementAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addExport
+import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addMemoryAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addTableAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
@@ -28,6 +34,7 @@ internal fun ModuleAllocatorImpl(
     instance: ModuleInstance,
     imports: List<ExternalValue>,
     globalInitValues: List<ExecutionValue>,
+    tableInitValues: List<ReferenceValue>,
     elementSegmentReferences: List<List<ReferenceValue>>,
 ): Result<ModuleInstance, InstantiationError> =
     ModuleAllocatorImpl(
@@ -36,6 +43,7 @@ internal fun ModuleAllocatorImpl(
         instance = instance,
         imports = imports,
         globalInitValues = globalInitValues,
+        tableInitValues = tableInitValues,
         elementSegmentReferences = elementSegmentReferences,
         tableAllocator = ::TableAllocatorImpl,
         memoryAllocator = ::MemoryAllocatorImpl,
@@ -50,6 +58,7 @@ internal fun ModuleAllocatorImpl(
     instance: ModuleInstance,
     imports: List<ExternalValue>,
     globalInitValues: List<ExecutionValue>,
+    tableInitValues: List<ReferenceValue>,
     elementSegmentReferences: List<List<ReferenceValue>>,
     tableAllocator: TableAllocator,
     memoryAllocator: MemoryAllocator,
@@ -67,8 +76,8 @@ internal fun ModuleAllocatorImpl(
         }
     }
 
-    module.tables.forEach { table ->
-        val address = tableAllocator(store, table.type, ReferenceValue.Null(table.type.referenceType))
+    module.tables.forEachIndexed { idx, table ->
+        val address = tableAllocator(store, table.type, tableInitValues[idx])
         instance.addTableAddress(address)
     }
 

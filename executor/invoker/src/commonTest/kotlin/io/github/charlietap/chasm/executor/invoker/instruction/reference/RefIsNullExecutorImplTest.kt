@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.instance.functionAddress
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.type.referenceType
+import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.fixture.value
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,9 +16,9 @@ class RefIsNullExecutorImplTest {
     fun `can execute the refisnull instruction when a null ref is on top of the stack`() {
 
         val stack = stack()
-        val refType = referenceType()
+        val heapType = heapType()
 
-        stack.push(value(ReferenceValue.Null(refType)))
+        stack.push(value(ReferenceValue.Null(heapType)))
 
         val expected = value(NumberValue.I32(1))
 

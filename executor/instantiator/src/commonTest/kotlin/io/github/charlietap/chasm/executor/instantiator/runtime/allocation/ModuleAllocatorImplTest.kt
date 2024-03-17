@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocatorImpl
@@ -32,6 +33,7 @@ import io.github.charlietap.chasm.fixture.module.tableExportDescriptor
 import io.github.charlietap.chasm.fixture.module.type
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.heapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -54,9 +56,11 @@ class ModuleAllocatorImplTest {
         val global = global()
         val globalInitValue = NumberValue.I32(117)
         val globalInitValues = listOf(globalInitValue)
-        val refType = ReferenceType.Externref
+        val tableInitValue = ReferenceValue.Null(heapType())
+        val tableInitValues = listOf(tableInitValue)
+        val refType = ReferenceType.RefNull(HeapType.Extern)
         val elementSegment = elementSegment(type = refType)
-        val refVals = listOf(ReferenceValue.Null(ReferenceType.Externref))
+        val refVals = listOf(ReferenceValue.Null(HeapType.Extern))
         val elementSegmentReferences = listOf(refVals)
         val bytes = ubyteArrayOf()
         val dataSegment = dataSegment(initData = bytes)
@@ -120,7 +124,7 @@ class ModuleAllocatorImplTest {
         val tableAllocator: TableAllocator = { _store, _tableType, _refVal ->
             assertEquals(store, _store)
             assertEquals(table.type, _tableType)
-            assertEquals(ReferenceValue.Null(table.type.referenceType), _refVal)
+            assertEquals(tableInitValue, _refVal)
 
             tableAddress
         }
@@ -187,6 +191,7 @@ class ModuleAllocatorImplTest {
             instance = partial,
             imports = imports,
             globalInitValues = globalInitValues,
+            tableInitValues = tableInitValues,
             elementSegmentReferences = elementSegmentReferences,
             tableAllocator = tableAllocator,
             memoryAllocator = memoryAllocator,

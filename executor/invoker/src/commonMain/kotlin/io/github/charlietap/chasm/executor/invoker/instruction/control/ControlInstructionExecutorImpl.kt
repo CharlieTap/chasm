@@ -19,12 +19,18 @@ internal fun ControlInstructionExecutorImpl(
         stack = stack,
         callExecutor = ::CallExecutorImpl,
         callIndirectExecutor = ::CallIndirectExecutorImpl,
+        returnCallExecutor = ::ReturnCallExecutorImpl,
+        returnCallIndirectExecutor = ::ReturnCallIndirectExecutorImpl,
+        callRefExecutor = ::CallRefExecutorImpl,
+        returnCallRefExecutor = ::ReturnCallRefExecutorImpl,
         blockExecutor = ::BlockExecutorImpl,
         loopExecutor = ::LoopExecutorImpl,
         ifExecutor = ::IfExecutorImpl,
         breakExecutor = ::BreakExecutorImpl,
         brIfExecutor = ::BrIfExecutorImpl,
         brTableExecutor = ::BrTableExecutorImpl,
+        brOnNullExecutor = ::BrOnNullExecutorImpl,
+        brOnNonNullExecutor = ::BrOnNonNullExecutorImpl,
         returnExecutor = ::ReturnExecutorImpl,
     )
 
@@ -34,12 +40,18 @@ internal fun ControlInstructionExecutorImpl(
     stack: Stack,
     callExecutor: CallExecutor,
     callIndirectExecutor: CallIndirectExecutor,
+    returnCallExecutor: ReturnCallExecutor,
+    returnCallIndirectExecutor: ReturnCallIndirectExecutor,
+    callRefExecutor: CallRefExecutor,
+    returnCallRefExecutor: ReturnCallRefExecutor,
     blockExecutor: BlockExecutor,
     loopExecutor: LoopExecutor,
     ifExecutor: IfExecutor,
     breakExecutor: BreakExecutor,
     brIfExecutor: BrIfExecutor,
     brTableExecutor: BrTableExecutor,
+    brOnNullExecutor: BrOnNullExecutor,
+    brOnNonNullExecutor: BrOnNonNullExecutor,
     returnExecutor: ReturnExecutor,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
@@ -51,9 +63,15 @@ internal fun ControlInstructionExecutorImpl(
         is ControlInstruction.Br -> breakExecutor(stack, instruction.labelIndex).bind()
         is ControlInstruction.BrIf -> brIfExecutor(stack, instruction).bind()
         is ControlInstruction.BrTable -> brTableExecutor(stack, instruction).bind()
+        is ControlInstruction.BrOnNull -> brOnNullExecutor(stack, instruction).bind()
+        is ControlInstruction.BrOnNonNull -> brOnNonNullExecutor(stack, instruction).bind()
         is ControlInstruction.Return -> returnExecutor(stack).bind()
         is ControlInstruction.Call -> callExecutor(store, stack, instruction).bind()
         is ControlInstruction.CallIndirect -> callIndirectExecutor(store, stack, instruction).bind()
+        is ControlInstruction.ReturnCall -> returnCallExecutor(store, stack, instruction).bind()
+        is ControlInstruction.ReturnCallIndirect -> returnCallIndirectExecutor(store, stack, instruction).bind()
+        is ControlInstruction.CallRef -> callRefExecutor(store, stack).bind()
+        is ControlInstruction.ReturnCallRef -> returnCallRefExecutor(store, stack).bind()
 
         else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
     }

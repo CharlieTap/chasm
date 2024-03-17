@@ -73,6 +73,10 @@ sealed interface InvocationError : ModuleRuntimeError {
 
     data object ReferenceValueExpected : InvocationError
 
+    data object FunctionReferenceExpected : InvocationError
+
+    data object UndefinedDefaultReferenceType : InvocationError
+
     @JvmInline
     value class UnimplementedInstruction(val instruction: Instruction) : InvocationError
 

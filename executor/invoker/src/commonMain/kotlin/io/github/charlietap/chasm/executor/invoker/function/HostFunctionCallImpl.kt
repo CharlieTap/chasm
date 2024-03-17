@@ -3,13 +3,14 @@ package io.github.charlietap.chasm.executor.invoker.function
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
-import io.github.charlietap.chasm.executor.invoker.ext.popValueOrError
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -55,13 +56,22 @@ private fun classifyValue(valueType: ValueType, value: ExecutionValue?): Boolean
             }
         }
         is ValueType.Reference -> {
-            when (valueType.referenceType) {
-                ReferenceType.Funcref ->
-                    value is ReferenceValue.FunctionAddress ||
-                        value is ReferenceValue.Null && value.referenceType == valueType.referenceType
-                ReferenceType.Externref ->
-                    value is ReferenceValue.FunctionAddress ||
-                        value is ReferenceValue.Null && value.referenceType == valueType.referenceType
+            when (val referenceType = valueType.referenceType) {
+                is ReferenceType.RefNull ->
+                    when (referenceType.heapType) {
+                        is HeapType.Func ->
+                            value is ReferenceValue.FunctionAddress ||
+                                value is ReferenceValue.Null && value.heapType == referenceType.heapType
+                        is HeapType.Extern ->
+                            value is ReferenceValue.ExternAddress ||
+                                value is ReferenceValue.Null && value.heapType == referenceType.heapType
+                        else -> false
+                    }
+                is ReferenceType.Ref -> when (referenceType.heapType) {
+                    is HeapType.Func -> value is ReferenceValue.FunctionAddress
+                    is HeapType.Extern -> value is ReferenceValue.ExternAddress
+                    else -> false
+                }
             }
         }
         is ValueType.Vector -> {

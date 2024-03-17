@@ -26,12 +26,12 @@ import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.F64S
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.F64StoreExecutorImpl
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreExecutorImpl
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedSignedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedSignedExecutorImpl
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutorImpl
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreExecutorImpl
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreSizedSignedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreSizedSignedExecutorImpl
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreSizedExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreSizedExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -60,8 +60,8 @@ internal fun MemoryInstructionExecutorImpl(
         f32LoadExecutor = ::F32LoadExecutorImpl,
         f64LoadExecutor = ::F64LoadExecutorImpl,
         i32StoreExecutor = ::I32StoreExecutorImpl,
-        i32StoreSizedSignedExecutor = ::I32StoreSizedSignedExecutorImpl,
-        i64StoreSizedSignedExecutor = ::I64StoreSizedSignedExecutorImpl,
+        i32StoreSizedExecutor = ::I32StoreSizedExecutorImpl,
+        i64StoreSizedExecutor = ::I64StoreSizedExecutorImpl,
         i64StoreExecutor = ::I64StoreExecutorImpl,
         f32StoreExecutor = ::F32StoreExecutorImpl,
         f64StoreExecutor = ::F64StoreExecutorImpl,
@@ -86,8 +86,8 @@ internal fun MemoryInstructionExecutorImpll(
     f32LoadExecutor: F32LoadExecutor,
     f64LoadExecutor: F64LoadExecutor,
     i32StoreExecutor: I32StoreExecutor,
-    i32StoreSizedSignedExecutor: I32StoreSizedSignedExecutor,
-    i64StoreSizedSignedExecutor: I64StoreSizedSignedExecutor,
+    i32StoreSizedExecutor: I32StoreSizedExecutor,
+    i64StoreSizedExecutor: I64StoreSizedExecutor,
     i64StoreExecutor: I64StoreExecutor,
     f32StoreExecutor: F32StoreExecutor,
     f64StoreExecutor: F64StoreExecutor,
@@ -105,8 +105,8 @@ internal fun MemoryInstructionExecutorImpll(
         is MemoryInstruction.I32Load16S -> i32SizedSignedLoadExecutor(store, stack, instruction.memArg, 2).bind()
         is MemoryInstruction.I32Load16U -> i32SizedUnsignedLoadExecutor(store, stack, instruction.memArg, 2).bind()
         is MemoryInstruction.I32Store -> i32StoreExecutor(store, stack, instruction).bind()
-        is MemoryInstruction.I32Store8 -> i32StoreSizedSignedExecutor(store, stack, instruction.memArg, 1).bind()
-        is MemoryInstruction.I32Store16 -> i32StoreSizedSignedExecutor(store, stack, instruction.memArg, 2).bind()
+        is MemoryInstruction.I32Store8 -> i32StoreSizedExecutor(store, stack, instruction.memArg, 1).bind()
+        is MemoryInstruction.I32Store16 -> i32StoreSizedExecutor(store, stack, instruction.memArg, 2).bind()
         is MemoryInstruction.I64Load -> i64LoadExecutor(store, stack, instruction).bind()
         is MemoryInstruction.I64Load8S -> i64SizedSignedLoadExecutor(store, stack, instruction.memArg, 1).bind()
         is MemoryInstruction.I64Load8U -> i64SizedUnsignedLoadExecutor(store, stack, instruction.memArg, 1).bind()
@@ -115,9 +115,9 @@ internal fun MemoryInstructionExecutorImpll(
         is MemoryInstruction.I64Load32S -> i64SizedSignedLoadExecutor(store, stack, instruction.memArg, 3).bind()
         is MemoryInstruction.I64Load32U -> i64SizedUnsignedLoadExecutor(store, stack, instruction.memArg, 3).bind()
         is MemoryInstruction.I64Store -> i64StoreExecutor(store, stack, instruction).bind()
-        is MemoryInstruction.I64Store8 -> i64StoreSizedSignedExecutor(store, stack, instruction.memArg, 1).bind()
-        is MemoryInstruction.I64Store16 -> i64StoreSizedSignedExecutor(store, stack, instruction.memArg, 2).bind()
-        is MemoryInstruction.I64Store32 -> i64StoreSizedSignedExecutor(store, stack, instruction.memArg, 3).bind()
+        is MemoryInstruction.I64Store8 -> i64StoreSizedExecutor(store, stack, instruction.memArg, 1).bind()
+        is MemoryInstruction.I64Store16 -> i64StoreSizedExecutor(store, stack, instruction.memArg, 2).bind()
+        is MemoryInstruction.I64Store32 -> i64StoreSizedExecutor(store, stack, instruction.memArg, 3).bind()
         is MemoryInstruction.F32Load -> f32LoadExecutor(store, stack, instruction).bind()
         is MemoryInstruction.F32Store -> f32StoreExecutor(store, stack, instruction).bind()
         is MemoryInstruction.F64Load -> f64LoadExecutor(store, stack, instruction).bind()
