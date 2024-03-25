@@ -20,7 +20,7 @@ Additionally, the runtime supports the following Stage 4 proposals
 
 - [x] Tail Call
 - [x] Extended Constant Expressions
-- [ ] Typed Function References (In progress)
+- [x] Typed Function References
 - [ ] Wasm GC (In progress)
 
 # Setup
