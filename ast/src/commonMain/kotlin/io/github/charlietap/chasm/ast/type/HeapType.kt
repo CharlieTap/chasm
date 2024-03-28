@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.ast.type
 
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import kotlin.jvm.JvmInline
 
 sealed interface HeapType : Type {

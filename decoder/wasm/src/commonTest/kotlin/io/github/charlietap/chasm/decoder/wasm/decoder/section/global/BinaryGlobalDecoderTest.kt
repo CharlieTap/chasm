@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.section.global
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.Global
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ValueType

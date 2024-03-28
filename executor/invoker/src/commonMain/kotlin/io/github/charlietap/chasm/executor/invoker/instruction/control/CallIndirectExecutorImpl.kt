@@ -7,7 +7,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCallImpl

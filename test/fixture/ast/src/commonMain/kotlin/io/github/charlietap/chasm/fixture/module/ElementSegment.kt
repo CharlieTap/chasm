@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.fixture.module
 
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.ElementSegment
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 

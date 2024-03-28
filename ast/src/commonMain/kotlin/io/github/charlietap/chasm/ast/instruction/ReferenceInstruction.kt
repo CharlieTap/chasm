@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.HeapType
 import kotlin.jvm.JvmInline
 

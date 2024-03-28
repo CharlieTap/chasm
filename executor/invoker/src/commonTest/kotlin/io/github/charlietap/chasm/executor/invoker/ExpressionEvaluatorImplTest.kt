@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Configuration

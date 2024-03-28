@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.section.type
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.NumberType

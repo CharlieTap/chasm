@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.section.import
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.Import
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.wasm.decoder.value.name.NameValueDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.fixture.module
 
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.Global
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.fixture.instruction.expression
 import io.github.charlietap.chasm.fixture.type.globalType

@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.section.element
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.ExpressionDecoder

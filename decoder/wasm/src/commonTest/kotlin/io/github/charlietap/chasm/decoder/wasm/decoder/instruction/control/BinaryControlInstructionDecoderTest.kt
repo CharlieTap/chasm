@@ -4,8 +4,8 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.Instruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.BLOCK
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.BR
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.BR_IF

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.instruction
 
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 
 fun localIndex(
     index: UInt = 0u,

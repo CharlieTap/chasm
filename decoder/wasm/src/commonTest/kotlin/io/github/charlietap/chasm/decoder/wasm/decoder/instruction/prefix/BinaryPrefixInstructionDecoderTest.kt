@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.prefix
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.DATA_DROP
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.ELEM_DROP
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.I32_TRUNC_SAT_F32_S

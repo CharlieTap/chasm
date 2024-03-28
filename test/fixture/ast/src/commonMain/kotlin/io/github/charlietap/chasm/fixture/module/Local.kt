@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.module
 
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Local
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.fixture.type.valueType

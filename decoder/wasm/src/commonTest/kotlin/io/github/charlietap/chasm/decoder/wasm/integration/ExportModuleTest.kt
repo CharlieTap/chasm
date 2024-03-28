@@ -3,12 +3,12 @@ package io.github.charlietap.chasm.decoder.wasm.integration
 import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Global
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table

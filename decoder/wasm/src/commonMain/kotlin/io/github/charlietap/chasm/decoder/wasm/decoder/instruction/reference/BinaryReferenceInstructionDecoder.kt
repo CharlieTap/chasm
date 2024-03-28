@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.reference
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.REF_AS_NON_NULL
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.REF_FUNC
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.REF_ISNULL

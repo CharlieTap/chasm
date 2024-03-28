@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.control
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.VALUE_TYPE_NUMBER_F32

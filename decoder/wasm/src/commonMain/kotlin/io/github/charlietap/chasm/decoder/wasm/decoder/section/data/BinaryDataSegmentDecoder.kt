@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.section.data
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.DataSegment
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.BinaryExpressionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.ExpressionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.BinaryMemoryIndexDecoder

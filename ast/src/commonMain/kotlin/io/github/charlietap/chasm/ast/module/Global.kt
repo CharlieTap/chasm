@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.ast.module
 
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index.GlobalIndex
+import io.github.charlietap.chasm.ast.module.Index.GlobalIndex
 import io.github.charlietap.chasm.ast.type.GlobalType
 
 data class Global(

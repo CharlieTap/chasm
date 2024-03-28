@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ValueType
 import kotlin.jvm.JvmInline
 
@@ -53,12 +54,13 @@ sealed interface ControlInstruction : Instruction {
     @JvmInline
     value class CallRef(val typeIndex: Index.TypeIndex) : ControlInstruction
 
-    data class CallIndirect(val typeIndex: Index.TypeIndex, val tableIndex: Index.TableIndex = Index.TableIndex(0u)) : ControlInstruction
+    data class CallIndirect(
+        val typeIndex: Index.TypeIndex,
+        val tableIndex: Index.TableIndex,
+    ) : ControlInstruction
 
     data class ReturnCallIndirect(
         val typeIndex: Index.TypeIndex,
-        val tableIndex: Index.TableIndex = Index.TableIndex(
-            0u,
-        ),
+        val tableIndex: Index.TableIndex,
     ) : ControlInstruction
 }

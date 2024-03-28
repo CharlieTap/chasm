@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.fixture.module
 
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.DataSegment
+import io.github.charlietap.chasm.ast.module.Index
 
 fun dataSegment(
     idx: Index.DataIndex = Index.DataIndex(0u),

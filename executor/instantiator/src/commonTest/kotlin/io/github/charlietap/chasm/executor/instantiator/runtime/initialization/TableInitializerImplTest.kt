@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializerImpl
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity

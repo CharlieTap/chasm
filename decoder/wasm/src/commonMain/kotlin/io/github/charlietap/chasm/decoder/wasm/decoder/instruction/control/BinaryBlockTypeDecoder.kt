@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.BinaryValueTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.VALUE_TYPE_NUMBER_I32
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.VALUE_TYPE_REFERENCE_EXTERNREF

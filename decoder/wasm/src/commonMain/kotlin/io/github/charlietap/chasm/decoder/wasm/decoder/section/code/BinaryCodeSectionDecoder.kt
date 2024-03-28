@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.section.code
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.BinaryVectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError

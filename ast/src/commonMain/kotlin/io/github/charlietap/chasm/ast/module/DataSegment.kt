@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.ast.module
 
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Index.DataIndex
-import io.github.charlietap.chasm.ast.instruction.Index.MemoryIndex
+import io.github.charlietap.chasm.ast.module.Index.DataIndex
+import io.github.charlietap.chasm.ast.module.Index.MemoryIndex
 
 data class DataSegment(
     val idx: DataIndex,

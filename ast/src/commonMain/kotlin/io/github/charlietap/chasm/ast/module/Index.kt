@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.ast.instruction
+package io.github.charlietap.chasm.ast.module
 
 import kotlin.jvm.JvmInline
 

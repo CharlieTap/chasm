@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.variable
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.GLOBAL_GET
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.GLOBAL_SET
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.LOCAL_GET

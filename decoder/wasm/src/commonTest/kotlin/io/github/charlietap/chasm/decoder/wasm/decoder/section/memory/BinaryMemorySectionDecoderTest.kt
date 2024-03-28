@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.section.memory
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType

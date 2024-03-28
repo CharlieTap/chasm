@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.section.export
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.Export
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.FunctionIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.GlobalIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.MemoryIndexDecoder

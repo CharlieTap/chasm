@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.ast.module
 
-import io.github.charlietap.chasm.ast.instruction.Index.TypeIndex
+import io.github.charlietap.chasm.ast.module.Index.TypeIndex
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType

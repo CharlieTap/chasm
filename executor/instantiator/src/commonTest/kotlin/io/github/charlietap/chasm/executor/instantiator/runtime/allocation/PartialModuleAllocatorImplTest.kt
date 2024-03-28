@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.value.NameValue

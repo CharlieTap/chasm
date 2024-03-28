@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.ast.module
 
-import io.github.charlietap.chasm.ast.instruction.Index.FunctionIndex
+import io.github.charlietap.chasm.ast.module.Index.FunctionIndex
 import kotlin.jvm.JvmInline
 
 @JvmInline

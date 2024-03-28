@@ -2,13 +2,13 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ControlInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.MemoryInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.NumericInstructionExecutor

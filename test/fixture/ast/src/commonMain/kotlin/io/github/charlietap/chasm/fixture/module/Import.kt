@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.fixture.module
 
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.Import
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType

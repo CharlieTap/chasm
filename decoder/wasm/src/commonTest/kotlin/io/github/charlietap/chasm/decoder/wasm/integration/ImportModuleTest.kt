@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.decoder.wasm.integration
 
 import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.module.Import
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version

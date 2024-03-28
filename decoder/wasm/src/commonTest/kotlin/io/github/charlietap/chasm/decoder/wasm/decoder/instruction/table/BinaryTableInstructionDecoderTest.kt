@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.table
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.TABLE_GET
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.TABLE_SET
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.TableIndexDecoder

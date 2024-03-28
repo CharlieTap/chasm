@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.instruction
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Index
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
@@ -11,6 +10,7 @@ import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.control.ControlInstructionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.memory.MemoryInstructionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.numeric.NumericInstructionDecoder
