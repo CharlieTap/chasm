@@ -8,8 +8,8 @@ sealed interface CompositeType : Type {
     value class Function(val functionType: FunctionType) : CompositeType
 
     @JvmInline
-    value class Struct(val fields: List<FieldType>) : CompositeType
+    value class Struct(val structType: StructType) : CompositeType
 
     @JvmInline
-    value class Array(val field: FieldType) : CompositeType
+    value class Array(val arrayType: ArrayType) : CompositeType
 }

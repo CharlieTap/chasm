@@ -19,6 +19,9 @@ sealed interface TypeDecodeError : WasmDecodeError {
     value class InvalidStorageType(val encoded: UByte) : TypeDecodeError
 
     @JvmInline
+    value class InvalidCompositeType(val encoded: UByte) : TypeDecodeError
+
+    @JvmInline
     value class InvalidReferenceType(val encoded: UByte) : TypeDecodeError
 
     @JvmInline

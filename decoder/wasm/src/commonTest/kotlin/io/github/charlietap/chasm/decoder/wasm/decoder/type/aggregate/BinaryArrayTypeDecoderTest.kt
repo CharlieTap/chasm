@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.type.aggregate
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.CompositeType
+import io.github.charlietap.chasm.ast.type.ArrayType
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.fixture.type.fieldType
 import kotlin.test.Test
@@ -20,7 +20,7 @@ class BinaryArrayTypeDecoderTest {
             Ok(fieldType)
         }
 
-        val expected = Ok(CompositeType.Array(fieldType))
+        val expected = Ok(ArrayType(fieldType))
 
         val actual = BinaryArrayTypeDecoder(
             reader,

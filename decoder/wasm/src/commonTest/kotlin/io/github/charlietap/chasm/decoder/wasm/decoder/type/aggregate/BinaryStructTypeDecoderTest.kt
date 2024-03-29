@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.type.aggregate
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FieldType
+import io.github.charlietap.chasm.ast.type.StructType
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
@@ -30,7 +30,7 @@ class BinaryStructTypeDecoderTest {
             Ok(Vector(fieldTypes))
         }
 
-        val expected = Ok(CompositeType.Struct(fieldTypes))
+        val expected = Ok(StructType(fieldTypes))
 
         val actual = BinaryStructTypeDecoder(
             reader,
