@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        os: [ macos-14, ubuntu-latest, windows-latest ]
     uses: ./.github/workflows/build.yml
     with:
       runner: ${{ matrix.os }}
