@@ -4,8 +4,8 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.fixture.instruction.labelIndex
-import io.github.charlietap.chasm.fixture.instruction.typeIndex
+import io.github.charlietap.chasm.fixture.module.labelIndex
+import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
 import kotlin.test.assertEquals

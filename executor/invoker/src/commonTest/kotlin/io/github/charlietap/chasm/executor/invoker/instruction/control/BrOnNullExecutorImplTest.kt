@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.instance.functionAddress
-import io.github.charlietap.chasm.fixture.instruction.labelIndex
+import io.github.charlietap.chasm.fixture.module.labelIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.fixture.value

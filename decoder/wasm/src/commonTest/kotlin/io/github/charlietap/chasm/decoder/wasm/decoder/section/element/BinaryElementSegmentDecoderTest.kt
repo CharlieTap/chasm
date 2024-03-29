@@ -20,7 +20,7 @@ import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.wasm.reader.IOErrorWasmFileReader
-import io.github.charlietap.chasm.fixture.instruction.functionIndex
+import io.github.charlietap.chasm.fixture.module.functionIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

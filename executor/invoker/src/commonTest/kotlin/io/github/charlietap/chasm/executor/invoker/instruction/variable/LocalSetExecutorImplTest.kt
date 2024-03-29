@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.localIndex
+import io.github.charlietap.chasm.fixture.module.localIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.value
 import kotlin.test.Test

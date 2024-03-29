@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
-import io.github.charlietap.chasm.fixture.instruction.globalIndex
-import io.github.charlietap.chasm.fixture.instruction.localIndex
+import io.github.charlietap.chasm.fixture.module.globalIndex
+import io.github.charlietap.chasm.fixture.module.localIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test

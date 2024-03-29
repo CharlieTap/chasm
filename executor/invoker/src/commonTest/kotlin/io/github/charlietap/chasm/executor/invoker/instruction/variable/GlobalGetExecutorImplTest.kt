@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.globalAddress
 import io.github.charlietap.chasm.fixture.instance.globalInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.globalIndex
+import io.github.charlietap.chasm.fixture.module.globalIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test

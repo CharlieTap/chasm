@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.fixture.instruction
+package io.github.charlietap.chasm.fixture.module
 
 import io.github.charlietap.chasm.ast.module.Index
 

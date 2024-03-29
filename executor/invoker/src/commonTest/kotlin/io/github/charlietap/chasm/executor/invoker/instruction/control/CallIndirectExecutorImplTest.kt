@@ -14,8 +14,8 @@ import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.instance.tableAddress
 import io.github.charlietap.chasm.fixture.instance.tableInstance
 import io.github.charlietap.chasm.fixture.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.instruction.tableIndex
-import io.github.charlietap.chasm.fixture.instruction.typeIndex
+import io.github.charlietap.chasm.fixture.module.tableIndex
+import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType

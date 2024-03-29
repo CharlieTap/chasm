@@ -33,8 +33,8 @@ import io.github.charlietap.chasm.decoder.wasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.instruction.labelIndex
-import io.github.charlietap.chasm.fixture.instruction.typeIndex
+import io.github.charlietap.chasm.fixture.module.labelIndex
+import io.github.charlietap.chasm.fixture.module.typeIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

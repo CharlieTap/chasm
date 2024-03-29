@@ -10,8 +10,8 @@ import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.fixture.instruction.expression
-import io.github.charlietap.chasm.fixture.instruction.tableIndex
 import io.github.charlietap.chasm.fixture.module.table
+import io.github.charlietap.chasm.fixture.module.tableIndex
 import io.github.charlietap.chasm.fixture.type.tableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
