@@ -1,12 +1,8 @@
 package io.github.charlietap.chasm.ast.type
 
-import kotlin.jvm.JvmInline
-
 sealed interface PackedType : Type {
 
-    @JvmInline
-    value class I8(val value: Byte) : PackedType
+    data object I8 : PackedType
 
-    @JvmInline
-    value class I16(val value: Short) : PackedType
+    data object I16 : PackedType
 }

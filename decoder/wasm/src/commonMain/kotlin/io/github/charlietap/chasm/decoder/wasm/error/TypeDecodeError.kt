@@ -13,6 +13,12 @@ sealed interface TypeDecodeError : WasmDecodeError {
     value class InvalidHeapType(val encoded: UByte) : TypeDecodeError
 
     @JvmInline
+    value class InvalidPackedType(val encoded: UByte) : TypeDecodeError
+
+    @JvmInline
+    value class InvalidStorageType(val encoded: UByte) : TypeDecodeError
+
+    @JvmInline
     value class InvalidReferenceType(val encoded: UByte) : TypeDecodeError
 
     @JvmInline
