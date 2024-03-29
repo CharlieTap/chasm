@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.tabl
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableGrowthAllocatorAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -22,7 +22,7 @@ class TableGrowthAllocatorImplTest {
         val elementsToAdd = 2u
         val limits = limits(1u)
         val newMin = elementsToAdd + limits.min
-        val refType = ReferenceType.RefNull(HeapType.Func)
+        val refType = ReferenceType.RefNull(AbstractHeapType.Func)
         val refVal = ReferenceValue.FunctionAddress(Address.Function(0))
         val type = tableType(refType, limits)
 
@@ -46,7 +46,7 @@ class TableGrowthAllocatorImplTest {
 
         val elementsToAdd = 2u
         val limits = limits(1u, 2u)
-        val refType = ReferenceType.RefNull(HeapType.Func)
+        val refType = ReferenceType.RefNull(AbstractHeapType.Func)
         val refVal = ReferenceValue.FunctionAddress(Address.Function(0))
         val type = tableType(refType, limits)
 

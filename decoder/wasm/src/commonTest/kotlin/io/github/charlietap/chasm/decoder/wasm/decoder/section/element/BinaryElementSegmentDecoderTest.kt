@@ -6,13 +6,13 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.ExpressionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.FunctionIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.TableIndexDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.type.reference.REFERENCE_TYPE_REF_NULL
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.reference.ReferenceTypeDecoder
-import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.VALUE_TYPE_REFERENCE_REF_NULL
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
@@ -46,7 +46,7 @@ class BinaryElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(HeapType.Func),
+                ReferenceType.RefNull(AbstractHeapType.Func),
                 listOf(
                     Expression(ReferenceInstruction.RefFunc(functionIndex1)),
                     Expression(ReferenceInstruction.RefFunc(functionIndex2)),
@@ -96,7 +96,7 @@ class BinaryElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(HeapType.Func),
+                ReferenceType.RefNull(AbstractHeapType.Func),
                 listOf(
                     Expression(ReferenceInstruction.RefFunc(functionIndex1)),
                     Expression(ReferenceInstruction.RefFunc(functionIndex2)),
@@ -148,7 +148,7 @@ class BinaryElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(HeapType.Func),
+                ReferenceType.RefNull(AbstractHeapType.Func),
                 listOf(
                     Expression(ReferenceInstruction.RefFunc(functionIndex1)),
                     Expression(ReferenceInstruction.RefFunc(functionIndex2)),
@@ -207,7 +207,7 @@ class BinaryElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(HeapType.Func),
+                ReferenceType.RefNull(AbstractHeapType.Func),
                 listOf(
                     Expression(ReferenceInstruction.RefFunc(functionIndex1)),
                     Expression(ReferenceInstruction.RefFunc(functionIndex2)),
@@ -260,7 +260,7 @@ class BinaryElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(HeapType.Func),
+                ReferenceType.RefNull(AbstractHeapType.Func),
                 emptyList(),
                 mode,
             ),
@@ -293,7 +293,7 @@ class BinaryElementSegmentDecoderTest {
     fun `can decode a passive many expressions element segment`() {
 
         val segmentId = SEGMENT_TYPE_PASSIVE_MANY_EXPRESSIONS
-        val opcode = VALUE_TYPE_REFERENCE_REF_NULL
+        val opcode = REFERENCE_TYPE_REF_NULL
 
         val segmentReader: () -> Result<UInt, WasmDecodeError> = {
             Ok(segmentId)
@@ -314,7 +314,7 @@ class BinaryElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(HeapType.Func),
+                ReferenceType.RefNull(AbstractHeapType.Func),
                 emptyList(),
                 mode,
             ),
@@ -323,7 +323,7 @@ class BinaryElementSegmentDecoderTest {
         val referenceTypeDecoder: ReferenceTypeDecoder = { _reader, _opcode ->
             assertEquals(reader, _reader)
             assertEquals(opcode, _opcode)
-            Ok(ReferenceType.RefNull(HeapType.Func))
+            Ok(ReferenceType.RefNull(AbstractHeapType.Func))
         }
 
         val vectorExpressionDecoder: VectorDecoder<Expression> = { _, _ ->
@@ -349,7 +349,7 @@ class BinaryElementSegmentDecoderTest {
     fun `can decode an active with table index element segment`() {
 
         val segmentId = SEGMENT_TYPE_ACTIVE_W_TABLEIDX
-        val opcode = VALUE_TYPE_REFERENCE_REF_NULL
+        val opcode = REFERENCE_TYPE_REF_NULL
 
         val segmentReader: () -> Result<UInt, WasmDecodeError> = {
             Ok(segmentId)
@@ -372,7 +372,7 @@ class BinaryElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(HeapType.Func),
+                ReferenceType.RefNull(AbstractHeapType.Func),
                 emptyList(),
                 mode,
             ),
@@ -385,7 +385,7 @@ class BinaryElementSegmentDecoderTest {
         val referenceTypeDecoder: ReferenceTypeDecoder = { _reader, _opcode ->
             assertEquals(reader, _reader)
             assertEquals(opcode, _opcode)
-            Ok(ReferenceType.RefNull(HeapType.Func))
+            Ok(ReferenceType.RefNull(AbstractHeapType.Func))
         }
 
         val tableIndexDecoder: TableIndexDecoder = { _ ->
@@ -415,7 +415,7 @@ class BinaryElementSegmentDecoderTest {
     fun `can decode a declarative many expressions element segment`() {
 
         val segmentId = SEGMENT_TYPE_DECLARATIVE_MANY_EXPRESSIONS
-        val opcode = VALUE_TYPE_REFERENCE_REF_NULL
+        val opcode = REFERENCE_TYPE_REF_NULL
 
         val segmentReader: () -> Result<UInt, WasmDecodeError> = {
             Ok(segmentId)
@@ -436,7 +436,7 @@ class BinaryElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(HeapType.Func),
+                ReferenceType.RefNull(AbstractHeapType.Func),
                 emptyList(),
                 mode,
             ),
@@ -445,7 +445,7 @@ class BinaryElementSegmentDecoderTest {
         val referenceTypeDecoder: ReferenceTypeDecoder = { _reader, _opcode ->
             assertEquals(reader, _reader)
             assertEquals(opcode, _opcode)
-            Ok(ReferenceType.RefNull(HeapType.Func))
+            Ok(ReferenceType.RefNull(AbstractHeapType.Func))
         }
 
         val vectorExpressionDecoder: VectorDecoder<Expression> = { _, _ ->

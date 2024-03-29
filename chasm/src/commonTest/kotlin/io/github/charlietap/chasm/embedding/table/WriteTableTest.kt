@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.embedding.table
 
 import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -18,7 +18,7 @@ class WriteTableTest {
 
         val functionAddress = functionAddress()
         val value = ReferenceValue.FunctionAddress(functionAddress)
-        val instance = tableInstance(elements = mutableListOf(ReferenceValue.Null(HeapType.Func)))
+        val instance = tableInstance(elements = mutableListOf(ReferenceValue.Null(AbstractHeapType.Func)))
         val store = store(tables = mutableListOf(instance))
         val address = Address.Table(0)
 

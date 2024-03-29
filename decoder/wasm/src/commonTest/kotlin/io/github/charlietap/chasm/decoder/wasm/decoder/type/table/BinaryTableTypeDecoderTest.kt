@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.type.table
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.TableType
@@ -23,7 +23,7 @@ class BinaryTableTypeDecoderTest {
             Ok(expectedByte)
         }
 
-        val refType = ReferenceType.RefNull(HeapType.Func)
+        val refType = ReferenceType.RefNull(AbstractHeapType.Func)
         val referenceTypeDecoder: ReferenceTypeDecoder = { _reader, _opcode ->
             assertEquals(reader, _reader)
             assertEquals(expectedByte, _opcode)

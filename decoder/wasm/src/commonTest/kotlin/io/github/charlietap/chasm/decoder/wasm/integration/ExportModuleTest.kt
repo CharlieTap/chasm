@@ -14,9 +14,9 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.NumberType
@@ -57,11 +57,11 @@ class ExportModuleTest {
             descriptor = Export.Descriptor.Function(Index.FunctionIndex(0u)),
         )
 
-        val expectedTableType = TableType(ReferenceType.RefNull(HeapType.Func), Limits(1u))
+        val expectedTableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u))
         val expectedTable = Table(
             idx = Index.TableIndex(0u),
             type = expectedTableType,
-            initExpression = Expression(listOf(ReferenceInstruction.RefNull(HeapType.Func))),
+            initExpression = Expression(listOf(ReferenceInstruction.RefNull(AbstractHeapType.Func))),
         )
 
         val expectedTableExport = Export(

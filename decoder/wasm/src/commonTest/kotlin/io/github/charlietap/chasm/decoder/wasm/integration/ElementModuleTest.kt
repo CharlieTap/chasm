@@ -12,8 +12,8 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
@@ -47,13 +47,13 @@ class ElementModuleTest {
 
         val table = Table(
             idx = Index.TableIndex(0u),
-            type = TableType(ReferenceType.RefNull(HeapType.Func), Limits(1u)),
-            initExpression = Expression(listOf(ReferenceInstruction.RefNull(HeapType.Func))),
+            type = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u)),
+            initExpression = Expression(listOf(ReferenceInstruction.RefNull(AbstractHeapType.Func))),
         )
 
         val elementSegment = ElementSegment(
             idx = Index.ElementIndex(0u),
-            type = ReferenceType.RefNull(HeapType.Func),
+            type = ReferenceType.RefNull(AbstractHeapType.Func),
             initExpressions = listOf(Expression(ReferenceInstruction.RefFunc(Index.FunctionIndex(0u)))),
             mode = ElementSegment.Mode.Active(
                 tableIndex = Index.TableIndex(0u),

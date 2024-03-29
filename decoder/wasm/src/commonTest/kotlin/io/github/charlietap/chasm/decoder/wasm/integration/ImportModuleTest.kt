@@ -7,9 +7,9 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.NumberType
@@ -44,7 +44,7 @@ class ImportModuleTest {
             descriptor = Import.Descriptor.Function(Index.TypeIndex(0u)),
         )
 
-        val expectedTableType = TableType(ReferenceType.RefNull(HeapType.Func), Limits(1u, 2u))
+        val expectedTableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u, 2u))
 
         val expectedTableImport = Import(
             moduleName = NameValue("env"),

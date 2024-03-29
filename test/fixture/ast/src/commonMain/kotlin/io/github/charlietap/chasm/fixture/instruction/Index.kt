@@ -37,3 +37,7 @@ fun tableIndex(
 fun typeIndex(
     index: UInt = 0u,
 ) = Index.TypeIndex(index)
+
+fun fieldIndex(
+    index: UInt = 0u,
+) = Index.FieldIndex(index)

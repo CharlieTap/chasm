@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.ast.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ReferenceInstruction : Instruction {
@@ -14,4 +15,12 @@ sealed interface ReferenceInstruction : Instruction {
 
     @JvmInline
     value class RefFunc(val funcIdx: Index.FunctionIndex) : ReferenceInstruction
+
+    data object RefEq : ReferenceInstruction
+
+    @JvmInline
+    value class RefTest(val referenceType: ReferenceType) : ReferenceInstruction
+
+    @JvmInline
+    value class RefCast(val referenceType: ReferenceType) : ReferenceInstruction
 }

@@ -1,95 +1,121 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.type.heap
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.ast.type.ConcreteHeapType
+import io.github.charlietap.chasm.decoder.wasm.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.instruction.typeIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class BinaryHeapTypeDecoderTest {
 
     @Test
-    fun `can decode an encoded extern heap type`() {
+    fun `can decode an encoded abstract heap type`() {
 
-        val opcode = HEAP_TYPE_EXTERN
-        var timesCalled = 0
-        val fakeUByteReader: () -> Result<UByte, WasmDecodeError> = {
-            timesCalled++
-            Ok(opcode)
-        }
-        val fakeLongReader: () -> Result<Long, WasmDecodeError> = {
-            Ok(117)
+        val abstractHeapTypes = ABSTRACT_HEAP_TYPE_RANGE.map(UInt::toUByte)
+
+        val abstractHeapTypeDecoder: AbstractHeapTypeDecoder = { _ ->
+            Ok(AbstractHeapType.Extern)
         }
 
-        val peekReader = FakeWasmBinaryReader(
-            fakeUByteReader = fakeUByteReader,
-        )
+        abstractHeapTypes.forEach { abstractHeapTypeByte ->
 
-        val reader = FakeWasmBinaryReader(
-            fakeUByteReader = fakeUByteReader,
-            fakeLongReader = fakeLongReader,
-            fakePeekReader = { peekReader },
-        )
+            var timesCalled = 0
+            val fakeUByteReader: () -> Result<UByte, WasmDecodeError> = {
+                timesCalled++
+                Ok(abstractHeapTypeByte)
+            }
+            val fakeLongReader: () -> Result<Long, WasmDecodeError> = {
+                Ok(117)
+            }
 
-        val actual = BinaryHeapTypeDecoder(reader)
-        assertEquals(Ok(HeapType.Extern), actual)
-        assertEquals(2, timesCalled)
+            val peekReader = FakeWasmBinaryReader(
+                fakeUByteReader = fakeUByteReader,
+            )
+
+            val reader = FakeWasmBinaryReader(
+                fakeUByteReader = fakeUByteReader,
+                fakeLongReader = fakeLongReader,
+                fakePeekReader = { peekReader },
+            )
+
+            val actual = BinaryHeapTypeDecoder(reader, abstractHeapTypeDecoder)
+            assertEquals(Ok(AbstractHeapType.Extern), actual)
+            assertEquals(2, timesCalled)
+        }
     }
 
     @Test
-    fun `can decode an encoded func heap type`() {
+    fun `can decode an encoded concrete heap type`() {
 
-        val opcode = HEAP_TYPE_FUNC
-        var timesCalled = 0
-        val fakeUByteReader: () -> Result<UByte, WasmDecodeError> = {
-            timesCalled++
-            Ok(opcode)
+        val concreteHeapTypes = setOf(
+            CONCRETE_HEAP_TYPE_RANGE.first,
+            CONCRETE_HEAP_TYPE_RANGE.last,
+        ).map(UInt::toUByte)
+
+        val abstractHeapTypeDecoder: AbstractHeapTypeDecoder = { _ ->
+            fail("AbstractHeapTypeDecoder should not be called in this scenario")
         }
-        val fakeLongReader: () -> Result<Long, WasmDecodeError> = {
-            Ok(117)
+
+        concreteHeapTypes.forEach { concreteHeapTypeByte ->
+
+            val fakeUByteReader: () -> Result<UByte, WasmDecodeError> = {
+                Ok(concreteHeapTypeByte)
+            }
+
+            val expectedTypeIndex = Index.TypeIndex(117u)
+            val fakeLongReader: () -> Result<Long, WasmDecodeError> = {
+                Ok(expectedTypeIndex.idx.toLong())
+            }
+
+            val peekReader = FakeWasmBinaryReader(
+                fakeUByteReader = fakeUByteReader,
+            )
+
+            val reader = FakeWasmBinaryReader(
+                fakeUByteReader = fakeUByteReader,
+                fakeLongReader = fakeLongReader,
+                fakePeekReader = { peekReader },
+            )
+
+            val actual = BinaryHeapTypeDecoder(reader, abstractHeapTypeDecoder)
+            assertEquals(Ok(ConcreteHeapType(expectedTypeIndex)), actual)
         }
-
-        val peekReader = FakeWasmBinaryReader(
-            fakeUByteReader = fakeUByteReader,
-        )
-
-        val reader = FakeWasmBinaryReader(
-            fakeUByteReader = fakeUByteReader,
-            fakeLongReader = fakeLongReader,
-            fakePeekReader = { peekReader },
-        )
-
-        val actual = BinaryHeapTypeDecoder(reader)
-        assertEquals(Ok(HeapType.Func), actual)
-        assertEquals(2, timesCalled)
     }
 
     @Test
-    fun `can decode an encoded type index heap type`() {
+    fun `throws an InvalidHeapType error for bytes in the non positive range`() {
 
-        val opcode: UByte = 0x00u
-        val typeIndex = typeIndex(117u)
-        val fakeUByteReader: () -> Result<UByte, WasmDecodeError> = {
-            Ok(opcode)
-        }
-        val fakeLongReader: () -> Result<Long, WasmDecodeError> = {
-            Ok(typeIndex.idx.toLong())
-        }
-
-        val peekReader = FakeWasmBinaryReader(
-            fakeUByteReader = fakeUByteReader,
+        val negativeLimits = setOf(
+            0x80u, // start of negative range
+            UByte.MAX_VALUE, // end of negative range
         )
 
-        val reader = FakeWasmBinaryReader(
-            fakeUByteReader = fakeUByteReader,
-            fakeLongReader = fakeLongReader,
-            fakePeekReader = { peekReader },
-        )
+        val abstractHeapTypeDecoder: AbstractHeapTypeDecoder = { _ ->
+            fail("AbstractHeapTypeDecoder should not be called in this scenario")
+        }
 
-        val actual = BinaryHeapTypeDecoder(reader)
-        assertEquals(Ok(HeapType.TypeIndex(typeIndex)), actual)
+        negativeLimits.forEach { byte ->
+            val fakeUByteReader: () -> Result<UByte, WasmDecodeError> = {
+                Ok(byte)
+            }
+
+            val peekReader = FakeWasmBinaryReader(
+                fakeUByteReader = fakeUByteReader,
+            )
+
+            val reader = FakeWasmBinaryReader(
+                fakePeekReader = { peekReader },
+            )
+
+            val actual = BinaryHeapTypeDecoder(reader, abstractHeapTypeDecoder)
+            assertEquals(Err(TypeDecodeError.InvalidHeapType(byte)), actual)
+        }
     }
 }

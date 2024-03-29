@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
@@ -53,11 +53,11 @@ class TypeModuleTest {
         val expectedReferenceTypeFunctionType = FunctionType(
             params = ResultType(
                 listOf(
-                    ValueType.Reference(ReferenceType.RefNull(HeapType.Func)),
-                    ValueType.Reference(ReferenceType.RefNull(HeapType.Extern)),
+                    ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func)),
+                    ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Extern)),
                 ),
             ),
-            results = ResultType(listOf(ValueType.Reference(ReferenceType.RefNull(HeapType.Func)))),
+            results = ResultType(listOf(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func)))),
         )
         val expectedReferenceType = Type(Index.TypeIndex(2u), expectedReferenceTypeFunctionType)
 

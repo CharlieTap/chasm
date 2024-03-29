@@ -3,17 +3,30 @@ package io.github.charlietap.chasm.ast.type
 import io.github.charlietap.chasm.ast.module.Index
 import kotlin.jvm.JvmInline
 
-sealed interface HeapType : Type {
+sealed interface HeapType : Type
 
-    data object Func : HeapType
+sealed interface AbstractHeapType : HeapType {
 
-    data object Extern : HeapType
+    data object Func : AbstractHeapType
 
-    @JvmInline
-    value class TypeIndex(val index: Index.TypeIndex) : HeapType
+    data object NoFunc : AbstractHeapType
 
-    @JvmInline
-    value class FuncType(val functionType: FunctionType) : HeapType
+    data object Extern : AbstractHeapType
 
-    data object Bottom : HeapType
+    data object NoExtern : AbstractHeapType
+
+    data object Any : AbstractHeapType
+
+    data object Eq : AbstractHeapType
+
+    data object Struct : AbstractHeapType
+
+    data object Array : AbstractHeapType
+
+    data object I31 : AbstractHeapType
+
+    data object None : AbstractHeapType
 }
+
+@JvmInline
+value class ConcreteHeapType(val index: Index.TypeIndex) : HeapType

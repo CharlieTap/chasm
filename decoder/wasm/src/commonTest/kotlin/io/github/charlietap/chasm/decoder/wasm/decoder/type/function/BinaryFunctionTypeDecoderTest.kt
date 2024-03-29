@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.type.function
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
@@ -31,7 +31,7 @@ class BinaryFunctionTypeDecoderTest {
         val results = listOf(
             ValueType.Number(NumberType.F64),
             ValueType.Vector(VectorType.V128),
-            ValueType.Reference(ReferenceType.RefNull(HeapType.Func)),
+            ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func)),
         )
 
         val reader = FakeUByteReader {

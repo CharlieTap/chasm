@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.expect
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
@@ -52,7 +52,7 @@ class WasmFunctionCallImplTest {
 
         val function = function(
             locals = listOf(
-                local(type = ValueType.Reference(ReferenceType.RefNull(HeapType.Func))),
+                local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
             body = Expression(
                 listOf(
@@ -143,7 +143,7 @@ class WasmFunctionCallImplTest {
 
         val function = function(
             locals = listOf(
-                local(type = ValueType.Reference(ReferenceType.RefNull(HeapType.Func))),
+                local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
             body = Expression(
                 listOf(
@@ -236,7 +236,7 @@ class WasmFunctionCallImplTest {
 
         val function = function(
             locals = listOf(
-                local(type = ValueType.Reference(ReferenceType.RefNull(HeapType.Func))),
+                local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
             body = Expression(
                 listOf(

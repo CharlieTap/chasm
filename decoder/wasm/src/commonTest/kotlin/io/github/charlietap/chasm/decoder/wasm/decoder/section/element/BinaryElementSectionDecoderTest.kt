@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.section.element
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
@@ -21,7 +21,7 @@ class BinaryElementSectionDecoderTest {
 
         val segment = ElementSegment(
             idx = Index.ElementIndex(0u),
-            type = ReferenceType.RefNull(HeapType.Func),
+            type = ReferenceType.RefNull(AbstractHeapType.Func),
             initExpressions = emptyList(),
             mode = ElementSegment.Mode.Passive,
         )

@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.REF_AS_NON_NULL
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.REF_FUNC
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.REF_ISNULL
@@ -29,9 +29,9 @@ class BinaryReferenceInstructionDecoderTest {
         }
         val heapTypeDecoder: HeapTypeDecoder = { _reader ->
             assertEquals(reader, _reader)
-            Ok(HeapType.Func)
+            Ok(AbstractHeapType.Func)
         }
-        val expected = Ok(ReferenceInstruction.RefNull(HeapType.Func))
+        val expected = Ok(ReferenceInstruction.RefNull(AbstractHeapType.Func))
 
         val actual = BinaryReferenceInstructionDecoder(reader, opcode, heapTypeDecoder)
 

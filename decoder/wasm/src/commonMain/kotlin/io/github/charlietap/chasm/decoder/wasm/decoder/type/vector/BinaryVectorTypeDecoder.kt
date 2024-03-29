@@ -7,8 +7,10 @@ import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.decoder.wasm.error.TypeDecodeError
 
 internal fun BinaryVectorTypeDecoder(encoded: UByte): Result<VectorType, TypeDecodeError.InvalidVectorType> =
-    if (encoded == 0x7B.toUByte()) {
+    if (encoded == VECTOR_TYPE_128) {
         Ok(VectorType.V128)
     } else {
         Err(TypeDecodeError.InvalidVectorType(encoded))
     }
+
+internal const val VECTOR_TYPE_128: UByte = 0x7Bu

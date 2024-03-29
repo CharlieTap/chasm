@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocatorImpl
@@ -45,7 +45,7 @@ class PartialModuleAllocatorImplTest {
         val table = table()
         val memory = memory()
         val global = global()
-        val refType = ReferenceType.RefNull(HeapType.Extern)
+        val refType = ReferenceType.RefNull(AbstractHeapType.Extern)
         val elementSegment = elementSegment(type = refType)
         val bytes = ubyteArrayOf()
         val dataSegment = dataSegment(initData = bytes)

@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.TableType
@@ -29,10 +29,10 @@ class TableModuleTest {
         val expectedTable = Table(
             idx = Index.TableIndex(0u),
             type = TableType(
-                referenceType = ReferenceType.RefNull(HeapType.Func),
+                referenceType = ReferenceType.RefNull(AbstractHeapType.Func),
                 limits = Limits(1u, 2u),
             ),
-            initExpression = Expression(listOf(ReferenceInstruction.RefNull(HeapType.Func))),
+            initExpression = Expression(listOf(ReferenceInstruction.RefNull(AbstractHeapType.Func))),
         )
 
         val expected = Ok(

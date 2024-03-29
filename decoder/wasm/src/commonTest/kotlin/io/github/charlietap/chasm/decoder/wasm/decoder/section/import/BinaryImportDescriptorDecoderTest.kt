@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.section.import
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.NumberType
@@ -56,7 +56,7 @@ class BinaryImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_TABLE
 
-        val tableType = TableType(ReferenceType.RefNull(HeapType.Func), Limits(117u))
+        val tableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(117u))
         val expected = Ok(Import.Descriptor.Table(tableType))
 
         val reader = FakeUByteReader {

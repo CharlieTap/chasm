@@ -3,13 +3,17 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.type.value
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
+import io.github.charlietap.chasm.decoder.wasm.decoder.type.heap.HEAP_TYPE_NO_FUNC
+import io.github.charlietap.chasm.decoder.wasm.decoder.type.number.BinaryNumberTypeDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.type.number.NUMBER_TYPE_F64
+import io.github.charlietap.chasm.decoder.wasm.decoder.type.number.NUMBER_TYPE_I32
+import io.github.charlietap.chasm.decoder.wasm.decoder.type.number.NumberTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.reference.BinaryReferenceTypeDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.type.reference.REFERENCE_TYPE_REF_NULL
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.reference.ReferenceTypeDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.type.vector.VECTOR_TYPE_128
 import io.github.charlietap.chasm.decoder.wasm.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.wasm.reader.WasmBinaryReader
@@ -19,35 +23,31 @@ internal fun BinaryValueTypeDecoder(
 ): Result<ValueType, WasmDecodeError> =
     BinaryValueTypeDecoder(
         reader = reader,
+        numberTypeDecoder = ::BinaryNumberTypeDecoder,
         referenceTypeDecoder = ::BinaryReferenceTypeDecoder,
     )
 
 internal fun BinaryValueTypeDecoder(
     reader: WasmBinaryReader,
+    numberTypeDecoder: NumberTypeDecoder,
     referenceTypeDecoder: ReferenceTypeDecoder,
 ): Result<ValueType, WasmDecodeError> = binding {
     when (val byte = reader.ubyte().bind()) {
-        VALUE_TYPE_NUMBER_I32 -> ValueType.Number(NumberType.I32)
-        VALUE_TYPE_NUMBER_I64 -> ValueType.Number(NumberType.I64)
-        VALUE_TYPE_NUMBER_F32 -> ValueType.Number(NumberType.F32)
-        VALUE_TYPE_NUMBER_F64 -> ValueType.Number(NumberType.F64)
-        VALUE_TYPE_VECTOR_V128 -> ValueType.Vector(VectorType.V128)
-        VALUE_TYPE_REFERENCE_FUNCREF -> ValueType.Reference(ReferenceType.RefNull(HeapType.Func))
-        VALUE_TYPE_REFERENCE_EXTERNREF -> ValueType.Reference(ReferenceType.RefNull(HeapType.Extern))
-        VALUE_TYPE_REFERENCE_REF -> ValueType.Reference(referenceTypeDecoder(reader, byte).bind())
-        VALUE_TYPE_REFERENCE_REF_NULL -> ValueType.Reference(referenceTypeDecoder(reader, byte).bind())
+        in NUMBER_TYPE_RANGE -> {
+            val numberType = numberTypeDecoder(byte).bind()
+            ValueType.Number(numberType)
+        }
+        in VECTOR_TYPE_RANGE -> {
+            ValueType.Vector(VectorType.V128)
+        }
+        in REFERENCE_TYPE_RANGE -> {
+            val referenceType = referenceTypeDecoder(reader, byte).bind()
+            ValueType.Reference(referenceType)
+        }
         else -> Err(TypeDecodeError.InvalidValueType(byte)).bind<ValueType>()
     }
 }
 
-internal const val VALUE_TYPE_NUMBER_I32: UByte = 0x7Fu
-internal const val VALUE_TYPE_NUMBER_I64: UByte = 0x7Eu
-internal const val VALUE_TYPE_NUMBER_F32: UByte = 0x7Du
-internal const val VALUE_TYPE_NUMBER_F64: UByte = 0x7Cu
-
-internal const val VALUE_TYPE_VECTOR_V128: UByte = 0x7Bu
-
-internal const val VALUE_TYPE_REFERENCE_FUNCREF: UByte = 0x70u
-internal const val VALUE_TYPE_REFERENCE_EXTERNREF: UByte = 0x6Fu
-internal const val VALUE_TYPE_REFERENCE_REF_NULL: UByte = 0x63u
-internal const val VALUE_TYPE_REFERENCE_REF: UByte = 0x64u
+internal val NUMBER_TYPE_RANGE = NUMBER_TYPE_F64..NUMBER_TYPE_I32
+internal val VECTOR_TYPE_RANGE = VECTOR_TYPE_128..VECTOR_TYPE_128
+internal val REFERENCE_TYPE_RANGE = REFERENCE_TYPE_REF_NULL..HEAP_TYPE_NO_FUNC
