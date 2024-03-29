@@ -4,14 +4,12 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.wasm.section.GlobalSection
 import io.github.charlietap.chasm.decoder.wasm.section.SectionSize
+import io.github.charlietap.chasm.fixture.type.globalType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,12 +20,12 @@ class BinaryGlobalSectionDecoderTest {
 
         val global1 = Global(
             idx = Index.GlobalIndex(0u),
-            type = GlobalType(ValueType.Number(NumberType.I32), GlobalType.Mutability.Var),
+            type = globalType(),
             initExpression = Expression(),
         )
         val global2 = Global(
             idx = Index.GlobalIndex(1u),
-            type = GlobalType(ValueType.Number(NumberType.I32), GlobalType.Mutability.Var),
+            type = globalType(),
             initExpression = Expression(),
         )
         val expected = Ok(GlobalSection(listOf(global1, global2)))

@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
@@ -62,7 +63,7 @@ class ImportModuleTest {
 
         val expectedGlobalType = GlobalType(
             ValueType.Number(NumberType.I32),
-            GlobalType.Mutability.Const,
+            Mutability.Const,
         )
 
         val expectedGlobalImport = Import(

@@ -1,26 +1,25 @@
-package io.github.charlietap.chasm.decoder.wasm.decoder.type.global
+package io.github.charlietap.chasm.decoder.wasm.decoder.type.aggregate
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.GlobalType
+import io.github.charlietap.chasm.ast.type.FieldType
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.MutabilityDecoder
-import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.ValueTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.fixture.type.mutability
-import io.github.charlietap.chasm.fixture.type.valueType
+import io.github.charlietap.chasm.fixture.type.storageType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class BinaryGlobalTypeDecoderTest {
+class BinaryFieldTypeDecoderTest {
 
     @Test
-    fun `can decode an encoded global type`() {
+    fun `can decode an encoded field type`() {
 
         val reader = FakeWasmBinaryReader()
 
-        val valueType = valueType()
-        val valueTypeDecoder: ValueTypeDecoder = { _reader ->
+        val storageType = storageType()
+        val storageTypeDecoder: StorageTypeDecoder = { _reader ->
             assertEquals(reader, _reader)
-            Ok(valueType)
+            Ok(storageType)
         }
 
         val mutability = mutability()
@@ -29,11 +28,11 @@ class BinaryGlobalTypeDecoderTest {
             Ok(mutability)
         }
 
-        val expected = Ok(GlobalType(valueType, mutability))
+        val expected = Ok(FieldType(storageType, mutability))
 
-        val actual = BinaryGlobalTypeDecoder(
+        val actual = BinaryFieldTypeDecoder(
             reader,
-            valueTypeDecoder,
+            storageTypeDecoder,
             mutabilityDecoder,
         )
 
