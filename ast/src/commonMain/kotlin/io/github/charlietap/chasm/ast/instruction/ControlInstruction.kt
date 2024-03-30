@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.ast.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import kotlin.jvm.JvmInline
 
@@ -39,6 +40,18 @@ sealed interface ControlInstruction : Instruction {
 
     @JvmInline
     value class BrOnNonNull(val labelIndex: Index.LabelIndex) : ControlInstruction
+
+    data class BrOnCast(
+        val labelIndex: Index.LabelIndex,
+        val srcReferenceType: ReferenceType,
+        val dstReferenceType: ReferenceType,
+    ) : ControlInstruction
+
+    data class BrOnCastFail(
+        val labelIndex: Index.LabelIndex,
+        val srcReferenceType: ReferenceType,
+        val dstReferenceType: ReferenceType,
+    ) : ControlInstruction
 
     data object Return : ControlInstruction
 
