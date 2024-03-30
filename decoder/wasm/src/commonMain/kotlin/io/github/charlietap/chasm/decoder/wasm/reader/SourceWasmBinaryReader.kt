@@ -49,6 +49,8 @@ internal class SourceWasmBinaryReader(
 
     override fun uint(): Result<UInt, WasmDecodeError> = tryRead { unsignedByteStream.toUIntLeb128() }
 
+    override fun s33(): Result<UInt, WasmDecodeError> = tryRead { byteStream.toLongLeb128().toUInt() }
+
     override fun long(): Result<Long, WasmDecodeError> = tryRead { byteStream.toLongLeb128() }
 
     override fun float(): Result<Float, WasmDecodeError> = binding {

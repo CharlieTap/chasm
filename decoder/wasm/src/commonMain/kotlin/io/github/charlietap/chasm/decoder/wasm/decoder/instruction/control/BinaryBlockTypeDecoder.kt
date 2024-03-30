@@ -39,9 +39,8 @@ internal fun BinaryBlockTypeDecoder(
         }
 
         else -> {
-            // Not using TypeIndexDecoder here as it's stored in a signed leb s33
-            val idx = reader.long().bind()
-            BlockType.SignedTypeIndex(Index.TypeIndex(idx.toUInt()))
+            val idx = reader.s33().bind()
+            BlockType.SignedTypeIndex(Index.TypeIndex(idx))
         }
     }
 }

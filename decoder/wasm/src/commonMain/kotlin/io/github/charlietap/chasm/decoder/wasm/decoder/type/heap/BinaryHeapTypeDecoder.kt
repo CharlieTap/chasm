@@ -28,8 +28,7 @@ internal fun BinaryHeapTypeDecoder(
             abstractHeapTypeDecoder(encoded).bind()
         }
         in CONCRETE_HEAP_TYPE_RANGE -> {
-            // Not using TypeIndexDecoder here as it's stored in a signed leb s33
-            val typeIndex = Index.TypeIndex(reader.long().bind().toUInt())
+            val typeIndex = Index.TypeIndex(reader.s33().bind())
             ConcreteHeapType(typeIndex)
         }
         else -> Err(TypeDecodeError.InvalidHeapType(encoded)).bind<HeapType>()

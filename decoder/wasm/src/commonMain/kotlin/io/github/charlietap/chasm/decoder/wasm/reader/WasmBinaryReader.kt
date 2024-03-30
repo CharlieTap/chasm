@@ -17,6 +17,8 @@ internal interface WasmBinaryReader {
 
     fun uint(): Result<UInt, WasmDecodeError>
 
+    fun s33(): Result<UInt, WasmDecodeError>
+
     fun long(): Result<Long, WasmDecodeError>
 
     fun float(): Result<Float, WasmDecodeError>

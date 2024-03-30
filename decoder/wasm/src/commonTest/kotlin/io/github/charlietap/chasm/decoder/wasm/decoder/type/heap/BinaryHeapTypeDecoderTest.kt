@@ -26,28 +26,20 @@ class BinaryHeapTypeDecoderTest {
 
         abstractHeapTypes.forEach { abstractHeapTypeByte ->
 
-            var timesCalled = 0
             val fakeUByteReader: () -> Result<UByte, WasmDecodeError> = {
-                timesCalled++
                 Ok(abstractHeapTypeByte)
             }
-            val fakeLongReader: () -> Result<Long, WasmDecodeError> = {
-                Ok(117)
-            }
-
             val peekReader = FakeWasmBinaryReader(
                 fakeUByteReader = fakeUByteReader,
             )
 
             val reader = FakeWasmBinaryReader(
                 fakeUByteReader = fakeUByteReader,
-                fakeLongReader = fakeLongReader,
                 fakePeekReader = { peekReader },
             )
 
             val actual = BinaryHeapTypeDecoder(reader, abstractHeapTypeDecoder)
             assertEquals(Ok(AbstractHeapType.Extern), actual)
-            assertEquals(2, timesCalled)
         }
     }
 
@@ -70,22 +62,20 @@ class BinaryHeapTypeDecoderTest {
             }
 
             val expectedTypeIndex = Index.TypeIndex(117u)
-            val fakeLongReader: () -> Result<Long, WasmDecodeError> = {
-                Ok(expectedTypeIndex.idx.toLong())
-            }
 
             val peekReader = FakeWasmBinaryReader(
                 fakeUByteReader = fakeUByteReader,
             )
-
             val reader = FakeWasmBinaryReader(
                 fakeUByteReader = fakeUByteReader,
-                fakeLongReader = fakeLongReader,
+                fakeS33Reader = { Ok(expectedTypeIndex.idx) },
                 fakePeekReader = { peekReader },
             )
 
+            val expected = ConcreteHeapType(expectedTypeIndex)
+
             val actual = BinaryHeapTypeDecoder(reader, abstractHeapTypeDecoder)
-            assertEquals(Ok(ConcreteHeapType(expectedTypeIndex)), actual)
+            assertEquals(Ok(expected), actual)
         }
     }
 
