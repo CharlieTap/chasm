@@ -14,6 +14,9 @@ sealed interface InstructionDecodeError : WasmDecodeError {
     value class InvalidReferenceInstruction(val byte: UByte) : InstructionDecodeError
 
     @JvmInline
+    value class InvalidPrefixedReferenceInstruction(val byte: UByte) : InstructionDecodeError
+
+    @JvmInline
     value class InvalidParametricInstruction(val byte: UByte) : InstructionDecodeError
 
     @JvmInline

@@ -15,6 +15,8 @@ import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.parametric.Pa
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.prefix.BinaryPrefixInstructionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.prefix.PrefixInstructionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.reference.BinaryReferenceInstructionDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.reference.REF_AS_NON_NULL
+import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.reference.REF_NULL
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.reference.ReferenceInstructionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.table.BinaryTableInstructionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.table.TableInstructionDecoder

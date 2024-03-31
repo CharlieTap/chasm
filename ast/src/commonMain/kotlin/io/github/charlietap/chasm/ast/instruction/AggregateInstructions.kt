@@ -29,7 +29,7 @@ sealed interface AggregateInstruction : Instruction {
 
     data class ArrayNewData(val typeIndex: Index.TypeIndex, val dataIndex: Index.DataIndex) : AggregateInstruction
 
-    data class ArrayNewElem(val typeIndex: Index.TypeIndex, val elementIndex: Index.ElementIndex) : AggregateInstruction
+    data class ArrayNewElement(val typeIndex: Index.TypeIndex, val elementIndex: Index.ElementIndex) : AggregateInstruction
 
     @JvmInline
     value class ArrayGet(val typeIndex: Index.TypeIndex) : AggregateInstruction
@@ -52,7 +52,7 @@ sealed interface AggregateInstruction : Instruction {
 
     data class ArrayInitData(val typeIndex: Index.TypeIndex, val dataIndex: Index.DataIndex) : AggregateInstruction
 
-    data class ArrayInitElem(val typeIndex: Index.TypeIndex, val elementIndex: Index.ElementIndex) : AggregateInstruction
+    data class ArrayInitElement(val typeIndex: Index.TypeIndex, val elementIndex: Index.ElementIndex) : AggregateInstruction
 
     data object RefI31 : AggregateInstruction
 

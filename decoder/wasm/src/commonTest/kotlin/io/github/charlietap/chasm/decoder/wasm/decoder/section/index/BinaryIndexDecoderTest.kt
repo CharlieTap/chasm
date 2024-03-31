@@ -154,6 +154,20 @@ class BinaryIndexDecoderTest {
     }
 
     @Test
+    fun `can decode an encoded field index`() {
+
+        val intReader: () -> Result<UInt, WasmDecodeError> = {
+            Ok(32u)
+        }
+        val reader = FakeWasmBinaryReader(fakeUIntReader = intReader)
+
+        val expected = Ok(Index.FieldIndex(32u))
+        val actual = BinaryFieldIndexDecoder(reader)
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun `returns io error when read fails`() {
 
         val err = ioError()
