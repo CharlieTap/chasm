@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.fixture.instance
 
-import io.github.charlietap.chasm.ast.type.FunctionType
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 
 fun moduleInstance(
-    types: List<FunctionType> = emptyList(),
+    types: List<DefinedType> = emptyList(),
     functionAddresses: MutableList<Address.Function> = mutableListOf(),
     tableAddresses: MutableList<Address.Table> = mutableListOf(),
     memAddresses: MutableList<Address.Memory> = mutableListOf(),

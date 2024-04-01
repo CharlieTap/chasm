@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.parametric.Parame
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.ReferenceInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.table.TableInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.variable.VariableInstructionExecutor
-import io.github.charlietap.chasm.fixture.instruction.tableIndex
+import io.github.charlietap.chasm.fixture.module.tableIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test

@@ -30,6 +30,7 @@ ktlint_standard_no-empty-first-line-in-method-block = disabled
 ktlint_standard_multiline-expression-wrapping = disabled
 ktlint_standard_property-naming = disabled
 ktlint_standard_string-template-indent = disabled
+ktlint_standard_value-argument-comment = disabled
 
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true

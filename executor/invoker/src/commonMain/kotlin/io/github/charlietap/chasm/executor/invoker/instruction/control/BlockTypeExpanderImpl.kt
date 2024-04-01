@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.type.ext.functionType
 
 internal inline fun BlockTypeExpanderImpl(
     instance: ModuleInstance,
@@ -17,7 +18,7 @@ internal inline fun BlockTypeExpanderImpl(
     when (type) {
         is ControlInstruction.BlockType.Empty -> null
         is ControlInstruction.BlockType.SignedTypeIndex -> {
-            instance.types[type.typeIndex.idx.toInt()]
+            instance.types[type.typeIndex.idx.toInt()].functionType().bind()
         }
         is ControlInstruction.BlockType.ValType -> {
             FunctionType(ResultType(emptyList()), ResultType(listOf(type.valueType)))

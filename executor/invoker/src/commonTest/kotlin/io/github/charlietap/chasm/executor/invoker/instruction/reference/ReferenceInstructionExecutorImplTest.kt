@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.fixture.instruction.functionIndex
+import io.github.charlietap.chasm.fixture.module.functionIndex
 import io.github.charlietap.chasm.fixture.type.heapType
 import kotlin.test.Test
 import kotlin.test.assertEquals

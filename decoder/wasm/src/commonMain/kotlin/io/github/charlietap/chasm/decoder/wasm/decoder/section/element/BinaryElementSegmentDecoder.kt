@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.BinaryExpressionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.ExpressionDecoder
@@ -62,14 +62,14 @@ internal fun BinaryElementSegmentDecoder(
                 Expression(listOf(ReferenceInstruction.RefFunc(idx)))
             }
 
-            ElementSegment(elemIdx, ReferenceType.RefNull(HeapType.Func), expressions, mode)
+            ElementSegment(elemIdx, ReferenceType.RefNull(AbstractHeapType.Func), expressions, mode)
         }
         SEGMENT_TYPE_PASSIVE_FUNCREFS -> {
 
             val elemKind = elementKindDecoder(reader).bind()
             val refType = elemKind.let { kind ->
                 when (kind) {
-                    ElementKind.FuncRef -> ReferenceType.RefNull(HeapType.Func)
+                    ElementKind.FuncRef -> ReferenceType.RefNull(AbstractHeapType.Func)
                 }
             }
 
@@ -92,7 +92,7 @@ internal fun BinaryElementSegmentDecoder(
             val elemKind = elementKindDecoder(reader).bind()
             val refType = elemKind.let { kind ->
                 when (kind) {
-                    ElementKind.FuncRef -> ReferenceType.RefNull(HeapType.Func)
+                    ElementKind.FuncRef -> ReferenceType.RefNull(AbstractHeapType.Func)
                 }
             }
 
@@ -108,7 +108,7 @@ internal fun BinaryElementSegmentDecoder(
             val elemKind = elementKindDecoder(reader).bind()
             val refType = elemKind.let { kind ->
                 when (kind) {
-                    ElementKind.FuncRef -> ReferenceType.RefNull(HeapType.Func)
+                    ElementKind.FuncRef -> ReferenceType.RefNull(AbstractHeapType.Func)
                 }
             }
 
@@ -128,7 +128,7 @@ internal fun BinaryElementSegmentDecoder(
 
             val expressions = expressionVectorDecoder(reader, expressionDecoder).bind()
 
-            ElementSegment(elemIdx, ReferenceType.RefNull(HeapType.Func), expressions.vector, mode)
+            ElementSegment(elemIdx, ReferenceType.RefNull(AbstractHeapType.Func), expressions.vector, mode)
         }
         SEGMENT_TYPE_PASSIVE_MANY_EXPRESSIONS -> {
 

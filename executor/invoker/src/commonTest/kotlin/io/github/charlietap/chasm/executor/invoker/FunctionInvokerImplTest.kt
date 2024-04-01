@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.function
 import io.github.charlietap.chasm.fixture.store
@@ -33,9 +34,10 @@ class FunctionInvokerImplTest {
             functionAddresses = mutableListOf(address),
         )
         val functionType = functionType()
+        val definedType = functionType.definedType()
         val function = function()
         val functionInstance = FunctionInstance.WasmFunction(
-            functionType,
+            definedType,
             moduleInstance,
             function,
         )
@@ -78,9 +80,10 @@ class FunctionInvokerImplTest {
         val address = Address.Function(0)
         val moduleInstance = moduleInstance()
         val functionType = functionType()
+        val definedType = functionType.definedType()
         val function = function()
         val functionInstance = FunctionInstance.WasmFunction(
-            functionType,
+            definedType,
             moduleInstance,
             function,
         )

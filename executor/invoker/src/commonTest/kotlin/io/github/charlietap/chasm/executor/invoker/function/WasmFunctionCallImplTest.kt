@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.expect
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.label
 import io.github.charlietap.chasm.fixture.module.function
@@ -49,10 +50,11 @@ class WasmFunctionCallImplTest {
                 ),
             ),
         )
+        val definedType = functionType.definedType()
 
         val function = function(
             locals = listOf(
-                local(type = ValueType.Reference(ReferenceType.RefNull(HeapType.Func))),
+                local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
             body = Expression(
                 listOf(
@@ -63,7 +65,7 @@ class WasmFunctionCallImplTest {
         )
 
         val functionInstance = FunctionInstance.WasmFunction(
-            type = functionType,
+            type = definedType,
             module = moduleInstance(),
             function = function,
         )
@@ -140,10 +142,11 @@ class WasmFunctionCallImplTest {
                 ),
             ),
         )
+        val definedType = functionType.definedType()
 
         val function = function(
             locals = listOf(
-                local(type = ValueType.Reference(ReferenceType.RefNull(HeapType.Func))),
+                local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
             body = Expression(
                 listOf(
@@ -154,7 +157,7 @@ class WasmFunctionCallImplTest {
         )
 
         val functionInstance = FunctionInstance.WasmFunction(
-            type = functionType,
+            type = definedType,
             module = moduleInstance(),
             function = function,
         )
@@ -233,10 +236,11 @@ class WasmFunctionCallImplTest {
                 ),
             ),
         )
+        val definedType = functionType.definedType()
 
         val function = function(
             locals = listOf(
-                local(type = ValueType.Reference(ReferenceType.RefNull(HeapType.Func))),
+                local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
             body = Expression(
                 listOf(
@@ -247,7 +251,7 @@ class WasmFunctionCallImplTest {
         )
 
         val functionInstance = FunctionInstance.WasmFunction(
-            type = functionType,
+            type = definedType,
             module = moduleInstance(),
             function = function,
         )

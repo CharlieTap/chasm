@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocatorImpl
@@ -17,6 +17,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.executor.type.ext.definedType
+import io.github.charlietap.chasm.executor.type.ext.recursiveType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.dataSegment
 import io.github.charlietap.chasm.fixture.module.elementSegment
@@ -49,8 +51,9 @@ class ModuleAllocatorImplTest {
             function(typeIndex = typeIndex)
         val type = type(
             idx = typeIndex,
-            functionType = functionType,
+            recursiveType = functionType.recursiveType(),
         )
+        val definedType = functionType.definedType()
         val table = table()
         val memory = memory()
         val global = global()
@@ -58,9 +61,9 @@ class ModuleAllocatorImplTest {
         val globalInitValues = listOf(globalInitValue)
         val tableInitValue = ReferenceValue.Null(heapType())
         val tableInitValues = listOf(tableInitValue)
-        val refType = ReferenceType.RefNull(HeapType.Extern)
+        val refType = ReferenceType.RefNull(AbstractHeapType.Extern)
         val elementSegment = elementSegment(type = refType)
-        val refVals = listOf(ReferenceValue.Null(HeapType.Extern))
+        val refVals = listOf(ReferenceValue.Null(AbstractHeapType.Extern))
         val elementSegmentReferences = listOf(refVals)
         val bytes = ubyteArrayOf()
         val dataSegment = dataSegment(initData = bytes)
@@ -164,13 +167,13 @@ class ModuleAllocatorImplTest {
         }
 
         val partial = moduleInstance(
-            types = listOf(type.functionType),
+            types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
             globalAddresses = mutableListOf(importGlobalAddress),
         )
 
         val expected = ModuleInstance(
-            types = listOf(type.functionType),
+            types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
             tableAddresses = mutableListOf(importTableAddress, tableAddress),
             memAddresses = mutableListOf(importMemoryAddress, memoryAddress),

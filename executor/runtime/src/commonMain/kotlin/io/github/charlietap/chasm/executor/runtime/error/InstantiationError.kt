@@ -16,4 +16,6 @@ sealed interface InstantiationError : ModuleRuntimeError {
     data class UnexpectedImport(val importModuleName: String, val importEntityName: String) : InstantiationError
 
     data object DataSegmentMemoryIndexNotZero : InstantiationError
+
+    data object ClassificationError : InstantiationError
 }

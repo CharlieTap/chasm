@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.functionAddress
@@ -14,8 +15,8 @@ import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.instance.tableAddress
 import io.github.charlietap.chasm.fixture.instance.tableInstance
 import io.github.charlietap.chasm.fixture.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.instruction.tableIndex
-import io.github.charlietap.chasm.fixture.instruction.typeIndex
+import io.github.charlietap.chasm.fixture.module.tableIndex
+import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -31,8 +32,12 @@ class CallIndirectExecutorImplTest {
         val stack = stack()
 
         val typeIndex = typeIndex(0u)
-        val functionInstance = wasmFunctionInstance()
         val functionType = functionType()
+        val definedType = functionType.definedType()
+        val functionInstance = wasmFunctionInstance(
+            type = definedType,
+        )
+
         val functionAddress = functionAddress()
 
         val tableIndex = tableIndex(0u)
@@ -51,7 +56,7 @@ class CallIndirectExecutorImplTest {
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress),
             tableAddresses = mutableListOf(tableAddress),
-            types = listOf(functionType),
+            types = listOf(definedType),
         )
 
         val frame = frame(
@@ -86,8 +91,11 @@ class CallIndirectExecutorImplTest {
         val stack = stack()
 
         val typeIndex = typeIndex(0u)
-        val functionInstance = hostFunctionInstance()
         val functionType = functionType()
+        val definedType = functionType.definedType()
+        val functionInstance = hostFunctionInstance(
+            type = definedType,
+        )
         val functionAddress = functionAddress()
 
         val tableIndex = tableIndex(0u)
@@ -106,7 +114,7 @@ class CallIndirectExecutorImplTest {
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress),
             tableAddresses = mutableListOf(tableAddress),
-            types = listOf(functionType),
+            types = listOf(definedType),
         )
 
         val frame = frame(

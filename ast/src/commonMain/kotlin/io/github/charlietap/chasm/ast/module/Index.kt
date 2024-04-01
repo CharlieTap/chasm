@@ -32,4 +32,7 @@ sealed interface Index {
 
     @JvmInline
     value class TypeIndex(override val idx: UInt) : Index
+
+    @JvmInline
+    value class FieldIndex(override val idx: UInt) : Index
 }

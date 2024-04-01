@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.GlobalType
+import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
@@ -29,7 +30,7 @@ class GlobalModuleTest {
             idx = Index.GlobalIndex(0u),
             type = GlobalType(
                 valueType = ValueType.Number(NumberType.I32),
-                GlobalType.Mutability.Const,
+                Mutability.Const,
             ),
             initExpression = Expression(
                 listOf(NumericInstruction.I32Const(10)),
@@ -40,7 +41,7 @@ class GlobalModuleTest {
             idx = Index.GlobalIndex(1u),
             type = GlobalType(
                 valueType = ValueType.Number(NumberType.I32),
-                GlobalType.Mutability.Var,
+                Mutability.Var,
             ),
             initExpression = Expression(
                 listOf(NumericInstruction.I32Const(20)),

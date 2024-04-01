@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.fixture.instruction
+package io.github.charlietap.chasm.fixture.module
 
 import io.github.charlietap.chasm.ast.module.Index
 
@@ -37,3 +37,7 @@ fun tableIndex(
 fun typeIndex(
     index: UInt = 0u,
 ) = Index.TypeIndex(index)
+
+fun fieldIndex(
+    index: UInt = 0u,
+) = Index.FieldIndex(index)

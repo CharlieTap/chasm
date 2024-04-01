@@ -5,17 +5,13 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
-import io.github.charlietap.chasm.executor.instantiator.classification.ClassifiedExternalValue
-import io.github.charlietap.chasm.executor.instantiator.classification.ExternalValueClassifier
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
-import io.github.charlietap.chasm.executor.instantiator.validation.ImportValidator
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.type.ExternalType
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.elementSegment
@@ -26,7 +22,6 @@ import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.module.startFunction
 import io.github.charlietap.chasm.fixture.module.table
 import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.heapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -55,24 +50,6 @@ class ModuleInstantiatorImplTest {
             startFunction = startFunction,
         )
         val imports = listOf(ExternalValue.Function(Address.Function(0)))
-        val classified = ClassifiedExternalValue(
-            type = ExternalType.Function(functionType()),
-            value = imports[0],
-        )
-        val classifier: ExternalValueClassifier = { eStore, eExtern ->
-            assertEquals(store, eStore)
-            assertEquals(imports[0], eExtern)
-
-            Ok(classified)
-        }
-
-        val validator: ImportValidator = { iModule, iImport, iClassifiedExtern ->
-            assertEquals(module, iModule)
-            assertEquals(import, iImport)
-            assertEquals(classified, iClassifiedExtern)
-
-            Ok(Unit)
-        }
 
         val partialInstance = moduleInstance(
             functionAddresses = mutableListOf(Address.Function(0)),
@@ -137,10 +114,8 @@ class ModuleInstantiatorImplTest {
             store = store,
             module = module,
             imports = imports,
-            classifier = classifier,
             pallocator = pallocator,
             allocator = allocator,
-            validator = validator,
             invoker = invoker,
             evaluator = evaluator,
             tableInitializer = tableInitializer,

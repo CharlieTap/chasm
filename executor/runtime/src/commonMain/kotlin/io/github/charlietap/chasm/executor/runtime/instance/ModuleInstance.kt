@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
-import io.github.charlietap.chasm.ast.type.FunctionType
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.store.Address
 
 data class ModuleInstance(
-    val types: List<FunctionType>,
+    val types: List<DefinedType>,
     val functionAddresses: MutableList<Address.Function> = mutableListOf(),
     val tableAddresses: MutableList<Address.Table> = mutableListOf(),
     val memAddresses: MutableList<Address.Memory> = mutableListOf(),

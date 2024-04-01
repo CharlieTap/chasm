@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -19,7 +19,7 @@ class ReferenceTest {
             fileDirectory = FILE_DIR,
         )
 
-        val expected = listOf(ReferenceValue.Null(HeapType.Func))
+        val expected = listOf(ReferenceValue.Null(AbstractHeapType.Func))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

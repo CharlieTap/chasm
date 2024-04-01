@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.element
 
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
@@ -19,7 +19,7 @@ class ElementAllocatorImplTest {
             elements = elements,
         )
 
-        val refType = ReferenceType.RefNull(HeapType.Func)
+        val refType = ReferenceType.RefNull(AbstractHeapType.Func)
 
         val expected = ElementInstance(
             type = refType,

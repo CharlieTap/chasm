@@ -11,6 +11,7 @@ internal fun FakeWasmBinaryReader(
     fakeUBytesReader: ((UInt) -> Result<UByteArray, WasmDecodeError>)? = null,
     fakeIntReader: (() -> Result<Int, WasmDecodeError>)? = null,
     fakeUIntReader: (() -> Result<UInt, WasmDecodeError>)? = null,
+    fakeS33Reader: (() -> Result<UInt, WasmDecodeError>)? = null,
     fakeLongReader: (() -> Result<Long, WasmDecodeError>)? = null,
     fakeFloatReader: (() -> Result<Float, WasmDecodeError>)? = null,
     fakeDoubleReader: (() -> Result<Double, WasmDecodeError>)? = null,
@@ -40,6 +41,8 @@ internal fun FakeWasmBinaryReader(
 
     override fun uint(): Result<UInt, WasmDecodeError> = (fakeUIntReader ?: fail)()
 
+    override fun s33(): Result<UInt, WasmDecodeError> = (fakeS33Reader ?: fail)()
+
     override fun long(): Result<Long, WasmDecodeError> = (fakeLongReader ?: fail)()
 
     override fun float(): Result<Float, WasmDecodeError> = (fakeFloatReader ?: fail)()
@@ -68,6 +71,10 @@ internal fun FakeIntReader(
 internal fun FakeUIntReader(
     uint: () -> Result<UInt, WasmDecodeError>,
 ): WasmBinaryReader = FakeWasmBinaryReader(fakeUIntReader = uint)
+
+internal fun FakeS33Reader(
+    s33: () -> Result<UInt, WasmDecodeError>,
+): WasmBinaryReader = FakeWasmBinaryReader(fakeS33Reader = s33)
 
 internal fun FakeLongReader(
     long: () -> Result<Long, WasmDecodeError>,

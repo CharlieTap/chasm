@@ -163,11 +163,6 @@ internal const val I64_EXTEND8_S: UByte = 0xC2u
 internal const val I64_EXTEND16_S: UByte = 0xC3u
 internal const val I64_EXTEND32_S: UByte = 0xC4u
 
-internal const val REF_NULL: UByte = 0xD0u
-internal const val REF_ISNULL: UByte = 0xD1u
-internal const val REF_FUNC: UByte = 0xD2u
-internal const val REF_AS_NON_NULL: UByte = 0xD4u
-
 internal const val DROP: UByte = 0x1Au
 internal const val SELECT: UByte = 0x1Bu
 internal const val SELECT_W_TYPE: UByte = 0x1Cu

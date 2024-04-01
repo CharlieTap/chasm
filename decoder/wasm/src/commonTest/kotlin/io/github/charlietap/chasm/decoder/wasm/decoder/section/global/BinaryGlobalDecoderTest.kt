@@ -4,12 +4,10 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.ExpressionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.global.GlobalTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.fixture.type.globalType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -18,10 +16,7 @@ class BinaryGlobalDecoderTest {
     @Test
     fun `can decode an encoded global`() {
 
-        val globalType = GlobalType(
-            valueType = ValueType.Number(NumberType.I32),
-            mutability = GlobalType.Mutability.Var,
-        )
+        val globalType = globalType()
         val globalTypeDecoder: GlobalTypeDecoder = { _ ->
             Ok(globalType)
         }

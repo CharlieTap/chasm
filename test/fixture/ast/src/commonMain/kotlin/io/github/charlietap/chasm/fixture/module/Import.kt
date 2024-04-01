@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.tableType
 
 fun functionImportDescriptor(
-    typeIndex: Index.TypeIndex = Index.TypeIndex(0u),
+    typeIndex: Index.TypeIndex = typeIndex(),
 ) = Import.Descriptor.Function(
     typeIndex = typeIndex,
 )

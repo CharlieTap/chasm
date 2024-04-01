@@ -4,15 +4,12 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Table
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorLength
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorLengthDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.wasm.section.SectionSize
 import io.github.charlietap.chasm.decoder.wasm.section.TableSection
+import io.github.charlietap.chasm.fixture.type.tableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,9 +19,7 @@ class BinaryTableSectionDecoderTest {
     fun `can decode an encoded custom section`() {
 
         val reader = FakeWasmBinaryReader()
-        val limits = Limits(117u, 121u)
-        val refType = ReferenceType.RefNull(HeapType.Func)
-        val tableType = TableType(refType, limits)
+        val tableType = tableType()
         val table = Table(Index.TableIndex(0u), tableType, Expression.EMPTY)
         val expected = Ok(TableSection(listOf(table)))
 

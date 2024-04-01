@@ -7,19 +7,23 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
+import io.github.charlietap.chasm.fixture.type.recursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -36,7 +40,15 @@ class ImportModuleTest {
             params = ResultType(emptyList()),
             results = ResultType(listOf(ValueType.Number(NumberType.I32))),
         )
-        val expectedFunctionImportType = Type(Index.TypeIndex(0u), expectedFunctionType)
+        val expectedRecursiveType = recursiveType(
+            subTypes = listOf(
+                SubType.Final(
+                    superTypes = emptyList(),
+                    compositeType = CompositeType.Function(expectedFunctionType),
+                ),
+            ),
+        )
+        val expectedFunctionImportType = Type(Index.TypeIndex(0u), expectedRecursiveType)
 
         val expectedFunctionImport = Import(
             moduleName = NameValue("env"),
@@ -44,7 +56,7 @@ class ImportModuleTest {
             descriptor = Import.Descriptor.Function(Index.TypeIndex(0u)),
         )
 
-        val expectedTableType = TableType(ReferenceType.RefNull(HeapType.Func), Limits(1u, 2u))
+        val expectedTableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u, 2u))
 
         val expectedTableImport = Import(
             moduleName = NameValue("env"),
@@ -62,7 +74,7 @@ class ImportModuleTest {
 
         val expectedGlobalType = GlobalType(
             ValueType.Number(NumberType.I32),
-            GlobalType.Mutability.Const,
+            Mutability.Const,
         )
 
         val expectedGlobalImport = Import(

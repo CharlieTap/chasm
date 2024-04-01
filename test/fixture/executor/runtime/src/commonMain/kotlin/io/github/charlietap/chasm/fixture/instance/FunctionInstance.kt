@@ -1,15 +1,15 @@
 package io.github.charlietap.chasm.fixture.instance
 
 import io.github.charlietap.chasm.ast.module.Function
-import io.github.charlietap.chasm.ast.type.FunctionType
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.fixture.module.function
-import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.definedType
 
 fun hostFunctionInstance(
-    type: FunctionType = functionType(),
+    type: DefinedType = definedType(),
     function: HostFunction = { emptyList() },
 ) = FunctionInstance.HostFunction(
     type = type,
@@ -17,7 +17,7 @@ fun hostFunctionInstance(
 )
 
 fun wasmFunctionInstance(
-    type: FunctionType = functionType(),
+    type: DefinedType = definedType(),
     module: ModuleInstance = moduleInstance(),
     function: Function = function(),
 ) = FunctionInstance.WasmFunction(

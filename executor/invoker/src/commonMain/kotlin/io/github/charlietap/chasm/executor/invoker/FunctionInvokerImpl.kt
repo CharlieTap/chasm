@@ -17,6 +17,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.executor.type.ext.functionType
 
 fun FunctionInvokerImpl(
     store: Store,
@@ -42,9 +43,11 @@ internal fun FunctionInvokerImpl(
 
     if (index == -1) Err(InvocationError.InvalidAddress).bind<List<ExecutionValue>>()
 
+    val functionType = function.functionType().bind()
+
     val thread = Thread(
         Stack.Entry.ActivationFrame(
-            Arity(function.type.results.types.size),
+            Arity(functionType.results.types.size),
             Stack.Entry.ActivationFrame.State(
                 values.toMutableList(),
                 function.module,

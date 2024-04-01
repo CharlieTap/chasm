@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.functionAddress
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.functionIndex
+import io.github.charlietap.chasm.fixture.module.functionIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.value
 import kotlin.test.Test

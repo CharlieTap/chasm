@@ -15,9 +15,9 @@ import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.function
-import io.github.charlietap.chasm.executor.runtime.ext.functionType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.table
@@ -56,7 +56,7 @@ internal inline fun CallIndirectExecutorImpl(
     val tableAddress = frame.state.module.tableAddress(tableIndex.index()).bind()
     val tableInstance = store.table(tableAddress).bind()
 
-    val functionType = frame.state.module.functionType(typeIndex.index()).bind()
+    val functionType = frame.state.module.definedType(typeIndex.index()).bind()
 
     val elementIndex = stack.popI32().bind()
     val reference = tableInstance.element(elementIndex).bind()

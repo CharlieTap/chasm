@@ -18,6 +18,8 @@ internal fun IOErrorWasmFileReader(err: Err<WasmDecodeError.IOError>): WasmBinar
 
     override fun uint(): Result<UInt, WasmDecodeError> = err
 
+    override fun s33(): Result<UInt, WasmDecodeError> = err
+
     override fun long(): Result<Long, WasmDecodeError> = err
 
     override fun float(): Result<Float, WasmDecodeError> = err

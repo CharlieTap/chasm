@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.function
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
@@ -17,6 +17,7 @@ import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.VectorValue
+import io.github.charlietap.chasm.executor.type.ext.functionType
 
 @Suppress("UNUSED_PARAMETER")
 internal fun HostFunctionCallImpl(
@@ -24,7 +25,7 @@ internal fun HostFunctionCallImpl(
     stack: Stack,
     function: FunctionInstance.HostFunction,
 ): Result<Unit, InvocationError> = binding {
-    val type = function.type
+    val type = function.functionType().bind()
 
     val params = List(type.params.types.size) {
         stack.popValueOrError().bind().value
@@ -59,17 +60,17 @@ private fun classifyValue(valueType: ValueType, value: ExecutionValue?): Boolean
             when (val referenceType = valueType.referenceType) {
                 is ReferenceType.RefNull ->
                     when (referenceType.heapType) {
-                        is HeapType.Func ->
+                        is AbstractHeapType.Func ->
                             value is ReferenceValue.FunctionAddress ||
                                 value is ReferenceValue.Null && value.heapType == referenceType.heapType
-                        is HeapType.Extern ->
+                        is AbstractHeapType.Extern ->
                             value is ReferenceValue.ExternAddress ||
                                 value is ReferenceValue.Null && value.heapType == referenceType.heapType
                         else -> false
                     }
                 is ReferenceType.Ref -> when (referenceType.heapType) {
-                    is HeapType.Func -> value is ReferenceValue.FunctionAddress
-                    is HeapType.Extern -> value is ReferenceValue.ExternAddress
+                    is AbstractHeapType.Func -> value is ReferenceValue.FunctionAddress
+                    is AbstractHeapType.Extern -> value is ReferenceValue.ExternAddress
                     else -> false
                 }
             }

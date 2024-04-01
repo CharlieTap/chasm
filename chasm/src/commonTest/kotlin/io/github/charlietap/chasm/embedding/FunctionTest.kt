@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import kotlin.test.Test
@@ -18,12 +19,13 @@ class FunctionTest {
         val funcType = functionType()
         val hostFunction: HostFunction = { emptyList() }
 
+        val expectedType = funcType.definedType()
         val expected = ExternalValue.Function(Address.Function(0))
 
         val actual = function(store, funcType, hostFunction)
 
         assertEquals(expected, actual)
-        assertEquals(funcType, store.functions[0].type)
+        assertEquals(expectedType, store.functions[0].type)
         assertEquals(hostFunction, (store.functions[0] as? FunctionInstance.HostFunction)?.function)
     }
 }

@@ -3,12 +3,12 @@ package io.github.charlietap.chasm.fixture.module
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 
 fun elementSegment(
     idx: Index.ElementIndex = Index.ElementIndex(0u),
-    type: ReferenceType = ReferenceType.RefNull(HeapType.Func),
+    type: ReferenceType = ReferenceType.RefNull(AbstractHeapType.Func),
     initExpressions: List<Expression> = emptyList(),
     mode: ElementSegment.Mode = ElementSegment.Mode.Passive,
 ) = ElementSegment(
