@@ -1,23 +1,23 @@
 package io.github.charlietap.chasm.fixture.type
 
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.CompositeType
+import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.SubType
 
 fun subType() = openSubType()
 
 fun openSubType(
-    typeIndices: List<Index.TypeIndex> = emptyList(),
+    heapTypes: List<HeapType> = emptyList(),
     compositeType: CompositeType = compositeType(),
 ) = SubType.Open(
-    typeIndices,
+    heapTypes,
     compositeType,
 )
 
 fun finalSubType(
-    typeIndices: List<Index.TypeIndex> = emptyList(),
+    heapTypes: List<HeapType> = emptyList(),
     compositeType: CompositeType = compositeType(),
 ) = SubType.Final(
-    typeIndices,
+    heapTypes,
     compositeType,
 )

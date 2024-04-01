@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -38,6 +39,7 @@ class HostFunctionCallImplTest {
                 ),
             ),
         )
+        val definedType = functionType.definedType()
 
         val hostFunction: HostFunction = {
             listOf(
@@ -47,7 +49,7 @@ class HostFunctionCallImplTest {
         }
 
         val functionInstance = FunctionInstance.HostFunction(
-            type = functionType,
+            type = definedType,
             function = hostFunction,
         )
 
@@ -93,6 +95,7 @@ class HostFunctionCallImplTest {
                 ),
             ),
         )
+        val definedType = functionType.definedType()
 
         val hostFunction: HostFunction = {
             listOf(
@@ -102,7 +105,7 @@ class HostFunctionCallImplTest {
         }
 
         val functionInstance = FunctionInstance.HostFunction(
-            type = functionType,
+            type = definedType,
             function = hostFunction,
         )
 

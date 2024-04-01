@@ -15,14 +15,17 @@ import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.ast.type.NumberType
+import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.value.NameValue
@@ -44,7 +47,13 @@ class ExportModuleTest {
             params = ResultType(emptyList()),
             results = ResultType(emptyList()),
         )
-        val expectedFunctionExportType = Type(Index.TypeIndex(0u), expectedFunctionType)
+        val expectedRecursiveType = RecursiveType(
+            listOf(
+                SubType.Final(emptyList(), CompositeType.Function(expectedFunctionType)),
+            ),
+        )
+
+        val expectedFunctionExportType = Type(Index.TypeIndex(0u), expectedRecursiveType)
 
         val expectedFunction = Function(
             idx = Index.FunctionIndex(0u),

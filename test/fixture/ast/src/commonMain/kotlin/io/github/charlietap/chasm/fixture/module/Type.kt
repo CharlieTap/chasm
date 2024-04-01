@@ -2,13 +2,13 @@ package io.github.charlietap.chasm.fixture.module
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Type
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.ast.type.RecursiveType
+import io.github.charlietap.chasm.fixture.type.recursiveType
 
 fun type(
-    idx: Index.TypeIndex = Index.TypeIndex(0u),
-    functionType: FunctionType = functionType(),
+    idx: Index.TypeIndex = typeIndex(),
+    recursiveType: RecursiveType = recursiveType(),
 ) = Type(
     idx = idx,
-    functionType = functionType,
+    recursiveType = recursiveType,
 )

@@ -17,6 +17,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.executor.type.ext.definedType
+import io.github.charlietap.chasm.executor.type.ext.recursiveType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.dataSegment
 import io.github.charlietap.chasm.fixture.module.elementSegment
@@ -49,8 +51,9 @@ class ModuleAllocatorImplTest {
             function(typeIndex = typeIndex)
         val type = type(
             idx = typeIndex,
-            functionType = functionType,
+            recursiveType = functionType.recursiveType(),
         )
+        val definedType = functionType.definedType()
         val table = table()
         val memory = memory()
         val global = global()
@@ -164,13 +167,13 @@ class ModuleAllocatorImplTest {
         }
 
         val partial = moduleInstance(
-            types = listOf(type.functionType),
+            types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
             globalAddresses = mutableListOf(importGlobalAddress),
         )
 
         val expected = ModuleInstance(
-            types = listOf(type.functionType),
+            types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
             tableAddresses = mutableListOf(importTableAddress, tableAddress),
             memAddresses = mutableListOf(importMemoryAddress, memoryAddress),

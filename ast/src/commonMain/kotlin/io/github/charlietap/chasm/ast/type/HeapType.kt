@@ -5,7 +5,7 @@ import kotlin.jvm.JvmInline
 
 sealed interface HeapType : Type
 
-sealed interface AbstractHeapType : HeapType {
+sealed interface AbstractHeapType : HeapType, BottomType {
 
     data object Func : AbstractHeapType
 
@@ -28,5 +28,14 @@ sealed interface AbstractHeapType : HeapType {
     data object None : AbstractHeapType
 }
 
-@JvmInline
-value class ConcreteHeapType(val index: Index.TypeIndex) : HeapType
+sealed interface ConcreteHeapType : HeapType {
+
+    @JvmInline
+    value class TypeIndex(val index: Index.TypeIndex) : ConcreteHeapType
+
+    @JvmInline
+    value class RecursiveTypeIndex(val index: Int) : ConcreteHeapType
+
+    @JvmInline
+    value class Defined(val definedType: DefinedType) : ConcreteHeapType
+}

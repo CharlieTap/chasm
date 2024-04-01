@@ -29,7 +29,7 @@ internal fun BinaryHeapTypeDecoder(
         }
         in CONCRETE_HEAP_TYPE_RANGE -> {
             val typeIndex = Index.TypeIndex(reader.s33().bind())
-            ConcreteHeapType(typeIndex)
+            ConcreteHeapType.TypeIndex(typeIndex)
         }
         else -> Err(TypeDecodeError.InvalidHeapType(encoded)).bind<HeapType>()
     }

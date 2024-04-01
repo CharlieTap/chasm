@@ -72,7 +72,7 @@ class BinaryHeapTypeDecoderTest {
                 fakePeekReader = { peekReader },
             )
 
-            val expected = ConcreteHeapType(expectedTypeIndex)
+            val expected = ConcreteHeapType.TypeIndex(expectedTypeIndex)
 
             val actual = BinaryHeapTypeDecoder(reader, abstractHeapTypeDecoder)
             assertEquals(Ok(expected), actual)

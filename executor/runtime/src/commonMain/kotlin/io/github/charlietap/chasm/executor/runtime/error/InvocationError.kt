@@ -77,6 +77,12 @@ sealed interface InvocationError : ModuleRuntimeError {
 
     data object UndefinedDefaultReferenceType : InvocationError
 
+    data object FunctionCompositeTypeExpected : InvocationError
+
+    data object StructCompositeTypeExpected : InvocationError
+
+    data object ArrayCompositeTypeExpected : InvocationError
+
     @JvmInline
     value class UnimplementedInstruction(val instruction: Instruction) : InvocationError
 

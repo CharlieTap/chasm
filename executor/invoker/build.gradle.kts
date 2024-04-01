@@ -24,6 +24,7 @@ kotlin {
                 api(projects.ast)
                 api(projects.executor.runtime)
                 api(projects.executor.runtimeExt)
+                api(projects.executor.type)
                 api(libs.result)
 
                 implementation(projects.executor.memory)

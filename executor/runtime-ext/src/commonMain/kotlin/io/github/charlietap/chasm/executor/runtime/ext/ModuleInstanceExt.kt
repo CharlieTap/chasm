@@ -5,13 +5,13 @@ package io.github.charlietap.chasm.executor.runtime.ext
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.ast.type.FunctionType
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 
-inline fun ModuleInstance.functionType(index: Int): Result<FunctionType, InvocationError.FunctionTypeLookupFailed> =
+inline fun ModuleInstance.definedType(index: Int): Result<DefinedType, InvocationError.FunctionTypeLookupFailed> =
     types.getOrNull(index)?.let(::Ok) ?: Err(InvocationError.FunctionTypeLookupFailed(index))
 
 inline fun ModuleInstance.functionAddress(index: Int): Result<Address.Function, InvocationError.FunctionAddressLookupFailed> =

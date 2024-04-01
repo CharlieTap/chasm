@@ -9,10 +9,13 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.StartFunction
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
+import io.github.charlietap.chasm.fixture.type.recursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -29,7 +32,15 @@ class StartModuleTest {
             params = ResultType(emptyList()),
             results = ResultType(emptyList()),
         )
-        val expectedType = Type(Index.TypeIndex(0u), expectedFunctionType)
+        val expectedRecursiveType = recursiveType(
+            subTypes = listOf(
+                SubType.Final(
+                    superTypes = emptyList(),
+                    compositeType = CompositeType.Function(expectedFunctionType),
+                ),
+            ),
+        )
+        val expectedType = Type(Index.TypeIndex(0u), expectedRecursiveType)
 
         val expectedFunction = Function(
             idx = Index.FunctionIndex(0u),

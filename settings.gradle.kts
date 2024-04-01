@@ -47,6 +47,7 @@ include(":executor:invoker")
 include(":executor:memory")
 include(":executor:runtime")
 include(":executor:runtime-ext")
+include(":executor:type")
 
 include(":test:fake:decoder")
 

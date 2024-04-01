@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.function.Wasm
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.function
 import io.github.charlietap.chasm.fixture.store
@@ -25,7 +26,7 @@ class WasmFunctionAllocatorImplTest {
             functions = functions,
         )
 
-        val type = functionType()
+        val type = functionType().definedType()
         val wasmFunction = function(
             typeIndex = Index.TypeIndex(0u),
         )

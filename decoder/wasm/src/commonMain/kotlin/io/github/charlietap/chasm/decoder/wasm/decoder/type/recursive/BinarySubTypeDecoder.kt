@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.type.recursive
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.BinaryTypeIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.TypeIndexDecoder
@@ -33,14 +34,16 @@ internal fun BinarySubTypeDecoder(
         OPEN_SUB_TYPE -> {
             reader.ubyte().bind() // consume byte
             val typeIndices = vectorDecoder(reader, typeIndexDecoder).bind()
+            val heapTypes = typeIndices.vector.map(ConcreteHeapType::TypeIndex)
             val compositeType = compositeTypeDecoder(reader).bind()
-            SubType.Open(typeIndices.vector, compositeType)
+            SubType.Open(heapTypes, compositeType)
         }
         FINAL_SUB_TYPE -> {
             reader.ubyte().bind() // consume byte
             val typeIndices = vectorDecoder(reader, typeIndexDecoder).bind()
+            val heapTypes = typeIndices.vector.map(ConcreteHeapType::TypeIndex)
             val compositeType = compositeTypeDecoder(reader).bind()
-            SubType.Final(typeIndices.vector, compositeType)
+            SubType.Final(heapTypes, compositeType)
         }
         else -> {
             val compositeType = compositeTypeDecoder(reader).bind()

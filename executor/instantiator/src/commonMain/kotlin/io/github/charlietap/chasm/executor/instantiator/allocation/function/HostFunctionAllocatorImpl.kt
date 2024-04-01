@@ -5,13 +5,15 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.executor.type.ext.definedType
 
 fun HostFunctionAllocatorImpl(
     store: Store,
-    type: FunctionType,
+    functionType: FunctionType,
     function: HostFunction,
 ): Address.Function {
 
+    val type = functionType.definedType()
     val instance = FunctionInstance.HostFunction(type, function)
 
     store.functions.add(instance)

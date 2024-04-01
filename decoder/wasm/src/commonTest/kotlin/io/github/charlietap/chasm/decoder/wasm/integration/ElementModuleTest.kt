@@ -13,10 +13,13 @@ import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.Limits
+import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
@@ -36,7 +39,12 @@ class ElementModuleTest {
             params = ResultType(emptyList()),
             results = ResultType(emptyList()),
         )
-        val expectedType = Type(Index.TypeIndex(0u), expectedFunctionType)
+        val expectedRecursiveType = RecursiveType(
+            listOf(
+                SubType.Final(emptyList(), CompositeType.Function(expectedFunctionType)),
+            ),
+        )
+        val expectedType = Type(Index.TypeIndex(0u), expectedRecursiveType)
 
         val expectedFunction = Function(
             idx = Index.FunctionIndex(0u),

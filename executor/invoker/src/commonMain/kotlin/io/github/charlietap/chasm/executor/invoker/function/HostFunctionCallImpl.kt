@@ -17,6 +17,7 @@ import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.VectorValue
+import io.github.charlietap.chasm.executor.type.ext.functionType
 
 @Suppress("UNUSED_PARAMETER")
 internal fun HostFunctionCallImpl(
@@ -24,7 +25,7 @@ internal fun HostFunctionCallImpl(
     stack: Stack,
     function: FunctionInstance.HostFunction,
 ): Result<Unit, InvocationError> = binding {
-    val type = function.type
+    val type = function.functionType().bind()
 
     val params = List(type.params.types.size) {
         stack.popValueOrError().bind().value

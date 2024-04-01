@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.popLabelOrError
 import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.executor.type.ext.functionType
 
 internal inline fun WasmFunctionCallImpl(
     store: Store,
@@ -43,7 +44,7 @@ internal inline fun WasmFunctionCallImpl(
         stack.popFrameOrError().bind()
     }
 
-    val type = instance.type
+    val type = instance.functionType().bind()
 
     val params = List(type.params.types.size) {
         stack.popValueOrError().bind().value

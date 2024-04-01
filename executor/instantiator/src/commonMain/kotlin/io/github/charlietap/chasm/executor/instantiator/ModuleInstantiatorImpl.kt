@@ -8,13 +8,10 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocat
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocatorImpl
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocatorImpl
-import io.github.charlietap.chasm.executor.instantiator.classification.ExternalValueClassifier
-import io.github.charlietap.chasm.executor.instantiator.classification.ExternalValueClassifierImpl
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializerImpl
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializerImpl
-import io.github.charlietap.chasm.executor.instantiator.validation.ImportValidator
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluatorImpl
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
@@ -36,10 +33,8 @@ fun ModuleInstantiatorImpl(
         store = store,
         module = module,
         imports = imports,
-        classifier = ::ExternalValueClassifierImpl,
         pallocator = ::PartialModuleAllocatorImpl,
         allocator = ::ModuleAllocatorImpl,
-        validator = ::ImportValidator,
         invoker = ::FunctionInvokerImpl,
         evaluator = ::ExpressionEvaluatorImpl,
         tableInitializer = ::TableInitializerImpl,
@@ -50,10 +45,8 @@ internal fun ModuleInstantiatorImpl(
     store: Store,
     module: Module,
     imports: List<ExternalValue>,
-    classifier: ExternalValueClassifier,
     pallocator: PartialModuleAllocator,
     allocator: ModuleAllocator,
-    validator: ImportValidator,
     invoker: FunctionInvoker,
     evaluator: ExpressionEvaluator,
     tableInitializer: TableInitializer,
@@ -63,17 +56,6 @@ internal fun ModuleInstantiatorImpl(
 
     if (module.imports.size != imports.size) {
         Err(InstantiationError.MissingImport).bind<ModuleInstance>()
-    }
-
-    val classifiedImports = imports.map { import ->
-        classifier(store, import).bind()
-    }
-
-    // it's an invariant that external values are ordered and matched
-    // before the ModuleInstantiator is called
-    module.imports.forEachIndexed { idx, import ->
-        val classified = classifiedImports[idx]
-        validator(module, import, classified).bind()
     }
 
     val partialInstance = pallocator(store, module, imports).bind()

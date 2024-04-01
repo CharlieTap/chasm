@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.valueType
@@ -43,8 +44,9 @@ class BlockTypeExpanderImplTest {
     fun `can expand a signed type index block type`() {
         val typeIndex = Index.TypeIndex(0u)
         val type = functionType()
+        val definedType = type.definedType()
         val instance = moduleInstance(
-            types = listOf(type),
+            types = listOf(definedType),
         )
 
         val blockType = ControlInstruction.BlockType.SignedTypeIndex(typeIndex)
