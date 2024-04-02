@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.decoder.wasm.reader
 
 import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.decoder.wasm.const.Leb128
+import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -10,7 +12,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read a byte from source and forward it on`() {
-        val expected: Ok<Byte> = Ok(0x01)
+        val expected: Result<Byte, WasmDecodeError> = Ok(0x01)
         val sourceReader = FakeByteSourceReader {
             expected.value
         }
@@ -34,7 +36,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read a ubyte from source and forward it on`() {
-        val expected: Ok<UByte> = Ok(0x01u)
+        val expected: Result<UByte, WasmDecodeError> = Ok(0x01u)
         val sourceReader = FakeByteSourceReader {
             expected.value.toByte()
         }
@@ -58,7 +60,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read bytes from source and forward them on`() {
-        val expected: Ok<ByteArray> = Ok(byteArrayOf(0x01, 0x02))
+        val expected: Result<ByteArray, WasmDecodeError> = Ok(byteArrayOf(0x01, 0x02))
         val sourceReader = FakeByteArraySourceReader { amount ->
             assertEquals(2, amount)
             expected.value
@@ -83,7 +85,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read ubytes from source and forward them on`() {
-        val expected: Ok<UByteArray> = Ok(ubyteArrayOf(0x01u, 0x02u))
+        val expected: Result<UByteArray, WasmDecodeError> = Ok(ubyteArrayOf(0x01u, 0x02u))
         val sourceReader = FakeByteArraySourceReader { amount ->
             assertEquals(2, amount)
             expected.value.asByteArray()
@@ -108,7 +110,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read a leb128 encoded int and forward it on`() {
-        val expected: Ok<Int> = Ok(128)
+        val expected: Result<Int, WasmDecodeError> = Ok(128)
         val source = Leb128.Integer.TWO_BYTES_SIGNED_POSITIVE.asSequence().iterator()
         val sourceReader = FakeByteSourceReader {
             source.next()
@@ -133,7 +135,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read a leb128 encoded uint and forward it on`() {
-        val expected: Ok<UInt> = Ok(128u)
+        val expected: Result<UInt, WasmDecodeError> = Ok(128u)
         val source = Leb128.Integer.TWO_BYTES_UNSIGNED.asSequence().iterator()
         val sourceReader = FakeByteSourceReader {
             source.next().toByte()
@@ -158,7 +160,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read a leb128 encoded long and forward it on`() {
-        val expected: Ok<Long> = Ok(Long.MAX_VALUE)
+        val expected: Result<Long, WasmDecodeError> = Ok(Long.MAX_VALUE)
         val source = Leb128.Long.TEN_BYTES_SIGNED_POSITIVE.asSequence().iterator()
         val sourceReader = FakeByteSourceReader {
             source.next()
@@ -183,7 +185,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read an IEEE 754 encoded float and forward it on`() {
-        val expected: Ok<Float> = Ok(1.5f)
+        val expected: Result<Float, WasmDecodeError> = Ok(1.5f)
         val sourceReader = FakeByteArraySourceReader {
             byteArrayOf(0x00.toByte(), 0x00.toByte(), 0xC0.toByte(), 0x3F.toByte())
         }
@@ -207,7 +209,7 @@ class SourceWasmBinaryReaderTest {
 
     @Test
     fun `can read an IEEE 754 encoded double and forward it on`() {
-        val expected: Ok<Double> = Ok(12345.6789)
+        val expected: Result<Double, WasmDecodeError> = Ok(12345.6789)
         val sourceReader = FakeByteArraySourceReader {
             byteArrayOf(161.toByte(), 248.toByte(), 49.toByte(), 230.toByte(), 214.toByte(), 28.toByte(), 200.toByte(), 64.toByte())
         }
