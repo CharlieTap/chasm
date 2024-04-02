@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.decoder.wasm.reader
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 
-internal fun IOErrorWasmFileReader(err: Err<WasmDecodeError.IOError>): WasmBinaryReader = object : WasmBinaryReader {
+internal fun IOErrorWasmFileReader(err: Result<Nothing, WasmDecodeError.IOError>): WasmBinaryReader = object : WasmBinaryReader {
 
     override fun byte(): Result<Byte, WasmDecodeError> = err
 

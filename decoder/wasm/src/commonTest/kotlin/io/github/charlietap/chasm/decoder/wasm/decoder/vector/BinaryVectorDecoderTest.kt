@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.vector
 
 import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.wasm.reader.IOErrorWasmFileReader
@@ -14,8 +16,8 @@ class BinaryVectorDecoderTest {
 
         val expected = Ok(ByteVector(VALID_VECTOR, 16u))
 
-        val int: () -> Ok<UInt> = { Ok(16u) }
-        val bytes: (UInt) -> Ok<UByteArray> = { _ -> Ok(VALID_VECTOR) }
+        val int: () -> Result<UInt, WasmDecodeError> = { Ok(16u) }
+        val bytes: (UInt) -> Result<UByteArray, WasmDecodeError> = { _ -> Ok(VALID_VECTOR) }
 
         val reader = FakeWasmBinaryReader(fakeUBytesReader = bytes, fakeUIntReader = int)
 

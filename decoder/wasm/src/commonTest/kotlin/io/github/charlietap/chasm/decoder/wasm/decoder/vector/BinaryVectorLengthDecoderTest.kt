@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.vector
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.decoder.wasm.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.wasm.reader.IOErrorWasmFileReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,8 +14,7 @@ class BinaryVectorLengthDecoderTest {
 
         val expected = Ok(VectorLength(16u))
 
-        val int: () -> Ok<UInt> = { Ok(16u) }
-        val reader = FakeWasmBinaryReader(fakeUIntReader = int)
+        val reader = FakeUIntReader { Ok(16u) }
 
         val actual = BinaryVectorLengthDecoder(reader)
 

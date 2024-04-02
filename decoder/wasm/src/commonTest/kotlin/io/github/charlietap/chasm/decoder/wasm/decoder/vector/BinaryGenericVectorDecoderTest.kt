@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.wasm.decoder.value.name.NameValueDecoder
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.decoder.wasm.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.wasm.reader.IOErrorWasmFileReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,8 +20,7 @@ class BinaryGenericVectorDecoderTest {
         )
         val expected = Ok(Vector(expectedNames))
 
-        val int: () -> Ok<UInt> = { Ok(2u) }
-        val reader = FakeWasmBinaryReader(fakeUIntReader = int)
+        val reader = FakeUIntReader { Ok(2u) }
 
         val names = sequenceOf(NameValue("one"), NameValue("two")).iterator()
         val subDecoder: NameValueDecoder = {

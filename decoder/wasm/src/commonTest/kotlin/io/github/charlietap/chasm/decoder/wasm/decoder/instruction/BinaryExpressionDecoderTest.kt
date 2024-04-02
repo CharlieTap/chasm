@@ -20,7 +20,7 @@ class BinaryExpressionDecoderTest {
         }
         val expected = Ok(Expression(NumericInstruction.I32Eqz))
 
-        val actual = io.github.charlietap.chasm.decoder.wasm.decoder.instruction.BinaryExpressionDecoder(
+        val actual = BinaryExpressionDecoder(
             FakeWasmBinaryReader(),
             instructionBlockDecoder,
         )
@@ -34,7 +34,7 @@ class BinaryExpressionDecoderTest {
         val err = ioError()
         val reader = IOErrorWasmFileReader(err)
 
-        val actual = io.github.charlietap.chasm.decoder.wasm.decoder.instruction.BinaryExpressionDecoder(reader)
+        val actual = BinaryExpressionDecoder(reader)
 
         assertEquals(err, actual)
     }
