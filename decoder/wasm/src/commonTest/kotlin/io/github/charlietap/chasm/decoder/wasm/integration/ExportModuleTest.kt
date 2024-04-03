@@ -29,8 +29,8 @@ import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.value.NameValue
+import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -39,7 +39,7 @@ class ExportModuleTest {
     @Test
     fun `can decode an export module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/export.wasm").readBytes().asSequence()
+        val byteStream = Resource("src/commonTest/resources/export.wasm").readBytes()
 
         val reader = FakeSourceReader(byteStream)
 

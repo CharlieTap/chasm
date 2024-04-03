@@ -2,13 +2,13 @@ package io.github.charlietap.chasm.decoder.wasm
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.decoder.factory.BinaryReaderFactory
 import io.github.charlietap.chasm.decoder.wasm.decoder.magic.MagicNumberValidator
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.SectionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.SectionTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.version.VersionDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeExhaustedReader
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
 import io.github.charlietap.chasm.fixture.module.module
 import kotlin.test.Test
 import kotlin.test.assertEquals

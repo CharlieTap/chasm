@@ -22,3 +22,30 @@ fun FakeSourceReader(
 
     override fun peek(): SourceReader = FakeSourceReader(bytes, position)
 }
+
+fun FakeSourceReader(
+    byte: () -> Byte = { 0x00 },
+    bytes: (Int) -> ByteArray = { byteArrayOf() },
+    exhausted: () -> Boolean = { false },
+    peek: () -> SourceReader = { FakeSourceReader() },
+): SourceReader = object : SourceReader {
+    override fun byte(): Byte = byte()
+
+    override fun bytes(amount: Int): ByteArray = bytes(amount)
+
+    override fun exhausted(): Boolean = exhausted()
+
+    override fun peek(): SourceReader = peek()
+}
+
+fun FakeByteSourceReader(
+    byte: () -> Byte,
+): SourceReader = FakeSourceReader(byte = byte)
+
+fun FakeByteArraySourceReader(
+    bytes: (Int) -> ByteArray,
+): SourceReader = FakeSourceReader(bytes = bytes)
+
+fun FakeExhaustedSourceReader(
+    exhausted: () -> Boolean,
+): SourceReader = FakeSourceReader(exhausted = exhausted)

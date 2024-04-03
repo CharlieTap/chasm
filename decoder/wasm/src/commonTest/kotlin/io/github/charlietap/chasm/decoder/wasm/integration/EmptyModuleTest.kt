@@ -4,8 +4,8 @@ import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -14,7 +14,7 @@ class EmptyModuleTest {
     @Test
     fun `can decode an empty module`() {
 
-        val byteStream = Resource("src/commonTest/resources/empty.wasm").readBytes().asSequence()
+        val byteStream = Resource("src/commonTest/resources/empty.wasm").readBytes()
 
         val reader = FakeSourceReader(byteStream)
 

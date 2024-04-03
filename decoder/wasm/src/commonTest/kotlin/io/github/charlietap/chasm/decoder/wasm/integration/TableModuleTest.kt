@@ -12,8 +12,8 @@ import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,7 +22,7 @@ class TableModuleTest {
     @Test
     fun `can decode a table module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/table.wasm").readBytes().asSequence()
+        val byteStream = Resource("src/commonTest/resources/table.wasm").readBytes()
 
         val reader = FakeSourceReader(byteStream)
 

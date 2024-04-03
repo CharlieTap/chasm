@@ -123,12 +123,12 @@ internal val CONTROL_OPCODES: Set<UIntRange> by lazy {
 
 internal val VECTOR_OPCODES by lazy {
     setOf(
-        PREFIX_VECTOR..PREFIX_VECTOR,
+        PREFIX_FD..PREFIX_FD,
     )
 }
 
 internal val PREFIXED_OPCODES by lazy {
     setOf(
-        PREFIX_MISC..PREFIX_MISC,
+        PREFIX_FB..PREFIX_FC,
     )
 }

@@ -29,6 +29,7 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation(projects.test.fake.decoder)
                 implementation(projects.test.fixture.ast)
 
                 implementation(libs.kotlin.test)

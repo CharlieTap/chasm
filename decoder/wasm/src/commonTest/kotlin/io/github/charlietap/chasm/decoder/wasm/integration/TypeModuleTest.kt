@@ -15,8 +15,8 @@ import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
+import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,7 +26,7 @@ class TypeModuleTest {
     @Test
     fun `can decode a type module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/type.wasm").readBytes().asSequence()
+        val byteStream = Resource("src/commonTest/resources/type.wasm").readBytes()
 
         val reader = FakeSourceReader(byteStream)
 

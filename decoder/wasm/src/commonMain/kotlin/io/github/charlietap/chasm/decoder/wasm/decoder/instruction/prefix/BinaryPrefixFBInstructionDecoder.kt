@@ -1,19 +1,26 @@
-package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.reference
+package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.prefix
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.PREFIX_FB
+import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.control.BinaryCastFlagsDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.control.CastFlagsDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.control.Nullability
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.BinaryDataIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.BinaryElementIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.BinaryFieldIndexDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.BinaryLabelIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.BinaryTypeIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.DataIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.ElementIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.FieldIndexDecoder
+import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.LabelIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.TypeIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.heap.BinaryHeapTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.heap.HeapTypeDecoder
@@ -21,27 +28,35 @@ import io.github.charlietap.chasm.decoder.wasm.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.wasm.reader.WasmBinaryReader
 
-internal fun BinaryPrefixedReferenceInstructionDecoder(
+internal fun BinaryPrefixFBInstructionDecoder(
     reader: WasmBinaryReader,
+    opcode: UInt,
 ): Result<Instruction, WasmDecodeError> =
-    BinaryPrefixedReferenceInstructionDecoder(
+    BinaryPrefixFBInstructionDecoder(
         reader = reader,
+        opcode = opcode,
         dataIndexDecoder = ::BinaryDataIndexDecoder,
         elementIndexDecoder = ::BinaryElementIndexDecoder,
         fieldIndexDecoder = ::BinaryFieldIndexDecoder,
         typeIndexDecoder = ::BinaryTypeIndexDecoder,
         heapTypeDecoder = ::BinaryHeapTypeDecoder,
+        labelIndexDecoder = ::BinaryLabelIndexDecoder,
+        castFlagsDecoder = ::BinaryCastFlagsDecoder,
     )
 
-internal fun BinaryPrefixedReferenceInstructionDecoder(
+internal fun BinaryPrefixFBInstructionDecoder(
     reader: WasmBinaryReader,
+    opcode: UInt,
     dataIndexDecoder: DataIndexDecoder,
     elementIndexDecoder: ElementIndexDecoder,
     fieldIndexDecoder: FieldIndexDecoder,
     typeIndexDecoder: TypeIndexDecoder,
     heapTypeDecoder: HeapTypeDecoder,
+    labelIndexDecoder: LabelIndexDecoder,
+    castFlagsDecoder: CastFlagsDecoder,
 ): Result<Instruction, WasmDecodeError> = binding {
-    when (val instruction = reader.uint().bind()) {
+
+    when (opcode) {
         STRUCT_NEW -> {
             val typeIndex = typeIndexDecoder(reader).bind()
             AggregateInstruction.StructNew(typeIndex)
@@ -149,12 +164,39 @@ internal fun BinaryPrefixedReferenceInstructionDecoder(
             val referenceType = ReferenceType.RefNull(heapType)
             ReferenceInstruction.RefCast(referenceType)
         }
+        BR_ON_CAST,
+        BR_ON_CAST_FAIL,
+        -> {
+            val castFlags = castFlagsDecoder(reader).bind()
+            val labelIndex = labelIndexDecoder(reader).bind()
+            val srcHeapType = heapTypeDecoder(reader).bind()
+            val dstHeapType = heapTypeDecoder(reader).bind()
+
+            val srcReferenceType = if (castFlags.src == Nullability.NON_NULL) {
+                ReferenceType.Ref(srcHeapType)
+            } else {
+                ReferenceType.RefNull(srcHeapType)
+            }
+
+            val dstReferenceType = if (castFlags.dst == Nullability.NON_NULL) {
+                ReferenceType.Ref(dstHeapType)
+            } else {
+                ReferenceType.RefNull(dstHeapType)
+            }
+
+            if (opcode == BR_ON_CAST) {
+                ControlInstruction.BrOnCast(labelIndex, srcReferenceType, dstReferenceType)
+            } else {
+                ControlInstruction.BrOnCastFail(labelIndex, srcReferenceType, dstReferenceType)
+            }
+        }
         ANY_CONVERT_EXTERN -> AggregateInstruction.AnyConvertExtern
         EXTERN_CONVERT_ANY -> AggregateInstruction.ExternConvertAny
         REF_I31 -> AggregateInstruction.RefI31
         I31_GET_SIGNED -> AggregateInstruction.I31GetSigned
         I31_GET_UNSIGNED -> AggregateInstruction.I31GetUnsigned
-        else -> Err(InstructionDecodeError.InvalidPrefixedReferenceInstruction(instruction.toUByte())).bind<Instruction>()
+
+        else -> Err(InstructionDecodeError.InvalidPrefixInstruction(PREFIX_FB, opcode)).bind<Instruction>()
     }
 }
 
@@ -182,6 +224,8 @@ internal const val REF_TEST = 20u
 internal const val REF_TEST_NULL = 21u
 internal const val REF_CAST = 22u
 internal const val REF_CAST_NULL = 23u
+internal const val BR_ON_CAST = 24u
+internal const val BR_ON_CAST_FAIL = 25u
 internal const val ANY_CONVERT_EXTERN = 26u
 internal const val EXTERN_CONVERT_ANY = 27u
 internal const val REF_I31 = 28u

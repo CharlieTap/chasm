@@ -11,8 +11,8 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -21,7 +21,7 @@ class DataModuleTest {
     @Test
     fun `can decode a data module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/data.wasm").readBytes().asSequence()
+        val byteStream = Resource("src/commonTest/resources/data.wasm").readBytes()
 
         val reader = FakeSourceReader(byteStream)
 

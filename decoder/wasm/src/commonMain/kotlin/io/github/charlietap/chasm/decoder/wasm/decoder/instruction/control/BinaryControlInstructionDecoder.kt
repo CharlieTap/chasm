@@ -55,7 +55,6 @@ internal fun BinaryControlInstructionDecoder(
         tableIndexDecoder = ::BinaryTableIndexDecoder,
         labelIndexDecoder = ::BinaryLabelIndexDecoder,
         vectorDecoder = ::BinaryVectorDecoder,
-        prefixedControlInstructionDecoder = ::BinaryPrefixedControlInstructionDecoder,
     )
 
 internal fun BinaryControlInstructionDecoder(
@@ -69,7 +68,6 @@ internal fun BinaryControlInstructionDecoder(
     tableIndexDecoder: TableIndexDecoder,
     labelIndexDecoder: LabelIndexDecoder,
     vectorDecoder: VectorDecoder<Index.LabelIndex>,
-    prefixedControlInstructionDecoder: PrefixedControlInstructionDecoder,
 ): Result<Instruction, WasmDecodeError> = binding {
     when (opcode) {
         UNREACHABLE -> ControlInstruction.Unreachable
@@ -137,10 +135,7 @@ internal fun BinaryControlInstructionDecoder(
             val labelIndex = labelIndexDecoder(reader).bind()
             ControlInstruction.BrOnNonNull(labelIndex)
         }
-        PREFIXED_CONTROL_INSTRUCTION -> prefixedControlInstructionDecoder(reader).bind()
 
         else -> Err(InstructionDecodeError.InvalidControlInstruction(opcode)).bind<Instruction>()
     }
 }
-
-internal const val PREFIXED_CONTROL_INSTRUCTION: UByte = 0xFBu

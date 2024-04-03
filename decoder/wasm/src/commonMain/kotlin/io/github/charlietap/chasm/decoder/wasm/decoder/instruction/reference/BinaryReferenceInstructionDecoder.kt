@@ -20,14 +20,12 @@ internal fun BinaryReferenceInstructionDecoder(
         reader = reader,
         opcode = opcode,
         heapTypeDecoder = ::BinaryHeapTypeDecoder,
-        prefixedInstructionDecoder = ::BinaryPrefixedReferenceInstructionDecoder,
     )
 
 internal fun BinaryReferenceInstructionDecoder(
     reader: WasmBinaryReader,
     opcode: UByte,
     heapTypeDecoder: HeapTypeDecoder,
-    prefixedInstructionDecoder: PrefixedReferenceInstructionDecoder,
 ): Result<Instruction, WasmDecodeError> = binding {
     when (opcode) {
         REF_NULL -> {
@@ -47,7 +45,6 @@ internal fun BinaryReferenceInstructionDecoder(
         REF_AS_NON_NULL -> {
             ReferenceInstruction.RefAsNonNull
         }
-        PREFIXED_REFERENCE_INSTRUCTION -> prefixedInstructionDecoder(reader).bind()
         else -> Err(InstructionDecodeError.InvalidReferenceInstruction(opcode)).bind<Instruction>()
     }
 }
@@ -57,4 +54,3 @@ internal const val REF_ISNULL: UByte = 0xD1u
 internal const val REF_FUNC: UByte = 0xD2u
 internal const val REF_EQ: UByte = 0xD3u
 internal const val REF_AS_NON_NULL: UByte = 0xD4u
-internal const val PREFIXED_REFERENCE_INSTRUCTION: UByte = 0xFBu

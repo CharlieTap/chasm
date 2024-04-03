@@ -12,8 +12,8 @@ import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,7 +22,7 @@ class GlobalModuleTest {
     @Test
     fun `can decode a global module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/global.wasm").readBytes().asSequence()
+        val byteStream = Resource("src/commonTest/resources/global.wasm").readBytes()
 
         val reader = FakeSourceReader(byteStream)
 

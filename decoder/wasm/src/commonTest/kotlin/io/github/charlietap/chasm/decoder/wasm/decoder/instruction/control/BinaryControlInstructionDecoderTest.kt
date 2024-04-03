@@ -33,7 +33,6 @@ import io.github.charlietap.chasm.decoder.wasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.instruction.prefixedControlInstruction
 import io.github.charlietap.chasm.fixture.module.labelIndex
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import kotlin.test.Test
@@ -92,7 +91,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -126,7 +124,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -159,7 +156,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -187,7 +183,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -215,7 +210,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -248,7 +242,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = vectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -287,7 +280,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -320,7 +312,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -348,7 +339,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -381,7 +371,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -409,7 +398,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -437,7 +425,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -465,7 +452,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -493,36 +479,6 @@ class BinaryControlInstructionDecoderTest {
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
             vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = neverPrefixedControlInstructionDecoder,
-        )
-
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `delegates prefixed control instructions to the prefixed decoder`() {
-
-        val opcode = PREFIXED_CONTROL_INSTRUCTION
-
-        val prefixedControlInstruction = prefixedControlInstruction()
-        val prefixedControlInstructionDecoder: PrefixedControlInstructionDecoder = { _ ->
-            Ok(prefixedControlInstruction)
-        }
-
-        val expected = Ok(prefixedControlInstruction)
-
-        val actual = BinaryControlInstructionDecoder(
-            reader = FakeWasmBinaryReader(),
-            opcode = opcode,
-            blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
-            functionIndexDecoder = neverFunctionIndexDecoder,
-            typeIndexDecoder = neverTypeIndexDecoder,
-            labelIndexDecoder = neverLabelIndexDecoder,
-            tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
-            prefixedControlInstructionDecoder = prefixedControlInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -564,9 +520,6 @@ class BinaryControlInstructionDecoderTest {
         }
         private val neverVectorDecoder: VectorDecoder<Index.LabelIndex> = { _, _ ->
             fail("vector decoder should not run in this scenario")
-        }
-        private val neverPrefixedControlInstructionDecoder: PrefixedControlInstructionDecoder = { _ ->
-            fail("prefixed control instruction decoder should not run in this scenario")
         }
     }
 }

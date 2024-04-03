@@ -2,6 +2,9 @@ package io.github.charlietap.chasm.decoder.wasm.reader
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.decoder.FakeByteArraySourceReader
+import io.github.charlietap.chasm.decoder.FakeByteSourceReader
+import io.github.charlietap.chasm.decoder.FakeExhaustedSourceReader
 import io.github.charlietap.chasm.decoder.wasm.const.Leb128
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError

@@ -11,10 +11,8 @@ import io.github.charlietap.chasm.decoder.wasm.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.instruction.prefixedReferenceInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.fail
 
 class BinaryReferenceInstructionDecoderTest {
 
@@ -35,7 +33,6 @@ class BinaryReferenceInstructionDecoderTest {
             reader,
             opcode,
             heapTypeDecoder,
-            prefixedReferenceInstructionDecoder(),
         )
 
         assertEquals(expected, actual)
@@ -89,25 +86,6 @@ class BinaryReferenceInstructionDecoderTest {
     }
 
     @Test
-    fun `delegates prefixed instructions to the prefixed decoder`() {
-
-        val opcode = PREFIXED_REFERENCE_INSTRUCTION
-
-        val reader = FakeWasmBinaryReader()
-
-        val prefixedReferenceInstruction = prefixedReferenceInstruction()
-        val prefixedDecoder: PrefixedReferenceInstructionDecoder = { _reader ->
-            assertEquals(reader, _reader)
-            Ok(prefixedReferenceInstruction)
-        }
-        val expected = Ok(prefixedReferenceInstruction)
-
-        val actual = BinaryReferenceInstructionDecoder(reader, opcode, heapTypeDecoder(), prefixedDecoder)
-
-        assertEquals(expected, actual)
-    }
-
-    @Test
     fun `returns an unknown numeric instruction error when the opcode doesn't match`() {
 
         val opcode = 0xFFu.toUByte()
@@ -117,15 +95,5 @@ class BinaryReferenceInstructionDecoderTest {
         val actual = BinaryNumericInstructionDecoder(FakeWasmBinaryReader(), opcode)
 
         assertEquals(expected, actual)
-    }
-
-    companion object {
-        private fun heapTypeDecoder(): HeapTypeDecoder = { _ ->
-            fail("HeapTypeDecoder should not be called in this scenario")
-        }
-
-        private fun prefixedReferenceInstructionDecoder(): PrefixedReferenceInstructionDecoder = { _ ->
-            fail("PrefixedReferenceInstruction should not be called in this scenario")
-        }
     }
 }

@@ -202,8 +202,9 @@ internal const val I64_STORE32: UByte = 0x3Eu
 internal const val MEMORY_SIZE: UByte = 0x3Fu
 internal const val MEMORY_GROW: UByte = 0x40u
 
-internal const val PREFIX_MISC: UByte = 0xFCu
-internal const val PREFIX_VECTOR: UByte = 0xFDu
+internal const val PREFIX_FB: UByte = 0xFBu
+internal const val PREFIX_FC: UByte = 0xFCu
+internal const val PREFIX_FD: UByte = 0xFDu
 
 // prefixed
 

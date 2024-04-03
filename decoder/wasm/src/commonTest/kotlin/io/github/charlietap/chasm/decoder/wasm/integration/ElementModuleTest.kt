@@ -21,8 +21,8 @@ import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -31,7 +31,7 @@ class ElementModuleTest {
     @Test
     fun `can decode an element module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/element.wasm").readBytes().asSequence()
+        val byteStream = Resource("src/commonTest/resources/element.wasm").readBytes()
 
         val reader = FakeSourceReader(byteStream)
 
