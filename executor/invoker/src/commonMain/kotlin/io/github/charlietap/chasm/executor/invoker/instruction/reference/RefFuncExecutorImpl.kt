@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.functionAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal inline fun RefFuncExecutorImpl(
@@ -17,9 +17,9 @@ internal inline fun RefFuncExecutorImpl(
     instruction: ReferenceInstruction.RefFunc,
 ): Result<Unit, InvocationError> = binding {
 
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
 
     val functionAddress = frame.state.module.functionAddress(instruction.funcIdx.index()).bind()
 
-    stack.push(Stack.Entry.Value(ReferenceValue.FunctionAddress(functionAddress)))
+    stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
 }

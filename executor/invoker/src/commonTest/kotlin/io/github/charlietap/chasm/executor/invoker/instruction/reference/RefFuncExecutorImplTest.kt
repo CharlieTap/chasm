@@ -34,12 +34,12 @@ class RefFuncExecutorImplTest {
 
         val instruction = ReferenceInstruction.RefFunc(functionIndex)
 
-        val expected = value(ReferenceValue.FunctionAddress(functionAddress))
+        val expected = value(ReferenceValue.Function(functionAddress))
 
         val actual = RefFuncExecutorImpl(stack, instruction)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(expected, stack.popValue())
+        assertEquals(expected, stack.popValueOrNull())
     }
 }

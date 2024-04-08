@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.function
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
@@ -40,7 +40,7 @@ internal inline fun CallExecutorImpl(
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
 ): Result<Unit, InvocationError> = binding {
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
     val address = frame.state.module.functionAddresses[functionIndex.index()]
 
     when (val instance = store.function(address).bind()) {

@@ -6,7 +6,7 @@ import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.executor.memory.LinearMemoryInteractor
 import io.github.charlietap.chasm.executor.memory.LinearMemoryInteractorImpl
-import io.github.charlietap.chasm.executor.memory.ext.toULongLittleEndian
+import io.github.charlietap.chasm.executor.memory.ext.toULongSizedLittleEndian
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 
@@ -29,6 +29,6 @@ internal inline fun MemoryInstanceULongReaderImpl(
     linearMemoryInteractor: LinearMemoryInteractor<ULong>,
 ): Result<ULong, InvocationError.MemoryOperationOutOfBounds> = linearMemoryInteractor(instance.data, byteOffsetInMemory, valueSizeInBytes) {
     (instance.data as ByteArrayLinearMemory).memory.sliceArray(
-        byteOffsetInMemory..(byteOffsetInMemory + valueSizeInBytes),
-    ).toULongLittleEndian()
+        byteOffsetInMemory until (byteOffsetInMemory + valueSizeInBytes),
+    ).toULongSizedLittleEndian(valueSizeInBytes)
 }

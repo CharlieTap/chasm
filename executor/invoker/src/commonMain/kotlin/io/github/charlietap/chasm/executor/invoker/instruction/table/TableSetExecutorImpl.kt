@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.ext.table
@@ -22,7 +22,7 @@ internal inline fun TableSetExecutorImpl(
     instruction: TableInstruction.TableSet,
 ): Result<Unit, InvocationError> = binding {
 
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
     val tableAddress = frame.state.module.tableAddress(instruction.tableIdx.index()).bind()
     val tableInstance = store.table(tableAddress).bind()
 

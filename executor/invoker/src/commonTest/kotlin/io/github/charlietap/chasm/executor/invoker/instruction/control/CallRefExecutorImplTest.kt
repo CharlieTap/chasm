@@ -41,7 +41,7 @@ class CallRefExecutorImplTest {
             fail("Host function should not be called in this scenario")
         }
 
-        stack.push(Stack.Entry.Value(ReferenceValue.FunctionAddress(functionAddress)))
+        stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
 
         val actual = CallRefExecutorImpl(store, stack, tailRecursion, hostFunctionCall, wasmFunctionCall)
 
@@ -70,7 +70,7 @@ class CallRefExecutorImplTest {
             Ok(Unit)
         }
 
-        stack.push(Stack.Entry.Value(ReferenceValue.FunctionAddress(functionAddress)))
+        stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
 
         val actual = CallRefExecutorImpl(store, stack, tailRecursion, hostFunctionCall, wasmFunctionCall)
 

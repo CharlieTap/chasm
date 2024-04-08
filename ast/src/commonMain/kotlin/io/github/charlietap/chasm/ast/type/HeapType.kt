@@ -5,7 +5,7 @@ import kotlin.jvm.JvmInline
 
 sealed interface HeapType : Type
 
-sealed interface AbstractHeapType : HeapType, BottomType {
+sealed interface AbstractHeapType : HeapType {
 
     data object Func : AbstractHeapType
 
@@ -26,6 +26,9 @@ sealed interface AbstractHeapType : HeapType, BottomType {
     data object I31 : AbstractHeapType
 
     data object None : AbstractHeapType
+
+    @JvmInline
+    value class Bottom(val bottomType: BottomType) : AbstractHeapType
 }
 
 sealed interface ConcreteHeapType : HeapType {

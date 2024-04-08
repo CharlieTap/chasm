@@ -23,7 +23,7 @@ class TableGrowthAllocatorImplTest {
         val limits = limits(1u)
         val newMin = elementsToAdd + limits.min
         val refType = ReferenceType.RefNull(AbstractHeapType.Func)
-        val refVal = ReferenceValue.FunctionAddress(Address.Function(0))
+        val refVal = ReferenceValue.Function(Address.Function(0))
         val type = tableType(refType, limits)
 
         val instance = TableInstance(
@@ -47,7 +47,7 @@ class TableGrowthAllocatorImplTest {
         val elementsToAdd = 2u
         val limits = limits(1u, 2u)
         val refType = ReferenceType.RefNull(AbstractHeapType.Func)
-        val refVal = ReferenceValue.FunctionAddress(Address.Function(0))
+        val refVal = ReferenceValue.Function(Address.Function(0))
         val type = tableType(refType, limits)
 
         val instance = TableInstance(

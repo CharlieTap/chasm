@@ -22,12 +22,14 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
+                api(projects.executor.gc)
                 api(libs.result)
             }
         }
 
         commonTest {
             dependencies {
+                implementation(projects.test.fixture.executor.runtime)
                 implementation(libs.kotlin.test)
             }
         }

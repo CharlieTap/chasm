@@ -20,6 +20,7 @@ fun testRunner(
     store: Store = store(),
     imports: List<Import> = emptyList(),
     functionName: String = fileName.replace(".wasm", ""),
+    setupFunctions: List<Pair<String, List<ExecutionValue>>> = emptyList(),
 ): ChasmResult<List<ExecutionValue>, ChasmError> {
 
     val byteStream = Resource(fileDirectory + fileName).readBytes()
@@ -29,6 +30,11 @@ fun testRunner(
         .flatMap { module ->
             instance(store, module, imports)
         }.flatMap { instance ->
+
+            setupFunctions.forEach { (function, args) ->
+                invoke(store, instance, function, args)
+            }
+
             invoke(
                 store,
                 instance,

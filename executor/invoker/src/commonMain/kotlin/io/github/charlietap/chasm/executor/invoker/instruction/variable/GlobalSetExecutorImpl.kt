@@ -10,8 +10,8 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.global
 import io.github.charlietap.chasm.executor.runtime.ext.globalAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
-import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
+import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal inline fun GlobalSetExecutorImpl(
@@ -19,10 +19,10 @@ internal inline fun GlobalSetExecutorImpl(
     stack: Stack,
     instruction: VariableInstruction.GlobalSet,
 ): Result<Unit, InvocationError> = binding {
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
     val address = frame.state.module.globalAddress(instruction.globalIdx.index()).bind()
     val global = store.global(address).bind()
 
-    val value = stack.popValueOrError().bind()
+    val value = stack.popValue().bind()
     global.value = value.value
 }

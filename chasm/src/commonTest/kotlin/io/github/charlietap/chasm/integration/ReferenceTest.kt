@@ -47,7 +47,7 @@ class ReferenceTest {
             fileDirectory = FILE_DIR,
         )
 
-        val expected = listOf(ReferenceValue.FunctionAddress(Address.Function(0)))
+        val expected = listOf(ReferenceValue.Function(Address.Function(0)))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

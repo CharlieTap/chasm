@@ -13,7 +13,7 @@ internal inline fun RefAsNonNullExecutorImpl(
     stack: Stack,
 ): Result<Unit, InvocationError> = binding {
 
-    val value = stack.peekValue()?.value
+    val value = stack.peekValueOrNull()?.value
 
     if (value is ReferenceValue) {
         if (value is ReferenceValue.Null) {

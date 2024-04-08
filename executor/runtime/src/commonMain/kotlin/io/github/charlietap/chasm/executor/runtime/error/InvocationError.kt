@@ -41,6 +41,12 @@ sealed interface InvocationError : ModuleRuntimeError {
     @JvmInline
     value class TableElementLookupFailed(val index: Int) : InvocationError
 
+    @JvmInline
+    value class ArrayFieldLookupFailed(val index: Int) : InvocationError
+
+    @JvmInline
+    value class StructFieldLookupFailed(val index: Int) : InvocationError
+
     data class MemoryGrowExceedsLimits(
         val pagesRequested: Int,
         val maxPages: Int,
@@ -71,9 +77,15 @@ sealed interface InvocationError : ModuleRuntimeError {
 
     data object IndirectCallHasIncorrectFunctionType : InvocationError
 
+    data object NumberValueExpected : InvocationError
+
     data object ReferenceValueExpected : InvocationError
 
     data object FunctionReferenceExpected : InvocationError
+
+    data object UnexpectedReferenceValue : InvocationError
+
+    data object UndefinedDefaultBottomType : InvocationError
 
     data object UndefinedDefaultReferenceType : InvocationError
 
@@ -82,6 +94,12 @@ sealed interface InvocationError : ModuleRuntimeError {
     data object StructCompositeTypeExpected : InvocationError
 
     data object ArrayCompositeTypeExpected : InvocationError
+
+    data object PackedValueExpected : InvocationError
+
+    data object UnobservableBitWidth : InvocationError
+
+    data object ArrayCopyOnAConstArray : InvocationError
 
     @JvmInline
     value class UnimplementedInstruction(val instruction: Instruction) : InvocationError

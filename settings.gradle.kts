@@ -42,6 +42,7 @@ include(":decoder")
 include(":decoder:wasm")
 include(":decoder:wat")
 
+include(":executor:gc")
 include(":executor:instantiator")
 include(":executor:invoker")
 include(":executor:memory")

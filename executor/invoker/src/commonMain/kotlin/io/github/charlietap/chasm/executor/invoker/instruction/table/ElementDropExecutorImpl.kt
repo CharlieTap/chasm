@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal inline fun ElementDropExecutorImpl(
@@ -19,7 +19,7 @@ internal inline fun ElementDropExecutorImpl(
     instruction: TableInstruction.ElemDrop,
 ): Result<Unit, InvocationError> = binding {
 
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
     val elementAddress = frame.state.module.elementAddress(instruction.elemIdx.index()).bind()
     val elementInstance = store.element(elementAddress).bind()
 

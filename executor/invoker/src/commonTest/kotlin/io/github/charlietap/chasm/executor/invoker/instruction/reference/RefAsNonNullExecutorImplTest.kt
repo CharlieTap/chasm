@@ -17,7 +17,7 @@ class RefAsNonNullExecutorImplTest {
     fun `can execute the refasnonnull instruction when a function address is on top of the stack`() {
 
         val stack = stack()
-        val value = ReferenceValue.FunctionAddress(functionAddress())
+        val value = ReferenceValue.Function(functionAddress())
 
         stack.push(value(value))
 
@@ -25,7 +25,7 @@ class RefAsNonNullExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(value, stack.popValue()?.value)
+        assertEquals(value, stack.popValueOrNull()?.value)
     }
 
     @Test

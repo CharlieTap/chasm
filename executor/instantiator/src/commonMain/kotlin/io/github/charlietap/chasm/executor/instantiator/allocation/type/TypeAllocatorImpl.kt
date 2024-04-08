@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.allocation.type
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.RecursiveType
+import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.type.rolling.DefinedTypeRoller
 import io.github.charlietap.chasm.executor.type.rolling.DefinedTypeRollerImpl
 import io.github.charlietap.chasm.executor.type.rolling.substitution.ConcreteHeapTypeSubstitutor
@@ -28,7 +29,7 @@ fun TypeAllocatorImpl(
     val substitutor: ConcreteHeapTypeSubstitutor = { heapType ->
         when (heapType) {
             is ConcreteHeapType.TypeIndex -> {
-                ConcreteHeapType.Defined(acc[size - 1])
+                ConcreteHeapType.Defined(acc[heapType.index.index()])
             }
             else -> heapType
         }

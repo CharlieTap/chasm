@@ -13,10 +13,11 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.VectorValue
 
-fun ValueType.default(): Result<ExecutionValue, InvocationError.UndefinedDefaultReferenceType> = when (this) {
+fun ValueType.default(): Result<ExecutionValue, InvocationError> = when (this) {
     is ValueType.Number -> Ok(default())
-    is ValueType.Reference -> default()
+    is ValueType.Reference -> Ok(default())
     is ValueType.Vector -> Ok(default())
+    is ValueType.Bottom -> Err(InvocationError.UndefinedDefaultBottomType)
 }
 
 fun ValueType.Number.default(): ExecutionValue = when (this.numberType) {
@@ -26,9 +27,9 @@ fun ValueType.Number.default(): ExecutionValue = when (this.numberType) {
     NumberType.F64 -> NumberValue.F64(0.0)
 }
 
-fun ValueType.Reference.default(): Result<ExecutionValue, InvocationError.UndefinedDefaultReferenceType> = when (val refType = this.referenceType) {
-    is ReferenceType.RefNull -> Ok(ReferenceValue.Null(refType.heapType))
-    is ReferenceType.Ref -> Err(InvocationError.UndefinedDefaultReferenceType)
+fun ValueType.Reference.default(): ExecutionValue = when (val refType = this.referenceType) {
+    is ReferenceType.RefNull -> ReferenceValue.Null(refType.heapType)
+    is ReferenceType.Ref -> ExecutionValue.Uninitialised
 }
 
 fun ValueType.Vector.default(): ExecutionValue = when (this.vectorType) {

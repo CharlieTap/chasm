@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.executor.invoker.flow.BreakException
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.popLabelOrError
-import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
+import io.github.charlietap.chasm.executor.runtime.ext.popLabel
+import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -48,14 +48,14 @@ internal fun InstructionBlockExecutorImpl(
         instructions.forEach { instruction ->
             instructionExecutor(instruction, store, stack).bind()
         }
-        stack.popLabelOrError().bind()
+        stack.popLabel().bind()
     } catch (exception: BreakException) {
 
         while (stack.valuesDepth() > valuesDepth) {
-            stack.popValueOrError().bind()
+            stack.popValue().bind()
         }
 
-        stack.popLabelOrError().bind()
+        stack.popLabel().bind()
 
         if (exception.labelsToBreak != 0) {
             throw exception.copy(labelsToBreak = exception.labelsToBreak - 1)

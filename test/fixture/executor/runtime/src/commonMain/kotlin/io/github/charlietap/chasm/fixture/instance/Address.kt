@@ -25,3 +25,15 @@ fun elementAddress(
 fun dataAddress(
     address: Int = 0,
 ): Address.Data = Address.Data(address)
+
+fun structAddress(
+    address: Int = 0,
+): Address.Struct = Address.Struct(address)
+
+fun arrayAddress(
+    address: Int = 0,
+): Address.Array = Address.Array(address)
+
+fun hostAddress(
+    address: Int = 0,
+): Address.Host = Address.Host(address)

@@ -11,9 +11,9 @@ import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.default
-import io.github.charlietap.chasm.executor.runtime.ext.popFrameOrError
-import io.github.charlietap.chasm.executor.runtime.ext.popLabelOrError
-import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
+import io.github.charlietap.chasm.executor.runtime.ext.popFrame
+import io.github.charlietap.chasm.executor.runtime.ext.popLabel
+import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.type.ext.functionType
@@ -41,13 +41,13 @@ internal inline fun WasmFunctionCallImpl(
 ): Result<Unit, InvocationError> = binding {
 
     if (tailRecursion) {
-        stack.popFrameOrError().bind()
+        stack.popFrame().bind()
     }
 
     val type = instance.functionType().bind()
 
     val params = List(type.params.types.size) {
-        stack.popValueOrError().bind().value
+        stack.popValue().bind().value
     }.asReversed()
 
     val locals = params + instance.function.locals.map { local ->
@@ -65,7 +65,7 @@ internal inline fun WasmFunctionCallImpl(
     stack.push(frame)
 
     val label = Stack.Entry.Label(
-        arity = Arity(type.params.types.size),
+        arity = Arity(type.results.types.size),
         continuation = emptyList(),
     )
 
@@ -76,10 +76,10 @@ internal inline fun WasmFunctionCallImpl(
         instructionBlockExecutor(store, stack, label, instance.function.body.instructions, emptyList()).bind()
     } catch (exception: ReturnException) {
         while (stack.labelsDepth() > labelsDepth) {
-            stack.popLabelOrError().bind()
+            stack.popLabel().bind()
         }
         while (stack.valuesDepth() > valuesDepth) {
-            stack.popValueOrError().bind()
+            stack.popValue().bind()
         }
 
         exception.results.forEach { value ->
@@ -88,6 +88,6 @@ internal inline fun WasmFunctionCallImpl(
     }
 
     if (!tailRecursion) {
-        stack.popFrameOrError().bind()
+        stack.popFrame().bind()
     }
 }

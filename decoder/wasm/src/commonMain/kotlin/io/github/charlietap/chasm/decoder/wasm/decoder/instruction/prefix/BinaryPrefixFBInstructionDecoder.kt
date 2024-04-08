@@ -130,8 +130,8 @@ internal fun BinaryPrefixFBInstructionDecoder(
             AggregateInstruction.ArrayFill(typeIndex)
         }
         ARRAY_COPY -> {
-            val srcTypeIndex = typeIndexDecoder(reader).bind()
             val dstTypeIndex = typeIndexDecoder(reader).bind()
+            val srcTypeIndex = typeIndexDecoder(reader).bind()
             AggregateInstruction.ArrayCopy(srcTypeIndex, dstTypeIndex)
         }
         ARRAY_INIT_DATA -> {

@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
+import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -28,7 +28,7 @@ internal fun HostFunctionCallImpl(
     val type = function.functionType().bind()
 
     val params = List(type.params.types.size) {
-        stack.popValueOrError().bind().value
+        stack.popValue().bind().value
     }.asReversed()
 
     val results = function.function.invoke(params)
@@ -61,16 +61,28 @@ private fun classifyValue(valueType: ValueType, value: ExecutionValue?): Boolean
                 is ReferenceType.RefNull ->
                     when (referenceType.heapType) {
                         is AbstractHeapType.Func ->
-                            value is ReferenceValue.FunctionAddress ||
-                                value is ReferenceValue.Null && value.heapType == referenceType.heapType
+                            value is ReferenceValue.Function ||
+                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.Func
                         is AbstractHeapType.Extern ->
-                            value is ReferenceValue.ExternAddress ||
-                                value is ReferenceValue.Null && value.heapType == referenceType.heapType
+                            value is ReferenceValue.Extern ||
+                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.Extern
+                        is AbstractHeapType.Struct ->
+                            value is ReferenceValue.Struct ||
+                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.Struct
+                        is AbstractHeapType.Array ->
+                            value is ReferenceValue.Array ||
+                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.Array
+                        is AbstractHeapType.I31 ->
+                            value is ReferenceValue.I31 ||
+                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.I31
                         else -> false
                     }
                 is ReferenceType.Ref -> when (referenceType.heapType) {
-                    is AbstractHeapType.Func -> value is ReferenceValue.FunctionAddress
-                    is AbstractHeapType.Extern -> value is ReferenceValue.ExternAddress
+                    is AbstractHeapType.Func -> value is ReferenceValue.Function
+                    is AbstractHeapType.Extern -> value is ReferenceValue.Extern
+                    is AbstractHeapType.Struct -> value is ReferenceValue.Struct
+                    is AbstractHeapType.Array -> value is ReferenceValue.Array
+                    is AbstractHeapType.I31 -> value is ReferenceValue.I31
                     else -> false
                 }
             }
@@ -80,5 +92,6 @@ private fun classifyValue(valueType: ValueType, value: ExecutionValue?): Boolean
                 VectorType.V128 -> value is VectorValue.V128
             }
         }
+        is ValueType.Bottom -> true
     }
 }

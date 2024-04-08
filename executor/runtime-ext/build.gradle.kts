@@ -29,6 +29,7 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation(projects.test.fixture.executor.runtime)
                 implementation(libs.kotlin.test)
             }
         }

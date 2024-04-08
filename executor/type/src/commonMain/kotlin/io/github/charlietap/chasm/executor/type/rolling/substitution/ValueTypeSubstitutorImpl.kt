@@ -20,6 +20,7 @@ internal fun ValueTypeSubstitutorImpl(
 ): ValueType = when (valueType) {
     is ValueType.Number,
     is ValueType.Vector,
+    is ValueType.Bottom,
     -> valueType
     is ValueType.Reference -> {
         ValueType.Reference(
