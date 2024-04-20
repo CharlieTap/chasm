@@ -29,21 +29,23 @@ data class Stack(
 
     fun push(value: Entry.Value) = values.addLast(value)
 
-    fun popFrame(): Entry.ActivationFrame? = frames.removeLastOrNull()
+    fun popFrameOrNull(): Entry.ActivationFrame? = frames.removeLastOrNull()
 
-    fun popLabel(): Entry.Label? = labels.removeLastOrNull()
+    fun popLabelOrNull(): Entry.Label? = labels.removeLastOrNull()
 
-    fun popValue(): Entry.Value? = values.removeLastOrNull()
+    fun popValueOrNull(): Entry.Value? = values.removeLastOrNull()
 
-    fun peekFrame(): Entry.ActivationFrame? = frames.lastOrNull()
+    fun peekFrameOrNull(): Entry.ActivationFrame? = frames.lastOrNull()
 
-    fun peekLabel(): Entry.Label? = labels.lastOrNull()
+    fun peekLabelOrNull(): Entry.Label? = labels.lastOrNull()
 
-    fun peekNthLabel(n: Int): Entry.Label? = labels.getOrNull(labels.lastIndex - n)
+    fun peekValueOrNull(): Entry.Value? = values.lastOrNull()
 
-    fun peekValue(): Entry.Value? = values.lastOrNull()
+    fun peekNthFrameOrNull(n: Int): Entry.ActivationFrame? = frames.getOrNull(frames.lastIndex - n)
 
-    fun peekNthValue(n: Int): Entry.Value? = values.getOrNull(values.lastIndex - n)
+    fun peekNthLabelOrNull(n: Int): Entry.Label? = labels.getOrNull(labels.lastIndex - n)
+
+    fun peekNthValueOrNull(n: Int): Entry.Value? = values.getOrNull(values.lastIndex - n)
 
     fun size() = frames.size + labels.size + values.size
 

@@ -2,25 +2,26 @@
 
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.invoker.flow.BreakException
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekNthLabel
+import io.github.charlietap.chasm.executor.runtime.ext.popValue
 
 internal inline fun BreakExecutorImpl(
     stack: Stack,
     labelIndex: Index.LabelIndex,
 ): Result<Unit, InvocationError> = binding {
-    stack.peekNthLabel(labelIndex.idx.toInt())?.let { label ->
 
-        val results = List(label.arity.value) {
-            stack.popValueOrError().bind().value
-        }
+    val label = stack.peekNthLabel(labelIndex.index()).bind()
 
-        throw BreakException(labelIndex.idx.toInt(), results, label.continuation)
-    } ?: Err(InvocationError.MissingStackLabel).bind<Unit>()
+    val results = List(label.arity.value) {
+        stack.popValue().bind().value
+    }.asReversed()
+
+    throw BreakException(labelIndex.idx.toInt(), results, label.continuation)
 }

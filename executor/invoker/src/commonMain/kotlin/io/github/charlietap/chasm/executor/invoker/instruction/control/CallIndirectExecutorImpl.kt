@@ -18,7 +18,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.function
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
@@ -51,7 +51,7 @@ internal inline fun CallIndirectExecutorImpl(
     crossinline wasmFunctionCall: WasmFunctionCall,
 ): Result<Unit, InvocationError> = binding {
 
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
 
     val tableAddress = frame.state.module.tableAddress(tableIndex.index()).bind()
     val tableInstance = store.table(tableAddress).bind()
@@ -62,7 +62,7 @@ internal inline fun CallIndirectExecutorImpl(
     val reference = tableInstance.element(elementIndex).bind()
 
     val address = when (reference) {
-        is ReferenceValue.FunctionAddress -> Ok(reference.address)
+        is ReferenceValue.Function -> Ok(reference.address)
         else -> Err(InvocationError.IndirectCallOnANonFunctionReference)
     }.bind()
 

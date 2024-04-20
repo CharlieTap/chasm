@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.ast.module.Index.ElementIndex
 import io.github.charlietap.chasm.ast.module.Index.TableIndex
 import kotlin.jvm.JvmInline
 
-interface TableInstruction : Instruction {
+sealed interface TableInstruction : Instruction {
     @JvmInline
     value class TableGet(val tableIdx: TableIndex) : TableInstruction
 

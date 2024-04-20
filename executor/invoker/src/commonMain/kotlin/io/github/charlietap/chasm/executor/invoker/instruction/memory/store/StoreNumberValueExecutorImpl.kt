@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
@@ -21,7 +21,7 @@ internal inline fun <T> StoreNumberValueExecutorImpl(
     crossinline popper: StackValuePopper<T>,
     crossinline writer: NumberValueWriter<T>,
 ): Result<Unit, InvocationError> = binding {
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
     val memoryAddress = frame.state.module.memoryAddress(0).bind()
     val memory = store.memory(memoryAddress).bind()
 

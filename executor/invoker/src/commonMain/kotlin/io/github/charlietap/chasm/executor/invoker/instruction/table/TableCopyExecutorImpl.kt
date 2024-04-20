@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
@@ -37,7 +37,7 @@ internal fun TableCopyExecutorImpl(
     tableSetExecutor: TableSetExecutor,
 ): Result<Unit, InvocationError> = binding {
 
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
     val srcTableAddress = frame.state.module.tableAddress(instruction.srcTableIdx.index()).bind()
     val srcTableInstance = store.table(srcTableAddress).bind() // taby
 

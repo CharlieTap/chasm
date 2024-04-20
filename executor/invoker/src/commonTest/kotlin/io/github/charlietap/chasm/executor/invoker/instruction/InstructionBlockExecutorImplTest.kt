@@ -38,8 +38,8 @@ class InstructionBlockExecutorImplTest {
             assertEquals(instructionIter.next(), passedInstruction)
             assertEquals(store, passedStore)
             assertEquals(stack, passedStack)
-            assertEquals(label, stack.peekLabel())
-            assertEquals(paramsIter.next(), stack.popValue()?.value)
+            assertEquals(label, stack.peekLabelOrNull())
+            assertEquals(paramsIter.next(), stack.popValueOrNull()?.value)
 
             Ok(Unit)
         }
@@ -78,8 +78,8 @@ class InstructionBlockExecutorImplTest {
             assertEquals(instructionIter.next(), passedInstruction)
             assertEquals(store, passedStore)
             assertEquals(stack, passedStack)
-            assertEquals(label, stack.peekLabel())
-            assertEquals(paramsIter.next(), stack.peekValue()?.value)
+            assertEquals(label, stack.peekLabelOrNull())
+            assertEquals(paramsIter.next(), stack.peekValueOrNull()?.value)
 
             repeat(3) { _ ->
                 stack.push(value())
@@ -137,7 +137,7 @@ class InstructionBlockExecutorImplTest {
             assertEquals(instructionIter.next(), passedInstruction)
             assertEquals(store, passedStore)
             assertEquals(stack, passedStack)
-            assertEquals(paramsIter.next(), stack.popValue()?.value)
+            assertEquals(paramsIter.next(), stack.popValueOrNull()?.value)
 
             if (!hasManipulatedStack) {
                 repeat(3) { _ ->

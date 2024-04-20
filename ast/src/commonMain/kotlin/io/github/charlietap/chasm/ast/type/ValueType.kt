@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.ast.type
 
 import kotlin.jvm.JvmInline
 
-sealed interface ValueType : BottomType {
+sealed interface ValueType : Type {
     @JvmInline
     value class Number(val numberType: NumberType) : ValueType
 
@@ -11,4 +11,7 @@ sealed interface ValueType : BottomType {
 
     @JvmInline
     value class Reference(val referenceType: ReferenceType) : ValueType
+
+    @JvmInline
+    value class Bottom(val bottomType: BottomType) : ValueType
 }

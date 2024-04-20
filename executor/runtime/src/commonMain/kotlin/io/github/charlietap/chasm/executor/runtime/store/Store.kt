@@ -1,10 +1,13 @@
 package io.github.charlietap.chasm.executor.runtime.store
 
+import io.github.charlietap.chasm.executor.gc.WeakReference
+import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 
 data class Store(
@@ -14,4 +17,6 @@ data class Store(
     val globals: MutableList<GlobalInstance> = mutableListOf(),
     val elements: MutableList<ElementInstance> = mutableListOf(),
     val data: MutableList<DataInstance> = mutableListOf(),
+    val structs: MutableList<WeakReference<StructInstance>> = mutableListOf(),
+    val arrays: MutableList<WeakReference<ArrayInstance>> = mutableListOf(),
 )

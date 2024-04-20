@@ -41,7 +41,7 @@ internal fun MemoryInstructionExecutorImpl(
     store: Store,
     stack: Stack,
 ): Result<Unit, InvocationError> =
-    MemoryInstructionExecutorImpll(
+    MemoryInstructionExecutorImpl(
         instruction = instruction,
         store = store,
         stack = stack,
@@ -67,7 +67,7 @@ internal fun MemoryInstructionExecutorImpl(
         f64StoreExecutor = ::F64StoreExecutorImpl,
     )
 
-internal fun MemoryInstructionExecutorImpll(
+internal fun MemoryInstructionExecutorImpl(
     instruction: MemoryInstruction,
     store: Store,
     stack: Stack,

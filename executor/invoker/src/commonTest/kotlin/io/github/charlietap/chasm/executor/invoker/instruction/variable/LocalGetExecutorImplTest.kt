@@ -41,6 +41,6 @@ class LocalGetExecutorImplTest {
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.framesDepth())
         assertEquals(1, stack.valuesDepth())
-        assertEquals(expected, stack.popValue())
+        assertEquals(expected, stack.popValueOrNull())
     }
 }

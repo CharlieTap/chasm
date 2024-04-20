@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
@@ -39,7 +39,7 @@ internal fun MemoryInitExecutorImpl(
     instruction: MemoryInstruction.MemoryInit,
     i32StoreSizedExecutor: I32StoreSizedExecutor,
 ): Result<Unit, InvocationError> = binding {
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
     val memoryAddress = frame.state.module.memoryAddress(0).bind()
     val memory = store.memory(memoryAddress).bind()
 

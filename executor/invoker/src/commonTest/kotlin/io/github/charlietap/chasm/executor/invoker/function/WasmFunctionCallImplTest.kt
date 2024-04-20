@@ -104,7 +104,7 @@ class WasmFunctionCallImplTest {
             assertEquals(function.body.instructions, _instructions)
             assertEquals(emptyList(), _params)
 
-            assertEquals(frame, stack.peekFrame())
+            assertEquals(frame, stack.peekFrameOrNull())
             assertEquals(1, stack.framesDepth())
 
             Ok(Unit)
@@ -198,7 +198,7 @@ class WasmFunctionCallImplTest {
             assertEquals(function.body.instructions, _instructions)
             assertEquals(emptyList(), _params)
 
-            assertEquals(frame, stack.peekFrame())
+            assertEquals(frame, stack.peekFrameOrNull())
             assertEquals(1, stack.framesDepth())
 
             Ok(Unit)
@@ -293,7 +293,7 @@ class WasmFunctionCallImplTest {
             assertEquals(function.body.instructions, _instructions)
             assertEquals(emptyList(), _params)
 
-            assertEquals(frame, stack.peekFrame())
+            assertEquals(frame, stack.peekFrameOrNull())
 
             repeat(2) { _ ->
                 stack.push(label())
@@ -318,6 +318,6 @@ class WasmFunctionCallImplTest {
         assertEquals(0, stack.framesDepth())
         assertEquals(0, stack.labelsDepth())
         assertEquals(1, stack.valuesDepth())
-        assertEquals(results[0], stack.popValue()?.value)
+        assertEquals(results[0], stack.popValueOrNull()?.value)
     }
 }

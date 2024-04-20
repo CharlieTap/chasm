@@ -20,7 +20,7 @@ class BrOnNonNullExecutorImplTest {
         val stack = stack()
         val instruction = ControlInstruction.BrOnNonNull(labelIndex())
 
-        val referenceValue = ReferenceValue.FunctionAddress(functionAddress())
+        val referenceValue = ReferenceValue.Function(functionAddress())
         stack.push(value(referenceValue))
 
         val breakExecutor: BreakExecutor = { _stack, _labelIndex ->
@@ -34,7 +34,7 @@ class BrOnNonNullExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(referenceValue, stack.popValue()?.value)
+        assertEquals(referenceValue, stack.popValueOrNull()?.value)
     }
 
     @Test

@@ -24,5 +24,11 @@ sealed interface Address {
     value class Data(override val address: Int) : Address
 
     @JvmInline
-    value class Extern(override val address: Int) : Address
+    value class Struct(override val address: Int) : Address
+
+    @JvmInline
+    value class Array(override val address: Int) : Address
+
+    @JvmInline
+    value class Host(override val address: Int) : Address
 }

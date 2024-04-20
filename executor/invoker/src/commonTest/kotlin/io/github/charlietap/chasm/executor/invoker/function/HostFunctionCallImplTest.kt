@@ -71,8 +71,8 @@ class HostFunctionCallImplTest {
         assertEquals(Ok(Unit), actual)
         assertEquals(0, stack.framesDepth())
         assertEquals(2, stack.valuesDepth())
-        assertEquals(NumberValue.I64(118), stack.popValue()?.value)
-        assertEquals(NumberValue.I32(117), stack.popValue()?.value)
+        assertEquals(NumberValue.I64(118), stack.popValueOrNull()?.value)
+        assertEquals(NumberValue.I32(117), stack.popValueOrNull()?.value)
     }
 
     @Test

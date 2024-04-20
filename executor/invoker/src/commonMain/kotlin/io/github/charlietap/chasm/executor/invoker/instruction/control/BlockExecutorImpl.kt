@@ -11,8 +11,8 @@ import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockE
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrameOrError
-import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
+import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal inline fun BlockExecutorImpl(
@@ -39,18 +39,18 @@ internal inline fun BlockExecutorImpl(
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
 
-    val frame = stack.peekFrameOrError().bind()
+    val frame = stack.peekFrame().bind()
     val functionType = expander(frame.state.module, blockType).bind()
-    val paramArity = functionType?.let {
-        Arity(functionType.params.types.size)
-    } ?: Arity.SIDE_EFFECT
+    val (paramArity, resultArity) = functionType?.let {
+        Arity(functionType.params.types.size) to Arity(functionType.results.types.size)
+    } ?: (Arity.SIDE_EFFECT to Arity.SIDE_EFFECT)
 
     val params = List(paramArity.value) {
-        stack.popValueOrError().bind().value
+        stack.popValue().bind().value
     }
 
     val label = Stack.Entry.Label(
-        arity = paramArity,
+        arity = resultArity,
         continuation = emptyList(),
     )
 

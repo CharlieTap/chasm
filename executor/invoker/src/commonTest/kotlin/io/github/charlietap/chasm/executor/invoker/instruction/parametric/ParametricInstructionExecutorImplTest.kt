@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.fixture.stack
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -12,7 +12,7 @@ class ParametricInstructionExecutorImplTest {
     @Test
     fun `drop instruction delegates to drop executor`() {
 
-        val stack = Stack()
+        val stack = stack()
 
         val instruction = ParametricInstruction.Drop
 
@@ -34,7 +34,7 @@ class ParametricInstructionExecutorImplTest {
     @Test
     fun `select instruction delegates to select executor`() {
 
-        val stack = Stack()
+        val stack = stack()
 
         val instruction = ParametricInstruction.Select
 
@@ -56,7 +56,7 @@ class ParametricInstructionExecutorImplTest {
     @Test
     fun `select with type instruction delegates to select executor`() {
 
-        val stack = Stack()
+        val stack = stack()
 
         val instruction = ParametricInstruction.SelectWithType(emptyList())
 

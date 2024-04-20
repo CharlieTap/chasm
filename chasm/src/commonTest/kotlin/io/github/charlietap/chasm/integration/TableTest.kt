@@ -46,7 +46,7 @@ class TableTest {
             fileDirectory = FILE_DIR,
         )
 
-        val expected = listOf(ReferenceValue.FunctionAddress(Address.Function(0)))
+        val expected = listOf(ReferenceValue.Function(Address.Function(0)))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -60,7 +60,7 @@ class TableTest {
             fileDirectory = FILE_DIR,
         )
 
-        val expected = listOf(ReferenceValue.FunctionAddress(Address.Function(1)))
+        val expected = listOf(ReferenceValue.Function(Address.Function(1)))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -74,7 +74,7 @@ class TableTest {
             fileDirectory = FILE_DIR,
         )
 
-        val expected = listOf(ReferenceValue.FunctionAddress(Address.Function(0)))
+        val expected = listOf(ReferenceValue.Function(Address.Function(0)))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -103,7 +103,7 @@ class TableTest {
             fileDirectory = FILE_DIR,
         )
 
-        val expected = listOf(ReferenceValue.FunctionAddress(Address.Function(0)))
+        val expected = listOf(ReferenceValue.Function(Address.Function(0)))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

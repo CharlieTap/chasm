@@ -18,5 +18,5 @@ internal fun ArrayTypeSubstitutorImpl(
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     fieldTypeSubstitutor: TypeSubstitutor<FieldType>,
 ): ArrayType = ArrayType(
-    fieldTypeSubstitutor(arrayType.field, concreteHeapTypeSubstitutor),
+    fieldTypeSubstitutor(arrayType.fieldType, concreteHeapTypeSubstitutor),
 )

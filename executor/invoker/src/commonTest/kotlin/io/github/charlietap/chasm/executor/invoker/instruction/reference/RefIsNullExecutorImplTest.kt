@@ -26,7 +26,7 @@ class RefIsNullExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(expected, stack.popValue())
+        assertEquals(expected, stack.popValueOrNull())
     }
 
     @Test
@@ -34,7 +34,7 @@ class RefIsNullExecutorImplTest {
 
         val stack = stack()
 
-        stack.push(value(ReferenceValue.FunctionAddress(functionAddress())))
+        stack.push(value(ReferenceValue.Function(functionAddress())))
 
         val expected = value(NumberValue.I32(0))
 
@@ -42,6 +42,6 @@ class RefIsNullExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(expected, stack.popValue())
+        assertEquals(expected, stack.popValueOrNull())
     }
 }

@@ -7,6 +7,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
@@ -15,62 +16,110 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import kotlin.jvm.JvmName
 
-inline fun Stack.peekFrameOrError(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
-    return peekFrame()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
+inline fun Stack.push(value: ExecutionValue) = push(Stack.Entry.Value(value))
+
+inline fun Stack.peekFrame(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
+    return peekFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
 }
 
-inline fun Stack.peekLabelOrError(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
-    return peekLabel()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
+inline fun Stack.peekLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
+    return peekLabelOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
 }
 
-inline fun Stack.peekValueOrError(): Result<Stack.Entry.Value, InvocationError.MissingStackValue> {
-    return peekValue()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.peekValue(): Result<Stack.Entry.Value, InvocationError.MissingStackValue> {
+    return peekValueOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
 }
 
-inline fun Stack.popFrameOrError(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
-    return popFrame()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
+inline fun Stack.peekNthFrame(n: Int): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
+    return peekNthFrameOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
 }
 
-inline fun Stack.popLabelOrError(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
-    return popLabel()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
+inline fun Stack.peekNthLabel(n: Int): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
+    return peekNthLabelOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
 }
 
-inline fun Stack.popValueOrError(): Result<Stack.Entry.Value, InvocationError.MissingStackValue> {
-    return popValue()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.peekNthValue(n: Int): Result<Stack.Entry.Value, InvocationError.MissingStackValue> {
+    return peekNthValueOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
+}
+
+inline fun Stack.popFrame(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
+    return popFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
+}
+
+inline fun Stack.popLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
+    return popLabelOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
+}
+
+inline fun Stack.popValue(): Result<Stack.Entry.Value, InvocationError.MissingStackValue> {
+    return popValueOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
+}
+
+inline fun Stack.popExecutionValue(): Result<ExecutionValue, InvocationError.MissingStackValue> {
+    return popValueOrNull()?.value?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
 }
 
 inline fun Stack.popI32(): Result<Int, InvocationError.MissingStackValue> {
-    return ((popValue()?.value as? I32)?.value)?.let {
+    return ((popValueOrNull()?.value as? I32)?.value)?.let {
         Ok(it)
     } ?: Err(InvocationError.MissingStackValue)
 }
 
 inline fun Stack.popI64(): Result<Long, InvocationError.MissingStackValue> {
-    return ((popValue()?.value as? I64)?.value)?.let {
+    return ((popValueOrNull()?.value as? I64)?.value)?.let {
         Ok(it)
     } ?: Err(InvocationError.MissingStackValue)
 }
 
 inline fun Stack.popF32(): Result<Float, InvocationError.MissingStackValue> {
-    return ((popValue()?.value as? F32)?.value)?.let {
+    return ((popValueOrNull()?.value as? F32)?.value)?.let {
         Ok(it)
     } ?: Err(InvocationError.MissingStackValue)
 }
 
 inline fun Stack.popF64(): Result<Double, InvocationError.MissingStackValue> {
-    return ((popValue()?.value as? F64)?.value)?.let {
+    return ((popValueOrNull()?.value as? F64)?.value)?.let {
         Ok(it)
     } ?: Err(InvocationError.MissingStackValue)
 }
 
 inline fun Stack.popReference(): Result<ReferenceValue, InvocationError.MissingStackValue> {
-    return (popValue()?.value as? ReferenceValue)?.let {
+    return (popValueOrNull()?.value as? ReferenceValue)?.let {
         Ok(it)
     } ?: Err(InvocationError.MissingStackValue)
 }
 
-inline fun Stack.popFunctionAddress(): Result<ReferenceValue.FunctionAddress, InvocationError.FunctionReferenceExpected> {
-    return (popValue()?.value as? ReferenceValue.FunctionAddress)?.let {
+inline fun Stack.peekReference(): Result<ReferenceValue, InvocationError.MissingStackValue> {
+    return (peekValueOrNull()?.value as? ReferenceValue)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
+inline fun Stack.popNullReference(): Result<ReferenceValue.Null, InvocationError.MissingStackValue> {
+    return (popValueOrNull()?.value as? ReferenceValue.Null)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
+inline fun Stack.popI31Reference(): Result<ReferenceValue.I31, InvocationError.MissingStackValue> {
+    return (popValueOrNull()?.value as? ReferenceValue.I31)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
+inline fun Stack.popArrayReference(): Result<ReferenceValue.Array, InvocationError.MissingStackValue> {
+    return (popValueOrNull()?.value as? ReferenceValue.Array)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
+inline fun Stack.popStructReference(): Result<ReferenceValue.Struct, InvocationError.MissingStackValue> {
+    return (popValueOrNull()?.value as? ReferenceValue.Struct)?.let {
+        Ok(it)
+    } ?: Err(InvocationError.MissingStackValue)
+}
+
+inline fun Stack.popFunctionAddress(): Result<ReferenceValue.Function, InvocationError.FunctionReferenceExpected> {
+    return (popValueOrNull()?.value as? ReferenceValue.Function)?.let {
         Ok(it)
     } ?: Err(InvocationError.FunctionReferenceExpected)
 }
@@ -95,7 +144,7 @@ inline fun <S, T : NumberValue<S>> Stack.unaryOperation(
     crossinline constructor: (S) -> T,
     crossinline operation: (S) -> S,
 ): Result<Unit, InvocationError> {
-    val operand = popValue()?.value as T
+    val operand = popValueOrNull()?.value as T
 
     val result = operation(operand.value)
     push(Stack.Entry.Value(constructor(result)))
@@ -126,8 +175,8 @@ inline fun <S, T : NumberValue<S>> Stack.binaryOperation(
     crossinline constructor: (S) -> T,
     crossinline operation: (S, S) -> S,
 ): Result<Unit, InvocationError> {
-    val operand2 = popValue()?.value as T
-    val operand1 = popValue()?.value as T
+    val operand2 = popValueOrNull()?.value as T
+    val operand1 = popValueOrNull()?.value as T
 
     val result = operation(operand1.value, operand2.value)
     push(Stack.Entry.Value(constructor(result)))
@@ -157,7 +206,7 @@ inline fun Stack.binaryOperation(
 inline fun <S, T : NumberValue<S>> Stack.testOperation(
     crossinline operation: (S) -> Boolean,
 ): Result<Unit, InvocationError> {
-    val operand = popValue()?.value as T
+    val operand = popValueOrNull()?.value as T
     val result = if (operation(operand.value)) {
         I32(1)
     } else {
@@ -168,50 +217,24 @@ inline fun <S, T : NumberValue<S>> Stack.testOperation(
 }
 
 inline fun <S, T : NumberValue<S>> Stack.relationalOperation(
-    pass: T,
-    fail: T,
     crossinline operation: (S, S) -> Boolean,
 ): Result<Unit, InvocationError> {
-    val operand2 = popValue()?.value as T
-    val operand1 = popValue()?.value as T
+    val operand2 = popValueOrNull()?.value as T
+    val operand1 = popValueOrNull()?.value as T
     val result = if (operation(operand1.value, operand2.value)) {
-        pass
+        I32(1)
     } else {
-        fail
+        I32(0)
     }
     push(Stack.Entry.Value(result))
     return Ok(Unit)
 }
 
-@JvmName("i32RelationalOperation")
-inline fun Stack.relationalOperation(
-    crossinline operation: (Int, Int) -> Boolean,
-): Result<Unit, InvocationError> =
-    relationalOperation(I32(1), I32(0), operation)
-
-@JvmName("i64RelationalOperation")
-inline fun Stack.relationalOperation(
-    crossinline operation: (Long, Long) -> Boolean,
-): Result<Unit, InvocationError> =
-    relationalOperation(I64(1), I64(0), operation)
-
-@JvmName("f32RelationalOperation")
-inline fun Stack.relationalOperation(
-    crossinline operation: (Float, Float) -> Boolean,
-): Result<Unit, InvocationError> =
-    relationalOperation(F32(1f), F32(0f), operation)
-
-@JvmName("f64RelationalOperation")
-inline fun Stack.relationalOperation(
-    crossinline operation: (Double, Double) -> Boolean,
-): Result<Unit, InvocationError> =
-    relationalOperation(F64(1.0), F64(0.0), operation)
-
 inline fun <S, A : NumberValue<S>, T, B : NumberValue<T>> Stack.convertOperation(
     crossinline constructor: (T) -> B,
     crossinline operation: (S) -> T,
 ): Result<Unit, InvocationError> {
-    val operand = popValue()?.value as A
+    val operand = popValueOrNull()?.value as A
     val result = try {
         operation(operand.value)
     } catch (e: Throwable) {

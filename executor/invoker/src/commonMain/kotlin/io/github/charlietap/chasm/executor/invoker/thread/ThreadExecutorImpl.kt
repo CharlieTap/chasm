@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.InstructionExecut
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.popValueOrError
+import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 internal fun ThreadExecutorImpl(
@@ -37,10 +37,10 @@ internal fun ThreadExecutorImpl(
     }
 
     val results = List(thread.frame.arity.value) {
-        stack.popValueOrError().bind().value
-    }
+        stack.popValue().bind().value
+    }.asReversed()
 
-    val frame = stack.popFrame()
+    val frame = stack.popFrameOrNull()
 
     if (frame != thread.frame) {
         Err(InvocationError.MissingStackFrame).bind<List<ExecutionValue>>()

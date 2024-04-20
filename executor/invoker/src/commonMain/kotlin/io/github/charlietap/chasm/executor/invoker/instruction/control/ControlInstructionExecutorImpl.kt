@@ -31,6 +31,7 @@ internal fun ControlInstructionExecutorImpl(
         brTableExecutor = ::BrTableExecutorImpl,
         brOnNullExecutor = ::BrOnNullExecutorImpl,
         brOnNonNullExecutor = ::BrOnNonNullExecutorImpl,
+        brOnCastExecutor = ::BrOnCastExecutorImpl,
         returnExecutor = ::ReturnExecutorImpl,
     )
 
@@ -52,6 +53,7 @@ internal fun ControlInstructionExecutorImpl(
     brTableExecutor: BrTableExecutor,
     brOnNullExecutor: BrOnNullExecutor,
     brOnNonNullExecutor: BrOnNonNullExecutor,
+    brOnCastExecutor: BrOnCastExecutor,
     returnExecutor: ReturnExecutor,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
@@ -72,6 +74,10 @@ internal fun ControlInstructionExecutorImpl(
         is ControlInstruction.ReturnCallIndirect -> returnCallIndirectExecutor(store, stack, instruction).bind()
         is ControlInstruction.CallRef -> callRefExecutor(store, stack).bind()
         is ControlInstruction.ReturnCallRef -> returnCallRefExecutor(store, stack).bind()
+        is ControlInstruction.BrOnCast ->
+            brOnCastExecutor(store, stack, instruction.labelIndex, instruction.srcReferenceType, instruction.dstReferenceType, true).bind()
+        is ControlInstruction.BrOnCastFail ->
+            brOnCastExecutor(store, stack, instruction.labelIndex, instruction.srcReferenceType, instruction.dstReferenceType, false).bind()
 
         else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
     }

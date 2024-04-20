@@ -16,7 +16,7 @@ class ReadTableTest {
     fun `can read a reference value from a table`() {
 
         val functionAddress = functionAddress()
-        val value = ReferenceValue.FunctionAddress(functionAddress)
+        val value = ReferenceValue.Function(functionAddress)
         val instance = tableInstance(elements = mutableListOf(value))
         val store = store(tables = mutableListOf(instance))
         val address = Address.Table(0)
