@@ -52,6 +52,6 @@ internal fun MemoryInitializerImpl(
             ),
         )
 
-        evaluator(store, instance, expression, Arity.SIDE_EFFECT).bind()
+        evaluator(store, instance, expression, Arity.Return.SIDE_EFFECT).bind()
     }
 }

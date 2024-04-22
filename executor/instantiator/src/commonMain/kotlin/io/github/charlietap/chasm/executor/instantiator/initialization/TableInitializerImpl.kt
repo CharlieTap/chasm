@@ -46,7 +46,7 @@ internal fun TableInitializerImpl(
                 TableInstruction.ElemDrop(segment.idx),
             ),
         )
-        evaluator(store, instance, expression, Arity.SIDE_EFFECT).bind()
+        evaluator(store, instance, expression, Arity.Return.SIDE_EFFECT).bind()
     }
 
     module.elementSegments.filter { segment ->
@@ -55,6 +55,6 @@ internal fun TableInitializerImpl(
         val expression = Expression(
             instructions = listOf(TableInstruction.ElemDrop(segment.idx)),
         )
-        evaluator(store, instance, expression, Arity.SIDE_EFFECT).bind()
+        evaluator(store, instance, expression, Arity.Return.SIDE_EFFECT).bind()
     }
 }

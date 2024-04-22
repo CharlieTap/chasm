@@ -23,7 +23,7 @@ fun frameState(
 )
 
 fun frame(
-    arity: Arity = Arity.SIDE_EFFECT,
+    arity: Arity.Return = Arity.Return.SIDE_EFFECT,
     state: Stack.Entry.ActivationFrame.State = frameState(),
 ) = Stack.Entry.ActivationFrame(
     arity = arity,
@@ -31,7 +31,7 @@ fun frame(
 )
 
 fun label(
-    arity: Arity = Arity.SIDE_EFFECT,
+    arity: Arity.Return = Arity.Return.SIDE_EFFECT,
     continuation: List<Instruction> = emptyList(),
 ) = Stack.Entry.Label(
     arity = arity,

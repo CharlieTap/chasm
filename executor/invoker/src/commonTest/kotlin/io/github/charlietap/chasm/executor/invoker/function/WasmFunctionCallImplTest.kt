@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.invoker.flow.ReturnException
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -21,6 +20,7 @@ import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.label
 import io.github.charlietap.chasm.fixture.module.function
 import io.github.charlietap.chasm.fixture.module.local
+import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -71,7 +71,7 @@ class WasmFunctionCallImplTest {
         )
 
         val label = label(
-            arity = Arity(functionType.params.types.size),
+            arity = returnArity(functionType.params.types.size),
         )
 
         val params = listOf(
@@ -90,7 +90,7 @@ class WasmFunctionCallImplTest {
         ).toMutableList()
 
         val frame = Stack.Entry.ActivationFrame(
-            arity = Arity(functionType.results.types.size),
+            arity = returnArity(functionType.results.types.size),
             state = Stack.Entry.ActivationFrame.State(
                 locals = locals,
                 module = functionInstance.module,
@@ -163,7 +163,7 @@ class WasmFunctionCallImplTest {
         )
 
         val label = label(
-            arity = Arity(functionType.params.types.size),
+            arity = returnArity(functionType.params.types.size),
         )
 
         val params = listOf(
@@ -182,7 +182,7 @@ class WasmFunctionCallImplTest {
         ).toMutableList()
 
         val frame = Stack.Entry.ActivationFrame(
-            arity = Arity(functionType.results.types.size),
+            arity = returnArity(functionType.results.types.size),
             state = Stack.Entry.ActivationFrame.State(
                 locals = locals,
                 module = functionInstance.module,
@@ -257,7 +257,7 @@ class WasmFunctionCallImplTest {
         )
 
         val label = label(
-            arity = Arity(functionType.params.types.size),
+            arity = returnArity(functionType.params.types.size),
         )
 
         val params = listOf(
@@ -276,7 +276,7 @@ class WasmFunctionCallImplTest {
         ).toMutableList()
 
         val frame = Stack.Entry.ActivationFrame(
-            arity = Arity(functionType.results.types.size),
+            arity = returnArity(functionType.results.types.size),
             state = Stack.Entry.ActivationFrame.State(
                 locals = locals,
                 module = functionInstance.module,

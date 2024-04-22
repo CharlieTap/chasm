@@ -55,7 +55,7 @@ internal inline fun WasmFunctionCallImpl(
     }
 
     val frame = Stack.Entry.ActivationFrame(
-        arity = Arity(type.results.types.size),
+        arity = Arity.Return(type.results.types.size),
         state = Stack.Entry.ActivationFrame.State(
             locals = locals.toMutableList(),
             module = instance.module,
@@ -65,7 +65,7 @@ internal inline fun WasmFunctionCallImpl(
     stack.push(frame)
 
     val label = Stack.Entry.Label(
-        arity = Arity(type.results.types.size),
+        arity = Arity.Return(type.results.types.size),
         continuation = emptyList(),
     )
 

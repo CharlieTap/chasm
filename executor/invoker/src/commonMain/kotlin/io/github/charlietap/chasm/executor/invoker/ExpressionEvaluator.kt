@@ -8,4 +8,4 @@ import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-typealias ExpressionEvaluator = (Store, ModuleInstance, Expression, Arity) -> Result<ExecutionValue?, InvocationError>
+typealias ExpressionEvaluator = (Store, ModuleInstance, Expression, Arity.Return) -> Result<ExecutionValue?, InvocationError>

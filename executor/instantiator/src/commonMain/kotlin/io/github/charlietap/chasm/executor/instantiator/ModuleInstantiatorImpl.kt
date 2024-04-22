@@ -61,16 +61,16 @@ internal fun ModuleInstantiatorImpl(
     val partialInstance = pallocator(store, module, imports).bind()
 
     val globalInitValues = module.globals.mapNotNull { global ->
-        evaluator(store, partialInstance, global.initExpression, Arity(1)).bind()
+        evaluator(store, partialInstance, global.initExpression, Arity.Return(1)).bind()
     }
 
     val tableInitValues = module.tables.map { table ->
-        evaluator(store, partialInstance, table.initExpression, Arity(1)).bind() as ReferenceValue
+        evaluator(store, partialInstance, table.initExpression, Arity.Return(1)).bind() as ReferenceValue
     }
 
     val elementSegmentReferences = module.elementSegments.map { segment ->
         segment.initExpressions.map { initExpression ->
-            evaluator(store, partialInstance, initExpression, Arity(1)).bind() as ReferenceValue
+            evaluator(store, partialInstance, initExpression, Arity.Return(1)).bind() as ReferenceValue
         }
     }
 

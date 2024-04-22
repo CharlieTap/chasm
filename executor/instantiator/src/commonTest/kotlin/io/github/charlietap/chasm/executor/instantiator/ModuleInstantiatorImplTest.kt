@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryIni
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -21,6 +20,7 @@ import io.github.charlietap.chasm.fixture.module.import
 import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.module.startFunction
 import io.github.charlietap.chasm.fixture.module.table
+import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.heapType
 import kotlin.test.Test
@@ -77,7 +77,7 @@ class ModuleInstantiatorImplTest {
         val evaluator: ExpressionEvaluator = { eStore, eInstance, eExpression, eArity ->
             assertEquals(store, eStore)
             assertEquals(partialInstance, eInstance)
-            assertEquals(Arity(1), eArity)
+            assertEquals(returnArity(1), eArity)
 
             if (eExpression.instructions.isEmpty()) {
                 Ok(null)

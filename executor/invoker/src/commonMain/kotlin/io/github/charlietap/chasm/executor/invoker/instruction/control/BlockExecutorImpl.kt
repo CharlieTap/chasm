@@ -42,8 +42,8 @@ internal inline fun BlockExecutorImpl(
     val frame = stack.peekFrame().bind()
     val functionType = expander(frame.state.module, blockType).bind()
     val (paramArity, resultArity) = functionType?.let {
-        Arity(functionType.params.types.size) to Arity(functionType.results.types.size)
-    } ?: (Arity.SIDE_EFFECT to Arity.SIDE_EFFECT)
+        Arity.Argument(functionType.params.types.size) to Arity.Return(functionType.results.types.size)
+    } ?: (Arity.Argument.NULLARY to Arity.Return.SIDE_EFFECT)
 
     val params = List(paramArity.value) {
         stack.popValue().bind().value

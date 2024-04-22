@@ -18,7 +18,7 @@ fun ExpressionEvaluatorImpl(
     store: Store,
     instance: ModuleInstance,
     expression: Expression,
-    arity: Arity = Arity(1),
+    arity: Arity.Return = Arity.Return(1),
 ): Result<ExecutionValue?, InvocationError> =
     ExpressionEvaluatorImpl(
         store = store,
@@ -32,7 +32,7 @@ fun ExpressionEvaluatorImpl(
     store: Store,
     instance: ModuleInstance,
     expression: Expression,
-    arity: Arity,
+    arity: Arity.Return,
     threadExecutor: ThreadExecutor,
 ): Result<ExecutionValue?, InvocationError> {
 

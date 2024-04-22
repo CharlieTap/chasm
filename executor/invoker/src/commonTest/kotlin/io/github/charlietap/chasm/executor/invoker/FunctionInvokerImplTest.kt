@@ -5,7 +5,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Thread
@@ -17,6 +16,7 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.function
+import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import kotlin.test.Test
@@ -48,7 +48,7 @@ class FunctionInvokerImplTest {
 
         val thread = Thread(
             Stack.Entry.ActivationFrame(
-                Arity(functionType.results.types.size),
+                returnArity(functionType.results.types.size),
                 Stack.Entry.ActivationFrame.State(
                     locals,
                     moduleInstance,

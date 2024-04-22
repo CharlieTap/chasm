@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,7 +31,7 @@ class ExpressionEvaluatorImplTest {
 
         val thread = Thread(
             Stack.Entry.ActivationFrame(
-                Arity(1),
+                returnArity(1),
                 Stack.Entry.ActivationFrame.State(
                     mutableListOf(),
                     instance,
@@ -49,7 +50,7 @@ class ExpressionEvaluatorImplTest {
             store = store,
             instance = instance,
             expression = expression,
-            arity = Arity(1),
+            arity = returnArity(1),
             threadExecutor = threadExecutor,
         )
 
@@ -68,7 +69,7 @@ class ExpressionEvaluatorImplTest {
 
         val thread = Thread(
             Stack.Entry.ActivationFrame(
-                Arity.SIDE_EFFECT,
+                Arity.Return.SIDE_EFFECT,
                 Stack.Entry.ActivationFrame.State(
                     mutableListOf(),
                     instance,
@@ -87,7 +88,7 @@ class ExpressionEvaluatorImplTest {
             store = store,
             instance = instance,
             expression = expression,
-            arity = Arity.SIDE_EFFECT,
+            arity = Arity.Return.SIDE_EFFECT,
             threadExecutor = threadExecutor,
         )
 

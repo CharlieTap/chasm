@@ -47,7 +47,7 @@ internal fun FunctionInvokerImpl(
 
     val thread = Thread(
         Stack.Entry.ActivationFrame(
-            Arity(functionType.results.types.size),
+            Arity.Return(functionType.results.types.size),
             Stack.Entry.ActivationFrame.State(
                 values.toMutableList(),
                 function.module,

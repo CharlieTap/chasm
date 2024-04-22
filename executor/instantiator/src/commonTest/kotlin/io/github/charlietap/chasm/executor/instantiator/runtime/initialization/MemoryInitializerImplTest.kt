@@ -54,7 +54,7 @@ class MemoryInitializerImplTest {
             assertEquals(store, eStore)
             assertEquals(instance, eInstance)
             assertEquals(expression, eExpression)
-            assertEquals(Arity.SIDE_EFFECT, eArity)
+            assertEquals(Arity.Return.SIDE_EFFECT, eArity)
 
             Ok(null)
         }

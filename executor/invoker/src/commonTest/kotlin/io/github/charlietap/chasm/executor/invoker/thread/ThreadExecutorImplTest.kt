@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -24,7 +25,7 @@ class ThreadExecutorImplTest {
         val locals = mutableListOf<ExecutionValue>(NumberValue.I32(2), NumberValue.I32(3))
 
         val frame = Stack.Entry.ActivationFrame(
-            Arity(1),
+            returnArity(1),
             Stack.Entry.ActivationFrame.State(
                 locals = locals,
                 module = moduleInstance(),
@@ -90,7 +91,7 @@ class ThreadExecutorImplTest {
         val locals = mutableListOf<ExecutionValue>()
 
         val frame = Stack.Entry.ActivationFrame(
-            Arity.SIDE_EFFECT,
+            Arity.Return.SIDE_EFFECT,
             Stack.Entry.ActivationFrame.State(
                 locals = locals,
                 module = moduleInstance(),

@@ -62,7 +62,7 @@ class TableInitializerImplTest {
             assertEquals(store, eStore)
             assertEquals(instance, eInstance)
             assertEquals(expressions.next(), eExpression)
-            assertEquals(Arity.SIDE_EFFECT, eArity)
+            assertEquals(Arity.Return.SIDE_EFFECT, eArity)
 
             Ok(null)
         }

@@ -84,12 +84,12 @@ data class Stack(
         value class Value(val value: ExecutionValue) : Entry
 
         data class Label(
-            val arity: Arity,
+            val arity: Arity.Return,
             val continuation: List<Instruction>,
         ) : Entry
 
         data class ActivationFrame(
-            val arity: Arity,
+            val arity: Arity.Return,
             val state: State,
         ) : Entry {
             data class State(
