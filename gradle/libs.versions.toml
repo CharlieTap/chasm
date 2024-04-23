@@ -1,6 +1,6 @@
 [versions]
 
-version-name = "0.2.0"
+version-name = "0.2.2"
 
 java-compiler-version = "21"
 java-bytecode-version = "11"

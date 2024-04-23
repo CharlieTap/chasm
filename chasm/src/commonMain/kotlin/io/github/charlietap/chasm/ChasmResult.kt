@@ -25,3 +25,48 @@ fun <E : ChasmError, S, T> ChasmResult<S, E>.flatMap(transformation: (S) -> Chas
         is ChasmResult.Error -> this
     }
 }
+
+fun <S, E : ChasmError, T> ChasmResult<S, E>.fold(
+    onSuccess: (S) -> T,
+    onError: (E) -> T,
+): T {
+    return when (this) {
+        is ChasmResult.Success -> onSuccess(result)
+        is ChasmResult.Error -> onError(error)
+    }
+}
+
+fun <S, E : ChasmError> ChasmResult<S, E>.getOrNull(): S? {
+    return when (this) {
+        is ChasmResult.Success -> this.result
+        is ChasmResult.Error -> null
+    }
+}
+
+fun <S, E : ChasmError> ChasmResult<S, E>.getOrElse(defaultValue: S): S {
+    return when (this) {
+        is ChasmResult.Success -> result
+        is ChasmResult.Error -> defaultValue
+    }
+}
+
+fun <S, E : ChasmError> ChasmResult<S, E>.expect(message: String): S {
+    return when (this) {
+        is ChasmResult.Success -> this.result
+        is ChasmResult.Error -> throw IllegalStateException("$message: ${this.error}")
+    }
+}
+
+fun <S, E : ChasmError> ChasmResult<S, E>.onSuccess(action: (S) -> Unit): ChasmResult<S, E> {
+    if (this is ChasmResult.Success) {
+        action(result)
+    }
+    return this
+}
+
+fun <S, E : ChasmError> ChasmResult<S, E>.onError(action: (E) -> Unit): ChasmResult<S, E> {
+    if (this is ChasmResult.Error) {
+        action(error)
+    }
+    return this
+}

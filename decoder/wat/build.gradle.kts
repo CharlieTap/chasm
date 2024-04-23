@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.atomic.fu)
     id("kmp-conventions")
     id("linting-conventions")
+    id("publishing-conventions")
 }
 
 kotlin {
@@ -24,6 +25,11 @@ kotlin {
             }
         }
     }
+}
+
+configure<PublishingConventionsExtension> {
+    name = "wat-parser"
+    description = "A wat text file decoder for Kotlin Multiplatform"
 }
 
 tasks.withType<KotlinCompile>().configureEach {
