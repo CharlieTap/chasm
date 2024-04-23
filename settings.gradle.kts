@@ -57,6 +57,8 @@ include(":test:fixture:executor:runtime")
 
 include(":validator")
 
+includeBuild("example")
+
 rootProject.name = "chasm-multiplatform"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
