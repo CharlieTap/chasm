@@ -4,12 +4,13 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.decoder.wasm.decoder.Decoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.TypeIndexDecoder
-import io.github.charlietap.chasm.decoder.wasm.decoder.type.global.GlobalTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.memory.MemoryTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.table.TableTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
@@ -115,7 +116,7 @@ class BinaryImportDescriptorDecoderTest {
             Ok(descriptor)
         }
 
-        val globalTypeDecoder: GlobalTypeDecoder = { _ ->
+        val globalTypeDecoder: Decoder<GlobalType> = { _ ->
             Ok(globalType)
         }
 
@@ -151,7 +152,7 @@ class BinaryImportDescriptorDecoderTest {
         private val neverMemoryTypeDecoder: MemoryTypeDecoder = {
             fail("memory type decoder should not be called in this scenario")
         }
-        private val neverGlobalTypeDecoder: GlobalTypeDecoder = {
+        private val neverGlobalTypeDecoder: Decoder<GlobalType> = {
             fail("global type decoder should not be called in this scenario")
         }
     }

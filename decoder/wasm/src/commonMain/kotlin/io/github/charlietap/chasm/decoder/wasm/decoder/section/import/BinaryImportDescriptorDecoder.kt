@@ -4,12 +4,13 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Import
+import io.github.charlietap.chasm.ast.type.GlobalType
+import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.decoder.wasm.decoder.Decoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.BinaryTypeIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.index.TypeIndexDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.global.BinaryGlobalTypeDecoder
-import io.github.charlietap.chasm.decoder.wasm.decoder.type.global.GlobalTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.memory.BinaryMemoryTypeDecoder
-import io.github.charlietap.chasm.decoder.wasm.decoder.type.memory.MemoryTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.table.BinaryTableTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.table.TableTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.error.SectionDecodeError
@@ -29,8 +30,8 @@ internal fun BinaryImportDescriptorDecoder(
 
 internal fun BinaryImportDescriptorDecoder(
     reader: WasmBinaryReader,
-    globalTypeDecoder: GlobalTypeDecoder,
-    memTypeDecoder: MemoryTypeDecoder,
+    globalTypeDecoder: Decoder<GlobalType>,
+    memTypeDecoder: Decoder<MemoryType>,
     tableTypeDecoder: TableTypeDecoder,
     typeIndexDecoder: TypeIndexDecoder,
 ): Result<Import.Descriptor, WasmDecodeError> = binding {
