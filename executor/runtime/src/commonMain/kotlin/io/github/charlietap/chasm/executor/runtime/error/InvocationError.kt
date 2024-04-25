@@ -9,6 +9,9 @@ import kotlin.jvm.JvmInline
 sealed interface InvocationError : ModuleRuntimeError {
 
     @JvmInline
+    value class FunctionNotFound(val function: String) : InvocationError
+
+    @JvmInline
     value class StoreLookupFailed(val address: Address) : InvocationError
 
     @JvmInline

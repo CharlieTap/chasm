@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.ChasmResult.Success
 import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.FunctionInvokerImpl
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -33,10 +34,14 @@ internal fun invoke(
     args: List<ExecutionValue>,
     invoker: FunctionInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
+
     val extern = instance.exports.firstOrNull { export ->
         export.name.name == name
     }?.value
-    val address = (extern as ExternalValue.Function).address
+
+    val address = (extern as? ExternalValue.Function)?.address ?: return Error(
+        ChasmError.ExecutionError(InvocationError.FunctionNotFound(name)),
+    )
 
     return invoker(store, address, args)
         .mapError(ChasmError::ExecutionError)
