@@ -2,6 +2,8 @@
 
 package io.github.charlietap.chasm.executor.invoker.ext
 
+import kotlin.math.pow
+
 internal inline fun Long.divu(other: Long): Long = this.toULong().div(other.toULong()).toLong()
 
 internal inline fun Long.eq(other: Long): Boolean = this == other
@@ -48,7 +50,15 @@ internal inline fun Long.countTrailingZero(): Long = countTrailingZeroBits().toL
 
 internal inline fun Long.convertF32s(): Float = this.toFloat()
 
-internal inline fun Long.convertF32u(): Float = this.toULong().toFloat()
+internal inline fun Long.convertF32u(): Float {
+    return if (this.toULong() < 0x10_0000_0000_0000uL) {
+        this.toULong().toFloat()
+    } else {
+        val r = if (this.toULong() and 0xfffuL == 0uL) 0uL else 1uL
+        val result = (this.toULong() shr 12) or r
+        (result.toFloat() * 2.0f.pow(12))
+    }
+}
 
 internal inline fun Long.convertF64s(): Double = this.toDouble()
 

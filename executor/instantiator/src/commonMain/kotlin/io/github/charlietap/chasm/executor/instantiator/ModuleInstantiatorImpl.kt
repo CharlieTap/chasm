@@ -81,7 +81,7 @@ internal fun ModuleInstantiatorImpl(
 
     module.startFunction?.let { function ->
         val address = instance.functionAddresses[function.idx.idx.toInt()]
-        invoker(store, address, emptyList())
+        invoker(store, address, emptyList()).bind()
     }
 
     instance

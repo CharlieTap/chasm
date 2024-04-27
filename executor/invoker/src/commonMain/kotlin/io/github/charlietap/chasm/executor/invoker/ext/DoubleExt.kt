@@ -44,8 +44,8 @@ internal inline fun Double.truncI64u(): Long = toULong().toLong()
 
 internal inline fun Double.truncI32sTrapping(): Int = when {
     this.isNaN() -> throw IllegalArgumentException()
-    this > Int.MAX_VALUE -> throw IllegalArgumentException()
-    this < Int.MIN_VALUE -> throw IllegalArgumentException()
+    this.toULong() > UInt.MAX_VALUE -> throw IllegalArgumentException()
+    this.toLong() < Int.MIN_VALUE -> throw IllegalArgumentException()
     else -> toInt()
 }
 

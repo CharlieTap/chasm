@@ -44,6 +44,11 @@ internal inline fun ByteArray.toIntSizedLittleEndian(size: Int): Int {
     for (index in 0 until size) {
         result = result or ((this[index].toInt() and 0xFF) shl (8 * index))
     }
+    if (size > 0 && this[size - 1] < 0) {
+        for (index in size * 8 until 32) {
+            result = result or (1 shl index)
+        }
+    }
     return result
 }
 
@@ -94,6 +99,11 @@ internal inline fun ByteArray.toLongSizedLittleEndian(size: Int): Long {
     var result: Long = 0
     for (index in 0 until size) {
         result = result or ((this[index].toLong() and 0xFF) shl (8 * index))
+    }
+    if (size > 0 && this[size - 1] < 0) {
+        for (index in size * 8 until 64) {
+            result = result or (1L shl index)
+        }
     }
     return result
 }

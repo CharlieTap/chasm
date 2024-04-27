@@ -4,7 +4,6 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.flow.ReturnException
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
@@ -12,9 +11,12 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.popFrame
+import io.github.charlietap.chasm.executor.runtime.ext.popInstruction
 import io.github.charlietap.chasm.executor.runtime.ext.popLabel
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.type.ext.functionType
 
@@ -40,11 +42,31 @@ internal inline fun WasmFunctionCallImpl(
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
 
-    if (tailRecursion) {
-        stack.popFrame().bind()
-    }
-
     val type = instance.functionType().bind()
+
+    if (tailRecursion) {
+        val frame = stack.popFrame().bind()
+
+        val results = List(type.params.types.size) {
+            stack.popValue().bind()
+        }
+
+        do {
+            val instruction = stack.popInstruction().bind()
+        } while (instruction.instruction !is AdminInstruction.Frame)
+
+        while (stack.labelsDepth() > frame.stackLabelsDepth) {
+            stack.popLabel().bind()
+        }
+
+        while (stack.valuesDepth() > frame.stackValuesDepth) {
+            stack.popValue().bind()
+        }
+
+        results.asReversed().forEach { value ->
+            stack.push(value)
+        }
+    }
 
     val params = List(type.params.types.size) {
         stack.popValue().bind().value
@@ -56,6 +78,8 @@ internal inline fun WasmFunctionCallImpl(
 
     val frame = Stack.Entry.ActivationFrame(
         arity = Arity.Return(type.results.types.size),
+        stackLabelsDepth = stack.labelsDepth(),
+        stackValuesDepth = stack.valuesDepth(),
         state = Stack.Entry.ActivationFrame.State(
             locals = locals.toMutableList(),
             module = instance.module,
@@ -66,28 +90,9 @@ internal inline fun WasmFunctionCallImpl(
 
     val label = Stack.Entry.Label(
         arity = Arity.Return(type.results.types.size),
+        stackValuesDepth = stack.valuesDepth(),
         continuation = emptyList(),
     )
 
-    val labelsDepth = stack.labelsDepth()
-    val valuesDepth = stack.valuesDepth()
-
-    try {
-        instructionBlockExecutor(store, stack, label, instance.function.body.instructions, emptyList()).bind()
-    } catch (exception: ReturnException) {
-        while (stack.labelsDepth() > labelsDepth) {
-            stack.popLabel().bind()
-        }
-        while (stack.valuesDepth() > valuesDepth) {
-            stack.popValue().bind()
-        }
-
-        exception.results.forEach { value ->
-            stack.push(Stack.Entry.Value(value))
-        }
-    }
-
-    if (!tailRecursion) {
-        stack.popFrame().bind()
-    }
+    instructionBlockExecutor(stack, label, instance.function.body.instructions.map(::ModuleInstruction), emptyList()).bind()
 }

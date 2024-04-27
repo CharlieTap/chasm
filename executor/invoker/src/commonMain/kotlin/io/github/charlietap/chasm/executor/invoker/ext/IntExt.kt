@@ -36,7 +36,7 @@ internal inline fun Int.extend16s(): Int = (this and 0xFFFF).toShort().toInt()
 
 internal inline fun Int.extendI64s(): Long = this.toLong()
 
-internal inline fun Int.extendI64u(): Long = this.toULong().toLong()
+internal inline fun Int.extendI64u(): Long = this.toUInt().toLong()
 
 internal inline fun Int.convertF32s(): Float = this.toFloat()
 

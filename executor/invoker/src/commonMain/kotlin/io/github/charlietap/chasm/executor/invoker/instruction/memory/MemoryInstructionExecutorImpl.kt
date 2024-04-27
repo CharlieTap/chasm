@@ -34,6 +34,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64S
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreSizedExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun MemoryInstructionExecutorImpl(
@@ -123,6 +124,6 @@ internal fun MemoryInstructionExecutorImpl(
         is MemoryInstruction.F64Load -> f64LoadExecutor(store, stack, instruction).bind()
         is MemoryInstruction.F64Store -> f64StoreExecutor(store, stack, instruction).bind()
 
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        else -> Err(InvocationError.UnimplementedInstruction(ModuleInstruction(instruction))).bind<Unit>()
     }
 }

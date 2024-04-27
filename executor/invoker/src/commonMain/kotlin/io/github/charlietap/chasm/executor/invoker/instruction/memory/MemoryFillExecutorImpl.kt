@@ -4,29 +4,30 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.MemArg
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutorImpl
+import io.github.charlietap.chasm.executor.memory.fill.MemoryInstanceFiller
+import io.github.charlietap.chasm.executor.memory.fill.MemoryInstanceFillerImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.memory
+import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
-internal inline fun MemoryFillExecutorImpl(
+internal fun MemoryFillExecutorImpl(
     store: Store,
     stack: Stack,
 ): Result<Unit, InvocationError> =
     MemoryFillExecutorImpl(
         store = store,
         stack = stack,
-        storeSizedSignedExecutor = ::I32StoreSizedExecutorImpl,
+        memoryInstanceFiller = ::MemoryInstanceFillerImpl,
     )
 
-internal fun MemoryFillExecutorImpl(
+internal inline fun MemoryFillExecutorImpl(
     store: Store,
     stack: Stack,
-    storeSizedSignedExecutor: I32StoreSizedExecutor,
+    crossinline memoryInstanceFiller: MemoryInstanceFiller,
 ): Result<Unit, InvocationError> = binding {
 
     val bytesToFill = stack.popI32().bind()
@@ -35,14 +36,9 @@ internal fun MemoryFillExecutorImpl(
 
     if (bytesToFill == 0) return@binding
 
-    stack.push(Stack.Entry.Value(NumberValue.I32(offset)))
-    stack.push(Stack.Entry.Value(NumberValue.I32(fillValue)))
+    val frame = stack.peekFrame().bind()
+    val memoryAddress = frame.state.module.memoryAddress(0).bind()
+    val memory = store.memory(memoryAddress).bind()
 
-    storeSizedSignedExecutor(store, stack, MemArg(0u, 0u), 1).bind()
-
-    stack.push(Stack.Entry.Value(NumberValue.I32(offset + 1)))
-    stack.push(Stack.Entry.Value(NumberValue.I32(fillValue)))
-    stack.push(Stack.Entry.Value(NumberValue.I32(bytesToFill - 1)))
-
-    MemoryFillExecutorImpl(store, stack, storeSizedSignedExecutor).bind()
+    memoryInstanceFiller(memory, offset..(offset + bytesToFill), fillValue.toByte()).bind()
 }

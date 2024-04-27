@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -39,12 +40,14 @@ fun ExpressionEvaluatorImpl(
     val thread = Thread(
         Stack.Entry.ActivationFrame(
             arity,
+            0,
+            0,
             Stack.Entry.ActivationFrame.State(
                 mutableListOf(),
                 instance,
             ),
         ),
-        expression.instructions,
+        expression.instructions.map(::ModuleInstruction),
     )
 
     val configuration = Configuration(

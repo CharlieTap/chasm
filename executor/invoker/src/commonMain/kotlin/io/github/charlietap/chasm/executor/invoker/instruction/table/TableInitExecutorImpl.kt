@@ -46,17 +46,20 @@ internal fun TableInitExecutorImpl(
     val elementInstance = store.element(elementAddress).bind()
 
     val elementsToInitialise = stack.popI32().bind()
-    val sourceOffset = stack.popI32().bind()
+    val segmentOffset = stack.popI32().bind()
     val tableOffset = stack.popI32().bind()
 
-    if (sourceOffset + elementsToInitialise > elementInstance.elements.size || tableOffset + elementsToInitialise > tableInstance.elements.size) {
+    if (
+        segmentOffset + elementsToInitialise > elementInstance.elements.size ||
+        tableOffset + elementsToInitialise > tableInstance.elements.size
+    ) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }
 
     if (elementsToInitialise == 0) return@binding
 
-    val referenceValue = elementInstance.elements.getOrNull(sourceOffset).toResultOr {
-        InvocationError.ElementReferenceLookupFailed(sourceOffset)
+    val referenceValue = elementInstance.elements.getOrNull(segmentOffset).toResultOr {
+        InvocationError.ElementReferenceLookupFailed(segmentOffset)
     }.bind()
 
     stack.push(Stack.Entry.Value(NumberValue.I32(tableOffset)))
@@ -65,7 +68,7 @@ internal fun TableInitExecutorImpl(
     tableSetExecutor(store, stack, TableInstruction.TableSet(instruction.tableIdx)).bind()
 
     stack.push(Stack.Entry.Value(NumberValue.I32(tableOffset + 1)))
-    stack.push(Stack.Entry.Value(NumberValue.I32(sourceOffset + 1)))
+    stack.push(Stack.Entry.Value(NumberValue.I32(segmentOffset + 1)))
     stack.push(Stack.Entry.Value(NumberValue.I32(elementsToInitialise - 1)))
 
     TableInitExecutorImpl(store, stack, instruction, tableSetExecutor).bind()

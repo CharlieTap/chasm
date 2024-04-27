@@ -6,6 +6,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 
 internal fun ParametricInstructionExecutorImpl(
     instruction: ParametricInstruction,
@@ -31,6 +32,6 @@ internal fun ParametricInstructionExecutorImpl(
         is ParametricInstruction.Select -> selectExecutor(stack).bind()
         is ParametricInstruction.SelectWithType -> selectWithTypeExecutor(stack, instruction).bind()
 
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        else -> Err(InvocationError.UnimplementedInstruction(ModuleInstruction(instruction))).bind<Unit>()
     }
 }

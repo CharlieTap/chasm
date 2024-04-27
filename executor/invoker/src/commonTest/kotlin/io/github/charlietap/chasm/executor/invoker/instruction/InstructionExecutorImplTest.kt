@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.parametric.Parame
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.ReferenceInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.table.TableInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.variable.VariableInstructionExecutor
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.fixture.module.tableIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
@@ -43,8 +44,8 @@ class InstructionExecutorImplTest {
             Ok(Unit)
         }
 
-        val actual = InstructionExecutorImpl(
-            instruction = instruction,
+        val actual = ModuleInstructionExecutorImpl(
+            instruction = ModuleInstruction(instruction),
             store = store,
             stack = stack,
             aggregateInstructionExecutor = aggregateInstructionExecutor,
@@ -76,8 +77,8 @@ class InstructionExecutorImplTest {
             Ok(Unit)
         }
 
-        val actual = InstructionExecutorImpl(
-            instruction = instruction,
+        val actual = ModuleInstructionExecutorImpl(
+            instruction = ModuleInstruction(instruction),
             store = store,
             stack = stack,
             aggregateInstructionExecutor = aggregateInstructionExecutor(),
@@ -109,8 +110,8 @@ class InstructionExecutorImplTest {
             Ok(Unit)
         }
 
-        val actual = InstructionExecutorImpl(
-            instruction = instruction,
+        val actual = ModuleInstructionExecutorImpl(
+            instruction = ModuleInstruction(instruction),
             store = store,
             stack = stack,
             aggregateInstructionExecutor = aggregateInstructionExecutor(),
@@ -141,8 +142,8 @@ class InstructionExecutorImplTest {
             Ok(Unit)
         }
 
-        val actual = InstructionExecutorImpl(
-            instruction = instruction,
+        val actual = ModuleInstructionExecutorImpl(
+            instruction = ModuleInstruction(instruction),
             store = store,
             stack = stack,
             aggregateInstructionExecutor = aggregateInstructionExecutor(),
@@ -173,8 +174,8 @@ class InstructionExecutorImplTest {
             Ok(Unit)
         }
 
-        val actual = InstructionExecutorImpl(
-            instruction = instruction,
+        val actual = ModuleInstructionExecutorImpl(
+            instruction = ModuleInstruction(instruction),
             store = store,
             stack = stack,
             aggregateInstructionExecutor = aggregateInstructionExecutor(),
@@ -206,8 +207,8 @@ class InstructionExecutorImplTest {
             Ok(Unit)
         }
 
-        val actual = InstructionExecutorImpl(
-            instruction = instruction,
+        val actual = ModuleInstructionExecutorImpl(
+            instruction = ModuleInstruction(instruction),
             store = store,
             stack = stack,
             aggregateInstructionExecutor = aggregateInstructionExecutor(),
@@ -239,8 +240,8 @@ class InstructionExecutorImplTest {
             Ok(Unit)
         }
 
-        val actual = InstructionExecutorImpl(
-            instruction = instruction,
+        val actual = ModuleInstructionExecutorImpl(
+            instruction = ModuleInstruction(instruction),
             store = store,
             stack = stack,
             aggregateInstructionExecutor = aggregateInstructionExecutor(),
@@ -272,8 +273,8 @@ class InstructionExecutorImplTest {
             Ok(Unit)
         }
 
-        val actual = InstructionExecutorImpl(
-            instruction = instruction,
+        val actual = ModuleInstructionExecutorImpl(
+            instruction = ModuleInstruction(instruction),
             store = store,
             stack = stack,
             aggregateInstructionExecutor = aggregateInstructionExecutor(),

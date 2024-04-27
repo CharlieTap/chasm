@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.executor.invoker.thread
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.instruction.InstructionExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.InstructionExecutorImpl
+import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -16,12 +16,12 @@ internal fun ThreadExecutorImpl(
 ): Result<List<ExecutionValue>, InvocationError> =
     ThreadExecutorImpl(
         configuration = configuration,
-        instructionExecutor = ::InstructionExecutorImpl,
+        instructionExecutor = ::ExecutionInstructionExecutorImpl,
     )
 
 internal fun ThreadExecutorImpl(
     configuration: Configuration,
-    instructionExecutor: InstructionExecutor,
+    instructionExecutor: ExecutionInstructionExecutor,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
     val thread = configuration.thread
@@ -32,19 +32,18 @@ internal fun ThreadExecutorImpl(
         stack.push(Stack.Entry.Value(local))
     }
 
-    thread.instructions.forEach { instruction ->
-        instructionExecutor(instruction, configuration.store, stack).bind()
+    thread.instructions.asReversed().forEach { instruction ->
+        stack.push(Stack.Entry.Instruction(instruction))
+    }
+
+    while (true) {
+        val entry = stack.popInstructionOrNull() ?: break
+        instructionExecutor(entry.instruction, configuration.store, stack).bind()
     }
 
     val results = List(thread.frame.arity.value) {
         stack.popValue().bind().value
     }.asReversed()
-
-    val frame = stack.popFrameOrNull()
-
-    if (frame != thread.frame) {
-        Err(InvocationError.MissingStackFrame).bind<List<ExecutionValue>>()
-    }
 
     if (stack.size() > 0) {
         Err(InvocationError.ProgramFinishedInconsistentState).bind<List<ExecutionValue>>()

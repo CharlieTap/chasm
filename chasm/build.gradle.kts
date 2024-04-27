@@ -1,3 +1,6 @@
+
+import io.github.charlietap.sweet.plugin.WasmTestSuiteGenPluginExtension
+import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -8,6 +11,7 @@ plugins {
     id("kmp-conventions")
     id("linting-conventions")
     id("publishing-conventions")
+    id("io.github.charlietap.sweet.plugin")
 }
 
 kotlin {
@@ -48,6 +52,8 @@ kotlin {
 
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.test.resources)
+                implementation(libs.sweet.lib)
+                implementation(libs.kotlinx.serialization)
             }
         }
     }
@@ -58,6 +64,21 @@ configure<PublishingConventionsExtension> {
     description = "A wasm runtime for Kotlin Multiplatform"
 }
 
+configure<WasmTestSuiteGenPluginExtension> {
+    wabtVersion = "1.0.34"
+    testSuiteCommit = "16a839d5601c283541a84572b47637f035b51437"
+    scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
+    testPackageName = "io.github.charlietap.chasm"
+    proposals = listOf("tail-call", "extended-const")
+    excludes = listOf("**/comments.wast","**/if.wast", "simd_*/**")
+}
+
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.jvmTarget = libs.versions.java.bytecode.version.get()
+}
+
+tasks.named {
+    it.contains("lintKotlinCommonTest")
+}.configureEach {
+    dependsOn(tasks.withType<GenerateTestsTask>())
 }

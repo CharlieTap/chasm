@@ -26,7 +26,7 @@ internal inline fun BrTableExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
     val index = stack.popI32().bind()
 
-    val label = if (index < instruction.labelIndices.size) {
+    val label = if (index >= 0 && index < instruction.labelIndices.size) {
         instruction.labelIndices[index]
     } else {
         instruction.defaultLabelIndex

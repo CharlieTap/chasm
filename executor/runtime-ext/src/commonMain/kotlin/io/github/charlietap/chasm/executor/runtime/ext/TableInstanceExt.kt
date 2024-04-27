@@ -15,17 +15,18 @@ inline fun TableInstance.grow(
     initialisationValue: ReferenceValue,
 ): Result<TableInstance, InvocationError> {
 
-    val proposedLength = elementsToAdd + elements.size
-    val max = type.limits.max
-    if (max != null && proposedLength.toUInt() > max) {
-        return Err(InvocationError.TableGrowExceedsLimits(max))
+    val proposedLength = (elementsToAdd + elements.size).toUInt()
+
+    val range = type.limits.min..(type.limits.max ?: UInt.MAX_VALUE)
+    if (proposedLength !in range) {
+        return Err(InvocationError.TableGrowExceedsLimits(proposedLength))
     }
 
     repeat(elementsToAdd) {
         elements.add(initialisationValue)
     }
 
-    val newLimits = type.limits.copy(min = proposedLength.toUInt())
+    val newLimits = type.limits.copy(min = proposedLength)
 
     return Ok(copy(type.copy(limits = newLimits)))
 }

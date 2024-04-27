@@ -36,6 +36,7 @@ hilt-integrations = "1.2.0"
 junit = "4.13.2"
 
 kotlin = "1.9.23"
+kotlin-poet = "1.16.0"
 kotlinter = "4.2.0"
 kot-compile-testing = "1.5.0"
 
@@ -102,6 +103,7 @@ junit = { module = "junit:junit", version.ref = "junit"}
 kotlin-compile-testing-core = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kot-compile-testing"}
 kotlin-compile-testing-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kot-compile-testing"}
 kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin"}
+kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet"}
 kotlin-reflection = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin"}
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin"}
 
@@ -116,6 +118,8 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-test-resources = { module = "com.goncalossilva:resources", version.ref = "kotlinx-test-resources"}
 
 result = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref = "result"}
+
+sweet-lib = { module = "io.github.charlietap.sweet:lib" }
 
 dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradle-versions-plugin = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versions-plugin" }

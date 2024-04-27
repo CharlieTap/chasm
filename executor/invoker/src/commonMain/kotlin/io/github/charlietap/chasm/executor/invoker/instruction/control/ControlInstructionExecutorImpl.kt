@@ -6,6 +6,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun ControlInstructionExecutorImpl(
@@ -79,6 +80,6 @@ internal fun ControlInstructionExecutorImpl(
         is ControlInstruction.BrOnCastFail ->
             brOnCastExecutor(store, stack, instruction.labelIndex, instruction.srcReferenceType, instruction.dstReferenceType, false).bind()
 
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        else -> Err(InvocationError.UnimplementedInstruction(ModuleInstruction(instruction))).bind<Unit>()
     }
 }

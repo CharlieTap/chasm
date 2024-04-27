@@ -5,7 +5,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
@@ -30,14 +29,15 @@ import io.github.charlietap.chasm.executor.invoker.instruction.variable.Variable
 import io.github.charlietap.chasm.executor.invoker.instruction.variable.VariableInstructionExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-internal fun InstructionExecutorImpl(
-    instruction: Instruction,
+internal fun ModuleInstructionExecutorImpl(
+    instruction: ModuleInstruction,
     store: Store,
     stack: Stack,
 ): Result<Unit, InvocationError> =
-    InstructionExecutorImpl(
+    ModuleInstructionExecutorImpl(
         instruction = instruction,
         store = store,
         stack = stack,
@@ -51,8 +51,8 @@ internal fun InstructionExecutorImpl(
         variableInstructionExecutor = ::VariableInstructionExecutorImpl,
     )
 
-internal fun InstructionExecutorImpl(
-    instruction: Instruction,
+internal fun ModuleInstructionExecutorImpl(
+    instruction: ModuleInstruction,
     store: Store,
     stack: Stack,
     aggregateInstructionExecutor: AggregateInstructionExecutor,
@@ -64,15 +64,15 @@ internal fun InstructionExecutorImpl(
     referenceInstructionExecutor: ReferenceInstructionExecutor,
     variableInstructionExecutor: VariableInstructionExecutor,
 ): Result<Unit, InvocationError> = binding {
-    when (instruction) {
-        is AggregateInstruction -> aggregateInstructionExecutor(instruction, store, stack).bind()
-        is ControlInstruction -> controlInstructionExecutor(instruction, store, stack).bind()
-        is MemoryInstruction -> memoryInstructionExecutor(instruction, store, stack).bind()
-        is NumericInstruction -> numericInstructionExecutor(instruction, stack).bind()
-        is ParametricInstruction -> parametricInstructionExecutor(instruction, stack).bind()
-        is TableInstruction -> tableInstructionExecutor(instruction, store, stack).bind()
-        is ReferenceInstruction -> referenceInstructionExecutor(instruction, store, stack).bind()
-        is VariableInstruction -> variableInstructionExecutor(instruction, store, stack).bind()
+    when (val moduleInstruction = instruction.instruction) {
+        is AggregateInstruction -> aggregateInstructionExecutor(moduleInstruction, store, stack).bind()
+        is ControlInstruction -> controlInstructionExecutor(moduleInstruction, store, stack).bind()
+        is MemoryInstruction -> memoryInstructionExecutor(moduleInstruction, store, stack).bind()
+        is NumericInstruction -> numericInstructionExecutor(moduleInstruction, stack).bind()
+        is ParametricInstruction -> parametricInstructionExecutor(moduleInstruction, stack).bind()
+        is TableInstruction -> tableInstructionExecutor(moduleInstruction, store, stack).bind()
+        is ReferenceInstruction -> referenceInstructionExecutor(moduleInstruction, store, stack).bind()
+        is VariableInstruction -> variableInstructionExecutor(moduleInstruction, store, stack).bind()
         else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
     }
 }

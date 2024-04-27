@@ -8,6 +8,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun AggregateInstructionExecutorImpl(
@@ -98,6 +99,6 @@ internal inline fun AggregateInstructionExecutorImpl(
             arrayInitElementExecutor(store, stack, instruction.typeIndex, instruction.elementIndex).bind()
         is AggregateInstruction.AnyConvertExtern -> anyConvertExternExecutor(stack).bind()
         is AggregateInstruction.ExternConvertAny -> externConvertAnyExecutor(stack).bind()
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        else -> Err(InvocationError.UnimplementedInstruction(ModuleInstruction(instruction))).bind<Unit>()
     }
 }

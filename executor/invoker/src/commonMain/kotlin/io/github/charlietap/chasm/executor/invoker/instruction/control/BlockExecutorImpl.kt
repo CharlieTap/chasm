@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal inline fun BlockExecutorImpl(
@@ -51,8 +52,9 @@ internal inline fun BlockExecutorImpl(
 
     val label = Stack.Entry.Label(
         arity = resultArity,
+        stackValuesDepth = stack.valuesDepth(),
         continuation = emptyList(),
     )
 
-    instructionBlockExecutor(store, stack, label, instructions, params).bind()
+    instructionBlockExecutor(stack, label, instructions.map(::ModuleInstruction), params).bind()
 }
