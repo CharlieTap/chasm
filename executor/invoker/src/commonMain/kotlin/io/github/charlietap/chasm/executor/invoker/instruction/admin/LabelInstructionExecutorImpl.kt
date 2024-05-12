@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popLabel
 
+@Suppress("UNUSED_PARAMETER")
 internal inline fun LabelInstructionExecutorImpl(
     label: Stack.Entry.Label,
     stack: Stack,

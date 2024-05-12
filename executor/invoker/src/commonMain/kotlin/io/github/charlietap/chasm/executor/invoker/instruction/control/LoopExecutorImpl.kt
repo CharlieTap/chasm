@@ -31,6 +31,7 @@ internal inline fun LoopExecutorImpl(
         instructionBlockExecutor = ::InstructionBlockExecutorImpl,
     )
 
+@Suppress("UNUSED_PARAMETER")
 internal inline fun LoopExecutorImpl(
     store: Store,
     stack: Stack,

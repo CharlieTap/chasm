@@ -34,6 +34,7 @@ internal inline fun WasmFunctionCallImpl(
         instructionBlockExecutor = ::InstructionBlockExecutorImpl,
     )
 
+@Suppress("UNUSED_PARAMETER")
 internal inline fun WasmFunctionCallImpl(
     store: Store,
     stack: Stack,

@@ -26,6 +26,7 @@ internal fun AdminInstructionExecutorImpl(
         labelInstructionExecutor = ::LabelInstructionExecutorImpl,
     )
 
+@Suppress("UNUSED_PARAMETER")
 internal fun AdminInstructionExecutorImpl(
     instruction: ExecutionInstruction,
     store: Store,

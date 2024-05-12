@@ -15,6 +15,7 @@ fun AssertTrapCommandRunner(
     actionRunner = ::ActionRunner,
 )
 
+@Suppress("UNUSED_PARAMETER")
 private fun AssertTrapCommandRunner(
     context: ScriptContext,
     command: AssertTrapCommand,

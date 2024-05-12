@@ -4,6 +4,7 @@ import io.github.charlietap.sweet.lib.command.AssertExhaustionCommand
 
 typealias AssertExhaustionCommandRunner = (AssertExhaustionCommand) -> CommandResult
 
+@Suppress("UNUSED_PARAMETER")
 fun AssertExhaustionCommandRunner(
     command: AssertExhaustionCommand,
 ): CommandResult {

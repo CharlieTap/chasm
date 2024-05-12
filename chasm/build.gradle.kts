@@ -54,6 +54,7 @@ kotlin {
                 implementation(libs.kotlinx.test.resources)
                 implementation(libs.sweet.lib)
                 implementation(libs.kotlinx.serialization)
+                implementation(libs.kotlinx.io.core)
             }
         }
     }
