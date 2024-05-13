@@ -4,9 +4,11 @@ import io.github.charlietap.sweet.plugin.action.Wast2JsonAction
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -15,6 +17,8 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.ChangeType
+import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
@@ -46,8 +50,6 @@ abstract class PrepareTestSuiteTask : DefaultTask() {
     @TaskAction
     fun prepare(inputChanges: InputChanges) {
 
-        val queue = workerExecutor.noIsolation()
-
         inputChanges.getFileChanges(inputFiles).forEach { change ->
 
             if(change.file.isDirectory) return@forEach
@@ -59,11 +61,31 @@ abstract class PrepareTestSuiteTask : DefaultTask() {
                 outputDirectory.dir(change.file.nameWithoutExtension)
             }
 
-            queue.submit(Wast2JsonAction::class.java) {
-                inputFile.set(change.file)
-                outputDirectory.set(generatedDirectory)
-                wast2JsonFile.set(wast2Json)
+            when(change.changeType) {
+                ChangeType.REMOVED -> {
+                    generatedDirectory.get().asFile.deleteRecursively()
+                }
+                ChangeType.MODIFIED -> {
+                    generatedDirectory.get().asFile.deleteRecursively()
+                    queueJobToRunWast2Json(change, generatedDirectory)
+                }
+                ChangeType.ADDED -> {
+                    queueJobToRunWast2Json(change, generatedDirectory)
+                }
+                null -> Unit
             }
+        }
+    }
+
+    private fun queueJobToRunWast2Json(
+        change: FileChange,
+        generatedDirectory: Provider<Directory>,
+    ) {
+        val queue = workerExecutor.noIsolation()
+        queue.submit(Wast2JsonAction::class.java) {
+            inputFile.set(change.file)
+            outputDirectory.set(generatedDirectory)
+            wast2JsonFile.set(wast2Json)
         }
     }
 }

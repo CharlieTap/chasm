@@ -38,8 +38,6 @@ fun AssertReturnCommandRunner(
             if (resultsMatch) {
                 CommandResult.Success
             } else {
-                println(expected)
-                println(result.value)
                 val mismatch = mismatchTemplate(expected, result.value)
                 CommandResult.Failure(command, mismatch)
             }

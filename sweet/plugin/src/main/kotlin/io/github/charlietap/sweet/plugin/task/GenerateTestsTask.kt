@@ -6,6 +6,7 @@ import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -15,6 +16,8 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.assign
+import org.gradle.work.ChangeType
+import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
@@ -42,8 +45,6 @@ abstract class GenerateTestsTask : DefaultTask() {
     @TaskAction
     fun generate(inputChanges: InputChanges) {
 
-        val queue = workerExecutor.noIsolation()
-
         inputChanges.getFileChanges(inputFiles).forEach { change ->
 
             if(change.file.isDirectory) return@forEach
@@ -59,12 +60,32 @@ abstract class GenerateTestsTask : DefaultTask() {
                 testPackageDir.dir(change.file.nameWithoutExtension).file(name)
             }
 
-            queue.submit(GenerateTestAction::class.java) {
-                runner = scriptRunner
-                scriptFile = change.file
-                testPackage = testPackageName
-                testFile = test
+            when(change.changeType) {
+                ChangeType.REMOVED -> {
+                    test.asFile.parentFile.deleteRecursively()
+                }
+                ChangeType.MODIFIED -> {
+                    test.asFile.delete()
+                    queueJobToGenerateTest(change, test)
+                }
+                ChangeType.ADDED -> {
+                    queueJobToGenerateTest(change, test)
+                }
+                null -> Unit
             }
+        }
+    }
+
+    private fun queueJobToGenerateTest(
+        change: FileChange,
+        generatedTestFile: RegularFile,
+    ) {
+        val queue = workerExecutor.noIsolation()
+        queue.submit(GenerateTestAction::class.java) {
+            runner = scriptRunner
+            scriptFile = change.file
+            testPackage = testPackageName
+            testFile = generatedTestFile
         }
     }
 }
