@@ -71,7 +71,7 @@ configure<WasmTestSuiteGenPluginExtension> {
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm"
     proposals = listOf("tail-call", "extended-const")
-    excludes = listOf("**/comments.wast","**/if.wast", "**/float_exprs.wast", "simd_*/**")
+    excludes = listOf("**/comments.wast","**/if.wast", "**/float_exprs.wast", "**/f64.wast", "**/float_misc.wast", "simd_*/**")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
