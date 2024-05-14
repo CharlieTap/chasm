@@ -14,16 +14,14 @@ fun ValueMatcher(
     else -> first == second
 }
 
-private fun compareFloats(first: Float, second: Float): Boolean = if (first.isNaN())
-    {
-        second.isNaN()
-    } else {
+private fun compareFloats(first: Float, second: Float): Boolean = if (first.isNaN()) {
+    second.isNaN()
+} else {
     first == second
 }
 
-private fun compareDoubles(first: Double, second: Double): Boolean = if (first.isNaN())
-    {
-        second.isNaN()
-    } else {
+private fun compareDoubles(first: Double, second: Double): Boolean = if (first.isNaN()) {
+    second.isNaN()
+} else {
     first == second
 }
