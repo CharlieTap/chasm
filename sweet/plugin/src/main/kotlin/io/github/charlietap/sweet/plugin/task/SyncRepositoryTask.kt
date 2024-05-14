@@ -28,18 +28,39 @@ abstract class SyncRepositoryTask : DefaultTask() {
 
     @TaskAction
     fun sync() {
+        try {
+            syncRepository()
+        } catch (e: Exception) {
+            wipeDirectory()
+            syncRepository()
+        }
+    }
+
+    private fun syncRepository() {
         if (repositoryHasBeenCloned()) {
-             cli.exec {
-                workingDir = outputDirectory.get().asFile
-                commandLine("git", "fetch", "--all")
-             }
+            fetchRepo()
         } else {
-            cli.exec {
-                workingDir = outputDirectory.get().asFile
-                commandLine("git", "clone", repositoryUrl.get(), outputDirectory.get().asFile.absolutePath)
-            }
+            cloneRepo()
         }
 
+        checkoutCommit()
+    }
+
+    private fun cloneRepo() {
+        cli.exec {
+            workingDir = outputDirectory.get().asFile
+            commandLine("git", "clone", repositoryUrl.get(), outputDirectory.get().asFile.absolutePath)
+        }
+    }
+
+    private fun fetchRepo() {
+        cli.exec {
+            workingDir = outputDirectory.get().asFile
+            commandLine("git", "fetch", "--all")
+        }
+    }
+
+    private fun checkoutCommit() {
         cli.exec {
             workingDir = outputDirectory.get().asFile
             commandLine("git", "checkout", commitHash.get())
@@ -52,8 +73,13 @@ abstract class SyncRepositoryTask : DefaultTask() {
 
         return if(outputDir.exists() && outputDir.isDirectory) {
             val path = outputDir.toPath()
-
             Files.list(path).findAny().isPresent
         } else false
+    }
+
+    private fun wipeDirectory() {
+        outputDirectory.get().files().forEach {
+            it.deleteRecursively()
+        }
     }
 }
