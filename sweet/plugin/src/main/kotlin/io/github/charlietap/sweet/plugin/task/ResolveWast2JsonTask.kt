@@ -46,6 +46,7 @@ abstract class ResolveWast2JsonTask : DefaultTask() {
             fs.copy {
                 from(existingLocation)
                 into(outputFile.get().asFile.parentFile)
+                rename{ "wast2json" }
             }
         }
 
