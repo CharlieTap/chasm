@@ -58,6 +58,8 @@ include(":test:fixture:executor:runtime")
 include(":validator")
 
 includeBuild("example")
+includeBuild("sweet")
+
 
 rootProject.name = "chasm-multiplatform"
 

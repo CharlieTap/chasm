@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.error
 
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import kotlin.jvm.JvmInline
@@ -58,7 +58,7 @@ sealed interface InvocationError : ModuleRuntimeError {
     data object MemoryOperationOutOfBounds : InvocationError
 
     @JvmInline
-    value class TableGrowExceedsLimits(val max: UInt) : InvocationError
+    value class TableGrowExceedsLimits(val proposed: UInt) : InvocationError
 
     data object InvalidAddress : InvocationError
 
@@ -67,6 +67,8 @@ sealed interface InvocationError : ModuleRuntimeError {
     data object FunctionReturnArityMismatch : InvocationError
 
     data object MissingStackFrame : InvocationError
+
+    data object MissingInstruction : InvocationError
 
     data object MissingStackLabel : InvocationError
 
@@ -105,7 +107,7 @@ sealed interface InvocationError : ModuleRuntimeError {
     data object ArrayCopyOnAConstArray : InvocationError
 
     @JvmInline
-    value class UnimplementedInstruction(val instruction: Instruction) : InvocationError
+    value class UnimplementedInstruction(val instruction: ExecutionInstruction) : InvocationError
 
     data class HostFunctionInconsistentWithType(
         val expectedType: ValueType,

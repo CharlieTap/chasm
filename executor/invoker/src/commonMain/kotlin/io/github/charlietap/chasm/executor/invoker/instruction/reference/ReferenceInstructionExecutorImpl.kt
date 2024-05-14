@@ -6,6 +6,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun ReferenceInstructionExecutorImpl(
@@ -47,6 +48,6 @@ internal fun ReferenceInstructionExecutorImpl(
         is ReferenceInstruction.RefTest -> refTestExecutor(store, stack, instruction.referenceType).bind()
         is ReferenceInstruction.RefCast -> refCastExecutor(store, stack, instruction.referenceType).bind()
 
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        else -> Err(InvocationError.UnimplementedInstruction(ModuleInstruction(instruction))).bind<Unit>()
     }
 }

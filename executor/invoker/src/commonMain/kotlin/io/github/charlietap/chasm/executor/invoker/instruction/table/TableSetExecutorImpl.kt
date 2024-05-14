@@ -29,7 +29,7 @@ internal inline fun TableSetExecutorImpl(
     val value = stack.popReference().bind()
     val elementIndex = stack.popI32().bind()
 
-    if (elementIndex >= tableInstance.elements.size) {
+    if (elementIndex !in tableInstance.elements.indices) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }
 

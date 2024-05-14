@@ -5,5 +5,5 @@ plugins {
 }
 
 tasks.withType<ConfigurableKtLintTask>().configureEach {
-    exclude { it.file.path.contains("build/")}
+    exclude { it.file.path.contains("build${File.separator}") }
 }

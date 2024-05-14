@@ -6,14 +6,16 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.ext.definedType
+import io.github.charlietap.chasm.fixture.frame
+import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.function
 import io.github.charlietap.chasm.fixture.returnArity
@@ -47,14 +49,14 @@ class FunctionInvokerImplTest {
         )
 
         val thread = Thread(
-            Stack.Entry.ActivationFrame(
-                returnArity(functionType.results.types.size),
-                Stack.Entry.ActivationFrame.State(
+            frame(
+                arity = returnArity(functionType.results.types.size),
+                state = frameState(
                     locals,
                     moduleInstance,
                 ),
             ),
-            listOf(ControlInstruction.Call(Index.FunctionIndex(0u))),
+            listOf(ModuleInstruction(ControlInstruction.Call(Index.FunctionIndex(0u)))),
         )
         val expectedConfig = Configuration(store, thread)
 

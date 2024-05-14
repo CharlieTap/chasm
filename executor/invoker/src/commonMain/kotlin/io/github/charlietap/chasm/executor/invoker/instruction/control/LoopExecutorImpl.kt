@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal inline fun LoopExecutorImpl(
@@ -30,6 +31,7 @@ internal inline fun LoopExecutorImpl(
         instructionBlockExecutor = ::InstructionBlockExecutorImpl,
     )
 
+@Suppress("UNUSED_PARAMETER")
 internal inline fun LoopExecutorImpl(
     store: Store,
     stack: Stack,
@@ -40,20 +42,22 @@ internal inline fun LoopExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-
     val functionType = expander(frame.state.module, blockType).bind()
-    val (paramArity, resultArity) = functionType?.let {
-        Arity.Argument(functionType.params.types.size) to Arity.Return(functionType.results.types.size)
-    } ?: (Arity.Argument.NULLARY to Arity.Return.SIDE_EFFECT)
+    val paramArity = functionType?.let {
+        Arity.Argument(functionType.params.types.size)
+    } ?: Arity.Argument.NULLARY
+
+    val executionInstructions = instructions.map(::ModuleInstruction)
 
     val params = List(paramArity.value) {
         stack.popValue().bind().value
     }
 
     val label = Stack.Entry.Label(
-        arity = resultArity,
-        continuation = listOf(ControlInstruction.Loop(blockType, instructions)),
+        arity = paramArity,
+        stackValuesDepth = stack.valuesDepth(),
+        continuation = listOf(ModuleInstruction(ControlInstruction.Loop(blockType, instructions))),
     )
 
-    instructionBlockExecutor(store, stack, label, instructions, params).bind()
+    instructionBlockExecutor(stack, label, executionInstructions, params).bind()
 }

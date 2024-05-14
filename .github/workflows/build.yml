@@ -35,5 +35,16 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
+      - name: Setup WABT
+        if: runner.os != 'macOS'
+        uses: mwilliamson/setup-wabt-action@v2
+        with:
+          wabt-version: "1.0.34"
+
+      - name: Setup WABT on macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install wabt
+
       - name: Execute Gradle build
         run: ./gradlew build

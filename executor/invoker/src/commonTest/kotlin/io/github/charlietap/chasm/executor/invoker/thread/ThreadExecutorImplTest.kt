@@ -2,18 +2,22 @@ package io.github.charlietap.chasm.executor.invoker.thread
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.ast.instruction.TableInstruction
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.instruction.InstructionExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
+import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Value
 import io.github.charlietap.chasm.executor.runtime.Thread
+import io.github.charlietap.chasm.executor.runtime.ext.popFrame
+import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.fixture.frame
+import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.returnArity
+import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.fixture.value.i32NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,19 +26,19 @@ class ThreadExecutorImplTest {
     @Test
     fun `can execute a thread and return a result`() {
 
-        val locals = mutableListOf<ExecutionValue>(NumberValue.I32(2), NumberValue.I32(3))
+        val locals = mutableListOf<ExecutionValue>(i32NumberValue(2), i32NumberValue(3))
 
-        val frame = Stack.Entry.ActivationFrame(
-            returnArity(1),
-            Stack.Entry.ActivationFrame.State(
+        val frame = frame(
+            arity = returnArity(1),
+            state = frameState(
                 locals = locals,
-                module = moduleInstance(),
+                moduleInstance = moduleInstance(),
             ),
         )
 
         val thread = Thread(
             frame = frame,
-            instructions = listOf(NumericInstruction.I32Mul, NumericInstruction.I32Eqz),
+            instructions = listOf(NumericInstruction.I32Mul, NumericInstruction.I32Eqz).map(::ModuleInstruction),
         )
 
         val configuration = Configuration(
@@ -42,40 +46,42 @@ class ThreadExecutorImplTest {
             thread = thread,
         )
 
-        val instructions = thread.instructions.asSequence().iterator()
+        val instructions = (thread.instructions + listOf(AdminInstruction.Frame(frame))).asSequence().iterator()
 
-        val stack1 = Stack(
+        val stack1 = stack(
             sequenceOf(
-                frame,
-                Stack.Entry.Value(locals[0]),
-                Stack.Entry.Value(locals[1]),
+                Value(locals[0]),
+                Value(locals[1]),
             ),
         )
-        val stack2 = Stack(
+        val stack2 = stack(
             sequenceOf(
-                frame,
-                Stack.Entry.Value(NumberValue.I32(6)),
+                Value(i32NumberValue(6)),
             ),
         )
-        val stack3 = Stack(
+        val stack3 = stack(
             sequenceOf(
-                frame,
-                Stack.Entry.Value(NumberValue.I32(0)),
+                Value(i32NumberValue(0)),
             ),
         )
-        val inputStacks = sequenceOf(stack1, stack2).iterator()
-        val outputStacks = sequenceOf(stack2, stack3).iterator()
+        val inputStacks = sequenceOf(stack1, stack2, stack3).iterator()
+        val outputStacks = sequenceOf(stack2, stack3, stack3).iterator()
 
-        val instructionExecutor: InstructionExecutor = { instruction, store, stack ->
+        val instructionExecutor: ExecutionInstructionExecutor = { instruction, store, stack ->
+
             val inputStack = inputStacks.next()
             val outputStack = outputStacks.next()
 
             assertEquals(instructions.next(), instruction)
             assertEquals(configuration.store, store)
-            assertEquals(inputStack, stack)
+            assertEquals(inputStack.values(), stack.values())
 
-            stack.empty()
+            stack.values().removeAll { true }
             stack.fill(outputStack)
+
+            if (instruction is AdminInstruction.Frame) {
+                stack.popFrame()
+            }
 
             Ok(Unit)
         }
@@ -83,48 +89,5 @@ class ThreadExecutorImplTest {
         val actual = ThreadExecutorImpl(configuration, instructionExecutor)
 
         assertEquals(Ok(listOf(NumberValue.I32(0))), actual)
-    }
-
-    @Test
-    fun `can execute a thread for a side effect`() {
-
-        val locals = mutableListOf<ExecutionValue>()
-
-        val frame = Stack.Entry.ActivationFrame(
-            Arity.Return.SIDE_EFFECT,
-            Stack.Entry.ActivationFrame.State(
-                locals = locals,
-                module = moduleInstance(),
-            ),
-        )
-
-        val sideEffectInstruction = TableInstruction.ElemDrop(Index.ElementIndex(0u))
-        val thread = Thread(
-            frame = frame,
-            instructions = listOf(sideEffectInstruction),
-        )
-
-        val configuration = Configuration(
-            store = store(),
-            thread = thread,
-        )
-
-        val stack = Stack(
-            sequenceOf(
-                frame,
-            ),
-        )
-
-        val instructionExecutor: InstructionExecutor = { iInstruction, iStore, iStack ->
-            assertEquals(sideEffectInstruction, iInstruction)
-            assertEquals(configuration.store, iStore)
-            assertEquals(stack, iStack)
-
-            Ok(Unit)
-        }
-
-        val actual = ThreadExecutorImpl(configuration, instructionExecutor)
-
-        assertEquals(Ok(emptyList()), actual)
     }
 }

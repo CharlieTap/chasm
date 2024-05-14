@@ -6,6 +6,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun TableInstructionExecutorImpl(
@@ -50,6 +51,6 @@ internal fun TableInstructionExecutorImpl(
         is TableInstruction.TableSize -> tableSizeExecutor(store, stack, instruction).bind()
         is TableInstruction.ElemDrop -> elementDropExecutor(store, stack, instruction).bind()
 
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        else -> Err(InvocationError.UnimplementedInstruction(ModuleInstruction(instruction))).bind<Unit>()
     }
 }

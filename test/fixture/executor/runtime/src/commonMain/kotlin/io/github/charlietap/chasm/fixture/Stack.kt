@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.fixture
 
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.value.executionValue
@@ -24,17 +24,23 @@ fun frameState(
 
 fun frame(
     arity: Arity.Return = Arity.Return.SIDE_EFFECT,
+    stackLabelsDepth: Int = 0,
+    stackValuesDepth: Int = 0,
     state: Stack.Entry.ActivationFrame.State = frameState(),
 ) = Stack.Entry.ActivationFrame(
     arity = arity,
+    stackLabelsDepth = stackLabelsDepth,
+    stackValuesDepth = stackValuesDepth,
     state = state,
 )
 
 fun label(
     arity: Arity.Return = Arity.Return.SIDE_EFFECT,
-    continuation: List<Instruction> = emptyList(),
+    stackValuesDepth: Int = 0,
+    continuation: List<ExecutionInstruction> = emptyList(),
 ) = Stack.Entry.Label(
     arity = arity,
+    stackValuesDepth = stackValuesDepth,
     continuation = continuation,
 )
 

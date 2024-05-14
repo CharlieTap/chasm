@@ -46,6 +46,10 @@ inline fun Stack.popFrame(): Result<Stack.Entry.ActivationFrame, InvocationError
     return popFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
 }
 
+inline fun Stack.popInstruction(): Result<Stack.Entry.Instruction, InvocationError.MissingInstruction> {
+    return popInstructionOrNull()?.let(::Ok) ?: Err(InvocationError.MissingInstruction)
+}
+
 inline fun Stack.popLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
     return popLabelOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
 }

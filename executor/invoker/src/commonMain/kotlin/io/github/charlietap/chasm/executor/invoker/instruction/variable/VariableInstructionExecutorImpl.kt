@@ -6,6 +6,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun VariableInstructionExecutorImpl(
@@ -41,6 +42,6 @@ internal fun VariableInstructionExecutorImpl(
         is VariableInstruction.GlobalGet -> globalGetExecutor(store, stack, instruction).bind()
         is VariableInstruction.GlobalSet -> globalSetExecutor(store, stack, instruction).bind()
 
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        else -> Err(InvocationError.UnimplementedInstruction(ModuleInstruction(instruction))).bind<Unit>()
     }
 }

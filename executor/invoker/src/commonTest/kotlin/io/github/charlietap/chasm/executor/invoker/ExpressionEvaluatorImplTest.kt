@@ -8,9 +8,11 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Thread
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.fixture.frame
+import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.store
@@ -30,14 +32,14 @@ class ExpressionEvaluatorImplTest {
         )
 
         val thread = Thread(
-            Stack.Entry.ActivationFrame(
-                returnArity(1),
-                Stack.Entry.ActivationFrame.State(
-                    mutableListOf(),
-                    instance,
+            frame(
+                arity = returnArity(1),
+                state = frameState(
+                    locals = mutableListOf(),
+                    moduleInstance = instance,
                 ),
             ),
-            expression.instructions,
+            expression.instructions.map(::ModuleInstruction),
         )
         val expectedConfig = Configuration(store, thread)
 
@@ -68,14 +70,14 @@ class ExpressionEvaluatorImplTest {
         )
 
         val thread = Thread(
-            Stack.Entry.ActivationFrame(
-                Arity.Return.SIDE_EFFECT,
-                Stack.Entry.ActivationFrame.State(
+            frame(
+                arity = Arity.Return.SIDE_EFFECT,
+                state = frameState(
                     mutableListOf(),
                     instance,
                 ),
             ),
-            expression.instructions,
+            expression.instructions.map(::ModuleInstruction),
         )
         val expectedConfig = Configuration(store, thread)
 

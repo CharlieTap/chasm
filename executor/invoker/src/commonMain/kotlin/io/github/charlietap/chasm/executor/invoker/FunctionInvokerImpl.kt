@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -45,15 +46,19 @@ internal fun FunctionInvokerImpl(
 
     val functionType = function.functionType().bind()
 
+    val instruction = ControlInstruction.Call(Index.FunctionIndex(index.toUInt()))
+
     val thread = Thread(
         Stack.Entry.ActivationFrame(
             Arity.Return(functionType.results.types.size),
+            0,
+            0,
             Stack.Entry.ActivationFrame.State(
                 values.toMutableList(),
                 function.module,
             ),
         ),
-        listOf(ControlInstruction.Call(Index.FunctionIndex(index.toUInt()))),
+        listOf(ModuleInstruction(instruction)),
     )
 
     val configuration = Configuration(
