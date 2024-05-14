@@ -72,7 +72,6 @@ abstract class PrepareTestSuiteTask : DefaultTask() {
                 ChangeType.ADDED -> {
                     queueJobToRunWast2Json(change, generatedDirectory)
                 }
-                null -> Unit
             }
         }
     }

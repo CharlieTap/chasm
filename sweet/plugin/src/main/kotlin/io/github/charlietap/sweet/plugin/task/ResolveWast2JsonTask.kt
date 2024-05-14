@@ -31,10 +31,12 @@ abstract class ResolveWast2JsonTask : DefaultTask() {
 
     @TaskAction
     fun resolve() {
+        val osName = System.getProperty("os.name").lowercase()
+        val command = if (osName.contains("win")) "where" else "which"
         val existingLocationBytes = ByteArrayOutputStream()
 
         cli.exec {
-            commandLine = listOf("which", "wast2json")
+            commandLine = listOf(command, "wast2json")
             standardOutput = existingLocationBytes
         }
 
