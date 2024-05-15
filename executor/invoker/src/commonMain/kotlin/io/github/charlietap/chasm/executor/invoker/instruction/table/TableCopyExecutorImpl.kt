@@ -14,27 +14,11 @@ import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
-
-internal inline fun TableCopyExecutorImpl(
-    store: Store,
-    stack: Stack,
-    instruction: TableInstruction.TableCopy,
-): Result<Unit, InvocationError> =
-    TableCopyExecutorImpl(
-        store = store,
-        stack = stack,
-        instruction = instruction,
-        tableGetExecutor = ::TableGetExecutorImpl,
-        tableSetExecutor = ::TableSetExecutorImpl,
-    )
 
 internal fun TableCopyExecutorImpl(
     store: Store,
     stack: Stack,
     instruction: TableInstruction.TableCopy,
-    tableGetExecutor: TableGetExecutor,
-    tableSetExecutor: TableSetExecutor,
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
@@ -54,23 +38,11 @@ internal fun TableCopyExecutorImpl(
 
     if (elementsToCopy == 0) return@binding
 
-    if (dstOffset <= srcOffset) {
-        stack.push(Stack.Entry.Value(NumberValue.I32(dstOffset)))
-        stack.push(Stack.Entry.Value(NumberValue.I32(srcOffset)))
-        tableGetExecutor(store, stack, TableInstruction.TableGet(instruction.srcTableIdx)).bind()
-        tableSetExecutor(store, stack, TableInstruction.TableSet(instruction.destTableIdx)).bind()
-        stack.push(Stack.Entry.Value(NumberValue.I32(dstOffset + 1)))
-        stack.push(Stack.Entry.Value(NumberValue.I32(srcOffset + 1)))
-    } else {
-        stack.push(Stack.Entry.Value(NumberValue.I32(dstOffset + elementsToCopy - 1)))
-        stack.push(Stack.Entry.Value(NumberValue.I32(srcOffset + elementsToCopy - 1)))
-        tableGetExecutor(store, stack, TableInstruction.TableGet(instruction.srcTableIdx)).bind()
-        tableSetExecutor(store, stack, TableInstruction.TableSet(instruction.destTableIdx)).bind()
-        stack.push(Stack.Entry.Value(NumberValue.I32(dstOffset)))
-        stack.push(Stack.Entry.Value(NumberValue.I32(srcOffset)))
+    val step = if (dstOffset <= srcOffset) 1 else -1
+    val start = if (dstOffset <= srcOffset) 0 else elementsToCopy - 1
+
+    repeat(elementsToCopy) { i ->
+        val index = start + i * step
+        dstTableInstance.elements[dstOffset + index] = srcTableInstance.elements[srcOffset + index]
     }
-
-    stack.push(Stack.Entry.Value(NumberValue.I32(elementsToCopy - 1)))
-
-    TableCopyExecutorImpl(store, stack, instruction, tableGetExecutor, tableSetExecutor).bind()
 }

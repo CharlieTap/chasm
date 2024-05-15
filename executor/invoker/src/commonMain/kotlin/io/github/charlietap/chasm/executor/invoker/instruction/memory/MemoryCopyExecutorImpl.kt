@@ -40,7 +40,8 @@ internal fun MemoryCopyExecutorImpl(
     val memoryAddress = frame.state.module.memoryAddress(0).bind()
     val memory = store.memory(memoryAddress).bind()
 
-    val srcRange = sourceOffset..(sourceOffset + bytesToCopy)
+    val srcRange = sourceOffset..<(sourceOffset + bytesToCopy)
+    val dstRange = destinationOffset..<(destinationOffset + bytesToCopy)
 
-    memoryInstanceCopier(memory, srcRange, destinationOffset).bind()
+    memoryInstanceCopier(memory, memory, srcRange, dstRange).bind()
 }
