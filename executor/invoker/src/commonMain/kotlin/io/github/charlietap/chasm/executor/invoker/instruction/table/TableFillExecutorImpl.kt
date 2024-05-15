@@ -9,31 +9,18 @@ import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.contains
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
-
-internal inline fun TableFillExecutorImpl(
-    store: Store,
-    stack: Stack,
-    instruction: TableInstruction.TableFill,
-): Result<Unit, InvocationError> =
-    TableFillExecutorImpl(
-        store = store,
-        stack = stack,
-        instruction = instruction,
-        tableSetExecutor = ::TableSetExecutorImpl,
-    )
 
 internal fun TableFillExecutorImpl(
     store: Store,
     stack: Stack,
     instruction: TableInstruction.TableFill,
-    tableSetExecutor: TableSetExecutor,
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
@@ -44,20 +31,15 @@ internal fun TableFillExecutorImpl(
     val fillValue = stack.popReference().bind()
     val tableOffset = stack.popI32().bind()
 
-    if (tableOffset + elementsToFill > tableInstance.elements.size) {
+    val fillRange = tableOffset..<(tableOffset + elementsToFill)
+
+    if (!tableInstance.elements.indices.contains(fillRange)) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }
 
     if (elementsToFill == 0) return@binding
 
-    stack.push(Stack.Entry.Value(NumberValue.I32(tableOffset)))
-    stack.push(Stack.Entry.Value(fillValue))
-
-    tableSetExecutor(store, stack, TableInstruction.TableSet(instruction.tableIdx)).bind()
-
-    stack.push(Stack.Entry.Value(NumberValue.I32(tableOffset + 1)))
-    stack.push(Stack.Entry.Value(fillValue))
-    stack.push(Stack.Entry.Value(NumberValue.I32(elementsToFill - 1)))
-
-    TableFillExecutorImpl(store, stack, instruction, tableSetExecutor).bind()
+    fillRange.forEach { tableIndex ->
+        tableInstance.elements[tableIndex] = fillValue
+    }
 }

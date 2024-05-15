@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package io.github.charlietap.chasm.executor.memory.copy
+package io.github.charlietap.chasm.executor.memory.init
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
@@ -8,19 +8,20 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.contains
+import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 
-fun MemoryInstanceCopierImpl(
-    src: MemoryInstance,
+fun MemoryInstanceInitialiserImpl(
+    src: DataInstance,
     dst: MemoryInstance,
     srcRange: IntRange,
     dstRange: IntRange,
 ): Result<Unit, InvocationError.MemoryOperationOutOfBounds> {
 
-    val srcByteArray = (src.data as ByteArrayLinearMemory).memory
+    val srcByteArray = src.bytes.asByteArray()
     val dstByteArray = (dst.data as ByteArrayLinearMemory).memory
 
-    return MemoryInstanceCopierImpl(
+    return MemoryInstanceInitialiserImpl(
         src = srcByteArray,
         dst = dstByteArray,
         srcRange = srcRange,
@@ -28,7 +29,7 @@ fun MemoryInstanceCopierImpl(
     )
 }
 
-internal inline fun MemoryInstanceCopierImpl(
+internal inline fun MemoryInstanceInitialiserImpl(
     src: ByteArray,
     dst: ByteArray,
     srcRange: IntRange,
