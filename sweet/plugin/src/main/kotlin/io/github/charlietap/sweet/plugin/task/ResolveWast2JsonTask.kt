@@ -42,12 +42,12 @@ abstract class ResolveWast2JsonTask : DefaultTask() {
 
         val existingLocation =  File(existingLocationBytes.toString().trim())
 
-        if(!outputFile.get().asFile.exists()) {
-            fs.copy {
-                from(existingLocation)
-                into(outputFile.get().asFile.parentFile)
-                rename{ "wast2json" }
-            }
+        outputFile.get().asFile.delete()
+
+        fs.copy {
+            from(existingLocation)
+            into(outputFile.get().asFile.parentFile)
+            rename{ "wast2json" }
         }
 
         val versionBytes = ByteArrayOutputStream()
