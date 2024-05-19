@@ -63,7 +63,7 @@ class ArrayInitElementExecutorImplTest {
         val elementToCopy = i31ReferenceValue()
         val elementAddress = elementAddress(0)
         val elementInstance = elementInstance(
-            elements = mutableListOf(
+            elements = arrayOf(
                 elementToCopy,
             ),
         )

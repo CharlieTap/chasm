@@ -17,7 +17,7 @@ class ReadTableTest {
 
         val functionAddress = functionAddress()
         val value = ReferenceValue.Function(functionAddress)
-        val instance = tableInstance(elements = mutableListOf(value))
+        val instance = tableInstance(elements = arrayOf(value))
         val store = store(tables = mutableListOf(instance))
         val address = Address.Table(0)
 

@@ -12,7 +12,7 @@ internal fun ElementAllocatorImpl(
     values: List<ReferenceValue>,
 ): Address.Element {
 
-    val instance = ElementInstance(type, values.toMutableList())
+    val instance = ElementInstance(type, values.toTypedArray())
 
     store.elements.add(instance)
 

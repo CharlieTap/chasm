@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.fixture.type.referenceType
 
 fun elementInstance(
     type: ReferenceType = referenceType(),
-    elements: MutableList<ReferenceValue> = mutableListOf(),
+    elements: Array<ReferenceValue> = arrayOf(),
     dropped: Boolean = false,
 ) = ElementInstance(
     type = type,

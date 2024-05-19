@@ -23,7 +23,7 @@ class ElementAllocatorImplTest {
 
         val expected = ElementInstance(
             type = refType,
-            elements = mutableListOf(),
+            elements = arrayOf(),
         )
 
         val address = ElementAllocatorImpl(store, refType, emptyList())

@@ -18,7 +18,7 @@ class WriteTableTest {
 
         val functionAddress = functionAddress()
         val value = ReferenceValue.Function(functionAddress)
-        val instance = tableInstance(elements = mutableListOf(ReferenceValue.Null(AbstractHeapType.Func)))
+        val instance = tableInstance(elements = arrayOf(ReferenceValue.Null(AbstractHeapType.Func)))
         val store = store(tables = mutableListOf(instance))
         val address = Address.Table(0)
 

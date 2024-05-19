@@ -43,7 +43,7 @@ class CallIndirectExecutorImplTest {
         val tableIndex = tableIndex(0u)
         val tableAddress = tableAddress()
         val tableInstance = tableInstance(
-            elements = mutableListOf(ReferenceValue.Function(functionAddress)),
+            elements = arrayOf(ReferenceValue.Function(functionAddress)),
         )
         val elementIndex = 0
 
@@ -101,7 +101,7 @@ class CallIndirectExecutorImplTest {
         val tableIndex = tableIndex(0u)
         val tableAddress = tableAddress()
         val tableInstance = tableInstance(
-            elements = mutableListOf(ReferenceValue.Function(functionAddress)),
+            elements = arrayOf(ReferenceValue.Function(functionAddress)),
         )
         val elementIndex = 0
 

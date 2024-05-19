@@ -47,7 +47,5 @@ internal fun TableInitExecutorImpl(
 
     if (elementsToInitialise == 0) return@binding
 
-    for (srcOffset in srcRange) {
-        tableInstance.elements[tableOffset + srcOffset - srcRange.first] = elementInstance.elements[srcOffset]
-    }
+    elementInstance.elements.copyInto(tableInstance.elements, dstRange.first, srcRange.first, srcRange.last + 1)
 }

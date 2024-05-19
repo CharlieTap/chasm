@@ -26,7 +26,7 @@ class TableAllocatorImplTest {
         val type = tableType(limits = limits)
 
         val refValue = ReferenceValue.Null(AbstractHeapType.Func)
-        val elements = MutableList<ReferenceValue>(min) {
+        val elements = Array<ReferenceValue>(min) {
             refValue
         }
 

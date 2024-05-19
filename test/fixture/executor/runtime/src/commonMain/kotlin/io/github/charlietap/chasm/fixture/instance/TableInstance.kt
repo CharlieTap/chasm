@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.fixture.type.tableType
 
 fun tableInstance(
     type: TableType = tableType(),
-    elements: MutableList<ReferenceValue> = mutableListOf(),
+    elements: Array<ReferenceValue> = arrayOf(),
 ) = TableInstance(
     type = type,
     elements = elements,

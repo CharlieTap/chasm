@@ -33,7 +33,7 @@ class ArrayNewElementExecutorImplTest {
         val arrayElem2 = ReferenceValue.I31(118u)
 
         val elementInstance = elementInstance(
-            elements = mutableListOf(
+            elements = arrayOf(
                 referenceValue(),
                 referenceValue(),
                 referenceValue(),

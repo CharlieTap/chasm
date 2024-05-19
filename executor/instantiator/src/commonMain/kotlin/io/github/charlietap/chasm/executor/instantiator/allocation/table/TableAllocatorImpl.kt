@@ -12,7 +12,7 @@ fun TableAllocatorImpl(
     reference: ReferenceValue,
 ): Address.Table {
 
-    val elements = MutableList(type.limits.min.toInt()) { reference }
+    val elements = Array(type.limits.min.toInt()) { reference }
     val instance = TableInstance(type, elements)
 
     store.tables.add(instance)

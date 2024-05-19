@@ -4,12 +4,11 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import com.github.michaelbull.result.fold
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.grow
+import io.github.charlietap.chasm.executor.runtime.ext.asRange
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
@@ -27,17 +26,26 @@ internal inline fun TableGrowExecutorImpl(
     val frame = stack.peekFrame().bind()
     val tableAddress = frame.state.module.tableAddress(instruction.tableIdx.index()).bind()
     val tableInstance = store.table(tableAddress).bind()
+    val tableType = tableInstance.type
 
     val tableSize = tableInstance.elements.size
     val elementsToAdd = stack.popI32().bind()
     val referenceValue = stack.popReference().bind()
 
-    val result = tableInstance.grow(elementsToAdd, referenceValue)
-
-    result.fold({ newInstance ->
-        store.tables[tableAddress.address] = newInstance
-        stack.push(Stack.Entry.Value(NumberValue.I32(tableSize)))
-    }, {
+    val proposedLength = (tableSize + elementsToAdd).toUInt()
+    if (proposedLength !in tableType.limits.asRange()) {
         stack.push(Stack.Entry.Value(NumberValue.I32(-1)))
-    })
+        return@binding
+    }
+
+    tableInstance.apply {
+        type = type.copy(
+            limits = type.limits.copy(
+                min = proposedLength,
+            ),
+        )
+        elements += Array(elementsToAdd) { referenceValue }
+    }
+
+    stack.push(Stack.Entry.Value(NumberValue.I32(tableSize)))
 }

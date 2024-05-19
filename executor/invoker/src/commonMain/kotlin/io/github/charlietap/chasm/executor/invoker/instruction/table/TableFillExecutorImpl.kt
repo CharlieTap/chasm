@@ -39,7 +39,5 @@ internal fun TableFillExecutorImpl(
 
     if (elementsToFill == 0) return@binding
 
-    fillRange.forEach { tableIndex ->
-        tableInstance.elements[tableIndex] = fillValue
-    }
+    tableInstance.elements.fill(fillValue, fillRange.first, fillRange.last + 1)
 }
