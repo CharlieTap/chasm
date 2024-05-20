@@ -19,7 +19,7 @@ import io.github.charlietap.chasm.fixture.type.arrayCompositeType
 import io.github.charlietap.chasm.fixture.type.arrayType
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
-import io.github.charlietap.chasm.fixture.type.i32NumberValueType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.mutableFieldType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.valueStorageType
@@ -47,7 +47,7 @@ class ArrayInitDataExecutorImplTest {
                             arrayType = arrayType(
                                 fieldType = mutableFieldType(
                                     storageType = valueStorageType(
-                                        valueType = i32NumberValueType(),
+                                        valueType = i32ValueType(),
                                     ),
                                     mutability = varMutability(),
                                 ),

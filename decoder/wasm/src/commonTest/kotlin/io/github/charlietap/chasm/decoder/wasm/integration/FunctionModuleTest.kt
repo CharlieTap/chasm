@@ -12,11 +12,12 @@ import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.SubType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.type.f32ValueType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
@@ -34,14 +35,14 @@ class FunctionModuleTest {
         val expectedFunctionType = FunctionType(
             params = resultType(
                 listOf(
-                    ValueType.Number(NumberType.I32),
-                    ValueType.Number(NumberType.I32),
+                    i32ValueType(),
+                    i32ValueType(),
                 ),
             ),
             results = resultType(
                 listOf(
-                    ValueType.Number(NumberType.I32),
-                    ValueType.Number(NumberType.I64),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
         )
@@ -59,11 +60,11 @@ class FunctionModuleTest {
             idx = Index.FunctionIndex(0u),
             typeIndex = Index.TypeIndex(0u),
             locals = listOf(
-                Local(Index.LocalIndex(0u), ValueType.Number(NumberType.I32)),
-                Local(Index.LocalIndex(1u), ValueType.Number(NumberType.I32)),
-                Local(Index.LocalIndex(2u), ValueType.Number(NumberType.I32)),
-                Local(Index.LocalIndex(3u), ValueType.Number(NumberType.I64)),
-                Local(Index.LocalIndex(4u), ValueType.Number(NumberType.F32)),
+                Local(Index.LocalIndex(0u), i32ValueType()),
+                Local(Index.LocalIndex(1u), i32ValueType()),
+                Local(Index.LocalIndex(2u), i32ValueType()),
+                Local(Index.LocalIndex(3u), i64ValueType()),
+                Local(Index.LocalIndex(4u), f32ValueType()),
             ),
             body = Expression(
                 listOf(

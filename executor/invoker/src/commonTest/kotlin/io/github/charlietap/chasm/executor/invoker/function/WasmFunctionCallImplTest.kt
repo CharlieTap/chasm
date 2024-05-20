@@ -23,8 +23,8 @@ import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
-import io.github.charlietap.chasm.fixture.type.i32NumberValueType
-import io.github.charlietap.chasm.fixture.type.i64NumberValueType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.value.i32NumberValue
 import kotlin.test.Test
@@ -41,14 +41,14 @@ class WasmFunctionCallImplTest {
         val functionType = functionType(
             params = resultType(
                 listOf(
-                    i32NumberValueType(),
-                    i64NumberValueType(),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
             results = resultType(
                 listOf(
-                    i32NumberValueType(),
-                    i64NumberValueType(),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
         )
@@ -132,14 +132,14 @@ class WasmFunctionCallImplTest {
         val functionType = functionType(
             params = resultType(
                 listOf(
-                    i32NumberValueType(),
-                    i64NumberValueType(),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
             results = resultType(
                 listOf(
-                    i32NumberValueType(),
-                    i64NumberValueType(),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
         )

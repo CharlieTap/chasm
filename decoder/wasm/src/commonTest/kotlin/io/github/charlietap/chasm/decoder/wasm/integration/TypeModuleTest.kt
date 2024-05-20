@@ -9,13 +9,16 @@ import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.type.f32ValueType
+import io.github.charlietap.chasm.fixture.type.f64ValueType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
@@ -33,13 +36,13 @@ class TypeModuleTest {
         val expectedNumberTypeFunctionType = FunctionType(
             params = resultType(
                 listOf(
-                    ValueType.Number(NumberType.I32),
-                    ValueType.Number(NumberType.I64),
-                    ValueType.Number(NumberType.F32),
-                    ValueType.Number(NumberType.F64),
+                    i32ValueType(),
+                    i64ValueType(),
+                    f32ValueType(),
+                    f64ValueType(),
                 ),
             ),
-            results = resultType(listOf(ValueType.Number(NumberType.I32))),
+            results = resultType(listOf(i32ValueType())),
         )
         val expectedNumberTypeRecursiveType = recursiveType(
             subTypes = listOf(

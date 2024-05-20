@@ -2,8 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -13,6 +11,8 @@ import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -28,14 +28,14 @@ class HostFunctionCallImplTest {
         val functionType = functionType(
             params = resultType(
                 listOf(
-                    ValueType.Number(NumberType.I32),
-                    ValueType.Number(NumberType.I64),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
             results = resultType(
                 listOf(
-                    ValueType.Number(NumberType.I32),
-                    ValueType.Number(NumberType.I64),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
         )
@@ -84,14 +84,14 @@ class HostFunctionCallImplTest {
         val functionType = functionType(
             params = resultType(
                 listOf(
-                    ValueType.Number(NumberType.I32),
-                    ValueType.Number(NumberType.I64),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
             results = resultType(
                 listOf(
-                    ValueType.Number(NumberType.I32),
-                    ValueType.Number(NumberType.I64),
+                    i32ValueType(),
+                    i64ValueType(),
                 ),
             ),
         )
@@ -120,7 +120,7 @@ class HostFunctionCallImplTest {
 
         val expected = Err(
             InvocationError.HostFunctionInconsistentWithType(
-                ValueType.Number(NumberType.I64),
+                i64ValueType(),
                 NumberValue.I32(118),
             ),
         )

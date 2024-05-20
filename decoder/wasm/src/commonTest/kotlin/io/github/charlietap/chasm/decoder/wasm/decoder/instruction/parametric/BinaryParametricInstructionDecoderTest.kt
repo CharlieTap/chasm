@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.parametric
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
-import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.DROP
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.SELECT
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.decoder.wasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.fixture.type.i32ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -52,7 +52,7 @@ class BinaryParametricInstructionDecoderTest {
             fail("Value type decoder should never be called")
         }
 
-        val expectedValueTypes = listOf(ValueType.Number(NumberType.I32))
+        val expectedValueTypes = listOf(i32ValueType())
         val vectorDecoder: VectorDecoder<ValueType> = { _, sub ->
             assertEquals(valueTypeDecoder, sub)
             Ok(Vector(expectedValueTypes))

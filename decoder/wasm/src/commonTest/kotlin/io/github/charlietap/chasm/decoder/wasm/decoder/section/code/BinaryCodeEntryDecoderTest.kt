@@ -4,14 +4,14 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Local
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.wasm.decoder.instruction.ExpressionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.wasm.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.wasm.reader.IOErrorWasmFileReader
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.i64ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -23,15 +23,15 @@ class BinaryCodeEntryDecoderTest {
 
         val size = 117u
         val localEntries = listOf(
-            LocalEntry(3u, ValueType.Number(NumberType.I32)),
-            LocalEntry(2u, ValueType.Number(NumberType.I64)),
+            LocalEntry(3u, i32ValueType()),
+            LocalEntry(2u, i64ValueType()),
         )
         val locals = listOf(
-            Local(Index.LocalIndex(0u), ValueType.Number(NumberType.I32)),
-            Local(Index.LocalIndex(1u), ValueType.Number(NumberType.I32)),
-            Local(Index.LocalIndex(2u), ValueType.Number(NumberType.I32)),
-            Local(Index.LocalIndex(3u), ValueType.Number(NumberType.I64)),
-            Local(Index.LocalIndex(4u), ValueType.Number(NumberType.I64)),
+            Local(Index.LocalIndex(0u), i32ValueType()),
+            Local(Index.LocalIndex(1u), i32ValueType()),
+            Local(Index.LocalIndex(2u), i32ValueType()),
+            Local(Index.LocalIndex(3u), i64ValueType()),
+            Local(Index.LocalIndex(4u), i64ValueType()),
         )
         val expression = Expression(emptyList())
 

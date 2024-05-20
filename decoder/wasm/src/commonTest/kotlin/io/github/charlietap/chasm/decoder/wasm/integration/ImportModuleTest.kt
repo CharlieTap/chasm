@@ -14,14 +14,13 @@ import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
@@ -38,7 +37,7 @@ class ImportModuleTest {
 
         val expectedFunctionType = FunctionType(
             params = resultType(emptyList()),
-            results = resultType(listOf(ValueType.Number(NumberType.I32))),
+            results = resultType(listOf(i32ValueType())),
         )
         val expectedRecursiveType = recursiveType(
             subTypes = listOf(
@@ -73,7 +72,7 @@ class ImportModuleTest {
         )
 
         val expectedGlobalType = GlobalType(
-            ValueType.Number(NumberType.I32),
+            i32ValueType(),
             Mutability.Const,
         )
 

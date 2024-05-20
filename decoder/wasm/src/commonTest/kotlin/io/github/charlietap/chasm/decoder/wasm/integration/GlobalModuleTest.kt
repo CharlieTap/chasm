@@ -10,10 +10,9 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.type.i32ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -29,7 +28,7 @@ class GlobalModuleTest {
         val expectedConstGlobal = Global(
             idx = Index.GlobalIndex(0u),
             type = GlobalType(
-                valueType = ValueType.Number(NumberType.I32),
+                valueType = i32ValueType(),
                 Mutability.Const,
             ),
             initExpression = Expression(
@@ -40,7 +39,7 @@ class GlobalModuleTest {
         val expectedVarGlobal = Global(
             idx = Index.GlobalIndex(1u),
             type = GlobalType(
-                valueType = ValueType.Number(NumberType.I32),
+                valueType = i32ValueType(),
                 Mutability.Var,
             ),
             initExpression = Expression(

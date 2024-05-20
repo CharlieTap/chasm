@@ -4,8 +4,6 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.NUMBER_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.REFERENCE_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.value.VECTOR_TYPE_RANGE
@@ -15,6 +13,7 @@ import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.wasm.reader.IOErrorWasmFileReader
+import io.github.charlietap.chasm.fixture.type.i32ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -56,10 +55,10 @@ class BinaryBlockTypeDecoderTest {
         val reader = FakeWasmBinaryReader(fakePeekReader = { peekReader })
 
         val valueTypeDecoder: ValueTypeDecoder = { _ ->
-            Ok(ValueType.Number(NumberType.I32))
+            Ok(i32ValueType())
         }
 
-        val expected = Ok(BlockType.ValType(ValueType.Number(NumberType.I32)))
+        val expected = Ok(BlockType.ValType(i32ValueType()))
 
         valueTypes.forEach { _ ->
             val actual = BinaryBlockTypeDecoder(reader, valueTypeDecoder)
