@@ -5,13 +5,13 @@ import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.decoder.wasm.decoder.type.result.ResultTypeDecoder
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.wasm.reader.IOErrorWasmFileReader
+import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -34,11 +34,11 @@ class BinaryFunctionTypeDecoderTest {
 
         val resultSequence = sequenceOf(params, results).iterator()
         val resultDecoder: ResultTypeDecoder = {
-            Ok(ResultType(resultSequence.next()))
+            Ok(resultType(resultSequence.next()))
         }
 
-        val expectedParams = ResultType(params)
-        val expectedResults = ResultType(results)
+        val expectedParams = resultType(params)
+        val expectedResults = resultType(results)
         val expected = Ok(FunctionType(expectedParams, expectedResults))
 
         val actual = BinaryFunctionTypeDecoder(FakeWasmBinaryReader(), resultDecoder)

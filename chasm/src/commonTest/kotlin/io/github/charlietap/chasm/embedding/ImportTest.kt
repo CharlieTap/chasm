@@ -5,11 +5,11 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.import.Import
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
@@ -32,8 +32,8 @@ class ImportTest {
         )
 
         val functionType = FunctionType(
-            ResultType(listOf(ValueType.Number(NumberType.I32))),
-            ResultType(emptyList()),
+            resultType(listOf(ValueType.Number(NumberType.I32))),
+            resultType(emptyList()),
         )
 
         val hostFunction: HostFunction = { _ ->

@@ -13,12 +13,12 @@ import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -32,13 +32,13 @@ class FunctionModuleTest {
         val reader = FakeSourceReader(byteStream)
 
         val expectedFunctionType = FunctionType(
-            params = ResultType(
+            params = resultType(
                 listOf(
                     ValueType.Number(NumberType.I32),
                     ValueType.Number(NumberType.I32),
                 ),
             ),
-            results = ResultType(
+            results = resultType(
                 listOf(
                     ValueType.Number(NumberType.I32),
                     ValueType.Number(NumberType.I64),

@@ -18,11 +18,11 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -36,8 +36,8 @@ class ElementModuleTest {
         val reader = FakeSourceReader(byteStream)
 
         val expectedFunctionType = FunctionType(
-            params = ResultType(emptyList()),
-            results = ResultType(emptyList()),
+            params = resultType(emptyList()),
+            results = resultType(emptyList()),
         )
         val expectedRecursiveType = RecursiveType(
             listOf(

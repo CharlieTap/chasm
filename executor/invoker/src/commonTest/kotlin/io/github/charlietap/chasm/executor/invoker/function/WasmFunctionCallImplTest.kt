@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -26,6 +25,7 @@ import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32NumberValueType
 import io.github.charlietap.chasm.fixture.type.i64NumberValueType
+import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.value.i32NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -39,13 +39,13 @@ class WasmFunctionCallImplTest {
         val stack = stack()
 
         val functionType = functionType(
-            params = ResultType(
+            params = resultType(
                 listOf(
                     i32NumberValueType(),
                     i64NumberValueType(),
                 ),
             ),
-            results = ResultType(
+            results = resultType(
                 listOf(
                     i32NumberValueType(),
                     i64NumberValueType(),
@@ -130,13 +130,13 @@ class WasmFunctionCallImplTest {
         val stack = stack()
 
         val functionType = functionType(
-            params = ResultType(
+            params = resultType(
                 listOf(
                     i32NumberValueType(),
                     i64NumberValueType(),
                 ),
             ),
-            results = ResultType(
+            results = resultType(
                 listOf(
                     i32NumberValueType(),
                     i64NumberValueType(),

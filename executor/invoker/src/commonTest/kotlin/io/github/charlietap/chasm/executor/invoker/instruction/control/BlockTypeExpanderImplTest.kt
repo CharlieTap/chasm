@@ -4,10 +4,10 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.valueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,7 +33,7 @@ class BlockTypeExpanderImplTest {
 
         val blockType = ControlInstruction.BlockType.ValType(valueType)
 
-        val expected = FunctionType(ResultType(emptyList()), ResultType(listOf(valueType)))
+        val expected = FunctionType(resultType(emptyList()), resultType(listOf(valueType)))
 
         val actual = BlockTypeExpanderImpl(instance, blockType)
 

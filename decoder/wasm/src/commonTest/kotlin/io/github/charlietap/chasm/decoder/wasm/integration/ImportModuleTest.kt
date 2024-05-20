@@ -16,7 +16,6 @@ import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.ValueType
@@ -24,6 +23,7 @@ import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -37,8 +37,8 @@ class ImportModuleTest {
         val reader = FakeSourceReader(byteStream)
 
         val expectedFunctionType = FunctionType(
-            params = ResultType(emptyList()),
-            results = ResultType(listOf(ValueType.Number(NumberType.I32))),
+            params = resultType(emptyList()),
+            results = resultType(listOf(ValueType.Number(NumberType.I32))),
         )
         val expectedRecursiveType = recursiveType(
             subTypes = listOf(

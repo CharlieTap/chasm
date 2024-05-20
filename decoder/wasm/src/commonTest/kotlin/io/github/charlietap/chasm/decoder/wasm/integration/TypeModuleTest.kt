@@ -11,13 +11,13 @@ import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.wasm.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -31,7 +31,7 @@ class TypeModuleTest {
         val reader = FakeSourceReader(byteStream)
 
         val expectedNumberTypeFunctionType = FunctionType(
-            params = ResultType(
+            params = resultType(
                 listOf(
                     ValueType.Number(NumberType.I32),
                     ValueType.Number(NumberType.I64),
@@ -39,7 +39,7 @@ class TypeModuleTest {
                     ValueType.Number(NumberType.F64),
                 ),
             ),
-            results = ResultType(listOf(ValueType.Number(NumberType.I32))),
+            results = resultType(listOf(ValueType.Number(NumberType.I32))),
         )
         val expectedNumberTypeRecursiveType = recursiveType(
             subTypes = listOf(
@@ -52,12 +52,12 @@ class TypeModuleTest {
         val expectedNumberType = Type(Index.TypeIndex(0u), expectedNumberTypeRecursiveType)
 
         val expectedVectorTypeFunctionType = FunctionType(
-            params = ResultType(
+            params = resultType(
                 listOf(
                     ValueType.Vector(VectorType.V128),
                 ),
             ),
-            results = ResultType(listOf(ValueType.Vector(VectorType.V128))),
+            results = resultType(listOf(ValueType.Vector(VectorType.V128))),
         )
         val expectedVectorTypeRecursiveType = recursiveType(
             subTypes = listOf(
@@ -70,13 +70,13 @@ class TypeModuleTest {
         val expectedVectorType = Type(Index.TypeIndex(1u), expectedVectorTypeRecursiveType)
 
         val expectedReferenceTypeFunctionType = FunctionType(
-            params = ResultType(
+            params = resultType(
                 listOf(
                     ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func)),
                     ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Extern)),
                 ),
             ),
-            results = ResultType(listOf(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func)))),
+            results = resultType(listOf(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func)))),
         )
         val expectedReferenceTypeRecursiveType = recursiveType(
             subTypes = listOf(

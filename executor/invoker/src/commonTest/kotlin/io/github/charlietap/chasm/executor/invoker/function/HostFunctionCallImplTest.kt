@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.function
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -14,6 +13,7 @@ import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -26,13 +26,13 @@ class HostFunctionCallImplTest {
         val stack = stack()
 
         val functionType = functionType(
-            params = ResultType(
+            params = resultType(
                 listOf(
                     ValueType.Number(NumberType.I32),
                     ValueType.Number(NumberType.I64),
                 ),
             ),
-            results = ResultType(
+            results = resultType(
                 listOf(
                     ValueType.Number(NumberType.I32),
                     ValueType.Number(NumberType.I64),
@@ -82,13 +82,13 @@ class HostFunctionCallImplTest {
         val stack = stack()
 
         val functionType = functionType(
-            params = ResultType(
+            params = resultType(
                 listOf(
                     ValueType.Number(NumberType.I32),
                     ValueType.Number(NumberType.I64),
                 ),
             ),
-            results = ResultType(
+            results = resultType(
                 listOf(
                     ValueType.Number(NumberType.I32),
                     ValueType.Number(NumberType.I64),
