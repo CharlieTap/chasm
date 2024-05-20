@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -15,7 +15,7 @@ class GlobalTest {
 
         val store = store()
         val globalType = globalType()
-        val initialValue = NumberValue.I32(117)
+        val initialValue = i32(117)
 
         val expected = ExternalValue.Global(Address.Global(0))
 

@@ -7,11 +7,11 @@ import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.instance.exportInstance
 import io.github.charlietap.chasm.fixture.instance.functionAddress
 import io.github.charlietap.chasm.fixture.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.fixture.value.nameValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -87,7 +87,7 @@ class InvokeTest {
             ),
         )
 
-        val results = listOf(NumberValue.I32(117))
+        val results = listOf(i32(117))
         val functionInvoker: FunctionInvoker = { _store, _address, _args ->
             assertEquals(store, _store)
             assertEquals(address, _address)

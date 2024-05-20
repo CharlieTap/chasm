@@ -2,8 +2,9 @@ package io.github.charlietap.chasm.integration.gc
 
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.fixture.value.f32
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,7 +33,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.F32(0f))
+        val expected = listOf(f32(0f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -46,7 +47,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.F32(0f))
+        val expected = listOf(f32(0f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -60,7 +61,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.F32(0f))
+        val expected = listOf(f32(0f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -74,7 +75,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.F32(0f))
+        val expected = listOf(f32(0f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -85,10 +86,10 @@ class StructTest {
             fileName = "struct_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "set_get_y",
-            arguments = listOf(NumberValue.F32(7f)),
+            arguments = listOf(f32(7f)),
         )
 
-        val expected = listOf(NumberValue.F32(7f))
+        val expected = listOf(f32(7f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -99,10 +100,10 @@ class StructTest {
             fileName = "struct_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "set_get_1",
-            arguments = listOf(NumberValue.F32(7f)),
+            arguments = listOf(f32(7f)),
         )
 
-        val expected = listOf(NumberValue.F32(7f))
+        val expected = listOf(f32(7f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -116,7 +117,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(0), NumberValue.I32(0))
+        val expected = listOf(i32(0), i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -130,7 +131,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(-2), NumberValue.I32(254))
+        val expected = listOf(i32(-2), i32(254))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -144,7 +145,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(1), NumberValue.I32(1))
+        val expected = listOf(i32(1), i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -158,7 +159,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(-1), NumberValue.I32(255))
+        val expected = listOf(i32(-1), i32(255))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -172,7 +173,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(2), NumberValue.I32(2))
+        val expected = listOf(i32(2), i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -186,7 +187,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(-2), NumberValue.I32(65534))
+        val expected = listOf(i32(-2), i32(65534))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -200,7 +201,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(3), NumberValue.I32(3))
+        val expected = listOf(i32(3), i32(3))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -214,7 +215,7 @@ class StructTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(-1), NumberValue.I32(65535))
+        val expected = listOf(i32(-1), i32(65535))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -225,10 +226,10 @@ class StructTest {
             fileName = "struct_2.wasm",
             fileDirectory = FILE_DIR,
             functionName = "set_get_packed_g0_1",
-            arguments = listOf(NumberValue.I32(257)),
+            arguments = listOf(i32(257)),
         )
 
-        val expected = listOf(NumberValue.I32(1), NumberValue.I32(1))
+        val expected = listOf(i32(1), i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -239,10 +240,10 @@ class StructTest {
             fileName = "struct_2.wasm",
             fileDirectory = FILE_DIR,
             functionName = "set_get_packed_g0_3",
-            arguments = listOf(NumberValue.I32(257)),
+            arguments = listOf(i32(257)),
         )
 
-        val expected = listOf(NumberValue.I32(257), NumberValue.I32(257))
+        val expected = listOf(i32(257), i32(257))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

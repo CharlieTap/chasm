@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.gc.weakReference
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.ext.push
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.fixture.frame
@@ -23,6 +22,7 @@ import io.github.charlietap.chasm.fixture.type.fieldType
 import io.github.charlietap.chasm.fixture.value
 import io.github.charlietap.chasm.fixture.value.executionValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -67,7 +67,7 @@ class ArrayGetExecutorImplTest {
         val arrayReference = ReferenceValue.Array(arrayAddress, arrayInstance)
         stack.push(arrayReference)
 
-        stack.push(NumberValue.I32(fieldIndex.index()))
+        stack.push(i32(fieldIndex.index()))
 
         val definedTypeExpander: DefinedTypeExpander = {
             assertEquals(definedType, it)

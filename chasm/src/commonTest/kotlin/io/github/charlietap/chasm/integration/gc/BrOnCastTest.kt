@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.integration.gc
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,11 +17,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -32,11 +32,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -47,11 +47,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -62,11 +62,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -77,11 +77,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -92,11 +92,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -107,11 +107,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(7))
+        val expected = listOf(i32(7))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -122,11 +122,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -137,11 +137,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -152,11 +152,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -167,11 +167,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -182,11 +182,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -197,11 +197,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(6))
+        val expected = listOf(i32(6))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -212,11 +212,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -227,11 +227,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -242,11 +242,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -257,11 +257,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -272,11 +272,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -287,11 +287,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(3))
+        val expected = listOf(i32(3))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -302,11 +302,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -317,11 +317,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -332,11 +332,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -347,11 +347,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -362,11 +362,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -377,11 +377,11 @@ class BrOnCastTest {
             fileName = "br_on_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

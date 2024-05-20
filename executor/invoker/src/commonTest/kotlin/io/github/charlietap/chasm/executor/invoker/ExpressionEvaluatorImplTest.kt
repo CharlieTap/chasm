@@ -10,12 +10,12 @@ import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -45,7 +45,7 @@ class ExpressionEvaluatorImplTest {
 
         val threadExecutor: ThreadExecutor = { config ->
             assertEquals(expectedConfig, config)
-            Ok(listOf(NumberValue.I32(117)))
+            Ok(listOf(i32(117)))
         }
 
         val actual = ExpressionEvaluatorImpl(
@@ -56,7 +56,7 @@ class ExpressionEvaluatorImplTest {
             threadExecutor = threadExecutor,
         )
 
-        assertEquals(Ok(NumberValue.I32(117)), actual)
+        assertEquals(Ok(i32(117)), actual)
     }
 
     @Test

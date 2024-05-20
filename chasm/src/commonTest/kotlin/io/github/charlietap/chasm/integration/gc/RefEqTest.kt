@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.integration.gc
 
 import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,11 +15,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(0)),
+            arguments = listOf(i32(0), i32(0)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -30,11 +30,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(1)),
+            arguments = listOf(i32(0), i32(1)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -45,11 +45,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(2)),
+            arguments = listOf(i32(0), i32(2)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -60,11 +60,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(3)),
+            arguments = listOf(i32(0), i32(3)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -75,11 +75,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(4)),
+            arguments = listOf(i32(0), i32(4)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -90,11 +90,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(5)),
+            arguments = listOf(i32(0), i32(5)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -105,11 +105,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(6)),
+            arguments = listOf(i32(0), i32(6)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -120,11 +120,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(7)),
+            arguments = listOf(i32(0), i32(7)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -135,11 +135,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(8)),
+            arguments = listOf(i32(0), i32(8)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -150,11 +150,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(0)),
+            arguments = listOf(i32(1), i32(0)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -165,11 +165,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(1)),
+            arguments = listOf(i32(1), i32(1)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -180,11 +180,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(2)),
+            arguments = listOf(i32(1), i32(2)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -195,11 +195,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(3)),
+            arguments = listOf(i32(1), i32(3)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -210,11 +210,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(4)),
+            arguments = listOf(i32(1), i32(4)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -225,11 +225,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(5)),
+            arguments = listOf(i32(1), i32(5)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -240,11 +240,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(6)),
+            arguments = listOf(i32(1), i32(6)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -255,11 +255,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(7)),
+            arguments = listOf(i32(1), i32(7)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -270,11 +270,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(8)),
+            arguments = listOf(i32(1), i32(8)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -285,11 +285,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(0)),
+            arguments = listOf(i32(2), i32(0)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -300,11 +300,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(1)),
+            arguments = listOf(i32(2), i32(1)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -315,11 +315,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(2)),
+            arguments = listOf(i32(2), i32(2)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -330,11 +330,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(3)),
+            arguments = listOf(i32(2), i32(3)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -345,11 +345,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(4)),
+            arguments = listOf(i32(2), i32(4)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -360,11 +360,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(5)),
+            arguments = listOf(i32(2), i32(5)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -375,11 +375,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(6)),
+            arguments = listOf(i32(2), i32(6)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -390,11 +390,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(7)),
+            arguments = listOf(i32(2), i32(7)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -405,11 +405,11 @@ class RefEqTest {
             fileName = "ref_eq.wasm",
             fileDirectory = FILE_DIR,
             functionName = "eq",
-            arguments = listOf(NumberValue.I32(2), NumberValue.I32(8)),
+            arguments = listOf(i32(2), i32(8)),
             setupFunctions = listOf("init" to emptyList()),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

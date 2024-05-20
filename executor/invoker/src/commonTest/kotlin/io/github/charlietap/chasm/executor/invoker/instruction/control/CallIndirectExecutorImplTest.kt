@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.frame
@@ -20,6 +19,7 @@ import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -47,7 +47,7 @@ class CallIndirectExecutorImplTest {
         )
         val elementIndex = 0
 
-        stack.push(Stack.Entry.Value(NumberValue.I32(elementIndex)))
+        stack.push(Stack.Entry.Value(i32(elementIndex)))
 
         val store = store(
             functions = mutableListOf(functionInstance),
@@ -105,7 +105,7 @@ class CallIndirectExecutorImplTest {
         )
         val elementIndex = 0
 
-        stack.push(Stack.Entry.Value(NumberValue.I32(elementIndex)))
+        stack.push(Stack.Entry.Value(i32(elementIndex)))
 
         val store = store(
             functions = mutableListOf(functionInstance),

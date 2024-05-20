@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
@@ -14,6 +13,8 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.value.i64
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -43,8 +44,8 @@ class HostFunctionCallImplTest {
 
         val hostFunction: HostFunction = {
             listOf(
-                NumberValue.I32(117),
-                NumberValue.I64(118),
+                i32(117),
+                i64(118),
             )
         }
 
@@ -54,8 +55,8 @@ class HostFunctionCallImplTest {
         )
 
         val params = listOf(
-            NumberValue.I32(115),
-            NumberValue.I64(116),
+            i32(115),
+            i64(116),
         )
 
         params.forEach { value ->
@@ -71,8 +72,8 @@ class HostFunctionCallImplTest {
         assertEquals(Ok(Unit), actual)
         assertEquals(0, stack.framesDepth())
         assertEquals(2, stack.valuesDepth())
-        assertEquals(NumberValue.I64(118), stack.popValueOrNull()?.value)
-        assertEquals(NumberValue.I32(117), stack.popValueOrNull()?.value)
+        assertEquals(i64(118), stack.popValueOrNull()?.value)
+        assertEquals(i32(117), stack.popValueOrNull()?.value)
     }
 
     @Test
@@ -99,8 +100,8 @@ class HostFunctionCallImplTest {
 
         val hostFunction: HostFunction = {
             listOf(
-                NumberValue.I32(117),
-                NumberValue.I32(118),
+                i32(117),
+                i32(118),
             )
         }
 
@@ -110,8 +111,8 @@ class HostFunctionCallImplTest {
         )
 
         val params = listOf(
-            NumberValue.I32(115),
-            NumberValue.I64(116),
+            i32(115),
+            i64(116),
         )
 
         params.forEach { value ->
@@ -121,7 +122,7 @@ class HostFunctionCallImplTest {
         val expected = Err(
             InvocationError.HostFunctionInconsistentWithType(
                 i64ValueType(),
-                NumberValue.I32(118),
+                i32(118),
             ),
         )
 

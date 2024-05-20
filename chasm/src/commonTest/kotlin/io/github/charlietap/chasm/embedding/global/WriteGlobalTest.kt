@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.instance.globalInstance
 import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -14,7 +14,7 @@ class WriteGlobalTest {
     @Test
     fun `can write a value to a global`() {
 
-        val value = NumberValue.I32(117)
+        val value = i32(117)
         val instance = globalInstance()
         val store = store(globals = mutableListOf(instance))
         val address = Address.Global(0)

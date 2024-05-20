@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.gc.weakReference
 import io.github.charlietap.chasm.executor.runtime.ext.push
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -22,6 +21,7 @@ import io.github.charlietap.chasm.fixture.type.structType
 import io.github.charlietap.chasm.fixture.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.value.executionValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.fixture.value.structReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -38,7 +38,7 @@ class StructSetExecutorImplTest {
 
         val fieldType = fieldType()
         val fieldValue = fieldValue()
-        val updatedFieldValue = executionFieldValue(NumberValue.I32(1))
+        val updatedFieldValue = executionFieldValue(i32(1))
         val structType = structCompositeType(
             structType = structType(
                 listOf(fieldType),

@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.runtime.ext.push
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.value.i31ReferenceValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -34,7 +34,7 @@ class I31GetExecutorImplTest {
         val actual = I31GetExecutorImpl(stack, signedExtension, i31SignedExtender, i31UnsignedExtender)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(NumberValue.I32(i32), stack.popValueOrNull()?.value)
+        assertEquals(i32(i32), stack.popValueOrNull()?.value)
     }
 
     @Test
@@ -59,6 +59,6 @@ class I31GetExecutorImplTest {
         val actual = I31GetExecutorImpl(stack, signedExtension, i31SignedExtender, i31UnsignedExtender)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(NumberValue.I32(i32), stack.popValueOrNull()?.value)
+        assertEquals(i32(i32), stack.popValueOrNull()?.value)
     }
 }

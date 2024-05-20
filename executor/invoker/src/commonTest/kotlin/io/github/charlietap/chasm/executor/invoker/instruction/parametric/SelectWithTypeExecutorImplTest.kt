@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.value
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -15,12 +15,12 @@ class SelectWithTypeExecutorImplTest {
 
         val stack = stack()
 
-        val value1 = value(NumberValue.I32(117))
-        val value2 = value(NumberValue.I32(118))
+        val value1 = value(i32(117))
+        val value2 = value(i32(118))
 
         stack.push(value1)
         stack.push(value2)
-        stack.push(value(NumberValue.I32(1)))
+        stack.push(value(i32(1)))
 
         val instruction = ParametricInstruction.SelectWithType(emptyList())
 
@@ -36,12 +36,12 @@ class SelectWithTypeExecutorImplTest {
 
         val stack = stack()
 
-        val value1 = value(NumberValue.I32(117))
-        val value2 = value(NumberValue.I32(118))
+        val value1 = value(i32(117))
+        val value2 = value(i32(118))
 
         stack.push(value1)
         stack.push(value2)
-        stack.push(value(NumberValue.I32(0)))
+        stack.push(value(i32(0)))
 
         val instruction = ParametricInstruction.SelectWithType(emptyList())
 

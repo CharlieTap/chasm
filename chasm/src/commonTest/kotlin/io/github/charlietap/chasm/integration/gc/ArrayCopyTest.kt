@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.integration.gc
 
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,10 +16,10 @@ class ArrayCopyTest {
             fileName = "array_copy.wasm",
             fileDirectory = FILE_DIR,
             functionName = "array_get_nth",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -31,10 +31,10 @@ class ArrayCopyTest {
             fileName = "array_copy.wasm",
             fileDirectory = FILE_DIR,
             functionName = "array_get_nth",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -46,10 +46,10 @@ class ArrayCopyTest {
             fileName = "array_copy.wasm",
             fileDirectory = FILE_DIR,
             functionName = "array_get_nth",
-            arguments = listOf(NumberValue.I32(11)),
+            arguments = listOf(i32(11)),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -61,7 +61,7 @@ class ArrayCopyTest {
             fileName = "array_copy.wasm",
             fileDirectory = FILE_DIR,
             functionName = "array_copy",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(0), NumberValue.I32(2)),
+            arguments = listOf(i32(0), i32(0), i32(2)),
         )
 
         val expected = listOf<ExecutionValue>()

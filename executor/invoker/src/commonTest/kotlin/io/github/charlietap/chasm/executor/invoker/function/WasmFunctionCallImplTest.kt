@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
@@ -26,7 +25,7 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -77,8 +76,8 @@ class WasmFunctionCallImplTest {
         )
 
         val params = listOf(
-            i32NumberValue(1),
-            i32NumberValue(2),
+            i32(1),
+            i32(2),
         )
 
         params.forEach { value ->
@@ -168,8 +167,8 @@ class WasmFunctionCallImplTest {
         )
 
         val params = listOf(
-            NumberValue.I32(1),
-            NumberValue.I32(2),
+            i32(1),
+            i32(2),
         )
 
         params.forEach { value ->

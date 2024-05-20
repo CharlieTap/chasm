@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.fixture.instruction.moduleInstruction
 import io.github.charlietap.chasm.fixture.label
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -26,8 +26,8 @@ class InstructionBlockExecutorImplTest {
             moduleInstruction(NumericInstruction.I32GeU),
         )
         val params = listOf(
-            i32NumberValue(1),
-            i32NumberValue(2),
+            i32(1),
+            i32(2),
         )
 
         val actual = InstructionBlockExecutorImpl(

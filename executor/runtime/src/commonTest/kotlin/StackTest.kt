@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.fixture.label
 import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.value
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -62,11 +62,11 @@ class StackTest {
         val stack = stack()
 
         val value1 = value(
-            i32NumberValue(1),
+            i32(1),
         )
 
         val value2 = value(
-            i32NumberValue(2),
+            i32(2),
         )
 
         stack.push(value1)

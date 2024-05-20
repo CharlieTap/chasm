@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.push
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.instance.functionAddress
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -23,7 +23,7 @@ class RefEqExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(i32NumberValue(1), stack.popValueOrNull()?.value)
+        assertEquals(i32(1), stack.popValueOrNull()?.value)
     }
 
     @Test
@@ -39,6 +39,6 @@ class RefEqExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(i32NumberValue(0), stack.popValueOrNull()?.value)
+        assertEquals(i32(0), stack.popValueOrNull()?.value)
     }
 }

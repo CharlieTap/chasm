@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.integration.gc
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,11 +18,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -33,11 +33,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -48,11 +48,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -63,11 +63,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -78,11 +78,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -93,11 +93,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -108,11 +108,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -123,11 +123,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -138,11 +138,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -153,11 +153,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -168,11 +168,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -183,11 +183,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -198,11 +198,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -213,11 +213,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -228,11 +228,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -243,11 +243,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -258,11 +258,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -273,11 +273,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -288,11 +288,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -303,11 +303,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -318,11 +318,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -333,11 +333,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -348,11 +348,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -363,11 +363,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -378,11 +378,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -393,11 +393,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -408,11 +408,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -423,11 +423,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -438,11 +438,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -453,11 +453,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -468,11 +468,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -483,11 +483,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -498,11 +498,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -513,11 +513,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -528,11 +528,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -543,11 +543,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -558,11 +558,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -573,11 +573,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -588,11 +588,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -603,11 +603,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -618,11 +618,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -633,11 +633,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -648,11 +648,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -663,11 +663,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -678,11 +678,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -693,11 +693,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -708,11 +708,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -723,11 +723,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_func",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -738,11 +738,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_func",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -753,11 +753,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_func",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -768,11 +768,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_func",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -783,11 +783,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_func",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -798,11 +798,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_func",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -813,11 +813,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -828,11 +828,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -843,11 +843,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -858,11 +858,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -873,11 +873,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -888,11 +888,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -903,11 +903,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -918,11 +918,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -933,11 +933,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -948,11 +948,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -963,11 +963,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -978,11 +978,11 @@ class RefTestTest {
             fileName = "ref_test_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

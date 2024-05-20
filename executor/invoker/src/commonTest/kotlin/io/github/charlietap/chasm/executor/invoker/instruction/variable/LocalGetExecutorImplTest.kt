@@ -3,11 +3,11 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.localIndex
 import io.github.charlietap.chasm.fixture.stack
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -18,7 +18,7 @@ class LocalGetExecutorImplTest {
 
         val stack = stack()
 
-        val local = NumberValue.I32(117)
+        val local = i32(117)
 
         val frame = frame(
             state = Stack.Entry.ActivationFrame.State(

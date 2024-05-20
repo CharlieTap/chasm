@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.executor.type.ext.recursiveType
@@ -36,6 +35,7 @@ import io.github.charlietap.chasm.fixture.module.type
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.heapType
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -57,7 +57,7 @@ class ModuleAllocatorImplTest {
         val table = table()
         val memory = memory()
         val global = global()
-        val globalInitValue = NumberValue.I32(117)
+        val globalInitValue = i32(117)
         val globalInitValues = listOf(globalInitValue)
         val tableInitValue = ReferenceValue.Null(heapType())
         val tableInitValues = listOf(tableInitValue)

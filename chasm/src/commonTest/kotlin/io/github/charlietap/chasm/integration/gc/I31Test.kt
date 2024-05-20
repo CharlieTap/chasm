@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.integration.gc
 
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,7 +18,7 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "new",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
         )
 
         assertIs<ChasmResult<ReferenceValue.I31, ChasmError>>(result)
@@ -31,10 +31,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -45,10 +45,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(100)),
+            arguments = listOf(i32(100)),
         )
 
-        val expected = listOf(NumberValue.I32(100))
+        val expected = listOf(i32(100))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -59,10 +59,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(-1)),
+            arguments = listOf(i32(-1)),
         )
 
-        val expected = listOf(NumberValue.I32(0x7fff_ffff))
+        val expected = listOf(i32(0x7fff_ffff))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -73,10 +73,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(0x3fff_ffff)),
+            arguments = listOf(i32(0x3fff_ffff)),
         )
 
-        val expected = listOf(NumberValue.I32(0x3fff_ffff))
+        val expected = listOf(i32(0x3fff_ffff))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -87,10 +87,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(0x4000_0000)),
+            arguments = listOf(i32(0x4000_0000)),
         )
 
-        val expected = listOf(NumberValue.I32(0x4000_0000))
+        val expected = listOf(i32(0x4000_0000))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -101,10 +101,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(0x7fff_ffff)),
+            arguments = listOf(i32(0x7fff_ffff)),
         )
 
-        val expected = listOf(NumberValue.I32(0x7fff_ffff))
+        val expected = listOf(i32(0x7fff_ffff))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -115,10 +115,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(0xaaaa_aaaa.toInt())),
+            arguments = listOf(i32(0xaaaa_aaaa.toInt())),
         )
 
-        val expected = listOf(NumberValue.I32(0x2aaa_aaaa))
+        val expected = listOf(i32(0x2aaa_aaaa))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -129,10 +129,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(0xcaaa_aaaa.toInt())),
+            arguments = listOf(i32(0xcaaa_aaaa.toInt())),
         )
 
-        val expected = listOf(NumberValue.I32(0x4aaa_aaaa))
+        val expected = listOf(i32(0x4aaa_aaaa))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -143,10 +143,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
         )
 
-        val expected = listOf(NumberValue.I32(0))
+        val expected = listOf(i32(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -157,10 +157,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(100)),
+            arguments = listOf(i32(100)),
         )
 
-        val expected = listOf(NumberValue.I32(100))
+        val expected = listOf(i32(100))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -171,10 +171,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(-1)),
+            arguments = listOf(i32(-1)),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -185,10 +185,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(0x3FFF_FFFF)),
+            arguments = listOf(i32(0x3FFF_FFFF)),
         )
 
-        val expected = listOf(NumberValue.I32(0x3FFF_FFFF))
+        val expected = listOf(i32(0x3FFF_FFFF))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -199,10 +199,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(0x4000_0000)),
+            arguments = listOf(i32(0x4000_0000)),
         )
 
-        val expected = listOf(NumberValue.I32(-0x4000_0000))
+        val expected = listOf(i32(-0x4000_0000))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -213,10 +213,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(0x7FFF_FFFF)),
+            arguments = listOf(i32(0x7FFF_FFFF)),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -227,10 +227,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(0xAAAA_AAAA.toInt())),
+            arguments = listOf(i32(0xAAAA_AAAA.toInt())),
         )
 
-        val expected = listOf(NumberValue.I32(0x2AAA_AAAA))
+        val expected = listOf(i32(0x2AAA_AAAA))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -241,10 +241,10 @@ class I31Test {
             fileName = "i31_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(0xCAAA_AAAA.toInt())),
+            arguments = listOf(i32(0xCAAA_AAAA.toInt())),
         )
 
-        val expected = listOf(NumberValue.I32(0xCAAA_AAAA.toInt()))
+        val expected = listOf(i32(0xCAAA_AAAA.toInt()))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -257,7 +257,7 @@ class I31Test {
             functionName = "get_globals",
         )
 
-        val expected = listOf(NumberValue.I32(2), NumberValue.I32(3))
+        val expected = listOf(i32(2), i32(3))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

@@ -22,7 +22,7 @@ import io.github.charlietap.chasm.fixture.type.varMutability
 import io.github.charlietap.chasm.fixture.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -52,7 +52,7 @@ class ArrayCopyExecutorImplTest {
         )
 
         val fieldValue = fieldValue()
-        val fillValue = i32NumberValue(117)
+        val fillValue = i32(117)
         val fillFieldValue = executionFieldValue(fillValue)
 
         val srcArrayAddress = arrayAddress(0)
@@ -85,10 +85,10 @@ class ArrayCopyExecutorImplTest {
         stack.push(frame)
 
         stack.push(arrayReferenceValue(dstArrayAddress))
-        stack.push(i32NumberValue(0))
+        stack.push(i32(0))
         stack.push(arrayReferenceValue(srcArrayAddress))
-        stack.push(i32NumberValue(0))
-        stack.push(i32NumberValue(4))
+        stack.push(i32(0))
+        stack.push(i32(4))
 
         val expectedInstance = arrayInstance(
             definedType = definedType,

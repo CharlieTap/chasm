@@ -25,7 +25,7 @@ import io.github.charlietap.chasm.fixture.type.varMutability
 import io.github.charlietap.chasm.fixture.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.value.i31ReferenceValue
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -37,7 +37,7 @@ class ArrayInitElementExecutorImplTest {
         val stack = stack()
         val typeIndex = typeIndex(0u)
         val elementIndex = elementIndex(0u)
-        val fieldValue = executionFieldValue(i32NumberValue(0))
+        val fieldValue = executionFieldValue(i32(0))
         val definedType = definedType(
             recursiveType = recursiveType(
                 subTypes = listOf(
@@ -91,9 +91,9 @@ class ArrayInitElementExecutorImplTest {
         stack.push(frame)
 
         stack.push(arrayReferenceValue(arrayAddress))
-        stack.push(i32NumberValue(0))
-        stack.push(i32NumberValue(0))
-        stack.push(i32NumberValue(1))
+        stack.push(i32(0))
+        stack.push(i32(0))
+        stack.push(i32(1))
 
         val expectedInstance = arrayInstance(
             definedType = definedType,

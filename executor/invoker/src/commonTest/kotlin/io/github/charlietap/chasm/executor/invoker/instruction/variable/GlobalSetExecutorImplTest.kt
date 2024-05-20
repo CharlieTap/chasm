@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.globalAddress
 import io.github.charlietap.chasm.fixture.instance.globalInstance
@@ -12,6 +11,7 @@ import io.github.charlietap.chasm.fixture.module.globalIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.value
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,7 +20,7 @@ class GlobalSetExecutorImplTest {
     @Test
     fun `can execute a global set instruction`() {
 
-        val executionValue = NumberValue.I32(0)
+        val executionValue = i32(0)
         val globalIndex = globalIndex()
         val globalInstance = globalInstance(
             value = executionValue,
@@ -45,7 +45,7 @@ class GlobalSetExecutorImplTest {
 
         stack.push(frame)
 
-        val expected = NumberValue.I32(117)
+        val expected = i32(117)
         stack.push(value(expected))
 
         val instruction = VariableInstruction.GlobalSet(globalIndex)

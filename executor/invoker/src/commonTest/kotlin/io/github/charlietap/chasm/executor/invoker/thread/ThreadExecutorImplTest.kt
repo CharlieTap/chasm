@@ -10,14 +10,13 @@ import io.github.charlietap.chasm.executor.runtime.ext.popFrame
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -26,7 +25,7 @@ class ThreadExecutorImplTest {
     @Test
     fun `can execute a thread and return a result`() {
 
-        val locals = mutableListOf<ExecutionValue>(i32NumberValue(2), i32NumberValue(3))
+        val locals = mutableListOf<ExecutionValue>(i32(2), i32(3))
 
         val frame = frame(
             arity = returnArity(1),
@@ -56,12 +55,12 @@ class ThreadExecutorImplTest {
         )
         val stack2 = stack(
             sequenceOf(
-                Value(i32NumberValue(6)),
+                Value(i32(6)),
             ),
         )
         val stack3 = stack(
             sequenceOf(
-                Value(i32NumberValue(0)),
+                Value(i32(0)),
             ),
         )
         val inputStacks = sequenceOf(stack1, stack2, stack3).iterator()
@@ -88,6 +87,6 @@ class ThreadExecutorImplTest {
 
         val actual = ThreadExecutorImpl(configuration, instructionExecutor)
 
-        assertEquals(Ok(listOf(NumberValue.I32(0))), actual)
+        assertEquals(Ok(listOf(i32(0))), actual)
     }
 }

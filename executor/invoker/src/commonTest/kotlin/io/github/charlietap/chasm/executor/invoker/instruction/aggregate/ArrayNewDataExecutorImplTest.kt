@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.memory.ext.copyInto
 import io.github.charlietap.chasm.executor.runtime.ext.push
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -20,6 +19,7 @@ import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.mutableFieldType
 import io.github.charlietap.chasm.fixture.type.valueStorageType
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -74,8 +74,8 @@ class ArrayNewDataExecutorImplTest {
 
         stack.push(frame)
 
-        stack.push(NumberValue.I32(offset))
-        stack.push(NumberValue.I32(size.toInt()))
+        stack.push(i32(offset))
+        stack.push(i32(size.toInt()))
 
         val definedTypeExpander: DefinedTypeExpander = { _definedType ->
             assertEquals(definedType, _definedType)
@@ -96,7 +96,7 @@ class ArrayNewDataExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(2, stack.valuesDepth())
-        assertEquals(NumberValue.I32(arrayElem2), stack.popValueOrNull()?.value)
-        assertEquals(NumberValue.I32(arrayElem1), stack.popValueOrNull()?.value)
+        assertEquals(i32(arrayElem2), stack.popValueOrNull()?.value)
+        assertEquals(i32(arrayElem1), stack.popValueOrNull()?.value)
     }
 }

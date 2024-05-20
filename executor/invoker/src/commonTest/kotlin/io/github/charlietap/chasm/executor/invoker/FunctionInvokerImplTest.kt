@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -21,6 +20,7 @@ import io.github.charlietap.chasm.fixture.module.function
 import io.github.charlietap.chasm.fixture.returnArity
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -30,7 +30,7 @@ class FunctionInvokerImplTest {
     @Test
     fun `can invoke a function and return a result`() {
 
-        val locals = mutableListOf<ExecutionValue>(NumberValue.I32(117))
+        val locals = mutableListOf<ExecutionValue>(i32(117))
         val address = Address.Function(0)
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(address),
@@ -62,7 +62,7 @@ class FunctionInvokerImplTest {
 
         val threadExecutor: ThreadExecutor = { config ->
             assertEquals(expectedConfig, config)
-            Ok(listOf(NumberValue.I32(117)))
+            Ok(listOf(i32(117)))
         }
 
         val actual = FunctionInvokerImpl(
@@ -72,13 +72,13 @@ class FunctionInvokerImplTest {
             threadExecutor = threadExecutor,
         )
 
-        assertEquals(Ok(listOf(NumberValue.I32(117))), actual)
+        assertEquals(Ok(listOf(i32(117))), actual)
     }
 
     @Test
     fun `throws error if address does not exist`() {
 
-        val locals = mutableListOf<ExecutionValue>(NumberValue.I32(117))
+        val locals = mutableListOf<ExecutionValue>(i32(117))
         val address = Address.Function(0)
         val moduleInstance = moduleInstance()
         val functionType = functionType()

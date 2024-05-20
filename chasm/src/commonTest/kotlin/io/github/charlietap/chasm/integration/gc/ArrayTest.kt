@@ -2,8 +2,9 @@ package io.github.charlietap.chasm.integration.gc
 
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.fixture.value.f32
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,10 +31,10 @@ class ArrayTest {
             fileName = "array_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
         )
 
-        val expected = listOf(NumberValue.F32(0f))
+        val expected = listOf(f32(0f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -44,10 +45,10 @@ class ArrayTest {
             fileName = "array_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "set_get",
-            arguments = listOf(NumberValue.I32(0), NumberValue.F32(7f)),
+            arguments = listOf(i32(0), f32(7f)),
         )
 
-        val expected = listOf(NumberValue.F32(7f))
+        val expected = listOf(f32(7f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -61,7 +62,7 @@ class ArrayTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(3))
+        val expected = listOf(i32(3))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -84,10 +85,10 @@ class ArrayTest {
             fileName = "array_2.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
         )
 
-        val expected = listOf(NumberValue.F32(1f))
+        val expected = listOf(f32(1f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -98,10 +99,10 @@ class ArrayTest {
             fileName = "array_2.wasm",
             fileDirectory = FILE_DIR,
             functionName = "set_get",
-            arguments = listOf(NumberValue.I32(1), NumberValue.F32(7f)),
+            arguments = listOf(i32(1), f32(7f)),
         )
 
-        val expected = listOf(NumberValue.F32(7f))
+        val expected = listOf(f32(7f))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -115,7 +116,7 @@ class ArrayTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -138,10 +139,10 @@ class ArrayTest {
             fileName = "array_3.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_u",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
         )
 
-        val expected = listOf(NumberValue.I32(255))
+        val expected = listOf(i32(255))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -152,10 +153,10 @@ class ArrayTest {
             fileName = "array_3.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get_s",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
         )
 
-        val expected = listOf(NumberValue.I32(-1))
+        val expected = listOf(i32(-1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -169,7 +170,7 @@ class ArrayTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(3))
+        val expected = listOf(i32(3))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -193,10 +194,10 @@ class ArrayTest {
             fileName = "array_4.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(0)),
+            arguments = listOf(i32(0), i32(0)),
         )
 
-        val expected = listOf(NumberValue.I32(7))
+        val expected = listOf(i32(7))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -207,10 +208,10 @@ class ArrayTest {
             fileName = "array_4.wasm",
             fileDirectory = FILE_DIR,
             functionName = "get",
-            arguments = listOf(NumberValue.I32(1), NumberValue.I32(0)),
+            arguments = listOf(i32(1), i32(0)),
         )
 
-        val expected = listOf(NumberValue.I32(1))
+        val expected = listOf(i32(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -221,10 +222,10 @@ class ArrayTest {
             fileName = "array_4.wasm",
             fileDirectory = FILE_DIR,
             functionName = "set_get",
-            arguments = listOf(NumberValue.I32(0), NumberValue.I32(1), NumberValue.I32(1)),
+            arguments = listOf(i32(0), i32(1), i32(1)),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -238,7 +239,7 @@ class ArrayTest {
             arguments = listOf(),
         )
 
-        val expected = listOf(NumberValue.I32(2))
+        val expected = listOf(i32(2))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

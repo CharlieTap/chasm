@@ -21,7 +21,7 @@ import io.github.charlietap.chasm.fixture.type.valueStorageType
 import io.github.charlietap.chasm.fixture.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -49,7 +49,7 @@ class ArrayFillExecutorImplTest {
         )
 
         val fieldValue = fieldValue()
-        val fillValue = i32NumberValue()
+        val fillValue = i32()
 
         val arrayAddress = arrayAddress(0)
         val arrayInstance = arrayInstance(
@@ -70,9 +70,9 @@ class ArrayFillExecutorImplTest {
         stack.push(frame)
 
         stack.push(arrayReferenceValue(arrayAddress))
-        stack.push(i32NumberValue(2))
+        stack.push(i32(2))
         stack.push(fillValue)
-        stack.push(i32NumberValue(2))
+        stack.push(i32(2))
 
         val expectedFieldValue = executionFieldValue(fillValue)
         val expectedInstance = arrayInstance(

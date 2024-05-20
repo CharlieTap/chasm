@@ -5,8 +5,8 @@ import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,7 +20,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_non_null",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -36,7 +36,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_non_null",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -52,7 +52,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_non_null",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -68,7 +68,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_non_null",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -84,7 +84,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_null",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -100,7 +100,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_null",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -116,7 +116,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_null",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -132,7 +132,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_null",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -148,7 +148,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_null",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -164,7 +164,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_null",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -180,7 +180,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_null",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -196,7 +196,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_null",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -212,7 +212,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_i31",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -228,7 +228,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_i31",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -244,7 +244,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_i31",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -260,7 +260,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_i31",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -276,7 +276,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_i31",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -292,7 +292,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_i31",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -308,7 +308,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_i31",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -324,7 +324,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_i31",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -340,7 +340,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_struct",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -356,7 +356,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_struct",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -372,7 +372,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_struct",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -388,7 +388,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_struct",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -404,7 +404,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_struct",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -420,7 +420,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_struct",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -436,7 +436,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_struct",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -452,7 +452,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_struct",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -468,7 +468,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_array",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -484,7 +484,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_array",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -500,7 +500,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_array",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -516,7 +516,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_array",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -532,7 +532,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_array",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -548,7 +548,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_array",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -564,7 +564,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_array",
-            arguments = listOf(NumberValue.I32(6)),
+            arguments = listOf(i32(6)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -580,7 +580,7 @@ class RefCastTest {
             fileName = "ref_cast_1.wasm",
             fileDirectory = FILE_DIR,
             functionName = "ref_cast_array",
-            arguments = listOf(NumberValue.I32(7)),
+            arguments = listOf(i32(7)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 

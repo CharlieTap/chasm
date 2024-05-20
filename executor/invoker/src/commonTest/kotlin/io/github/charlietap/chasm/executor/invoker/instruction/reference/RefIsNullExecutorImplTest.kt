@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.instance.functionAddress
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.fixture.value
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,7 +20,7 @@ class RefIsNullExecutorImplTest {
 
         stack.push(value(ReferenceValue.Null(heapType)))
 
-        val expected = value(NumberValue.I32(1))
+        val expected = value(i32(1))
 
         val actual = RefIsNullExecutorImpl(stack)
 
@@ -36,7 +36,7 @@ class RefIsNullExecutorImplTest {
 
         stack.push(value(ReferenceValue.Function(functionAddress())))
 
-        val expected = value(NumberValue.I32(0))
+        val expected = value(i32(0))
 
         val actual = RefIsNullExecutorImpl(stack)
 

@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -80,7 +80,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
         )
 
         val expected = listOf(ReferenceValue.Null(AbstractHeapType.Extern))
@@ -95,7 +95,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -109,7 +109,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -123,7 +123,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -137,7 +137,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -151,7 +151,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
         )
 
         val expected = listOf(ReferenceValue.Null(AbstractHeapType.Extern))
@@ -166,7 +166,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
-            arguments = listOf(NumberValue.I32(0)),
+            arguments = listOf(i32(0)),
         )
 
         val expected = listOf(ReferenceValue.Null(AbstractHeapType.Any))
@@ -181,7 +181,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
-            arguments = listOf(NumberValue.I32(1)),
+            arguments = listOf(i32(1)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -195,7 +195,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
-            arguments = listOf(NumberValue.I32(2)),
+            arguments = listOf(i32(2)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -209,7 +209,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
-            arguments = listOf(NumberValue.I32(3)),
+            arguments = listOf(i32(3)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -223,7 +223,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
-            arguments = listOf(NumberValue.I32(4)),
+            arguments = listOf(i32(4)),
             setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
         )
 
@@ -239,7 +239,7 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
-            arguments = listOf(NumberValue.I32(5)),
+            arguments = listOf(i32(5)),
         )
 
         val expected = listOf(ReferenceValue.Null(AbstractHeapType.Any))

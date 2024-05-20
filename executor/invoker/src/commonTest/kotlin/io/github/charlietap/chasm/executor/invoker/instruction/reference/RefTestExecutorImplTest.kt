@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.referenceType
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.fixture.value.referenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -61,7 +61,7 @@ class RefTestExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(i32NumberValue(1), stack.popValueOrNull()?.value)
+        assertEquals(i32(1), stack.popValueOrNull()?.value)
     }
 
     @Test
@@ -105,6 +105,6 @@ class RefTestExecutorImplTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(i32NumberValue(0), stack.popValueOrNull()?.value)
+        assertEquals(i32(0), stack.popValueOrNull()?.value)
     }
 }

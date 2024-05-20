@@ -3,10 +3,11 @@ package io.github.charlietap.chasm.script.value
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.value.i64
 import io.github.charlietap.sweet.lib.value.Value
 
 typealias ValueMapper = (Value) -> ExecutionValue?
@@ -25,13 +26,13 @@ fun ValueMapper(
 private fun i32ValueMapper(
     value: Value.I32,
 ): ExecutionValue? = value.value?.let {
-    NumberValue.I32(it.toIntOrNull() ?: it.toUInt().toInt())
+    i32(it.toIntOrNull() ?: it.toUInt().toInt())
 }
 
 private fun i64ValueMapper(
     value: Value.I64,
 ): ExecutionValue? = value.value?.let {
-    NumberValue.I64(it.toLongOrNull() ?: it.toULong().toLong())
+    i64(it.toLongOrNull() ?: it.toULong().toLong())
 }
 
 private fun f32ValueMapper(

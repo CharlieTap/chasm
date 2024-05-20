@@ -18,7 +18,7 @@ import io.github.charlietap.chasm.fixture.type.structCompositeType
 import io.github.charlietap.chasm.fixture.type.structType
 import io.github.charlietap.chasm.fixture.value
 import io.github.charlietap.chasm.fixture.value.executionFieldValue
-import io.github.charlietap.chasm.fixture.value.i32NumberValue
+import io.github.charlietap.chasm.fixture.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -49,8 +49,8 @@ class StructNewExecutorImplTest {
 
         stack.push(frame)
 
-        val executionValue1 = i32NumberValue(0)
-        val executionValue2 = i32NumberValue(1)
+        val executionValue1 = i32(0)
+        val executionValue2 = i32(1)
 
         stack.push(executionValue1)
         stack.push(executionValue2)
