@@ -66,12 +66,12 @@ configure<PublishingConventionsExtension> {
 }
 
 configure<WasmTestSuiteGenPluginExtension> {
-    wabtVersion = "1.0.34"
+    wabtVersion = "1.0.35"
     testSuiteCommit = "16a839d5601c283541a84572b47637f035b51437"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm"
     proposals = listOf("tail-call", "extended-const")
-    excludes = listOf("**/comments.wast","**/if.wast", "**/float_exprs.wast", "**/f64.wast", "**/float_misc.wast", "simd_*/**")
+    excludes = listOf("**/float_exprs.wast", "**/f64.wast", "**/float_misc.wast", "simd_*/**")
 }
 
 tasks.withType<KotlinCompile>().configureEach {

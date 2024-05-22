@@ -78,7 +78,7 @@ abstract class SyncRepositoryTask : DefaultTask() {
     }
 
     private fun wipeDirectory() {
-        outputDirectory.get().files().forEach {
+        outputDirectory.get().asFile.listFiles()?.forEach {
             it.deleteRecursively()
         }
     }

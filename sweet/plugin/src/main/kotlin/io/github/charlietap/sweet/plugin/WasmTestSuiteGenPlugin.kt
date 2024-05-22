@@ -1,5 +1,6 @@
 package io.github.charlietap.sweet.plugin
 
+import io.github.charlietap.sweet.plugin.task.DownloadWabtTask
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import io.github.charlietap.sweet.plugin.task.PrepareTestSuiteTask
 import io.github.charlietap.sweet.plugin.task.ResolveWast2JsonTask
@@ -28,6 +29,16 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             outputDirectory.set(extension.testSuiteDirectory)
         }
 
+        val downloadWabtTask = project.tasks.register<DownloadWabtTask>(
+            TASK_NAME_DOWNLOAD_WABT,
+        ) {
+            description = TASK_DESCRIPTION_DOWNLOAD_WABT
+            group = GROUP
+
+            wabtVersion.set(extension.wabtVersion)
+            outputDirectory.set(project.layout.buildDirectory.dir("wabt"))
+        }
+
         val resolveWast2JsonTask = project.tasks.register<ResolveWast2JsonTask>(
             TASK_NAME_RESOLVE_W2J,
         ) {
@@ -35,7 +46,10 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             group = GROUP
 
             wabtVersion.set(extension.wabtVersion)
-            outputFile.set(project.layout.buildDirectory.file("wast2json"))
+            wabtDirectory.set(downloadWabtTask.flatMap { it.outputDirectory })
+            outputFile.set(wabtVersion.zip(wabtDirectory) { version, dir ->
+                dir.dir(version).file("wast2json")
+            })
         }
 
         val prepareTestSuiteTask = project.tasks.register<PrepareTestSuiteTask>(
@@ -99,11 +113,13 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
         const val GROUP = "testsuite"
 
         const val TASK_NAME_SYNC_SUITE = "syncWasmTestSuite"
+        const val TASK_NAME_DOWNLOAD_WABT = "downloadWabt"
         const val TASK_NAME_RESOLVE_W2J = "resolveWast2Json"
         const val TASK_NAME_PREPARE_SUITE = "prepareTestSuite"
         const val TASK_NAME_GENERATE_TESTS = "generateTests"
 
         const val TASK_DESCRIPTION_SYNC_SUITE = "Clones/Updates the wasm test suite to the given commit"
+        const val TASK_DESCRIPTION_DOWNLOAD_WABT = "Downloads and extracts the web assembly binary toolkit"
         const val TASK_DESCRIPTION_RESOLVE_W2J = "Resolves for wastjson on the local filesystem"
         const val TASK_DESCRIPTION_PREPARE_SUITE = "Prepare the wasm test suite for generation by running wast2json"
         const val TASK_DESCRIPTION_GENERATE_TESTS = "Generate tests from the web assembly testsuite"

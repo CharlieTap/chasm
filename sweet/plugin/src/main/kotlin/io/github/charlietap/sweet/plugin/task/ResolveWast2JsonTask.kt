@@ -1,16 +1,18 @@
 package io.github.charlietap.sweet.plugin.task
 
 import java.io.ByteArrayOutputStream
-import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 
@@ -20,34 +22,23 @@ abstract class ResolveWast2JsonTask : DefaultTask() {
     @get:Input
     abstract val wabtVersion: Property<String>
 
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val wabtDirectory: DirectoryProperty
+
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
     @get:Inject
     abstract val cli: ExecOperations
 
-    @get:Inject
-    abstract val fs: FileSystemOperations
-
     @TaskAction
     fun resolve() {
-        val osName = System.getProperty("os.name").lowercase()
-        val command = if (osName.contains("win")) "where" else "which"
-        val existingLocationBytes = ByteArrayOutputStream()
 
-        cli.exec {
-            commandLine = listOf(command, "wast2json")
-            standardOutput = existingLocationBytes
-        }
+        val wast2JsonFile = outputFile.get().asFile
 
-        val existingLocation =  File(existingLocationBytes.toString().trim())
-
-        if(!outputFile.get().asFile.exists()) {
-            fs.copy {
-                from(existingLocation)
-                into(outputFile.get().asFile.parentFile)
-                rename{ "wast2json" }
-            }
+        if(!wast2JsonFile.exists()) {
+            throw GradleException("wast2json file does not exist: ${wast2JsonFile.absolutePath}")
         }
 
         val versionBytes = ByteArrayOutputStream()
