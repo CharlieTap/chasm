@@ -63,6 +63,7 @@ abstract class DownloadWabtTask : DefaultTask() {
                     path = path
                         .replace("wabt-${wabtVersion.get()}", wabtVersion.get())
                         .replace("bin", "")
+                        .replace(".exe", "")
                     includeEmptyDirs = false
                 }
             }
