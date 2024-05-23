@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -39,5 +40,7 @@ configure<PublishingConventionsExtension> {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = libs.versions.java.bytecode.version.get()
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
+    }
 }

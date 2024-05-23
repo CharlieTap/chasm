@@ -1,6 +1,7 @@
 
 import io.github.charlietap.sweet.plugin.WasmTestSuiteGenPluginExtension
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -75,7 +76,9 @@ configure<WasmTestSuiteGenPluginExtension> {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = libs.versions.java.bytecode.version.get()
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
+    }
 }
 
 tasks.named {

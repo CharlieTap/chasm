@@ -35,7 +35,7 @@ hilt-integrations = "1.2.0"
 
 junit = "4.13.2"
 
-kotlin = "1.9.24"
+kotlin = "2.0.0"
 kotlin-poet = "1.16.0"
 kotlinter = "4.2.0"
 kot-compile-testing = "1.5.0"
@@ -48,7 +48,7 @@ kotlinx-io = "0.3.2"
 kotlinx-serialization = "1.5.1"
 kotlinx-test-resources = "0.4.1"
 
-ksp = "1.9.24-1.0.20"
+ksp = "2.0.0-1.0.21"
 
 result = "2.0.0"
 
@@ -57,6 +57,7 @@ result = "2.0.0"
 android-application = { id = "com.android.application", version.ref = "android-build-tools-plugin" }
 android-lib = { id = "com.android.library", version.ref = "android-build-tools-plugin" }
 android-test = { id = "com.android.test", version.ref = "android-build-tools-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref="dependency-analysis" }
 dokka = { id = "org.jetbrains.dokka", version.ref="dokka" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt-core" }

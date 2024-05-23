@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -24,10 +25,13 @@ kotlin {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = libs.versions.java.bytecode.version.get()
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
+    }
 }
 
 tasks.withType<KotlinJsCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += listOf("-Xwasm-use-traps-instead-of-exceptions")
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xwasm-use-traps-instead-of-exceptions")
+    }
 }
-

@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.symbol.processing)
     id("linting-conventions")
@@ -44,11 +45,10 @@ android {
         buildConfig = true
         compose = true
     }
+}
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-    }
-
+composeCompiler {
+    enableStrongSkippingMode = true
 }
 
 dependencies {
