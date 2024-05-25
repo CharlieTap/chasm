@@ -38,7 +38,7 @@ kotlin {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "executor"
+    name = "runtime-ext"
     description = "Internal extensions for chasms runtime"
 }
 

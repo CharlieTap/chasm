@@ -12,11 +12,22 @@ plugins {
 
 kotlin {
 
+    mingwX64 {
+        compilations.getByName("main") {
+            cinterops {
+                val libsse2 by creating {
+                    defFile(project.file("src/cinterop/libsse2.def"))
+                }
+            }
+        }
+    }
+
     sourceSets {
 
         all {
             languageSettings {
                 optIn("kotlin.ExperimentalUnsignedTypes")
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
             }
         }
 
@@ -25,7 +36,6 @@ kotlin {
                 api(projects.ast)
                 api(projects.executor.runtime)
                 api(projects.executor.runtimeExt)
-                api(projects.executor.invoker)
                 api(projects.executor.type)
                 api(libs.result)
 
@@ -40,12 +50,18 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
+
+        mingwX64Main {
+            dependencies {
+                implementation(libs.kotlin.test)
+            }
+        }
     }
 }
 
 configure<PublishingConventionsExtension> {
-    name = "instantiator"
-    description = "A wasm module instantiator"
+    name = "numeric"
+    description = "numeric operations for chasms runtime execution"
 }
 
 tasks.withType<KotlinCompile>().configureEach {

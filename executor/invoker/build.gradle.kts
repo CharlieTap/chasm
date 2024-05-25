@@ -23,6 +23,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
+                api(projects.executor.numeric)
                 api(projects.executor.runtime)
                 api(projects.executor.runtimeExt)
                 api(projects.executor.type)
@@ -43,7 +44,7 @@ kotlin {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "executor"
+    name = "invoker"
     description = "A wasm function invoker"
 }
 
