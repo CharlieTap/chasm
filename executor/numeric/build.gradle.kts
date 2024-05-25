@@ -50,12 +50,6 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
-
-        mingwX64Main {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
-        }
     }
 }
 
