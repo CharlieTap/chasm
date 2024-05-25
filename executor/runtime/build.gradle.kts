@@ -38,7 +38,7 @@ kotlin {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "executor"
+    name = "runtime"
     description = "A wasm runtime implementation"
 }
 

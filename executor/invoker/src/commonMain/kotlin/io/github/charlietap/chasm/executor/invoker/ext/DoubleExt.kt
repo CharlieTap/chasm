@@ -2,8 +2,8 @@
 
 package io.github.charlietap.chasm.executor.invoker.ext
 
+import io.github.charlietap.chasm.executor.numeric.ext.fsqrt
 import kotlin.math.round
-import kotlin.math.sqrt
 import kotlin.math.withSign
 
 internal inline fun Double.ceil(): Double = kotlin.math.ceil(this)
@@ -30,7 +30,7 @@ internal inline fun Double.max(other: Double): Double = kotlin.math.max(this, ot
 
 internal inline fun Double.min(other: Double): Double = kotlin.math.min(this, other)
 
-internal inline fun Double.sqrt(): Double = sqrt(this)
+internal inline fun Double.sqrt(): Double = fsqrt()
 
 internal inline fun Double.trunc(): Double = kotlin.math.truncate(this)
 

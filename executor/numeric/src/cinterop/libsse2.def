@@ -1,0 +1,9 @@
+headers = emmintrin.h
+---
+#include <emmintrin.h>
+
+double sse2_sqrt(double value) {
+    __m128d v = _mm_set_sd(value);
+    __m128d result = _mm_sqrt_sd(v, v);
+    return _mm_cvtsd_f64(result);
+}
