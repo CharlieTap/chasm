@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.embedding.memory
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceByteReader
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.store
@@ -28,7 +28,7 @@ class ReadMemoryTest {
             Ok(byte)
         }
 
-        val expected: Result<Byte, ModuleRuntimeError> = Ok(byte)
+        val expected: Result<Byte, ModuleTrapError> = Ok(byte)
 
         val actual = readMemory(
             store = store,

@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluatorImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
@@ -20,7 +20,7 @@ internal fun MemoryInitializerImpl(
     store: Store,
     instance: ModuleInstance,
     module: Module,
-): Result<Unit, ModuleRuntimeError> =
+): Result<Unit, ModuleTrapError> =
     MemoryInitializerImpl(
         store = store,
         instance = instance,
@@ -33,7 +33,7 @@ internal fun MemoryInitializerImpl(
     instance: ModuleInstance,
     module: Module,
     evaluator: ExpressionEvaluator,
-): Result<Unit, ModuleRuntimeError> = binding {
+): Result<Unit, ModuleTrapError> = binding {
 
     module.dataSegments.filter { segment ->
         segment.mode is DataSegment.Mode.Active

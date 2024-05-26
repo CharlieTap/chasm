@@ -10,14 +10,14 @@ import io.github.charlietap.chasm.executor.instantiator.classification.memory.Me
 import io.github.charlietap.chasm.executor.instantiator.classification.memory.MemoryClassifierImpl
 import io.github.charlietap.chasm.executor.instantiator.classification.table.TableClassifier
 import io.github.charlietap.chasm.executor.instantiator.classification.table.TableClassifierImpl
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun ExternalValueClassifierImpl(
     store: Store,
     value: ExternalValue,
-): Result<ClassifiedExternalValue, ModuleRuntimeError> =
+): Result<ClassifiedExternalValue, ModuleTrapError> =
     ExternalValueClassifierImpl(
         store = store,
         value = value,
@@ -34,7 +34,7 @@ internal fun ExternalValueClassifierImpl(
     tableClassifier: TableClassifier,
     memoryClassifier: MemoryClassifier,
     globalClassifier: GlobalClassifier,
-): Result<ClassifiedExternalValue, ModuleRuntimeError> = binding {
+): Result<ClassifiedExternalValue, ModuleTrapError> = binding {
     when (value) {
         is ExternalValue.Function -> functionClassifier(store, value).bind()
         is ExternalValue.Table -> tableClassifier(store, value).bind()

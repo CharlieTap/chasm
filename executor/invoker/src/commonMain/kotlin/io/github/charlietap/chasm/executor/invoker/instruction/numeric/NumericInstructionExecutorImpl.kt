@@ -4,66 +4,12 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.ceil
-import io.github.charlietap.chasm.executor.invoker.ext.convertF32s
-import io.github.charlietap.chasm.executor.invoker.ext.convertF32u
-import io.github.charlietap.chasm.executor.invoker.ext.convertF64s
-import io.github.charlietap.chasm.executor.invoker.ext.convertF64u
-import io.github.charlietap.chasm.executor.invoker.ext.copySign
-import io.github.charlietap.chasm.executor.invoker.ext.countLeadingZero
-import io.github.charlietap.chasm.executor.invoker.ext.countOnePopulation
-import io.github.charlietap.chasm.executor.invoker.ext.countTrailingZero
-import io.github.charlietap.chasm.executor.invoker.ext.divu
-import io.github.charlietap.chasm.executor.invoker.ext.eq
-import io.github.charlietap.chasm.executor.invoker.ext.eqz
-import io.github.charlietap.chasm.executor.invoker.ext.extend16s
-import io.github.charlietap.chasm.executor.invoker.ext.extend32s
-import io.github.charlietap.chasm.executor.invoker.ext.extend8s
-import io.github.charlietap.chasm.executor.invoker.ext.extendI64s
-import io.github.charlietap.chasm.executor.invoker.ext.extendI64u
-import io.github.charlietap.chasm.executor.invoker.ext.floor
-import io.github.charlietap.chasm.executor.invoker.ext.ge
-import io.github.charlietap.chasm.executor.invoker.ext.geu
-import io.github.charlietap.chasm.executor.invoker.ext.gt
-import io.github.charlietap.chasm.executor.invoker.ext.gtu
-import io.github.charlietap.chasm.executor.invoker.ext.le
-import io.github.charlietap.chasm.executor.invoker.ext.leu
-import io.github.charlietap.chasm.executor.invoker.ext.lt
-import io.github.charlietap.chasm.executor.invoker.ext.ltu
-import io.github.charlietap.chasm.executor.invoker.ext.max
-import io.github.charlietap.chasm.executor.invoker.ext.min
-import io.github.charlietap.chasm.executor.invoker.ext.ne
-import io.github.charlietap.chasm.executor.invoker.ext.nearest
-import io.github.charlietap.chasm.executor.invoker.ext.remu
-import io.github.charlietap.chasm.executor.invoker.ext.rotateLeft
-import io.github.charlietap.chasm.executor.invoker.ext.rotateRight
-import io.github.charlietap.chasm.executor.invoker.ext.shl
-import io.github.charlietap.chasm.executor.invoker.ext.shr
-import io.github.charlietap.chasm.executor.invoker.ext.shru
-import io.github.charlietap.chasm.executor.invoker.ext.sqrt
-import io.github.charlietap.chasm.executor.invoker.ext.trunc
-import io.github.charlietap.chasm.executor.invoker.ext.truncI32s
-import io.github.charlietap.chasm.executor.invoker.ext.truncI32sTrapping
-import io.github.charlietap.chasm.executor.invoker.ext.truncI32u
-import io.github.charlietap.chasm.executor.invoker.ext.truncI32uTrapping
-import io.github.charlietap.chasm.executor.invoker.ext.truncI64s
-import io.github.charlietap.chasm.executor.invoker.ext.truncI64sTrapping
-import io.github.charlietap.chasm.executor.invoker.ext.truncI64u
-import io.github.charlietap.chasm.executor.invoker.ext.truncI64uTrapping
-import io.github.charlietap.chasm.executor.invoker.ext.wrap
+import io.github.charlietap.chasm.executor.invoker.ext.*
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
-import io.github.charlietap.chasm.executor.runtime.ext.constOperation
-import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
-import io.github.charlietap.chasm.executor.runtime.ext.relationalOperation
-import io.github.charlietap.chasm.executor.runtime.ext.testOperation
-import io.github.charlietap.chasm.executor.runtime.ext.unaryOperation
+import io.github.charlietap.chasm.executor.runtime.ext.*
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
+import io.github.charlietap.chasm.executor.runtime.value.NumberValue.*
 import kotlin.math.absoluteValue
 
 internal fun NumericInstructionExecutorImpl(
@@ -91,13 +37,55 @@ internal fun NumericInstructionExecutorImpl(
         is NumericInstruction.F32Mul -> stack.binaryOperation(Float::times).bind()
         is NumericInstruction.F64Mul -> stack.binaryOperation(Double::times).bind()
 
-        is NumericInstruction.I32DivS -> stack.binaryOperation(Int::div).bind()
-        is NumericInstruction.I64DivS -> stack.binaryOperation(Long::div).bind()
+        is NumericInstruction.I32DivS -> {
+
+            val operand1 = stack.peekNthValue(1).bind().value as I32
+            val operand2 = stack.peekNthValue(0).bind().value as I32
+
+            if (operand2.value == 0) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            } else if (operand1.value == Int.MIN_VALUE && operand2.value == -1) {
+                Err(InvocationError.IntegerOverflow).bind<Unit>()
+            }
+
+            stack.binaryOperation(Int::div).bind()
+        }
+        is NumericInstruction.I64DivS -> {
+
+            val operand1 = stack.peekNthValue(1).bind().value as I64
+            val operand2 = stack.peekNthValue(0).bind().value as I64
+
+            if (operand2.value == 0L) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            } else if (operand1.value == Long.MIN_VALUE && operand2.value == -1L) {
+                Err(InvocationError.IntegerOverflow).bind<Unit>()
+            }
+
+            stack.binaryOperation(Long::div).bind()
+        }
         is NumericInstruction.F32Div -> stack.binaryOperation(Float::div).bind()
         is NumericInstruction.F64Div -> stack.binaryOperation(Double::div).bind()
 
-        is NumericInstruction.I32DivU -> stack.binaryOperation(Int::divu).bind()
-        is NumericInstruction.I64DivU -> stack.binaryOperation(Long::divu).bind()
+        is NumericInstruction.I32DivU -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I32
+
+            if (operand2.value.toUInt() == 0u) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Int::divu).bind()
+        }
+        is NumericInstruction.I64DivU -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I64
+
+            if (operand2.value.toULong() == 0uL) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Long::divu).bind()
+        }
 
         is NumericInstruction.I32And -> stack.binaryOperation(Int::and).bind()
         is NumericInstruction.I64And -> stack.binaryOperation(Long::and).bind()
@@ -108,11 +96,47 @@ internal fun NumericInstructionExecutorImpl(
         is NumericInstruction.I32Xor -> stack.binaryOperation(Int::xor).bind()
         is NumericInstruction.I64Xor -> stack.binaryOperation(Long::xor).bind()
 
-        is NumericInstruction.I32RemS -> stack.binaryOperation(Int::rem).bind()
-        is NumericInstruction.I64RemS -> stack.binaryOperation(Long::rem).bind()
+        is NumericInstruction.I32RemS -> {
 
-        is NumericInstruction.I32RemU -> stack.binaryOperation(Int::remu).bind()
-        is NumericInstruction.I64RemU -> stack.binaryOperation(Long::remu).bind()
+            val operand2 = stack.peekNthValue(0).bind().value as I32
+
+            if (operand2.value == 0) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Int::rem).bind()
+        }
+        is NumericInstruction.I64RemS -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I64
+
+            if (operand2.value == 0L) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Long::rem).bind()
+        }
+
+        is NumericInstruction.I32RemU -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I32
+
+            if (operand2.value.toUInt() == 0u) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Int::remu).bind()
+        }
+        is NumericInstruction.I64RemU -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I64
+
+            if (operand2.value.toULong() == 0uL) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Long::remu).bind()
+        }
 
         is NumericInstruction.I32Shl -> stack.binaryOperation(Int::shl).bind()
         is NumericInstruction.I64Shl -> stack.binaryOperation(Long::shl).bind()

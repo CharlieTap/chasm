@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.embedding.memory
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceByteWriter
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.store
@@ -29,7 +29,7 @@ class WriteMemoryTest {
             Ok(Unit)
         }
 
-        val expected: Result<Unit, ModuleRuntimeError> = Ok(Unit)
+        val expected: Result<Unit, ModuleTrapError> = Ok(Unit)
 
         val actual = writeMemory(
             store = store,

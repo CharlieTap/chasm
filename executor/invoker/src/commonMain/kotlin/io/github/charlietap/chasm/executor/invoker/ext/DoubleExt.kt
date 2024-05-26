@@ -4,6 +4,7 @@ package io.github.charlietap.chasm.executor.invoker.ext
 
 import io.github.charlietap.chasm.executor.numeric.ext.fsqrt
 import kotlin.math.round
+import kotlin.math.truncate
 import kotlin.math.withSign
 
 internal inline fun Double.ceil(): Double = kotlin.math.ceil(this)
@@ -44,32 +45,54 @@ internal inline fun Double.truncI64u(): Long = toULong().toLong()
 
 internal inline fun Double.truncI32sTrapping(): Int = when {
     this.isNaN() -> throw IllegalArgumentException()
-    this.toULong() > UInt.MAX_VALUE -> throw IllegalArgumentException()
-    this.toLong() < Int.MIN_VALUE -> throw IllegalArgumentException()
-    else -> toInt()
+    this.isInfinite() -> throw IllegalArgumentException()
+    else -> {
+        val truncated = truncate(this)
+        if (truncated.toLong() > Int.MAX_VALUE || truncated.toLong() < Int.MIN_VALUE) {
+            throw IllegalArgumentException()
+        }
+        truncated.toInt()
+    }
 }
 
-internal inline fun Double.truncI32uTrapping(): Int = (this to this.toUInt()).let { (float, uint) ->
-    when {
-        float.isNaN() -> throw IllegalArgumentException()
-        uint > UInt.MAX_VALUE -> throw IllegalArgumentException()
-        uint < UInt.MIN_VALUE -> throw IllegalArgumentException()
-        else -> uint.toInt()
+internal inline fun Double.truncI32uTrapping(): Int = when {
+    this.isNaN() -> throw IllegalArgumentException()
+    this.isInfinite() -> throw IllegalArgumentException()
+    else -> {
+        val truncated = truncate(this)
+        if (truncated < 0) {
+            throw IllegalArgumentException()
+        }
+        if (truncated.toLong() > UInt.MAX_VALUE.toLong()) {
+            throw IllegalArgumentException()
+        }
+        truncated.toUInt().toInt()
     }
 }
 
 internal inline fun Double.truncI64sTrapping(): Long = when {
     this.isNaN() -> throw IllegalArgumentException()
-    this > Long.MAX_VALUE -> throw IllegalArgumentException()
-    this < Long.MIN_VALUE -> throw IllegalArgumentException()
-    else -> toLong()
+    this.isInfinite() -> throw IllegalArgumentException()
+    else -> {
+        val truncated = truncate(this)
+        if (truncated.toULong() > Long.MAX_VALUE.toULong() || truncated < Long.MIN_VALUE) {
+            throw IllegalArgumentException()
+        }
+        truncated.toLong()
+    }
 }
 
-internal inline fun Double.truncI64uTrapping(): Long = (this to this.toULong()).let { (float, ulong) ->
-    when {
-        float.isNaN() -> throw IllegalArgumentException()
-        ulong > ULong.MAX_VALUE -> throw IllegalArgumentException()
-        ulong < ULong.MIN_VALUE -> throw IllegalArgumentException()
-        else -> ulong.toLong()
+internal inline fun Double.truncI64uTrapping(): Long = when {
+    this.isNaN() -> throw IllegalArgumentException()
+    this.isInfinite() -> throw IllegalArgumentException()
+    else -> {
+        val truncated = truncate(this)
+        if (truncated < 0) {
+            throw IllegalArgumentException()
+        }
+        if (truncated >= ULong.MAX_VALUE.toDouble()) {
+            throw IllegalArgumentException()
+        }
+        truncated.toULong().toLong()
     }
 }

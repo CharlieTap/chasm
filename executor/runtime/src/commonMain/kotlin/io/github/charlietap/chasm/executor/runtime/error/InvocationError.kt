@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import kotlin.jvm.JvmInline
 
-sealed interface InvocationError : ModuleRuntimeError {
+sealed interface InvocationError : ModuleTrapError {
 
     @JvmInline
     value class FunctionNotFound(val function: String) : InvocationError
@@ -39,9 +39,6 @@ sealed interface InvocationError : ModuleRuntimeError {
     value class ExportInstanceLookupFailed(val index: Int) : InvocationError
 
     @JvmInline
-    value class ElementReferenceLookupFailed(val index: Int) : InvocationError
-
-    @JvmInline
     value class TableElementLookupFailed(val index: Int) : InvocationError
 
     @JvmInline
@@ -57,14 +54,7 @@ sealed interface InvocationError : ModuleRuntimeError {
 
     data object MemoryOperationOutOfBounds : InvocationError
 
-    @JvmInline
-    value class TableGrowExceedsLimits(val proposed: UInt) : InvocationError
-
     data object InvalidAddress : InvocationError
-
-    data object NonWasmFunctionInvocation : InvocationError
-
-    data object FunctionReturnArityMismatch : InvocationError
 
     data object MissingStackFrame : InvocationError
 
@@ -75,8 +65,6 @@ sealed interface InvocationError : ModuleRuntimeError {
     data object MissingStackValue : InvocationError
 
     data object MissingLocal : InvocationError
-
-    data object InstructionFailure : InvocationError
 
     data object IndirectCallOnANonFunctionReference : InvocationError
 
@@ -92,8 +80,6 @@ sealed interface InvocationError : ModuleRuntimeError {
 
     data object UndefinedDefaultBottomType : InvocationError
 
-    data object UndefinedDefaultReferenceType : InvocationError
-
     data object FunctionCompositeTypeExpected : InvocationError
 
     data object StructCompositeTypeExpected : InvocationError
@@ -105,6 +91,10 @@ sealed interface InvocationError : ModuleRuntimeError {
     data object UnobservableBitWidth : InvocationError
 
     data object ArrayCopyOnAConstArray : InvocationError
+
+    data object CannotDivideIntegerByZero : InvocationError
+
+    data object IntegerOverflow : InvocationError
 
     @JvmInline
     value class UnimplementedInstruction(val instruction: ExecutionInstruction) : InvocationError

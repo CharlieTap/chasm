@@ -27,6 +27,6 @@ private fun ActionRunner(
     invokeActionRunner: InvokeActionRunner,
     getActionRunner: GetActionRunner,
 ): ActionResult = when (action) {
-    is InvokeAction -> invokeActionRunner(context, action)
+    is InvokeAction -> invokeActionRunner(context, command, action)
     is GetAction -> getActionRunner(context, command, action)
 }
