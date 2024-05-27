@@ -2,6 +2,7 @@
 
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemArg
@@ -26,8 +27,12 @@ internal inline fun <T> LoadNumberValueExecutorImpl(
     val memory = store.memory(memoryAddress).bind()
 
     val baseAddress = stack.popI32().bind()
+    val offset = memArg.offset.toInt()
+    val effectiveAddress = baseAddress + offset
 
-    val effectiveAddress = baseAddress + memArg.offset.toInt()
+    if (baseAddress < 0 || offset < 0) {
+        Err(InvocationError.MemoryOperationOutOfBounds).bind<Unit>()
+    }
 
     val result = reader(memory, effectiveAddress, valueSizeInBytes).bind()
     val value = constructor(result)

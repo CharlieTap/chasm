@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.ChasmResult.Error
 import io.github.charlietap.chasm.ChasmResult.Success
 import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.global
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -31,7 +31,7 @@ internal fun internalWriteGlobal(
     store: Store,
     address: Address.Global,
     value: ExecutionValue,
-): Result<Unit, ModuleRuntimeError> = binding {
+): Result<Unit, ModuleTrapError> = binding {
     val global = store.global(address).bind()
     global.value = value
 }

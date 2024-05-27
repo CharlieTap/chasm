@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.script.action
 
 import io.github.charlietap.chasm.embedding.global.readGlobal
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.expect
+import io.github.charlietap.chasm.fold
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.sweet.lib.action.GetAction
 import io.github.charlietap.sweet.lib.command.Command
@@ -22,5 +22,11 @@ fun GetActionRunner(
 
     val result = readGlobal(context.store, global.address)
 
-    return ActionResult.Success(listOf(result.expect("Get action failed")))
+    return result.fold(
+        { globalValue ->
+            ActionResult.Success(listOf(globalValue))
+        },
+    ) { error ->
+        ActionResult.Failure(command, "get action returned an error", error)
+    }
 }

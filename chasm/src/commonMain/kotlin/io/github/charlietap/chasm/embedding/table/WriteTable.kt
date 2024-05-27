@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.ChasmResult.Error
 import io.github.charlietap.chasm.ChasmResult.Success
 import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -34,7 +34,7 @@ internal fun internalWriteTable(
     address: Address.Table,
     elementIndex: Int,
     value: ReferenceValue,
-): Result<Unit, ModuleRuntimeError> = binding {
+): Result<Unit, ModuleTrapError> = binding {
     val table = store.table(address).bind()
     table.elements[elementIndex] = value
 }

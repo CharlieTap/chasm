@@ -39,6 +39,7 @@ internal fun TableInitExecutorImpl(
     val dstRange = tableOffset..<(tableOffset + elementsToInitialise)
 
     if (
+        elementsToInitialise < 0 || segmentOffset < 0 || tableOffset < 0 ||
         !elementInstance.elements.indices.contains(srcRange) ||
         !tableInstance.elements.indices.contains(dstRange)
     ) {

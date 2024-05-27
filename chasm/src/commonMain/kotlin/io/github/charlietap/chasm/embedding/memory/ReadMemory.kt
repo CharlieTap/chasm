@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.ChasmResult.Success
 import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceByteReader
 import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceByteReaderImpl
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -34,7 +34,7 @@ internal fun readMemory(
     address: Address.Memory,
     byteOffsetInMemory: Int,
     byteReader: MemoryInstanceByteReader,
-): Result<Byte, ModuleRuntimeError> = binding {
+): Result<Byte, ModuleTrapError> = binding {
     val instance = store.memory(address).bind()
     byteReader(instance, byteOffsetInMemory).bind()
 }

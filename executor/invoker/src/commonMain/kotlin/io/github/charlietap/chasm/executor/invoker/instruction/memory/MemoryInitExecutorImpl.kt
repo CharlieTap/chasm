@@ -48,11 +48,9 @@ internal fun MemoryInitExecutorImpl(
     val sourceOffset = stack.popI32().bind()
     val destinationOffset = stack.popI32().bind()
 
-    if ((sourceOffset + bytesToCopy) > data.bytes.size || (destinationOffset + bytesToCopy) > memory.data.size()) {
+    if (bytesToCopy < 0 || (sourceOffset + bytesToCopy) > data.bytes.size || (destinationOffset + bytesToCopy) > memory.data.size()) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }
-
-    if (bytesToCopy == 0) return@binding
 
     val srcRange = sourceOffset..<(sourceOffset + bytesToCopy)
     val dstRange = destinationOffset..<(destinationOffset + bytesToCopy)

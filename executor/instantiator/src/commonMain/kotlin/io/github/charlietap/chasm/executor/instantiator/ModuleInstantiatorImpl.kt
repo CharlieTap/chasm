@@ -18,7 +18,7 @@ import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.FunctionInvokerImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -28,7 +28,7 @@ fun ModuleInstantiatorImpl(
     store: Store,
     module: Module,
     imports: List<ExternalValue>,
-): Result<ModuleInstance, ModuleRuntimeError> =
+): Result<ModuleInstance, ModuleTrapError> =
     ModuleInstantiatorImpl(
         store = store,
         module = module,
@@ -51,7 +51,7 @@ internal fun ModuleInstantiatorImpl(
     evaluator: ExpressionEvaluator,
     tableInitializer: TableInitializer,
     memoryInitializer: MemoryInitializer,
-): Result<ModuleInstance, ModuleRuntimeError> = binding {
+): Result<ModuleInstance, ModuleTrapError> = binding {
     // todo module validation
 
     if (module.imports.size != imports.size) {

@@ -56,6 +56,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.executor.runtime.ext.constOperation
 import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
+import io.github.charlietap.chasm.executor.runtime.ext.peekNthValue
 import io.github.charlietap.chasm.executor.runtime.ext.relationalOperation
 import io.github.charlietap.chasm.executor.runtime.ext.testOperation
 import io.github.charlietap.chasm.executor.runtime.ext.unaryOperation
@@ -91,13 +92,55 @@ internal fun NumericInstructionExecutorImpl(
         is NumericInstruction.F32Mul -> stack.binaryOperation(Float::times).bind()
         is NumericInstruction.F64Mul -> stack.binaryOperation(Double::times).bind()
 
-        is NumericInstruction.I32DivS -> stack.binaryOperation(Int::div).bind()
-        is NumericInstruction.I64DivS -> stack.binaryOperation(Long::div).bind()
+        is NumericInstruction.I32DivS -> {
+
+            val operand1 = stack.peekNthValue(1).bind().value as I32
+            val operand2 = stack.peekNthValue(0).bind().value as I32
+
+            if (operand2.value == 0) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            } else if (operand1.value == Int.MIN_VALUE && operand2.value == -1) {
+                Err(InvocationError.IntegerOverflow).bind<Unit>()
+            }
+
+            stack.binaryOperation(Int::div).bind()
+        }
+        is NumericInstruction.I64DivS -> {
+
+            val operand1 = stack.peekNthValue(1).bind().value as I64
+            val operand2 = stack.peekNthValue(0).bind().value as I64
+
+            if (operand2.value == 0L) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            } else if (operand1.value == Long.MIN_VALUE && operand2.value == -1L) {
+                Err(InvocationError.IntegerOverflow).bind<Unit>()
+            }
+
+            stack.binaryOperation(Long::div).bind()
+        }
         is NumericInstruction.F32Div -> stack.binaryOperation(Float::div).bind()
         is NumericInstruction.F64Div -> stack.binaryOperation(Double::div).bind()
 
-        is NumericInstruction.I32DivU -> stack.binaryOperation(Int::divu).bind()
-        is NumericInstruction.I64DivU -> stack.binaryOperation(Long::divu).bind()
+        is NumericInstruction.I32DivU -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I32
+
+            if (operand2.value.toUInt() == 0u) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Int::divu).bind()
+        }
+        is NumericInstruction.I64DivU -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I64
+
+            if (operand2.value.toULong() == 0uL) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Long::divu).bind()
+        }
 
         is NumericInstruction.I32And -> stack.binaryOperation(Int::and).bind()
         is NumericInstruction.I64And -> stack.binaryOperation(Long::and).bind()
@@ -108,11 +151,47 @@ internal fun NumericInstructionExecutorImpl(
         is NumericInstruction.I32Xor -> stack.binaryOperation(Int::xor).bind()
         is NumericInstruction.I64Xor -> stack.binaryOperation(Long::xor).bind()
 
-        is NumericInstruction.I32RemS -> stack.binaryOperation(Int::rem).bind()
-        is NumericInstruction.I64RemS -> stack.binaryOperation(Long::rem).bind()
+        is NumericInstruction.I32RemS -> {
 
-        is NumericInstruction.I32RemU -> stack.binaryOperation(Int::remu).bind()
-        is NumericInstruction.I64RemU -> stack.binaryOperation(Long::remu).bind()
+            val operand2 = stack.peekNthValue(0).bind().value as I32
+
+            if (operand2.value == 0) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Int::rem).bind()
+        }
+        is NumericInstruction.I64RemS -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I64
+
+            if (operand2.value == 0L) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Long::rem).bind()
+        }
+
+        is NumericInstruction.I32RemU -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I32
+
+            if (operand2.value.toUInt() == 0u) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Int::remu).bind()
+        }
+        is NumericInstruction.I64RemU -> {
+
+            val operand2 = stack.peekNthValue(0).bind().value as I64
+
+            if (operand2.value.toULong() == 0uL) {
+                Err(InvocationError.CannotDivideIntegerByZero).bind<Unit>()
+            }
+
+            stack.binaryOperation(Long::remu).bind()
+        }
 
         is NumericInstruction.I32Shl -> stack.binaryOperation(Int::shl).bind()
         is NumericInstruction.I64Shl -> stack.binaryOperation(Long::shl).bind()

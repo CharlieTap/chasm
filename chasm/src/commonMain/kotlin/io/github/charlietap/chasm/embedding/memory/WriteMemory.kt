@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.ChasmResult.Success
 import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceByteWriter
 import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceByteWriterImpl
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -37,7 +37,7 @@ internal fun writeMemory(
     byteOffsetInMemory: Int,
     value: Byte,
     byteWriter: MemoryInstanceByteWriter,
-): Result<Unit, ModuleRuntimeError> = binding {
+): Result<Unit, ModuleTrapError> = binding {
     val instance = store.memory(address).bind()
     byteWriter(instance, value, byteOffsetInMemory).bind()
 }

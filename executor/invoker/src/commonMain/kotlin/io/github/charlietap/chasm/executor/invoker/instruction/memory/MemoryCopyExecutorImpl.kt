@@ -2,6 +2,7 @@
 
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.memory.copy.MemoryInstanceCopier
@@ -30,15 +31,17 @@ internal fun MemoryCopyExecutorImpl(
     memoryInstanceCopier: MemoryInstanceCopier,
 ): Result<Unit, InvocationError> = binding {
 
+    val frame = stack.peekFrame().bind()
+    val memoryAddress = frame.state.module.memoryAddress(0).bind()
+    val memory = store.memory(memoryAddress).bind()
+
     val bytesToCopy = stack.popI32().bind()
     val sourceOffset = stack.popI32().bind()
     val destinationOffset = stack.popI32().bind()
 
-    if (bytesToCopy == 0) return@binding
-
-    val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(0).bind()
-    val memory = store.memory(memoryAddress).bind()
+    if (bytesToCopy < 0) {
+        Err(InvocationError.MemoryOperationOutOfBounds).bind<Unit>()
+    }
 
     val srcRange = sourceOffset..<(sourceOffset + bytesToCopy)
     val dstRange = destinationOffset..<(destinationOffset + bytesToCopy)

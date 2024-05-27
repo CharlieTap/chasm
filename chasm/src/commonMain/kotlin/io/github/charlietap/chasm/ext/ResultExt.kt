@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.ChasmResult.Success
 import io.github.charlietap.chasm.decoder.ModuleDecoderError
 import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.error.ModuleRuntimeError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import kotlin.jvm.JvmName
 
 @JvmName("decoderToChasmResult")
@@ -17,6 +17,6 @@ internal fun <S, E> Result<S, E>.toChasmResult(): ChasmResult<S, ChasmError>
 
 @JvmName("executorToChasmResult")
 internal fun <S, E> Result<S, E>.toChasmResult(): ChasmResult<S, ChasmError>
-where E : ModuleRuntimeError = fold(::Success) { error ->
+where E : ModuleTrapError = fold(::Success) { error ->
     return ChasmResult.Error(ChasmError.ExecutionError(error))
 }
