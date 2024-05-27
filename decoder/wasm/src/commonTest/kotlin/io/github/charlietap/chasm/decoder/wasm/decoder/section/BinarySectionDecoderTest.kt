@@ -18,7 +18,7 @@ import io.github.charlietap.chasm.decoder.wasm.decoder.section.memory.MemorySect
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.start.StartSectionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.table.TableSectionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.type.TypeSectionDecoder
-import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.decoder.wasm.reader.FakePositionReader
 import io.github.charlietap.chasm.decoder.wasm.section.CodeSection
 import io.github.charlietap.chasm.decoder.wasm.section.CustomSection
 import io.github.charlietap.chasm.decoder.wasm.section.DataCountSection
@@ -47,6 +47,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = CustomSection(Custom(NameValue(""), ubyteArrayOf()))
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val customSectionDecoder = CustomSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -54,7 +59,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(customSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -67,6 +72,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = TypeSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val typeSectionDecoder = TypeSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -74,7 +84,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(typeSectionDecoder = typeSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -87,6 +97,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = FunctionSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val functionSectionDecoder = FunctionSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -94,7 +109,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(functionSectionDecoder = functionSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -107,6 +122,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = GlobalSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val globalSectionDecoder = GlobalSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -114,7 +134,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(globalSectionDecoder = globalSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -127,6 +147,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = MemorySection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val memorySectionDecoder = MemorySectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -134,7 +159,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(memorySectionDecoder = memorySectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -147,6 +172,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = ImportSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val importSectionDecoder = ImportSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -154,7 +184,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(importSectionDecoder = importSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -167,6 +197,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = TableSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val tableSectionDecoder = TableSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -174,7 +209,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(tableSectionDecoder = tableSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -187,6 +222,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = ExportSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val exportSectionDecoder = ExportSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -194,7 +234,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(exportSectionDecoder = exportSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -207,6 +247,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = StartSection(StartFunction(Index.FunctionIndex(117u)))
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val startSectionDecoder = StartSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -214,7 +259,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(startSectionDecoder = startSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -227,6 +272,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = CodeSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val codeSectionDecoder = CodeSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -234,7 +284,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(codeSectionDecoder = codeSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -247,6 +297,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = DataSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val dataSectionDecoder = DataSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -254,7 +309,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(dataSectionDecoder = dataSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -267,6 +322,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = DataCountSection(117u)
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val dataCountSectionDecoder = DataCountSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -274,7 +334,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(dataCountSectionDecoder = dataCountSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }
@@ -287,6 +347,11 @@ class BinarySectionDecoderTest {
 
         val expectedSection = ElementSection(emptyList())
 
+        val positions = sequenceOf(0u, secSize.size).iterator()
+        val reader = FakePositionReader {
+            positions.next()
+        }
+
         val elementSectionDecoder = ElementSectionDecoder { _, size ->
             assertEquals(secSize, size)
             Ok(expectedSection)
@@ -294,7 +359,7 @@ class BinarySectionDecoderTest {
 
         val decoder = BinarySectionDecoder(elementSectionDecoder = elementSectionDecoder)
 
-        val actual = decoder(FakeWasmBinaryReader(), type, secSize)
+        val actual = decoder(reader, type, secSize)
 
         assertEquals(Ok(expectedSection), actual)
     }

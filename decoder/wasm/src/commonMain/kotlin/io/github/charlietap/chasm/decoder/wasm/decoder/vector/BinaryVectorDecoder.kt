@@ -12,7 +12,7 @@ internal fun <T> BinaryVectorDecoder(
 
     val vecLength = reader.uint().bind()
 
-    val vector = (1u..vecLength).map {
+    val vector = List(vecLength.toInt()) {
         subDecoder(reader).bind()
     }
 

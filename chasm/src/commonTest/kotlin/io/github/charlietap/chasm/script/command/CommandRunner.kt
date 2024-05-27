@@ -50,7 +50,7 @@ private fun CommandRunner(
     is ActionCommand -> actionCommandRunner(context, command)
     is AssertExhaustionCommand -> assertExhaustionCommandRunner(command)
     is AssertInvalidCommand -> assertInvalidCommandRunner(command)
-    is AssertMalformedCommand -> assertMalformedCommandRunner(command)
+    is AssertMalformedCommand -> assertMalformedCommandRunner(context, command)
     is AssertReturnCommand -> assertReturnCommandRunner(context, command)
     is AssertTrapCommand -> assertTrapCommandRunner(context, command)
     is AssertUninstantiableCommand -> assertUninstantiableCommandRunner(context, command)

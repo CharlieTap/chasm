@@ -1,3 +1,7 @@
 package io.github.charlietap.chasm.decoder.wasm.error
 
-sealed interface ModuleDecodeError : WasmDecodeError
+import io.github.charlietap.chasm.decoder.ModuleDecoderError
+
+sealed interface ModuleDecodeError : WasmDecodeError {
+    data object ModuleMalformed : ModuleDecoderError
+}

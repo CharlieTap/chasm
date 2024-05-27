@@ -32,4 +32,6 @@ sealed interface InstructionDecodeError : WasmDecodeError {
     value class InvalidCastFlags(val byte: UByte) : InstructionDecodeError
 
     data class InvalidPrefixInstruction(val prefix: UByte, val opcode: UInt) : InstructionDecodeError
+
+    data object ReservedByteNotZero : InstructionDecodeError
 }

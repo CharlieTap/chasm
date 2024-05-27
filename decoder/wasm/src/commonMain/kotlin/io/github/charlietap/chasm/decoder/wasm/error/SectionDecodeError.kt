@@ -23,4 +23,14 @@ sealed interface SectionDecodeError : WasmDecodeError {
 
     @JvmInline
     value class UnknownElementKind(val byte: Byte) : SectionDecodeError
+
+    data object MultipleStartFunctions : SectionDecodeError
+
+    data object DataCountMismatch : SectionDecodeError
+
+    data object DataCountRequired : SectionDecodeError
+
+    data object SectionSizeMismatch : SectionDecodeError
+
+    data object TooManyLocals : SectionDecodeError
 }

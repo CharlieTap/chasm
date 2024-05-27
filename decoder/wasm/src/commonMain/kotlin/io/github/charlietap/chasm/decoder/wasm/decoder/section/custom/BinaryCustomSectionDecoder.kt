@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.section.custom
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Custom
 import io.github.charlietap.chasm.decoder.wasm.decoder.value.name.BinaryNameValueDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.value.name.NameValueDecoder
+import io.github.charlietap.chasm.decoder.wasm.error.SectionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.wasm.ext.trackBytes
 import io.github.charlietap.chasm.decoder.wasm.reader.WasmBinaryReader
@@ -26,6 +28,10 @@ internal class BinaryCustomSectionDecoder(
         val nameValue = nameResult.bind()
         val payloadSize = size.size - bytesConsumed
         val payload = reader.ubytes(payloadSize).bind()
+
+        if (payloadSize != payload.size.toUInt()) {
+            Err(SectionDecodeError.SectionSizeMismatch).bind<Unit>()
+        }
 
         CustomSection(Custom(nameValue, payload))
     }
