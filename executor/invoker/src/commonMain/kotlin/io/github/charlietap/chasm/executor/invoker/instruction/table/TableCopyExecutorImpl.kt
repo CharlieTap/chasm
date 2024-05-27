@@ -32,11 +32,12 @@ internal fun TableCopyExecutorImpl(
     val srcOffset = stack.popI32().bind()
     val dstOffset = stack.popI32().bind()
 
-    if (srcOffset + elementsToCopy > srcTableInstance.elements.size || dstOffset + elementsToCopy > dstTableInstance.elements.size) {
+    if (elementsToCopy < 0 || srcOffset < 0 || dstOffset < 0 ||
+        srcOffset + elementsToCopy > srcTableInstance.elements.size ||
+        dstOffset + elementsToCopy > dstTableInstance.elements.size
+    ) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }
-
-    if (elementsToCopy == 0) return@binding
 
     val step = if (dstOffset <= srcOffset) 1 else -1
     val start = if (dstOffset <= srcOffset) 0 else elementsToCopy - 1

@@ -16,7 +16,7 @@ internal inline fun <T> LinearMemoryInteractorImpl(
 ): Result<T, InvocationError.MemoryOperationOutOfBounds> {
     val lastByte = offset + size
 
-    return if (lastByte > 0 && lastByte <= memory.size()) {
+    return if (offset >= 0 && size >= 0 && lastByte > 0 && lastByte <= memory.size()) {
         Ok(operation())
     } else {
         Err(InvocationError.MemoryOperationOutOfBounds)
