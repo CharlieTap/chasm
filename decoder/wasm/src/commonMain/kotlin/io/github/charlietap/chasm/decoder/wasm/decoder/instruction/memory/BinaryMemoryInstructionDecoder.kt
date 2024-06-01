@@ -74,11 +74,17 @@ internal fun BinaryMemoryInstructionDecoder(
         I64_STORE16 -> MemoryInstruction.I64Store16(memArgDecoder(reader).bind())
         I64_STORE32 -> MemoryInstruction.I64Store32(memArgDecoder(reader).bind())
         MEMORY_SIZE -> {
-            reader.byte().bind()
+            val byte = reader.byte().bind()
+            if (byte != 0.toByte()) {
+                Err(InstructionDecodeError.ReservedByteNotZero).bind<Unit>()
+            }
             MemoryInstruction.MemorySize
         }
         MEMORY_GROW -> {
-            reader.byte().bind()
+            val byte = reader.byte().bind()
+            if (byte != 0.toByte()) {
+                Err(InstructionDecodeError.ReservedByteNotZero).bind<Unit>()
+            }
             MemoryInstruction.MemoryGrow
         }
 

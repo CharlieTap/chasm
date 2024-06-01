@@ -23,7 +23,7 @@ internal fun BinaryInstructionBlockDecoder(
     val instructions = mutableListOf<Instruction>()
     do {
         val opcode = reader.ubyte().bind()
-        if (opcode != blockEndOpcode) { // TODO make this branchless
+        if (opcode != blockEndOpcode) {
             instructions += instructionDecoder(reader, opcode).bind()
         }
     } while (opcode != blockEndOpcode)

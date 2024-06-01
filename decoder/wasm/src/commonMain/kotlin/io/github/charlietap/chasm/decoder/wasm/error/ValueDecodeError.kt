@@ -9,4 +9,7 @@ interface ValueDecodeError : WasmDecodeError {
 
     @JvmInline
     value class InvalidDouble(val bytes: ByteArray) : ValueDecodeError
+
+    @JvmInline
+    value class InvalidName(val bytes: UByteArray) : ValueDecodeError
 }

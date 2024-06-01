@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.decoder.wasm.decoder.section
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.code.BinaryCodeSectionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.code.CodeSectionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.custom.BinaryCustomSectionDecoder
@@ -27,7 +29,9 @@ import io.github.charlietap.chasm.decoder.wasm.decoder.section.table.BinaryTable
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.table.TableSectionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.type.BinaryTypeSectionDecoder
 import io.github.charlietap.chasm.decoder.wasm.decoder.section.type.TypeSectionDecoder
+import io.github.charlietap.chasm.decoder.wasm.error.SectionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.error.WasmDecodeError
+import io.github.charlietap.chasm.decoder.wasm.ext.trackBytes
 import io.github.charlietap.chasm.decoder.wasm.reader.WasmBinaryReader
 import io.github.charlietap.chasm.decoder.wasm.section.Section
 import io.github.charlietap.chasm.decoder.wasm.section.SectionSize
@@ -50,6 +54,23 @@ internal class BinarySectionDecoder(
 ) : SectionDecoder {
 
     override fun invoke(
+        reader: WasmBinaryReader,
+        type: SectionType,
+        size: SectionSize,
+    ): Result<Section, WasmDecodeError> = binding {
+
+        val (section, bytesConsumed) = reader.trackBytes {
+            decodeSection(reader, type, size).bind()
+        }
+
+        if (size.size != bytesConsumed) {
+            Err(SectionDecodeError.SectionSizeMismatch).bind<Unit>()
+        }
+
+        section
+    }
+
+    private fun decodeSection(
         reader: WasmBinaryReader,
         type: SectionType,
         size: SectionSize,

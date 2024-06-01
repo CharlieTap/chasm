@@ -29,5 +29,5 @@ internal fun ModuleBuilder.section(section: Section) = when (section) {
     is MemorySection -> memories(section.memories)
     is GlobalSection -> globals(section.globals)
     is StartSection -> start(section.startFunction)
-    is DataCountSection -> this
+    is DataCountSection -> dataCount(section.dataCount)
 }

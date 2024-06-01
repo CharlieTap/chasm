@@ -95,3 +95,7 @@ internal fun FakeUBytesReader(
 internal fun FakeExhaustedReader(
     exhausted: () -> Result<Boolean, WasmDecodeError>,
 ): WasmBinaryReader = FakeWasmBinaryReader(fakeExhaustedReader = exhausted)
+
+internal fun FakePositionReader(
+    position: () -> UInt,
+): WasmBinaryReader = FakeWasmBinaryReader(fakePositionReader = position)
