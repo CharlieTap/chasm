@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.popFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popInstruction
 import io.github.charlietap.chasm.executor.runtime.ext.popLabel
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
+import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
@@ -87,7 +88,7 @@ internal inline fun WasmFunctionCallImpl(
         ),
     )
 
-    stack.push(frame)
+    stack.pushFrame(frame).bind()
 
     val label = Stack.Entry.Label(
         arity = Arity.Return(type.results.types.size),
