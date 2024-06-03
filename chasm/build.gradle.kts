@@ -9,10 +9,11 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.atomic.fu)
     alias(libs.plugins.kotlinx.test.resources)
-    id("kmp-conventions")
-    id("linting-conventions")
-    id("publishing-conventions")
-    id("io.github.charlietap.sweet.plugin")
+    alias(libs.plugins.wasm.testsuite)
+
+    alias(libs.plugins.conventions.kmp)
+    alias(libs.plugins.conventions.linting)
+    alias(libs.plugins.conventions.publishing)
 }
 
 kotlin {

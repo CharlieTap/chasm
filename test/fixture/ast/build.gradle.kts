@@ -3,8 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    id("kmp-conventions")
-    id("linting-conventions")
+
+    alias(libs.plugins.conventions.kmp)
+    alias(libs.plugins.conventions.linting)
 }
 
 kotlin {
