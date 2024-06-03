@@ -6,9 +6,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.atomic.fu)
     alias(libs.plugins.kotlinx.test.resources)
-    id("kmp-conventions")
-    id("linting-conventions")
-    id("publishing-conventions")
+
+    alias(libs.plugins.conventions.kmp)
+    alias(libs.plugins.conventions.linting)
+    alias(libs.plugins.conventions.publishing)
 }
 
 kotlin {

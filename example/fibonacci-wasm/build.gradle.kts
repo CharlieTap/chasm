@@ -5,7 +5,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    id("linting-conventions")
+
+    alias(libs.plugins.conventions.linting)
 }
 
 kotlin {

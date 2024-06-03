@@ -71,7 +71,14 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kotlin-symbol-processing = { id = "com.google.devtools.ksp", version.ref = "ksp"  }
 kotlin-atomic-fu = { id = "org.jetbrains.kotlin.plugin.atomicfu", version.ref = "kotlin"  }
 kotlinx-test-resources = { id = "com.goncalossilva.resources", version.ref = "kotlinx-test-resources"}
-kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter"  }
+kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
+maven-publish = { id = "maven-publish" }
+wasm-testsuite = { id = "io.github.charlietap.sweet.plugin" }
+
+conventions-kmp  = { id = "kmp-conventions" }
+conventions-linting  = { id = "linting-conventions" }
+conventions-publishing  = { id = "publishing-conventions" }
+conventions-versions  = { id = "versions-conventions" }
 
 [libraries]
 

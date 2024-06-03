@@ -97,12 +97,10 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             dependsOn(generateTestsTask)
         }
 
-        project.afterEvaluate {
-            val kotlinExtension = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
+        val kotlinExtension = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
-            kotlinExtension.sourceSets.getByName("commonTest") {
-                kotlin.srcDir(extension.testSuiteTestsDirectory)
-            }
+        kotlinExtension.sourceSets.getByName("commonTest") {
+            kotlin.srcDir(extension.testSuiteTestsDirectory)
         }
     }
 
