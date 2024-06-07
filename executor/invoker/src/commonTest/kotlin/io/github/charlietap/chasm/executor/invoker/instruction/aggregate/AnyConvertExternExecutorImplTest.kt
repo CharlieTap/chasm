@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.value.externReferenceValue
@@ -19,7 +19,7 @@ class AnyConvertExternExecutorImplTest {
         val stack = stack()
         val nullRef = nullReferenceValue()
 
-        stack.push(nullRef)
+        stack.pushValue(nullRef)
 
         val actual = AnyConvertExternExecutorImpl(stack)
 
@@ -34,7 +34,7 @@ class AnyConvertExternExecutorImplTest {
         val referenceValue = referenceValue()
         val externReferenceValue = externReferenceValue(referenceValue)
 
-        stack.push(externReferenceValue)
+        stack.pushValue(externReferenceValue)
 
         val actual = AnyConvertExternExecutorImpl(stack)
 

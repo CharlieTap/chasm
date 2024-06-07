@@ -7,7 +7,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
 internal inline fun RefEqExecutorImpl(
@@ -18,8 +18,8 @@ internal inline fun RefEqExecutorImpl(
     val referenceValue2 = stack.popValue().bind().value
 
     if (referenceValue1 == referenceValue2) {
-        stack.push(NumberValue.I32(1))
+        stack.pushValue(NumberValue.I32(1))
     } else {
-        stack.push(NumberValue.I32(0))
+        stack.pushValue(NumberValue.I32(0))
     }
 }

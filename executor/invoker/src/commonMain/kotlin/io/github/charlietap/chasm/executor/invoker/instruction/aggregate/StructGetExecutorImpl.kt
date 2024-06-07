@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.field
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popStructReference
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -59,5 +59,5 @@ internal inline fun StructGetExecutorImpl(
 
     val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack).bind()
 
-    stack.push(unpackedValue)
+    stack.pushValue(unpackedValue)
 }

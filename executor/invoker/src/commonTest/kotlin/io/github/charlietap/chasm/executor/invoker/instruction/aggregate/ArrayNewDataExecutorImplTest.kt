@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.memory.ext.copyInto
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -74,8 +74,8 @@ class ArrayNewDataExecutorImplTest {
 
         stack.push(frame)
 
-        stack.push(i32(offset))
-        stack.push(i32(size.toInt()))
+        stack.pushValue(i32(offset))
+        stack.pushValue(i32(size.toInt()))
 
         val definedTypeExpander: DefinedTypeExpander = { _definedType ->
             assertEquals(definedType, _definedType)

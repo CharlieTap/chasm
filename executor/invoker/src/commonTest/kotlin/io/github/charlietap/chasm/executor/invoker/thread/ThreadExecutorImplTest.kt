@@ -48,19 +48,25 @@ class ThreadExecutorImplTest {
         val instructions = (thread.instructions + listOf(AdminInstruction.Frame(frame))).asSequence().iterator()
 
         val stack1 = stack(
-            sequenceOf(
-                Value(locals[0]),
-                Value(locals[1]),
+            values = ArrayDeque(
+                listOf(
+                    Value(locals[0]),
+                    Value(locals[1]),
+                ),
             ),
         )
         val stack2 = stack(
-            sequenceOf(
-                Value(i32(6)),
+            values = ArrayDeque(
+                listOf(
+                    Value(i32(6)),
+                ),
             ),
         )
         val stack3 = stack(
-            sequenceOf(
-                Value(i32(0)),
+            values = ArrayDeque(
+                listOf(
+                    Value(i32(0)),
+                ),
             ),
         )
         val inputStacks = sequenceOf(stack1, stack2, stack3).iterator()

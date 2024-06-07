@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.type.matching.TypeMatcher
 import io.github.charlietap.chasm.executor.type.rolling.substitution.TypeSubstitutor
@@ -34,7 +34,7 @@ class RefTestExecutorImplTest {
 
         val referenceValue = referenceValue()
 
-        stack.push(referenceValue)
+        stack.pushValue(referenceValue)
 
         val referenceTypeSubstitutor: TypeSubstitutor<ReferenceType> = { _referenceType, _ ->
             assertEquals(referenceType, _referenceType)
@@ -78,7 +78,7 @@ class RefTestExecutorImplTest {
 
         val referenceValue = referenceValue()
 
-        stack.push(referenceValue)
+        stack.pushValue(referenceValue)
 
         val referenceTypeSubstitutor: TypeSubstitutor<ReferenceType> = { _referenceType, _ ->
             assertEquals(referenceType, _referenceType)

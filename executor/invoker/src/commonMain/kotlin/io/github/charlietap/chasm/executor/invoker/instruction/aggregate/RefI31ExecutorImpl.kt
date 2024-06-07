@@ -7,7 +7,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.wrapI31
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
@@ -28,5 +28,5 @@ internal inline fun RefI31ExecutorImpl(
 
     val i31 = i31Wrapper(value)
 
-    stack.push(i31)
+    stack.pushValue(i31)
 }

@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.gc.weakReference
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.arrayAddress
@@ -84,11 +84,11 @@ class ArrayCopyExecutorImplTest {
 
         stack.push(frame)
 
-        stack.push(arrayReferenceValue(dstArrayAddress))
-        stack.push(i32(0))
-        stack.push(arrayReferenceValue(srcArrayAddress))
-        stack.push(i32(0))
-        stack.push(i32(4))
+        stack.pushValue(arrayReferenceValue(dstArrayAddress))
+        stack.pushValue(i32(0))
+        stack.pushValue(arrayReferenceValue(srcArrayAddress))
+        stack.pushValue(i32(0))
+        stack.pushValue(i32(4))
 
         val expectedInstance = arrayInstance(
             definedType = definedType,

@@ -15,7 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.type.matching.DefinedTypeLookup
@@ -81,7 +81,7 @@ internal inline fun RefCastExecutorImpl(
     }
 
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
-        stack.push(otherReferenceValue)
+        stack.pushValue(otherReferenceValue)
     } else {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }

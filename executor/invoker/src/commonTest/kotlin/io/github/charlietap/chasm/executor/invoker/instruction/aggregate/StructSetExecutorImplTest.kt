@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.gc.weakReference
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -65,10 +65,10 @@ class StructSetExecutorImplTest {
         stack.push(frame)
 
         val referenceValue = structReferenceValue(structAddress)
-        stack.push(referenceValue)
+        stack.pushValue(referenceValue)
 
         val executionValue = executionValue()
-        stack.push(executionValue)
+        stack.pushValue(executionValue)
 
         val definedTypeExpander: DefinedTypeExpander = {
             assertEquals(definedType, it)

@@ -6,12 +6,19 @@ import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.instruction.executionInstruction
 import io.github.charlietap.chasm.fixture.value.executionValue
 
 fun stack(
-    entries: Sequence<Stack.Entry> = sequenceOf(),
+    frames: ArrayDeque<Stack.Entry.ActivationFrame> = ArrayDeque(),
+    instructions: ArrayDeque<Stack.Entry.Instruction> = ArrayDeque(),
+    labels: ArrayDeque<Stack.Entry.Label> = ArrayDeque(),
+    values: ArrayDeque<Stack.Entry.Value> = ArrayDeque(),
 ) = Stack(
-    entries = entries,
+    frames = frames,
+    instructions = instructions,
+    labels = labels,
+    values = values,
 )
 
 fun frameState(
@@ -32,6 +39,12 @@ fun frame(
     stackLabelsDepth = stackLabelsDepth,
     stackValuesDepth = stackValuesDepth,
     state = state,
+)
+
+fun instruction(
+    instruction: ExecutionInstruction = executionInstruction(),
+) = Stack.Entry.Instruction(
+    instruction = instruction,
 )
 
 fun label(

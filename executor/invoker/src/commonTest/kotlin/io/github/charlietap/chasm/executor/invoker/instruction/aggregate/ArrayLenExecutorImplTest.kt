@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.gc.weakReference
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.stack
@@ -32,7 +32,7 @@ class ArrayLenExecutorImplTest {
         )
 
         val referenceValue = arrayReferenceValue(arrayAddress)
-        stack.push(referenceValue)
+        stack.pushValue(referenceValue)
 
         val actual = ArrayLenExecutorImpl(store, stack)
 
