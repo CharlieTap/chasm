@@ -96,6 +96,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object IntegerOverflow : InvocationError
 
+    data object CallStackExhausted : InvocationError
+
     @JvmInline
     value class UnimplementedInstruction(val instruction: ExecutionInstruction) : InvocationError
 

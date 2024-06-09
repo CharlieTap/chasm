@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun ArrayNewElementExecutorImpl(
@@ -54,7 +54,7 @@ internal inline fun ArrayNewElementExecutorImpl(
     elementInstance.elements
         .slice(arrayStartOffsetInSegment until arrayEndOffsetInSegment)
         .forEach { referenceValue ->
-            stack.push(referenceValue)
+            stack.pushValue(referenceValue)
         }
 
     arrayNewFixedExecutor(store, stack, typeIndex, arrayLength.toUInt())

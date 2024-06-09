@@ -48,7 +48,7 @@ private fun CommandRunner(
     registerCommandRunner: RegisterCommandRunner,
 ): CommandResult = when (command) {
     is ActionCommand -> actionCommandRunner(context, command)
-    is AssertExhaustionCommand -> assertExhaustionCommandRunner(command)
+    is AssertExhaustionCommand -> assertExhaustionCommandRunner(context, command)
     is AssertInvalidCommand -> assertInvalidCommandRunner(command)
     is AssertMalformedCommand -> assertMalformedCommandRunner(context, command)
     is AssertReturnCommand -> assertReturnCommandRunner(context, command)

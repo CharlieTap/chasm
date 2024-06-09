@@ -15,7 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
@@ -80,35 +80,35 @@ internal fun ArrayCopyExecutorImpl(
     if (elementsToCopy == 0) return@binding
 
     if (destinationOffset <= sourceOffset) {
-        stack.push(destReference)
-        stack.push(NumberValue.I32(destinationOffset))
-        stack.push(srcReference)
-        stack.push(NumberValue.I32(sourceOffset))
+        stack.pushValue(destReference)
+        stack.pushValue(NumberValue.I32(destinationOffset))
+        stack.pushValue(srcReference)
+        stack.pushValue(NumberValue.I32(sourceOffset))
 
         arrayGetExecutor(store, stack, srcTypeIndex, false).bind()
         arraySetExecutor(store, stack, destTypeIndex).bind()
 
-        stack.push(destReference)
-        stack.push(NumberValue.I32(destinationOffset + 1))
-        stack.push(srcReference)
-        stack.push(NumberValue.I32(sourceOffset + 1))
+        stack.pushValue(destReference)
+        stack.pushValue(NumberValue.I32(destinationOffset + 1))
+        stack.pushValue(srcReference)
+        stack.pushValue(NumberValue.I32(sourceOffset + 1))
     } else {
 
-        stack.push(destReference)
-        stack.push(NumberValue.I32(destinationOffset + elementsToCopy - 1))
-        stack.push(srcReference)
-        stack.push(NumberValue.I32(sourceOffset + elementsToCopy - 1))
+        stack.pushValue(destReference)
+        stack.pushValue(NumberValue.I32(destinationOffset + elementsToCopy - 1))
+        stack.pushValue(srcReference)
+        stack.pushValue(NumberValue.I32(sourceOffset + elementsToCopy - 1))
 
         arrayGetExecutor(store, stack, srcTypeIndex, false).bind()
         arraySetExecutor(store, stack, destTypeIndex).bind()
 
-        stack.push(destReference)
-        stack.push(NumberValue.I32(destinationOffset))
-        stack.push(srcReference)
-        stack.push(NumberValue.I32(sourceOffset))
+        stack.pushValue(destReference)
+        stack.pushValue(NumberValue.I32(destinationOffset))
+        stack.pushValue(srcReference)
+        stack.pushValue(NumberValue.I32(sourceOffset))
     }
 
-    stack.push(NumberValue.I32(elementsToCopy - 1))
+    stack.pushValue(NumberValue.I32(elementsToCopy - 1))
     ArrayCopyExecutorImpl(
         store,
         stack,

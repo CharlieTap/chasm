@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
@@ -58,5 +58,5 @@ internal inline fun StructNewExecutorImpl(
     val address = Address.Struct(store.structs.size - 1)
     val reference = ReferenceValue.Struct(address, instance)
 
-    stack.push(reference)
+    stack.pushValue(reference)
 }

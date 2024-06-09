@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpanderImpl
@@ -46,7 +46,7 @@ internal inline fun ArrayNewDefaultExecutorImpl(
     val size = stack.popI32().bind()
     val value = arrayType.fieldType.default().bind()
     repeat(size) {
-        stack.push(value)
+        stack.pushValue(value)
     }
 
     arrayNewFixedExecutor(store, stack, typeIndex, size.toUInt())

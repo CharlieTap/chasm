@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpanderImpl
@@ -68,7 +68,7 @@ internal inline fun ArrayNewDataExecutorImpl(
         val elementBytes = byteArray.sliceArray(i until i + arrayElementSizeInBytes)
         val value = arrayType.fieldType.valueFromBytes(elementBytes).bind()
 
-        stack.push(value)
+        stack.pushValue(value)
     }
 
     arrayNewFixedExecutor(store, stack, typeIndex, arrayLength.toUInt())

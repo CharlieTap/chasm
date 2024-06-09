@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.extendSigned
 import io.github.charlietap.chasm.executor.runtime.ext.extendUnsigned
 import io.github.charlietap.chasm.executor.runtime.ext.popI31Reference
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
@@ -39,5 +39,5 @@ internal inline fun I31GetExecutorImpl(
         i31UnsignedExtender(value)
     }
 
-    stack.push(NumberValue.I32(extended))
+    stack.pushValue(NumberValue.I32(extended))
 }

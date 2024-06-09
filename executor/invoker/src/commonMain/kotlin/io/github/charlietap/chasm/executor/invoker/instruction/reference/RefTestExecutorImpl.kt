@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -81,8 +81,8 @@ internal inline fun RefTestExecutorImpl(
     }
 
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
-        stack.push(NumberValue.I32(1))
+        stack.pushValue(NumberValue.I32(1))
     } else {
-        stack.push(NumberValue.I32(0))
+        stack.pushValue(NumberValue.I32(0))
     }
 }

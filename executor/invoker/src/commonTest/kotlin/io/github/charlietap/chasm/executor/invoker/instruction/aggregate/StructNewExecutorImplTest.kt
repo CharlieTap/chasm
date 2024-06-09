@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
@@ -52,8 +52,8 @@ class StructNewExecutorImplTest {
         val executionValue1 = i32(0)
         val executionValue2 = i32(1)
 
-        stack.push(executionValue1)
-        stack.push(executionValue2)
+        stack.pushValue(executionValue1)
+        stack.pushValue(executionValue2)
 
         val definedTypeExpander: DefinedTypeExpander = {
             assertEquals(definedType, it)

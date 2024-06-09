@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
@@ -47,16 +47,16 @@ internal fun ArrayFillExecutorImpl(
 
     if (elementsToFill == 0) return@binding
 
-    stack.push(arrayReference)
-    stack.push(NumberValue.I32(arrayElementOffset))
+    stack.pushValue(arrayReference)
+    stack.pushValue(NumberValue.I32(arrayElementOffset))
     stack.push(fillValue)
 
     arraySetExecutor(store, stack, typeIndex).bind()
 
-    stack.push(arrayReference)
-    stack.push(NumberValue.I32(arrayElementOffset + 1))
+    stack.pushValue(arrayReference)
+    stack.pushValue(NumberValue.I32(arrayElementOffset + 1))
     stack.push(fillValue)
-    stack.push(NumberValue.I32(elementsToFill - 1))
+    stack.pushValue(NumberValue.I32(elementsToFill - 1))
 
     ArrayFillExecutorImpl(store, stack, typeIndex, arraySetExecutor).bind()
 }

@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -61,5 +61,5 @@ internal inline fun ArrayNewFixedExecutorImpl(
     val address = Address.Array(store.arrays.size - 1)
     val reference = ReferenceValue.Array(address, instance)
 
-    stack.push(reference)
+    stack.pushValue(reference)
 }

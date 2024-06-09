@@ -18,7 +18,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
@@ -78,17 +78,17 @@ internal fun ArrayInitDataExecutorImpl(
     val byteArray = dataInstance.bytes.sliceArray(sourceOffsetInByteArray until endOffsetInByteArray)
     val element = arrayType.fieldType.valueFromBytes(byteArray).bind()
 
-    stack.push(arrayReference)
-    stack.push(NumberValue.I32(destinationOffsetInArray))
-    stack.push(element)
+    stack.pushValue(arrayReference)
+    stack.pushValue(NumberValue.I32(destinationOffsetInArray))
+    stack.pushValue(element)
 
     arraySetExecutor(store, stack, typeIndex).bind()
 
-    stack.push(arrayReference)
+    stack.pushValue(arrayReference)
 
-    stack.push(NumberValue.I32(destinationOffsetInArray + 1))
-    stack.push(NumberValue.I32(sourceOffsetInByteArray + arrayElementSizeInBytes))
-    stack.push(NumberValue.I32(elementsToCopy - 1))
+    stack.pushValue(NumberValue.I32(destinationOffsetInArray + 1))
+    stack.pushValue(NumberValue.I32(sourceOffsetInByteArray + arrayElementSizeInBytes))
+    stack.pushValue(NumberValue.I32(elementsToCopy - 1))
 
     ArrayInitDataExecutorImpl(store, stack, typeIndex, dataIndex, definedTypeExpander, arraySetExecutor).bind()
 }

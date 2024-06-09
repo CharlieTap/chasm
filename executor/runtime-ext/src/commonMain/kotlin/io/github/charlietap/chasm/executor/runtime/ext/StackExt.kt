@@ -6,6 +6,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.Stack.Companion.MAX_DEPTH
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
@@ -16,7 +17,16 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import kotlin.jvm.JvmName
 
-inline fun Stack.push(value: ExecutionValue) = push(Stack.Entry.Value(value))
+inline fun Stack.pushFrame(frame: Stack.Entry.ActivationFrame): Result<Unit, InvocationError> {
+    return if (framesDepth() < MAX_DEPTH) {
+        push(frame)
+        Ok(Unit)
+    } else {
+        Err(InvocationError.CallStackExhausted)
+    }
+}
+
+inline fun Stack.pushValue(value: ExecutionValue) = push(Stack.Entry.Value(value))
 
 inline fun Stack.peekFrame(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
     return peekFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)

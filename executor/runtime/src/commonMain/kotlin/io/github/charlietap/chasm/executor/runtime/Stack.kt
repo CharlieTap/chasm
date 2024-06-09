@@ -31,7 +31,7 @@ data class Stack(
         instructions.addLast(Entry.Instruction(AdminInstruction.Frame(frame)))
     }
 
-    fun push(frame: Entry.Instruction) = instructions.addLast(frame)
+    fun push(instruction: Entry.Instruction) = instructions.addLast(instruction)
 
     fun push(label: Entry.Label) {
         labels.addLast(label)
@@ -129,6 +129,7 @@ data class Stack(
     }
 
     companion object {
-        private const val INITIAL_CAPACITY = 256
+        const val INITIAL_CAPACITY = 256
+        const val MAX_DEPTH = 1028
     }
 }

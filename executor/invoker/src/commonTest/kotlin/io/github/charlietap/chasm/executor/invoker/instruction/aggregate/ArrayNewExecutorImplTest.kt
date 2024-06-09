@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
@@ -21,9 +21,9 @@ class ArrayNewExecutorImplTest {
         val typeIndex = typeIndex(0u)
         val executionValue = executionValue()
 
-        stack.push(executionValue)
+        stack.pushValue(executionValue)
 
-        stack.push(i32(size.toInt()))
+        stack.pushValue(i32(size.toInt()))
 
         val arrayNewFixedExecutor: ArrayNewFixedExecutor = { _store, _stack, _typeIndex, _size ->
             assertEquals(store, _store)

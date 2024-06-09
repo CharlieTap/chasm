@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.gc.weakReference
-import io.github.charlietap.chasm.executor.runtime.ext.push
+import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.arrayAddress
@@ -90,10 +90,10 @@ class ArrayInitElementExecutorImplTest {
 
         stack.push(frame)
 
-        stack.push(arrayReferenceValue(arrayAddress))
-        stack.push(i32(0))
-        stack.push(i32(0))
-        stack.push(i32(1))
+        stack.pushValue(arrayReferenceValue(arrayAddress))
+        stack.pushValue(i32(0))
+        stack.pushValue(i32(0))
+        stack.pushValue(i32(1))
 
         val expectedInstance = arrayInstance(
             definedType = definedType,
