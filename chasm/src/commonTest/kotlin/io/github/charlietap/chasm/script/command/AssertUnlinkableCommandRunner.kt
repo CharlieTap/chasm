@@ -1,13 +1,27 @@
 package io.github.charlietap.chasm.script.command
 
+import io.github.charlietap.chasm.embedding.instance
+import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.flatMap
+import io.github.charlietap.chasm.fold
+import io.github.charlietap.chasm.script.ScriptContext
+import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.command.AssertUnlinkableCommand
 
-typealias AssertUnlinkableCommandRunner = (AssertUnlinkableCommand) -> CommandResult
+typealias AssertUnlinkableCommandRunner = (ScriptContext, AssertUnlinkableCommand) -> CommandResult
 
-@Suppress("UNUSED_PARAMETER")
 fun AssertUnlinkableCommandRunner(
+    context: ScriptContext,
     command: AssertUnlinkableCommand,
 ): CommandResult {
-    println("ignoring AssertUnlinkableCommand")
-    return CommandResult.Success
+    val moduleFilePath = context.binaryDirectory + "/" + command.filename
+    val bytes = moduleFilePath.readBytesFromPath()
+
+    return module(bytes).flatMap { module ->
+        instance(context.store, module, context.imports)
+    }.fold({ _ ->
+        CommandResult.Failure(command, "unlinkable module was instantiated when it should have failed")
+    }) {
+        CommandResult.Success
+    }
 }

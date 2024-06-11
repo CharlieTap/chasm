@@ -37,7 +37,7 @@ internal fun instance(
     importMatcher: ImportMatcher,
     instantiator: ModuleInstantiator,
 ): ChasmResult<ModuleInstance, ChasmError.ExecutionError> {
-    val orderedImports = importMatcher(module, imports).component1()
+    val orderedImports = importMatcher(store, module, imports).component1()
         ?: return Error(ChasmError.ExecutionError(InstantiationError.MissingImport))
     return instantiator(store, module, orderedImports)
         .mapError(ChasmError::ExecutionError)
