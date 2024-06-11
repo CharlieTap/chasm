@@ -54,7 +54,7 @@ private fun CommandRunner(
     is AssertReturnCommand -> assertReturnCommandRunner(context, command)
     is AssertTrapCommand -> assertTrapCommandRunner(context, command)
     is AssertUninstantiableCommand -> assertUninstantiableCommandRunner(context, command)
-    is AssertUnlinkableCommand -> assertUnlinkableCommandRunner(command)
+    is AssertUnlinkableCommand -> assertUnlinkableCommandRunner(context, command)
     is ModuleCommand -> moduleCommandRunner(context, command)
     is RegisterCommand -> registerCommandRunner(context, command)
 }
