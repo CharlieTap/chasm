@@ -10,14 +10,14 @@ import io.github.charlietap.chasm.error.ChasmError.ValidationError
 import io.github.charlietap.chasm.validator.WasmModuleValidator
 import io.github.charlietap.chasm.validator.WasmModuleValidatorImpl
 
-fun validate(module: Module): ChasmResult<Unit, ValidationError> {
+fun validate(module: Module): ChasmResult<Module, ValidationError> {
     return validate(module, ::WasmModuleValidatorImpl)
 }
 
 internal fun validate(
     module: Module,
     validator: WasmModuleValidator,
-): ChasmResult<Unit, ValidationError> {
+): ChasmResult<Module, ValidationError> {
     return validator(module)
         .mapError(::ValidationError)
         .fold(::Success, ::Error)

@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.validator.validator.function.FunctionValidator
 
 fun WasmModuleValidatorImpl(
     module: Module,
-): Result<Unit, ModuleValidatorError> =
+): Result<Module, ModuleValidatorError> =
     WasmModuleValidatorImpl(
         module = module,
         functionValidator = ::FunctionValidator,
@@ -18,11 +18,13 @@ fun WasmModuleValidatorImpl(
 internal fun WasmModuleValidatorImpl(
     module: Module,
     functionValidator: Validator<Function>,
-): Result<Unit, ModuleValidatorError> = binding {
+): Result<Module, ModuleValidatorError> = binding {
 
     val context = ValidationContext(module)
 
-    module.functions.forEach { function ->
-        functionValidator(context, function).bind()
+    module.apply {
+        functions.forEach { function ->
+            functionValidator(context, function).bind()
+        }
     }
 }
