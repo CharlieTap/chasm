@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -28,6 +29,8 @@ fun testRunner(
 
     return module(reader)
         .flatMap { module ->
+            validate(module)
+        }.flatMap { module ->
             instance(store, module, imports)
         }.flatMap { instance ->
 

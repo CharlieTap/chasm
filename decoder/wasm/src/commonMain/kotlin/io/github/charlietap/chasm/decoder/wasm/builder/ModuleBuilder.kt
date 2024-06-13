@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.module.Import
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.StartFunction
@@ -89,10 +90,12 @@ internal class ModuleBuilder(private val version: Version) {
             Err(SectionDecodeError.DataCountMismatch).bind<Unit>()
         }
 
+        val functionImports = imports.count { it.descriptor is Import.Descriptor.Function }
+
         val functions = functionHeaders.mapIndexed { index, header ->
             val body = functionBodies[index]
             Function(
-                header.idx,
+                Index.FunctionIndex(functionImports.toUInt() + header.idx.idx),
                 header.typeIndex,
                 body.locals,
                 body.body,

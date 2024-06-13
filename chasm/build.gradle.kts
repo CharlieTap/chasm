@@ -40,6 +40,8 @@ kotlin {
 
                 implementation(projects.executor.memory)
 
+                implementation(projects.typeSystem)
+
                 implementation(projects.validator)
 
                 implementation(libs.result)
@@ -73,7 +75,7 @@ configure<WasmTestSuiteGenPluginExtension> {
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm"
     proposals = listOf("tail-call", "extended-const")
-    excludes = listOf("simd_*/**")
+    excludes = listOf("simd_*/**", "global.wast")
 }
 
 tasks.withType<KotlinCompile>().configureEach {

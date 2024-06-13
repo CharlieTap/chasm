@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.memory.ext.copyInto
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.dataAddress
@@ -20,6 +19,7 @@ import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.mutableFieldType
 import io.github.charlietap.chasm.fixture.type.valueStorageType
 import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

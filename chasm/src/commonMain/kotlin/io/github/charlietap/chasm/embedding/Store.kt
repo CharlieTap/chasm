@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.executor.gc.WeakReference
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
@@ -10,6 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.weakref.WeakReference
 
 fun store(
     functions: MutableList<FunctionInstance> = mutableListOf(),

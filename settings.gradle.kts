@@ -42,20 +42,22 @@ include(":decoder")
 include(":decoder:wasm")
 include(":decoder:wat")
 
-include(":executor:gc")
 include(":executor:instantiator")
 include(":executor:invoker")
-include(":executor:numeric")
 include(":executor:memory")
 include(":executor:runtime")
 include(":executor:runtime-ext")
-include(":executor:type")
+
+include(":libs:sse2")
+include(":libs:stack")
+include(":libs:weakref")
 
 include(":test:fake:decoder")
 
 include(":test:fixture:ast")
 include(":test:fixture:executor:runtime")
 
+include(":type-system")
 include(":validator")
 
 includeBuild("example")

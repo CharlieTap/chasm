@@ -24,13 +24,13 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
-                api(projects.executor.numeric)
                 api(projects.executor.runtime)
                 api(projects.executor.runtimeExt)
-                api(projects.executor.type)
                 api(libs.result)
 
                 implementation(projects.executor.memory)
+                implementation(projects.libs.sse2)
+                implementation(projects.typeSystem)
             }
         }
 
