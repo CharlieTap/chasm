@@ -18,6 +18,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
+                api(libs.result)
             }
         }
 
