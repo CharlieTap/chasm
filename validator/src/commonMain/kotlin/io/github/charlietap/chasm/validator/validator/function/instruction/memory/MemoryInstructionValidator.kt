@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.validator.validator.function.instruction.memo
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.validator.ValidationContext
 import io.github.charlietap.chasm.validator.Validator
+import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 
 internal fun MemoryInstructionValidator(
