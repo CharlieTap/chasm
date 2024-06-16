@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.function.instruction.memory.MemoryInstructionValidator
+import io.github.charlietap.chasm.validator.validator.function.instruction.table.TableInstructionValidator
 
 internal fun InstructionValidator(
     context: ValidationContext,
@@ -27,12 +28,14 @@ internal fun InstructionValidator(
         context = context,
         instruction = instruction,
         memoryInstructionValidator = ::MemoryInstructionValidator,
+        tableInstructionValidator = ::TableInstructionValidator,
     )
 
 internal fun InstructionValidator(
     context: ValidationContext,
     instruction: Instruction,
     memoryInstructionValidator: Validator<MemoryInstruction>,
+    tableInstructionValidator: Validator<TableInstruction>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
         is AggregateInstruction -> Ok(Unit)
@@ -41,7 +44,7 @@ internal fun InstructionValidator(
         is MemoryInstruction -> memoryInstructionValidator(context, instruction)
         is ParametricInstruction -> Ok(Unit)
         is ReferenceInstruction -> Ok(Unit)
-        is TableInstruction -> Ok(Unit)
+        is TableInstruction -> tableInstructionValidator(context, instruction)
         is VariableInstruction -> Ok(Unit)
         is VectorInstruction -> Ok(Unit)
         else -> Err(InstructionValidatorError.UnknownInstruction)
