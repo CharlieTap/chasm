@@ -2,16 +2,20 @@ package io.github.charlietap.chasm.validator.validator.module
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.validator.element.ElementSegmentValidator
 import io.github.charlietap.chasm.validator.validator.export.ExportValidator
 import io.github.charlietap.chasm.validator.validator.function.FunctionValidator
 import io.github.charlietap.chasm.validator.validator.import.ImportValidator
+import io.github.charlietap.chasm.validator.validator.table.TableValidator
 
 internal fun ModuleValidator(
     context: ValidationContext,
@@ -23,6 +27,8 @@ internal fun ModuleValidator(
         functionValidator = ::FunctionValidator,
         importValidator = ::ImportValidator,
         exportValidator = ::ExportValidator,
+        elementSegmentValidator = ::ElementSegmentValidator,
+        tableValidator = ::TableValidator,
         multipleMemoriesValidator = ::MultipleMemoriesValidator,
     )
 
@@ -32,6 +38,8 @@ internal fun ModuleValidator(
     functionValidator: Validator<Function>,
     importValidator: Validator<Import>,
     exportValidator: Validator<Export>,
+    elementSegmentValidator: Validator<ElementSegment>,
+    tableValidator: Validator<Table>,
     multipleMemoriesValidator: Validator<Module>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
@@ -46,6 +54,12 @@ internal fun ModuleValidator(
         }
         exports.forEach { export ->
             exportValidator(context, export).bind()
+        }
+        elementSegments.forEach { segment ->
+            elementSegmentValidator(context, segment).bind()
+        }
+        tables.forEach { table ->
+            tableValidator(context, table).bind()
         }
     }
 }
