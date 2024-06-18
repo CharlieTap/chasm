@@ -15,8 +15,8 @@ import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpanderImpl
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun StructSetExecutorImpl(
     store: Store,

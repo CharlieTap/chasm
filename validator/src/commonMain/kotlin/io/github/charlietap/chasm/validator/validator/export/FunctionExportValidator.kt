@@ -12,7 +12,7 @@ internal fun FunctionExportValidator(
     context: ValidationContext,
     descriptor: Export.Descriptor.Function,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (descriptor.functionIndex.idx.toInt() !in context.validFunctionIndices) {
+    if (descriptor.functionIndex.idx.toInt() !in context.functions.indices) {
         Err(ExportValidatorError.UnknownFunction).bind<Unit>()
     }
 }

@@ -19,6 +19,8 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(libs.result)
+
+                implementation(projects.recursive)
             }
         }
 

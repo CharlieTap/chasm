@@ -17,8 +17,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpanderImpl
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun StructNewExecutorImpl(
     store: Store,

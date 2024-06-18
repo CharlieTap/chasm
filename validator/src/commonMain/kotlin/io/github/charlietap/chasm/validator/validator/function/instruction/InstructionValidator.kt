@@ -17,8 +17,10 @@ import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.validator.function.instruction.control.ControlInstructionValidator
 import io.github.charlietap.chasm.validator.validator.function.instruction.memory.MemoryInstructionValidator
 import io.github.charlietap.chasm.validator.validator.function.instruction.table.TableInstructionValidator
+import io.github.charlietap.chasm.validator.validator.function.instruction.variable.VariableInstructionValidator
 
 internal fun InstructionValidator(
     context: ValidationContext,
@@ -27,25 +29,29 @@ internal fun InstructionValidator(
     InstructionValidator(
         context = context,
         instruction = instruction,
+        controlInstructionValidator = ::ControlInstructionValidator,
         memoryInstructionValidator = ::MemoryInstructionValidator,
         tableInstructionValidator = ::TableInstructionValidator,
+        variableInstructionValidator = ::VariableInstructionValidator,
     )
 
 internal fun InstructionValidator(
     context: ValidationContext,
     instruction: Instruction,
+    controlInstructionValidator: Validator<ControlInstruction>,
     memoryInstructionValidator: Validator<MemoryInstruction>,
     tableInstructionValidator: Validator<TableInstruction>,
+    variableInstructionValidator: Validator<VariableInstruction>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
         is AggregateInstruction -> Ok(Unit)
-        is ControlInstruction -> Ok(Unit)
+        is ControlInstruction -> controlInstructionValidator(context, instruction)
         is NumericInstruction -> Ok(Unit)
         is MemoryInstruction -> memoryInstructionValidator(context, instruction)
         is ParametricInstruction -> Ok(Unit)
         is ReferenceInstruction -> Ok(Unit)
         is TableInstruction -> tableInstructionValidator(context, instruction)
-        is VariableInstruction -> Ok(Unit)
+        is VariableInstruction -> variableInstructionValidator(context, instruction)
         is VectorInstruction -> Ok(Unit)
         else -> Err(InstructionValidatorError.UnknownInstruction)
     }

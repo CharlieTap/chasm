@@ -2,18 +2,33 @@ package io.github.charlietap.chasm.validator.context
 
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.type.ext.functionType
 
 internal data class ValidationContext(
     val module: Module,
     val exportContext: ExportContext = ExportContextImpl(),
-) : ExportContext by exportContext {
+    val functionContext: FunctionContext = FunctionContextImpl(),
+) : ExportContext by exportContext,
+    FunctionContext by functionContext {
 
-    val validFunctionIndices by lazy {
-        val importedFunctions = module.imports.filter { it.descriptor is Import.Descriptor.Function }.size
-        val moduleFunctions = module.functions.size
-        val totalFunctions = importedFunctions + moduleFunctions
-
-        0..<totalFunctions
+    val functions by lazy {
+        val importedFunctions = module.imports.fold(mutableListOf<ResultType>()) { acc, import ->
+            val descriptor = import.descriptor
+            if (descriptor is Import.Descriptor.Function) {
+                val functionType = module.types[descriptor.typeIndex.idx.toInt()].recursiveType.definedType().functionType()
+                functionType?.results?.let {
+                    acc += functionType.results
+                }
+            }
+            acc
+        }
+        val moduleFunctions = module.functions.mapNotNull { function ->
+            val functionType = module.types[function.typeIndex.idx.toInt()].recursiveType.definedType().functionType()
+            functionType?.results
+        }
+        importedFunctions + moduleFunctions
     }
 
     val validGlobalIndices by lazy {

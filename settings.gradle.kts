@@ -56,6 +56,7 @@ include(":test:fake:decoder")
 include(":test:fixture:ast")
 include(":test:fixture:executor:runtime")
 
+include(":recursive")
 include(":validator")
 
 includeBuild("example")

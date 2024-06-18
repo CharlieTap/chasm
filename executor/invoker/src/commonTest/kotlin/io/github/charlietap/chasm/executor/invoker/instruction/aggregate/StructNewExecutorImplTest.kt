@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
@@ -19,6 +18,7 @@ import io.github.charlietap.chasm.fixture.type.structType
 import io.github.charlietap.chasm.fixture.value
 import io.github.charlietap.chasm.fixture.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

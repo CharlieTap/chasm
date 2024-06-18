@@ -31,6 +31,7 @@ kotlin {
                 api(libs.result)
 
                 implementation(projects.executor.memory)
+                implementation(projects.recursive)
             }
         }
 

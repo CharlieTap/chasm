@@ -4,11 +4,11 @@ import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.executor.invoker.ext.index
-import io.github.charlietap.chasm.executor.type.rolling.DefinedTypeRoller
-import io.github.charlietap.chasm.executor.type.rolling.DefinedTypeRollerImpl
-import io.github.charlietap.chasm.executor.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.executor.type.rolling.substitution.DefinedTypeSubstitutorImpl
-import io.github.charlietap.chasm.executor.type.rolling.substitution.TypeSubstitutor
+import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
+import io.github.charlietap.chasm.type.rolling.DefinedTypeRollerImpl
+import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
+import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutorImpl
+import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 fun TypeAllocatorImpl(
     recursiveTypes: List<RecursiveType>,

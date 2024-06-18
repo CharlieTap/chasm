@@ -24,6 +24,7 @@ kotlin {
         commonMain {
             dependencies {
                 api(projects.ast)
+                api(projects.recursive)
                 api(projects.executor.runtime)
                 api(projects.executor.runtimeExt)
                 api(libs.result)
