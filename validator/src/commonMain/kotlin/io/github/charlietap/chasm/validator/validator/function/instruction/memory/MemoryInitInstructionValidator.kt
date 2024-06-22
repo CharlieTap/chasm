@@ -8,17 +8,11 @@ import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 
-internal fun I64Load16UInstructionValidator(
+internal fun MemoryInitInstructionValidator(
     context: ValidationContext,
-    instruction: MemoryInstruction.I64Load16U,
+    instruction: MemoryInstruction.MemoryInit,
 ): Result<Unit, ModuleValidatorError> = binding {
-
     if (context.memories.isEmpty()) {
         Err(InstructionValidatorError.UnknownMemory).bind<Unit>()
-    }
-
-    when (instruction.memArg.align) {
-        in 0u..1u -> Unit
-        else -> Err(InstructionValidatorError.UnnaturalMemoryAlignment).bind<Unit>()
     }
 }

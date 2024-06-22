@@ -9,6 +9,8 @@ sealed interface InstructionValidatorError : ModuleValidatorError {
 
     data object UnknownLabel : InstructionValidatorError
 
+    data object UnknownMemory : InstructionValidatorError
+
     data object UnknownTable : InstructionValidatorError
 
     data object UnnaturalMemoryAlignment : InstructionValidatorError

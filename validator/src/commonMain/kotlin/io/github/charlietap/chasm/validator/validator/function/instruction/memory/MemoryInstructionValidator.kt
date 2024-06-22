@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.validator.validator.function.instruction.memory
 
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.validator.Validator
@@ -14,6 +13,7 @@ internal fun MemoryInstructionValidator(
     MemoryInstructionValidator(
         context = context,
         instruction = instruction,
+        dataDropValidator = ::DataDropInstructionValidator,
         i32Load8SValidator = ::I32Load8SInstructionValidator,
         i32Load8UValidator = ::I32Load8UInstructionValidator,
         i32Load16SValidator = ::I32Load16SInstructionValidator,
@@ -37,11 +37,17 @@ internal fun MemoryInstructionValidator(
         i64StoreValidator = ::I64StoreInstructionValidator,
         f32StoreValidator = ::F32StoreInstructionValidator,
         f64StoreValidator = ::F64StoreInstructionValidator,
+        memoryCopyValidator = ::MemoryCopyInstructionValidator,
+        memoryFillValidator = ::MemoryFillInstructionValidator,
+        memoryGrowValidator = ::MemoryGrowInstructionValidator,
+        memoryInitValidator = ::MemoryInitInstructionValidator,
+        memorySizeValidator = ::MemorySizeInstructionValidator,
     )
 
 internal fun MemoryInstructionValidator(
     context: ValidationContext,
     instruction: MemoryInstruction,
+    dataDropValidator: Validator<MemoryInstruction.DataDrop>,
     i32Load8SValidator: Validator<MemoryInstruction.I32Load8S>,
     i32Load8UValidator: Validator<MemoryInstruction.I32Load8U>,
     i32Load16SValidator: Validator<MemoryInstruction.I32Load16S>,
@@ -65,6 +71,11 @@ internal fun MemoryInstructionValidator(
     i64StoreValidator: Validator<MemoryInstruction.I64Store>,
     f32StoreValidator: Validator<MemoryInstruction.F32Store>,
     f64StoreValidator: Validator<MemoryInstruction.F64Store>,
+    memoryCopyValidator: Validator<MemoryInstruction.MemoryCopy>,
+    memoryFillValidator: Validator<MemoryInstruction.MemoryFill>,
+    memoryGrowValidator: Validator<MemoryInstruction.MemoryGrow>,
+    memoryInitValidator: Validator<MemoryInstruction.MemoryInit>,
+    memorySizeValidator: Validator<MemoryInstruction.MemorySize>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
         is MemoryInstruction.I32Load8S -> i32Load8SValidator(context, instruction)
@@ -90,11 +101,11 @@ internal fun MemoryInstructionValidator(
         is MemoryInstruction.I64Store -> i64StoreValidator(context, instruction)
         is MemoryInstruction.F32Store -> f32StoreValidator(context, instruction)
         is MemoryInstruction.F64Store -> f64StoreValidator(context, instruction)
-        is MemoryInstruction.DataDrop -> Ok(Unit)
-        is MemoryInstruction.MemoryInit -> Ok(Unit)
-        MemoryInstruction.MemoryCopy -> Ok(Unit)
-        MemoryInstruction.MemoryFill -> Ok(Unit)
-        MemoryInstruction.MemoryGrow -> Ok(Unit)
-        MemoryInstruction.MemorySize -> Ok(Unit)
+        is MemoryInstruction.DataDrop -> dataDropValidator(context, instruction)
+        is MemoryInstruction.MemoryInit -> memoryInitValidator(context, instruction)
+        is MemoryInstruction.MemoryCopy -> memoryCopyValidator(context, instruction)
+        is MemoryInstruction.MemoryFill -> memoryFillValidator(context, instruction)
+        is MemoryInstruction.MemoryGrow -> memoryGrowValidator(context, instruction)
+        is MemoryInstruction.MemorySize -> memorySizeValidator(context, instruction)
     }
 }
