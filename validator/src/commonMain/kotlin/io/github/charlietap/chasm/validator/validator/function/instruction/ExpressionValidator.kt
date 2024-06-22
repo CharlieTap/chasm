@@ -16,14 +16,20 @@ internal fun ExpressionValidator(
         context = context,
         expression = expression,
         instructionValidator = ::InstructionValidator,
+        constInstructionValidator = ::ConstInstructionValidator,
     )
 
 internal fun ExpressionValidator(
     context: ValidationContext,
     expression: Expression,
     instructionValidator: Validator<Instruction>,
+    constInstructionValidator: Validator<Instruction>,
 ): Result<Unit, ModuleValidatorError> = binding {
     expression.instructions.map { instruction ->
-        instructionValidator(context, instruction).bind()
+        if (context.expressionsMustBeConstant) {
+            constInstructionValidator(context, instruction).bind()
+        } else {
+            instructionValidator(context, instruction).bind()
+        }
     }
 }

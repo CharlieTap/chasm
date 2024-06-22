@@ -21,8 +21,10 @@ internal data class ValidationContext(
     val module: Module,
     val exportContext: ExportContext = ExportContextImpl(),
     val functionContext: FunctionContext = FunctionContextImpl(),
+    val globalContext: GlobalContext = GlobalContextImpl(),
 ) : ExportContext by exportContext,
-    FunctionContext by functionContext {
+    FunctionContext by functionContext,
+    GlobalContext by globalContext {
 
     val types by lazy {
         module.types.map(Type::recursiveType).fold(mutableListOf<DefinedType>()) { acc, recursiveType ->

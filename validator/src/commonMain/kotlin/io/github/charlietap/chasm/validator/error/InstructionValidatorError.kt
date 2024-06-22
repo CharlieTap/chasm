@@ -12,4 +12,8 @@ sealed interface InstructionValidatorError : ModuleValidatorError {
     data object UnknownTable : InstructionValidatorError
 
     data object UnnaturalMemoryAlignment : InstructionValidatorError
+
+    data object MutationOfAConstGlobal : InstructionValidatorError
+
+    data object ConstInstructionExpected : InstructionValidatorError
 }

@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Function
+import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table
@@ -16,6 +17,7 @@ import io.github.charlietap.chasm.validator.validator.data.DataSegmentValidator
 import io.github.charlietap.chasm.validator.validator.element.ElementSegmentValidator
 import io.github.charlietap.chasm.validator.validator.export.ExportValidator
 import io.github.charlietap.chasm.validator.validator.function.FunctionValidator
+import io.github.charlietap.chasm.validator.validator.global.GlobalValidator
 import io.github.charlietap.chasm.validator.validator.import.ImportValidator
 import io.github.charlietap.chasm.validator.validator.table.TableValidator
 
@@ -29,6 +31,7 @@ internal fun ModuleValidator(
         functionValidator = ::FunctionValidator,
         importValidator = ::ImportValidator,
         exportValidator = ::ExportValidator,
+        globalValidator = ::GlobalValidator,
         dataSegmentValidator = ::DataSegmentValidator,
         elementSegmentValidator = ::ElementSegmentValidator,
         tableValidator = ::TableValidator,
@@ -41,6 +44,7 @@ internal fun ModuleValidator(
     functionValidator: Validator<Function>,
     importValidator: Validator<Import>,
     exportValidator: Validator<Export>,
+    globalValidator: Validator<Global>,
     dataSegmentValidator: Validator<DataSegment>,
     elementSegmentValidator: Validator<ElementSegment>,
     tableValidator: Validator<Table>,
@@ -58,6 +62,9 @@ internal fun ModuleValidator(
         }
         exports.forEach { export ->
             exportValidator(context, export).bind()
+        }
+        globals.forEach { global ->
+            globalValidator(context, global).bind()
         }
         dataSegments.forEach { dataSegment ->
             dataSegmentValidator(context, dataSegment).bind()

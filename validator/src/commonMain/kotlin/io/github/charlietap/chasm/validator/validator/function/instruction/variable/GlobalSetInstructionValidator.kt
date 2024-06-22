@@ -4,15 +4,18 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.ext.global
 
 internal fun GlobalSetInstructionValidator(
     context: ValidationContext,
     instruction: VariableInstruction.GlobalSet,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (instruction.globalIdx.idx.toInt() !in context.globals.indices) {
-        Err(InstructionValidatorError.UnknownGlobal).bind<Unit>()
+    val globalType = context.global(instruction.globalIdx).bind()
+    if (globalType.mutability == Mutability.Const) {
+        Err(InstructionValidatorError.MutationOfAConstGlobal).bind<Unit>()
     }
 }
