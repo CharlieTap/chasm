@@ -12,7 +12,7 @@ internal fun GlobalExportValidator(
     context: ValidationContext,
     descriptor: Export.Descriptor.Global,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (descriptor.globalIndex.idx.toInt() !in context.validGlobalIndices) {
+    if (descriptor.globalIndex.idx.toInt() !in context.globals.indices) {
         Err(ExportValidatorError.UnknownGlobal).bind<Unit>()
     }
 }

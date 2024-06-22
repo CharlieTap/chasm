@@ -12,7 +12,7 @@ internal fun TableInitInstructionValidator(
     context: ValidationContext,
     instruction: TableInstruction.TableInit,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (instruction.tableIdx.idx.toInt() !in context.validTableIndices) {
+    if (instruction.tableIdx.idx.toInt() !in context.tables.indices) {
         Err(TableValidatorError.UnknownTable).bind<Unit>()
     }
     if (instruction.elemIdx.idx.toInt() !in context.module.elementSegments.indices) {

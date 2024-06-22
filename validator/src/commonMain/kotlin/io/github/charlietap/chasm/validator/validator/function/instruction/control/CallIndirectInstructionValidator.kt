@@ -7,12 +7,16 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.ext.functionType
 
-internal fun BreakInstructionValidator(
+internal fun CallIndirectValidator(
     context: ValidationContext,
-    instruction: ControlInstruction.Br,
+    instruction: ControlInstruction.CallIndirect,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (instruction.labelIndex.idx.toInt() !in context.labels.indices) {
-        Err(InstructionValidatorError.UnknownLabel).bind<Unit>()
+    if (instruction.tableIndex.idx.toInt() !in context.tables.indices) {
+        Err(InstructionValidatorError.UnknownTable).bind<Unit>()
     }
+
+    val functionType = context.functionType(instruction.typeIndex).bind()
+    context.labels.add(functionType.results)
 }

@@ -12,7 +12,7 @@ internal fun GlobalSetInstructionValidator(
     context: ValidationContext,
     instruction: VariableInstruction.GlobalSet,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (instruction.globalIdx.idx.toInt() !in context.validGlobalIndices) {
+    if (instruction.globalIdx.idx.toInt() !in context.globals.indices) {
         Err(InstructionValidatorError.UnknownGlobal).bind<Unit>()
     }
 }

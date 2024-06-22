@@ -14,37 +14,43 @@ internal fun ControlInstructionValidator(
     ControlInstructionValidator(
         context = context,
         instruction = instruction,
+        blockValidator = ::BlockInstructionValidator,
         breakValidator = ::BreakInstructionValidator,
+        breakTableValidator = ::BreakTableInstructionValidator,
         callValidator = ::CallInstructionValidator,
+        callIndirectValidator = ::CallIndirectValidator,
         loopValidator = ::LoopInstructionValidator,
     )
 
 internal fun ControlInstructionValidator(
     context: ValidationContext,
     instruction: ControlInstruction,
+    blockValidator: Validator<ControlInstruction.Block>,
     breakValidator: Validator<ControlInstruction.Br>,
+    breakTableValidator: Validator<ControlInstruction.BrTable>,
     callValidator: Validator<ControlInstruction.Call>,
+    callIndirectValidator: Validator<ControlInstruction.CallIndirect>,
     loopValidator: Validator<ControlInstruction.Loop>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
-        is ControlInstruction.Block -> Ok(Unit) // label
+        is ControlInstruction.Block -> blockValidator(context, instruction)
         is ControlInstruction.Br -> breakValidator(context, instruction)
         is ControlInstruction.BrIf -> Ok(Unit)
         is ControlInstruction.BrOnCast -> Ok(Unit)
         is ControlInstruction.BrOnCastFail -> Ok(Unit)
         is ControlInstruction.BrOnNonNull -> Ok(Unit)
         is ControlInstruction.BrOnNull -> Ok(Unit)
-        is ControlInstruction.BrTable -> Ok(Unit)
+        is ControlInstruction.BrTable -> breakTableValidator(context, instruction)
         is ControlInstruction.Call -> callValidator(context, instruction)
-        is ControlInstruction.CallIndirect -> Ok(Unit) // label
-        is ControlInstruction.CallRef -> Ok(Unit)
+        is ControlInstruction.CallIndirect -> callIndirectValidator(context, instruction)
+        is ControlInstruction.CallRef -> Ok(Unit) // label
         is ControlInstruction.If -> Ok(Unit)
         is ControlInstruction.Loop -> loopValidator(context, instruction)
         ControlInstruction.Nop -> Ok(Unit)
         ControlInstruction.Return -> Ok(Unit)
         is ControlInstruction.ReturnCall -> Ok(Unit) // label
-        is ControlInstruction.ReturnCallIndirect -> Ok(Unit)
-        is ControlInstruction.ReturnCallRef -> Ok(Unit)
+        is ControlInstruction.ReturnCallIndirect -> Ok(Unit) // label
+        is ControlInstruction.ReturnCallRef -> Ok(Unit) // label
         ControlInstruction.Unreachable -> Ok(Unit)
     }
 }

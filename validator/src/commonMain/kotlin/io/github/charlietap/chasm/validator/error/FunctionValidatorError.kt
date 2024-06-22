@@ -1,0 +1,5 @@
+package io.github.charlietap.chasm.validator.error
+
+sealed interface FunctionValidatorError : ModuleValidatorError {
+    data object UnknownType : FunctionValidatorError
+}

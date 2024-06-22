@@ -12,7 +12,7 @@ internal fun MemoryExportValidator(
     context: ValidationContext,
     descriptor: Export.Descriptor.Memory,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (descriptor.memoryIndex.idx.toInt() !in context.validMemoryIndices) {
+    if (descriptor.memoryIndex.idx.toInt() !in context.memories.indices) {
         Err(ExportValidatorError.UnknownMemory).bind<Unit>()
     }
 }

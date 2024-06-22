@@ -12,7 +12,7 @@ internal fun TableExportValidator(
     context: ValidationContext,
     descriptor: Export.Descriptor.Table,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (descriptor.tableIndex.idx.toInt() !in context.validTableIndices) {
+    if (descriptor.tableIndex.idx.toInt() !in context.tables.indices) {
         Err(ExportValidatorError.UnknownTable).bind<Unit>()
     }
 }

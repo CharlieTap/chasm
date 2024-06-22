@@ -8,11 +8,16 @@ import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 
-internal fun BreakInstructionValidator(
+internal fun BreakTableInstructionValidator(
     context: ValidationContext,
-    instruction: ControlInstruction.Br,
+    instruction: ControlInstruction.BrTable,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (instruction.labelIndex.idx.toInt() !in context.labels.indices) {
-        Err(InstructionValidatorError.UnknownLabel).bind<Unit>()
+
+    val labels = instruction.labelIndices + instruction.defaultLabelIndex
+
+    labels.forEach { label ->
+        if (label.idx.toInt() !in context.labels.indices) {
+            Err(InstructionValidatorError.UnknownLabel).bind<Unit>()
+        }
     }
 }

@@ -1,39 +1,38 @@
-package io.github.charlietap.chasm.validator.validator.element
+package io.github.charlietap.chasm.validator.validator.data
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.module.ElementSegment
+import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
-import io.github.charlietap.chasm.validator.error.ElementSegmentValidatorError
+import io.github.charlietap.chasm.validator.error.DataSegmentValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.function.instruction.ExpressionValidator
 
-internal fun ElementSegmentModeValidator(
+internal fun DataSegmentModeValidator(
     context: ValidationContext,
-    mode: ElementSegment.Mode,
+    mode: DataSegment.Mode,
 ): Result<Unit, ModuleValidatorError> =
-    ElementSegmentModeValidator(
+    DataSegmentModeValidator(
         context = context,
         mode = mode,
         expressionValidator = ::ExpressionValidator,
     )
 
-internal fun ElementSegmentModeValidator(
+internal fun DataSegmentModeValidator(
     context: ValidationContext,
-    mode: ElementSegment.Mode,
+    mode: DataSegment.Mode,
     expressionValidator: Validator<Expression>,
 ): Result<Unit, ModuleValidatorError> = binding {
     when (mode) {
-        is ElementSegment.Mode.Active -> {
-            if (mode.tableIndex.idx.toInt() !in context.tables.indices) {
-                Err(ElementSegmentValidatorError.UnknownTable).bind<Unit>()
+        is DataSegment.Mode.Active -> {
+            if (mode.memoryIndex.idx.toInt() !in context.memories.indices) {
+                Err(DataSegmentValidatorError.UnknownMemory).bind<Unit>()
             }
-            expressionValidator(context, mode.offsetExpr).bind()
+            expressionValidator(context, mode.offset).bind()
         }
-        ElementSegment.Mode.Declarative -> Unit
-        ElementSegment.Mode.Passive -> Unit
+        DataSegment.Mode.Passive -> Unit
     }
 }
