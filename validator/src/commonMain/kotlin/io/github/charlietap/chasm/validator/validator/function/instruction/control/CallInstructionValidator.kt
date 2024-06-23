@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.ext.functionType
 
 internal fun CallInstructionValidator(
     context: ValidationContext,
@@ -16,6 +17,6 @@ internal fun CallInstructionValidator(
         Err(InstructionValidatorError.UnknownFunction).bind<Unit>()
     }
 
-    val function = context.functions[instruction.functionIndex.idx.toInt()]
-    context.labels.add(function)
+    val functionType = context.functionType(instruction.functionIndex).bind()
+    context.labels.add(functionType.results)
 }

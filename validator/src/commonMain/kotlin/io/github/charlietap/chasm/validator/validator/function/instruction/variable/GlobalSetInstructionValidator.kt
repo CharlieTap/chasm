@@ -8,13 +8,13 @@ import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
-import io.github.charlietap.chasm.validator.ext.global
+import io.github.charlietap.chasm.validator.ext.globalType
 
 internal fun GlobalSetInstructionValidator(
     context: ValidationContext,
     instruction: VariableInstruction.GlobalSet,
 ): Result<Unit, ModuleValidatorError> = binding {
-    val globalType = context.global(instruction.globalIdx).bind()
+    val globalType = context.globalType(instruction.globalIdx).bind()
     if (globalType.mutability == Mutability.Const) {
         Err(InstructionValidatorError.MutationOfAConstGlobal).bind<Unit>()
     }

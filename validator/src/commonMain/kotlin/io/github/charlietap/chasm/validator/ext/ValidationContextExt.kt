@@ -18,13 +18,19 @@ internal fun ValidationContext.type(index: Index.TypeIndex): Result<DefinedType,
     }
 }
 
+internal fun ValidationContext.functionType(index: Index.FunctionIndex): Result<FunctionType, ModuleValidatorError> {
+    return functions.getOrNull(index.idx.toInt()).toResultOr {
+        FunctionValidatorError.UnknownType
+    }
+}
+
 internal fun ValidationContext.functionType(index: Index.TypeIndex): Result<FunctionType, ModuleValidatorError> {
     return types.getOrNull(index.idx.toInt())?.functionType().toResultOr {
         FunctionValidatorError.UnknownType
     }
 }
 
-internal fun ValidationContext.global(index: Index.GlobalIndex): Result<GlobalType, ModuleValidatorError> {
+internal fun ValidationContext.globalType(index: Index.GlobalIndex): Result<GlobalType, ModuleValidatorError> {
     return globals.getOrNull(index.idx.toInt()).toResultOr {
         InstructionValidatorError.UnknownGlobal
     }

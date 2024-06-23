@@ -8,9 +8,9 @@ import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
+import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
-import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRollerImpl
@@ -22,9 +22,11 @@ internal data class ValidationContext(
     val exportContext: ExportContext = ExportContextImpl(),
     val functionContext: FunctionContext = FunctionContextImpl(),
     val globalContext: GlobalContext = GlobalContextImpl(),
+    val typeContext: TypeContext = TypeContextImpl(),
 ) : ExportContext by exportContext,
     FunctionContext by functionContext,
-    GlobalContext by globalContext {
+    GlobalContext by globalContext,
+    TypeContext by typeContext {
 
     val types by lazy {
         module.types.map(Type::recursiveType).fold(mutableListOf<DefinedType>()) { acc, recursiveType ->
@@ -50,19 +52,18 @@ internal data class ValidationContext(
     }
 
     val functions by lazy {
-        val importedFunctions = module.imports.fold(mutableListOf<ResultType>()) { acc, import ->
+        val importedFunctions = module.imports.fold(mutableListOf<FunctionType>()) { acc, import ->
             val descriptor = import.descriptor
             if (descriptor is Import.Descriptor.Function) {
                 val functionType = types[descriptor.typeIndex.idx.toInt()].functionType()
                 functionType?.results?.let {
-                    acc += functionType.results
+                    acc += functionType
                 }
             }
             acc
         }
         val moduleFunctions = module.functions.mapNotNull { function ->
-            val functionType = types[function.typeIndex.idx.toInt()].functionType()
-            functionType?.results
+            types[function.typeIndex.idx.toInt()].functionType()
         }
         importedFunctions + moduleFunctions
     }

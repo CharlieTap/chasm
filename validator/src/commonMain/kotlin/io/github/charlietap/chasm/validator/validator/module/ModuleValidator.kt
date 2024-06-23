@@ -8,7 +8,9 @@ import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.module.Import
+import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.StartFunction
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
@@ -19,6 +21,8 @@ import io.github.charlietap.chasm.validator.validator.export.ExportValidator
 import io.github.charlietap.chasm.validator.validator.function.FunctionValidator
 import io.github.charlietap.chasm.validator.validator.global.GlobalValidator
 import io.github.charlietap.chasm.validator.validator.import.ImportValidator
+import io.github.charlietap.chasm.validator.validator.memory.MemoryValidator
+import io.github.charlietap.chasm.validator.validator.start.StartFunctionValidator
 import io.github.charlietap.chasm.validator.validator.table.TableValidator
 
 internal fun ModuleValidator(
@@ -34,6 +38,8 @@ internal fun ModuleValidator(
         globalValidator = ::GlobalValidator,
         dataSegmentValidator = ::DataSegmentValidator,
         elementSegmentValidator = ::ElementSegmentValidator,
+        memoryValidator = ::MemoryValidator,
+        startFunctionValidator = ::StartFunctionValidator,
         tableValidator = ::TableValidator,
         multipleMemoriesValidator = ::MultipleMemoriesValidator,
     )
@@ -47,6 +53,8 @@ internal fun ModuleValidator(
     globalValidator: Validator<Global>,
     dataSegmentValidator: Validator<DataSegment>,
     elementSegmentValidator: Validator<ElementSegment>,
+    memoryValidator: Validator<Memory>,
+    startFunctionValidator: Validator<StartFunction>,
     tableValidator: Validator<Table>,
     multipleMemoriesValidator: Validator<Module>,
 ): Result<Unit, ModuleValidatorError> = binding {
@@ -72,8 +80,14 @@ internal fun ModuleValidator(
         elementSegments.forEach { segment ->
             elementSegmentValidator(context, segment).bind()
         }
+        memories.forEach { memory ->
+            memoryValidator(context, memory).bind()
+        }
         tables.forEach { table ->
             tableValidator(context, table).bind()
+        }
+        startFunction?.let { function ->
+            startFunctionValidator(context, function).bind()
         }
     }
 }
