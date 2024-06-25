@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.function.instruction.control.ControlInstructionValidator
 import io.github.charlietap.chasm.validator.validator.function.instruction.memory.MemoryInstructionValidator
+import io.github.charlietap.chasm.validator.validator.function.instruction.reference.ReferenceInstructionValidator
 import io.github.charlietap.chasm.validator.validator.function.instruction.table.TableInstructionValidator
 import io.github.charlietap.chasm.validator.validator.function.instruction.variable.VariableInstructionValidator
 
@@ -31,6 +32,7 @@ internal fun InstructionValidator(
         instruction = instruction,
         controlInstructionValidator = ::ControlInstructionValidator,
         memoryInstructionValidator = ::MemoryInstructionValidator,
+        referenceInstructionValidator = ::ReferenceInstructionValidator,
         tableInstructionValidator = ::TableInstructionValidator,
         variableInstructionValidator = ::VariableInstructionValidator,
     )
@@ -40,6 +42,7 @@ internal fun InstructionValidator(
     instruction: Instruction,
     controlInstructionValidator: Validator<ControlInstruction>,
     memoryInstructionValidator: Validator<MemoryInstruction>,
+    referenceInstructionValidator: Validator<ReferenceInstruction>,
     tableInstructionValidator: Validator<TableInstruction>,
     variableInstructionValidator: Validator<VariableInstruction>,
 ): Result<Unit, ModuleValidatorError> {
@@ -49,7 +52,7 @@ internal fun InstructionValidator(
         is NumericInstruction -> Ok(Unit)
         is MemoryInstruction -> memoryInstructionValidator(context, instruction)
         is ParametricInstruction -> Ok(Unit)
-        is ReferenceInstruction -> Ok(Unit)
+        is ReferenceInstruction -> referenceInstructionValidator(context, instruction)
         is TableInstruction -> tableInstructionValidator(context, instruction)
         is VariableInstruction -> variableInstructionValidator(context, instruction)
         is VectorInstruction -> Ok(Unit)

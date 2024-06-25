@@ -15,4 +15,7 @@ internal fun MemoryInitInstructionValidator(
     if (context.memories.isEmpty()) {
         Err(InstructionValidatorError.UnknownMemory).bind<Unit>()
     }
+    if (instruction.dataIdx.idx.toInt() !in context.module.dataSegments.indices) {
+        Err(InstructionValidatorError.UnknownDataSegment).bind<Unit>()
+    }
 }

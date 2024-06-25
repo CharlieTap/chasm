@@ -26,9 +26,6 @@ internal fun FunctionValidator(
     expressionValidator: Validator<Expression>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
-    context.locals.clear()
-    context.labels.clear()
-
     val functionType = context.functionType(function.typeIndex).bind()
 
     context.locals += functionType.params.types + function.locals.map { local ->

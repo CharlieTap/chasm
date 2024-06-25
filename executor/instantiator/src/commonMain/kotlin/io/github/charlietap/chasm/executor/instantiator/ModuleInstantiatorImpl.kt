@@ -52,7 +52,6 @@ internal fun ModuleInstantiatorImpl(
     tableInitializer: TableInitializer,
     memoryInitializer: MemoryInitializer,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
-    // todo module validation
 
     if (module.imports.size != imports.size) {
         Err(InstantiationError.MissingImport).bind<ModuleInstance>()

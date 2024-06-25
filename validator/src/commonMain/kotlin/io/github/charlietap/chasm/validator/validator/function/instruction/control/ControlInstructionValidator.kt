@@ -19,6 +19,7 @@ internal fun ControlInstructionValidator(
         breakTableValidator = ::BreakTableInstructionValidator,
         callValidator = ::CallInstructionValidator,
         callIndirectValidator = ::CallIndirectValidator,
+        returnCallIndirectValidator = ::ReturnCallIndirectValidator,
         loopValidator = ::LoopInstructionValidator,
     )
 
@@ -30,6 +31,7 @@ internal fun ControlInstructionValidator(
     breakTableValidator: Validator<ControlInstruction.BrTable>,
     callValidator: Validator<ControlInstruction.Call>,
     callIndirectValidator: Validator<ControlInstruction.CallIndirect>,
+    returnCallIndirectValidator: Validator<ControlInstruction.ReturnCallIndirect>,
     loopValidator: Validator<ControlInstruction.Loop>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
@@ -46,11 +48,11 @@ internal fun ControlInstructionValidator(
         is ControlInstruction.CallRef -> Ok(Unit) // label
         is ControlInstruction.If -> Ok(Unit)
         is ControlInstruction.Loop -> loopValidator(context, instruction)
-        ControlInstruction.Nop -> Ok(Unit)
-        ControlInstruction.Return -> Ok(Unit)
+        is ControlInstruction.Nop -> Ok(Unit)
+        is ControlInstruction.Return -> Ok(Unit)
         is ControlInstruction.ReturnCall -> Ok(Unit) // label
-        is ControlInstruction.ReturnCallIndirect -> Ok(Unit) // label
+        is ControlInstruction.ReturnCallIndirect -> returnCallIndirectValidator(context, instruction)
         is ControlInstruction.ReturnCallRef -> Ok(Unit) // label
-        ControlInstruction.Unreachable -> Ok(Unit)
+        is ControlInstruction.Unreachable -> Ok(Unit)
     }
 }

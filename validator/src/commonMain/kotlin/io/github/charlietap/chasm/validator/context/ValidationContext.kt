@@ -22,10 +22,12 @@ internal data class ValidationContext(
     val exportContext: ExportContext = ExportContextImpl(),
     val functionContext: FunctionContext = FunctionContextImpl(),
     val globalContext: GlobalContext = GlobalContextImpl(),
+    val refsContext: RefsContext = RefsContextImpl(module),
     val typeContext: TypeContext = TypeContextImpl(),
 ) : ExportContext by exportContext,
     FunctionContext by functionContext,
     GlobalContext by globalContext,
+    RefsContext by refsContext,
     TypeContext by typeContext {
 
     val types by lazy {

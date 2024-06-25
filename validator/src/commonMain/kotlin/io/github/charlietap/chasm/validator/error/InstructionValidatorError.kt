@@ -3,6 +3,8 @@ package io.github.charlietap.chasm.validator.error
 sealed interface InstructionValidatorError : ModuleValidatorError {
     data object UnknownInstruction : InstructionValidatorError
 
+    data object UnknownDataSegment : InstructionValidatorError
+
     data object UnknownFunction : InstructionValidatorError
 
     data object UnknownGlobal : InstructionValidatorError
@@ -10,6 +12,8 @@ sealed interface InstructionValidatorError : ModuleValidatorError {
     data object UnknownLabel : InstructionValidatorError
 
     data object UnknownMemory : InstructionValidatorError
+
+    data object UnknownReference : InstructionValidatorError
 
     data object UnknownTable : InstructionValidatorError
 
