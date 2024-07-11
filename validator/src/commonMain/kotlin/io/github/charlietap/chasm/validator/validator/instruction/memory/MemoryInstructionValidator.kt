@@ -1,0 +1,111 @@
+package io.github.charlietap.chasm.validator.validator.instruction.memory
+
+import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.validator.Validator
+import io.github.charlietap.chasm.validator.context.ValidationContext
+import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+
+internal fun MemoryInstructionValidator(
+    context: ValidationContext,
+    instruction: MemoryInstruction,
+): Result<Unit, ModuleValidatorError> =
+    MemoryInstructionValidator(
+        context = context,
+        instruction = instruction,
+        dataDropValidator = ::DataDropInstructionValidator,
+        i32Load8SValidator = ::I32Load8SInstructionValidator,
+        i32Load8UValidator = ::I32Load8UInstructionValidator,
+        i32Load16SValidator = ::I32Load16SInstructionValidator,
+        i32Load16UValidator = ::I32Load16UInstructionValidator,
+        i32LoadValidator = ::I32LoadInstructionValidator,
+        i64Load8SValidator = ::I64Load8SInstructionValidator,
+        i64Load8UValidator = ::I64Load8UInstructionValidator,
+        i64Load16SValidator = ::I64Load16SInstructionValidator,
+        i64Load16UValidator = ::I64Load16UInstructionValidator,
+        i64Load32SValidator = ::I64Load32SInstructionValidator,
+        i64Load32UValidator = ::I64Load32UInstructionValidator,
+        i64LoadValidator = ::I64LoadInstructionValidator,
+        f32LoadValidator = ::F32LoadInstructionValidator,
+        f64LoadValidator = ::F64LoadInstructionValidator,
+        i32Store8Validator = ::I32Store8InstructionValidator,
+        i32Store16Validator = ::I32Store16InstructionValidator,
+        i32StoreValidator = ::I32StoreInstructionValidator,
+        i64Store8Validator = ::I64Store8InstructionValidator,
+        i64Store16Validator = ::I64Store16InstructionValidator,
+        i64Store32Validator = ::I64Store32InstructionValidator,
+        i64StoreValidator = ::I64StoreInstructionValidator,
+        f32StoreValidator = ::F32StoreInstructionValidator,
+        f64StoreValidator = ::F64StoreInstructionValidator,
+        memoryCopyValidator = ::MemoryCopyInstructionValidator,
+        memoryFillValidator = ::MemoryFillInstructionValidator,
+        memoryGrowValidator = ::MemoryGrowInstructionValidator,
+        memoryInitValidator = ::MemoryInitInstructionValidator,
+        memorySizeValidator = ::MemorySizeInstructionValidator,
+    )
+
+internal fun MemoryInstructionValidator(
+    context: ValidationContext,
+    instruction: MemoryInstruction,
+    dataDropValidator: Validator<MemoryInstruction.DataDrop>,
+    i32Load8SValidator: Validator<MemoryInstruction.I32Load8S>,
+    i32Load8UValidator: Validator<MemoryInstruction.I32Load8U>,
+    i32Load16SValidator: Validator<MemoryInstruction.I32Load16S>,
+    i32Load16UValidator: Validator<MemoryInstruction.I32Load16U>,
+    i32LoadValidator: Validator<MemoryInstruction.I32Load>,
+    i64Load8SValidator: Validator<MemoryInstruction.I64Load8S>,
+    i64Load8UValidator: Validator<MemoryInstruction.I64Load8U>,
+    i64Load16SValidator: Validator<MemoryInstruction.I64Load16S>,
+    i64Load16UValidator: Validator<MemoryInstruction.I64Load16U>,
+    i64Load32SValidator: Validator<MemoryInstruction.I64Load32S>,
+    i64Load32UValidator: Validator<MemoryInstruction.I64Load32U>,
+    i64LoadValidator: Validator<MemoryInstruction.I64Load>,
+    f32LoadValidator: Validator<MemoryInstruction.F32Load>,
+    f64LoadValidator: Validator<MemoryInstruction.F64Load>,
+    i32Store8Validator: Validator<MemoryInstruction.I32Store8>,
+    i32Store16Validator: Validator<MemoryInstruction.I32Store16>,
+    i32StoreValidator: Validator<MemoryInstruction.I32Store>,
+    i64Store8Validator: Validator<MemoryInstruction.I64Store8>,
+    i64Store32Validator: Validator<MemoryInstruction.I64Store32>,
+    i64Store16Validator: Validator<MemoryInstruction.I64Store16>,
+    i64StoreValidator: Validator<MemoryInstruction.I64Store>,
+    f32StoreValidator: Validator<MemoryInstruction.F32Store>,
+    f64StoreValidator: Validator<MemoryInstruction.F64Store>,
+    memoryCopyValidator: Validator<MemoryInstruction.MemoryCopy>,
+    memoryFillValidator: Validator<MemoryInstruction.MemoryFill>,
+    memoryGrowValidator: Validator<MemoryInstruction.MemoryGrow>,
+    memoryInitValidator: Validator<MemoryInstruction.MemoryInit>,
+    memorySizeValidator: Validator<MemoryInstruction.MemorySize>,
+): Result<Unit, ModuleValidatorError> {
+    return when (instruction) {
+        is MemoryInstruction.I32Load8S -> i32Load8SValidator(context, instruction)
+        is MemoryInstruction.I32Load8U -> i32Load8UValidator(context, instruction)
+        is MemoryInstruction.I32Load16S -> i32Load16SValidator(context, instruction)
+        is MemoryInstruction.I32Load16U -> i32Load16UValidator(context, instruction)
+        is MemoryInstruction.I32Load -> i32LoadValidator(context, instruction)
+        is MemoryInstruction.I64Load8S -> i64Load8SValidator(context, instruction)
+        is MemoryInstruction.I64Load8U -> i64Load8UValidator(context, instruction)
+        is MemoryInstruction.I64Load16S -> i64Load16SValidator(context, instruction)
+        is MemoryInstruction.I64Load16U -> i64Load16UValidator(context, instruction)
+        is MemoryInstruction.I64Load32S -> i64Load32SValidator(context, instruction)
+        is MemoryInstruction.I64Load32U -> i64Load32UValidator(context, instruction)
+        is MemoryInstruction.I64Load -> i64LoadValidator(context, instruction)
+        is MemoryInstruction.F32Load -> f32LoadValidator(context, instruction)
+        is MemoryInstruction.F64Load -> f64LoadValidator(context, instruction)
+        is MemoryInstruction.I32Store8 -> i32Store8Validator(context, instruction)
+        is MemoryInstruction.I32Store16 -> i32Store16Validator(context, instruction)
+        is MemoryInstruction.I32Store -> i32StoreValidator(context, instruction)
+        is MemoryInstruction.I64Store8 -> i64Store8Validator(context, instruction)
+        is MemoryInstruction.I64Store16 -> i64Store16Validator(context, instruction)
+        is MemoryInstruction.I64Store32 -> i64Store32Validator(context, instruction)
+        is MemoryInstruction.I64Store -> i64StoreValidator(context, instruction)
+        is MemoryInstruction.F32Store -> f32StoreValidator(context, instruction)
+        is MemoryInstruction.F64Store -> f64StoreValidator(context, instruction)
+        is MemoryInstruction.DataDrop -> dataDropValidator(context, instruction)
+        is MemoryInstruction.MemoryInit -> memoryInitValidator(context, instruction)
+        is MemoryInstruction.MemoryCopy -> memoryCopyValidator(context, instruction)
+        is MemoryInstruction.MemoryFill -> memoryFillValidator(context, instruction)
+        is MemoryInstruction.MemoryGrow -> memoryGrowValidator(context, instruction)
+        is MemoryInstruction.MemorySize -> memorySizeValidator(context, instruction)
+    }
+}

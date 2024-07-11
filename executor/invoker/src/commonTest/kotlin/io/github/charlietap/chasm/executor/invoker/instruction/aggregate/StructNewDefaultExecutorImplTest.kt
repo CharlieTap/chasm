@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.runtime.ext.default
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
@@ -14,6 +13,7 @@ import io.github.charlietap.chasm.fixture.type.fieldType
 import io.github.charlietap.chasm.fixture.type.structCompositeType
 import io.github.charlietap.chasm.fixture.type.structType
 import io.github.charlietap.chasm.fixture.value
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

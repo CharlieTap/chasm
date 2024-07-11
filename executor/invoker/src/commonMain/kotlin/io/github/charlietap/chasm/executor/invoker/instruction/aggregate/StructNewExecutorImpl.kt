@@ -5,7 +5,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.gc.weakReference
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -17,8 +16,9 @@ import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.executor.type.expansion.DefinedTypeExpanderImpl
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
+import io.github.charlietap.chasm.weakref.weakReference
 
 internal fun StructNewExecutorImpl(
     store: Store,

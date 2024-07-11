@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
+import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
@@ -17,7 +18,6 @@ import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.VectorValue
-import io.github.charlietap.chasm.executor.type.ext.functionType
 
 @Suppress("UNUSED_PARAMETER")
 internal fun HostFunctionCallImpl(

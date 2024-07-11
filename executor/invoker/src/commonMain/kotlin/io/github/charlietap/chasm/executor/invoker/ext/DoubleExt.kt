@@ -2,7 +2,7 @@
 
 package io.github.charlietap.chasm.executor.invoker.ext
 
-import io.github.charlietap.chasm.executor.numeric.ext.fsqrt
+import io.github.charlietap.chasm.sse2.ext.fsqrt
 import kotlin.math.round
 import kotlin.math.truncate
 import kotlin.math.withSign

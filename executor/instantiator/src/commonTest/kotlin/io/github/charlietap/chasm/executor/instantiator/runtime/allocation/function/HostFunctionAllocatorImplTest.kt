@@ -4,9 +4,9 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.function.Host
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.type.ext.definedType
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

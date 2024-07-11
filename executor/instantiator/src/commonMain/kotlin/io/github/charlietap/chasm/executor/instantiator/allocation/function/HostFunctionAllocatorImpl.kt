@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.type.ext.definedType
+import io.github.charlietap.chasm.type.ext.definedType
 
 fun HostFunctionAllocatorImpl(
     store: Store,

@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.script.command
 
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.flatMap
 import io.github.charlietap.chasm.fold
 import io.github.charlietap.chasm.script.ScriptContext
@@ -18,6 +19,8 @@ fun AssertUnlinkableCommandRunner(
     val bytes = moduleFilePath.readBytesFromPath()
 
     return module(bytes).flatMap { module ->
+        validate(module)
+    }.flatMap { module ->
         instance(context.store, module, context.imports)
     }.fold({ _ ->
         CommandResult.Failure(command, "unlinkable module was instantiated when it should have failed")

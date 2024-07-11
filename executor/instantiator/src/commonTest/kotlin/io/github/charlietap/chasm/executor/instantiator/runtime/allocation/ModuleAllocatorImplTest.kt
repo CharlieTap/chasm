@@ -16,8 +16,6 @@ import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.executor.type.ext.definedType
-import io.github.charlietap.chasm.executor.type.ext.recursiveType
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.dataSegment
 import io.github.charlietap.chasm.fixture.module.elementSegment
@@ -36,6 +34,8 @@ import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.type.ext.recursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

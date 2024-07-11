@@ -10,21 +10,21 @@ import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.invoker.ext.index
+import io.github.charlietap.chasm.executor.invoker.type.TypeOf
+import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.peekReference
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.executor.type.matching.DefinedTypeLookup
-import io.github.charlietap.chasm.executor.type.matching.ReferenceTypeMatcher
-import io.github.charlietap.chasm.executor.type.matching.TypeMatcher
-import io.github.charlietap.chasm.executor.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.executor.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.executor.type.rolling.substitution.ReferenceTypeSubstitutorImpl
-import io.github.charlietap.chasm.executor.type.rolling.substitution.TypeSubstitutor
-import io.github.charlietap.chasm.executor.type.value.TypeOf
-import io.github.charlietap.chasm.executor.type.value.TypeOfReferenceValue
+import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
+import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
+import io.github.charlietap.chasm.type.matching.TypeMatcher
+import io.github.charlietap.chasm.type.matching.TypeMatcherContext
+import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
+import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutorImpl
+import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 internal inline fun BrOnCastExecutorImpl(
     store: Store,

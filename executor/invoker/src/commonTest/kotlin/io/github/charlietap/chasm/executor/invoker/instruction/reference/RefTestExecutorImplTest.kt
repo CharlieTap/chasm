@@ -3,11 +3,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.executor.type.matching.TypeMatcher
-import io.github.charlietap.chasm.executor.type.rolling.substitution.TypeSubstitutor
-import io.github.charlietap.chasm.executor.type.value.TypeOf
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
@@ -15,6 +13,8 @@ import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.referenceType
 import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.fixture.value.referenceValue
+import io.github.charlietap.chasm.type.matching.TypeMatcher
+import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

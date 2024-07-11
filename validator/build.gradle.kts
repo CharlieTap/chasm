@@ -18,6 +18,10 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
+                api(libs.result)
+
+                implementation(projects.typeSystem)
+                implementation(projects.libs.stack)
             }
         }
 
