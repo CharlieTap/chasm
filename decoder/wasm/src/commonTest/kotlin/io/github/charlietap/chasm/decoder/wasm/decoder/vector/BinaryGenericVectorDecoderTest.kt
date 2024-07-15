@@ -2,7 +2,8 @@ package io.github.charlietap.chasm.decoder.wasm.decoder.vector
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.value.NameValue
-import io.github.charlietap.chasm.decoder.wasm.decoder.value.name.NameValueDecoder
+import io.github.charlietap.chasm.decoder.wasm.Decoder
+import io.github.charlietap.chasm.decoder.wasm.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.wasm.fixture.ioError
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.wasm.reader.IOErrorWasmFileReader
@@ -21,13 +22,14 @@ class BinaryGenericVectorDecoderTest {
         val expected = Ok(Vector(expectedNames))
 
         val reader = FakeUIntReader { Ok(2u) }
+        val context = decoderContext(reader)
 
         val names = sequenceOf(NameValue("one"), NameValue("two")).iterator()
-        val subDecoder: NameValueDecoder = {
+        val subDecoder: Decoder<NameValue> = {
             Ok(names.next())
         }
 
-        val actual = BinaryVectorDecoder(reader, subDecoder)
+        val actual = VectorDecoder(context, subDecoder)
 
         assertEquals(expected, actual)
     }
@@ -36,12 +38,13 @@ class BinaryGenericVectorDecoderTest {
     fun `can catch io exceptions from the wasm file reader`() {
         val expected = ioError()
         val reader = IOErrorWasmFileReader(expected)
+        val context = decoderContext(reader)
 
-        val subDecoder: NameValueDecoder = {
+        val subDecoder: Decoder<NameValue> = {
             Ok(NameValue(""))
         }
 
-        val actual = BinaryVectorDecoder(reader, subDecoder)
+        val actual = VectorDecoder(context, subDecoder)
 
         assertEquals(expected, actual)
     }

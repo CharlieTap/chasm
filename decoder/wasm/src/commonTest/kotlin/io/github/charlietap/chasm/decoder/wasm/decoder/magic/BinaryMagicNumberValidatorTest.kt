@@ -19,7 +19,7 @@ class BinaryMagicNumberValidatorTest {
             Ok(MAGIC_NUMBER)
         }
 
-        val actual = io.github.charlietap.chasm.decoder.wasm.decoder.magic.BinaryMagicNumberValidator(reader)
+        val actual = BinaryMagicNumberValidator(reader)
 
         assertEquals(Ok(Unit), actual)
     }
@@ -33,7 +33,7 @@ class BinaryMagicNumberValidatorTest {
             Ok(invalidMagicNumber)
         }
 
-        val actual = io.github.charlietap.chasm.decoder.wasm.decoder.magic.BinaryMagicNumberValidator(reader)
+        val actual = BinaryMagicNumberValidator(reader)
 
         assertEquals(Err(WasmDecodeError.InvalidWasmFile(invalidMagicNumber)), actual)
     }
@@ -44,7 +44,7 @@ class BinaryMagicNumberValidatorTest {
         val err = ioError()
         val reader = IOErrorWasmFileReader(err)
 
-        val actual = io.github.charlietap.chasm.decoder.wasm.decoder.magic.BinaryMagicNumberValidator(reader)
+        val actual = BinaryMagicNumberValidator(reader)
 
         assertEquals(err, actual)
     }

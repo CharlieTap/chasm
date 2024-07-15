@@ -3,12 +3,13 @@ package io.github.charlietap.chasm.decoder.wasm
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.decoder.FakeSourceReader
+import io.github.charlietap.chasm.decoder.wasm.context.scope.Scope
 import io.github.charlietap.chasm.decoder.wasm.decoder.factory.BinaryReaderFactory
 import io.github.charlietap.chasm.decoder.wasm.decoder.magic.MagicNumberValidator
-import io.github.charlietap.chasm.decoder.wasm.decoder.section.SectionDecoder
-import io.github.charlietap.chasm.decoder.wasm.decoder.section.SectionTypeDecoder
-import io.github.charlietap.chasm.decoder.wasm.decoder.version.VersionDecoder
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeExhaustedReader
+import io.github.charlietap.chasm.decoder.wasm.section.Section
+import io.github.charlietap.chasm.decoder.wasm.section.SectionSize
+import io.github.charlietap.chasm.decoder.wasm.section.SectionType
 import io.github.charlietap.chasm.fixture.module.module
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,17 +34,21 @@ class WasmModuleDecoderTest {
             Ok(Unit)
         }
 
-        val versionDecoder: VersionDecoder = { _reader ->
-            assertEquals(reader, _reader)
+        val versionDecoder: Decoder<Version> = { context ->
+            assertEquals(reader, context.reader)
             Ok(version)
         }
 
-        val sectionTypeDecoder: SectionTypeDecoder = { _ ->
+        val sectionTypeDecoder: Decoder<SectionType> = { _ ->
             fail("Section type decoder should not be called in this scenario")
         }
 
-        val sectionDecoder = SectionDecoder { _, _, _ ->
+        val sectionDecoder: Decoder<Section> = { _ ->
             fail("Section decoder should not be called in this scenario")
+        }
+
+        val scope: Scope<Pair<SectionSize, SectionType>> = { _, _ ->
+            fail("Scope should not be called in this scenario")
         }
 
         val expected = module(
@@ -57,6 +62,7 @@ class WasmModuleDecoderTest {
             versionDecoder = versionDecoder,
             sectionTypeDecoder = sectionTypeDecoder,
             sectionDecoder = sectionDecoder,
+            scope = scope,
         )
 
         assertEquals(Ok(expected), actual)
