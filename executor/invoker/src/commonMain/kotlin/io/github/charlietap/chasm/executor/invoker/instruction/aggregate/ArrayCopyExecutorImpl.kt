@@ -15,9 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
@@ -80,42 +78,16 @@ internal fun ArrayCopyExecutorImpl(
     if (elementsToCopy == 0) return@binding
 
     if (destinationOffset <= sourceOffset) {
-        stack.pushValue(destReference)
-        stack.pushValue(NumberValue.I32(destinationOffset))
-        stack.pushValue(srcReference)
-        stack.pushValue(NumberValue.I32(sourceOffset))
-
-        arrayGetExecutor(store, stack, srcTypeIndex, false).bind()
-        arraySetExecutor(store, stack, destTypeIndex).bind()
-
-        stack.pushValue(destReference)
-        stack.pushValue(NumberValue.I32(destinationOffset + 1))
-        stack.pushValue(srcReference)
-        stack.pushValue(NumberValue.I32(sourceOffset + 1))
+        // forward copy
+        repeat(elementsToCopy) { copyOffset ->
+            val field = source.fields[sourceOffset + copyOffset]
+            destination.fields[destinationOffset + copyOffset] = field
+        }
     } else {
-
-        stack.pushValue(destReference)
-        stack.pushValue(NumberValue.I32(destinationOffset + elementsToCopy - 1))
-        stack.pushValue(srcReference)
-        stack.pushValue(NumberValue.I32(sourceOffset + elementsToCopy - 1))
-
-        arrayGetExecutor(store, stack, srcTypeIndex, false).bind()
-        arraySetExecutor(store, stack, destTypeIndex).bind()
-
-        stack.pushValue(destReference)
-        stack.pushValue(NumberValue.I32(destinationOffset))
-        stack.pushValue(srcReference)
-        stack.pushValue(NumberValue.I32(sourceOffset))
+        // backward copy
+        repeat(elementsToCopy) { copyOffset ->
+            val field = source.fields[sourceOffset + elementsToCopy - 1 - copyOffset]
+            destination.fields[destinationOffset + elementsToCopy - 1 - copyOffset] = field
+        }
     }
-
-    stack.pushValue(NumberValue.I32(elementsToCopy - 1))
-    ArrayCopyExecutorImpl(
-        store,
-        stack,
-        srcTypeIndex,
-        destTypeIndex,
-        definedTypeExpander,
-        arrayGetExecutor,
-        arraySetExecutor,
-    ).bind()
 }
