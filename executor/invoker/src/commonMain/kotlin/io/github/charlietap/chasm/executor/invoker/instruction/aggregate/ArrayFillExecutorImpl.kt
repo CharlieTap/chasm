@@ -6,15 +6,18 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.array
+import io.github.charlietap.chasm.executor.runtime.ext.arrayType
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun ArrayFillExecutorImpl(
     store: Store,
@@ -25,14 +28,16 @@ internal fun ArrayFillExecutorImpl(
         store = store,
         stack = stack,
         typeIndex = typeIndex,
-        arraySetExecutor = ::ArraySetExecutorImpl,
+        definedTypeExpander = ::DefinedTypeExpanderImpl,
+        fieldPacker = ::FieldPackerImpl,
     )
 
 internal fun ArrayFillExecutorImpl(
     store: Store,
     stack: Stack,
     typeIndex: Index.TypeIndex,
-    arraySetExecutor: ArraySetExecutor,
+    definedTypeExpander: DefinedTypeExpander,
+    fieldPacker: FieldPacker,
 ): Result<Unit, InvocationError> = binding {
 
     val elementsToFill = stack.popI32().bind()
@@ -47,16 +52,15 @@ internal fun ArrayFillExecutorImpl(
 
     if (elementsToFill == 0) return@binding
 
-    stack.pushValue(arrayReference)
-    stack.pushValue(NumberValue.I32(arrayElementOffset))
-    stack.push(fillValue)
+    val frame = stack.peekFrame().bind()
+    val definedType = frame.state.module.types[typeIndex.index()]
+    val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
-    arraySetExecutor(store, stack, typeIndex).bind()
+    repeat(elementsToFill) { fillOffset ->
 
-    stack.pushValue(arrayReference)
-    stack.pushValue(NumberValue.I32(arrayElementOffset + 1))
-    stack.push(fillValue)
-    stack.pushValue(NumberValue.I32(elementsToFill - 1))
+        val fieldIndex = arrayElementOffset + fillOffset
+        val fieldValue = fieldPacker(fillValue.value, arrayType.fieldType).bind()
 
-    ArrayFillExecutorImpl(store, stack, typeIndex, arraySetExecutor).bind()
+        arrayInstance.fields[fieldIndex] = fieldValue
+    }
 }
