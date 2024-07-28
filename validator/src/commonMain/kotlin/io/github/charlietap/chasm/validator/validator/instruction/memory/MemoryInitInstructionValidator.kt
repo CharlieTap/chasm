@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.ext.popI32
 
 internal fun MemoryInitInstructionValidator(
     context: ValidationContext,
@@ -17,5 +18,9 @@ internal fun MemoryInitInstructionValidator(
     }
     if (instruction.dataIdx.idx.toInt() !in context.module.dataSegments.indices) {
         Err(InstructionValidatorError.UnknownDataSegment).bind<Unit>()
+    }
+
+    repeat(3) {
+        context.popI32().bind()
     }
 }

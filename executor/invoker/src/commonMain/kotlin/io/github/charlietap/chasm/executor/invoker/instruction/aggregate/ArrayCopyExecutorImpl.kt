@@ -28,29 +28,23 @@ internal fun ArrayCopyExecutorImpl(
     ArrayCopyExecutorImpl(
         store = store,
         stack = stack,
-        srcTypeIndex = srcTypeIndex,
         destTypeIndex = destTypeIndex,
         definedTypeExpander = ::DefinedTypeExpanderImpl,
-        arrayGetExecutor = ::ArrayGetExecutorImpl,
-        arraySetExecutor = ::ArraySetExecutorImpl,
     )
 
 internal fun ArrayCopyExecutorImpl(
     store: Store,
     stack: Stack,
-    srcTypeIndex: Index.TypeIndex,
     destTypeIndex: Index.TypeIndex,
     definedTypeExpander: DefinedTypeExpander,
-    arrayGetExecutor: ArrayGetExecutor,
-    arraySetExecutor: ArraySetExecutor,
 ): Result<Unit, InvocationError> = binding {
 
     // x = dest
     // y = src
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.types[destTypeIndex.index()]
+    val destDefinedType = frame.state.module.types[destTypeIndex.index()]
 
-    val destArrayType = definedTypeExpander(definedType).arrayType().bind()
+    val destArrayType = definedTypeExpander(destDefinedType).arrayType().bind()
     if (destArrayType.fieldType.mutability != Mutability.Var) {
         Err(InvocationError.ArrayCopyOnAConstArray).bind<Unit>()
     }

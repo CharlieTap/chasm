@@ -7,6 +7,8 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.ext.popI32
+import io.github.charlietap.chasm.validator.ext.pushI32
 
 internal fun MemoryGrowInstructionValidator(
     context: ValidationContext,
@@ -15,4 +17,7 @@ internal fun MemoryGrowInstructionValidator(
     if (context.memories.isEmpty()) {
         Err(InstructionValidatorError.UnknownMemory).bind<Unit>()
     }
+
+    context.popI32().bind()
+    context.pushI32()
 }

@@ -25,19 +25,17 @@ internal fun InstructionTypeResolverImpl(
         context = context,
         instruction = instruction,
         numericInstructionTypeResolver = ::NumericInstructionTypeResolverImpl,
-        memoryInstructionTypeResolver = ::MemoryInstructionTypeResolverImpl,
     )
 
 internal fun InstructionTypeResolverImpl(
     context: ValidationContext,
     instruction: Instruction,
     numericInstructionTypeResolver: InstructionTypeResolver<NumericInstruction>,
-    memoryInstructionTypeResolver: InstructionTypeResolver<MemoryInstruction>,
 ): Result<InstructionType, ModuleValidatorError> = when (instruction) {
     is AggregateInstruction -> Err(InstructionValidatorError.UnknownInstruction)
     is ControlInstruction -> Err(InstructionValidatorError.UnknownInstruction)
     is NumericInstruction -> numericInstructionTypeResolver(context, instruction)
-    is MemoryInstruction -> memoryInstructionTypeResolver(context, instruction)
+    is MemoryInstruction -> Err(InstructionValidatorError.UnknownInstruction)
     is ParametricInstruction -> Err(InstructionValidatorError.UnknownInstruction)
     is ReferenceInstruction -> Err(InstructionValidatorError.UnknownInstruction)
     is TableInstruction -> Err(InstructionValidatorError.UnknownInstruction)

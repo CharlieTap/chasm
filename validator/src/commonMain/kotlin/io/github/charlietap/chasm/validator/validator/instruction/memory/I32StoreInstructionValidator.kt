@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.ext.popI32
 
 internal fun I32StoreInstructionValidator(
     context: ValidationContext,
@@ -21,4 +22,7 @@ internal fun I32StoreInstructionValidator(
         in 0u..2u -> Unit
         else -> Err(InstructionValidatorError.UnnaturalMemoryAlignment).bind<Unit>()
     }
+
+    context.popI32().bind()
+    context.popI32().bind()
 }

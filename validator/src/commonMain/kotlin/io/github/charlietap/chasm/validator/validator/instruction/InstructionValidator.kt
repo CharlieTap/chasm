@@ -65,8 +65,7 @@ internal fun InstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     if (
-        instruction is NumericInstruction ||
-        instruction is MemoryInstruction
+        instruction is NumericInstruction
     ) {
         val type = instructionTypeResolver(context, instruction).bind()
         instructionTypeValidator(context, type).bind()
