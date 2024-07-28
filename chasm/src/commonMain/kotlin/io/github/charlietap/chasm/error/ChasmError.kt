@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.error
 
-import io.github.charlietap.chasm.decoder.ModuleDecoderError
+import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import kotlin.jvm.JvmInline

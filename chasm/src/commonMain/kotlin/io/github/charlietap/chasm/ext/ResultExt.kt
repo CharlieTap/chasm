@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.fold
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.ChasmResult.Success
-import io.github.charlietap.chasm.decoder.ModuleDecoderError
+import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import kotlin.jvm.JvmName

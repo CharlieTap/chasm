@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.atomic.fu)
+    alias(libs.plugins.kotlinx.test.resources)
 
     alias(libs.plugins.conventions.kmp)
     alias(libs.plugins.conventions.linting)
@@ -15,24 +16,35 @@ kotlin {
 
     sourceSets {
 
+        all {
+            languageSettings {
+                optIn("kotlin.ExperimentalUnsignedTypes")
+            }
+        }
+
        commonMain {
             dependencies {
                 api(projects.ast)
                 api(libs.result)
+                api(libs.kotlinx.io.core)
             }
         }
 
         commonTest {
             dependencies {
+                implementation(projects.test.fixture.ast)
+                implementation(projects.test.fake.decoder)
+
                 implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.test.resources)
             }
         }
     }
 }
 
 configure<PublishingConventionsExtension> {
-    name = "decoder"
-    description = "An api for module decoding embedded in Kotlin Multiplatform"
+    name = "wasm-parser"
+    description = "A wasm binary decoder for Kotlin Multiplatform"
 }
 
 tasks.withType<KotlinCompile>().configureEach {

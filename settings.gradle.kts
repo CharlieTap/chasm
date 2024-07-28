@@ -39,7 +39,6 @@ include(":ast")
 include(":chasm")
 
 include(":decoder")
-include(":decoder:wasm")
 
 include(":executor:instantiator")
 include(":executor:invoker")
