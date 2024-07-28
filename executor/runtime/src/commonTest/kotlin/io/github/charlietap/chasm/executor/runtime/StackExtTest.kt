@@ -1,9 +1,15 @@
-package io.github.charlietap.chasm.executor.runtime.ext
+package io.github.charlietap.chasm.executor.runtime
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
+import io.github.charlietap.chasm.executor.runtime.ext.constOperation
+import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
+import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
+import io.github.charlietap.chasm.executor.runtime.ext.relationalOperation
+import io.github.charlietap.chasm.executor.runtime.ext.testOperation
+import io.github.charlietap.chasm.executor.runtime.ext.unaryOperation
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
@@ -12,29 +18,8 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instruction
 import io.github.charlietap.chasm.fixture.stack
-import kotlin.math.sqrt
 import kotlin.test.Test
 import kotlin.test.assertEquals
-
-private fun Int.eq(other: Int): Boolean = this == other
-
-private fun Long.eq(other: Long): Boolean = this == other
-
-private fun Float.eq(other: Float): Boolean = this == other
-
-private fun Double.eq(other: Double): Boolean = this == other
-
-private fun Int.eqz(): Boolean = this == 0
-
-private fun Long.eqz(): Boolean = this == 0L
-
-private fun Long.countTrailingZero(): Long = countTrailingZeroBits().toLong()
-
-private fun Long.wrap(): Int = this.toInt()
-
-private fun Float.sqrt(): Float = sqrt(this)
-
-private fun Double.sqrt(): Double = sqrt(this)
 
 class StackExtTest {
 
@@ -370,3 +355,23 @@ class StackExtTest {
         assertEquals(Stack.MAX_DEPTH, stack.size())
     }
 }
+
+private fun Int.eq(other: Int): Boolean = this == other
+
+private fun Long.eq(other: Long): Boolean = this == other
+
+private fun Float.eq(other: Float): Boolean = this == other
+
+private fun Double.eq(other: Double): Boolean = this == other
+
+private fun Int.eqz(): Boolean = this == 0
+
+private fun Long.eqz(): Boolean = this == 0L
+
+private fun Long.countTrailingZero(): Long = countTrailingZeroBits().toLong()
+
+private fun Long.wrap(): Int = this.toInt()
+
+private fun Float.sqrt(): Float = kotlin.math.sqrt(this)
+
+private fun Double.sqrt(): Double = kotlin.math.sqrt(this)

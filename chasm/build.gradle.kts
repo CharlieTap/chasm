@@ -36,7 +36,6 @@ kotlin {
 
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
-                implementation(projects.executor.runtimeExt)
 
                 implementation(projects.executor.memory)
 

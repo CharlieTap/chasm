@@ -46,7 +46,6 @@ include(":executor:instantiator")
 include(":executor:invoker")
 include(":executor:memory")
 include(":executor:runtime")
-include(":executor:runtime-ext")
 
 include(":libs:sse2")
 include(":libs:stack")

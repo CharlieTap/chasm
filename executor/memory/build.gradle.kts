@@ -25,7 +25,6 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.executor.runtime)
-                api(projects.executor.runtimeExt)
                 api(libs.result)
             }
         }
