@@ -40,7 +40,6 @@ include(":chasm")
 
 include(":decoder")
 include(":decoder:wasm")
-include(":decoder:wat")
 
 include(":executor:instantiator")
 include(":executor:invoker")

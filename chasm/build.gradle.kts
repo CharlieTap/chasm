@@ -32,7 +32,6 @@ kotlin {
                 api(projects.executor.runtime)
 
                 implementation(projects.decoder.wasm)
-                implementation(projects.decoder.wat)
 
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
