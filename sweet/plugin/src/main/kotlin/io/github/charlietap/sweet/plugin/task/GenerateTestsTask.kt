@@ -51,7 +51,7 @@ abstract class GenerateTestsTask : DefaultTask() {
 
             val testPackageDirPath = testPackageName.get().replace(".", "/")
             val testPackageDir = outputDirectory.dir(testPackageDirPath).get()
-            val name = change.file.nameWithoutExtension.snakeCaseToPascalCase() + ".kt"
+            val name = change.file.nameWithoutExtension.snakeCaseToPascalCase() + "Test.kt"
 
             val test = if(change.file.path.contains("proposal")) {
                 val dir = "proposal/${change.file.parentFile.name}"

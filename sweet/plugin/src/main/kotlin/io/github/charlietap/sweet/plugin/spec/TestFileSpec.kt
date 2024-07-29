@@ -22,7 +22,7 @@ fun testFileSpec(
     val testAnnotation = ClassName("kotlin.test", "Test")
     val assertEqualsFunction = ClassName("kotlin.test", "assertEquals")
 
-    val testName = test.nameWithoutExtension.snakeCaseToPascalCase() + "Test"
+    val testName = test.nameWithoutExtension.snakeCaseToPascalCase()
     val testClassName = if(test.path.contains("proposal")) {
         val modifiedTestPackage = testPackage + ".proposal." + test.parentFile.name
         ClassName(modifiedTestPackage, testName)
