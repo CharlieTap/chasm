@@ -41,7 +41,6 @@ internal fun ModuleValidator(
         memoryValidator = ::MemoryValidator,
         startFunctionValidator = ::StartFunctionValidator,
         tableValidator = ::TableValidator,
-        multipleMemoriesValidator = ::MultipleMemoriesValidator,
     )
 
 internal fun ModuleValidator(
@@ -56,10 +55,7 @@ internal fun ModuleValidator(
     memoryValidator: Validator<Memory>,
     startFunctionValidator: Validator<StartFunction>,
     tableValidator: Validator<Table>,
-    multipleMemoriesValidator: Validator<Module>,
 ): Result<Unit, ModuleValidatorError> = binding {
-
-    multipleMemoriesValidator(context, module).bind()
 
     module.apply {
         functions.forEach { function ->

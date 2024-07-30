@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.decoder.decoder.instruction.prefix
+package io.github.charlietap.chasm.decoder.wasm.decoder.instruction.prefix
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
@@ -26,10 +26,13 @@ import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_FILL
 import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_GROW
 import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_INIT
 import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_SIZE
+import io.github.charlietap.chasm.decoder.decoder.instruction.prefix.PrefixFCInstructionDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.fixture.instruction.memoryCopyInstruction
+import io.github.charlietap.chasm.fixture.module.memoryIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -62,6 +65,7 @@ class PrefixFCInstructionDecoderTest {
                 context = context,
                 dataIndexDecoder = neverDataIndexDecoder,
                 elementIndexDecoder = neverElementIndexDecoder,
+                memoryIndexDecoder = neverMemoryIndexDecoder,
                 tableIndexDecoder = neverTableIndexDecoder,
             )
 
@@ -75,34 +79,32 @@ class PrefixFCInstructionDecoderTest {
         val opcode = MEMORY_INIT
 
         val expectedDataIndex = Index.DataIndex(117u)
-
         val dataIndexDecoder: Decoder<Index.DataIndex> = { _ ->
             Ok(expectedDataIndex)
         }
-
-        var consumedEmptyByte = false
+        val expectedMemoryIndex = memoryIndex()
+        val memoryIndexDecoder: Decoder<Index.MemoryIndex> = {
+            Ok(expectedMemoryIndex)
+        }
         val reader = FakeWasmBinaryReader(
-            fakeByteReader = {
-                consumedEmptyByte = true
-                Ok(0x00)
-            },
             fakeUIntReader = {
                 Ok(opcode)
             },
         )
+
         val context = decoderContext(reader)
 
-        val expected = Ok(MemoryInstruction.MemoryInit(expectedDataIndex))
+        val expected = Ok(MemoryInstruction.MemoryInit(expectedMemoryIndex, expectedDataIndex))
 
         val actual = PrefixFCInstructionDecoder(
             context = context,
             dataIndexDecoder = dataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
+            memoryIndexDecoder = memoryIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
         )
 
         assertEquals(expected, actual)
-        assertEquals(true, consumedEmptyByte)
     }
 
     @Test
@@ -125,6 +127,7 @@ class PrefixFCInstructionDecoderTest {
             context = context,
             dataIndexDecoder = dataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
+            memoryIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
         )
 
@@ -136,30 +139,30 @@ class PrefixFCInstructionDecoderTest {
 
         val opcode = MEMORY_COPY
 
-        var consumedEmptyBytes = false
         val reader = FakeWasmBinaryReader(
-            fakeBytesReader = { amount ->
-                consumedEmptyBytes = true
-                assertEquals(2, amount)
-                Ok(byteArrayOf(0x00, 0x00))
-            },
             fakeUIntReader = {
                 Ok(opcode)
             },
         )
+        val srcMemoryIndex = memoryIndex(117u)
+        val dstMemoryIndex = memoryIndex(118u)
+        val indices = sequenceOf(dstMemoryIndex, srcMemoryIndex).iterator()
+        val memoryIndexDecoder: Decoder<Index.MemoryIndex> = {
+            Ok(indices.next())
+        }
         val context = decoderContext(reader)
 
-        val expected = Ok(MemoryInstruction.MemoryCopy)
+        val expected = Ok(memoryCopyInstruction(srcMemoryIndex, dstMemoryIndex))
 
         val actual = PrefixFCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
+            memoryIndexDecoder = memoryIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
         )
 
         assertEquals(expected, actual)
-        assertEquals(true, consumedEmptyBytes)
     }
 
     @Test
@@ -167,29 +170,29 @@ class PrefixFCInstructionDecoderTest {
 
         val opcode = MEMORY_FILL
 
-        var consumedEmptyByte = false
+        val expectedMemoryIndex = memoryIndex()
+        val memoryIndexDecoder: Decoder<Index.MemoryIndex> = {
+            Ok(expectedMemoryIndex)
+        }
+
         val reader = FakeWasmBinaryReader(
-            fakeByteReader = {
-                consumedEmptyByte = true
-                Ok(0x00)
-            },
             fakeUIntReader = {
                 Ok(opcode)
             },
         )
         val context = decoderContext(reader)
 
-        val expected = Ok(MemoryInstruction.MemoryFill)
+        val expected = Ok(MemoryInstruction.MemoryFill(expectedMemoryIndex))
 
         val actual = PrefixFCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
+            memoryIndexDecoder = memoryIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
         )
 
         assertEquals(expected, actual)
-        assertEquals(true, consumedEmptyByte)
     }
 
     @Test
@@ -216,6 +219,7 @@ class PrefixFCInstructionDecoderTest {
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = elementIndexDecoder,
+            memoryIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
         )
 
@@ -241,6 +245,7 @@ class PrefixFCInstructionDecoderTest {
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = elementIndexDecoder,
+            memoryIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
         )
 
@@ -268,6 +273,7 @@ class PrefixFCInstructionDecoderTest {
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
+            memoryIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
         )
 
@@ -293,6 +299,7 @@ class PrefixFCInstructionDecoderTest {
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
+            memoryIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
         )
 
@@ -318,6 +325,7 @@ class PrefixFCInstructionDecoderTest {
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
+            memoryIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
         )
 
@@ -343,6 +351,7 @@ class PrefixFCInstructionDecoderTest {
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
+            memoryIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
         )
 
@@ -370,6 +379,9 @@ class PrefixFCInstructionDecoderTest {
         }
         private val neverElementIndexDecoder: Decoder<Index.ElementIndex> = { _ ->
             fail("element index decoder should not run in this scenario")
+        }
+        private val neverMemoryIndexDecoder: Decoder<Index.MemoryIndex> = { _ ->
+            fail("memory index decoder should not run in this scenario")
         }
         private val neverTableIndexDecoder: Decoder<Index.TableIndex> = { _ ->
             fail("table index decoder should not run in this scenario")

@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.memory
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
@@ -40,51 +39,112 @@ internal fun MemoryInstructionDecoder(
 ): Result<MemoryInstruction, WasmDecodeError> =
     MemoryInstructionDecoder(
         context = context,
-        memArgDecoder = ::MemArgDecoder,
+        memArgWithIndexDecoder = ::MemArgWithIndexDecoder,
+        memoryGrowDecoder = ::MemoryGrowInstructionDecoder,
+        memorySizeDecoder = ::MemorySizeInstructionDecoder,
     )
 
 internal fun MemoryInstructionDecoder(
     context: DecoderContext,
-    memArgDecoder: Decoder<MemArg>,
+    memArgWithIndexDecoder: Decoder<MemArgWithIndex>,
+    memoryGrowDecoder: Decoder<MemoryInstruction.MemoryGrow>,
+    memorySizeDecoder: Decoder<MemoryInstruction.MemorySize>,
 ): Result<MemoryInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte().bind()) {
-        I32_LOAD -> MemoryInstruction.I32Load(memArgDecoder(context).bind())
-        I64_LOAD -> MemoryInstruction.I64Load(memArgDecoder(context).bind())
-        F32_LOAD -> MemoryInstruction.F32Load(memArgDecoder(context).bind())
-        F64_LOAD -> MemoryInstruction.F64Load(memArgDecoder(context).bind())
-        I32_LOAD8_S -> MemoryInstruction.I32Load8S(memArgDecoder(context).bind())
-        I32_LOAD8_U -> MemoryInstruction.I32Load8U(memArgDecoder(context).bind())
-        I32_LOAD16_S -> MemoryInstruction.I32Load16S(memArgDecoder(context).bind())
-        I32_LOAD16_U -> MemoryInstruction.I32Load16U(memArgDecoder(context).bind())
-        I64_LOAD8_S -> MemoryInstruction.I64Load8S(memArgDecoder(context).bind())
-        I64_LOAD8_U -> MemoryInstruction.I64Load8U(memArgDecoder(context).bind())
-        I64_LOAD16_S -> MemoryInstruction.I64Load16S(memArgDecoder(context).bind())
-        I64_LOAD16_U -> MemoryInstruction.I64Load16U(memArgDecoder(context).bind())
-        I64_LOAD32_S -> MemoryInstruction.I64Load32S(memArgDecoder(context).bind())
-        I64_LOAD32_U -> MemoryInstruction.I64Load32U(memArgDecoder(context).bind())
-        I32_STORE -> MemoryInstruction.I32Store(memArgDecoder(context).bind())
-        I64_STORE -> MemoryInstruction.I64Store(memArgDecoder(context).bind())
-        F32_STORE -> MemoryInstruction.F32Store(memArgDecoder(context).bind())
-        F64_STORE -> MemoryInstruction.F64Store(memArgDecoder(context).bind())
-        I32_STORE8 -> MemoryInstruction.I32Store8(memArgDecoder(context).bind())
-        I32_STORE16 -> MemoryInstruction.I32Store16(memArgDecoder(context).bind())
-        I64_STORE8 -> MemoryInstruction.I64Store8(memArgDecoder(context).bind())
-        I64_STORE16 -> MemoryInstruction.I64Store16(memArgDecoder(context).bind())
-        I64_STORE32 -> MemoryInstruction.I64Store32(memArgDecoder(context).bind())
-        MEMORY_SIZE -> {
-            val byte = context.reader.byte().bind()
-            if (byte != 0.toByte()) {
-                Err(InstructionDecodeError.ReservedByteNotZero).bind<Unit>()
-            }
-            MemoryInstruction.MemorySize
+        I32_LOAD -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I32Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
-        MEMORY_GROW -> {
-            val byte = context.reader.byte().bind()
-            if (byte != 0.toByte()) {
-                Err(InstructionDecodeError.ReservedByteNotZero).bind<Unit>()
-            }
-            MemoryInstruction.MemoryGrow
+        I64_LOAD -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
+        F32_LOAD -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.F32Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        F64_LOAD -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.F64Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I32_LOAD8_S -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I32Load8S(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I32_LOAD8_U -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I32Load8U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I32_LOAD16_S -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I32Load16S(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I32_LOAD16_U -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I32Load16U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_LOAD8_S -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Load8S(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_LOAD8_U -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Load8U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_LOAD16_S -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Load16S(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_LOAD16_U -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Load16U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_LOAD32_S -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Load32S(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_LOAD32_U -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Load32U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I32_STORE -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I32Store(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_STORE -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Store(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        F32_STORE -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.F32Store(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        F64_STORE -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.F64Store(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I32_STORE8 -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I32Store8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I32_STORE16 -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I32Store16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_STORE8 -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Store8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_STORE16 -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Store16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        I64_STORE32 -> {
+            val memArgWithIndex = memArgWithIndexDecoder(context).bind()
+            MemoryInstruction.I64Store32(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+        }
+        MEMORY_SIZE -> memorySizeDecoder(context).bind()
+        MEMORY_GROW -> memoryGrowDecoder(context).bind()
 
         else -> Err(InstructionDecodeError.InvalidMemoryInstruction(opcode)).bind<MemoryInstruction>()
     }

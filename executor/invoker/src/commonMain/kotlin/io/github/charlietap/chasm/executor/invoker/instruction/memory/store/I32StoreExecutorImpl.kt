@@ -30,6 +30,7 @@ internal inline fun I32StoreExecutorImpl(
 ): Result<Unit, InvocationError> = storeNumberValueExecutor(
     store,
     stack,
+    instruction.memoryIndex,
     instruction.memArg,
     Int.SIZE_BYTES,
     Stack::popI32,

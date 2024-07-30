@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.instantiator.initialization
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Expression
@@ -11,7 +10,6 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluatorImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -39,15 +37,12 @@ internal fun MemoryInitializerImpl(
         segment.mode is DataSegment.Mode.Active
     }.forEach { segment ->
         val mode = segment.mode as DataSegment.Mode.Active
-        if (mode.memoryIndex.idx != 0u) {
-            Err(InstantiationError.DataSegmentMemoryIndexNotZero).bind<ModuleInstance>()
-        }
         val size = segment.initData.size
         val expression = Expression(
             mode.offset.instructions + listOf(
                 NumericInstruction.I32Const(0),
                 NumericInstruction.I32Const(size),
-                MemoryInstruction.MemoryInit(segment.idx),
+                MemoryInstruction.MemoryInit(mode.memoryIndex, segment.idx),
                 MemoryInstruction.DataDrop(segment.idx),
             ),
         )
