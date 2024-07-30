@@ -31,6 +31,7 @@ import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_INIT
 import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_SIZE
 import io.github.charlietap.chasm.decoder.decoder.section.index.DataIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.ElementIndexDecoder
+import io.github.charlietap.chasm.decoder.decoder.section.index.MemoryIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.TableIndexDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
@@ -42,6 +43,7 @@ internal fun PrefixFCInstructionDecoder(
         context = context,
         dataIndexDecoder = ::DataIndexDecoder,
         elementIndexDecoder = ::ElementIndexDecoder,
+        memoryIndexDecoder = ::MemoryIndexDecoder,
         tableIndexDecoder = ::TableIndexDecoder,
     )
 
@@ -49,6 +51,7 @@ internal fun PrefixFCInstructionDecoder(
     context: DecoderContext,
     dataIndexDecoder: Decoder<Index.DataIndex>,
     elementIndexDecoder: Decoder<Index.ElementIndex>,
+    memoryIndexDecoder: Decoder<Index.MemoryIndex>,
     tableIndexDecoder: Decoder<Index.TableIndex>,
 ): Result<Instruction, WasmDecodeError> = binding {
 
@@ -64,24 +67,25 @@ internal fun PrefixFCInstructionDecoder(
         I64_TRUNC_SAT_F64_U -> NumericInstruction.I64TruncSatF64U
 
         MEMORY_INIT -> {
-            val dataIdx = dataIndexDecoder(context).bind()
-            context.reader.byte() // consume reserved byte
-            MemoryInstruction.MemoryInit(dataIdx)
+            val dataIndex = dataIndexDecoder(context).bind()
+            val memoryIndex = memoryIndexDecoder(context).bind()
+            MemoryInstruction.MemoryInit(memoryIndex, dataIndex)
         }
 
         DATA_DROP -> {
-            val dataIdx = dataIndexDecoder(context).bind()
-            MemoryInstruction.DataDrop(dataIdx)
+            val dataIndex = dataIndexDecoder(context).bind()
+            MemoryInstruction.DataDrop(dataIndex)
         }
 
         MEMORY_COPY -> {
-            context.reader.bytes(2) // consume two reserved bytes
-            MemoryInstruction.MemoryCopy
+            val dstMemoryIndex = memoryIndexDecoder(context).bind()
+            val srcMemoryIndex = memoryIndexDecoder(context).bind()
+            MemoryInstruction.MemoryCopy(srcMemoryIndex, dstMemoryIndex)
         }
 
         MEMORY_FILL -> {
-            context.reader.byte() // consume reserved byte
-            MemoryInstruction.MemoryFill
+            val memoryIndex = memoryIndexDecoder(context).bind()
+            MemoryInstruction.MemoryFill(memoryIndex)
         }
 
         TABLE_INIT -> {

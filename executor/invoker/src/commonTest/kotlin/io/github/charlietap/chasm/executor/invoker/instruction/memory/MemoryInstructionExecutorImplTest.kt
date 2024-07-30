@@ -24,6 +24,7 @@ import io.github.charlietap.chasm.fixture.instruction.i64Load32SInstruction
 import io.github.charlietap.chasm.fixture.instruction.i64Load32UInstruction
 import io.github.charlietap.chasm.fixture.instruction.i64Store32Instruction
 import io.github.charlietap.chasm.fixture.instruction.memArg
+import io.github.charlietap.chasm.fixture.module.memoryIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
@@ -38,14 +39,17 @@ class MemoryInstructionExecutorImplTest {
         val store = store()
         val stack = stack()
 
+        val memoryIndex = memoryIndex(117u)
         val memArg = memArg(117u, 118u)
         val instruction = i64Load32SInstruction(
+            memoryIndex,
             memArg,
         )
 
-        val i64SizedSignedLoadExecutor: I64SizedSignedLoadExecutor = { _store, _stack, _memarg, _bytes ->
+        val i64SizedSignedLoadExecutor: I64SizedSignedLoadExecutor = { _store, _stack, _memIndex, _memarg, _bytes ->
             assertEquals(store, _store)
             assertEquals(stack, _stack)
+            assertEquals(memoryIndex, _memIndex)
             assertEquals(memArg, _memarg)
             assertEquals(4, _bytes)
 
@@ -68,14 +72,17 @@ class MemoryInstructionExecutorImplTest {
         val store = store()
         val stack = stack()
 
+        val memoryIndex = memoryIndex(117u)
         val memArg = memArg(117u, 118u)
         val instruction = i64Load32UInstruction(
+            memoryIndex,
             memArg,
         )
 
-        val i64SizedUnsignedLoadExecutor: I64SizedUnsignedLoadExecutor = { _store, _stack, _memarg, _bytes ->
+        val i64SizedUnsignedLoadExecutor: I64SizedUnsignedLoadExecutor = { _store, _stack, _memIndex, _memarg, _bytes ->
             assertEquals(store, _store)
             assertEquals(stack, _stack)
+            assertEquals(memoryIndex, _memIndex)
             assertEquals(memArg, _memarg)
             assertEquals(4, _bytes)
 
@@ -98,14 +105,17 @@ class MemoryInstructionExecutorImplTest {
         val store = store()
         val stack = stack()
 
+        val memoryIndex = memoryIndex(117u)
         val memArg = memArg(117u, 118u)
         val instruction = i64Store32Instruction(
+            memoryIndex,
             memArg,
         )
 
-        val i64StoreSizedExecutor: I64StoreSizedExecutor = { _store, _stack, _memarg, _bytes ->
+        val i64StoreSizedExecutor: I64StoreSizedExecutor = { _store, _stack, _memIdx, _memarg, _bytes ->
             assertEquals(store, _store)
             assertEquals(stack, _stack)
+            assertEquals(memoryIndex, _memIdx)
             assertEquals(memArg, _memarg)
             assertEquals(4, _bytes)
 
@@ -127,19 +137,19 @@ class MemoryInstructionExecutorImplTest {
             fail("MemoryInitExecutor should not be called in this scenario")
         }
 
-        fun memoryGrowExecutor(): MemoryGrowExecutor = { _, _ ->
+        fun memoryGrowExecutor(): MemoryGrowExecutor = { _, _, _ ->
             fail("MemoryGrowExecutor should not be called in this scenario")
         }
 
-        fun memorySizeExecutor(): MemorySizeExecutor = { _, _ ->
+        fun memorySizeExecutor(): MemorySizeExecutor = { _, _, _ ->
             fail("MemorySizeExecutor should not be called in this scenario")
         }
 
-        fun memoryFillExecutor(): MemoryFillExecutor = { _, _ ->
+        fun memoryFillExecutor(): MemoryFillExecutor = { _, _, _ ->
             fail("MemoryFillExecutor should not be called in this scenario")
         }
 
-        fun memoryCopyExecutor(): MemoryCopyExecutor = { _, _ ->
+        fun memoryCopyExecutor(): MemoryCopyExecutor = { _, _, _ ->
             fail("MemoryCopyExecutor should not be called in this scenario")
         }
 
@@ -151,11 +161,11 @@ class MemoryInstructionExecutorImplTest {
             fail("I32LoadExecutor should not be called in this scenario")
         }
 
-        fun i32SizedSignedLoadExecutor(): I32SizedSignedLoadExecutor = { _, _, _, _ ->
+        fun i32SizedSignedLoadExecutor(): I32SizedSignedLoadExecutor = { _, _, _, _, _ ->
             fail("I32SizedSignedLoadExecutor should not be called in this scenario")
         }
 
-        fun i32SizedUnsignedLoadExecutor(): I32SizedUnsignedLoadExecutor = { _, _, _, _ ->
+        fun i32SizedUnsignedLoadExecutor(): I32SizedUnsignedLoadExecutor = { _, _, _, _, _ ->
             fail("I32SizedUnsignedLoadExecutor should not be called in this scenario")
         }
 
@@ -163,11 +173,11 @@ class MemoryInstructionExecutorImplTest {
             fail("I64LoadExecutor should not be called in this scenario")
         }
 
-        fun i64SizedSignedLoadExecutor(): I64SizedSignedLoadExecutor = { _, _, _, _ ->
+        fun i64SizedSignedLoadExecutor(): I64SizedSignedLoadExecutor = { _, _, _, _, _ ->
             fail("I64SizedSignedLoadExecutor should not be called in this scenario")
         }
 
-        fun i64SizedUnsignedLoadExecutor(): I64SizedUnsignedLoadExecutor = { _, _, _, _ ->
+        fun i64SizedUnsignedLoadExecutor(): I64SizedUnsignedLoadExecutor = { _, _, _, _, _ ->
             fail("I64SizedUnsignedLoadExecutor should not be called in this scenario")
         }
 
@@ -183,7 +193,7 @@ class MemoryInstructionExecutorImplTest {
             fail("I32StoreExecutor should not be called in this scenario")
         }
 
-        fun i32StoreSizedExecutor(): I32StoreSizedExecutor = { _, _, _, _ ->
+        fun i32StoreSizedExecutor(): I32StoreSizedExecutor = { _, _, _, _, _ ->
             fail("I32StoreSizedExecutor should not be called in this scenario")
         }
 
@@ -191,7 +201,7 @@ class MemoryInstructionExecutorImplTest {
             fail("I64StoreExecutor should not be called in this scenario")
         }
 
-        fun i64StoreSizedExecutor(): I64StoreSizedExecutor = { _, _, _, _ ->
+        fun i64StoreSizedExecutor(): I64StoreSizedExecutor = { _, _, _, _, _ ->
             fail("I64StoreSizedExecutor should not be called in this scenario")
         }
 

@@ -5,6 +5,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.fold
+import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.memory.grow.MemoryGrowerImpl
 import io.github.charlietap.chasm.executor.memory.grow.MemoryInstanceGrower
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -19,20 +21,24 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 internal inline fun MemoryGrowExecutorImpl(
     store: Store,
     stack: Stack,
+    instruction: MemoryInstruction.MemoryGrow,
 ): Result<Unit, InvocationError> =
     MemoryGrowExecutorImpl(
         store = store,
         stack = stack,
+        instruction = instruction,
         memoryInstanceGrower = ::MemoryGrowerImpl,
     )
 
 internal inline fun MemoryGrowExecutorImpl(
     store: Store,
     stack: Stack,
+    instruction: MemoryInstruction.MemoryGrow,
     crossinline memoryInstanceGrower: MemoryInstanceGrower,
 ): Result<Unit, InvocationError> = binding {
+
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(0).bind()
+    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex.index()).bind()
     val memory = store.memory(memoryAddress).bind()
 
     val sizeInPages = memory.data.min.amount

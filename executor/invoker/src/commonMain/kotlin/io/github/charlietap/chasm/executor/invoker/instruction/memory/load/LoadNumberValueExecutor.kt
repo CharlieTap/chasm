@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemArg
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
@@ -12,4 +13,4 @@ internal typealias NumberValueReader<T> = (MemoryInstance, Int, Int) -> Result<T
 
 internal typealias Constructor<T> = (T) -> NumberValue<T>
 
-internal typealias LoadNumberValueExecutor<T> = (Store, Stack, MemArg, Int, NumberValueReader<T>, Constructor<T>) -> Result<Unit, InvocationError>
+internal typealias LoadNumberValueExecutor<T> = (Store, Stack, Index.MemoryIndex, MemArg, Int, NumberValueReader<T>, Constructor<T>) -> Result<Unit, InvocationError>

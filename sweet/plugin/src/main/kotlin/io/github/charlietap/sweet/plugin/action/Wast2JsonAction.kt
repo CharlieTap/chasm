@@ -1,11 +1,11 @@
 package io.github.charlietap.sweet.plugin.action
 
-import javax.inject.Inject
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import javax.inject.Inject
 
 interface Wast2JsonParams: WorkParameters {
     val wast2JsonFile: RegularFileProperty
@@ -38,6 +38,7 @@ abstract class Wast2JsonAction : WorkAction<Wast2JsonParams> {
         val ADDITIONAL_FLAGS = setOf(
             "--enable-tail-call",
             "--enable-extended-const",
+            "--enable-multi-memory",
         )
     }
 }

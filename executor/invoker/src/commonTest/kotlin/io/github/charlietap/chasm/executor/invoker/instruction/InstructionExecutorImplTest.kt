@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
@@ -19,6 +18,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.reference.Referen
 import io.github.charlietap.chasm.executor.invoker.instruction.table.TableInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.variable.VariableInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
+import io.github.charlietap.chasm.fixture.instruction.memoryGrowInstruction
 import io.github.charlietap.chasm.fixture.module.tableIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
@@ -100,7 +100,7 @@ class InstructionExecutorImplTest {
         val store = store()
         val stack = stack()
 
-        val instruction = MemoryInstruction.MemoryGrow
+        val instruction = memoryGrowInstruction()
 
         val memoryInstructionExecutor: MemoryInstructionExecutor = { passedInstruction, passedStore, passedStack ->
             assertEquals(instruction, passedInstruction)

@@ -27,6 +27,8 @@ import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.wasm.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.wasm.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.fixture.instruction.memoryFillInstruction
+import io.github.charlietap.chasm.fixture.instruction.memorySizeInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -268,7 +270,7 @@ class InstructionDecoderTest {
             ),
         )
 
-        val expected = MemoryInstruction.MemorySize
+        val expected = memorySizeInstruction()
         val memoryInstructionDecoder: Decoder<MemoryInstruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(expected)
@@ -358,7 +360,7 @@ class InstructionDecoderTest {
             ),
         )
 
-        val expected = MemoryInstruction.MemoryFill
+        val expected = memoryFillInstruction()
         val prefixInstructionDecoder: Decoder<Instruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(expected)

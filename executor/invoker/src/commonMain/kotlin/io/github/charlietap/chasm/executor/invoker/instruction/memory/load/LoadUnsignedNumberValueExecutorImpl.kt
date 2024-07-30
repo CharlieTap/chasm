@@ -6,6 +6,8 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemArg
+import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
@@ -18,6 +20,7 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 internal inline fun <S, U> LoadUnsignedNumberValueExecutorImpl(
     store: Store,
     stack: Stack,
+    memoryIndex: Index.MemoryIndex,
     memArg: MemArg,
     sizeInBytes: Int,
     crossinline reader: NumberValueReader<U>,
@@ -25,7 +28,7 @@ internal inline fun <S, U> LoadUnsignedNumberValueExecutorImpl(
     crossinline constructor: (S) -> NumberValue<S>,
 ): Result<Unit, InvocationError> = binding {
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(0).bind()
+    val memoryAddress = frame.state.module.memoryAddress(memoryIndex.index()).bind()
     val memory = store.memory(memoryAddress).bind()
 
     val baseAddress = stack.popI32().bind()

@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.dataSegment
+import io.github.charlietap.chasm.fixture.module.memoryIndex
 import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
@@ -45,7 +46,7 @@ class MemoryInitializerImplTest {
             activeExpression.instructions + listOf(
                 NumericInstruction.I32Const(0),
                 NumericInstruction.I32Const(activeSegment.initData.size),
-                MemoryInstruction.MemoryInit(activeSegment.idx),
+                MemoryInstruction.MemoryInit(memoryIndex(0u), activeSegment.idx),
                 MemoryInstruction.DataDrop(activeSegment.idx),
             ),
         )

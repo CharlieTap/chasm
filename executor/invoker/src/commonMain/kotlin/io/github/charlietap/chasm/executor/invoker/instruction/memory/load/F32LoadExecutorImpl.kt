@@ -30,6 +30,7 @@ internal inline fun F32LoadExecutorImpl(
 ): Result<Unit, InvocationError> = loadNumberValueExecutor(
     store,
     stack,
+    instruction.memoryIndex,
     instruction.memArg,
     Float.SIZE_BYTES,
     ::MemoryInstanceFloatReaderImpl,
