@@ -12,7 +12,7 @@
 
 ---
 
-Chasm is an experimental WebAssembly runtime built on Kotlin Multiplatform.
+Chasm is a WebAssembly runtime built on Kotlin Multiplatform.
 
 The runtime targets the latest wasm [specification](https://webassembly.github.io/spec/core/index.html) and supports all instructions with the exception of VectorInstructions.
 
@@ -22,6 +22,7 @@ Additionally, the runtime supports the following Stage 4 proposals
 - [x] Extended Constant Expressions
 - [x] Typed Function References
 - [x] Wasm GC
+- [x] Multiple Memories
 
 # Setup
 
