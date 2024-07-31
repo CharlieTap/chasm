@@ -28,7 +28,7 @@ Additionally, the runtime supports the following Stage 4 proposals
 
 ```kotlin
 dependencies {
-    implementation("io.github.charlietap.chasm:chasm:0.7.0")
+    implementation("io.github.charlietap.chasm:chasm:0.7.1")
 }
 ```
 
