@@ -5,10 +5,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.default
+import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
@@ -38,7 +38,7 @@ internal inline fun StructNewDefaultExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.types[typeIndex.index()]
+    val definedType = frame.state.module.definedType(typeIndex).bind()
 
     val structType = definedTypeExpander(definedType).structType().bind()
     structType.fields.forEach { fieldType ->

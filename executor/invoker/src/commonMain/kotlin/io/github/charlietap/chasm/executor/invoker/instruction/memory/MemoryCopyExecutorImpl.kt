@@ -6,7 +6,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.memory.copy.MemoryInstanceCopier
 import io.github.charlietap.chasm.executor.memory.copy.MemoryInstanceCopierImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -37,9 +36,9 @@ internal fun MemoryCopyExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-    val srcMemoryAddress = frame.state.module.memoryAddress(instruction.srcIndex.index()).bind()
+    val srcMemoryAddress = frame.state.module.memoryAddress(instruction.srcIndex).bind()
     val srcMemory = store.memory(srcMemoryAddress).bind()
-    val dstMemoryAddress = frame.state.module.memoryAddress(instruction.dstIndex.index()).bind()
+    val dstMemoryAddress = frame.state.module.memoryAddress(instruction.dstIndex).bind()
     val dstMemory = store.memory(dstMemoryAddress).bind()
 
     val bytesToCopy = stack.popI32().bind()

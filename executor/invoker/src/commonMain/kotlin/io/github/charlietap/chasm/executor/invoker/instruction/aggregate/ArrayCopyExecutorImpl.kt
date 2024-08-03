@@ -7,11 +7,11 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
+import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -42,7 +42,7 @@ internal fun ArrayCopyExecutorImpl(
     // x = dest
     // y = src
     val frame = stack.peekFrame().bind()
-    val destDefinedType = frame.state.module.types[destTypeIndex.index()]
+    val destDefinedType = frame.state.module.definedType(destTypeIndex).bind()
 
     val destArrayType = definedTypeExpander(destDefinedType).arrayType().bind()
     if (destArrayType.fieldType.mutability != Mutability.Var) {

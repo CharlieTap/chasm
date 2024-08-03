@@ -6,7 +6,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.memory.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -15,6 +14,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.bitWidth
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
+import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -49,11 +49,11 @@ internal fun ArrayInitDataExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.types[typeIndex.index()]
+    val definedType = frame.state.module.definedType(typeIndex).bind()
 
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
-    val dataAddress = frame.state.module.dataAddress(dataIndex.index()).bind()
+    val dataAddress = frame.state.module.dataAddress(dataIndex).bind()
     val dataInstance = store.data(dataAddress).bind()
 
     val elementsToCopy = stack.popI32().bind()

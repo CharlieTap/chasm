@@ -5,10 +5,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
+import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
@@ -45,7 +45,7 @@ internal inline fun ArrayNewFixedExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.types[typeIndex.index()]
+    val definedType = frame.state.module.definedType(typeIndex).bind()
 
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 

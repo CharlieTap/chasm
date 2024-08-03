@@ -5,7 +5,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
@@ -20,7 +19,7 @@ internal inline fun MemorySizeExecutorImpl(
     instruction: MemoryInstruction.MemorySize,
 ): Result<Unit, InvocationError> = binding {
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex.index()).bind()
+    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
     val memory = store.memory(memoryAddress).bind()
 
     val sizeInPages = memory.data.min.amount

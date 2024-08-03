@@ -6,11 +6,11 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
+import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -47,11 +47,11 @@ internal fun ArrayInitElementExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.types[typeIndex.index()]
+    val definedType = frame.state.module.definedType(typeIndex).bind()
 
     definedTypeExpander(definedType).arrayType().bind()
 
-    val elementAddress = frame.state.module.elementAddress(elementIndex.index()).bind()
+    val elementAddress = frame.state.module.elementAddress(elementIndex).bind()
     val elementInstance = store.element(elementAddress).bind()
 
     val elementsToCopy = stack.popI32().bind()

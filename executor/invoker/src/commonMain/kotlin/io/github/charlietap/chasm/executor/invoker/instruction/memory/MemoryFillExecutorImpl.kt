@@ -5,7 +5,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.memory.fill.MemoryInstanceFiller
 import io.github.charlietap.chasm.executor.memory.fill.MemoryInstanceFillerImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -40,7 +39,7 @@ internal inline fun MemoryFillExecutorImpl(
     val offset = stack.popI32().bind()
 
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex.index()).bind()
+    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
     val memory = store.memory(memoryAddress).bind()
 
     memoryInstanceFiller(memory, offset..(offset + bytesToFill), fillValue.toByte()).bind()

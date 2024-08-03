@@ -6,7 +6,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.contains
@@ -25,10 +24,10 @@ internal fun TableInitExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-    val tableAddress = frame.state.module.tableAddress(instruction.tableIdx.index()).bind()
+    val tableAddress = frame.state.module.tableAddress(instruction.tableIdx).bind()
     val tableInstance = store.table(tableAddress).bind()
 
-    val elementAddress = frame.state.module.elementAddress(instruction.elemIdx.index()).bind()
+    val elementAddress = frame.state.module.elementAddress(instruction.elemIdx).bind()
     val elementInstance = store.element(elementAddress).bind()
 
     val elementsToInitialise = stack.popI32().bind()

@@ -5,7 +5,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -21,7 +20,7 @@ internal inline fun TableSizeExecutorImpl(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-    val tableAddress = frame.state.module.tableAddress(instruction.tableIdx.index()).bind()
+    val tableAddress = frame.state.module.tableAddress(instruction.tableIdx).bind()
     val tableInstance = store.table(tableAddress).bind()
 
     val tableSize = tableInstance.elements.size

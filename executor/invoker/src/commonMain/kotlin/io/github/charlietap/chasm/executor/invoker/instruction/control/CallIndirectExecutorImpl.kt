@@ -8,7 +8,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCallImpl
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
@@ -53,10 +52,10 @@ internal inline fun CallIndirectExecutorImpl(
 
     val frame = stack.peekFrame().bind()
 
-    val tableAddress = frame.state.module.tableAddress(tableIndex.index()).bind()
+    val tableAddress = frame.state.module.tableAddress(tableIndex).bind()
     val tableInstance = store.table(tableAddress).bind()
 
-    val functionType = frame.state.module.definedType(typeIndex.index()).bind()
+    val functionType = frame.state.module.definedType(typeIndex).bind()
 
     val elementIndex = stack.popI32().bind()
     val reference = tableInstance.element(elementIndex).bind()

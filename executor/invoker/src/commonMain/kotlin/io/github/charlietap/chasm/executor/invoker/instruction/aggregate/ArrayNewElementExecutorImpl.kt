@@ -6,7 +6,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.element
@@ -40,7 +39,7 @@ internal inline fun ArrayNewElementExecutorImpl(
 
     val frame = stack.peekFrame().bind()
 
-    val elementAddress = frame.state.module.elementAddress(elementIndex.index()).bind()
+    val elementAddress = frame.state.module.elementAddress(elementIndex).bind()
     val elementInstance = store.element(elementAddress).bind()
 
     val arrayLength = stack.popI32().bind()

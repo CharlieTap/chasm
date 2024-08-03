@@ -6,7 +6,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.memory.init.MemoryInstanceInitialiser
 import io.github.charlietap.chasm.executor.memory.init.MemoryInstanceInitialiserImpl
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -38,10 +37,10 @@ internal fun MemoryInitExecutorImpl(
     memoryInstanceInitialiser: MemoryInstanceInitialiser,
 ): Result<Unit, InvocationError> = binding {
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex.index()).bind()
+    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
     val memory = store.memory(memoryAddress).bind()
 
-    val dataAddress = frame.state.module.dataAddress(instruction.dataIndex.index()).bind()
+    val dataAddress = frame.state.module.dataAddress(instruction.dataIndex).bind()
     val data = store.data(dataAddress).bind()
 
     val bytesToCopy = stack.popI32().bind()
