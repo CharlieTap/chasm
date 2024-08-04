@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.import
+package io.github.charlietap.chasm.executor.instantiator.import
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding

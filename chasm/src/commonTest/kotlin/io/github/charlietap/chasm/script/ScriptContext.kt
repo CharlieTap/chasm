@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.script
 
+import io.github.charlietap.chasm.embedding.import.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.import.Import
 
 data class ScriptContext(
     val binaryDirectory: String,

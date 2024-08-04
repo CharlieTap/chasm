@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.import
+package io.github.charlietap.chasm.embedding.import
 
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 

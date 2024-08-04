@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.import
+package io.github.charlietap.chasm.executor.instantiator.import
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
@@ -9,10 +9,10 @@ import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-internal fun ImportMatcherImpl(
+fun ImportMatcherImpl(
     store: Store,
     module: Module,
-    imports: List<Import>,
+    imports: List<Triple<String, String, ExternalValue>>,
 ): Result<List<ExternalValue>, ModuleTrapError> =
     ImportMatcherImpl(
         store = store,
@@ -24,14 +24,14 @@ internal fun ImportMatcherImpl(
 internal fun ImportMatcherImpl(
     store: Store,
     module: Module,
-    imports: List<Import>,
+    imports: List<Triple<String, String, ExternalValue>>,
     descriptorMatcher: ImportDescriptorMatcher,
 ): Result<List<ExternalValue>, ModuleTrapError> = binding {
     module.imports.map { moduleImport ->
-        imports.firstOrNull { import ->
-            moduleImport.moduleName.name == import.moduleName &&
-                moduleImport.entityName.name == import.entityName &&
-                descriptorMatcher(store, module, moduleImport.descriptor, import.value).bind()
-        }?.value ?: Err(InstantiationError.MissingImport).bind()
+        imports.firstOrNull { (moduleName, entityName, externalValue) ->
+            moduleImport.moduleName.name == moduleName &&
+                moduleImport.entityName.name == entityName &&
+                descriptorMatcher(store, module, moduleImport.descriptor, externalValue).bind()
+        }?.third ?: Err(InstantiationError.MissingImport).bind<Nothing>()
     }
 }

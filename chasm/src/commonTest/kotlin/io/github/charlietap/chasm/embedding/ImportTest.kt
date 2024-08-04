@@ -4,12 +4,12 @@ import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.embedding.import.Import
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.import.Import
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals

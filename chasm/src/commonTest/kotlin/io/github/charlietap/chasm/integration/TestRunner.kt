@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.integration
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.decoder.FakeSourceReader
+import io.github.charlietap.chasm.embedding.import.Import
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
@@ -12,7 +13,6 @@ import io.github.charlietap.chasm.error.ChasmError
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.flatMap
-import io.github.charlietap.chasm.import.Import
 
 fun testRunner(
     fileName: String,
