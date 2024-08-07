@@ -8,33 +8,36 @@ import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.ChasmResult.Error
 import io.github.charlietap.chasm.ChasmResult.Success
 import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceByteReader
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceByteReaderImpl
+import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReader
+import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReaderImpl
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-fun readMemory(
+fun readBytes(
     store: Store,
     address: Address.Memory,
-    byteOffsetInMemory: Int,
-): ChasmResult<Byte, ChasmError.ExecutionError> =
-    readMemory(
+    pointer: Int,
+    numberOfBytes: Int,
+): ChasmResult<ByteArray, ChasmError.ExecutionError> =
+    readBytes(
         store = store,
         address = address,
-        byteOffsetInMemory = byteOffsetInMemory,
-        byteReader = ::MemoryInstanceByteReaderImpl,
+        pointer = pointer,
+        numberOfBytes = numberOfBytes,
+        bytesReader = ::MemoryInstanceBytesReaderImpl,
     )
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 
-internal fun readMemory(
+internal fun readBytes(
     store: Store,
     address: Address.Memory,
-    byteOffsetInMemory: Int,
-    byteReader: MemoryInstanceByteReader,
-): Result<Byte, ModuleTrapError> = binding {
+    pointer: Int,
+    numberOfBytes: Int,
+    bytesReader: MemoryInstanceBytesReader,
+): Result<ByteArray, ModuleTrapError> = binding {
     val instance = store.memory(address).bind()
-    byteReader(instance, byteOffsetInMemory).bind()
+    bytesReader(instance, pointer, numberOfBytes).bind()
 }

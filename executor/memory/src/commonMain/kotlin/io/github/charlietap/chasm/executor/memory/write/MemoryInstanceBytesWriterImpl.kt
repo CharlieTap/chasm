@@ -9,23 +9,23 @@ import io.github.charlietap.chasm.executor.memory.LinearMemoryInteractorImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 
-fun MemoryInstanceByteWriterImpl(
+fun MemoryInstanceBytesWriterImpl(
     instance: MemoryInstance,
     pointer: Int,
-    byte: Byte,
+    bytes: ByteArray,
 ): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
-    MemoryInstanceByteWriterImpl(
+    MemoryInstanceBytesWriterImpl(
         instance = instance,
         pointer = pointer,
-        byte = byte,
+        bytes = bytes,
         linearMemoryInteractor = ::LinearMemoryInteractorImpl,
     )
 
-internal inline fun MemoryInstanceByteWriterImpl(
+internal inline fun MemoryInstanceBytesWriterImpl(
     instance: MemoryInstance,
     pointer: Int,
-    byte: Byte,
+    bytes: ByteArray,
     linearMemoryInteractor: LinearMemoryInteractor<Unit>,
 ): Result<Unit, InvocationError.MemoryOperationOutOfBounds> = linearMemoryInteractor(instance.data, pointer, 1) {
-    (instance.data as ByteArrayLinearMemory).memory[pointer] = byte
+    bytes.copyInto((instance.data as ByteArrayLinearMemory).memory, pointer)
 }

@@ -15,29 +15,29 @@ import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-fun writeMemory(
+fun writeByte(
     store: Store,
     address: Address.Memory,
-    byteOffsetInMemory: Int,
-    value: Byte,
+    pointer: Int,
+    byte: Byte,
 ): ChasmResult<Unit, ChasmError.ExecutionError> =
-    writeMemory(
+    writeByte(
         store = store,
         address = address,
-        byteOffsetInMemory = byteOffsetInMemory,
-        value = value,
+        pointer = pointer,
+        byte = byte,
         byteWriter = ::MemoryInstanceByteWriterImpl,
     )
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 
-internal fun writeMemory(
+internal fun writeByte(
     store: Store,
     address: Address.Memory,
-    byteOffsetInMemory: Int,
-    value: Byte,
+    pointer: Int,
+    byte: Byte,
     byteWriter: MemoryInstanceByteWriter,
 ): Result<Unit, ModuleTrapError> = binding {
     val instance = store.memory(address).bind()
-    byteWriter(instance, value, byteOffsetInMemory).bind()
+    byteWriter(instance, pointer, byte).bind()
 }

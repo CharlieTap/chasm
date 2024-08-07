@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.embedding.memory
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceByteReader
+import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReader
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
@@ -10,31 +10,34 @@ import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ReadMemoryTest {
+class ReadBytesTest {
 
     @Test
-    fun `can read a byte from a memory instance`() {
+    fun `can read bytes from a memory instance`() {
 
         val instance = memoryInstance()
         val store = store(memories = mutableListOf(instance))
         val address = memoryAddress()
-        val offset = 118
-        val byte: Byte = 117
+        val pointer = 118
+        val numberOfBytes = 2
+        val bytes: ByteArray = byteArrayOf(117, 118)
 
-        val byteReader: MemoryInstanceByteReader = { _instance, _offset ->
+        val bytesReader: MemoryInstanceBytesReader = { _instance, _pointer, _numberOfBytes ->
             assertEquals(instance, _instance)
-            assertEquals(offset, _offset)
+            assertEquals(pointer, _pointer)
+            assertEquals(numberOfBytes, _numberOfBytes)
 
-            Ok(byte)
+            Ok(bytes)
         }
 
-        val expected: Result<Byte, ModuleTrapError> = Ok(byte)
+        val expected: Result<ByteArray, ModuleTrapError> = Ok(bytes)
 
-        val actual = readMemory(
+        val actual = readBytes(
             store = store,
             address = address,
-            byteOffsetInMemory = offset,
-            byteReader = byteReader,
+            pointer = pointer,
+            numberOfBytes = numberOfBytes,
+            bytesReader = bytesReader,
         )
 
         assertEquals(expected, actual)

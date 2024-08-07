@@ -30,7 +30,7 @@ class MemoryInstanceByteWriterTest {
         val memory = ByteArrayLinearMemory(LinearMemory.Pages(1))
         val instance = memoryInstance(data = memory)
 
-        val actual = MemoryInstanceByteWriterImpl(instance, 117, LinearMemory.PAGE_SIZE, ::LinearMemoryInteractorImpl)
+        val actual = MemoryInstanceByteWriterImpl(instance, LinearMemory.PAGE_SIZE, 117, ::LinearMemoryInteractorImpl)
 
         assertEquals(Err(InvocationError.MemoryOperationOutOfBounds), actual)
     }

@@ -4,4 +4,4 @@ import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 
-typealias MemoryInstanceByteWriter = (MemoryInstance, Int, Byte) -> Result<Unit, InvocationError.MemoryOperationOutOfBounds>
+typealias MemoryInstanceBytesWriter = (MemoryInstance, Int, ByteArray) -> Result<Unit, InvocationError.MemoryOperationOutOfBounds>

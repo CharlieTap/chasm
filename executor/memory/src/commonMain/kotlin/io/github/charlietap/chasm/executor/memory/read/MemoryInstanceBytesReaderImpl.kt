@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package io.github.charlietap.chasm.executor.memory.write
+package io.github.charlietap.chasm.executor.memory.read
 
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
@@ -9,23 +9,23 @@ import io.github.charlietap.chasm.executor.memory.LinearMemoryInteractorImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 
-fun MemoryInstanceByteWriterImpl(
+fun MemoryInstanceBytesReaderImpl(
     instance: MemoryInstance,
     pointer: Int,
-    byte: Byte,
-): Result<Unit, InvocationError.MemoryOperationOutOfBounds> =
-    MemoryInstanceByteWriterImpl(
+    numberOfBytes: Int,
+): Result<ByteArray, InvocationError.MemoryOperationOutOfBounds> =
+    MemoryInstanceBytesReaderImpl(
         instance = instance,
         pointer = pointer,
-        byte = byte,
+        numberOfBytes = numberOfBytes,
         linearMemoryInteractor = ::LinearMemoryInteractorImpl,
     )
 
-internal inline fun MemoryInstanceByteWriterImpl(
+internal inline fun MemoryInstanceBytesReaderImpl(
     instance: MemoryInstance,
     pointer: Int,
-    byte: Byte,
-    linearMemoryInteractor: LinearMemoryInteractor<Unit>,
-): Result<Unit, InvocationError.MemoryOperationOutOfBounds> = linearMemoryInteractor(instance.data, pointer, 1) {
-    (instance.data as ByteArrayLinearMemory).memory[pointer] = byte
+    numberOfBytes: Int,
+    linearMemoryInteractor: LinearMemoryInteractor<ByteArray>,
+): Result<ByteArray, InvocationError.MemoryOperationOutOfBounds> = linearMemoryInteractor(instance.data, pointer, numberOfBytes) {
+    (instance.data as ByteArrayLinearMemory).memory.sliceArray(pointer until pointer + numberOfBytes)
 }
