@@ -1,28 +1,27 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.ChasmResult
 import io.github.charlietap.chasm.decoder.FakeSourceReader
-import io.github.charlietap.chasm.embedding.import.Import
+import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.validate
-import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.flatMap
 
 fun testRunner(
     fileName: String,
     fileDirectory: String,
-    arguments: List<ExecutionValue> = emptyList(),
-    store: Store = store(),
+    arguments: List<Value> = emptyList(),
+    store: Store = Store(),
     imports: List<Import> = emptyList(),
     functionName: String = fileName.replace(".wasm", ""),
-    setupFunctions: List<Pair<String, List<ExecutionValue>>> = emptyList(),
-): ChasmResult<List<ExecutionValue>, ChasmError> {
+    setupFunctions: List<Pair<String, List<Value>>> = emptyList(),
+): ChasmResult<List<Value>, ChasmError> {
 
     val byteStream = Resource(fileDirectory + fileName).readBytes()
     val reader = FakeSourceReader(byteStream)

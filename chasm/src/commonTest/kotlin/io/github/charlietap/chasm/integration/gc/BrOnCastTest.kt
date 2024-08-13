@@ -1,13 +1,11 @@
 package io.github.charlietap.chasm.integration.gc
 
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.embedding.fixture.publicI32 as i32
 
 class BrOnCastTest {
 
@@ -18,7 +16,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -33,7 +31,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -48,7 +46,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -63,7 +61,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -78,7 +76,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_null",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -93,7 +91,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -108,7 +106,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(7))
@@ -123,7 +121,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -138,7 +136,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -153,7 +151,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_i31",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -168,7 +166,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -183,7 +181,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -198,7 +196,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(6))
@@ -213,7 +211,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -228,7 +226,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_struct",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -243,7 +241,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -258,7 +256,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -273,7 +271,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -288,7 +286,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(3))
@@ -303,7 +301,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "br_on_array",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(-1))
@@ -318,7 +316,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -333,7 +331,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -348,7 +346,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -363,7 +361,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -378,7 +376,7 @@ class BrOnCastTest {
             fileDirectory = FILE_DIR,
             functionName = "null-diff",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -394,7 +392,7 @@ class BrOnCastTest {
             functionName = "test-sub",
         )
 
-        val expected = listOf<ExecutionValue>()
+        val expected = listOf<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -407,7 +405,7 @@ class BrOnCastTest {
             functionName = "test-canon",
         )
 
-        val expected = listOf<ExecutionValue>()
+        val expected = listOf<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }

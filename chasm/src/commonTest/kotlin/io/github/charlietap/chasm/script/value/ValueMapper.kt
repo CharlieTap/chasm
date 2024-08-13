@@ -1,20 +1,14 @@
 package io.github.charlietap.chasm.script.value
 
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.value.i32
-import io.github.charlietap.chasm.fixture.value.i64
+import io.github.charlietap.chasm.embedding.shapes.HeapType
 import io.github.charlietap.sweet.lib.value.Value
+import io.github.charlietap.chasm.embedding.shapes.Value as ChasmValue
 
-typealias ValueMapper = (Value) -> ExecutionValue?
+typealias ValueMapper = (Value) -> ChasmValue?
 
 fun ValueMapper(
     value: Value,
-): ExecutionValue? = when (value) {
+): ChasmValue? = when (value) {
     is Value.I32 -> i32ValueMapper(value)
     is Value.I64 -> i64ValueMapper(value)
     is Value.F32 -> f32ValueMapper(value)
@@ -25,49 +19,49 @@ fun ValueMapper(
 
 private fun i32ValueMapper(
     value: Value.I32,
-): ExecutionValue? = value.value?.let {
-    i32(it.toIntOrNull() ?: it.toUInt().toInt())
+): ChasmValue.Number.I32? = value.value?.let {
+    ChasmValue.Number.I32(it.toIntOrNull() ?: it.toUInt().toInt())
 }
 
 private fun i64ValueMapper(
     value: Value.I64,
-): ExecutionValue? = value.value?.let {
-    i64(it.toLongOrNull() ?: it.toULong().toLong())
+): ChasmValue.Number.I64? = value.value?.let {
+    ChasmValue.Number.I64(it.toLongOrNull() ?: it.toULong().toLong())
 }
 
 private fun f32ValueMapper(
     value: Value.F32,
-): ExecutionValue? = value.value?.let {
+): ChasmValue.Number.F32? = value.value?.let {
     if (it.contains("nan")) {
         Float.NaN
     } else {
         val bitPattern = it.toUInt().toInt()
         Float.fromBits(bitPattern)
-    }.let(::F32)
+    }.let { ChasmValue.Number.F32(it) }
 }
 
 private fun f64ValueMapper(
     value: Value.F64,
-): ExecutionValue? = value.value?.let {
+): ChasmValue.Number.F64? = value.value?.let {
     if (it.contains("nan")) {
         Double.NaN
     } else {
         val bitPattern = it.toULong().toLong()
         Double.fromBits(bitPattern)
-    }.let(::F64)
+    }.let { ChasmValue.Number.F64(it) }
 }
 
 private fun externRefValueMapper(
     value: Value.Extern,
-): ExecutionValue = value.value?.let(::coalesceNullableInt)?.let {
-    ReferenceValue.Extern(ReferenceValue.Host(Address.Host(it)))
-} ?: ReferenceValue.Null(AbstractHeapType.Extern)
+): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
+    ChasmValue.Reference.Extern(ChasmValue.Reference.Host(it))
+} ?: ChasmValue.Reference.Null(HeapType.Extern)
 
 private fun funcRefValueMapper(
     value: Value.Func,
-): ExecutionValue = value.value?.let(::coalesceNullableInt)?.let {
-    ReferenceValue.Function(Address.Function(it))
-} ?: ReferenceValue.Null(AbstractHeapType.Func)
+): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
+    ChasmValue.Reference.Func(it)
+} ?: ChasmValue.Reference.Null(HeapType.Func)
 
 private fun coalesceNullableInt(value: String) = if (value == "null") {
     null

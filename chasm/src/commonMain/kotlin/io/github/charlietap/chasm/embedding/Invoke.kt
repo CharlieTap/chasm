@@ -1,49 +1,56 @@
 package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.ChasmResult.Error
-import io.github.charlietap.chasm.ChasmResult.Success
-import io.github.charlietap.chasm.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.embedding.transform.BidirectionalMapper
+import io.github.charlietap.chasm.embedding.transform.ValueMapper
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.FunctionInvokerImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 fun invoke(
     store: Store,
-    instance: ModuleInstance,
+    instance: Instance,
     name: String,
-    args: List<ExecutionValue> = emptyList(),
-): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> = invoke(
+    args: List<Value> = emptyList(),
+): ChasmResult<List<Value>, ChasmError.ExecutionError> = invoke(
     store = store,
     instance = instance,
     name = name,
     args = args,
     invoker = ::FunctionInvokerImpl,
+    valueMapper = ValueMapper.instance,
 )
 
 internal fun invoke(
     store: Store,
-    instance: ModuleInstance,
+    instance: Instance,
     name: String,
-    args: List<ExecutionValue>,
+    args: List<Value>,
     invoker: FunctionInvoker,
-): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
+    valueMapper: BidirectionalMapper<Value, ExecutionValue>,
+): ChasmResult<List<Value>, ChasmError.ExecutionError> {
 
-    val extern = instance.exports.firstOrNull { export ->
+    val extern = instance.instance.exports.firstOrNull { export ->
         export.name.name == name
     }?.value
-
     val address = (extern as? ExternalValue.Function)?.address ?: return Error(
         ChasmError.ExecutionError(InvocationError.FunctionNotFound(name)),
     )
+    val arguments = args.map(valueMapper::map)
 
-    return invoker(store, address, args)
+    return invoker(store.store, address, arguments)
+        .map { values -> values.map(valueMapper::bimap) }
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 }

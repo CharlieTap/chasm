@@ -1,6 +1,6 @@
-package io.github.charlietap.chasm
+package io.github.charlietap.chasm.embedding.shapes
 
-import io.github.charlietap.chasm.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ChasmError
 import kotlin.jvm.JvmInline
 
 sealed interface ChasmResult<out S, out E>

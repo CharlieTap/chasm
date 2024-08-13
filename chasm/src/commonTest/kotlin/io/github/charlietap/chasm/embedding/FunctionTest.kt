@@ -1,31 +1,38 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.embedding.fixture.publicFunction
+import io.github.charlietap.chasm.embedding.fixture.publicFunctionType
+import io.github.charlietap.chasm.embedding.fixture.publicStore
+import io.github.charlietap.chasm.embedding.shapes.HostFunction
+import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.fixture.instance.functionAddress
+import io.github.charlietap.chasm.fixture.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class FunctionTest {
 
     @Test
     fun `can allocate a function in the store and return an external value`() {
 
-        val store = store()
-        val funcType = functionType()
-        val hostFunction: HostFunction = { emptyList() }
+        val store = publicStore()
+        val funcType = publicFunctionType()
+        val hostFunction = object : HostFunction {
+            override fun invoke(p1: List<Value>): List<Value> {
+                return emptyList()
+            }
+        }
 
-        val expectedType = funcType.definedType()
-        val expected = ExternalValue.Function(Address.Function(0))
+        val expectedType = functionType().definedType()
+        val expected = publicFunction(functionExternalValue(functionAddress(0)))
 
         val actual = function(store, funcType, hostFunction)
 
         assertEquals(expected, actual)
-        assertEquals(expectedType, store.functions[0].type)
-        assertEquals(hostFunction, (store.functions[0] as? FunctionInstance.HostFunction)?.function)
+        assertEquals(expectedType, store.store.functions[0].type)
+        assertNotNull(store.store.functions[0])
     }
 }

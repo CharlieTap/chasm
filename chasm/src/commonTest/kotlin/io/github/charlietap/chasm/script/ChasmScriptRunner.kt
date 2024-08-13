@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.script
 
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.script.command.CommandResult
 import io.github.charlietap.chasm.script.command.CommandRunner
 import io.github.charlietap.chasm.script.ext.readTextFromPath
@@ -12,7 +12,7 @@ import io.github.charlietap.sweet.lib.ScriptRunner
 
 class ChasmScriptRunner(
     private val store: Store = Store(),
-    private val instances: MutableMap<String?, ModuleInstance> = mutableMapOf(),
+    private val instances: MutableMap<String?, Instance> = mutableMapOf(),
     private val commandRunner: CommandRunner = ::CommandRunner,
     private val hostModuleResolver: HostModuleResolver = ::HostModuleResolver,
 ) : ScriptRunner {
@@ -30,7 +30,7 @@ class ChasmScriptRunner(
         )
 
         val hostModule = hostModuleResolver(store)
-        context.registerImports(HOST_MODULE_NAME, hostModule.exports)
+        context.registerImports(HOST_MODULE_NAME, hostModule)
 
         script.commands.forEach { command ->
 

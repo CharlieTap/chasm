@@ -28,7 +28,7 @@ Additionally, the runtime supports the following Stage 4 proposals
 
 ```kotlin
 dependencies {
-    implementation("io.github.charlietap.chasm:chasm:0.7.1")
+    implementation("io.github.charlietap.chasm:chasm:0.9.0")
 }
 ```
 
@@ -36,7 +36,7 @@ dependencies {
 
 ### Invoking functions
 
-Webassembly compilations output a [Module](./ast/src/commonMain/kotlin/io/github/charlietap/chasm/ast/module/Module.kt)
+Webassembly compilations output a [Module](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Module.kt)
 encoded as either a .wasm or .wat file, currently chasm supports decoding only .wasm binaries
 
 ```kotlin
@@ -45,7 +45,6 @@ val result = module(wasmFileAsByteArray)
 ```
 
 Once a module has been decoded you'll need to instantiate it, and for that you'll need also need a store
-
 
 ```kotlin
 val store = store()
@@ -60,18 +59,30 @@ val result = invoke(store, instance, "fibonacci")
 
 ### Imports
 
-Modules often depend on imports, which come in two flavours, either:
+Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Import.kt), imports can be one of the following:
 
-- Host functions
-- Exported functions from other wasm modules
+- Functions
+- Globals
+- Memories
+- Tables
 
-Both are represented by [ExternalValue](executor/runtime/src/commonMain/kotlin/io/github/charlietap/chasm/executor/runtime/instance/ExternalValue.kt)'s and can be imported at instantiation time
+For the most part imports will actually be exports from other modules, this is the mechanism that wasm uses to share data/behaviour between modules.
+However you can also allocate them separately using the factory functions:
+
+```kotlin
+val function = function(store, functionType, hostFunction)
+val global = global(store, globalType, initialValue)
+val memory = memory(store, memoryType)
+val table = table(store, tableType, initialValue)
+```
+
+Once you have your importables you can pass them in at instantiation time.
 
 ```kotlin
 val import = Import(
     "import module name",
     "import entity name",
-    externalValue,
+    function,
 )
 val result = instance(store, module, listOf(import))
 ```
@@ -81,17 +92,17 @@ val result = instance(store, module, listOf(import))
 Host functions are kotlin functions that can be called by wasm programs at runtime.
 The majority of host functions represent system calls, WASI for example is intended to be integrated as imports of host functions.
 
-Allocation of a host function requires a [FunctionType](ast/src/commonMain/kotlin/io/github/charlietap/chasm/ast/type/FunctionType.kt)
+Allocation of a host function requires a [FunctionType](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/FunctionType.kt)
 
 The function type describes the inputs and outputs of your function so the runtime can call it and use its results
 
-Once you have function type you can allocate the host function like so
+Once you have defined a function type you can allocate the host function like so
 
 ```kotlin
-val functionType = FunctionType(ResultType(emptyList()), ResultType(emptyList()))
-val hostFunction: HostFunction = {
+val functionType = FunctionType(emptyList(), listOf(ValueType.Number.I32))
+val hostFunction = HostFunction { params ->
     println("Hello world")
-    emptyList()
+    listOf(Value.Number.I32(117))
 }
 
 val result = function(store, funcType, hostFunction)

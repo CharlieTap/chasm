@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.integration.gc
 
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.embedding.fixture.publicI32 as i32
 
 class ArrayCopyTest {
 
@@ -64,7 +64,7 @@ class ArrayCopyTest {
             arguments = listOf(i32(0), i32(0), i32(2)),
         )
 
-        val expected = listOf<ExecutionValue>()
+        val expected = listOf<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -79,7 +79,7 @@ class ArrayCopyTest {
             arguments = emptyList(),
         )
 
-        val expected = emptyList<ExecutionValue>()
+        val expected = emptyList<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }

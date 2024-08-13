@@ -1,15 +1,15 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.MemoryType
-import io.github.charlietap.chasm.embedding.import.Import
-import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.FunctionType
+import io.github.charlietap.chasm.embedding.shapes.HostFunction
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Limits
+import io.github.charlietap.chasm.embedding.shapes.MemoryType
+import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.embedding.shapes.ValueType
 import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.i32ValueType
-import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,7 +19,7 @@ class ImportTest {
     @Test
     fun `can run a wasm file with a host_function and return a correct result`() {
 
-        val store = store()
+        val store = Store(store())
 
         val memoryType = MemoryType(Limits(1u))
         val memoryExternal = memory(store, memoryType)
@@ -31,13 +31,15 @@ class ImportTest {
         )
 
         val functionType = FunctionType(
-            resultType(listOf(i32ValueType())),
-            resultType(emptyList()),
+            listOf(ValueType.Number.I32),
+            emptyList(),
         )
 
-        val hostFunction: HostFunction = { _ ->
-            println("hello")
-            emptyList()
+        val hostFunction = object : HostFunction {
+            override fun invoke(p1: List<Value>): List<Value> {
+                println("hello")
+                return emptyList()
+            }
         }
 
         val external = function(store, functionType, hostFunction)
@@ -54,7 +56,7 @@ class ImportTest {
             imports = listOf(memoryImport, printlnImport),
         )
 
-        val expected = emptyList<ExecutionValue>()
+        val expected = emptyList<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }

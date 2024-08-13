@@ -4,26 +4,26 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.mapError
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.ChasmResult.Error
-import io.github.charlietap.chasm.ChasmResult.Success
-import io.github.charlietap.chasm.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
+import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReader
 import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReaderImpl
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.store.Store
 
 fun readBytes(
     store: Store,
-    address: Address.Memory,
+    memory: Memory,
     pointer: Int,
     numberOfBytes: Int,
 ): ChasmResult<ByteArray, ChasmError.ExecutionError> =
     readBytes(
         store = store,
-        address = address,
+        memory = memory,
         pointer = pointer,
         numberOfBytes = numberOfBytes,
         bytesReader = ::MemoryInstanceBytesReaderImpl,
@@ -33,11 +33,11 @@ fun readBytes(
 
 internal fun readBytes(
     store: Store,
-    address: Address.Memory,
+    memory: Memory,
     pointer: Int,
     numberOfBytes: Int,
     bytesReader: MemoryInstanceBytesReader,
 ): Result<ByteArray, ModuleTrapError> = binding {
-    val instance = store.memory(address).bind()
+    val instance = store.store.memory(memory.reference.address).bind()
     bytesReader(instance, pointer, numberOfBytes).bind()
 }

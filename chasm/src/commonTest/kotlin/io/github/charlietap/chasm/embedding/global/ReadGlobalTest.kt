@@ -1,9 +1,12 @@
 package io.github.charlietap.chasm.embedding.global
 
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.fixture.publicStore
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.fixture.instance.globalAddress
+import io.github.charlietap.chasm.fixture.instance.globalExternalValue
 import io.github.charlietap.chasm.fixture.instance.globalInstance
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.value.i32
@@ -17,14 +20,15 @@ class ReadGlobalTest {
 
         val value = i32(117)
         val instance = globalInstance(value = value)
-        val store = store(globals = mutableListOf(instance))
-        val address = Address.Global(0)
+        val store = publicStore(store(globals = mutableListOf(instance)))
+        val address = globalAddress(0)
+        val global = Global(globalExternalValue(address))
 
-        val expected: ChasmResult<ExecutionValue, ChasmError.ExecutionError> = ChasmResult.Success(value)
+        val expected: ChasmResult<Value, ChasmError.ExecutionError> = ChasmResult.Success(Value.Number.I32(117))
 
         val actual = readGlobal(
             store = store,
-            address = address,
+            global = global,
         )
 
         assertEquals(expected, actual)

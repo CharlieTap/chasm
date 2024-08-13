@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.script.command
 
 import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.fold
+import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.command.AssertMalformedCommand

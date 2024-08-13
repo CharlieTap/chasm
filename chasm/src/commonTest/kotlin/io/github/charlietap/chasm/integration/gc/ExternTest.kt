@@ -1,15 +1,14 @@
 package io.github.charlietap.chasm.integration.gc
 
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.HeapType
+import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import io.github.charlietap.chasm.embedding.fixture.publicI32 as i32
 
 class ExternTest {
 
@@ -20,10 +19,10 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "internalize",
-            arguments = listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(1)))),
+            arguments = listOf(Value.Reference.Extern(Value.Reference.Host(1))),
         )
 
-        val expected = listOf(ReferenceValue.Host(Address.Host(1)))
+        val expected = listOf(Value.Reference.Host(1))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -35,10 +34,10 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "internalize",
-            arguments = listOf(ReferenceValue.Null(AbstractHeapType.Extern)),
+            arguments = listOf(Value.Reference.Null(HeapType.Extern)),
         )
 
-        val expected = listOf(ReferenceValue.Null(AbstractHeapType.Any))
+        val expected = listOf(Value.Reference.Null(HeapType.Any))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -50,10 +49,10 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize",
-            arguments = listOf(ReferenceValue.Host(Address.Host(2))),
+            arguments = listOf(Value.Reference.Host(2)),
         )
 
-        val expected = listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(2))))
+        val expected = listOf(Value.Reference.Extern(Value.Reference.Host(2)))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -65,10 +64,10 @@ class ExternTest {
             fileName = "extern.wasm",
             fileDirectory = FILE_DIR,
             functionName = "externalize",
-            arguments = listOf(ReferenceValue.Null(AbstractHeapType.Any)),
+            arguments = listOf(Value.Reference.Null(HeapType.Any)),
         )
 
-        val expected = listOf(ReferenceValue.Null(AbstractHeapType.Extern))
+        val expected = listOf(Value.Reference.Null(HeapType.Extern))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -83,7 +82,7 @@ class ExternTest {
             arguments = listOf(i32(0)),
         )
 
-        val expected = listOf(ReferenceValue.Null(AbstractHeapType.Extern))
+        val expected = listOf(Value.Reference.Null(HeapType.Extern))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -96,10 +95,10 @@ class ExternTest {
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        assertIs<ChasmResult<ReferenceValue.Extern, ChasmError>>(result)
+        assertIs<ChasmResult<Value.Reference.Extern, ChasmError>>(result)
     }
 
     @Test
@@ -110,10 +109,10 @@ class ExternTest {
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        assertIs<ChasmResult<ReferenceValue.Extern, ChasmError>>(result)
+        assertIs<ChasmResult<Value.Reference.Extern, ChasmError>>(result)
     }
 
     @Test
@@ -124,10 +123,10 @@ class ExternTest {
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        assertIs<ChasmResult<ReferenceValue.Extern, ChasmError>>(result)
+        assertIs<ChasmResult<Value.Reference.Extern, ChasmError>>(result)
     }
 
     @Test
@@ -138,10 +137,10 @@ class ExternTest {
             fileDirectory = FILE_DIR,
             functionName = "externalize-i",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        assertIs<ChasmResult<ReferenceValue.Extern, ChasmError>>(result)
+        assertIs<ChasmResult<Value.Reference.Extern, ChasmError>>(result)
     }
 
     @Test
@@ -154,7 +153,7 @@ class ExternTest {
             arguments = listOf(i32(5)),
         )
 
-        val expected = listOf(ReferenceValue.Null(AbstractHeapType.Extern))
+        val expected = listOf(Value.Reference.Null(HeapType.Extern))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -169,7 +168,7 @@ class ExternTest {
             arguments = listOf(i32(0)),
         )
 
-        val expected = listOf(ReferenceValue.Null(AbstractHeapType.Any))
+        val expected = listOf(Value.Reference.Null(HeapType.Any))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -182,10 +181,10 @@ class ExternTest {
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        assertIs<ChasmResult<ReferenceValue.I31, ChasmError>>(result)
+        assertIs<ChasmResult<Value.Reference.I31, ChasmError>>(result)
     }
 
     @Test
@@ -196,10 +195,10 @@ class ExternTest {
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        assertIs<ChasmResult<ReferenceValue.Struct, ChasmError>>(result)
+        assertIs<ChasmResult<Value.Reference.Struct, ChasmError>>(result)
     }
 
     @Test
@@ -210,10 +209,10 @@ class ExternTest {
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        assertIs<ChasmResult<ReferenceValue.Array, ChasmError>>(result)
+        assertIs<ChasmResult<Value.Reference.Array, ChasmError>>(result)
     }
 
     @Test
@@ -224,10 +223,10 @@ class ExternTest {
             fileDirectory = FILE_DIR,
             functionName = "externalize-ii",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = listOf(ReferenceValue.Host(Address.Host(0)))
+        val expected = listOf(Value.Reference.Host(0))
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -242,7 +241,7 @@ class ExternTest {
             arguments = listOf(i32(5)),
         )
 
-        val expected = listOf(ReferenceValue.Null(AbstractHeapType.Any))
+        val expected = listOf(Value.Reference.Null(HeapType.Any))
 
         assertEquals(ChasmResult.Success(expected), result)
     }

@@ -6,12 +6,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
-import io.github.charlietap.chasm.expect
-import io.github.charlietap.chasm.flatMap
-import io.github.charlietap.chasm.map
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.shapes.flatMap
+import io.github.charlietap.chasm.embedding.shapes.map
+import io.github.charlietap.chasm.embedding.store
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,8 +27,8 @@ class ChasmViewModel @Inject constructor(
     private val assetManager: AssetManager,
 ) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>()
 {
-    private val store = Store()
-    private lateinit var instance: ModuleInstance
+    private val store = store()
+    private lateinit var instance: Instance
 
     init {
         viewModelScope.launch {
@@ -75,15 +75,15 @@ class ChasmViewModel @Inject constructor(
         assetManager.open(filename).readBytes()
     }
 
-    private fun instantiateModule(byteArray: ByteArray) : ModuleInstance {
+    private fun instantiateModule(byteArray: ByteArray) : Instance {
         return module(byteArray).flatMap { module ->
             instance(store, module, emptyList())
         }.expect("Failed to instantiate module")
     }
 
     private fun calculateFibonacci(n: Int): Int {
-        return invoke(store, instance, "fibonacci", listOf(NumberValue.I32(n))).map {
-            (it.first() as NumberValue.I32).value
+        return invoke(store, instance, "fibonacci", listOf(Value.Number.I32(n))).map {
+            (it.first() as Value.Number.I32).value
         }.expect("Failed to calculate fibonacci")
     }
 

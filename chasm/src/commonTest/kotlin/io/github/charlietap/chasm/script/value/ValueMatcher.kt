@@ -1,16 +1,15 @@
 package io.github.charlietap.chasm.script.value
 
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.embedding.shapes.Value
 
-typealias ValueMatcher = (ExecutionValue, ExecutionValue) -> Boolean
+typealias ValueMatcher = (Value, Value) -> Boolean
 
 fun ValueMatcher(
-    first: ExecutionValue,
-    second: ExecutionValue,
+    first: Value,
+    second: Value,
 ): Boolean = when {
-    first is NumberValue.F32 && second is NumberValue.F32 -> compareFloats(first.value, second.value)
-    first is NumberValue.F64 && second is NumberValue.F64 -> compareDoubles(first.value, second.value)
+    first is Value.Number.F32 && second is Value.Number.F32 -> compareFloats(first.value, second.value)
+    first is Value.Number.F64 && second is Value.Number.F64 -> compareDoubles(first.value, second.value)
     else -> first == second
 }
 

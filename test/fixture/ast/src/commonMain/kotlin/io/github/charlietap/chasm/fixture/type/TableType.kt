@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.TableType
 
 fun tableType(
-    referenceType: ReferenceType = ReferenceType.RefNull(AbstractHeapType.Func),
+    referenceType: ReferenceType = ReferenceType.Ref(AbstractHeapType.Func),
     limits: Limits = limits(),
 ) = TableType(
     referenceType = referenceType,

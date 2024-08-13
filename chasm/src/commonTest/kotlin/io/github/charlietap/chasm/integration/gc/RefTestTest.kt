@@ -1,13 +1,11 @@
 package io.github.charlietap.chasm.integration.gc
 
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.embedding.fixture.publicI32 as i32
 
 class RefTestTest {
 
@@ -19,7 +17,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -34,7 +32,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -49,7 +47,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -64,7 +62,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -79,7 +77,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -94,7 +92,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
             arguments = listOf(i32(5)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -109,7 +107,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
             arguments = listOf(i32(6)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -124,7 +122,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_data",
             arguments = listOf(i32(7)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -139,7 +137,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -154,7 +152,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -169,7 +167,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -184,7 +182,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -199,7 +197,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -214,7 +212,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
             arguments = listOf(i32(5)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -229,7 +227,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
             arguments = listOf(i32(6)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -244,7 +242,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_any",
             arguments = listOf(i32(7)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -259,7 +257,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -274,7 +272,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -289,7 +287,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -304,7 +302,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -319,7 +317,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -334,7 +332,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
             arguments = listOf(i32(5)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -349,7 +347,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
             arguments = listOf(i32(6)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -364,7 +362,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_eq",
             arguments = listOf(i32(7)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -379,7 +377,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -394,7 +392,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -409,7 +407,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -424,7 +422,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -439,7 +437,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -454,7 +452,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
             arguments = listOf(i32(5)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -469,7 +467,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
             arguments = listOf(i32(6)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -484,7 +482,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_i31",
             arguments = listOf(i32(7)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -499,7 +497,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -514,7 +512,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -529,7 +527,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -544,7 +542,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -559,7 +557,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
             arguments = listOf(i32(5)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -574,7 +572,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
             arguments = listOf(i32(6)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -589,7 +587,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_struct",
             arguments = listOf(i32(7)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -604,7 +602,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -619,7 +617,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -634,7 +632,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -649,7 +647,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -664,7 +662,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -679,7 +677,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
             arguments = listOf(i32(5)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -694,7 +692,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
             arguments = listOf(i32(6)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -709,7 +707,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_array",
             arguments = listOf(i32(7)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -724,7 +722,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_func",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -739,7 +737,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_func",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -754,7 +752,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_func",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -769,7 +767,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_func",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -784,7 +782,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_func",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -799,7 +797,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_func",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -814,7 +812,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -829,7 +827,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -844,7 +842,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -859,7 +857,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -874,7 +872,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(0))
@@ -889,7 +887,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_null_extern",
             arguments = listOf(i32(5)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -904,7 +902,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
             arguments = listOf(i32(0)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -919,7 +917,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
             arguments = listOf(i32(1)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -934,7 +932,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
             arguments = listOf(i32(2)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -949,7 +947,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
             arguments = listOf(i32(3)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -964,7 +962,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
             arguments = listOf(i32(4)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(2))
@@ -979,7 +977,7 @@ class RefTestTest {
             fileDirectory = FILE_DIR,
             functionName = "ref_test_extern",
             arguments = listOf(i32(5)),
-            setupFunctions = listOf("init" to listOf(ReferenceValue.Extern(ReferenceValue.Host(Address.Host(0))))),
+            setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
         val expected = listOf(i32(1))
@@ -996,7 +994,7 @@ class RefTestTest {
             arguments = listOf(),
         )
 
-        val expected = listOf<ExecutionValue>()
+        val expected = listOf<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -1010,7 +1008,7 @@ class RefTestTest {
             arguments = listOf(),
         )
 
-        val expected = listOf<ExecutionValue>()
+        val expected = listOf<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }
