@@ -35,7 +35,7 @@ hilt-integrations = "1.2.0"
 
 junit = "4.13.2"
 
-kotlin = "2.0.0"
+kotlin = "2.0.20"
 kotlin-poet = "1.16.0"
 kotlinter = "4.2.0"
 kot-compile-testing = "1.5.0"
@@ -44,11 +44,11 @@ kotlinx-atomic-fu = "0.23.1"
 kotlinx-benchmark = "0.4.10"
 kotlinx-coroutines = "1.8.0"
 kotlinx-datetime = "0.5.0"
-kotlinx-io = "0.3.2"
-kotlinx-serialization = "1.5.1"
-kotlinx-test-resources = "0.4.1"
+kotlinx-io = "0.5.3"
+kotlinx-serialization = "1.7.1"
+kotlinx-test-resources = "0.9.0"
 
-ksp = "2.0.0-1.0.21"
+ksp = "2.0.20-1.0.24"
 
 result = "2.0.0"
 
