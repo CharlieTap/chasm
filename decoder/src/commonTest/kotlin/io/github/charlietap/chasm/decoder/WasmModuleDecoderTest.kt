@@ -1,12 +1,17 @@
 package io.github.charlietap.chasm.decoder
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.decoder.context.scope.Scope
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.factory.BinaryReaderFactory
 import io.github.charlietap.chasm.decoder.decoder.magic.MagicNumberValidator
+import io.github.charlietap.chasm.decoder.error.ModuleDecodeError
+import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeExhaustedReader
+import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.decoder.section.ImportSection
 import io.github.charlietap.chasm.decoder.section.Section
 import io.github.charlietap.chasm.decoder.section.SectionSize
 import io.github.charlietap.chasm.decoder.section.SectionType
@@ -66,5 +71,58 @@ class WasmModuleDecoderTest {
         )
 
         assertEquals(Ok(expected), actual)
+    }
+
+    @Test
+    fun `malformed error is returned if section order is unexpected`() {
+
+        val sourceReader = FakeSourceReader()
+        val reader = FakeWasmBinaryReader(
+            fakeUIntReader = { Ok(0u) },
+            fakeExhaustedReader = { Ok(false) },
+        )
+        val version = Version.One
+
+        val readerFactory: BinaryReaderFactory = { _sourceReader ->
+            assertEquals(sourceReader, _sourceReader)
+            reader
+        }
+
+        val magicNumberValidator: MagicNumberValidator = { _reader ->
+            assertEquals(reader, _reader)
+            Ok(Unit)
+        }
+
+        val versionDecoder: Decoder<Version> = { context ->
+            assertEquals(reader, context.reader)
+            Ok(version)
+        }
+
+        val sectionTypeSequence = sequenceOf(SectionType.Import, SectionType.Type).iterator()
+        val sectionTypeDecoder: Decoder<SectionType> = { _ ->
+            Ok(sectionTypeSequence.next())
+        }
+
+        val sectionDecoder: Decoder<Section> = { _ ->
+            Ok(ImportSection(emptyList()))
+        }
+
+        val scope: Scope<Pair<SectionSize, SectionType>> = { _, _ ->
+            Ok(decoderContext())
+        }
+
+        val expected = Err(ModuleDecodeError.ModuleMalformed)
+
+        val actual = WasmModuleDecoder(
+            source = sourceReader,
+            readerFactory = readerFactory,
+            magicNumberValidator = magicNumberValidator,
+            versionDecoder = versionDecoder,
+            sectionTypeDecoder = sectionTypeDecoder,
+            sectionDecoder = sectionDecoder,
+            scope = scope,
+        )
+
+        assertEquals(expected, actual)
     }
 }

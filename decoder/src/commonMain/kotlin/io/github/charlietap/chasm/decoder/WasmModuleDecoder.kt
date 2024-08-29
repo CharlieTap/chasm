@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.decoder
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Module
@@ -15,6 +16,7 @@ import io.github.charlietap.chasm.decoder.decoder.magic.MagicNumberValidator
 import io.github.charlietap.chasm.decoder.decoder.section.SectionDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.SectionTypeDecoder
 import io.github.charlietap.chasm.decoder.decoder.version.VersionDecoder
+import io.github.charlietap.chasm.decoder.error.ModuleDecodeError
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.decoder.ext.section
 import io.github.charlietap.chasm.decoder.reader.SourceReader
@@ -53,16 +55,21 @@ internal fun WasmModuleDecoder(
 
     val version = versionDecoder(context).bind()
     val builder = ModuleBuilder(version)
+    var previousSectionType = SectionType.Custom
 
     while (reader.exhausted().bind().not()) {
 
         val sectionType = sectionTypeDecoder(context).bind()
+        if (sectionType.ordinal <= previousSectionType.ordinal && sectionType != SectionType.Custom) {
+            Err(ModuleDecodeError.ModuleMalformed).bind()
+        }
         val sectionSize = SectionSize(reader.uint().bind())
 
         val scopedContext = scope(context, sectionSize to sectionType).bind()
         val section = sectionDecoder(scopedContext).bind()
 
         builder.section(section)
+        previousSectionType = sectionType
     }
 
     builder.build().bind()

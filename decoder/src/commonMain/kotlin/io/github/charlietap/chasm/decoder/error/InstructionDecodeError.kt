@@ -29,6 +29,9 @@ sealed interface InstructionDecodeError : WasmDecodeError {
     value class InvalidControlInstruction(val byte: UByte) : InstructionDecodeError
 
     @JvmInline
+    value class InvalidAlignment(val alignment: UInt) : InstructionDecodeError
+
+    @JvmInline
     value class InvalidCastFlags(val byte: UByte) : InstructionDecodeError
 
     data class InvalidPrefixInstruction(val prefix: UByte, val opcode: UInt) : InstructionDecodeError

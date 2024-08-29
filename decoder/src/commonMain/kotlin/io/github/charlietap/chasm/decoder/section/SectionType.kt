@@ -11,7 +11,7 @@ internal enum class SectionType(val id: UByte) {
     Export(0x07u),
     Start(0x08u),
     Element(0x09u),
+    DataCount(0x0Cu),
     Code(0x0Au),
     Data(0x0Bu),
-    DataCount(0x0Cu),
 }
