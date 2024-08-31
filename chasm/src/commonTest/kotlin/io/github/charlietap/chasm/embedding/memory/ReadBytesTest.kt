@@ -2,9 +2,12 @@ package io.github.charlietap.chasm.embedding.memory
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.embedding.fixture.publicMemory
+import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReader
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
+import io.github.charlietap.chasm.fixture.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
@@ -16,8 +19,9 @@ class ReadBytesTest {
     fun `can read bytes from a memory instance`() {
 
         val instance = memoryInstance()
-        val store = store(memories = mutableListOf(instance))
+        val store = publicStore(store(memories = mutableListOf(instance)))
         val address = memoryAddress()
+        val memory = publicMemory(memoryExternalValue(address))
         val pointer = 118
         val numberOfBytes = 2
         val bytes: ByteArray = byteArrayOf(117, 118)
@@ -34,7 +38,7 @@ class ReadBytesTest {
 
         val actual = readBytes(
             store = store,
-            address = address,
+            memory = memory,
             pointer = pointer,
             numberOfBytes = numberOfBytes,
             bytesReader = bytesReader,

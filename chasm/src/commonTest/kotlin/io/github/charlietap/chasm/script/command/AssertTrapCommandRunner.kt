@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.action.ActionResult
 import io.github.charlietap.chasm.script.action.ActionRunner

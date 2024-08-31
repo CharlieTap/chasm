@@ -1,25 +1,26 @@
 package io.github.charlietap.chasm.script
 
-import io.github.charlietap.chasm.embedding.import.Import
-import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.embedding.exports
+import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Store
 
 data class ScriptContext(
     val binaryDirectory: String,
     val store: Store,
-    val instances: MutableMap<String?, ModuleInstance>,
+    val instances: MutableMap<String?, Instance>,
     val imports: MutableList<Import> = mutableListOf(),
 ) {
 
-    fun instance(name: String?): ModuleInstance = instances[name]!!
+    fun instance(name: String?): Instance = instances[name]!!
 
-    fun registerImports(moduleName: String, exports: List<ExportInstance>) {
+    fun registerImports(moduleName: String, instance: Instance) {
 
+        val exports = exports(instance)
         val imports = exports.map { export ->
             Import(
                 moduleName,
-                export.name.name,
+                export.name,
                 export.value,
             )
         }

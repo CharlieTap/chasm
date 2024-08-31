@@ -1,6 +1,15 @@
 package io.github.charlietap.chasm
 
-import io.github.charlietap.chasm.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.expect
+import io.github.charlietap.chasm.embedding.shapes.flatMap
+import io.github.charlietap.chasm.embedding.shapes.fold
+import io.github.charlietap.chasm.embedding.shapes.getOrElse
+import io.github.charlietap.chasm.embedding.shapes.getOrNull
+import io.github.charlietap.chasm.embedding.shapes.map
+import io.github.charlietap.chasm.embedding.shapes.onError
+import io.github.charlietap.chasm.embedding.shapes.onSuccess
 import io.github.charlietap.chasm.fixture.error.moduleRuntimeError
 import kotlin.test.Test
 import kotlin.test.assertEquals

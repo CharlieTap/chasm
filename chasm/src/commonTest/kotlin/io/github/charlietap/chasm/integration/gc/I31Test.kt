@@ -1,13 +1,13 @@
 package io.github.charlietap.chasm.integration.gc
 
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.error.ChasmError
+import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import io.github.charlietap.chasm.embedding.fixture.publicI32 as i32
 
 class I31Test {
 

@@ -12,7 +12,7 @@ fun RegisterCommandRunner(
 
     val instance = context.instance(command.name)
 
-    context.registerImports(command.registerAs, instance.exports)
+    context.registerImports(command.registerAs, instance)
 
     return CommandResult.Success
 }

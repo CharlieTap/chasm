@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.error
+package io.github.charlietap.chasm.embedding.error
 
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError

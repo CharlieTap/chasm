@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.integration.gc
 
-import io.github.charlietap.chasm.ChasmResult
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.integration.testRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.embedding.fixture.publicI32 as i32
 
 class ArrayFillTest {
 
@@ -19,7 +19,7 @@ class ArrayFillTest {
             arguments = listOf(i32(12), i32(0), i32(0)),
         )
 
-        val expected = emptyList<ExecutionValue>()
+        val expected = emptyList<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }
@@ -88,7 +88,7 @@ class ArrayFillTest {
             arguments = listOf(i32(2), i32(11), i32(2)),
         )
 
-        val expected = emptyList<ExecutionValue>()
+        val expected = emptyList<Value>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }

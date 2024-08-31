@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.script.action
 
 import io.github.charlietap.chasm.embedding.invoke
-import io.github.charlietap.chasm.fold
+import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.value.ValueMapper
 import io.github.charlietap.sweet.lib.action.InvokeAction
