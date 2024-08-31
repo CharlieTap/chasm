@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Module
 
-fun module(sourceReader: SourceReader): ChasmResult<Module, DecodeError> {
+internal fun module(sourceReader: SourceReader): ChasmResult<Module, DecodeError> {
     return module(sourceReader, ::WasmModuleDecoder)
 }
 
