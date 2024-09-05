@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.decoder.decoder.instruction.memory
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.MemArg
+import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUIntReader
 import io.github.charlietap.chasm.fixture.module.memoryIndex
@@ -44,5 +46,19 @@ class MemArgWithIndexDecoderTest {
         )
 
         assertEquals(Ok(expected), actual)
+    }
+
+    @Test
+    fun `error is returned if alignment exponent is greater than max`() {
+
+        val reader = FakeUIntReader {
+            Ok(128u)
+        }
+        val context = decoderContext(reader)
+
+        val actual = MemArgWithIndexDecoder(context)
+        val expected = Err(InstructionDecodeError.InvalidAlignment(128u))
+
+        assertEquals(expected, actual)
     }
 }

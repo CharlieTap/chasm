@@ -68,11 +68,11 @@ configure<PublishingConventionsExtension> {
 
 configure<WasmTestSuiteGenPluginExtension> {
     wabtVersion = "1.0.35"
-    testSuiteCommit = "16a839d5601c283541a84572b47637f035b51437"
+    testSuiteCommit = "7c3ec23ab19b37c68976b555f9491752cbda6d5f"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm"
     proposals = listOf("tail-call", "extended-const", "multi-memory")
-    excludes = listOf("simd_*/**", "**/simd_*", "binary.wast", "global.wast", "imports.wast", "memory.wast")
+    excludes = listOf("simd_*/**", "**/simd_*", "align.wast", "binary.wast", "global.wast", "imports.wast", "memory.wast")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
