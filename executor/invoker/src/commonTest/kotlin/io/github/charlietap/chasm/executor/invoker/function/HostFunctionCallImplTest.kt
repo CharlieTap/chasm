@@ -6,6 +6,9 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
+import io.github.charlietap.chasm.fixture.frame
+import io.github.charlietap.chasm.fixture.frameState
+import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -25,6 +28,13 @@ class HostFunctionCallImplTest {
 
         val store = store()
         val stack = stack()
+        val frame = frame(
+            state = frameState(
+                moduleInstance = moduleInstance(),
+            ),
+        )
+
+        stack.push(frame)
 
         val functionType = functionType(
             params = resultType(
@@ -70,7 +80,7 @@ class HostFunctionCallImplTest {
         )
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(0, stack.framesDepth())
+        assertEquals(1, stack.framesDepth())
         assertEquals(2, stack.valuesDepth())
         assertEquals(i64(118), stack.popValueOrNull()?.value)
         assertEquals(i32(117), stack.popValueOrNull()?.value)
@@ -81,6 +91,13 @@ class HostFunctionCallImplTest {
 
         val store = store()
         val stack = stack()
+        val frame = frame(
+            state = frameState(
+                moduleInstance = moduleInstance(),
+            ),
+        )
+
+        stack.push(frame)
 
         val functionType = functionType(
             params = resultType(

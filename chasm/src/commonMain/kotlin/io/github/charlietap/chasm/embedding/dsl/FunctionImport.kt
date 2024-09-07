@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.embedding.dsl
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.FunctionType
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
-import io.github.charlietap.chasm.embedding.shapes.HostFunctionFactory
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 
@@ -20,10 +19,6 @@ class FunctionImportBuilder(private val store: Store) {
 
     fun type(builder: FunctionTypeBuilder.() -> Unit) {
         type = FunctionTypeBuilder().apply(builder).build()
-    }
-
-    fun reference(reference: HostFunctionFactory) {
-        hostFunction = reference(store)
     }
 
     fun reference(reference: HostFunction) {

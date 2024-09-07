@@ -11,8 +11,10 @@ import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instance.HostFunctionContext
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
@@ -25,13 +27,18 @@ internal fun HostFunctionCallImpl(
     stack: Stack,
     function: FunctionInstance.HostFunction,
 ): Result<Unit, InvocationError> = binding {
+    val frame = stack.peekFrame().bind()
     val type = function.functionType().bind()
 
     val params = List(type.params.types.size) {
         stack.popValue().bind().value
     }.asReversed()
 
-    val results = function.function.invoke(params)
+    val functionContext = HostFunctionContext(
+        store,
+        frame.state.module,
+    )
+    val results = function.function.invoke(functionContext, params)
 
     type.results.types.forEachIndexed { index, valueType ->
         val result = results.getOrNull(index)

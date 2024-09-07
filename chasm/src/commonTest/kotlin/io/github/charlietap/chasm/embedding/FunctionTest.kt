@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.embedding.fixture.publicFunction
 import io.github.charlietap.chasm.embedding.fixture.publicFunctionType
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
-import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.fixture.instance.functionAddress
 import io.github.charlietap.chasm.fixture.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -20,10 +19,8 @@ class FunctionTest {
 
         val store = publicStore()
         val funcType = publicFunctionType()
-        val hostFunction = object : HostFunction {
-            override fun invoke(p1: List<Value>): List<Value> {
-                return emptyList()
-            }
+        val hostFunction: HostFunction = {
+            emptyList()
         }
 
         val expectedType = functionType().definedType()

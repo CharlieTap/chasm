@@ -35,11 +35,8 @@ class ImportTest {
             emptyList(),
         )
 
-        val hostFunction = object : HostFunction {
-            override fun invoke(p1: List<Value>): List<Value> {
-                println("hello")
-                return emptyList()
-            }
+        val hostFunction: HostFunction = {
+            emptyList()
         }
 
         val external = function(store, functionType, hostFunction)
