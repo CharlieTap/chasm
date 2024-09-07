@@ -49,6 +49,8 @@ include(":libs:sse2")
 include(":libs:stack")
 include(":libs:weakref")
 
+include(":stream")
+
 include(":test:fake:decoder")
 
 include(":test:fixture:ast")

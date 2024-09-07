@@ -28,6 +28,8 @@ kotlin {
 
        commonMain {
             dependencies {
+                api(projects.stream)
+
                 implementation(projects.ast)
 
                 implementation(projects.decoder)

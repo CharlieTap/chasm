@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.decoder.ext.toFloatLe
 import io.github.charlietap.chasm.decoder.ext.toIntLeb128
 import io.github.charlietap.chasm.decoder.ext.toLongLeb128
 import io.github.charlietap.chasm.decoder.ext.toUIntLeb128
+import io.github.charlietap.chasm.stream.SourceReader
 
 internal class SourceWasmBinaryReader(
     private val source: SourceReader,

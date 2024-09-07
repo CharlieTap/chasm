@@ -19,11 +19,11 @@ import io.github.charlietap.chasm.decoder.decoder.version.VersionDecoder
 import io.github.charlietap.chasm.decoder.error.ModuleDecodeError
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.decoder.ext.section
-import io.github.charlietap.chasm.decoder.reader.SourceReader
 import io.github.charlietap.chasm.decoder.reader.SourceWasmBinaryReader
 import io.github.charlietap.chasm.decoder.section.Section
 import io.github.charlietap.chasm.decoder.section.SectionSize
 import io.github.charlietap.chasm.decoder.section.SectionType
+import io.github.charlietap.chasm.stream.SourceReader
 
 fun WasmModuleDecoder(
     source: SourceReader,

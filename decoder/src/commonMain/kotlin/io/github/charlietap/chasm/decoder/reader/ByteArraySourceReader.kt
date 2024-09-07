@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.decoder.reader
 
+import io.github.charlietap.chasm.stream.SourceReader
+
 fun ByteArraySourceReader(
     bytes: ByteArray,
     startPosition: Int = 0,

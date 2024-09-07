@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.decoder.reader
+package io.github.charlietap.chasm.stream
 
 interface SourceReader {
 

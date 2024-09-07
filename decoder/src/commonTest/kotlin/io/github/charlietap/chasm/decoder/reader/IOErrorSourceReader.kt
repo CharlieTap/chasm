@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.decoder.reader
 
+import io.github.charlietap.chasm.stream.SourceReader
+
 fun IOErrorSourceReader(err: Throwable): SourceReader = object : SourceReader {
     override fun byte(): Byte = throw err
 
