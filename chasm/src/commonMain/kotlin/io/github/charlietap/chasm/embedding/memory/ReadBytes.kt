@@ -11,22 +11,25 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReader
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReaderImpl
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 
 fun readBytes(
     store: Store,
     memory: Memory,
-    pointer: Int,
-    numberOfBytes: Int,
+    buffer: ByteArray,
+    memoryPointer: Int,
+    bytesToRead: Int,
+    bufferPointer: Int = 0,
 ): ChasmResult<ByteArray, ChasmError.ExecutionError> =
     readBytes(
         store = store,
         memory = memory,
-        pointer = pointer,
-        numberOfBytes = numberOfBytes,
-        bytesReader = ::MemoryInstanceBytesReaderImpl,
+        buffer = buffer,
+        memoryPointer = memoryPointer,
+        bytesToRead = bytesToRead,
+        bufferPointer = bufferPointer,
+        bytesReader = ::MemoryInstanceBytesReader,
     )
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
@@ -34,10 +37,12 @@ fun readBytes(
 internal fun readBytes(
     store: Store,
     memory: Memory,
-    pointer: Int,
-    numberOfBytes: Int,
+    buffer: ByteArray,
+    memoryPointer: Int,
+    bytesToRead: Int,
+    bufferPointer: Int,
     bytesReader: MemoryInstanceBytesReader,
 ): Result<ByteArray, ModuleTrapError> = binding {
     val instance = store.store.memory(memory.reference.address).bind()
-    bytesReader(instance, pointer, numberOfBytes).bind()
+    bytesReader(instance, buffer, memoryPointer, bytesToRead, bufferPointer).bind()
 }

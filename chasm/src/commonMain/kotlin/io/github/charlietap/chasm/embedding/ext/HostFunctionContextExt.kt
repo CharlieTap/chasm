@@ -11,20 +11,25 @@ import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.map
 
 inline fun HostFunctionContext.byte(
-    pointer: Int,
     memory: Memory,
-): ChasmResult<Byte, ChasmError.ExecutionError> = readByte(this.store, memory, pointer)
+    memoryPointer: Int,
+): ChasmResult<Byte, ChasmError.ExecutionError> = readByte(this.store, memory, memoryPointer)
 
 inline fun HostFunctionContext.bytes(
-    pointer: Int,
-    numberOfBytes: Int,
     memory: Memory,
-): ChasmResult<ByteArray, ChasmError.ExecutionError> = readBytes(this.store, memory, pointer, numberOfBytes)
+    buffer: ByteArray,
+    memoryPointer: Int,
+    bytesToRead: Int,
+    bufferPointer: Int = 0,
+): ChasmResult<ByteArray, ChasmError.ExecutionError> = readBytes(this.store, memory, buffer, memoryPointer, bytesToRead, bufferPointer)
 
 inline fun HostFunctionContext.int(
-    pointer: Int,
     memory: Memory,
-): ChasmResult<Int, ChasmError.ExecutionError> = readBytes(this.store, memory, pointer, Int.SIZE_BYTES).map { bytes ->
+    buffer: ByteArray,
+    memoryPointer: Int,
+    bufferPointer: Int = 0,
+): ChasmResult<Int, ChasmError.ExecutionError> = readBytes(this.store, memory, buffer, memoryPointer, Int.SIZE_BYTES, bufferPointer).map {
+        bytes ->
     var result: Int = 0
     for (i in 0 until Int.SIZE_BYTES) {
         result = result or (bytes[i].toInt() shl Byte.SIZE_BITS * i)
@@ -33,9 +38,12 @@ inline fun HostFunctionContext.int(
 }
 
 inline fun HostFunctionContext.uint(
-    pointer: Int,
     memory: Memory,
-): ChasmResult<UInt, ChasmError.ExecutionError> = readBytes(this.store, memory, pointer, Int.SIZE_BYTES).map { bytes ->
+    buffer: ByteArray,
+    memoryPointer: Int,
+    bufferPointer: Int = 0,
+): ChasmResult<UInt, ChasmError.ExecutionError> = readBytes(this.store, memory, buffer, memoryPointer, UInt.SIZE_BYTES, bufferPointer).map {
+        bytes ->
     var result: UInt = 0u
     for (i in 0 until Int.SIZE_BYTES) {
         result = result or (bytes[i].toUInt() shl (Byte.SIZE_BITS * i))
@@ -44,9 +52,12 @@ inline fun HostFunctionContext.uint(
 }
 
 inline fun HostFunctionContext.long(
-    pointer: Int,
     memory: Memory,
-): ChasmResult<Long, ChasmError.ExecutionError> = readBytes(this.store, memory, pointer, Long.SIZE_BYTES).map { bytes ->
+    buffer: ByteArray,
+    memoryPointer: Int,
+    bufferPointer: Int = 0,
+): ChasmResult<Long, ChasmError.ExecutionError> = readBytes(this.store, memory, buffer, memoryPointer, Long.SIZE_BYTES, bufferPointer).map {
+        bytes ->
     var result: Long = 0
     for (i in 0 until Long.SIZE_BYTES) {
         result = result or (bytes[i].toLong() shl Byte.SIZE_BITS * i)
@@ -55,9 +66,19 @@ inline fun HostFunctionContext.long(
 }
 
 inline fun HostFunctionContext.ulong(
-    pointer: Int,
     memory: Memory,
-): ChasmResult<ULong, ChasmError.ExecutionError> = readBytes(this.store, memory, pointer, Long.SIZE_BYTES).map { bytes ->
+    buffer: ByteArray,
+    memoryPointer: Int,
+    bufferPointer: Int = 0,
+): ChasmResult<ULong, ChasmError.ExecutionError> = readBytes(
+    this.store,
+    memory,
+    buffer,
+    memoryPointer,
+    ULong.SIZE_BYTES,
+    bufferPointer,
+).map {
+        bytes ->
     var result: ULong = 0uL
     for (i in 0 until Long.SIZE_BYTES) {
         result = result or (bytes[i].toULong() shl (Byte.SIZE_BITS * i))

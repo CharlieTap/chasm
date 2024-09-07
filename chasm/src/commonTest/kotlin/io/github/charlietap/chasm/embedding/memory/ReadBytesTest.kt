@@ -22,14 +22,18 @@ class ReadBytesTest {
         val store = publicStore(store(memories = mutableListOf(instance)))
         val address = memoryAddress()
         val memory = publicMemory(memoryExternalValue(address))
-        val pointer = 118
-        val numberOfBytes = 2
+        val memoryPointer = 118
+        val bytesToRead = 2
+        val buffer = byteArrayOf()
+        val bufferPointer = 117
         val bytes: ByteArray = byteArrayOf(117, 118)
 
-        val bytesReader: MemoryInstanceBytesReader = { _instance, _pointer, _numberOfBytes ->
+        val bytesReader: MemoryInstanceBytesReader = { _instance, _buffer, _memoryPointer, _bytesToRead, _bufferPointer ->
             assertEquals(instance, _instance)
-            assertEquals(pointer, _pointer)
-            assertEquals(numberOfBytes, _numberOfBytes)
+            assertEquals(buffer, _buffer)
+            assertEquals(memoryPointer, _memoryPointer)
+            assertEquals(bytesToRead, _bytesToRead)
+            assertEquals(bufferPointer, _bufferPointer)
 
             Ok(bytes)
         }
@@ -39,8 +43,10 @@ class ReadBytesTest {
         val actual = readBytes(
             store = store,
             memory = memory,
-            pointer = pointer,
-            numberOfBytes = numberOfBytes,
+            buffer = buffer,
+            memoryPointer = memoryPointer,
+            bytesToRead = bytesToRead,
+            bufferPointer = bufferPointer,
             bytesReader = bytesReader,
         )
 
