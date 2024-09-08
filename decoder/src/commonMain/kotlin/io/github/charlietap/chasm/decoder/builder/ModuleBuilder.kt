@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.StartFunction
 import io.github.charlietap.chasm.ast.module.Table
+import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.decoder.decoder.section.code.FunctionBody
@@ -30,6 +31,7 @@ internal class ModuleBuilder(private val version: Version) {
     private var functionBodies: MutableList<FunctionBody> = mutableListOf()
     private var tables: MutableList<Table> = mutableListOf()
     private var memories: MutableList<Memory> = mutableListOf()
+    private var tags: MutableList<Tag> = mutableListOf()
     private var globals: MutableList<Global> = mutableListOf()
     private var elementSegments: MutableList<ElementSegment> = mutableListOf()
     private var dataSegments: MutableList<DataSegment> = mutableListOf()
@@ -52,6 +54,8 @@ internal class ModuleBuilder(private val version: Version) {
     fun tables(tables: List<Table>) = apply { this.tables += tables }
 
     fun memories(memories: List<Memory>) = apply { this.memories += memories }
+
+    fun tags(tags: List<Tag>) = apply { this.tags += tags }
 
     fun globals(globals: List<Global>) = apply { this.globals += globals }
 

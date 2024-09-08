@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.fixture.module.functionIndex
 import io.github.charlietap.chasm.fixture.module.labelIndex
 import io.github.charlietap.chasm.fixture.module.tableIndex
+import io.github.charlietap.chasm.fixture.module.tagIndex
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.referenceType
 import io.github.charlietap.chasm.fixture.type.valueType
@@ -28,6 +29,36 @@ fun signedTypeIndex(
     typeIndex: Index.TypeIndex = typeIndex(),
 ) = ControlInstruction.BlockType.SignedTypeIndex(
     typeIndex = typeIndex,
+)
+
+fun catchHandler(): ControlInstruction.CatchHandler = catchCatchHandler()
+
+fun catchCatchHandler(
+    tagIndex: Index.TagIndex = tagIndex(),
+    labelIndex: Index.LabelIndex = labelIndex(),
+) = ControlInstruction.CatchHandler.Catch(
+    tagIndex = tagIndex,
+    labelIndex = labelIndex,
+)
+
+fun catchRefHandler(
+    tagIndex: Index.TagIndex = tagIndex(),
+    labelIndex: Index.LabelIndex = labelIndex(),
+) = ControlInstruction.CatchHandler.CatchRef(
+    tagIndex = tagIndex,
+    labelIndex = labelIndex,
+)
+
+fun catchAllHandler(
+    labelIndex: Index.LabelIndex = labelIndex(),
+) = ControlInstruction.CatchHandler.CatchAll(
+    labelIndex = labelIndex,
+)
+
+fun catchAllRefHandler(
+    labelIndex: Index.LabelIndex = labelIndex(),
+) = ControlInstruction.CatchHandler.CatchAllRef(
+    labelIndex = labelIndex,
 )
 
 fun unreachableInstruction() = ControlInstruction.Unreachable

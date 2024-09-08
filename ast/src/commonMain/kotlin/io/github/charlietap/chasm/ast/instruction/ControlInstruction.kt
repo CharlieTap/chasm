@@ -17,6 +17,19 @@ sealed interface ControlInstruction : Instruction {
         value class SignedTypeIndex(val typeIndex: Index.TypeIndex) : BlockType
     }
 
+    sealed interface CatchHandler {
+
+        data class Catch(val tagIndex: Index.TagIndex, val labelIndex: Index.LabelIndex) : CatchHandler
+
+        data class CatchRef(val tagIndex: Index.TagIndex, val labelIndex: Index.LabelIndex) : CatchHandler
+
+        @JvmInline
+        value class CatchAll(val labelIndex: Index.LabelIndex) : CatchHandler
+
+        @JvmInline
+        value class CatchAllRef(val labelIndex: Index.LabelIndex) : CatchHandler
+    }
+
     data object Unreachable : ControlInstruction
 
     data object Nop : ControlInstruction
@@ -26,6 +39,13 @@ sealed interface ControlInstruction : Instruction {
     data class Loop(val blockType: BlockType, val instructions: List<Instruction>) : ControlInstruction
 
     data class If(val blockType: BlockType, val thenInstructions: List<Instruction>, val elseInstructions: List<Instruction>?) : ControlInstruction
+
+    data class TryTable(val blockType: BlockType, val handlers: List<CatchHandler>, val instructions: List<Instruction>) : ControlInstruction
+
+    @JvmInline
+    value class Throw(val tagIndex: Index.TagIndex) : ControlInstruction
+
+    data object ThrowRef : ControlInstruction
 
     @JvmInline
     value class Br(val labelIndex: Index.LabelIndex) : ControlInstruction

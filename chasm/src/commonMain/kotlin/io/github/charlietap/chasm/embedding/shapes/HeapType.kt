@@ -8,6 +8,10 @@ sealed interface HeapType {
 
     data object NoFunc : HeapType
 
+    data object Exception : HeapType
+
+    data object NoException : HeapType
+
     data object Extern : HeapType
 
     data object NoExtern : HeapType

@@ -76,5 +76,8 @@ internal fun ControlInstructionValidator(
         is ControlInstruction.ReturnCallIndirect -> returnCallIndirectValidator(context, instruction)
         is ControlInstruction.ReturnCallRef -> returnCallRefValidator(context, instruction)
         is ControlInstruction.Unreachable -> unreachableValidator(context, instruction)
+        is ControlInstruction.Throw -> TODO()
+        is ControlInstruction.ThrowRef -> TODO()
+        is ControlInstruction.TryTable -> TODO()
     }
 }

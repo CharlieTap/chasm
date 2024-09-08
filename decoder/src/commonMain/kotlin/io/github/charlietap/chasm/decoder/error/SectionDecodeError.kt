@@ -7,6 +7,9 @@ sealed interface SectionDecodeError : WasmDecodeError {
     value class UnknownSectionType(val type: UByte) : SectionDecodeError
 
     @JvmInline
+    value class UnknownTagAttribute(val type: UByte) : SectionDecodeError
+
+    @JvmInline
     value class InvalidIndex(val encoded: UInt) : SectionDecodeError
 
     @JvmInline

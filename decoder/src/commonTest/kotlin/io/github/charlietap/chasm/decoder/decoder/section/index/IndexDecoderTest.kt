@@ -180,6 +180,21 @@ class IndexDecoderTest {
     }
 
     @Test
+    fun `can decode an encoded tag index`() {
+
+        val intReader: () -> Result<UInt, WasmDecodeError> = {
+            Ok(32u)
+        }
+        val reader = FakeWasmBinaryReader(fakeUIntReader = intReader)
+        val context = decoderContext(reader)
+
+        val expected = Ok(Index.TagIndex(32u))
+        val actual = TagIndexDecoder(context)
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun `returns io error when read fails`() {
 
         val err = ioError()

@@ -21,6 +21,7 @@ internal data class RefsContextImpl(
             is Export.Descriptor.Global,
             is Export.Descriptor.Memory,
             is Export.Descriptor.Table,
+            is Export.Descriptor.Tag,
             -> null
         }
     }

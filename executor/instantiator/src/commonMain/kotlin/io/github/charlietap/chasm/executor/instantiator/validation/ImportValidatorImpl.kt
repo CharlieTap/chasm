@@ -56,6 +56,7 @@ internal fun ImportValidatorImpl(
 
             type == externType
         }
+        is Import.Descriptor.Tag -> TODO()
     }
 
     if (matches) {

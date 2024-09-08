@@ -17,6 +17,7 @@ import io.github.charlietap.chasm.decoder.decoder.section.import.ImportSectionDe
 import io.github.charlietap.chasm.decoder.decoder.section.memory.MemorySectionDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.start.StartSectionDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.table.TableSectionDecoder
+import io.github.charlietap.chasm.decoder.decoder.section.tag.TagSectionDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.type.TypeSectionDecoder
 import io.github.charlietap.chasm.decoder.error.SectionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
@@ -35,6 +36,7 @@ import io.github.charlietap.chasm.decoder.section.Section
 import io.github.charlietap.chasm.decoder.section.SectionType
 import io.github.charlietap.chasm.decoder.section.StartSection
 import io.github.charlietap.chasm.decoder.section.TableSection
+import io.github.charlietap.chasm.decoder.section.TagSection
 import io.github.charlietap.chasm.decoder.section.TypeSection
 
 internal fun SectionDecoder(
@@ -54,6 +56,7 @@ internal fun SectionDecoder(
         memorySectionDecoder = ::MemorySectionDecoder,
         startSectionDecoder = ::StartSectionDecoder,
         tableSectionDecoder = ::TableSectionDecoder,
+        tagSectionDecoder = ::TagSectionDecoder,
         typeSectionDecoder = ::TypeSectionDecoder,
     )
 
@@ -71,6 +74,7 @@ internal fun SectionDecoder(
     memorySectionDecoder: Decoder<MemorySection>,
     startSectionDecoder: Decoder<StartSection>,
     tableSectionDecoder: Decoder<TableSection>,
+    tagSectionDecoder: Decoder<TagSection>,
     typeSectionDecoder: Decoder<TypeSection>,
 ): Result<Section, WasmDecodeError> = binding {
 
@@ -82,6 +86,7 @@ internal fun SectionDecoder(
             SectionType.Function -> functionSectionDecoder(context)
             SectionType.Table -> tableSectionDecoder(context)
             SectionType.Memory -> memorySectionDecoder(context)
+            SectionType.Tag -> tagSectionDecoder(context)
             SectionType.Global -> globalSectionDecoder(context)
             SectionType.Export -> exportSectionDecoder(context)
             SectionType.Start -> startSectionDecoder(context)

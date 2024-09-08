@@ -116,6 +116,9 @@ internal fun ModuleAllocatorImpl(
             is Export.Descriptor.Memory -> {
                 ExternalValue.Memory(instance.memAddresses[descriptor.memoryIndex.idx.toInt()])
             }
+            is Export.Descriptor.Tag -> {
+                TODO()
+            }
         }
 
         instance.addExport(ExportInstance(export.name, externalValue))

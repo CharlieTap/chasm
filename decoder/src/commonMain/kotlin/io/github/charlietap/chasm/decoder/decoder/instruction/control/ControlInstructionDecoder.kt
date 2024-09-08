@@ -6,6 +6,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.module.Index.TagIndex
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.context.scope.BlockScope
 import io.github.charlietap.chasm.decoder.context.scope.Scope
@@ -28,10 +29,14 @@ import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN
 import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN_CALL
 import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN_CALL_INDIRECT
 import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN_CALL_REF
+import io.github.charlietap.chasm.decoder.decoder.instruction.THROW
+import io.github.charlietap.chasm.decoder.decoder.instruction.THROW_REF
+import io.github.charlietap.chasm.decoder.decoder.instruction.TRY_TABLE
 import io.github.charlietap.chasm.decoder.decoder.instruction.UNREACHABLE
 import io.github.charlietap.chasm.decoder.decoder.section.index.FunctionIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.LabelIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.TableIndexDecoder
+import io.github.charlietap.chasm.decoder.decoder.section.index.TagIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.TypeIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
@@ -47,10 +52,13 @@ internal fun ControlInstructionDecoder(
         instructionBlockDecoder = ::InstructionBlockDecoder,
         ifDecoder = ::IfDecoder,
         functionIndexDecoder = ::FunctionIndexDecoder,
+        handlerDecoder = ::CatchHandlerDecoder,
+        tagIndexDecoder = ::TagIndexDecoder,
         typeIndexDecoder = ::TypeIndexDecoder,
         tableIndexDecoder = ::TableIndexDecoder,
         labelIndexDecoder = ::LabelIndexDecoder,
-        vectorDecoder = ::VectorDecoder,
+        handlerVectorDecoder = ::VectorDecoder,
+        labelVectorDecoder = ::VectorDecoder,
     )
 
 internal fun ControlInstructionDecoder(
@@ -60,10 +68,13 @@ internal fun ControlInstructionDecoder(
     instructionBlockDecoder: Decoder<List<Instruction>>,
     ifDecoder: Decoder<Pair<List<Instruction>, List<Instruction>?>>,
     functionIndexDecoder: Decoder<Index.FunctionIndex>,
+    handlerDecoder: Decoder<ControlInstruction.CatchHandler>,
+    tagIndexDecoder: Decoder<TagIndex>,
     typeIndexDecoder: Decoder<Index.TypeIndex>,
     tableIndexDecoder: Decoder<Index.TableIndex>,
     labelIndexDecoder: Decoder<Index.LabelIndex>,
-    vectorDecoder: VectorDecoder<Index.LabelIndex>,
+    handlerVectorDecoder: VectorDecoder<ControlInstruction.CatchHandler>,
+    labelVectorDecoder: VectorDecoder<Index.LabelIndex>,
 ): Result<ControlInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte().bind()) {
         UNREACHABLE -> ControlInstruction.Unreachable
@@ -85,6 +96,11 @@ internal fun ControlInstructionDecoder(
             val (thenInstructions, elseInstructions) = ifDecoder(context).bind()
             ControlInstruction.If(blockType, thenInstructions, elseInstructions)
         }
+        THROW -> {
+            val tagIndex = tagIndexDecoder(context).bind()
+            ControlInstruction.Throw(tagIndex)
+        }
+        THROW_REF -> ControlInstruction.ThrowRef
         BR -> {
             val idx = labelIndexDecoder(context).bind()
             ControlInstruction.Br(idx)
@@ -94,7 +110,7 @@ internal fun ControlInstructionDecoder(
             ControlInstruction.BrIf(idx)
         }
         BR_TABLE -> {
-            val indices = vectorDecoder(context, labelIndexDecoder).bind()
+            val indices = labelVectorDecoder(context, labelIndexDecoder).bind()
             val default = labelIndexDecoder(context).bind()
             ControlInstruction.BrTable(indices.vector, default)
         }
@@ -124,6 +140,14 @@ internal fun ControlInstructionDecoder(
         RETURN_CALL_REF -> {
             val typeIndex = typeIndexDecoder(context).bind()
             ControlInstruction.ReturnCallRef(typeIndex)
+        }
+        TRY_TABLE -> {
+            val blockType = blockTypeDecoder(context).bind()
+            val handlers = handlerVectorDecoder(context, handlerDecoder).bind()
+            val scopedContext = scope(context, END).bind()
+            val instructions = instructionBlockDecoder(scopedContext).bind()
+
+            ControlInstruction.TryTable(blockType, handlers.vector, instructions)
         }
         BR_ON_NULL -> {
             val labelIndex = labelIndexDecoder(context).bind()

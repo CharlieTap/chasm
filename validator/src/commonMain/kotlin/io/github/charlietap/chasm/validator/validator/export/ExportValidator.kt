@@ -35,6 +35,7 @@ internal fun ExportValidator(
         is Export.Descriptor.Global -> globalExportValidator(context, descriptor).bind()
         is Export.Descriptor.Memory -> memoryExportValidator(context, descriptor).bind()
         is Export.Descriptor.Table -> tableExportValidator(context, descriptor).bind()
+        is Export.Descriptor.Tag -> TODO()
     }
 
     if (!context.exportNames.add(export.name.name)) {

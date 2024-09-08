@@ -37,6 +37,7 @@ class ExportDescriptorDecoderTest {
             globalIndexDecoder = neverGlobalIndexDecoder,
             memIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
         )
 
         assertEquals(expected, actual)
@@ -65,6 +66,7 @@ class ExportDescriptorDecoderTest {
             globalIndexDecoder = neverGlobalIndexDecoder,
             memIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
         )
 
         assertEquals(expected, actual)
@@ -93,6 +95,7 @@ class ExportDescriptorDecoderTest {
             globalIndexDecoder = neverGlobalIndexDecoder,
             memIndexDecoder = memoryIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
         )
 
         assertEquals(expected, actual)
@@ -121,6 +124,36 @@ class ExportDescriptorDecoderTest {
             globalIndexDecoder = globalIndexDecoder,
             memIndexDecoder = neverMemoryIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
+        )
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can decode a tag export descriptor`() {
+
+        val descriptor = EXPORT_DESCRIPTOR_TYPE_TAG
+
+        val tagIndex = Index.TagIndex(117u)
+        val expected = Ok(Export.Descriptor.Tag(tagIndex))
+
+        val reader = FakeUByteReader {
+            Ok(descriptor)
+        }
+        val context = decoderContext(reader)
+
+        val tagIndexDecoder: Decoder<Index.TagIndex> = { _ ->
+            Ok(tagIndex)
+        }
+
+        val actual = ExportDescriptorDecoder(
+            context = context,
+            functionIndexDecoder = neverFunctionIndexDecoder,
+            globalIndexDecoder = neverGlobalIndexDecoder,
+            memIndexDecoder = neverMemoryIndexDecoder,
+            tableIndexDecoder = neverTableIndexDecoder,
+            tagIndexDecoder = tagIndexDecoder,
         )
 
         assertEquals(expected, actual)
@@ -150,6 +183,9 @@ class ExportDescriptorDecoderTest {
         }
         private val neverGlobalIndexDecoder: Decoder<Index.GlobalIndex> = {
             fail("global index decoder should not be called in this scenario")
+        }
+        private val neverTagIndexDecoder: Decoder<Index.TagIndex> = {
+            fail("tag index decoder should not be called in this scenario")
         }
     }
 }

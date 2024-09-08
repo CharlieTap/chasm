@@ -22,6 +22,7 @@ import io.github.charlietap.chasm.decoder.section.SectionSize
 import io.github.charlietap.chasm.decoder.section.SectionType
 import io.github.charlietap.chasm.decoder.section.StartSection
 import io.github.charlietap.chasm.decoder.section.TableSection
+import io.github.charlietap.chasm.decoder.section.TagSection
 import io.github.charlietap.chasm.decoder.section.TypeSection
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -66,6 +67,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -109,6 +111,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -152,6 +155,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -195,6 +199,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -238,6 +243,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -281,6 +287,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -324,6 +331,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -367,6 +375,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -410,6 +419,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -453,6 +463,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -496,6 +507,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -539,6 +551,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -582,6 +595,7 @@ class SectionDecoderTest {
             memorySectionDecoder = memorySectionDecoder,
             startSectionDecoder = startSectionDecoder,
             tableSectionDecoder = tableSectionDecoder,
+            tagSectionDecoder = tagSectionDecoder,
             typeSectionDecoder = typeSectionDecoder,
         )
 
@@ -624,6 +638,9 @@ class SectionDecoderTest {
         }
         private val tableSectionDecoder: Decoder<TableSection> = { _ ->
             fail("TableSectionDecoder should not be called in this scenario")
+        }
+        private val tagSectionDecoder: Decoder<TagSection> = { _ ->
+            fail("TagSectionDecoder should not be called in this scenario")
         }
         private val typeSectionDecoder: Decoder<TypeSection> = { _ ->
             fail("TypeSectionDecoder should not be called in this scenario")
