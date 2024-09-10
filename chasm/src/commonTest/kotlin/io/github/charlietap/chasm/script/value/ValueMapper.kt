@@ -13,6 +13,7 @@ fun ValueMapper(
     is Value.I64 -> i64ValueMapper(value)
     is Value.F32 -> f32ValueMapper(value)
     is Value.F64 -> f64ValueMapper(value)
+    is Value.Exception -> exceptionRefValueMapper(value)
     is Value.Extern -> externRefValueMapper(value)
     is Value.Func -> funcRefValueMapper(value)
 }
@@ -50,6 +51,12 @@ private fun f64ValueMapper(
         Double.fromBits(bitPattern)
     }.let { ChasmValue.Number.F64(it) }
 }
+
+private fun exceptionRefValueMapper(
+    value: Value.Exception,
+): ChasmValue.Reference = value.value?.let {
+    ChasmValue.Reference.Null(HeapType.Exception)
+} ?: ChasmValue.Reference.Null(HeapType.Exception)
 
 private fun externRefValueMapper(
     value: Value.Extern,

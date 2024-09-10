@@ -9,5 +9,7 @@ sealed interface ExportValidatorError : ModuleValidatorError {
 
     data object UnknownTable : ExportValidatorError
 
+    data object UnknownTag : ExportValidatorError
+
     data object DuplicateExportNames : ExportValidatorError
 }

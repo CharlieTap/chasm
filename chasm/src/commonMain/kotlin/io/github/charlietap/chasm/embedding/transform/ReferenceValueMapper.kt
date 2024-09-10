@@ -13,6 +13,7 @@ internal class ReferenceValueMapper(
     override fun map(input: Value.Reference): ReferenceValue {
         return when (input) {
             is Value.Reference.Array -> input.value
+            is Value.Reference.Exception -> input.value
             is Value.Reference.Extern -> ReferenceValue.Extern(map(input.value))
             is Value.Reference.Func -> ReferenceValue.Function(Address.Function(input.address))
             is Value.Reference.Host -> ReferenceValue.Host(input.value)
@@ -25,6 +26,7 @@ internal class ReferenceValueMapper(
     override fun bimap(input: ReferenceValue): Value.Reference {
         return when (input) {
             is ReferenceValue.Array -> Value.Reference.Array(input)
+            is ReferenceValue.Exception -> Value.Reference.Exception(input)
             is ReferenceValue.Extern -> Value.Reference.Extern(bimap(input.referenceValue))
             is ReferenceValue.Function -> Value.Reference.Func(input.address.address)
             is ReferenceValue.Host -> Value.Reference.Host(input.address)

@@ -10,4 +10,7 @@ sealed interface AdminInstruction : ExecutionInstruction {
 
     @JvmInline
     value class Label(val label: Stack.Entry.Label) : AdminInstruction
+
+    @JvmInline
+    value class Handler(val handler: Stack.Entry.ExceptionHandler) : AdminInstruction
 }

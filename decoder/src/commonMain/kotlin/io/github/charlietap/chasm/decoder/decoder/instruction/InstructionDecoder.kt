@@ -113,8 +113,10 @@ internal val MEMORY_OPCODES: Set<UIntRange> by lazy {
 
 internal val CONTROL_OPCODES: Set<UIntRange> by lazy {
     setOf(
-        UNREACHABLE..IF,
-        BR..RETURN_CALL_REF,
+        UNREACHABLE..ELSE,
+        THROW..THROW,
+        THROW_REF..RETURN_CALL_REF,
+        TRY_TABLE..TRY_TABLE,
         BR_ON_NULL..BR_ON_NON_NULL,
     )
 }

@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.type.matching
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ResultType
 
-internal fun FunctionTypeMatcher(
+fun FunctionTypeMatcher(
     type1: FunctionType,
     type2: FunctionType,
     context: TypeMatcherContext,

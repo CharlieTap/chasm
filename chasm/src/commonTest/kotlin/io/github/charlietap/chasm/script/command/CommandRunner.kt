@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.script.command
 
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.sweet.lib.command.ActionCommand
+import io.github.charlietap.sweet.lib.command.AssertExceptionCommand
 import io.github.charlietap.sweet.lib.command.AssertExhaustionCommand
 import io.github.charlietap.sweet.lib.command.AssertInvalidCommand
 import io.github.charlietap.sweet.lib.command.AssertMalformedCommand
@@ -22,6 +23,7 @@ fun CommandRunner(
     context = context,
     command = command,
     actionCommandRunner = ::ActionCommandRunner,
+    assertExceptionCommandRunner = ::AssertExceptionCommandRunner,
     assertExhaustionCommandRunner = ::AssertExhaustionCommandRunner,
     assertInvalidCommandRunner = ::AssertInvalidCommandRunner,
     assertMalformedCommandRunner = ::AssertMalformedCommandRunner,
@@ -37,6 +39,7 @@ private fun CommandRunner(
     context: ScriptContext,
     command: Command,
     actionCommandRunner: ActionCommandRunner,
+    assertExceptionCommandRunner: AssertExceptionCommandRunner,
     assertExhaustionCommandRunner: AssertExhaustionCommandRunner,
     assertInvalidCommandRunner: AssertInvalidCommandRunner,
     assertMalformedCommandRunner: AssertMalformedCommandRunner,
@@ -48,6 +51,7 @@ private fun CommandRunner(
     registerCommandRunner: RegisterCommandRunner,
 ): CommandResult = when (command) {
     is ActionCommand -> actionCommandRunner(context, command)
+    is AssertExceptionCommand -> assertExceptionCommandRunner(context, command)
     is AssertExhaustionCommand -> assertExhaustionCommandRunner(context, command)
     is AssertInvalidCommand -> assertInvalidCommandRunner(context, command)
     is AssertMalformedCommand -> assertMalformedCommandRunner(context, command)

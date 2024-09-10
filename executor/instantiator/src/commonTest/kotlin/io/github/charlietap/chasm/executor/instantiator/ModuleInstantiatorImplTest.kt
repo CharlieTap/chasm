@@ -62,11 +62,10 @@ class ModuleInstantiatorImplTest {
             Ok(partialInstance)
         }
 
-        val allocator: ModuleAllocator = { eStore, eModule, eInstance, eExterns, eGlobalInit, eTableInit, eElemRefs ->
+        val allocator: ModuleAllocator = { eStore, eModule, eInstance, eGlobalInit, eTableInit, eElemRefs ->
             assertEquals(store, eStore)
             assertEquals(module, eModule)
             assertEquals(partialInstance, eInstance)
-            assertEquals(imports, eExterns)
             assertEquals(emptyList(), eGlobalInit)
             assertEquals(listOf(ReferenceValue.Null(heapType())), eTableInit)
             assertEquals(listOf(emptyList()), eElemRefs)
@@ -114,7 +113,7 @@ class ModuleInstantiatorImplTest {
             store = store,
             module = module,
             imports = imports,
-            pallocator = pallocator,
+            partialAllocator = pallocator,
             allocator = allocator,
             invoker = invoker,
             evaluator = evaluator,

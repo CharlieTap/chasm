@@ -42,6 +42,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -83,6 +86,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -125,6 +131,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -166,6 +175,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -208,6 +220,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -248,6 +263,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -288,6 +306,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -330,6 +351,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -372,6 +396,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -413,6 +440,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -453,6 +483,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -493,6 +526,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -533,6 +569,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -573,6 +612,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -613,6 +655,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor,
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -661,6 +706,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor,
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -709,6 +757,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor,
             returnExecutor = returnExecutor(),
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -747,6 +798,9 @@ class ControlInstructionExecutorImplTest {
             brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor,
+            tryTableExecutor = tryTableExecutor(),
+            throwExecutor = throwExecutor(),
+            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -814,6 +868,18 @@ class ControlInstructionExecutorImplTest {
         }
 
         fun returnExecutor(): ReturnExecutor = { _ ->
+            fail()
+        }
+
+        fun throwExecutor(): ThrowExecutor = { _, _, _ ->
+            fail()
+        }
+
+        fun throwRefExecutor(): ThrowRefExecutor = { _, _, _ ->
+            fail()
+        }
+
+        fun tryTableExecutor(): TryTableExecutor = { _, _, _ ->
             fail()
         }
     }

@@ -6,7 +6,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal fun ControlInstructionExecutorImpl(
@@ -34,6 +33,9 @@ internal fun ControlInstructionExecutorImpl(
         brOnNonNullExecutor = ::BrOnNonNullExecutorImpl,
         brOnCastExecutor = ::BrOnCastExecutorImpl,
         returnExecutor = ::ReturnExecutorImpl,
+        throwExecutor = ::ThrowExecutor,
+        throwRefExecutor = ::ThrowRefExecutor,
+        tryTableExecutor = ::TryTableExecutor,
     )
 
 internal fun ControlInstructionExecutorImpl(
@@ -56,6 +58,9 @@ internal fun ControlInstructionExecutorImpl(
     brOnNonNullExecutor: BrOnNonNullExecutor,
     brOnCastExecutor: BrOnCastExecutor,
     returnExecutor: ReturnExecutor,
+    throwExecutor: ThrowExecutor,
+    throwRefExecutor: ThrowRefExecutor,
+    tryTableExecutor: TryTableExecutor,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is ControlInstruction.Nop -> Unit
@@ -79,7 +84,8 @@ internal fun ControlInstructionExecutorImpl(
             brOnCastExecutor(store, stack, instruction.labelIndex, instruction.srcReferenceType, instruction.dstReferenceType, true).bind()
         is ControlInstruction.BrOnCastFail ->
             brOnCastExecutor(store, stack, instruction.labelIndex, instruction.srcReferenceType, instruction.dstReferenceType, false).bind()
-
-        else -> Err(InvocationError.UnimplementedInstruction(ModuleInstruction(instruction))).bind<Unit>()
+        is ControlInstruction.Throw -> throwExecutor(store, stack, instruction).bind()
+        is ControlInstruction.ThrowRef -> throwRefExecutor(store, stack, instruction).bind()
+        is ControlInstruction.TryTable -> tryTableExecutor(store, stack, instruction).bind()
     }
 }

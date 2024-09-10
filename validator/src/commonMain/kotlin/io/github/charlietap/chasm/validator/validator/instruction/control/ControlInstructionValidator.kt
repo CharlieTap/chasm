@@ -26,6 +26,9 @@ internal fun ControlInstructionValidator(
         callIndirectValidator = ::CallIndirectValidator,
         callRefValidator = ::CallRefInstructionValidator,
         ifValidator = ::IfInstructionValidator,
+        throwValidator = ::ThrowInstructionValidator,
+        throwRefValidator = ::ThrowRefInstructionValidator,
+        tryTableValidator = ::TryTableInstructionValidator,
         returnValidator = ::ReturnValidator,
         returnCallValidator = ::ReturnCallInstructionValidator,
         returnCallIndirectValidator = ::ReturnCallIndirectInstructionValidator,
@@ -49,6 +52,9 @@ internal fun ControlInstructionValidator(
     callIndirectValidator: Validator<ControlInstruction.CallIndirect>,
     callRefValidator: Validator<ControlInstruction.CallRef>,
     ifValidator: Validator<ControlInstruction.If>,
+    throwValidator: Validator<ControlInstruction.Throw>,
+    throwRefValidator: Validator<ControlInstruction.ThrowRef>,
+    tryTableValidator: Validator<ControlInstruction.TryTable>,
     returnValidator: Validator<ControlInstruction.Return>,
     returnCallValidator: Validator<ControlInstruction.ReturnCall>,
     returnCallIndirectValidator: Validator<ControlInstruction.ReturnCallIndirect>,
@@ -76,8 +82,8 @@ internal fun ControlInstructionValidator(
         is ControlInstruction.ReturnCallIndirect -> returnCallIndirectValidator(context, instruction)
         is ControlInstruction.ReturnCallRef -> returnCallRefValidator(context, instruction)
         is ControlInstruction.Unreachable -> unreachableValidator(context, instruction)
-        is ControlInstruction.Throw -> TODO()
-        is ControlInstruction.ThrowRef -> TODO()
-        is ControlInstruction.TryTable -> TODO()
+        is ControlInstruction.Throw -> throwValidator(context, instruction)
+        is ControlInstruction.ThrowRef -> throwRefValidator(context, instruction)
+        is ControlInstruction.TryTable -> tryTableValidator(context, instruction)
     }
 }

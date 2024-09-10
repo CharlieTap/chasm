@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.memory.Memory
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocatorImpl
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocatorImpl
+import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.ext.addDataAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addElementAddress
@@ -21,6 +22,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.addExport
 import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addMemoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addTableAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
@@ -32,7 +34,6 @@ internal fun ModuleAllocatorImpl(
     store: Store,
     module: Module,
     instance: ModuleInstance,
-    imports: List<ExternalValue>,
     globalInitValues: List<ExecutionValue>,
     tableInitValues: List<ReferenceValue>,
     elementSegmentReferences: List<List<ReferenceValue>>,
@@ -41,12 +42,12 @@ internal fun ModuleAllocatorImpl(
         store = store,
         module = module,
         instance = instance,
-        imports = imports,
         globalInitValues = globalInitValues,
         tableInitValues = tableInitValues,
         elementSegmentReferences = elementSegmentReferences,
         tableAllocator = ::TableAllocatorImpl,
         memoryAllocator = ::MemoryAllocatorImpl,
+        tagAllocator = ::TagAllocator,
         globalAllocator = ::GlobalAllocatorImpl,
         elementAllocator = ::ElementAllocatorImpl,
         dataAllocator = ::DataAllocatorImpl,
@@ -56,25 +57,16 @@ internal fun ModuleAllocatorImpl(
     store: Store,
     module: Module,
     instance: ModuleInstance,
-    imports: List<ExternalValue>,
     globalInitValues: List<ExecutionValue>,
     tableInitValues: List<ReferenceValue>,
     elementSegmentReferences: List<List<ReferenceValue>>,
     tableAllocator: TableAllocator,
     memoryAllocator: MemoryAllocator,
+    tagAllocator: TagAllocator,
     globalAllocator: GlobalAllocator,
     elementAllocator: ElementAllocator,
     dataAllocator: DataAllocator,
 ): Result<ModuleInstance, InstantiationError> = binding {
-
-    imports.forEach { import ->
-        when (import) {
-            is ExternalValue.Table -> instance.addTableAddress(import.address)
-            is ExternalValue.Memory -> instance.addMemoryAddress(import.address)
-            is ExternalValue.Function -> Unit
-            is ExternalValue.Global -> Unit
-        }
-    }
 
     module.tables.forEachIndexed { idx, table ->
         val address = tableAllocator(store, table.type, tableInitValues[idx])
@@ -84,6 +76,11 @@ internal fun ModuleAllocatorImpl(
     module.memories.forEach { memory ->
         val address = memoryAllocator(store, memory.type)
         instance.addMemoryAddress(address)
+    }
+
+    module.tags.forEach { tag ->
+        val address = tagAllocator(store, tag.type)
+        instance.addTagAddress(address)
     }
 
     module.globals.forEachIndexed { idx, global ->
@@ -117,7 +114,7 @@ internal fun ModuleAllocatorImpl(
                 ExternalValue.Memory(instance.memAddresses[descriptor.memoryIndex.idx.toInt()])
             }
             is Export.Descriptor.Tag -> {
-                TODO()
+                ExternalValue.Tag(instance.tagAddresses[descriptor.tagIndex.idx.toInt()])
             }
         }
 

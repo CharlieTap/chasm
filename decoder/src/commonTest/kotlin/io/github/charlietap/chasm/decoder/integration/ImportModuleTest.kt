@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
@@ -20,6 +19,7 @@ import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
@@ -83,7 +83,7 @@ class ImportModuleTest {
         )
 
         val expected = Ok(
-            Module(
+            module(
                 version = Version.One,
                 types = listOf(expectedFunctionImportType),
                 imports = listOf(

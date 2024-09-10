@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.AggregateInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.AggregateInstructionExecutorImpl
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ControlInstructionExecutor
@@ -73,6 +74,6 @@ internal fun ModuleInstructionExecutorImpl(
         is TableInstruction -> tableInstructionExecutor(moduleInstruction, store, stack).bind()
         is ReferenceInstruction -> referenceInstructionExecutor(moduleInstruction, store, stack).bind()
         is VariableInstruction -> variableInstructionExecutor(moduleInstruction, store, stack).bind()
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        is VectorInstruction -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
     }
 }

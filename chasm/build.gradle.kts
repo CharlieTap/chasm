@@ -73,8 +73,13 @@ configure<WasmTestSuiteGenPluginExtension> {
     testSuiteCommit = "7c3ec23ab19b37c68976b555f9491752cbda6d5f"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm"
-    proposals = listOf("tail-call", "extended-const", "multi-memory")
-    excludes = listOf("simd_*/**", "**/simd_*", "align.wast", "binary.wast", "global.wast", "imports.wast", "memory.wast", "comments.wast")
+    proposals = listOf("tail-call", "extended-const", "multi-memory", "exception-handling")
+    excludes = listOf(
+        "simd_*/**", "**/simd_*",
+        "align.wast", "binary.wast", "global.wast", "imports.wast", "memory.wast", "comments.wast",
+        "proposals/exception-handling/binary.wast",
+        "proposals/exception-handling/imports.wast",
+    )
 }
 
 tasks.withType<KotlinCompile>().configureEach {

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -20,7 +19,7 @@ internal fun ExecutionInstructionExecutorImpl(
         store = store,
         stack = stack,
         adminInstructionExecutor = ::AdminInstructionExecutorImpl,
-        astInstructionExecutor = ::ModuleInstructionExecutorImpl,
+        moduleInstructionExecutor = ::ModuleInstructionExecutorImpl,
     )
 
 internal fun ExecutionInstructionExecutorImpl(
@@ -28,11 +27,10 @@ internal fun ExecutionInstructionExecutorImpl(
     store: Store,
     stack: Stack,
     adminInstructionExecutor: AdminInstructionExecutor,
-    astInstructionExecutor: ModuleInstructionExecutor,
+    moduleInstructionExecutor: ModuleInstructionExecutor,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is AdminInstruction -> adminInstructionExecutor(instruction, store, stack).bind()
-        is ModuleInstruction -> astInstructionExecutor(instruction, store, stack).bind()
-        else -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
+        is ModuleInstruction -> moduleInstructionExecutor(instruction, store, stack).bind()
     }
 }

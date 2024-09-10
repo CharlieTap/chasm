@@ -15,6 +15,9 @@ sealed interface Address {
     value class Memory(override val address: Int) : Address
 
     @JvmInline
+    value class Tag(override val address: Int) : Address
+
+    @JvmInline
     value class Global(override val address: Int) : Address
 
     @JvmInline
@@ -22,6 +25,9 @@ sealed interface Address {
 
     @JvmInline
     value class Data(override val address: Int) : Address
+
+    @JvmInline
+    value class Exception(override val address: Int) : Address
 
     @JvmInline
     value class Struct(override val address: Int) : Address

@@ -7,12 +7,12 @@ import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.module.module
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -42,19 +42,10 @@ class DataModuleTest {
         )
 
         val expected = Ok(
-            Module(
+            module(
                 version = Version.One,
-                types = emptyList(),
-                imports = emptyList(),
-                functions = emptyList(),
-                tables = emptyList(),
                 memories = listOf(expectedMemory),
-                globals = emptyList(),
-                exports = emptyList(),
-                startFunction = null,
-                elementSegments = emptyList(),
                 dataSegments = listOf(expectedDataSegment),
-                customs = emptyList(),
             ),
         )
 

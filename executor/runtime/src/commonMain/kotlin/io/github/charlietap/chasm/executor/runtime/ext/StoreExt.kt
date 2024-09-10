@@ -9,11 +9,13 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
+import io.github.charlietap.chasm.executor.runtime.instance.ExceptionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
+import io.github.charlietap.chasm.executor.runtime.instance.TagInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
@@ -29,6 +31,10 @@ inline fun Store.memory(address: Address.Memory): Result<MemoryInstance, Invocat
     return memories.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
 }
 
+inline fun Store.tag(address: Address.Tag): Result<TagInstance, InvocationError.StoreLookupFailed> {
+    return tags.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
+}
+
 inline fun Store.global(address: Address.Global): Result<GlobalInstance, InvocationError.StoreLookupFailed> {
     return globals.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
 }
@@ -39,6 +45,10 @@ inline fun Store.element(address: Address.Element): Result<ElementInstance, Invo
 
 inline fun Store.data(address: Address.Data): Result<DataInstance, InvocationError.StoreLookupFailed> {
     return data.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
+}
+
+inline fun Store.exception(address: Address.Exception): Result<ExceptionInstance, InvocationError.StoreLookupFailed> {
+    return exceptions.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
 }
 
 inline fun Store.struct(address: Address.Struct): Result<StructInstance, InvocationError.StoreLookupFailed> {

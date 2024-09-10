@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Local
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.CompositeType
@@ -15,6 +14,7 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.type.f32ValueType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
@@ -75,7 +75,7 @@ class FunctionModuleTest {
         )
 
         val expected = Ok(
-            Module(
+            module(
                 version = Version.One,
                 types = listOf(expectedType),
                 imports = emptyList(),

@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table
+import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
@@ -111,6 +113,18 @@ internal data class ValidationContext(
         }
         val moduleTables = module.tables.map(Table::type)
         importedTables + moduleTables
+    }
+
+    val tags by lazy {
+        val importedTags = module.imports.fold(mutableListOf<TagType>()) { acc, import ->
+            val descriptor = import.descriptor
+            if (descriptor is Import.Descriptor.Tag) {
+                acc += descriptor.type
+            }
+            acc
+        }
+        val moduleTags = module.tags.map(Tag::type)
+        importedTags + moduleTags
     }
 
     val datas by lazy {

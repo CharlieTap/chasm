@@ -1,6 +1,7 @@
+
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -13,6 +14,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmWasi {
+        nodejs()
         binaries.executable()
     }
 
@@ -33,6 +35,6 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.withType<KotlinJsCompile>().configureEach {
     compilerOptions {
-        freeCompilerArgs.addAll("-Xwasm-use-traps-instead-of-exceptions")
+        freeCompilerArgs.addAll("-Xwasm-use-new-exception-proposal")
     }
 }

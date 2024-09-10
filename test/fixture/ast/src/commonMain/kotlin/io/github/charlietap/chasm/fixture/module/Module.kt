@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.StartFunction
 import io.github.charlietap.chasm.ast.module.Table
+import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 
@@ -21,6 +22,7 @@ fun module(
     functions: List<Function> = emptyList(),
     tables: List<Table> = emptyList(),
     memories: List<Memory> = emptyList(),
+    tags: List<Tag> = emptyList(),
     globals: List<Global> = emptyList(),
     exports: List<Export> = emptyList(),
     startFunction: StartFunction? = null,
@@ -34,6 +36,7 @@ fun module(
     functions = functions,
     tables = tables,
     memories = memories,
+    tags = tags,
     globals = globals,
     exports = exports,
     startFunction = startFunction,

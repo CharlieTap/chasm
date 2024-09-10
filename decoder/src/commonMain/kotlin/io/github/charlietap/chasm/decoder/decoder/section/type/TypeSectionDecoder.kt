@@ -34,5 +34,7 @@ internal fun TypeSectionDecoder(
         Type(Index.TypeIndex(idx), recursiveType)
     }
 
+    context.types += types
+
     TypeSection(types)
 }

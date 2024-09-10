@@ -112,6 +112,7 @@ internal class ModuleBuilder(private val version: Version) {
             functions = functions,
             tables = tables,
             memories = memories,
+            tags = tags,
             globals = globals,
             elementSegments = elementSegments,
             dataSegments = dataSegments,

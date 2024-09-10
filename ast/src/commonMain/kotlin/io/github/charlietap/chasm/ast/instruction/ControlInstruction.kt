@@ -19,15 +19,17 @@ sealed interface ControlInstruction : Instruction {
 
     sealed interface CatchHandler {
 
-        data class Catch(val tagIndex: Index.TagIndex, val labelIndex: Index.LabelIndex) : CatchHandler
+        val labelIndex: Index.LabelIndex
 
-        data class CatchRef(val tagIndex: Index.TagIndex, val labelIndex: Index.LabelIndex) : CatchHandler
+        data class Catch(val tagIndex: Index.TagIndex, override val labelIndex: Index.LabelIndex) : CatchHandler
+
+        data class CatchRef(val tagIndex: Index.TagIndex, override val labelIndex: Index.LabelIndex) : CatchHandler
 
         @JvmInline
-        value class CatchAll(val labelIndex: Index.LabelIndex) : CatchHandler
+        value class CatchAll(override val labelIndex: Index.LabelIndex) : CatchHandler
 
         @JvmInline
-        value class CatchAllRef(val labelIndex: Index.LabelIndex) : CatchHandler
+        value class CatchAllRef(override val labelIndex: Index.LabelIndex) : CatchHandler
     }
 
     data object Unreachable : ControlInstruction

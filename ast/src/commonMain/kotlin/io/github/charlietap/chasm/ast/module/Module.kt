@@ -7,6 +7,7 @@ data class Module(
     val functions: List<Function>,
     val tables: List<Table>,
     val memories: List<Memory>,
+    val tags: List<Tag>,
     val globals: List<Global>,
     val exports: List<Export>,
     val startFunction: StartFunction?,

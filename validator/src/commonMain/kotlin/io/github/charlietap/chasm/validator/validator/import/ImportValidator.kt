@@ -27,6 +27,6 @@ internal fun ImportValidator(
         is Import.Descriptor.Global -> Unit
         is Import.Descriptor.Memory -> Unit
         is Import.Descriptor.Table -> Unit
-        is Import.Descriptor.Tag -> TODO()
+        is Import.Descriptor.Tag -> Unit
     }
 }

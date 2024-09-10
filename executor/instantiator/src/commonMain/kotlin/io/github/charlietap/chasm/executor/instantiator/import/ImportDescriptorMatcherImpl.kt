@@ -23,6 +23,7 @@ internal fun ImportDescriptorMatcherImpl(
         tableImportMatcher = ::TableImportMatcherImpl,
         memoryImportMatcher = ::MemoryImportMatcherImpl,
         globalImportMatcher = ::GlobalImportMatcherImpl,
+        tagImportMatcher = ::TagImportMatcher,
     )
 
 internal fun ImportDescriptorMatcherImpl(
@@ -34,20 +35,33 @@ internal fun ImportDescriptorMatcherImpl(
     tableImportMatcher: TableImportMatcher,
     memoryImportMatcher: MemoryImportMatcher,
     globalImportMatcher: GlobalImportMatcher,
+    tagImportMatcher: TagImportMatcher,
 ): Result<Boolean, ModuleTrapError> = binding {
-    when {
-        descriptor is ModuleImport.Descriptor.Function && externalValue is ExternalValue.Function -> {
+    when (descriptor) {
+        is ModuleImport.Descriptor.Function -> if (externalValue is ExternalValue.Function) {
             functionImportMatcher(store, module, descriptor, externalValue).bind()
+        } else {
+            false
         }
-        descriptor is ModuleImport.Descriptor.Table && externalValue is ExternalValue.Table -> {
+        is ModuleImport.Descriptor.Table -> if (externalValue is ExternalValue.Table) {
             tableImportMatcher(store, descriptor, externalValue).bind()
+        } else {
+            false
         }
-        descriptor is ModuleImport.Descriptor.Memory && externalValue is ExternalValue.Memory -> {
+        is ModuleImport.Descriptor.Memory -> if (externalValue is ExternalValue.Memory) {
             memoryImportMatcher(store, descriptor, externalValue).bind()
+        } else {
+            false
         }
-        descriptor is ModuleImport.Descriptor.Global && externalValue is ExternalValue.Global -> {
+        is ModuleImport.Descriptor.Global -> if (externalValue is ExternalValue.Global) {
             globalImportMatcher(store, descriptor, externalValue).bind()
+        } else {
+            false
         }
-        else -> false
+        is ModuleImport.Descriptor.Tag -> if (externalValue is ExternalValue.Tag) {
+            tagImportMatcher(store, descriptor, externalValue).bind()
+        } else {
+            false
+        }
     }
 }

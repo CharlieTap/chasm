@@ -24,6 +24,9 @@ inline fun ModuleInstance.tableAddress(index: Index.TableIndex): Result<Address.
 inline fun ModuleInstance.memoryAddress(index: Index.MemoryIndex): Result<Address.Memory, InvocationError.MemoryAddressLookupFailed> =
     memAddresses.getOrNull(index.idx.toInt())?.let(::Ok) ?: Err(InvocationError.MemoryAddressLookupFailed(index.idx.toInt()))
 
+inline fun ModuleInstance.tagAddress(index: Index.TagIndex): Result<Address.Tag, InvocationError.TagAddressLookupFailed> =
+    tagAddresses.getOrNull(index.idx.toInt())?.let(::Ok) ?: Err(InvocationError.TagAddressLookupFailed(index.idx.toInt()))
+
 inline fun ModuleInstance.globalAddress(index: Index.GlobalIndex): Result<Address.Global, InvocationError.GlobalAddressLookupFailed> =
     globalAddresses.getOrNull(index.idx.toInt())?.let(::Ok) ?: Err(InvocationError.GlobalAddressLookupFailed(index.idx.toInt()))
 
@@ -41,6 +44,8 @@ inline fun ModuleInstance.addFunctionAddress(address: Address.Function) = apply 
 inline fun ModuleInstance.addTableAddress(address: Address.Table) = apply { this.tableAddresses.add(address) }
 
 inline fun ModuleInstance.addMemoryAddress(address: Address.Memory) = apply { this.memAddresses.add(address) }
+
+inline fun ModuleInstance.addTagAddress(address: Address.Tag) = apply { this.tagAddresses.add(address) }
 
 inline fun ModuleInstance.addGlobalAddress(address: Address.Global) = apply { this.globalAddresses.add(address) }
 
