@@ -17,14 +17,14 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 
 @CacheableTask
-abstract class ResolveWast2JsonTask : DefaultTask() {
+abstract class ResolveWasmToolsTask : DefaultTask() {
 
     @get:Input
-    abstract val wabtVersion: Property<String>
+    abstract val wasmToolsVersion: Property<String>
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val wabtDirectory: DirectoryProperty
+    abstract val wasmToolsDirectory: DirectoryProperty
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
@@ -35,10 +35,10 @@ abstract class ResolveWast2JsonTask : DefaultTask() {
     @TaskAction
     fun resolve() {
 
-        val wast2JsonFile = outputFile.get().asFile
+        val wasmToolsFile = outputFile.get().asFile
 
-        if(!wast2JsonFile.exists()) {
-            throw GradleException("wast2json file does not exist: ${wast2JsonFile.absolutePath}")
+        if(!wasmToolsFile.exists()) {
+            throw GradleException("wasm-tools file does not exist: ${wasmToolsFile.absolutePath}")
         }
 
         val versionBytes = ByteArrayOutputStream()
@@ -50,8 +50,8 @@ abstract class ResolveWast2JsonTask : DefaultTask() {
 
         val version = versionBytes.toString().trim()
 
-        if(version != wabtVersion.get()) {
-            throw GradleException("Wast2JsonTask does not support version $wabtVersion")
+        if(!version.contains(wasmToolsVersion.get())) {
+            throw GradleException("wasm-tools does not support version $wasmToolsVersion")
         }
     }
 }
