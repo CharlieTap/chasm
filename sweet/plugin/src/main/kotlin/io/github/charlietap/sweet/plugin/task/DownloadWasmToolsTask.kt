@@ -46,7 +46,7 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
         }
         val arch = when {
             osArch.contains(ARCH_ARM) -> ARCH_ARM
-            osArch.contains(ARCH_X86) -> ARCH_X86
+            x86.contains(osArch) -> ARCH_X8664
             else -> throw GradleException("Unsupported cpu architecture: $osArch")
         }
 
@@ -91,7 +91,8 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
     private companion object {
         const val RELEASE_URL = "https://github.com/bytecodealliance/wasm-tools/releases/download/"
 
-        const val ARCH_X86 = "x86_64"
+        const val ARCH_X8664 = "x86_64"
+        const val ARCH_AMD64 = "amd64"
         const val ARCH_ARM = "aarch64"
 
         const val OS_LINUX = "linux"
@@ -99,6 +100,8 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
         const val OS_WINDOWS = "windows"
 
         const val FILE_EXTENSION = ".tar.gz"
+
+        val x86 = arrayOf(ARCH_AMD64, ARCH_X8664)
 
         fun filename(version: String, arch: String, os: String) = "wasm-tools-$version-$arch-$os"
     }
