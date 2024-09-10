@@ -36,12 +36,12 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
         val version = wasmToolsVersion.get()
         val osArch = System.getProperty("os.arch").lowercase()
         val osName = System.getProperty("os.name").lowercase()
-        val tarFile = outputDirectory.file("${version}.tar.gz").get().asFile
 
-        val os = when {
-            osName.contains("mac") -> OS_MAC
-            osName.contains("nux") -> OS_LINUX
-            osName.contains("win") -> OS_WINDOWS
+
+        val (os, extension) = when {
+            osName.contains("mac") -> OS_MAC to FILE_EXTENSION_TAR
+            osName.contains("nux") -> OS_LINUX to FILE_EXTENSION_TAR
+            osName.contains("win") -> OS_WINDOWS to FILE_EXTENSION_ZIP
             else -> throw GradleException("Unsupported OS: $osName")
         }
         val arch = when {
@@ -51,13 +51,25 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
         }
 
         val filename = filename(version, arch, os)
-        val url = "${RELEASE_URL}v${version}/${filename}${FILE_EXTENSION}"
+        val url = "${RELEASE_URL}v${version}/${filename}${extension}"
+
+        val compressed = if(os == OS_WINDOWS) {
+            outputDirectory.file("${version}${FILE_EXTENSION_ZIP}").get().asFile
+        } else {
+            outputDirectory.file("${version}${FILE_EXTENSION_TAR}").get().asFile
+        }
 
         wipeDirectory()
-        downloadRelease(URI(url).toURL(), tarFile)
+        downloadRelease(URI(url).toURL(), compressed)
+
+        val tree = if(os == OS_WINDOWS) {
+            archive.zipTree(compressed)
+        } else {
+            archive.tarTree(archive.gzip(compressed))
+        }
 
         fs.copy {
-            from(archive.tarTree(archive.gzip(tarFile))) {
+            from(tree) {
                 include("**/wasm-tools*")
                 eachFile {
                     path = path
@@ -71,7 +83,7 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
 
         val extractedDirectory = outputDirectory.dir(filename).get()
         extractedDirectory.asFile.deleteRecursively()
-        tarFile.delete()
+        compressed.delete()
     }
 
     private fun downloadRelease(url: URL, destination: File) {
@@ -99,7 +111,8 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
         const val OS_MAC = "macos"
         const val OS_WINDOWS = "windows"
 
-        const val FILE_EXTENSION = ".tar.gz"
+        const val FILE_EXTENSION_TAR = ".tar.gz"
+        const val FILE_EXTENSION_ZIP = ".zip"
 
         val x86 = arrayOf(ARCH_AMD64, ARCH_X8664)
 
