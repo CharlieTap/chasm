@@ -1,6 +1,6 @@
 package io.github.charlietap.sweet.plugin.task
 
-import io.github.charlietap.sweet.plugin.action.Wast2JsonAction
+import io.github.charlietap.sweet.plugin.action.WasmToolsAction
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileTree
@@ -67,24 +67,24 @@ abstract class PrepareTestSuiteTask : DefaultTask() {
                 }
                 ChangeType.MODIFIED -> {
                     generatedDirectory.get().asFile.deleteRecursively()
-                    queueJobToRunWast2Json(change, generatedDirectory)
+                    queueJobToRunWasmTools(change, generatedDirectory)
                 }
                 ChangeType.ADDED -> {
-                    queueJobToRunWast2Json(change, generatedDirectory)
+                    queueJobToRunWasmTools(change, generatedDirectory)
                 }
             }
         }
     }
 
-    private fun queueJobToRunWast2Json(
+    private fun queueJobToRunWasmTools(
         change: FileChange,
         generatedDirectory: Provider<Directory>,
     ) {
         val queue = workerExecutor.noIsolation()
-        queue.submit(Wast2JsonAction::class.java) {
+        queue.submit(WasmToolsAction::class.java) {
             inputFile.set(change.file)
             outputDirectory.set(generatedDirectory)
-            wast2JsonFile.set(wast2Json)
+            wasmToolsFile.set(wast2Json)
         }
     }
 }

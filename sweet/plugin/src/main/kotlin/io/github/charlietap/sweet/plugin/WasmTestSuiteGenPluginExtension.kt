@@ -11,7 +11,7 @@ open class WasmTestSuiteGenPluginExtension @Inject constructor(
     layout: ProjectLayout,
     objects: ObjectFactory,
 ) {
-    val wabtVersion: Property<String> = objects.property(String::class.java)
+    val wasmToolsVersion: Property<String> = objects.property(String::class.java)
 
     val testSuiteCommit: Property<String> = objects.property(String::class.java)
 

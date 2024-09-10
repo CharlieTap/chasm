@@ -1,9 +1,9 @@
 package io.github.charlietap.sweet.plugin
 
-import io.github.charlietap.sweet.plugin.task.DownloadWabtTask
+import io.github.charlietap.sweet.plugin.task.DownloadWasmToolsTask
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import io.github.charlietap.sweet.plugin.task.PrepareTestSuiteTask
-import io.github.charlietap.sweet.plugin.task.ResolveWast2JsonTask
+import io.github.charlietap.sweet.plugin.task.ResolveWasmToolsTask
 import io.github.charlietap.sweet.plugin.task.SyncRepositoryTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -29,26 +29,26 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             outputDirectory.set(extension.testSuiteDirectory)
         }
 
-        val downloadWabtTask = project.tasks.register<DownloadWabtTask>(
-            TASK_NAME_DOWNLOAD_WABT,
+        val downloadWasmToolsTask = project.tasks.register<DownloadWasmToolsTask>(
+            TASK_NAME_DOWNLOAD_WASM_TOOLS,
         ) {
             description = TASK_DESCRIPTION_DOWNLOAD_WABT
             group = GROUP
 
-            wabtVersion.set(extension.wabtVersion)
-            outputDirectory.set(project.layout.buildDirectory.dir("wabt"))
+            wasmToolsVersion.set(extension.wasmToolsVersion)
+            outputDirectory.set(project.layout.buildDirectory.dir("wasm-tools"))
         }
 
-        val resolveWast2JsonTask = project.tasks.register<ResolveWast2JsonTask>(
-            TASK_NAME_RESOLVE_W2J,
+        val resolveWasmToolsTask = project.tasks.register<ResolveWasmToolsTask>(
+            TASK_NAME_RESOLVE_WASM_TOOLS,
         ) {
             description = TASK_DESCRIPTION_RESOLVE_W2J
             group = GROUP
 
-            wabtVersion.set(extension.wabtVersion)
-            wabtDirectory.set(downloadWabtTask.flatMap { it.outputDirectory })
-            outputFile.set(wabtVersion.zip(wabtDirectory) { version, dir ->
-                dir.dir(version).file("wast2json")
+            wasmToolsVersion.set(extension.wasmToolsVersion)
+            wasmToolsDirectory.set(downloadWasmToolsTask.flatMap { it.outputDirectory })
+            outputFile.set(wasmToolsVersion.zip(wasmToolsDirectory) { version, dir ->
+                dir.dir(version).file("wasm-tools")
             })
         }
 
@@ -70,7 +70,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
 
             excludes.set(extension.excludes)
             proposals.set(extension.proposals)
-            wast2Json.set(resolveWast2JsonTask.flatMap { it.outputFile })
+            wast2Json.set(resolveWasmToolsTask.flatMap { it.outputFile })
             outputDirectory.set(extension.testSuiteIntermediateDirectory)
         }
 
@@ -111,8 +111,8 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
         const val GROUP = "testsuite"
 
         const val TASK_NAME_SYNC_SUITE = "syncWasmTestSuite"
-        const val TASK_NAME_DOWNLOAD_WABT = "downloadWabt"
-        const val TASK_NAME_RESOLVE_W2J = "resolveWast2Json"
+        const val TASK_NAME_DOWNLOAD_WASM_TOOLS = "downloadWasmTools"
+        const val TASK_NAME_RESOLVE_WASM_TOOLS = "resolveWasmTools"
         const val TASK_NAME_PREPARE_SUITE = "prepareTestSuite"
         const val TASK_NAME_GENERATE_TESTS = "generateTests"
 

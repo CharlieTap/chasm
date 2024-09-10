@@ -1,19 +1,20 @@
 package io.github.charlietap.sweet.plugin.action
 
+import java.io.File
+import javax.inject.Inject
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
-import javax.inject.Inject
 
-interface Wast2JsonParams: WorkParameters {
-    val wast2JsonFile: RegularFileProperty
+interface WasmToolsParams: WorkParameters {
+    val wasmToolsFile: RegularFileProperty
     val inputFile: RegularFileProperty
     val outputDirectory: DirectoryProperty
 }
 
-abstract class Wast2JsonAction : WorkAction<Wast2JsonParams> {
+abstract class WasmToolsAction : WorkAction<WasmToolsParams> {
 
     @get:Inject
     abstract val cli: ExecOperations
@@ -27,18 +28,20 @@ abstract class Wast2JsonAction : WorkAction<Wast2JsonParams> {
 
         cli.exec {
             workingDir = outputDir
-            executable = parameters.wast2JsonFile.get().asFile.absolutePath
+            executable = parameters.wasmToolsFile.get().asFile.absolutePath
             args = listOf(
+                CLI_ARG_J2W,
+                CLI_OPTION_DIR, outputDir.absolutePath,
+                CLI_OPTION_OUTPUT, outputDir.absolutePath + File.separator + outputDir.nameWithoutExtension + ".json",
                 parameters.inputFile.get().asFile.absolutePath,
-            ) + ADDITIONAL_FLAGS
+            )
         }
     }
 
     private companion object {
-        val ADDITIONAL_FLAGS = setOf(
-            "--enable-tail-call",
-            "--enable-extended-const",
-            "--enable-multi-memory",
-        )
+        const val CLI_ARG_J2W = "json-from-wast"
+
+        const val CLI_OPTION_DIR = "--wasm-dir"
+        const val CLI_OPTION_OUTPUT = "-o"
     }
 }
