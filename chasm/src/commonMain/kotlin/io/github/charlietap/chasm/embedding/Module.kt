@@ -5,6 +5,7 @@ import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.decoder.ModuleDecoder
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.decoder.reader.ByteArraySourceReader
 import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -26,6 +27,7 @@ internal fun module(
     decoder: ModuleDecoder,
 ): ChasmResult<Module, DecodeError> {
     return decoder(reader)
+        .mapError(ModuleDecoderError::toString)
         .mapError(::DecodeError)
         .map(::Module)
         .fold(::Success, ::Error)

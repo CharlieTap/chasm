@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.validator.WasmModuleValidator
 import io.github.charlietap.chasm.validator.WasmModuleValidatorImpl
+import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 
 fun validate(module: Module): ChasmResult<Module, ValidationError> {
     return validate(module, ::WasmModuleValidatorImpl)
@@ -20,6 +21,7 @@ internal fun validate(
     validator: WasmModuleValidator,
 ): ChasmResult<Module, ValidationError> {
     return validator(module.module)
+        .mapError(ModuleValidatorError::toString)
         .mapError(::ValidationError)
         .map(::Module)
         .fold(::Success, ::Error)

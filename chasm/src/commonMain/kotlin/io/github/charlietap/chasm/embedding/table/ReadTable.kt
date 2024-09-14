@@ -29,6 +29,7 @@ fun readTable(
         elementIndex = elementIndex,
         referenceValueMapper = ReferenceValueMapper.instance,
     )
+        .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

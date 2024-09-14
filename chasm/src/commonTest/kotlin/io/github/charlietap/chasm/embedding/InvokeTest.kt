@@ -30,7 +30,7 @@ class InvokeTest {
         val store = publicStore()
         val instance = publicInstance()
 
-        val expected = ChasmError.ExecutionError(InvocationError.FunctionNotFound(function))
+        val expected = ChasmError.ExecutionError(InvocationError.FunctionNotFound(function).toString())
 
         val actual = invoke(store, instance, function)
 
@@ -67,7 +67,7 @@ class InvokeTest {
             Err(error)
         }
 
-        val expected = ChasmError.ExecutionError(error)
+        val expected = ChasmError.ExecutionError(error.toString())
 
         val actual = invoke(store, instance, function, args, functionInvoker, ValueMapper.instance)
 

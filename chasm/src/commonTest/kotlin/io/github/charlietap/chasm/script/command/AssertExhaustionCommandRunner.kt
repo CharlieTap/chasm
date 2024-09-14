@@ -29,7 +29,7 @@ fun AssertExhaustionCommandRunner(
         }
         is ActionResult.Failure -> {
             val error = result.error
-            if (error is ChasmError.ExecutionError && error.error is InvocationError.CallStackExhausted) {
+            if (error is ChasmError.ExecutionError && error.error == InvocationError.CallStackExhausted.toString()) {
                 CommandResult.Success
             } else {
                 CommandResult.Failure(command, result.reason)

@@ -30,6 +30,7 @@ fun writeTable(
         value = value,
         referenceValueMapper = ReferenceValueMapper.instance,
     )
+        .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

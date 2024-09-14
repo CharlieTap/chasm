@@ -32,7 +32,7 @@ class ChasmResultTest {
     fun `calling map on a chasm error result does nothing`() {
 
         val error: ChasmResult<Int, ChasmError> = ChasmResult.Error(
-            ChasmError.ExecutionError(moduleRuntimeError()),
+            ChasmError.ExecutionError(moduleRuntimeError().toString()),
         )
         val actual = error.map { it * 2 }
 
@@ -52,7 +52,7 @@ class ChasmResultTest {
     fun `calling flatMap on a chasm error result does nothing`() {
 
         val error: ChasmResult<Int, ChasmError> = ChasmResult.Error(
-            ChasmError.ExecutionError(moduleRuntimeError()),
+            ChasmError.ExecutionError(moduleRuntimeError().toString()),
         )
         val actual = error.flatMap { ChasmResult.Success(it * 3) }
 
@@ -75,7 +75,7 @@ class ChasmResultTest {
     fun `calling fold a chasm error result returns the error branch`() {
 
         val error: ChasmResult<Int, ChasmError> = ChasmResult.Error(
-            ChasmError.ExecutionError(moduleRuntimeError()),
+            ChasmError.ExecutionError(moduleRuntimeError().toString()),
         )
         val actual = error.fold(
             onSuccess = { 100 },
@@ -98,7 +98,7 @@ class ChasmResultTest {
     fun `calling getOrNull on a chasm error result returns null`() {
 
         val error: ChasmResult<Int, ChasmError> = ChasmResult.Error(
-            ChasmError.ExecutionError(moduleRuntimeError()),
+            ChasmError.ExecutionError(moduleRuntimeError().toString()),
         )
         val actual = error.getOrNull()
 
@@ -118,7 +118,7 @@ class ChasmResultTest {
     fun `calling getOrElse on a chasm error result returns the value provided in else`() {
 
         val error: ChasmResult<Int, ChasmError> = ChasmResult.Error(
-            ChasmError.ExecutionError(moduleRuntimeError()),
+            ChasmError.ExecutionError(moduleRuntimeError().toString()),
         )
         val actual = error.getOrElse(117)
 
@@ -138,7 +138,7 @@ class ChasmResultTest {
     fun `expect throws on a chasm error result`() {
 
         val error: ChasmResult<Int, ChasmError> = ChasmResult.Error(
-            ChasmError.ExecutionError(moduleRuntimeError()),
+            ChasmError.ExecutionError(moduleRuntimeError().toString()),
         )
         assertFailsWith<IllegalStateException> {
             error.expect("Expected success but got error")
@@ -162,7 +162,7 @@ class ChasmResultTest {
     fun `onError triggers on chasm error result`() {
 
         val error: ChasmResult<Int, ChasmError> = ChasmResult.Error(
-            ChasmError.ExecutionError(moduleRuntimeError()),
+            ChasmError.ExecutionError(moduleRuntimeError().toString()),
         )
         var callbackExecuted = false
         error.onError {

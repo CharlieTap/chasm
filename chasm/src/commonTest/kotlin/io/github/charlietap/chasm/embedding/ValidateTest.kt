@@ -44,6 +44,6 @@ class ValidateTest {
 
         val actual = validate(module, validator)
 
-        assertEquals(ChasmResult.Error(ChasmError.ValidationError(TypeValidatorError.TypeMismatch)), actual)
+        assertEquals(ChasmResult.Error(ChasmError.ValidationError(TypeValidatorError.TypeMismatch.toString())), actual)
     }
 }

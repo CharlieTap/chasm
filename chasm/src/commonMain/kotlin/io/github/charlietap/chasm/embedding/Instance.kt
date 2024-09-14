@@ -20,6 +20,7 @@ import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiatorImpl
 import io.github.charlietap.chasm.executor.instantiator.import.ImportMatcher
 import io.github.charlietap.chasm.executor.instantiator.import.ImportMatcherImpl
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 
 fun instance(
@@ -47,8 +48,9 @@ internal fun instance(
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
     val mappedImports = imports.map { import -> Triple(import.moduleName, import.entityName, importableMapper.map(import.value)) }
     val orderedImports = importMatcher(store.store, module.module, mappedImports).get()
-        ?: return Error(ChasmError.ExecutionError(InstantiationError.MissingImport))
+        ?: return Error(ChasmError.ExecutionError(InstantiationError.MissingImport.toString()))
     return instantiator(store.store, module.module, orderedImports)
+        .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .map(::Instance)
         .fold(::Success, ::Error)

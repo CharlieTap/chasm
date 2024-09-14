@@ -29,7 +29,7 @@ private fun AssertExceptionCommandRunner(
             CommandResult.Failure(command, "expected exception but action succeeded")
         }
         is ActionResult.Failure -> {
-            if (result.error is ChasmError.ExecutionError && result.error.error is InvocationError.UncaughtException) {
+            if (result.error is ChasmError.ExecutionError && result.error.error == InvocationError.UncaughtException.toString()) {
                 CommandResult.Success
             } else {
                 CommandResult.Failure(command, "expected trap but encountered error ${result.error} with reason ${result.reason}")

@@ -24,6 +24,7 @@ fun sizeMemory(
         memory = memory,
         sizer = ::MemoryInstanceSizerImpl,
     )
+        .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

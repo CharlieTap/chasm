@@ -12,11 +12,11 @@ import kotlin.jvm.JvmName
 @JvmName("decoderToChasmResult")
 internal fun <S, E> Result<S, E>.toChasmResult(): ChasmResult<S, ChasmError>
     where E : ModuleDecoderError = fold(::Success) { error ->
-    return ChasmResult.Error(ChasmError.DecodeError(error))
+    return ChasmResult.Error(ChasmError.DecodeError(error.toString()))
 }
 
 @JvmName("executorToChasmResult")
 internal fun <S, E> Result<S, E>.toChasmResult(): ChasmResult<S, ChasmError>
 where E : ModuleTrapError = fold(::Success) { error ->
-    return ChasmResult.Error(ChasmError.ExecutionError(error))
+    return ChasmResult.Error(ChasmError.ExecutionError(error.toString()))
 }

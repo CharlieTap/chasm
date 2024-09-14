@@ -28,6 +28,7 @@ fun writeBytes(
         bytes = bytes,
         bytesWriter = ::MemoryInstanceBytesWriterImpl,
     )
+        .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.embedding.transform.ValueMapper
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.FunctionInvokerImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -45,12 +46,13 @@ internal fun invoke(
         export.name.name == name
     }?.value
     val address = (extern as? ExternalValue.Function)?.address ?: return Error(
-        ChasmError.ExecutionError(InvocationError.FunctionNotFound(name)),
+        ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
     )
     val arguments = args.map(valueMapper::map)
 
     return invoker(store.store, address, arguments)
         .map { values -> values.map(valueMapper::bimap) }
+        .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 }

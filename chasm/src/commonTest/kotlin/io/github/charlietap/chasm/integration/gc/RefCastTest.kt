@@ -102,7 +102,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -118,7 +118,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -134,7 +134,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -150,7 +150,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -214,7 +214,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -246,7 +246,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -262,7 +262,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -278,7 +278,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -294,7 +294,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -310,7 +310,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -326,7 +326,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -342,7 +342,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -358,7 +358,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -390,7 +390,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -406,7 +406,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -422,7 +422,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -438,7 +438,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -454,7 +454,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -470,7 +470,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -486,7 +486,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -502,7 +502,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -534,7 +534,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -550,7 +550,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -566,7 +566,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }
@@ -582,7 +582,7 @@ class RefCastTest {
             setupFunctions = listOf("init" to listOf(Value.Reference.Extern(Value.Reference.Host(0)))),
         )
 
-        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered)
+        val expected = ChasmError.ExecutionError(InvocationError.Trap.TrapEncountered.toString())
 
         assertEquals(ChasmResult.Error(expected), result)
     }

@@ -31,6 +31,7 @@ fun readBytes(
         bufferPointer = bufferPointer,
         bytesReader = ::MemoryInstanceBytesReader,
     )
+        .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 
