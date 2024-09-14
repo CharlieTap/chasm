@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 import io.github.charlietap.chasm.type.expansion.BlockTypeExpanderImpl
@@ -110,5 +111,13 @@ internal inline fun ValidationContext.tableType(
 ): Result<TableType, ModuleValidatorError> {
     return tables.getOrNull(index.idx.toInt()).toResultOr {
         InstructionValidatorError.UnknownTable
+    }
+}
+
+internal inline fun ValidationContext.tagType(
+    index: Index.TagIndex,
+): Result<TagType, ModuleValidatorError> {
+    return tags.getOrNull(index.idx.toInt()).toResultOr {
+        InstructionValidatorError.UnknownTag
     }
 }

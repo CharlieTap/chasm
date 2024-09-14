@@ -26,6 +26,8 @@ sealed interface Value {
 
         class Array internal constructor(internal val value: ReferenceValue.Array) : Reference
 
+        class Exception internal constructor(internal val value: ReferenceValue.Exception) : Reference
+
         @JvmInline
         value class Extern(val value: Reference) : Reference
 

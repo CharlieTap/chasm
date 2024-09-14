@@ -6,6 +6,8 @@ internal const val BLOCK: UByte = 0x02u
 internal const val LOOP: UByte = 0x03u
 internal const val IF: UByte = 0x04u
 internal const val ELSE: UByte = 0x05u
+internal const val THROW: UByte = 0x08u
+internal const val THROW_REF: UByte = 0x0Au
 internal const val END: UByte = 0x0Bu
 internal const val BR: UByte = 0x0Cu
 internal const val BR_IF: UByte = 0x0Du
@@ -17,6 +19,7 @@ internal const val RETURN_CALL: UByte = 0x12u
 internal const val RETURN_CALL_INDIRECT: UByte = 0x13u
 internal const val CALL_REF: UByte = 0x14u
 internal const val RETURN_CALL_REF: UByte = 0x15u
+internal const val TRY_TABLE: UByte = 0x1Fu
 internal const val BR_ON_NULL: UByte = 0xD5u
 internal const val BR_ON_NON_NULL: UByte = 0xD6u
 

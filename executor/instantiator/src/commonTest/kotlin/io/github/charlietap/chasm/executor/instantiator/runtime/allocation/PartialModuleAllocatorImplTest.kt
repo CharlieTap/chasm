@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocatorImpl
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocatorImpl
-import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocatorImpl
 import io.github.charlietap.chasm.executor.instantiator.classification.ClassifiedExternalValue
 import io.github.charlietap.chasm.executor.instantiator.classification.ExternalValueClassifier
 import io.github.charlietap.chasm.executor.instantiator.validation.ImportValidator
@@ -36,6 +35,7 @@ import io.github.charlietap.chasm.fixture.type.externalType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -108,8 +108,8 @@ class PartialModuleAllocatorImplTest {
         val expected = ModuleInstance(
             types = listOf(type.recursiveType.definedType()),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
-            tableAddresses = mutableListOf(),
-            memAddresses = mutableListOf(),
+            tableAddresses = mutableListOf(importTableAddress),
+            memAddresses = mutableListOf(importMemoryAddress),
             globalAddresses = mutableListOf(importGlobalAddress),
             elemAddresses = mutableListOf(),
             dataAddresses = mutableListOf(),
@@ -121,7 +121,7 @@ class PartialModuleAllocatorImplTest {
             module = module,
             imports = imports,
             wasmFunctionAllocator = ::WasmFunctionAllocatorImpl,
-            typeAllocator = ::TypeAllocatorImpl,
+            typeAllocator = ::DefinedTypeFactory,
             classifier = classifier,
             importValidator = validator,
         )

@@ -29,6 +29,8 @@ kotlin {
                 api(projects.stream)
 
                 api(libs.result)
+
+                implementation(projects.typeSystem)
             }
         }
 

@@ -23,6 +23,10 @@ sealed interface Value {
     data class F64(val value: String? = null) : Value
 
     @Serializable
+    @SerialName("exnref")
+    data class Exception(val value: String? = null): Value
+
+    @Serializable
     @SerialName("externref")
     data class Extern(val value: String? = null): Value
 

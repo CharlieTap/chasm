@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.StartFunction
 import io.github.charlietap.chasm.ast.module.Table
+import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
@@ -24,6 +25,7 @@ import io.github.charlietap.chasm.validator.validator.import.ImportValidator
 import io.github.charlietap.chasm.validator.validator.memory.MemoryValidator
 import io.github.charlietap.chasm.validator.validator.start.StartFunctionValidator
 import io.github.charlietap.chasm.validator.validator.table.TableValidator
+import io.github.charlietap.chasm.validator.validator.tag.TagValidator
 
 internal fun ModuleValidator(
     context: ValidationContext,
@@ -41,6 +43,7 @@ internal fun ModuleValidator(
         memoryValidator = ::MemoryValidator,
         startFunctionValidator = ::StartFunctionValidator,
         tableValidator = ::TableValidator,
+        tagValidator = ::TagValidator,
     )
 
 internal fun ModuleValidator(
@@ -55,6 +58,7 @@ internal fun ModuleValidator(
     memoryValidator: Validator<Memory>,
     startFunctionValidator: Validator<StartFunction>,
     tableValidator: Validator<Table>,
+    tagValidator: Validator<Tag>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     module.apply {
@@ -81,6 +85,9 @@ internal fun ModuleValidator(
         }
         tables.forEach { table ->
             tableValidator(context, table).bind()
+        }
+        tags.forEach { tag ->
+            tagValidator(context, tag).bind()
         }
         startFunction?.let { function ->
             startFunctionValidator(context, function).bind()

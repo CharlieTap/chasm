@@ -41,3 +41,7 @@ fun typeIndex(
 fun fieldIndex(
     index: UInt = 0u,
 ) = Index.FieldIndex(index)
+
+fun tagIndex(
+    index: UInt = 0u,
+) = Index.TagIndex(index)

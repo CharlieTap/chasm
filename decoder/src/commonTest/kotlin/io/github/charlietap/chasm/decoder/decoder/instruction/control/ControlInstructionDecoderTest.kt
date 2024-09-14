@@ -25,13 +25,20 @@ import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN
 import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN_CALL
 import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN_CALL_INDIRECT
 import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN_CALL_REF
+import io.github.charlietap.chasm.decoder.decoder.instruction.THROW
+import io.github.charlietap.chasm.decoder.decoder.instruction.THROW_REF
+import io.github.charlietap.chasm.decoder.decoder.instruction.TRY_TABLE
 import io.github.charlietap.chasm.decoder.decoder.instruction.UNREACHABLE
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
+import io.github.charlietap.chasm.fixture.instruction.blockType
+import io.github.charlietap.chasm.fixture.instruction.catchHandler
+import io.github.charlietap.chasm.fixture.instruction.instruction
 import io.github.charlietap.chasm.fixture.module.labelIndex
+import io.github.charlietap.chasm.fixture.module.tagIndex
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -95,10 +102,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = instructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -136,10 +146,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = instructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -171,10 +184,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = ifDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -201,10 +217,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -231,10 +250,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -266,10 +288,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = vectorDecoder,
+            labelVectorDecoder = vectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -291,10 +316,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -321,10 +349,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = functionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -356,10 +387,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = typeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -386,10 +420,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = functionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -421,10 +458,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = typeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = tableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -451,10 +491,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = typeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -481,10 +524,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = typeIndexDecoder,
             labelIndexDecoder = neverLabelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -511,10 +557,13 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
         )
 
         assertEquals(expected, actual)
@@ -541,10 +590,133 @@ class ControlInstructionDecoderTest {
             instructionBlockDecoder = neverInstructionBlockDecoder,
             ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
             labelIndexDecoder = labelIndexDecoder,
             tableIndexDecoder = neverTableIndexDecoder,
-            vectorDecoder = neverVectorDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
+        )
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can decode a THROW instruction`() {
+
+        val opcode = THROW
+        val context = decoderContext(
+            reader = FakeUByteReader { Ok(opcode) },
+        )
+
+        val tagIndex = tagIndex()
+        val tagIndexDecoder: Decoder<Index.TagIndex> = { _ ->
+            Ok(tagIndex)
+        }
+
+        val expected = Ok(ControlInstruction.Throw(tagIndex))
+
+        val actual = ControlInstructionDecoder(
+            context = context,
+            scope = neverScope,
+            blockTypeDecoder = neverBlockTypeDecoder,
+            instructionBlockDecoder = neverInstructionBlockDecoder,
+            ifDecoder = neverIfDecoder,
+            functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = tagIndexDecoder,
+            typeIndexDecoder = neverTypeIndexDecoder,
+            labelIndexDecoder = neverLabelIndexDecoder,
+            tableIndexDecoder = neverTableIndexDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
+        )
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can decode a THROW_REF instruction`() {
+
+        val opcode = THROW_REF
+        val context = decoderContext(
+            reader = FakeUByteReader { Ok(opcode) },
+        )
+
+        val expected = Ok(ControlInstruction.ThrowRef)
+
+        val actual = ControlInstructionDecoder(
+            context = context,
+            scope = neverScope,
+            blockTypeDecoder = neverBlockTypeDecoder,
+            instructionBlockDecoder = neverInstructionBlockDecoder,
+            ifDecoder = neverIfDecoder,
+            functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
+            typeIndexDecoder = neverTypeIndexDecoder,
+            labelIndexDecoder = neverLabelIndexDecoder,
+            tableIndexDecoder = neverTableIndexDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = neverHandlerVectorDecoder,
+        )
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can decode a TRY_TABLE instruction`() {
+
+        val opcode = TRY_TABLE
+        val context = decoderContext(
+            reader = FakeUByteReader { Ok(opcode) },
+        )
+
+        val scope: Scope<UByte> = { ctx, blockEndOpcode ->
+            assertEquals(context, ctx)
+            assertEquals(END, blockEndOpcode)
+            Ok(context)
+        }
+
+        val blockType = blockType()
+        val blockTypeDecoder: Decoder<BlockType> = { _ ->
+            Ok(blockType)
+        }
+
+        val handlers = listOf(catchHandler())
+        val handlersDecoder: VectorDecoder<ControlInstruction.CatchHandler> = { _, _ ->
+            Ok(Vector(handlers))
+        }
+
+        val instructions = listOf(instruction())
+        val instructionBlockDecoder: Decoder<List<Instruction>> = { ctx ->
+            assertEquals(context, ctx)
+            Ok(instructions)
+        }
+
+        val expected = Ok(
+            ControlInstruction.TryTable(
+                blockType = blockType,
+                handlers = handlers,
+                instructions = instructions,
+            ),
+        )
+
+        val actual = ControlInstructionDecoder(
+            context = context,
+            scope = scope,
+            blockTypeDecoder = blockTypeDecoder,
+            instructionBlockDecoder = instructionBlockDecoder,
+            ifDecoder = neverIfDecoder,
+            functionIndexDecoder = neverFunctionIndexDecoder,
+            handlerDecoder = neverHandlerDecoder,
+            tagIndexDecoder = neverTagIndexDecoder,
+            typeIndexDecoder = neverTypeIndexDecoder,
+            labelIndexDecoder = neverLabelIndexDecoder,
+            tableIndexDecoder = neverTableIndexDecoder,
+            labelVectorDecoder = neverLabelVectorDecoder,
+            handlerVectorDecoder = handlersDecoder,
         )
 
         assertEquals(expected, actual)
@@ -572,6 +744,9 @@ class ControlInstructionDecoderTest {
         private val neverBlockTypeDecoder: Decoder<BlockType> = { _ ->
             fail("block type decoder should not run in this scenario")
         }
+        private val neverHandlerDecoder: Decoder<ControlInstruction.CatchHandler> = { _ ->
+            fail("catch handler decoder should not run in this scenario")
+        }
         private val neverInstructionBlockDecoder: Decoder<List<Instruction>> = { _ ->
             fail("instruction block decoder should not run in this scenario")
         }
@@ -590,8 +765,14 @@ class ControlInstructionDecoderTest {
         private val neverTableIndexDecoder: Decoder<Index.TableIndex> = { _ ->
             fail("table index decoder should not run in this scenario")
         }
-        private val neverVectorDecoder: VectorDecoder<Index.LabelIndex> = { _, _ ->
-            fail("vector decoder should not run in this scenario")
+        private val neverTagIndexDecoder: Decoder<Index.TagIndex> = { _ ->
+            fail("tag index decoder should not run in this scenario")
+        }
+        private val neverLabelVectorDecoder: VectorDecoder<Index.LabelIndex> = { _, _ ->
+            fail("label vector decoder should not run in this scenario")
+        }
+        private val neverHandlerVectorDecoder: VectorDecoder<ControlInstruction.CatchHandler> = { _, _ ->
+            fail("catch handler vector decoder should not run in this scenario")
         }
     }
 }

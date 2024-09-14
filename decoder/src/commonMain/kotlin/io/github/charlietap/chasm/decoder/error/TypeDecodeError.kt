@@ -35,4 +35,6 @@ sealed interface TypeDecodeError : WasmDecodeError {
 
     @JvmInline
     value class UnknownMutabilityFlag(val encoded: UByte) : TypeDecodeError
+
+    data object InvalidTagType : TypeDecodeError
 }

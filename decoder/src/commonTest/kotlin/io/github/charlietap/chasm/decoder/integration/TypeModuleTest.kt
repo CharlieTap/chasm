@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.decoder.integration
 import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
@@ -15,6 +14,7 @@ import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.type.f32ValueType
 import io.github.charlietap.chasm.fixture.type.f64ValueType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
@@ -92,7 +92,7 @@ class TypeModuleTest {
         val expectedReferenceType = Type(Index.TypeIndex(2u), expectedReferenceTypeRecursiveType)
 
         val expected = Ok(
-            Module(
+            module(
                 version = Version.One,
                 types = listOf(
                     expectedNumberType,

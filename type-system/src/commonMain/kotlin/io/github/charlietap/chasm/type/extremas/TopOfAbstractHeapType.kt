@@ -19,6 +19,9 @@ internal fun TopOfAbstractHeapType(
     is AbstractHeapType.Func,
     is AbstractHeapType.NoFunc,
     -> AbstractHeapType.Func
+    is AbstractHeapType.Exception,
+    is AbstractHeapType.NoException,
+    -> AbstractHeapType.Exception
     is AbstractHeapType.Extern,
     is AbstractHeapType.NoExtern,
     -> AbstractHeapType.Extern

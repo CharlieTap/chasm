@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.decoder.section.MemorySection
 import io.github.charlietap.chasm.decoder.section.Section
 import io.github.charlietap.chasm.decoder.section.StartSection
 import io.github.charlietap.chasm.decoder.section.TableSection
+import io.github.charlietap.chasm.decoder.section.TagSection
 import io.github.charlietap.chasm.decoder.section.TypeSection
 
 internal fun ModuleBuilder.section(section: Section) = when (section) {
@@ -30,4 +31,5 @@ internal fun ModuleBuilder.section(section: Section) = when (section) {
     is GlobalSection -> globals(section.globals)
     is StartSection -> start(section.startFunction)
     is DataCountSection -> dataCount(section.dataCount)
+    is TagSection -> tags(section.tags)
 }

@@ -6,7 +6,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -32,7 +31,7 @@ internal inline fun WasmFunctionCallImpl(
         stack = stack,
         instance = instance,
         tailRecursion = tailRecursion,
-        instructionBlockExecutor = ::InstructionBlockExecutorImpl,
+        instructionBlockExecutor = ::InstructionBlockExecutor,
     )
 
 @Suppress("UNUSED_PARAMETER")
@@ -96,5 +95,5 @@ internal inline fun WasmFunctionCallImpl(
         continuation = emptyList(),
     )
 
-    instructionBlockExecutor(stack, label, instance.function.body.instructions.map(::ModuleInstruction), emptyList()).bind()
+    instructionBlockExecutor(stack, label, instance.function.body.instructions.map(::ModuleInstruction), emptyList(), null).bind()
 }

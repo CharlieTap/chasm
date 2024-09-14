@@ -30,11 +30,12 @@ class InstructionBlockExecutorImplTest {
             i32(2),
         )
 
-        val actual = InstructionBlockExecutorImpl(
+        val actual = InstructionBlockExecutor(
             stack = stack,
             label = label,
             instructions = instructions,
             params = params,
+            handler = null,
         )
 
         val expectedParams = params.asReversed().map(::Value)

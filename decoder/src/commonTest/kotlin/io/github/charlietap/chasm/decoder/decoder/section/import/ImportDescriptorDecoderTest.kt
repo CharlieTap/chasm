@@ -9,12 +9,14 @@ import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
 import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.type.tagType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -43,6 +45,7 @@ class ImportDescriptorDecoderTest {
             globalTypeDecoder = neverGlobalTypeDecoder,
             memTypeDecoder = neverMemoryTypeDecoder,
             tableTypeDecoder = neverTableTypeDecoder,
+            tagTypeDecoder = neverTagTypeDecoder,
             typeIndexDecoder = typeIndexDecoder,
         )
 
@@ -71,6 +74,7 @@ class ImportDescriptorDecoderTest {
             globalTypeDecoder = neverGlobalTypeDecoder,
             memTypeDecoder = neverMemoryTypeDecoder,
             tableTypeDecoder = tableTypeDecoder,
+            tagTypeDecoder = neverTagTypeDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
         )
 
@@ -99,6 +103,7 @@ class ImportDescriptorDecoderTest {
             globalTypeDecoder = neverGlobalTypeDecoder,
             memTypeDecoder = memoryTypeDecoder,
             tableTypeDecoder = neverTableTypeDecoder,
+            tagTypeDecoder = neverTagTypeDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
         )
 
@@ -127,6 +132,36 @@ class ImportDescriptorDecoderTest {
             globalTypeDecoder = globalTypeDecoder,
             memTypeDecoder = neverMemoryTypeDecoder,
             tableTypeDecoder = neverTableTypeDecoder,
+            tagTypeDecoder = neverTagTypeDecoder,
+            typeIndexDecoder = neverTypeIndexDecoder,
+        )
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can decode a tag import descriptor`() {
+
+        val descriptor = IMPORT_DESCRIPTOR_TYPE_TAG
+
+        val tagType = tagType()
+        val expected = Ok(Import.Descriptor.Tag(tagType))
+
+        val reader = FakeUByteReader {
+            Ok(descriptor)
+        }
+        val context = decoderContext(reader)
+
+        val tagTypeDecoder: Decoder<TagType> = { _ ->
+            Ok(tagType)
+        }
+
+        val actual = ImportDescriptorDecoder(
+            context = context,
+            globalTypeDecoder = neverGlobalTypeDecoder,
+            memTypeDecoder = neverMemoryTypeDecoder,
+            tableTypeDecoder = neverTableTypeDecoder,
+            tagTypeDecoder = tagTypeDecoder,
             typeIndexDecoder = neverTypeIndexDecoder,
         )
 
@@ -157,6 +192,9 @@ class ImportDescriptorDecoderTest {
         }
         private val neverGlobalTypeDecoder: Decoder<GlobalType> = {
             fail("global type decoder should not be called in this scenario")
+        }
+        private val neverTagTypeDecoder: Decoder<TagType> = {
+            fail("tag type decoder should not be called in this scenario")
         }
     }
 }

@@ -8,6 +8,7 @@ import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Companion.MAX_DEPTH
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
@@ -25,6 +26,8 @@ inline fun Stack.pushFrame(frame: Stack.Entry.ActivationFrame): Result<Unit, Inv
         Err(InvocationError.CallStackExhausted)
     }
 }
+
+inline fun Stack.pushInstruction(instruction: ExecutionInstruction) = push(Stack.Entry.Instruction(instruction))
 
 inline fun Stack.pushValue(value: ExecutionValue) = push(Stack.Entry.Value(value))
 

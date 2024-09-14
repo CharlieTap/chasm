@@ -7,8 +7,6 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocatorImpl
-import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocatorImpl
 import io.github.charlietap.chasm.executor.instantiator.classification.ExternalValueClassifier
 import io.github.charlietap.chasm.executor.instantiator.classification.ExternalValueClassifierImpl
 import io.github.charlietap.chasm.executor.instantiator.validation.ImportValidator
@@ -16,9 +14,13 @@ import io.github.charlietap.chasm.executor.instantiator.validation.ImportValidat
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.ext.addFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addMemoryAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addTableAddress
+import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 
 internal fun PartialModuleAllocatorImpl(
     store: Store,
@@ -30,7 +32,7 @@ internal fun PartialModuleAllocatorImpl(
         module = module,
         imports = imports,
         wasmFunctionAllocator = ::WasmFunctionAllocatorImpl,
-        typeAllocator = ::TypeAllocatorImpl,
+        typeAllocator = ::DefinedTypeFactory,
         classifier = ::ExternalValueClassifierImpl,
         importValidator = ::ImportValidatorImpl,
     )
@@ -40,7 +42,7 @@ internal fun PartialModuleAllocatorImpl(
     module: Module,
     imports: List<ExternalValue>,
     wasmFunctionAllocator: WasmFunctionAllocator,
-    typeAllocator: TypeAllocator,
+    typeAllocator: DefinedTypeFactory,
     classifier: ExternalValueClassifier,
     importValidator: ImportValidator,
 ): Result<ModuleInstance, InstantiationError> = binding {
@@ -63,9 +65,10 @@ internal fun PartialModuleAllocatorImpl(
     imports.forEach { import ->
         when (import) {
             is ExternalValue.Function -> instance.addFunctionAddress(import.address)
-            is ExternalValue.Table -> Unit
-            is ExternalValue.Memory -> Unit
+            is ExternalValue.Table -> instance.addTableAddress(import.address)
+            is ExternalValue.Memory -> instance.addMemoryAddress(import.address)
             is ExternalValue.Global -> instance.addGlobalAddress(import.address)
+            is ExternalValue.Tag -> instance.addTagAddress(import.address)
         }
     }
 

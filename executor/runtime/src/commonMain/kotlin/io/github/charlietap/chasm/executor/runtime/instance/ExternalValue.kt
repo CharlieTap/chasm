@@ -15,5 +15,8 @@ sealed interface ExternalValue {
     value class Memory(val address: Address.Memory) : ExternalValue
 
     @JvmInline
+    value class Tag(val address: Address.Tag) : ExternalValue
+
+    @JvmInline
     value class Global(val address: Address.Global) : ExternalValue
 }

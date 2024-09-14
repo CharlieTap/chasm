@@ -31,6 +31,9 @@ sealed interface Index {
     value class TableIndex(override val idx: UInt) : Index
 
     @JvmInline
+    value class TagIndex(override val idx: UInt) : Index
+
+    @JvmInline
     value class TypeIndex(override val idx: UInt) : Index
 
     @JvmInline

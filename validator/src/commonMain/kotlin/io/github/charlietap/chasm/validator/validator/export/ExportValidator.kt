@@ -20,6 +20,7 @@ internal fun ExportValidator(
         globalExportValidator = ::GlobalExportValidator,
         memoryExportValidator = ::MemoryExportValidator,
         tableExportValidator = ::TableExportValidator,
+        tagExportValidator = ::TagExportValidator,
     )
 
 internal fun ExportValidator(
@@ -29,12 +30,14 @@ internal fun ExportValidator(
     globalExportValidator: Validator<Export.Descriptor.Global>,
     memoryExportValidator: Validator<Export.Descriptor.Memory>,
     tableExportValidator: Validator<Export.Descriptor.Table>,
+    tagExportValidator: Validator<Export.Descriptor.Tag>,
 ): Result<Unit, ModuleValidatorError> = binding {
     when (val descriptor = export.descriptor) {
         is Export.Descriptor.Function -> functionExportValidator(context, descriptor).bind()
         is Export.Descriptor.Global -> globalExportValidator(context, descriptor).bind()
         is Export.Descriptor.Memory -> memoryExportValidator(context, descriptor).bind()
         is Export.Descriptor.Table -> tableExportValidator(context, descriptor).bind()
+        is Export.Descriptor.Tag -> tagExportValidator(context, descriptor).bind()
     }
 
     if (!context.exportNames.add(export.name.name)) {

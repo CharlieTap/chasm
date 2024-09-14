@@ -88,6 +88,6 @@ class ChasmViewModel @Inject constructor(
     }
 
     companion object {
-        private const val FILENAME = "chasm-example-fibonacci-wasm-wasm-wasi.wasm"
+        private const val FILENAME = "fibonacci.wasm"
     }
 }

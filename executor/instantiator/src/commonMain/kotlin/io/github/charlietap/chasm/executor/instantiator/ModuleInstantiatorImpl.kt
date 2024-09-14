@@ -33,7 +33,7 @@ fun ModuleInstantiatorImpl(
         store = store,
         module = module,
         imports = imports,
-        pallocator = ::PartialModuleAllocatorImpl,
+        partialAllocator = ::PartialModuleAllocatorImpl,
         allocator = ::ModuleAllocatorImpl,
         invoker = ::FunctionInvokerImpl,
         evaluator = ::ExpressionEvaluatorImpl,
@@ -45,7 +45,7 @@ internal fun ModuleInstantiatorImpl(
     store: Store,
     module: Module,
     imports: List<ExternalValue>,
-    pallocator: PartialModuleAllocator,
+    partialAllocator: PartialModuleAllocator,
     allocator: ModuleAllocator,
     invoker: FunctionInvoker,
     evaluator: ExpressionEvaluator,
@@ -57,7 +57,7 @@ internal fun ModuleInstantiatorImpl(
         Err(InstantiationError.MissingImport).bind<ModuleInstance>()
     }
 
-    val partialInstance = pallocator(store, module, imports).bind()
+    val partialInstance = partialAllocator(store, module, imports).bind()
 
     val globalInitValues = module.globals.mapNotNull { global ->
         evaluator(store, partialInstance, global.initExpression, Arity.Return(1)).bind()
@@ -73,7 +73,7 @@ internal fun ModuleInstantiatorImpl(
         }
     }
 
-    val instance = allocator(store, module, partialInstance, imports, globalInitValues, tableInitValues, elementSegmentReferences).bind()
+    val instance = allocator(store, module, partialInstance, globalInitValues, tableInitValues, elementSegmentReferences).bind()
 
     tableInitializer(store, instance, module).bind()
     memoryInitializer(store, instance, module).bind()

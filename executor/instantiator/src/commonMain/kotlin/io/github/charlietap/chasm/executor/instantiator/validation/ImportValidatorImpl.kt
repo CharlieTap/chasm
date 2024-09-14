@@ -56,6 +56,16 @@ internal fun ImportValidatorImpl(
 
             type == externType
         }
+        is Import.Descriptor.Tag -> {
+            val type = descriptor.type
+
+            val externType = when (classified.type) {
+                is ExternalType.Tag -> Ok(classified.type.tagType)
+                else -> Err(InstantiationError.UnexpectedImport(import.moduleName.name, import.entityName.name))
+            }.bind()
+
+            type == externType
+        }
     }
 
     if (matches) {

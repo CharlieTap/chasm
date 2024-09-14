@@ -1,25 +1,26 @@
-package io.github.charlietap.chasm.executor.instantiator.allocation.type
+package io.github.charlietap.chasm.type.factory
 
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.RecursiveType
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRollerImpl
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutorImpl
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
-fun TypeAllocatorImpl(
+typealias DefinedTypeFactory = (List<RecursiveType>) -> List<DefinedType>
+
+fun DefinedTypeFactory(
     recursiveTypes: List<RecursiveType>,
 ): List<DefinedType> =
-    TypeAllocatorImpl(
+    DefinedTypeFactory(
         recursiveTypes = recursiveTypes,
         definedTypeRoller = ::DefinedTypeRollerImpl,
         definedTypeSubstitutor = ::DefinedTypeSubstitutorImpl,
     )
 
-fun TypeAllocatorImpl(
+internal fun DefinedTypeFactory(
     recursiveTypes: List<RecursiveType>,
     definedTypeRoller: DefinedTypeRoller,
     definedTypeSubstitutor: TypeSubstitutor<DefinedType>,
@@ -29,7 +30,7 @@ fun TypeAllocatorImpl(
     val substitutor: ConcreteHeapTypeSubstitutor = { heapType ->
         when (heapType) {
             is ConcreteHeapType.TypeIndex -> {
-                ConcreteHeapType.Defined(acc[heapType.index.index()])
+                ConcreteHeapType.Defined(acc[heapType.index.idx.toInt()])
             }
             else -> heapType
         }

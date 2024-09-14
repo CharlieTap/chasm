@@ -8,6 +8,8 @@ import kotlin.jvm.JvmInline
 
 sealed interface InvocationError : ModuleTrapError {
 
+    data object UncaughtException : InvocationError
+
     @JvmInline
     value class FunctionNotFound(val function: String) : InvocationError
 
@@ -47,6 +49,9 @@ sealed interface InvocationError : ModuleTrapError {
     @JvmInline
     value class StructFieldLookupFailed(val index: Int) : InvocationError
 
+    @JvmInline
+    value class TagAddressLookupFailed(val index: Int) : InvocationError
+
     data class MemoryGrowExceedsLimits(
         val pagesRequested: Int,
         val maxPages: Int,
@@ -57,6 +62,8 @@ sealed interface InvocationError : ModuleTrapError {
     data object InvalidAddress : InvocationError
 
     data object MissingStackFrame : InvocationError
+
+    data object MissingStackHandler : InvocationError
 
     data object MissingInstruction : InvocationError
 

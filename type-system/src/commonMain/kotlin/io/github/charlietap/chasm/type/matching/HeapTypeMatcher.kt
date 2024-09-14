@@ -32,6 +32,7 @@ internal fun HeapTypeMatcher(
 ): Boolean = when {
     type1 is AbstractHeapType.None -> HeapTypeMatcher(type2, AbstractHeapType.Any, context)
     type1 is AbstractHeapType.NoFunc -> HeapTypeMatcher(type2, AbstractHeapType.Func, context)
+    type1 is AbstractHeapType.NoException -> HeapTypeMatcher(type2, AbstractHeapType.Exception, context)
     type1 is AbstractHeapType.NoExtern -> HeapTypeMatcher(type2, AbstractHeapType.Extern, context)
     type1 is AbstractHeapType.Bottom -> true
     type1 is AbstractHeapType && type2 is AbstractHeapType -> abstractHeapTypeMatcher(type1, type2, context)

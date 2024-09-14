@@ -8,6 +8,7 @@ data class ModuleInstance(
     val functionAddresses: MutableList<Address.Function> = mutableListOf(),
     val tableAddresses: MutableList<Address.Table> = mutableListOf(),
     val memAddresses: MutableList<Address.Memory> = mutableListOf(),
+    val tagAddresses: MutableList<Address.Tag> = mutableListOf(),
     val globalAddresses: MutableList<Address.Global> = mutableListOf(),
     val elemAddresses: MutableList<Address.Element> = mutableListOf(),
     val dataAddresses: MutableList<Address.Data> = mutableListOf(),

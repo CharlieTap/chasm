@@ -14,6 +14,10 @@ fun memoryAddress(
     address: Int = 0,
 ): Address.Memory = Address.Memory(address)
 
+fun tagAddress(
+    address: Int = 0,
+): Address.Tag = Address.Tag(address)
+
 fun globalAddress(
     address: Int = 0,
 ): Address.Global = Address.Global(address)

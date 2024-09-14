@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
@@ -28,6 +27,7 @@ import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
@@ -106,7 +106,7 @@ class ExportModuleTest {
         )
 
         val expected = Ok(
-            Module(
+            module(
                 version = Version.One,
                 types = listOf(expectedFunctionExportType),
                 imports = emptyList(),

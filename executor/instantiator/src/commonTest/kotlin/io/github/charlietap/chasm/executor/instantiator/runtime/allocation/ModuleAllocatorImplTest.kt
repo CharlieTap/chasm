@@ -11,12 +11,14 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.element.Eleme
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.instance.tagAddress
 import io.github.charlietap.chasm.fixture.module.dataSegment
 import io.github.charlietap.chasm.fixture.module.elementSegment
 import io.github.charlietap.chasm.fixture.module.export
@@ -29,6 +31,7 @@ import io.github.charlietap.chasm.fixture.module.memoryExportDescriptor
 import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.module.table
 import io.github.charlietap.chasm.fixture.module.tableExportDescriptor
+import io.github.charlietap.chasm.fixture.module.tag
 import io.github.charlietap.chasm.fixture.module.type
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -56,6 +59,7 @@ class ModuleAllocatorImplTest {
         val definedType = functionType.definedType()
         val table = table()
         val memory = memory()
+        val tag = tag()
         val global = global()
         val globalInitValue = i32(117)
         val globalInitValues = listOf(globalInitValue)
@@ -72,12 +76,6 @@ class ModuleAllocatorImplTest {
         val importTableAddress = Address.Table(0)
         val importMemoryAddress = Address.Memory(0)
         val importGlobalAddress = Address.Global(0)
-        val imports = listOf(
-            ExternalValue.Function(importFunctionAddress),
-            ExternalValue.Table(importTableAddress),
-            ExternalValue.Memory(importMemoryAddress),
-            ExternalValue.Global(importGlobalAddress),
-        )
 
         val functionExport = export(
             name = NameValue("function_export"),
@@ -140,6 +138,14 @@ class ModuleAllocatorImplTest {
             memoryAddress
         }
 
+        val tagAddress = tagAddress(1)
+        val tagAllocator: TagAllocator = { _store, _tagType ->
+            assertEquals(store, _store)
+            assertEquals(tag.type, _tagType)
+
+            tagAddress
+        }
+
         val globalAddress = Address.Global(1)
         val globalAllocator: GlobalAllocator = { _store, _globalType, _executionValue ->
             assertEquals(store, _store)
@@ -170,6 +176,8 @@ class ModuleAllocatorImplTest {
             types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
             globalAddresses = mutableListOf(importGlobalAddress),
+            memAddresses = mutableListOf(importMemoryAddress),
+            tableAddresses = mutableListOf(importTableAddress),
         )
 
         val expected = ModuleInstance(
@@ -192,12 +200,12 @@ class ModuleAllocatorImplTest {
             store = store,
             module = module,
             instance = partial,
-            imports = imports,
             globalInitValues = globalInitValues,
             tableInitValues = tableInitValues,
             elementSegmentReferences = elementSegmentReferences,
             tableAllocator = tableAllocator,
             memoryAllocator = memoryAllocator,
+            tagAllocator = tagAllocator,
             globalAllocator = globalAllocator,
             elementAllocator = elementAllocator,
             dataAllocator = dataAllocator,

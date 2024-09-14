@@ -7,7 +7,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutorImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -28,7 +27,7 @@ internal inline fun BlockExecutorImpl(
         blockType = blockType,
         instructions = instructions,
         expander = ::BlockTypeExpanderImpl,
-        instructionBlockExecutor = ::InstructionBlockExecutorImpl,
+        instructionBlockExecutor = ::InstructionBlockExecutor,
     )
 
 @Suppress("UNUSED_PARAMETER")
@@ -57,5 +56,5 @@ internal inline fun BlockExecutorImpl(
         continuation = emptyList(),
     )
 
-    instructionBlockExecutor(stack, label, instructions.map(::ModuleInstruction), params).bind()
+    instructionBlockExecutor(stack, label, instructions.map(::ModuleInstruction), params, null).bind()
 }

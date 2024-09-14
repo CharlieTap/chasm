@@ -28,5 +28,8 @@ sealed interface ReferenceValue : ExecutionValue {
     value class Host(val address: Any?) : ReferenceValue
 
     @JvmInline
+    value class Exception(val address: Address.Exception) : ReferenceValue
+
+    @JvmInline
     value class Extern(val referenceValue: ReferenceValue) : ReferenceValue
 }

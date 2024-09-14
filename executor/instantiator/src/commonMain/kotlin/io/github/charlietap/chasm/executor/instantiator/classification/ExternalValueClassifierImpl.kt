@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.executor.instantiator.classification.memory.Me
 import io.github.charlietap.chasm.executor.instantiator.classification.memory.MemoryClassifierImpl
 import io.github.charlietap.chasm.executor.instantiator.classification.table.TableClassifier
 import io.github.charlietap.chasm.executor.instantiator.classification.table.TableClassifierImpl
+import io.github.charlietap.chasm.executor.instantiator.classification.tag.TagClassifier
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
@@ -24,6 +25,7 @@ internal fun ExternalValueClassifierImpl(
         functionClassifier = ::FunctionClassifierImpl,
         tableClassifier = ::TableClassifierImpl,
         memoryClassifier = ::MemoryClassifierImpl,
+        tagClassifier = ::TagClassifier,
         globalClassifier = ::GlobalClassifierImpl,
     )
 
@@ -33,12 +35,14 @@ internal fun ExternalValueClassifierImpl(
     functionClassifier: FunctionClassifier,
     tableClassifier: TableClassifier,
     memoryClassifier: MemoryClassifier,
+    tagClassifier: TagClassifier,
     globalClassifier: GlobalClassifier,
 ): Result<ClassifiedExternalValue, ModuleTrapError> = binding {
     when (value) {
         is ExternalValue.Function -> functionClassifier(store, value).bind()
         is ExternalValue.Table -> tableClassifier(store, value).bind()
         is ExternalValue.Memory -> memoryClassifier(store, value).bind()
+        is ExternalValue.Tag -> tagClassifier(store, value).bind()
         is ExternalValue.Global -> globalClassifier(store, value).bind()
     }
 }

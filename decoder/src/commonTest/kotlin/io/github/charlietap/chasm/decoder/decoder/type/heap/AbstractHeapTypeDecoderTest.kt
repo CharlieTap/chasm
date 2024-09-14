@@ -25,6 +25,8 @@ class AbstractHeapTypeDecoderTest {
             HEAP_TYPE_NONE to AbstractHeapType.None,
             HEAP_TYPE_NO_EXTERN to AbstractHeapType.NoExtern,
             HEAP_TYPE_NO_FUNC to AbstractHeapType.NoFunc,
+            HEAP_TYPE_EXCEPTION to AbstractHeapType.Exception,
+            HEAP_TYPE_NO_EXCEPTION to AbstractHeapType.NoException,
         )
 
         var byte: UByte = 0u

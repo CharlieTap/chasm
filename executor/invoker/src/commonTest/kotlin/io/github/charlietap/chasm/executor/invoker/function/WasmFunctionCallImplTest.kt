@@ -98,7 +98,7 @@ class WasmFunctionCallImplTest {
             ),
         )
 
-        val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params ->
+        val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params, _handler ->
             assertEquals(stack, _stack)
             assertEquals(label, _label)
             assertEquals(function.body.instructions.map(::ModuleInstruction), _instructions)
@@ -191,7 +191,7 @@ class WasmFunctionCallImplTest {
 
         stack.push(frame)
 
-        val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params ->
+        val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params, _handler ->
             assertEquals(stack, _stack)
             assertEquals(label, _label)
             assertEquals(function.body.instructions.map(::ModuleInstruction), _instructions)

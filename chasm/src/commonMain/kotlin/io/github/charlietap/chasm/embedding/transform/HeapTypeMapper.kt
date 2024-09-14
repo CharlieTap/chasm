@@ -20,6 +20,8 @@ internal object HeapTypeMapper : BidirectionalMapper<HeapType, InternalHeapType>
             HeapType.NoFunc -> AbstractHeapType.NoFunc
             HeapType.None -> AbstractHeapType.None
             HeapType.Struct -> AbstractHeapType.Struct
+            HeapType.Exception -> AbstractHeapType.Exception
+            HeapType.NoException -> AbstractHeapType.NoException
             is HeapType.Concrete -> input.heapType
         }
     }
@@ -39,6 +41,8 @@ internal object HeapTypeMapper : BidirectionalMapper<HeapType, InternalHeapType>
                     AbstractHeapType.NoFunc -> HeapType.NoFunc
                     AbstractHeapType.None -> HeapType.None
                     AbstractHeapType.Struct -> HeapType.Struct
+                    AbstractHeapType.Exception -> HeapType.Exception
+                    AbstractHeapType.NoException -> HeapType.NoException
                 }
             }
             is ConcreteHeapType -> {
