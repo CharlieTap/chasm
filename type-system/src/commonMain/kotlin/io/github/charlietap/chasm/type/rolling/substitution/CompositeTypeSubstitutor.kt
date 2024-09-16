@@ -5,19 +5,19 @@ import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.StructType
 
-internal fun CompositeTypeSubstitutorImpl(
+internal fun CompositeTypeSubstitutor(
     compositeType: CompositeType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
 ): CompositeType =
-    CompositeTypeSubstitutorImpl(
+    CompositeTypeSubstitutor(
         compositeType = compositeType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
         structTypeSubstitutor = ::StructTypeSubstitutorImpl,
-        arrayTypeSubstitutor = ::ArrayTypeSubstitutorImpl,
-        functionTypeSubstitutor = ::FunctionTypeSubstitutorImpl,
+        arrayTypeSubstitutor = ::ArrayTypeSubstitutor,
+        functionTypeSubstitutor = ::FunctionTypeSubstitutor,
     )
 
-internal fun CompositeTypeSubstitutorImpl(
+internal fun CompositeTypeSubstitutor(
     compositeType: CompositeType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     structTypeSubstitutor: TypeSubstitutor<StructType>,

@@ -22,7 +22,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun ArrayInitDataExecutorImpl(
     store: Store,
@@ -35,7 +34,7 @@ internal fun ArrayInitDataExecutorImpl(
         stack = stack,
         typeIndex = typeIndex,
         dataIndex = dataIndex,
-        definedTypeExpander = ::DefinedTypeExpanderImpl,
+        definedTypeExpander = ::DefinedTypeExpander,
         arraySetExecutor = ::ArraySetExecutorImpl,
     )
 

@@ -25,7 +25,7 @@ import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutorImpl
+import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 internal fun RefTestExecutorImpl(
@@ -36,7 +36,7 @@ internal fun RefTestExecutorImpl(
     store = store,
     stack = stack,
     referenceType = referenceType,
-    referenceTypeSubstitutor = ::ReferenceTypeSubstitutorImpl,
+    referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
     referenceTypeMatcher = ::ReferenceTypeMatcher,
     typeOfReferenceValue = ::TypeOfReferenceValue,
 )

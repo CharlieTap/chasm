@@ -16,7 +16,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun StructGetExecutorImpl(
     store: Store,
@@ -31,7 +30,7 @@ internal fun StructGetExecutorImpl(
         typeIndex = typeIndex,
         fieldIndex = fieldIndex,
         signedUnpack = signedUnpack,
-        definedTypeExpander = ::DefinedTypeExpanderImpl,
+        definedTypeExpander = ::DefinedTypeExpander,
         fieldUnpacker = ::FieldUnpackerImpl,
     )
 

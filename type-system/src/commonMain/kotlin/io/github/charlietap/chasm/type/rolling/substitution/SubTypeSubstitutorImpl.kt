@@ -11,8 +11,8 @@ internal fun SubTypeSubstitutorImpl(
     SubTypeSubstitutorImpl(
         subType = subType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        heapTypeSubstitutor = ::HeapTypeSubstitutorImpl,
-        compositeTypeSubstitutor = ::CompositeTypeSubstitutorImpl,
+        heapTypeSubstitutor = ::HeapTypeSubstitutor,
+        compositeTypeSubstitutor = ::CompositeTypeSubstitutor,
     )
 
 internal fun SubTypeSubstitutorImpl(

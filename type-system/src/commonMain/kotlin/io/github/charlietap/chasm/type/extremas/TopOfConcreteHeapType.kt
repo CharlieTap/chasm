@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun TopOfConcreteHeapType(
     type: ConcreteHeapType,
@@ -13,7 +12,7 @@ internal fun TopOfConcreteHeapType(
 ): HeapType? = TopOfConcreteHeapType(
     type = type,
     types = types,
-    definedTypeExpander = ::DefinedTypeExpanderImpl,
+    definedTypeExpander = ::DefinedTypeExpander,
     topOfCompositeType = ::TopOfCompositeType,
 )
 

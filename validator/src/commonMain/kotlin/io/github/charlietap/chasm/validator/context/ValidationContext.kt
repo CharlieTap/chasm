@@ -19,9 +19,9 @@ import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.DefinedTypeRollerImpl
+import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutorImpl
+import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
 
 internal data class ValidationContext(
     val module: Module,
@@ -54,8 +54,8 @@ internal data class ValidationContext(
 
             acc.apply {
                 addAll(
-                    DefinedTypeRollerImpl(size, recursiveType).map { definedType ->
-                        DefinedTypeSubstitutorImpl(definedType, substitutor)
+                    DefinedTypeRoller(size, recursiveType).map { definedType ->
+                        DefinedTypeSubstitutor(definedType, substitutor)
                     },
                 )
             }

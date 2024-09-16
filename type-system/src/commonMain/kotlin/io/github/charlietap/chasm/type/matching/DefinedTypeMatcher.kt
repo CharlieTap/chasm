@@ -4,8 +4,7 @@ import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnrollerImpl
-import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutorImpl
+import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 internal fun DefinedTypeMatcher(
@@ -16,8 +15,8 @@ internal fun DefinedTypeMatcher(
     type1 = type1,
     type2 = type2,
     context = context,
-    definedTypeSubstitutor = ::DefinedTypeSubstitutorImpl,
-    definedTypeUnroller = ::DefinedTypeUnrollerImpl,
+    definedTypeSubstitutor = ::DefinedTypeSubstitutor,
+    definedTypeUnroller = ::DefinedTypeUnroller,
     heapTypeMatcher = ::HeapTypeMatcher,
 )
 

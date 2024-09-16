@@ -3,17 +3,17 @@ package io.github.charlietap.chasm.type.rolling.substitution
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 
-fun ReferenceTypeSubstitutorImpl(
+fun ReferenceTypeSubstitutor(
     referenceType: ReferenceType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
 ): ReferenceType =
-    ReferenceTypeSubstitutorImpl(
+    ReferenceTypeSubstitutor(
         referenceType = referenceType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        heapTypeSubstitutor = ::HeapTypeSubstitutorImpl,
+        heapTypeSubstitutor = ::HeapTypeSubstitutor,
     )
 
-internal fun ReferenceTypeSubstitutorImpl(
+internal fun ReferenceTypeSubstitutor(
     referenceType: ReferenceType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     heapTypeSubstitutor: TypeSubstitutor<HeapType>,

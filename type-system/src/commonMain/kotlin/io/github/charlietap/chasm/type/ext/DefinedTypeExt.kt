@@ -7,16 +7,15 @@ import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.StructType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 inline fun DefinedType.functionType(
-    definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpanderImpl,
+    definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpander,
 ): FunctionType? = definedTypeExpander(this).functionType()
 
 inline fun DefinedType.structType(
-    definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpanderImpl,
+    definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpander,
 ): StructType? = definedTypeExpander(this).structType()
 
 inline fun DefinedType.arrayType(
-    definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpanderImpl,
+    definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpander,
 ): ArrayType? = definedTypeExpander(this).arrayType()

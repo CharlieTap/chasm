@@ -17,7 +17,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun StructSetExecutorImpl(
     store: Store,
@@ -28,7 +27,7 @@ internal fun StructSetExecutorImpl(
         store = store,
         stack = stack,
         instruction = instruction,
-        definedTypeExpander = ::DefinedTypeExpanderImpl,
+        definedTypeExpander = ::DefinedTypeExpander,
         fieldPacker = ::FieldPackerImpl,
     )
 

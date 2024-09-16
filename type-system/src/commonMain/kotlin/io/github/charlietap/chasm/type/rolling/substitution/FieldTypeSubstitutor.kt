@@ -3,17 +3,17 @@ package io.github.charlietap.chasm.type.rolling.substitution
 import io.github.charlietap.chasm.ast.type.FieldType
 import io.github.charlietap.chasm.ast.type.StorageType
 
-internal fun FieldTypeSubstitutorImpl(
+internal fun FieldTypeSubstitutor(
     fieldType: FieldType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
 ): FieldType =
-    FieldTypeSubstitutorImpl(
+    FieldTypeSubstitutor(
         fieldType = fieldType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        storageTypeSubstitutor = ::StorageTypeSubstitutorImpl,
+        storageTypeSubstitutor = ::StorageTypeSubstitutor,
     )
 
-internal fun FieldTypeSubstitutorImpl(
+internal fun FieldTypeSubstitutor(
     fieldType: FieldType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     storageTypeSubstitutor: TypeSubstitutor<StorageType>,

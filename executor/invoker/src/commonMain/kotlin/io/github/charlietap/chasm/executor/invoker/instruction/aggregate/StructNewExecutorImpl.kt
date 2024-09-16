@@ -17,7 +17,6 @@ import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 import io.github.charlietap.chasm.weakref.weakReference
 
 internal fun StructNewExecutorImpl(
@@ -29,7 +28,7 @@ internal fun StructNewExecutorImpl(
         store = store,
         stack = stack,
         typeIndex = typeIndex,
-        definedTypeExpander = ::DefinedTypeExpanderImpl,
+        definedTypeExpander = ::DefinedTypeExpander,
         fieldPacker = ::FieldPackerImpl,
     )
 

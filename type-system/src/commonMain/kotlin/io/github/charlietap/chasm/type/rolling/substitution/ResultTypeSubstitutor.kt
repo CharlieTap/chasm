@@ -3,17 +3,17 @@ package io.github.charlietap.chasm.type.rolling.substitution
 import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.ValueType
 
-internal fun ResultTypeSubstitutorImpl(
+internal fun ResultTypeSubstitutor(
     resultType: ResultType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
 ): ResultType =
-    ResultTypeSubstitutorImpl(
+    ResultTypeSubstitutor(
         resultType = resultType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
         valueTypeSubstitutor = ::ValueTypeSubstitutorImpl,
     )
 
-internal fun ResultTypeSubstitutorImpl(
+internal fun ResultTypeSubstitutor(
     resultType: ResultType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     valueTypeSubstitutor: TypeSubstitutor<ValueType>,

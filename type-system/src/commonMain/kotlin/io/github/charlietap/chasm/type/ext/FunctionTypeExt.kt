@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
-import io.github.charlietap.chasm.type.rolling.DefinedTypeRollerImpl
 
 inline fun FunctionType.recursiveType() = RecursiveType(
     listOf(
@@ -17,5 +16,5 @@ inline fun FunctionType.recursiveType() = RecursiveType(
 )
 
 inline fun FunctionType.definedType(
-    definedTypeRoller: DefinedTypeRoller = ::DefinedTypeRollerImpl,
+    definedTypeRoller: DefinedTypeRoller = ::DefinedTypeRoller,
 ): DefinedType = definedTypeRoller(0, this.recursiveType()).first()

@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun ArrayNewDefaultExecutorImpl(
     store: Store,
@@ -26,7 +25,7 @@ internal fun ArrayNewDefaultExecutorImpl(
         store = store,
         stack = stack,
         typeIndex = typeIndex,
-        definedTypeExpander = ::DefinedTypeExpanderImpl,
+        definedTypeExpander = ::DefinedTypeExpander,
         arrayNewFixedExecutor = ::ArrayNewFixedExecutorImpl,
     )
 

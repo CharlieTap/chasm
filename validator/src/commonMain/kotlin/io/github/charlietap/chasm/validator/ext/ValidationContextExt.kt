@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
-import io.github.charlietap.chasm.type.expansion.BlockTypeExpanderImpl
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.FunctionValidatorError
@@ -57,7 +56,7 @@ internal inline fun ValidationContext.functionType(
 
 internal inline fun ValidationContext.functionType(
     blockType: ControlInstruction.BlockType,
-    blockTypeExpander: BlockTypeExpander = ::BlockTypeExpanderImpl,
+    blockTypeExpander: BlockTypeExpander = ::BlockTypeExpander,
 ): Result<FunctionType, ModuleValidatorError> {
     return blockTypeExpander(types, blockType).toResultOr {
         FunctionValidatorError.UnknownType

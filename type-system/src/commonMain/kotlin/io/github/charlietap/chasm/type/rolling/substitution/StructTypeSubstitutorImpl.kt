@@ -10,7 +10,7 @@ internal fun StructTypeSubstitutorImpl(
     StructTypeSubstitutorImpl(
         structType = structType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        fieldTypeSubstitutor = ::FieldTypeSubstitutorImpl,
+        fieldTypeSubstitutor = ::FieldTypeSubstitutor,
     )
 
 internal fun StructTypeSubstitutorImpl(

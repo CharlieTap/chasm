@@ -23,7 +23,7 @@ import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutorImpl
+import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 internal inline fun BrOnCastExecutorImpl(
@@ -41,7 +41,7 @@ internal inline fun BrOnCastExecutorImpl(
         referenceType1 = referenceType1,
         referenceType2 = referenceType2,
         breakIfMatches = breakIfMatches,
-        referenceTypeSubstitutor = ::ReferenceTypeSubstitutorImpl,
+        referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
         referenceTypeMatcher = ::ReferenceTypeMatcher,
         typeOfReferenceValue = ::TypeOfReferenceValue,
         breakExecutor = ::BreakExecutorImpl,

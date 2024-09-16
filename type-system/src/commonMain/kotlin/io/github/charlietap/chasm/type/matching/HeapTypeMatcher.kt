@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 fun HeapTypeMatcher(
     type1: HeapType,
@@ -18,7 +17,7 @@ fun HeapTypeMatcher(
         type2 = type2,
         context = context,
         abstractHeapTypeMatcher = ::AbstractHeapTypeMatcher,
-        definedTypeExpander = ::DefinedTypeExpanderImpl,
+        definedTypeExpander = ::DefinedTypeExpander,
         definedTypeMatcher = ::DefinedTypeMatcher,
     )
 

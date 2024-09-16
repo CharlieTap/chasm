@@ -4,9 +4,8 @@ import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
-import io.github.charlietap.chasm.type.rolling.DefinedTypeRollerImpl
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutorImpl
+import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 typealias DefinedTypeFactory = (List<RecursiveType>) -> List<DefinedType>
@@ -16,8 +15,8 @@ fun DefinedTypeFactory(
 ): List<DefinedType> =
     DefinedTypeFactory(
         recursiveTypes = recursiveTypes,
-        definedTypeRoller = ::DefinedTypeRollerImpl,
-        definedTypeSubstitutor = ::DefinedTypeSubstitutorImpl,
+        definedTypeRoller = ::DefinedTypeRoller,
+        definedTypeSubstitutor = ::DefinedTypeSubstitutor,
     )
 
 internal fun DefinedTypeFactory(

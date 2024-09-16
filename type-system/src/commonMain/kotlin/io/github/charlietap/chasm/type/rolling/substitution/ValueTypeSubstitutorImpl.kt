@@ -10,7 +10,7 @@ internal fun ValueTypeSubstitutorImpl(
     ValueTypeSubstitutorImpl(
         valueType = valueType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        referenceTypeSubstitutor = ::ReferenceTypeSubstitutorImpl,
+        referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
     )
 
 internal fun ValueTypeSubstitutorImpl(

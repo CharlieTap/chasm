@@ -3,17 +3,17 @@ package io.github.charlietap.chasm.type.rolling.substitution
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.SubType
 
-fun RecursiveTypeSubstitutorImpl(
+fun RecursiveTypeSubstitutor(
     recursiveType: RecursiveType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
 ): RecursiveType =
-    RecursiveTypeSubstitutorImpl(
+    RecursiveTypeSubstitutor(
         recursiveType = recursiveType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
         subTypeSubstitutor = ::SubTypeSubstitutorImpl,
     )
 
-internal fun RecursiveTypeSubstitutorImpl(
+internal fun RecursiveTypeSubstitutor(
     recursiveType: RecursiveType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     subTypeSubstitutor: TypeSubstitutor<SubType>,

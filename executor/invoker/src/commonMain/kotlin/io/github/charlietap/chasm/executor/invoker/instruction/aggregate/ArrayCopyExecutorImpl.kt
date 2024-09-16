@@ -17,7 +17,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpanderImpl
 
 internal fun ArrayCopyExecutorImpl(
     store: Store,
@@ -29,7 +28,7 @@ internal fun ArrayCopyExecutorImpl(
         store = store,
         stack = stack,
         destTypeIndex = destTypeIndex,
-        definedTypeExpander = ::DefinedTypeExpanderImpl,
+        definedTypeExpander = ::DefinedTypeExpander,
     )
 
 internal fun ArrayCopyExecutorImpl(
