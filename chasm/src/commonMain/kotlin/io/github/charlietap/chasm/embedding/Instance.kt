@@ -16,9 +16,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.ImportableMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
-import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiatorImpl
 import io.github.charlietap.chasm.executor.instantiator.import.ImportMatcher
-import io.github.charlietap.chasm.executor.instantiator.import.ImportMatcherImpl
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
@@ -32,8 +30,8 @@ fun instance(
         store = store,
         module = module,
         imports = imports,
-        importMatcher = ::ImportMatcherImpl,
-        instantiator = ::ModuleInstantiatorImpl,
+        importMatcher = ::ImportMatcher,
+        instantiator = ::ModuleInstantiator,
         importableMapper = ImportableMapper,
     )
 }

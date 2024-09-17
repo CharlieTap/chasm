@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.memory
 
-import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocatorImpl
+import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.fixture.type.memoryType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MemoryAllocatorImplTest {
+class MemoryAllocatorTest {
 
     @Test
     fun `can allocate a memory instance`() {
@@ -42,7 +42,7 @@ class MemoryAllocatorImplTest {
             data = memory,
         )
 
-        val address = MemoryAllocatorImpl(store, type, memoryFactory)
+        val address = MemoryAllocator(store, type, memoryFactory)
 
         assertEquals(Address.Memory(0), address)
         assertEquals(expected, memories[0])

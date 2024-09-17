@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializerImpl
+import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class TableInitializerImplTest {
+class TableInitializerTest {
 
     @Test
     fun `can initialize a table on a module instance`() {
@@ -67,7 +67,7 @@ class TableInitializerImplTest {
             Ok(null)
         }
 
-        val actual = TableInitializerImpl(
+        val actual = TableInitializer(
             store = store,
             instance = instance,
             module = module,

@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.value.NameValue
-import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocatorImpl
+import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
@@ -42,7 +42,7 @@ import io.github.charlietap.chasm.type.ext.recursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ModuleAllocatorImplTest {
+class ModuleAllocatorTest {
 
     @Test
     fun `can allocate a module instance`() {
@@ -196,7 +196,7 @@ class ModuleAllocatorImplTest {
             ),
         )
 
-        val actual = ModuleAllocatorImpl(
+        val actual = ModuleAllocator(
             store = store,
             module = module,
             instance = partial,

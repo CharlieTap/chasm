@@ -26,7 +26,7 @@ import io.github.charlietap.chasm.fixture.type.heapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ModuleInstantiatorImplTest {
+class ModuleInstantiatorTest {
 
     @Test
     fun `can instantiate a module instance`() {
@@ -109,7 +109,7 @@ class ModuleInstantiatorImplTest {
             Ok(Unit)
         }
 
-        val actual = ModuleInstantiatorImpl(
+        val actual = ModuleInstantiator(
             store = store,
             module = module,
             imports = imports,

@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.Mapper
 import io.github.charlietap.chasm.embedding.transform.MemoryTypeMapper
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.ast.type.MemoryType as InternalMemoryType
 
@@ -16,7 +15,7 @@ fun memory(
 ): Memory = memory(
     store = store,
     type = type,
-    allocator = ::MemoryAllocatorImpl,
+    allocator = ::MemoryAllocator,
     memoryTypeMapper = MemoryTypeMapper.instance,
 )
 

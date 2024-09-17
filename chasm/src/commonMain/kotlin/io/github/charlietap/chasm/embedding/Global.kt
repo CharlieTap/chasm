@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.embedding.transform.GlobalTypeMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
 import io.github.charlietap.chasm.embedding.transform.ValueMapper
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.ast.type.GlobalType as InternalGlobalType
@@ -21,7 +20,7 @@ fun global(
     store = store,
     type = type,
     value = value,
-    allocator = ::GlobalAllocatorImpl,
+    allocator = ::GlobalAllocator,
     globalTypeMapper = GlobalTypeMapper.instance,
     valueMapper = ValueMapper.instance,
 )

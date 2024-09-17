@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializerImpl
+import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
@@ -17,7 +17,7 @@ import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MemoryInitializerImplTest {
+class MemoryInitializerTest {
 
     @Test
     fun `can initialize a memory on a module instance`() {
@@ -60,7 +60,7 @@ class MemoryInitializerImplTest {
             Ok(null)
         }
 
-        val actual = MemoryInitializerImpl(
+        val actual = MemoryInitializer(
             store = store,
             instance = instance,
             module = module,

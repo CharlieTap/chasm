@@ -6,7 +6,9 @@ import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-fun GlobalAllocatorImpl(
+typealias GlobalAllocator = (Store, GlobalType, ExecutionValue) -> Address.Global
+
+fun GlobalAllocator(
     store: Store,
     type: GlobalType,
     value: ExecutionValue,

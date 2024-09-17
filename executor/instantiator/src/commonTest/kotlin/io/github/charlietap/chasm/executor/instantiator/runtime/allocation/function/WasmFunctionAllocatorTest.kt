@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.func
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocatorImpl
+import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
@@ -16,7 +16,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class WasmFunctionAllocatorImplTest {
+class WasmFunctionAllocatorTest {
 
     @Test
     fun `can allocate a wasm function`() {
@@ -41,7 +41,7 @@ class WasmFunctionAllocatorImplTest {
             module = moduleInstance,
         )
 
-        val actual = WasmFunctionAllocatorImpl(store, moduleInstance, wasmFunction)
+        val actual = WasmFunctionAllocator(store, moduleInstance, wasmFunction)
 
         assertEquals(Ok(Address.Function(0)), actual)
         assertEquals(expectedInstance, functions[0])
@@ -67,7 +67,7 @@ class WasmFunctionAllocatorImplTest {
             ),
         )
 
-        val actual = WasmFunctionAllocatorImpl(store, moduleInstance, wasmFunction)
+        val actual = WasmFunctionAllocator(store, moduleInstance, wasmFunction)
 
         assertEquals(expected, actual)
         assertTrue(functions.isEmpty())

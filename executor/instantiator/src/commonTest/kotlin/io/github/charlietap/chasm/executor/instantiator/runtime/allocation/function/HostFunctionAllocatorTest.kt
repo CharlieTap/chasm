@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.function
 
-import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocatorImpl
+import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocator
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.store.Address
@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class HostFunctionAllocatorImplTest {
+class HostFunctionAllocatorTest {
 
     @Test
     fun `can allocate a host function`() {
@@ -28,7 +28,7 @@ class HostFunctionAllocatorImplTest {
             function = hostFunction,
         )
 
-        val address = HostFunctionAllocatorImpl(store, type, hostFunction)
+        val address = HostFunctionAllocator(store, type, hostFunction)
 
         assertEquals(Address.Function(0), address)
         assertEquals(expected, functions[0])

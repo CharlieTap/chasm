@@ -4,8 +4,8 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocatorImpl
-import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocatorImpl
+import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.instantiator.classification.ClassifiedExternalValue
 import io.github.charlietap.chasm.executor.instantiator.classification.ExternalValueClassifier
 import io.github.charlietap.chasm.executor.instantiator.validation.ImportValidator
@@ -39,7 +39,7 @@ import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class PartialModuleAllocatorImplTest {
+class PartialModuleAllocatorTest {
 
     @Test
     fun `can allocate a partial module instance`() {
@@ -116,11 +116,11 @@ class PartialModuleAllocatorImplTest {
             exports = mutableListOf(),
         )
 
-        val actual = PartialModuleAllocatorImpl(
+        val actual = PartialModuleAllocator(
             store = store,
             module = module,
             imports = imports,
-            wasmFunctionAllocator = ::WasmFunctionAllocatorImpl,
+            wasmFunctionAllocator = ::WasmFunctionAllocator,
             typeAllocator = ::DefinedTypeFactory,
             classifier = classifier,
             importValidator = validator,

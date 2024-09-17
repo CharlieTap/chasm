@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.embedding.transform.Mapper
 import io.github.charlietap.chasm.embedding.transform.ReferenceValueMapper
 import io.github.charlietap.chasm.embedding.transform.TableTypeMapper
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocatorImpl
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.ast.type.TableType as InternalTableType
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue as InternalReferenceValue
@@ -21,7 +20,7 @@ fun table(
     store = store,
     type = type,
     value = value,
-    allocator = ::TableAllocatorImpl,
+    allocator = ::TableAllocator,
     tableTypeMapper = TableTypeMapper.instance,
     referenceValueMapper = ReferenceValueMapper.instance,
 )
