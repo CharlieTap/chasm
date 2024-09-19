@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
-import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluatorImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
@@ -25,7 +24,7 @@ internal fun MemoryInitializer(
         store = store,
         instance = instance,
         module = module,
-        evaluator = ::ExpressionEvaluatorImpl,
+        evaluator = ::ExpressionEvaluator,
     )
 
 internal fun MemoryInitializer(

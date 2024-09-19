@@ -1,8 +1,26 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.functionAddress
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal typealias RefFuncExecutor = (Stack, ReferenceInstruction.RefFunc) -> Result<Unit, InvocationError>
+
+internal inline fun RefFuncExecutor(
+    stack: Stack,
+    instruction: ReferenceInstruction.RefFunc,
+): Result<Unit, InvocationError> = binding {
+
+    val frame = stack.peekFrame().bind()
+
+    val functionAddress = frame.state.module.functionAddress(instruction.funcIdx).bind()
+
+    stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
+}

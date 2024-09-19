@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
-import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluatorImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
@@ -25,7 +24,7 @@ internal fun TableInitializer(
         store = store,
         instance = instance,
         module = module,
-        evaluator = ::ExpressionEvaluatorImpl,
+        evaluator = ::ExpressionEvaluator,
     )
 
 internal fun TableInitializer(

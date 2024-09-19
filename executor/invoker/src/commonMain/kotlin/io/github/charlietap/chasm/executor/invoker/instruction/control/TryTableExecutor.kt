@@ -24,7 +24,7 @@ internal inline fun TryTableExecutor(
     store = store,
     stack = stack,
     instruction = instruction,
-    expander = ::BlockTypeExpanderImpl,
+    expander = ::BlockTypeExpander,
     blockExecutor = ::InstructionBlockExecutor,
 )
 

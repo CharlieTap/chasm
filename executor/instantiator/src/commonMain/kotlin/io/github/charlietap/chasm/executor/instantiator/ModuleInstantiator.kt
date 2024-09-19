@@ -9,9 +9,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModule
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
-import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluatorImpl
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.executor.invoker.FunctionInvokerImpl
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
@@ -33,8 +31,8 @@ fun ModuleInstantiator(
         imports = imports,
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
-        invoker = ::FunctionInvokerImpl,
-        evaluator = ::ExpressionEvaluatorImpl,
+        invoker = ::FunctionInvoker,
+        evaluator = ::ExpressionEvaluator,
         tableInitializer = ::TableInitializer,
         memoryInitializer = ::MemoryInitializer,
     )

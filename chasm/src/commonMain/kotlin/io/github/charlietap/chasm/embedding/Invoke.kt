@@ -13,7 +13,6 @@ import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.transform.BidirectionalMapper
 import io.github.charlietap.chasm.embedding.transform.ValueMapper
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.executor.invoker.FunctionInvokerImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
@@ -29,7 +28,7 @@ fun invoke(
     instance = instance,
     name = name,
     args = args,
-    invoker = ::FunctionInvokerImpl,
+    invoker = ::FunctionInvoker,
     valueMapper = ValueMapper.instance,
 )
 
