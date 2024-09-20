@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.fixture.instruction.selectWithTypeInstruction
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.value
 import io.github.charlietap.chasm.fixture.value.i32
@@ -14,6 +15,7 @@ class SelectWithTypeExecutorTest {
     fun `can execute the select with type instruction and choose value 1`() {
 
         val stack = stack()
+        val context = executionContext(stack)
 
         val value1 = value(i32(117))
         val value2 = value(i32(118))
@@ -22,9 +24,12 @@ class SelectWithTypeExecutorTest {
         stack.push(value2)
         stack.push(value(i32(1)))
 
-        val instruction = ParametricInstruction.SelectWithType(emptyList())
+        val instruction = selectWithTypeInstruction(emptyList())
 
-        val actual = SelectWithTypeExecutor(stack, instruction)
+        val actual = SelectWithTypeExecutor(
+            context = context,
+            instruction = instruction,
+        )
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
@@ -35,6 +40,7 @@ class SelectWithTypeExecutorTest {
     fun `can execute the select instruction and choose value 2`() {
 
         val stack = stack()
+        val context = executionContext(stack)
 
         val value1 = value(i32(117))
         val value2 = value(i32(118))
@@ -43,9 +49,12 @@ class SelectWithTypeExecutorTest {
         stack.push(value2)
         stack.push(value(i32(0)))
 
-        val instruction = ParametricInstruction.SelectWithType(emptyList())
+        val instruction = selectWithTypeInstruction(emptyList())
 
-        val actual = SelectWithTypeExecutor(stack, instruction)
+        val actual = SelectWithTypeExecutor(
+            context = context,
+            instruction = instruction,
+        )
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())

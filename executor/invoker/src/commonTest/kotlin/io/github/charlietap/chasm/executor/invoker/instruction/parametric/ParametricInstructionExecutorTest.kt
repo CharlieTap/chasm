@@ -2,7 +2,12 @@ package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.fixture.instruction.dropInstruction
+import io.github.charlietap.chasm.fixture.instruction.selectInstruction
+import io.github.charlietap.chasm.fixture.instruction.selectWithTypeInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -14,18 +19,16 @@ class ParametricInstructionExecutorTest {
 
         val context = executionContext()
 
-        val instruction = ParametricInstruction.Drop
+        val instruction = dropInstruction()
 
-        val dropExecutor: DropExecutor = { _ ->
+        val dropExecutor: Executor<ParametricInstruction.Drop> = { _, _ ->
             Ok(Unit)
         }
 
-        val actual = ParametricInstructionExecutor(
+        val actual = parametricInstructionExecutor(
             context = context,
             instruction = instruction,
             dropExecutor = dropExecutor,
-            selectExecutor = selectExecutor(),
-            selectWithTypeExecutor = selectWithTypeExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -36,18 +39,16 @@ class ParametricInstructionExecutorTest {
 
         val context = executionContext()
 
-        val instruction = ParametricInstruction.Select
+        val instruction = selectInstruction()
 
-        val selectExecutor: SelectExecutor = { _ ->
+        val selectExecutor: Executor<ParametricInstruction.Select> = { _, _ ->
             Ok(Unit)
         }
 
-        val actual = ParametricInstructionExecutor(
+        val actual = parametricInstructionExecutor(
             context = context,
             instruction = instruction,
-            dropExecutor = dropExecutor(),
             selectExecutor = selectExecutor,
-            selectWithTypeExecutor = selectWithTypeExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -58,17 +59,15 @@ class ParametricInstructionExecutorTest {
 
         val context = executionContext()
 
-        val instruction = ParametricInstruction.SelectWithType(emptyList())
+        val instruction = selectWithTypeInstruction()
 
-        val selectWithTypeExecutor: SelectWithTypeExecutor = { _, _ ->
+        val selectWithTypeExecutor: Executor<ParametricInstruction.SelectWithType> = { _, _ ->
             Ok(Unit)
         }
 
-        val actual = ParametricInstructionExecutor(
+        val actual = parametricInstructionExecutor(
             context = context,
             instruction = instruction,
-            dropExecutor = dropExecutor(),
-            selectExecutor = selectExecutor(),
             selectWithTypeExecutor = selectWithTypeExecutor,
         )
 
@@ -76,16 +75,30 @@ class ParametricInstructionExecutorTest {
     }
 
     companion object {
-        fun dropExecutor(): DropExecutor = { _ ->
+        fun dropExecutor(): Executor<ParametricInstruction.Drop> = { _, _ ->
             fail()
         }
 
-        fun selectExecutor(): SelectExecutor = { _ ->
+        fun selectExecutor(): Executor<ParametricInstruction.Select> = { _, _ ->
             fail()
         }
 
-        fun selectWithTypeExecutor(): SelectWithTypeExecutor = { _, _ ->
+        fun selectWithTypeExecutor(): Executor<ParametricInstruction.SelectWithType> = { _, _ ->
             fail()
         }
+
+        fun parametricInstructionExecutor(
+            context: ExecutionContext,
+            instruction: ParametricInstruction,
+            dropExecutor: Executor<ParametricInstruction.Drop> = dropExecutor(),
+            selectExecutor: Executor<ParametricInstruction.Select> = selectExecutor(),
+            selectWithTypeExecutor: Executor<ParametricInstruction.SelectWithType> = selectWithTypeExecutor(),
+        ) = ParametricInstructionExecutor(
+            context = context,
+            instruction = instruction,
+            dropExecutor = dropExecutor,
+            selectExecutor = selectExecutor,
+            selectWithTypeExecutor = selectWithTypeExecutor,
+        )
     }
 }
