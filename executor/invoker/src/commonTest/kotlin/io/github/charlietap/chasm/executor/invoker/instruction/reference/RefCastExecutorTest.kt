@@ -4,11 +4,13 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.frame
+import io.github.charlietap.chasm.fixture.instruction.refCastInstruction
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
@@ -26,6 +28,7 @@ class RefCastExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val referenceType = referenceType()
         val typeOfReferenceType = refNullReferenceType(AbstractHeapType.I31)
 
@@ -58,7 +61,13 @@ class RefCastExecutorTest {
             typeOfReferenceType
         }
 
-        val actual = RefCastExecutor(store, stack, referenceType, referenceTypeSubstitutor, referenceTypeMatcher, typeOfReferenceValue)
+        val actual = RefCastExecutor(
+            context = context,
+            instruction = refCastInstruction(referenceType),
+            referenceTypeSubstitutor = referenceTypeSubstitutor,
+            referenceTypeMatcher = referenceTypeMatcher,
+            typeOfReferenceValue = typeOfReferenceValue,
+        )
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
@@ -70,6 +79,7 @@ class RefCastExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val referenceType = referenceType()
         val typeOfReferenceType = refNullReferenceType(AbstractHeapType.I31)
 
@@ -102,7 +112,13 @@ class RefCastExecutorTest {
             typeOfReferenceType
         }
 
-        val actual = RefCastExecutor(store, stack, referenceType, referenceTypeSubstitutor, referenceTypeMatcher, typeOfReferenceValue)
+        val actual = RefCastExecutor(
+            context = context,
+            instruction = refCastInstruction(referenceType),
+            referenceTypeSubstitutor = referenceTypeSubstitutor,
+            referenceTypeMatcher = referenceTypeMatcher,
+            typeOfReferenceValue = typeOfReferenceValue,
+        )
 
         assertEquals(Err(InvocationError.Trap.TrapEncountered), actual)
     }

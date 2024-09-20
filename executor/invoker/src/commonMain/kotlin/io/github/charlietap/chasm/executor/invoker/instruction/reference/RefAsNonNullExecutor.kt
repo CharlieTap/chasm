@@ -5,15 +5,17 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
-internal typealias RefAsNonNullExecutor = (Stack) -> Result<Unit, InvocationError>
-
 internal inline fun RefAsNonNullExecutor(
-    stack: Stack,
+    context: ExecutionContext,
+    instruction: ReferenceInstruction.RefAsNonNull,
 ): Result<Unit, InvocationError> = binding {
+
+    val (stack) = context
 
     val value = stack.peekValueOrNull()?.value
 

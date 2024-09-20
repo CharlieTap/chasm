@@ -3,10 +3,12 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.frame
+import io.github.charlietap.chasm.fixture.instruction.refTestInstruction
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
@@ -25,6 +27,7 @@ class RefTestExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val referenceType = referenceType()
         val typeOfReferenceType = refNullReferenceType(AbstractHeapType.I31)
 
@@ -57,7 +60,13 @@ class RefTestExecutorTest {
             typeOfReferenceType
         }
 
-        val actual = RefTestExecutor(store, stack, referenceType, referenceTypeSubstitutor, referenceTypeMatcher, typeOfReferenceValue)
+        val actual = RefTestExecutor(
+            context = context,
+            instruction = refTestInstruction(referenceType),
+            referenceTypeSubstitutor = referenceTypeSubstitutor,
+            referenceTypeMatcher = referenceTypeMatcher,
+            typeOfReferenceValue = typeOfReferenceValue,
+        )
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
@@ -69,6 +78,7 @@ class RefTestExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val referenceType = referenceType()
         val typeOfReferenceType = refNullReferenceType(AbstractHeapType.I31)
 
@@ -101,7 +111,13 @@ class RefTestExecutorTest {
             typeOfReferenceType
         }
 
-        val actual = RefTestExecutor(store, stack, referenceType, referenceTypeSubstitutor, referenceTypeMatcher, typeOfReferenceValue)
+        val actual = RefTestExecutor(
+            context = context,
+            instruction = refTestInstruction(referenceType),
+            referenceTypeSubstitutor = referenceTypeSubstitutor,
+            referenceTypeMatcher = referenceTypeMatcher,
+            typeOfReferenceValue = typeOfReferenceValue,
+        )
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
