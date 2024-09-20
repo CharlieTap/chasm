@@ -5,21 +5,16 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias AggregateInstructionExecutor = (AggregateInstruction, Store, Stack) -> Result<Unit, InvocationError>
 
 internal fun AggregateInstructionExecutor(
+    context: ExecutionContext,
     instruction: AggregateInstruction,
-    store: Store,
-    stack: Stack,
 ): Result<Unit, InvocationError> =
     AggregateInstructionExecutor(
+        context = context,
         instruction = instruction,
-        store = store,
-        stack = stack,
         structNewExecutor = ::StructNewExecutor,
         structNewDefaultExecutor = ::StructNewDefaultExecutor,
         structGetExecutor = ::StructGetExecutor,
@@ -43,9 +38,8 @@ internal fun AggregateInstructionExecutor(
     )
 
 internal inline fun AggregateInstructionExecutor(
+    context: ExecutionContext,
     instruction: AggregateInstruction,
-    store: Store,
-    stack: Stack,
     crossinline structNewExecutor: StructNewExecutor,
     crossinline structNewDefaultExecutor: StructNewDefaultExecutor,
     crossinline structGetExecutor: StructGetExecutor,
@@ -67,6 +61,7 @@ internal inline fun AggregateInstructionExecutor(
     crossinline anyConvertExternExecutor: AnyConvertExternExecutor,
     crossinline externConvertAnyExecutor: ExternConvertAnyExecutor,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     when (instruction) {
         is AggregateInstruction.StructNew -> structNewExecutor(store, stack, instruction.typeIndex).bind()
         is AggregateInstruction.StructNewDefault -> structNewDefaultExecutor(store, stack, instruction.typeIndex).bind()

@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.ext.ceil
 import io.github.charlietap.chasm.executor.invoker.ext.convertF32s
 import io.github.charlietap.chasm.executor.invoker.ext.convertF32u
@@ -51,7 +52,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.truncI64sTrapping
 import io.github.charlietap.chasm.executor.invoker.ext.truncI64u
 import io.github.charlietap.chasm.executor.invoker.ext.truncI64uTrapping
 import io.github.charlietap.chasm.executor.invoker.ext.wrap
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.executor.runtime.ext.constOperation
@@ -66,12 +66,11 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 import kotlin.math.absoluteValue
 
-internal typealias NumericInstructionExecutor = (NumericInstruction, Stack) -> Result<Unit, InvocationError>
-
 internal fun NumericInstructionExecutor(
+    context: ExecutionContext,
     instruction: NumericInstruction,
-    stack: Stack,
 ): Result<Unit, InvocationError> = binding {
+    val (stack) = context
     when (instruction) {
         is NumericInstruction.I32Const -> stack.constOperation(instruction.value)
         is NumericInstruction.I64Const -> stack.constOperation(instruction.value)

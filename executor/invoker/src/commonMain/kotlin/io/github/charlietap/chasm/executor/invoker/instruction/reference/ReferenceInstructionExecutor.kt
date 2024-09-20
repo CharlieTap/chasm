@@ -3,21 +3,16 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias ReferenceInstructionExecutor = (ReferenceInstruction, Store, Stack) -> Result<Unit, InvocationError>
 
 internal fun ReferenceInstructionExecutor(
+    context: ExecutionContext,
     instruction: ReferenceInstruction,
-    store: Store,
-    stack: Stack,
 ): Result<Unit, InvocationError> =
     ReferenceInstructionExecutor(
+        context = context,
         instruction = instruction,
-        store = store,
-        stack = stack,
         refNullExecutor = ::RefNullExecutor,
         refIsNullExecutor = ::RefIsNullExecutor,
         refFuncExecutor = ::RefFuncExecutor,
@@ -28,9 +23,8 @@ internal fun ReferenceInstructionExecutor(
     )
 
 internal fun ReferenceInstructionExecutor(
+    context: ExecutionContext,
     instruction: ReferenceInstruction,
-    store: Store,
-    stack: Stack,
     refNullExecutor: RefNullExecutor,
     refIsNullExecutor: RefIsNullExecutor,
     refFuncExecutor: RefFuncExecutor,
@@ -39,6 +33,7 @@ internal fun ReferenceInstructionExecutor(
     refTestExecutor: RefTestExecutor,
     refCastExecutor: RefCastExecutor,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     when (instruction) {
         is ReferenceInstruction.RefNull -> refNullExecutor(stack, instruction).bind()
         is ReferenceInstruction.RefIsNull -> refIsNullExecutor(stack).bind()

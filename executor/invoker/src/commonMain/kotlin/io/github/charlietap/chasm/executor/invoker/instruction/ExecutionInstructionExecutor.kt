@@ -2,37 +2,32 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias ExecutionInstructionExecutor = (ExecutionInstruction, Store, Stack) -> Result<Unit, InvocationError>
 
 internal fun ExecutionInstructionExecutor(
+    context: ExecutionContext,
     instruction: ExecutionInstruction,
-    store: Store,
-    stack: Stack,
 ): Result<Unit, InvocationError> =
     ExecutionInstructionExecutor(
+        context = context,
         instruction = instruction,
-        store = store,
-        stack = stack,
         adminInstructionExecutor = ::AdminInstructionExecutor,
         moduleInstructionExecutor = ::ModuleInstructionExecutor,
     )
 
 internal fun ExecutionInstructionExecutor(
+    context: ExecutionContext,
     instruction: ExecutionInstruction,
-    store: Store,
-    stack: Stack,
-    adminInstructionExecutor: AdminInstructionExecutor,
-    moduleInstructionExecutor: ModuleInstructionExecutor,
+    adminInstructionExecutor: Executor<AdminInstruction>,
+    moduleInstructionExecutor: Executor<ModuleInstruction>,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
-        is AdminInstruction -> adminInstructionExecutor(instruction, store, stack).bind()
-        is ModuleInstruction -> moduleInstructionExecutor(instruction, store, stack).bind()
+        is AdminInstruction -> adminInstructionExecutor(context, instruction).bind()
+        is ModuleInstruction -> moduleInstructionExecutor(context, instruction).bind()
     }
 }

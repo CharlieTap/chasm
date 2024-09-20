@@ -2,6 +2,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.module.functionIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
@@ -18,6 +20,7 @@ class ReferenceInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = ReferenceInstruction.RefNull(heapType())
 
@@ -27,17 +30,10 @@ class ReferenceInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ReferenceInstructionExecutor(
+        val actual = referenceInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
             refNullExecutor = refNullExecutor,
-            refIsNullExecutor = refIsNullExecutor(),
-            refFuncExecutor = refFuncExecutor(),
-            refAsNonNullExecutor = refAsNonNullExecutor(),
-            refEqExecutor = refEqExecutor(),
-            refTestExecutor = refTestExecutor(),
-            refCastExecutor = refCastExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -48,6 +44,7 @@ class ReferenceInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = ReferenceInstruction.RefIsNull
 
@@ -56,17 +53,10 @@ class ReferenceInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ReferenceInstructionExecutor(
+        val actual = referenceInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            refNullExecutor = refNullExecutor(),
             refIsNullExecutor = refIsNullExecutor,
-            refFuncExecutor = refFuncExecutor(),
-            refAsNonNullExecutor = refAsNonNullExecutor(),
-            refEqExecutor = refEqExecutor(),
-            refTestExecutor = refTestExecutor(),
-            refCastExecutor = refCastExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -77,6 +67,7 @@ class ReferenceInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = ReferenceInstruction.RefFunc(functionIndex())
 
@@ -86,17 +77,10 @@ class ReferenceInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ReferenceInstructionExecutor(
+        val actual = referenceInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            refNullExecutor = refNullExecutor(),
-            refIsNullExecutor = refIsNullExecutor(),
             refFuncExecutor = refFuncExecutor,
-            refAsNonNullExecutor = refAsNonNullExecutor(),
-            refEqExecutor = refEqExecutor(),
-            refTestExecutor = refTestExecutor(),
-            refCastExecutor = refCastExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -107,6 +91,7 @@ class ReferenceInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = ReferenceInstruction.RefAsNonNull
 
@@ -115,17 +100,10 @@ class ReferenceInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ReferenceInstructionExecutor(
+        val actual = referenceInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            refNullExecutor = refNullExecutor(),
-            refIsNullExecutor = refIsNullExecutor(),
-            refFuncExecutor = refFuncExecutor(),
             refAsNonNullExecutor = refAsNonNullExecutor,
-            refEqExecutor = refEqExecutor(),
-            refTestExecutor = refTestExecutor(),
-            refCastExecutor = refCastExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -136,6 +114,7 @@ class ReferenceInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = ReferenceInstruction.RefEq
 
@@ -144,17 +123,10 @@ class ReferenceInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ReferenceInstructionExecutor(
+        val actual = referenceInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            refNullExecutor = refNullExecutor(),
-            refIsNullExecutor = refIsNullExecutor(),
-            refFuncExecutor = refFuncExecutor(),
-            refAsNonNullExecutor = refAsNonNullExecutor(),
             refEqExecutor = refEqExecutor,
-            refTestExecutor = refTestExecutor(),
-            refCastExecutor = refCastExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -165,8 +137,9 @@ class ReferenceInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
-        val referenceType = referenceType()
+        val context = executionContext(stack, store)
 
+        val referenceType = referenceType()
         val instruction = ReferenceInstruction.RefTest(referenceType)
 
         val refTestExecutor: RefTestExecutor = { _store, _stack, _refType ->
@@ -176,17 +149,10 @@ class ReferenceInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ReferenceInstructionExecutor(
+        val actual = referenceInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            refNullExecutor = refNullExecutor(),
-            refIsNullExecutor = refIsNullExecutor(),
-            refFuncExecutor = refFuncExecutor(),
-            refAsNonNullExecutor = refAsNonNullExecutor(),
-            refEqExecutor = refEqExecutor(),
             refTestExecutor = refTestExecutor,
-            refCastExecutor = refCastExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -197,8 +163,9 @@ class ReferenceInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
-        val referenceType = referenceType()
+        val context = executionContext(stack, store)
 
+        val referenceType = referenceType()
         val instruction = ReferenceInstruction.RefCast(referenceType)
 
         val refCastExecutor: RefCastExecutor = { _store, _stack, _refType ->
@@ -208,16 +175,9 @@ class ReferenceInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ReferenceInstructionExecutor(
+        val actual = referenceInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            refNullExecutor = refNullExecutor(),
-            refIsNullExecutor = refIsNullExecutor(),
-            refFuncExecutor = refFuncExecutor(),
-            refAsNonNullExecutor = refAsNonNullExecutor(),
-            refEqExecutor = refEqExecutor(),
-            refTestExecutor = refTestExecutor(),
             refCastExecutor = refCastExecutor,
         )
 
@@ -252,5 +212,27 @@ class ReferenceInstructionExecutorTest {
         fun refCastExecutor(): RefTestExecutor = { _, _, _ ->
             fail("RefCastExecutor should not be called in this scenario")
         }
+
+        fun referenceInstructionExecutor(
+            context: ExecutionContext,
+            instruction: ReferenceInstruction,
+            refNullExecutor: RefNullExecutor = refNullExecutor(),
+            refIsNullExecutor: RefIsNullExecutor = refIsNullExecutor(),
+            refFuncExecutor: RefFuncExecutor = refFuncExecutor(),
+            refAsNonNullExecutor: RefAsNonNullExecutor = refAsNonNullExecutor(),
+            refEqExecutor: RefEqExecutor = refEqExecutor(),
+            refTestExecutor: RefTestExecutor = refTestExecutor(),
+            refCastExecutor: RefCastExecutor = refCastExecutor(),
+        ) = ReferenceInstructionExecutor(
+            context = context,
+            instruction = instruction,
+            refNullExecutor = refNullExecutor,
+            refIsNullExecutor = refIsNullExecutor,
+            refFuncExecutor = refFuncExecutor,
+            refAsNonNullExecutor = refAsNonNullExecutor,
+            refEqExecutor = refEqExecutor,
+            refTestExecutor = refTestExecutor,
+            refCastExecutor = refCastExecutor,
+        )
     }
 }

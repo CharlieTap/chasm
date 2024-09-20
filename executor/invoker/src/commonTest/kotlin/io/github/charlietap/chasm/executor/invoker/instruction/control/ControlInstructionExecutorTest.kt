@@ -3,6 +3,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.module.labelIndex
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
@@ -19,32 +21,13 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = ControlInstruction.Nop
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -55,6 +38,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val functionIndex = Index.FunctionIndex(0u)
         val instruction = ControlInstruction.Call(functionIndex)
@@ -66,29 +50,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
             callExecutor = callExecutor,
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -99,6 +64,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val typeIndex = Index.TypeIndex(0u)
         val tableIndex = Index.TableIndex(0u)
@@ -111,29 +77,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
             callIndirectExecutor = callIndirectExecutor,
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -144,6 +91,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val functionIndex = Index.FunctionIndex(0u)
         val instruction = ControlInstruction.ReturnCall(functionIndex)
@@ -155,29 +103,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
             returnCallExecutor = returnCallExecutor,
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -188,6 +117,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val typeIndex = Index.TypeIndex(0u)
         val tableIndex = Index.TableIndex(0u)
@@ -200,29 +130,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
             returnCallIndirectExecutor = returnCallIndirectExecutor,
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -233,6 +144,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val typeIndex = typeIndex()
         val instruction = ControlInstruction.CallRef(typeIndex)
@@ -243,29 +155,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
             callRefExecutor = callRefExecutor,
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -276,6 +169,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val typeIndex = typeIndex()
         val instruction = ControlInstruction.ReturnCallRef(typeIndex)
@@ -286,29 +180,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
             returnCallRefExecutor = returnCallRefExecutor,
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -319,6 +194,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val blockType = ControlInstruction.BlockType.Empty
         val instruction = ControlInstruction.Block(blockType, emptyList())
@@ -331,29 +207,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
             blockExecutor = blockExecutor,
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -364,6 +221,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val blockType = ControlInstruction.BlockType.Empty
         val instruction = ControlInstruction.Loop(blockType, emptyList())
@@ -376,29 +234,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
             loopExecutor = loopExecutor,
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -409,6 +248,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val blockType = ControlInstruction.BlockType.Empty
         val instruction = ControlInstruction.If(blockType, emptyList(), null)
@@ -420,29 +260,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
             ifExecutor = ifExecutor,
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -453,6 +274,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val labelIndex = Index.LabelIndex(0u)
         val instruction = ControlInstruction.Br(labelIndex)
@@ -463,29 +285,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
             breakExecutor = breakExecutor,
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -496,6 +299,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val labelIndex = Index.LabelIndex(0u)
         val instruction = ControlInstruction.BrIf(labelIndex)
@@ -506,29 +310,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
             brIfExecutor = brIfExecutor,
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -539,6 +324,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val defaultLabelIndex = Index.LabelIndex(0u)
         val instruction = ControlInstruction.BrTable(emptyList(), defaultLabelIndex)
@@ -549,29 +335,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
             brTableExecutor = brTableExecutor,
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -582,6 +349,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val labelIndex = labelIndex()
         val instruction = ControlInstruction.BrOnNull(labelIndex)
@@ -592,29 +360,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
             brOnNullExecutor = brOnNullExecutor,
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -625,6 +374,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val labelIndex = labelIndex()
         val instruction = ControlInstruction.BrOnNonNull(labelIndex)
@@ -635,29 +385,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
             brOnNonNullExecutor = brOnNonNullExecutor,
-            brOnCastExecutor = brOnCastExecutor(),
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -668,6 +399,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val labelIndex = labelIndex()
         val srcReferenceType = referenceType()
@@ -686,29 +418,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor,
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -719,6 +432,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val labelIndex = labelIndex()
         val srcReferenceType = referenceType()
@@ -737,29 +451,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
             brOnCastExecutor = brOnCastExecutor,
-            returnExecutor = returnExecutor(),
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -770,6 +465,7 @@ class ControlInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = ControlInstruction.Return
 
@@ -778,29 +474,10 @@ class ControlInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = ControlInstructionExecutor(
+        val actual = controlInstructionExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
-            callExecutor = callExecutor(),
-            callIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor = callRefExecutor(),
-            returnCallRefExecutor = returnCallRefExecutor(),
-            blockExecutor = blockExecutor(),
-            loopExecutor = loopExecutor(),
-            ifExecutor = ifExecutor(),
-            breakExecutor = breakExecutor(),
-            brIfExecutor = brIfExecutor(),
-            brTableExecutor = brTableExecutor(),
-            brOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor = brOnNonNullExecutor(),
-            brOnCastExecutor = brOnCastExecutor(),
             returnExecutor = returnExecutor,
-            tryTableExecutor = tryTableExecutor(),
-            throwExecutor = throwExecutor(),
-            throwRefExecutor = throwRefExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -882,5 +559,51 @@ class ControlInstructionExecutorTest {
         fun tryTableExecutor(): TryTableExecutor = { _, _, _ ->
             fail()
         }
+
+        fun controlInstructionExecutor(
+            context: ExecutionContext,
+            instruction: ControlInstruction,
+            callExecutor: CallExecutor = callExecutor(),
+            callIndirectExecutor: CallIndirectExecutor = callIndirectExecutor(),
+            returnCallExecutor: ReturnCallExecutor = returnCallExecutor(),
+            returnCallIndirectExecutor: ReturnCallIndirectExecutor = returnCallIndirectExecutor(),
+            callRefExecutor: CallRefExecutor = callRefExecutor(),
+            returnCallRefExecutor: ReturnCallRefExecutor = returnCallRefExecutor(),
+            blockExecutor: BlockExecutor = blockExecutor(),
+            loopExecutor: LoopExecutor = loopExecutor(),
+            ifExecutor: IfExecutor = ifExecutor(),
+            breakExecutor: BreakExecutor = breakExecutor(),
+            brIfExecutor: BrIfExecutor = brIfExecutor(),
+            brTableExecutor: BrTableExecutor = brTableExecutor(),
+            brOnNullExecutor: BrOnNullExecutor = brOnNullExecutor(),
+            brOnNonNullExecutor: BrOnNonNullExecutor = brOnNonNullExecutor(),
+            brOnCastExecutor: BrOnCastExecutor = brOnCastExecutor(),
+            returnExecutor: ReturnExecutor = returnExecutor(),
+            throwExecutor: ThrowExecutor = throwExecutor(),
+            throwRefExecutor: ThrowRefExecutor = throwRefExecutor(),
+            tryTableExecutor: TryTableExecutor = tryTableExecutor(),
+        ) = ControlInstructionExecutor(
+            context = context,
+            instruction = instruction,
+            callExecutor = callExecutor,
+            callIndirectExecutor = callIndirectExecutor,
+            returnCallExecutor = returnCallExecutor,
+            returnCallIndirectExecutor = returnCallIndirectExecutor,
+            callRefExecutor = callRefExecutor,
+            returnCallRefExecutor = returnCallRefExecutor,
+            blockExecutor = blockExecutor,
+            loopExecutor = loopExecutor,
+            ifExecutor = ifExecutor,
+            breakExecutor = breakExecutor,
+            brIfExecutor = brIfExecutor,
+            brTableExecutor = brTableExecutor,
+            brOnNullExecutor = brOnNullExecutor,
+            brOnNonNullExecutor = brOnNonNullExecutor,
+            brOnCastExecutor = brOnCastExecutor,
+            returnExecutor = returnExecutor,
+            tryTableExecutor = tryTableExecutor,
+            throwExecutor = throwExecutor,
+            throwRefExecutor = throwRefExecutor,
+        )
     }
 }

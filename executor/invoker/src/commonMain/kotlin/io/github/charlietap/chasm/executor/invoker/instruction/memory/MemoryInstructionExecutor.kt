@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.F32LoadExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.F64LoadExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.I32LoadExecutor
@@ -17,21 +18,15 @@ import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32S
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreSizedExecutor
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias MemoryInstructionExecutor = (MemoryInstruction, Store, Stack) -> Result<Unit, InvocationError>
 
 internal fun MemoryInstructionExecutor(
+    context: ExecutionContext,
     instruction: MemoryInstruction,
-    store: Store,
-    stack: Stack,
 ): Result<Unit, InvocationError> =
     MemoryInstructionExecutor(
+        context = context,
         instruction = instruction,
-        store = store,
-        stack = stack,
         memoryInitExecutor = ::MemoryInitExecutor,
         memoryGrowExecutor = ::MemoryGrowExecutor,
         memorySizeExecutor = ::MemorySizeExecutor,
@@ -55,9 +50,8 @@ internal fun MemoryInstructionExecutor(
     )
 
 internal fun MemoryInstructionExecutor(
+    context: ExecutionContext,
     instruction: MemoryInstruction,
-    store: Store,
-    stack: Stack,
     memoryInitExecutor: MemoryInitExecutor,
     memoryGrowExecutor: MemoryGrowExecutor,
     memorySizeExecutor: MemorySizeExecutor,
@@ -79,6 +73,7 @@ internal fun MemoryInstructionExecutor(
     f32StoreExecutor: F32StoreExecutor,
     f64StoreExecutor: F64StoreExecutor,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     when (instruction) {
         is MemoryInstruction.MemoryInit -> memoryInitExecutor(store, stack, instruction).bind()
         is MemoryInstruction.DataDrop -> dataDropExecutor(store, stack, instruction).bind()

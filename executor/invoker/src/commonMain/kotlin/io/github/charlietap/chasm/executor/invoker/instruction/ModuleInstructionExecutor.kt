@@ -12,6 +12,8 @@ import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.AggregateInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ControlInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.MemoryInstructionExecutor
@@ -20,22 +22,16 @@ import io.github.charlietap.chasm.executor.invoker.instruction.parametric.Parame
 import io.github.charlietap.chasm.executor.invoker.instruction.reference.ReferenceInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.table.TableInstructionExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.variable.VariableInstructionExecutor
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias ModuleInstructionExecutor = (ModuleInstruction, Store, Stack) -> Result<Unit, InvocationError>
 
 internal fun ModuleInstructionExecutor(
+    context: ExecutionContext,
     instruction: ModuleInstruction,
-    store: Store,
-    stack: Stack,
 ): Result<Unit, InvocationError> =
     ModuleInstructionExecutor(
+        context = context,
         instruction = instruction,
-        store = store,
-        stack = stack,
         aggregateInstructionExecutor = ::AggregateInstructionExecutor,
         controlInstructionExecutor = ::ControlInstructionExecutor,
         memoryInstructionExecutor = ::MemoryInstructionExecutor,
@@ -47,27 +43,26 @@ internal fun ModuleInstructionExecutor(
     )
 
 internal fun ModuleInstructionExecutor(
+    context: ExecutionContext,
     instruction: ModuleInstruction,
-    store: Store,
-    stack: Stack,
-    aggregateInstructionExecutor: AggregateInstructionExecutor,
-    controlInstructionExecutor: ControlInstructionExecutor,
-    memoryInstructionExecutor: MemoryInstructionExecutor,
-    numericInstructionExecutor: NumericInstructionExecutor,
-    parametricInstructionExecutor: ParametricInstructionExecutor,
-    tableInstructionExecutor: TableInstructionExecutor,
-    referenceInstructionExecutor: ReferenceInstructionExecutor,
-    variableInstructionExecutor: VariableInstructionExecutor,
+    aggregateInstructionExecutor: Executor<AggregateInstruction>,
+    controlInstructionExecutor: Executor<ControlInstruction>,
+    memoryInstructionExecutor: Executor<MemoryInstruction>,
+    numericInstructionExecutor: Executor<NumericInstruction>,
+    parametricInstructionExecutor: Executor<ParametricInstruction>,
+    tableInstructionExecutor: Executor<TableInstruction>,
+    referenceInstructionExecutor: Executor<ReferenceInstruction>,
+    variableInstructionExecutor: Executor<VariableInstruction>,
 ): Result<Unit, InvocationError> = binding {
     when (val moduleInstruction = instruction.instruction) {
-        is AggregateInstruction -> aggregateInstructionExecutor(moduleInstruction, store, stack).bind()
-        is ControlInstruction -> controlInstructionExecutor(moduleInstruction, store, stack).bind()
-        is MemoryInstruction -> memoryInstructionExecutor(moduleInstruction, store, stack).bind()
-        is NumericInstruction -> numericInstructionExecutor(moduleInstruction, stack).bind()
-        is ParametricInstruction -> parametricInstructionExecutor(moduleInstruction, stack).bind()
-        is TableInstruction -> tableInstructionExecutor(moduleInstruction, store, stack).bind()
-        is ReferenceInstruction -> referenceInstructionExecutor(moduleInstruction, store, stack).bind()
-        is VariableInstruction -> variableInstructionExecutor(moduleInstruction, store, stack).bind()
+        is AggregateInstruction -> aggregateInstructionExecutor(context, moduleInstruction).bind()
+        is ControlInstruction -> controlInstructionExecutor(context, moduleInstruction).bind()
+        is MemoryInstruction -> memoryInstructionExecutor(context, moduleInstruction).bind()
+        is NumericInstruction -> numericInstructionExecutor(context, moduleInstruction).bind()
+        is ParametricInstruction -> parametricInstructionExecutor(context, moduleInstruction).bind()
+        is TableInstruction -> tableInstructionExecutor(context, moduleInstruction).bind()
+        is ReferenceInstruction -> referenceInstructionExecutor(context, moduleInstruction).bind()
+        is VariableInstruction -> variableInstructionExecutor(context, moduleInstruction).bind()
         is VectorInstruction -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
     }
 }

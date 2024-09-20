@@ -3,21 +3,16 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias TableInstructionExecutor = (TableInstruction, Store, Stack) -> Result<Unit, InvocationError>
 
 internal fun TableInstructionExecutor(
+    context: ExecutionContext,
     instruction: TableInstruction,
-    store: Store,
-    stack: Stack,
 ): Result<Unit, InvocationError> =
     TableInstructionExecutor(
+        context = context,
         instruction = instruction,
-        store = store,
-        stack = stack,
         tableInitExecutor = ::TableInitExecutor,
         elementDropExecutor = ::ElementDropExecutor,
         tableCopyExecutor = ::TableCopyExecutor,
@@ -29,9 +24,8 @@ internal fun TableInstructionExecutor(
     )
 
 internal fun TableInstructionExecutor(
+    context: ExecutionContext,
     instruction: TableInstruction,
-    store: Store,
-    stack: Stack,
     tableInitExecutor: TableInitExecutor,
     elementDropExecutor: ElementDropExecutor,
     tableCopyExecutor: TableCopyExecutor,
@@ -41,6 +35,7 @@ internal fun TableInstructionExecutor(
     tableSetExecutor: TableSetExecutor,
     tableSizeExecutor: TableSizeExecutor,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     when (instruction) {
         is TableInstruction.TableInit -> tableInitExecutor(store, stack, instruction).bind()
         is TableInstruction.TableCopy -> tableCopyExecutor(store, stack, instruction).bind()

@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
-import io.github.charlietap.chasm.fixture.stack
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -12,7 +12,7 @@ class ParametricInstructionExecutorTest {
     @Test
     fun `drop instruction delegates to drop executor`() {
 
-        val stack = stack()
+        val context = executionContext()
 
         val instruction = ParametricInstruction.Drop
 
@@ -21,8 +21,8 @@ class ParametricInstructionExecutorTest {
         }
 
         val actual = ParametricInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
             dropExecutor = dropExecutor,
             selectExecutor = selectExecutor(),
             selectWithTypeExecutor = selectWithTypeExecutor(),
@@ -34,7 +34,7 @@ class ParametricInstructionExecutorTest {
     @Test
     fun `select instruction delegates to select executor`() {
 
-        val stack = stack()
+        val context = executionContext()
 
         val instruction = ParametricInstruction.Select
 
@@ -43,8 +43,8 @@ class ParametricInstructionExecutorTest {
         }
 
         val actual = ParametricInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
             dropExecutor = dropExecutor(),
             selectExecutor = selectExecutor,
             selectWithTypeExecutor = selectWithTypeExecutor(),
@@ -56,7 +56,7 @@ class ParametricInstructionExecutorTest {
     @Test
     fun `select with type instruction delegates to select executor`() {
 
-        val stack = stack()
+        val context = executionContext()
 
         val instruction = ParametricInstruction.SelectWithType(emptyList())
 
@@ -65,8 +65,8 @@ class ParametricInstructionExecutorTest {
         }
 
         val actual = ParametricInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
             dropExecutor = dropExecutor(),
             selectExecutor = selectExecutor(),
             selectWithTypeExecutor = selectWithTypeExecutor,

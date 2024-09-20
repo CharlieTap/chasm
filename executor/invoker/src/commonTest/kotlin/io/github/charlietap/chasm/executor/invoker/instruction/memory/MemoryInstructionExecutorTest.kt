@@ -3,6 +3,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.F32LoadExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.F64LoadExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.I32LoadExecutor
@@ -17,9 +19,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32S
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreSizedExecutor
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.fixture.instruction.i64Load32SInstruction
 import io.github.charlietap.chasm.fixture.instruction.i64Load32UInstruction
 import io.github.charlietap.chasm.fixture.instruction.i64Store32Instruction
@@ -38,6 +38,7 @@ class MemoryInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val memoryIndex = memoryIndex(117u)
         val memArg = memArg(117u, 118u)
@@ -56,10 +57,9 @@ class MemoryInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = createMemoryInstructionExecutor(
+        val actual = memoryInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
-            store = store,
             i64SizedSignedLoadExecutor = i64SizedSignedLoadExecutor,
         )
 
@@ -71,6 +71,7 @@ class MemoryInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val memoryIndex = memoryIndex(117u)
         val memArg = memArg(117u, 118u)
@@ -89,10 +90,9 @@ class MemoryInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = createMemoryInstructionExecutor(
+        val actual = memoryInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
-            store = store,
             i64SizedUnsignedLoadExecutor = i64SizedUnsignedLoadExecutor,
         )
 
@@ -104,6 +104,7 @@ class MemoryInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val memoryIndex = memoryIndex(117u)
         val memArg = memArg(117u, 118u)
@@ -122,10 +123,9 @@ class MemoryInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = createMemoryInstructionExecutor(
+        val actual = memoryInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
-            store = store,
             i64StoreSizedExecutor = i64StoreSizedExecutor,
         )
 
@@ -213,10 +213,9 @@ class MemoryInstructionExecutorTest {
             fail("F64StoreExecutor should not be called in this scenario")
         }
 
-        fun createMemoryInstructionExecutor(
+        fun memoryInstructionExecutor(
+            context: ExecutionContext,
             instruction: MemoryInstruction,
-            stack: Stack,
-            store: Store,
             memoryInitExecutor: MemoryInitExecutor = memoryInitExecutor(),
             memoryGrowExecutor: MemoryGrowExecutor = memoryGrowExecutor(),
             memorySizeExecutor: MemorySizeExecutor = memorySizeExecutor(),
@@ -239,9 +238,8 @@ class MemoryInstructionExecutorTest {
             f64StoreExecutor: F64StoreExecutor = f64StoreExecutor(),
         ): Result<Unit, InvocationError> {
             return MemoryInstructionExecutor(
+                context = context,
                 instruction = instruction,
-                stack = stack,
-                store = store,
                 memoryInitExecutor = memoryInitExecutor,
                 memoryGrowExecutor = memoryGrowExecutor,
                 memorySizeExecutor = memorySizeExecutor,

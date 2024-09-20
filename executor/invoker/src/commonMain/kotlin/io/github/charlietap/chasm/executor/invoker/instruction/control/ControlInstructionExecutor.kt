@@ -4,21 +4,16 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias ControlInstructionExecutor = (ControlInstruction, Store, Stack) -> Result<Unit, InvocationError>
 
 internal fun ControlInstructionExecutor(
+    context: ExecutionContext,
     instruction: ControlInstruction,
-    store: Store,
-    stack: Stack,
 ): Result<Unit, InvocationError> =
     ControlInstructionExecutor(
+        context = context,
         instruction = instruction,
-        store = store,
-        stack = stack,
         callExecutor = ::CallExecutor,
         callIndirectExecutor = ::CallIndirectExecutor,
         returnCallExecutor = ::ReturnCallExecutor,
@@ -41,9 +36,8 @@ internal fun ControlInstructionExecutor(
     )
 
 internal fun ControlInstructionExecutor(
+    context: ExecutionContext,
     instruction: ControlInstruction,
-    store: Store,
-    stack: Stack,
     callExecutor: CallExecutor,
     callIndirectExecutor: CallIndirectExecutor,
     returnCallExecutor: ReturnCallExecutor,
@@ -64,6 +58,7 @@ internal fun ControlInstructionExecutor(
     throwRefExecutor: ThrowRefExecutor,
     tryTableExecutor: TryTableExecutor,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     when (instruction) {
         is ControlInstruction.Nop -> Unit
         is ControlInstruction.Unreachable -> Err(InvocationError.Trap.TrapEncountered).bind<Unit>()

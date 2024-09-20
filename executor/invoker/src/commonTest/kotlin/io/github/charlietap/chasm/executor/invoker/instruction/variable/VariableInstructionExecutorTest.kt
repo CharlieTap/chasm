@@ -2,6 +2,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.module.globalIndex
 import io.github.charlietap.chasm.fixture.module.localIndex
 import io.github.charlietap.chasm.fixture.stack
@@ -17,6 +19,7 @@ class VariableInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = VariableInstruction.LocalGet(localIndex())
 
@@ -27,15 +30,10 @@ class VariableInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = VariableInstructionExecutor(
+        val actual = variableInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
-            store = store,
             localGetExecutor = localGetExecutor,
-            localSetExecutor = localSetExecutor(),
-            localTeeExecutor = localTeeExecutor(),
-            globalGetExecutor = globalGetExecutor(),
-            globalSetExecutor = globalSetExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -46,6 +44,7 @@ class VariableInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = VariableInstruction.LocalSet(localIndex())
 
@@ -56,15 +55,10 @@ class VariableInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = VariableInstructionExecutor(
+        val actual = variableInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
-            store = store,
-            localGetExecutor = localGetExecutor(),
             localSetExecutor = localSetExecutor,
-            localTeeExecutor = localTeeExecutor(),
-            globalGetExecutor = globalGetExecutor(),
-            globalSetExecutor = globalSetExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -75,6 +69,7 @@ class VariableInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = VariableInstruction.LocalTee(localIndex())
 
@@ -85,15 +80,10 @@ class VariableInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = VariableInstructionExecutor(
+        val actual = variableInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
-            store = store,
-            localGetExecutor = localGetExecutor(),
-            localSetExecutor = localSetExecutor(),
             localTeeExecutor = localTeeExecutor,
-            globalGetExecutor = globalGetExecutor(),
-            globalSetExecutor = globalSetExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -104,6 +94,7 @@ class VariableInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = VariableInstruction.GlobalGet(globalIndex())
 
@@ -115,15 +106,10 @@ class VariableInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = VariableInstructionExecutor(
+        val actual = variableInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
-            store = store,
-            localGetExecutor = localGetExecutor(),
-            localSetExecutor = localSetExecutor(),
-            localTeeExecutor = localTeeExecutor(),
             globalGetExecutor = globalGetExecutor,
-            globalSetExecutor = globalSetExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -134,6 +120,7 @@ class VariableInstructionExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val instruction = VariableInstruction.GlobalSet(globalIndex())
 
@@ -145,14 +132,9 @@ class VariableInstructionExecutorTest {
             Ok(Unit)
         }
 
-        val actual = VariableInstructionExecutor(
+        val actual = variableInstructionExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
-            store = store,
-            localGetExecutor = localGetExecutor(),
-            localSetExecutor = localSetExecutor(),
-            localTeeExecutor = localTeeExecutor(),
-            globalGetExecutor = globalGetExecutor(),
             globalSetExecutor = globalSetExecutor,
         )
 
@@ -179,5 +161,23 @@ class VariableInstructionExecutorTest {
         fun globalSetExecutor(): GlobalSetExecutor = { _, _, _ ->
             fail()
         }
+
+        fun variableInstructionExecutor(
+            context: ExecutionContext,
+            instruction: VariableInstruction,
+            localGetExecutor: LocalGetExecutor = localGetExecutor(),
+            localSetExecutor: LocalSetExecutor = localSetExecutor(),
+            localTeeExecutor: LocalTeeExecutor = localTeeExecutor(),
+            globalGetExecutor: GlobalGetExecutor = globalGetExecutor(),
+            globalSetExecutor: GlobalSetExecutor = globalSetExecutor(),
+        ) = VariableInstructionExecutor(
+            context = context,
+            instruction = instruction,
+            localGetExecutor = localGetExecutor,
+            localSetExecutor = localSetExecutor,
+            localTeeExecutor = localTeeExecutor,
+            globalGetExecutor = globalGetExecutor,
+            globalSetExecutor = globalSetExecutor,
+        )
     }
 }

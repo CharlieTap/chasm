@@ -3,11 +3,14 @@ package io.github.charlietap.chasm.executor.invoker.thread
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
+import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 internal typealias ThreadExecutor = (Configuration) -> Result<List<ExecutionValue>, InvocationError>
@@ -22,11 +25,15 @@ internal fun ThreadExecutor(
 
 internal fun ThreadExecutor(
     configuration: Configuration,
-    instructionExecutor: ExecutionInstructionExecutor,
+    instructionExecutor: Executor<ExecutionInstruction>,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
     val thread = configuration.thread
     val stack = Stack()
+    val context = ExecutionContext(
+        stack = stack,
+        store = configuration.store,
+    )
 
     stack.push(thread.frame)
     thread.frame.state.locals.forEach { local ->
@@ -39,7 +46,7 @@ internal fun ThreadExecutor(
 
     while (true) {
         val entry = stack.popInstructionOrNull() ?: break
-        instructionExecutor(entry.instruction, configuration.store, stack).bind()
+        instructionExecutor(context, entry.instruction).bind()
     }
 
     val results = List(thread.frame.arity.value) {

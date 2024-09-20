@@ -2,12 +2,13 @@ package io.github.charlietap.chasm.executor.invoker.thread
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutor
+import io.github.charlietap.chasm.executor.invoker.Executor
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Value
 import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.ext.popFrame
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.frame
@@ -72,20 +73,20 @@ class ThreadExecutorTest {
         val inputStacks = sequenceOf(stack1, stack2, stack3).iterator()
         val outputStacks = sequenceOf(stack2, stack3, stack3).iterator()
 
-        val instructionExecutor: ExecutionInstructionExecutor = { instruction, store, stack ->
+        val instructionExecutor: Executor<ExecutionInstruction> = { context, instruction ->
 
             val inputStack = inputStacks.next()
             val outputStack = outputStacks.next()
 
             assertEquals(instructions.next(), instruction)
-            assertEquals(configuration.store, store)
-            assertEquals(inputStack.values(), stack.values())
+            assertEquals(configuration.store, context.store)
+            assertEquals(inputStack.values(), context.stack.values())
 
-            stack.values().removeAll { true }
-            stack.fill(outputStack)
+            context.stack.values().removeAll { true }
+            context.stack.fill(outputStack)
 
             if (instruction is AdminInstruction.Frame) {
-                stack.popFrame()
+                context.stack.popFrame()
             }
 
             Ok(Unit)
