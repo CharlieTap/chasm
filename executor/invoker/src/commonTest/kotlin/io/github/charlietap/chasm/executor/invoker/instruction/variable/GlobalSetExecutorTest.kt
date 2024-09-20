@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.globalAddress
@@ -35,6 +36,7 @@ class GlobalSetExecutorTest {
             ),
         )
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val frame = frame(
             state = Stack.Entry.ActivationFrame.State(
@@ -51,9 +53,8 @@ class GlobalSetExecutorTest {
         val instruction = VariableInstruction.GlobalSet(globalIndex)
 
         val actual = GlobalSetExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
         )
 
         assertEquals(Ok(Unit), actual)

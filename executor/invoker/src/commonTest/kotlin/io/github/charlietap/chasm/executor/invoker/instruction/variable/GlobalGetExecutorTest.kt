@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.globalAddress
@@ -34,6 +35,7 @@ class GlobalGetExecutorTest {
             ),
         )
         val stack = stack()
+        val context = executionContext(stack, store)
 
         val frame = frame(
             state = Stack.Entry.ActivationFrame.State(
@@ -49,9 +51,8 @@ class GlobalGetExecutorTest {
         val expected = Stack.Entry.Value(executionValue)
 
         val actual = GlobalGetExecutor(
+            context = context,
             instruction = instruction,
-            store = store,
-            stack = stack,
         )
 
         assertEquals(Ok(Unit), actual)

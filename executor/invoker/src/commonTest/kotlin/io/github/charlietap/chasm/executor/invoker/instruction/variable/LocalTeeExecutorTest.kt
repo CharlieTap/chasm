@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
@@ -18,6 +19,7 @@ class LocalTeeExecutorTest {
     fun `can execute a local tee instruction`() {
 
         val stack = stack()
+        val context = executionContext(stack)
 
         val local = i32(0)
 
@@ -36,8 +38,8 @@ class LocalTeeExecutorTest {
         stack.push(value(expected))
 
         val actual = LocalTeeExecutor(
+            context = context,
             instruction = instruction,
-            stack = stack,
         )
 
         assertEquals(Ok(Unit), actual)

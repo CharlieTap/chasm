@@ -6,17 +6,17 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 
-internal typealias LocalGetExecutor = (Stack, VariableInstruction.LocalGet) -> Result<Unit, InvocationError>
-
 internal inline fun LocalGetExecutor(
-    stack: Stack,
+    context: ExecutionContext,
     instruction: VariableInstruction.LocalGet,
 ): Result<Unit, InvocationError> = binding {
+    val (stack) = context
     val frame = stack.peekFrame().bind()
 
     frame.state.locals.getOrNull(instruction.localIdx.index())?.let { local ->

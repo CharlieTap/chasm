@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.module.globalIndex
@@ -23,9 +24,9 @@ class VariableInstructionExecutorTest {
 
         val instruction = VariableInstruction.LocalGet(localIndex())
 
-        val localGetExecutor: LocalGetExecutor = { passedStack, passedInstruction ->
-            assertEquals(stack, passedStack)
-            assertEquals(instruction, passedInstruction)
+        val localGetExecutor: Executor<VariableInstruction.LocalGet> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -48,9 +49,9 @@ class VariableInstructionExecutorTest {
 
         val instruction = VariableInstruction.LocalSet(localIndex())
 
-        val localSetExecutor: LocalSetExecutor = { passedStack, passedInstruction ->
-            assertEquals(stack, passedStack)
-            assertEquals(instruction, passedInstruction)
+        val localSetExecutor: Executor<VariableInstruction.LocalSet> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -73,9 +74,9 @@ class VariableInstructionExecutorTest {
 
         val instruction = VariableInstruction.LocalTee(localIndex())
 
-        val localTeeExecutor: LocalTeeExecutor = { passedStack, passedInstruction ->
-            assertEquals(stack, passedStack)
-            assertEquals(instruction, passedInstruction)
+        val localTeeExecutor: Executor<VariableInstruction.LocalTee> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -98,10 +99,9 @@ class VariableInstructionExecutorTest {
 
         val instruction = VariableInstruction.GlobalGet(globalIndex())
 
-        val globalGetExecutor: GlobalGetExecutor = { passedStore, passedStack, passedInstruction ->
-            assertEquals(store, passedStore)
-            assertEquals(stack, passedStack)
-            assertEquals(instruction, passedInstruction)
+        val globalGetExecutor: Executor<VariableInstruction.GlobalGet> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -124,10 +124,9 @@ class VariableInstructionExecutorTest {
 
         val instruction = VariableInstruction.GlobalSet(globalIndex())
 
-        val globalSetExecutor: GlobalSetExecutor = { passedStore, passedStack, passedInstruction ->
-            assertEquals(store, passedStore)
-            assertEquals(stack, passedStack)
-            assertEquals(instruction, passedInstruction)
+        val globalSetExecutor: Executor<VariableInstruction.GlobalSet> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -142,34 +141,34 @@ class VariableInstructionExecutorTest {
     }
 
     companion object {
-        fun localGetExecutor(): LocalGetExecutor = { _, _ ->
+        fun localGetExecutor(): Executor<VariableInstruction.LocalGet> = { _, _ ->
             fail()
         }
 
-        fun localSetExecutor(): LocalSetExecutor = { _, _ ->
+        fun localSetExecutor(): Executor<VariableInstruction.LocalSet> = { _, _ ->
             fail()
         }
 
-        fun localTeeExecutor(): LocalTeeExecutor = { _, _ ->
+        fun localTeeExecutor(): Executor<VariableInstruction.LocalTee> = { _, _ ->
             fail()
         }
 
-        fun globalGetExecutor(): GlobalGetExecutor = { _, _, _ ->
+        fun globalGetExecutor(): Executor<VariableInstruction.GlobalGet> = { _, _ ->
             fail()
         }
 
-        fun globalSetExecutor(): GlobalSetExecutor = { _, _, _ ->
+        fun globalSetExecutor(): Executor<VariableInstruction.GlobalSet> = { _, _ ->
             fail()
         }
 
         fun variableInstructionExecutor(
             context: ExecutionContext,
             instruction: VariableInstruction,
-            localGetExecutor: LocalGetExecutor = localGetExecutor(),
-            localSetExecutor: LocalSetExecutor = localSetExecutor(),
-            localTeeExecutor: LocalTeeExecutor = localTeeExecutor(),
-            globalGetExecutor: GlobalGetExecutor = globalGetExecutor(),
-            globalSetExecutor: GlobalSetExecutor = globalSetExecutor(),
+            localGetExecutor: Executor<VariableInstruction.LocalGet> = localGetExecutor(),
+            localSetExecutor: Executor<VariableInstruction.LocalSet> = localSetExecutor(),
+            localTeeExecutor: Executor<VariableInstruction.LocalTee> = localTeeExecutor(),
+            globalGetExecutor: Executor<VariableInstruction.GlobalGet> = globalGetExecutor(),
+            globalSetExecutor: Executor<VariableInstruction.GlobalSet> = globalSetExecutor(),
         ) = VariableInstructionExecutor(
             context = context,
             instruction = instruction,
