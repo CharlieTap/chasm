@@ -5,6 +5,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.asRange
@@ -13,16 +14,14 @@ import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
-internal typealias TableGrowExecutor = (Store, Stack, TableInstruction.TableGrow) -> Result<Unit, InvocationError>
-
 internal inline fun TableGrowExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: TableInstruction.TableGrow,
 ): Result<Unit, InvocationError> = binding {
+
+    val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
     val tableAddress = frame.state.module.tableAddress(instruction.tableIdx).bind()
