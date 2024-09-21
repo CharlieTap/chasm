@@ -6,9 +6,9 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.init.MemoryInstanceInitialiser
 import io.github.charlietap.chasm.executor.memory.init.MemoryInstanceInitialiserImpl
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
@@ -16,28 +16,23 @@ import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias MemoryInitExecutor = (Store, Stack, MemoryInstruction.MemoryInit) -> Result<Unit, InvocationError>
 
 internal inline fun MemoryInitExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: MemoryInstruction.MemoryInit,
 ): Result<Unit, InvocationError> =
     MemoryInitExecutor(
-        store = store,
-        stack = stack,
+        context = context,
         instruction = instruction,
         memoryInstanceInitialiser = ::MemoryInstanceInitialiserImpl,
     )
 
 internal fun MemoryInitExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: MemoryInstruction.MemoryInit,
     memoryInstanceInitialiser: MemoryInstanceInitialiser,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     val frame = stack.peekFrame().bind()
     val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
     val memory = store.memory(memoryAddress).bind()

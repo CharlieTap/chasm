@@ -6,37 +6,32 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.copy.MemoryInstanceCopier
 import io.github.charlietap.chasm.executor.memory.copy.MemoryInstanceCopierImpl
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias MemoryCopyExecutor = (Store, Stack, MemoryInstruction.MemoryCopy) -> Result<Unit, InvocationError>
 
 internal inline fun MemoryCopyExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: MemoryInstruction.MemoryCopy,
 ): Result<Unit, InvocationError> =
     MemoryCopyExecutor(
-        store = store,
-        stack = stack,
+        context = context,
         instruction = instruction,
         memoryInstanceCopier = ::MemoryInstanceCopierImpl,
     )
 
 internal fun MemoryCopyExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: MemoryInstruction.MemoryCopy,
     memoryInstanceCopier: MemoryInstanceCopier,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
     val frame = stack.peekFrame().bind()
     val srcMemoryAddress = frame.state.module.memoryAddress(instruction.srcIndex).bind()
     val srcMemory = store.memory(srcMemoryAddress).bind()

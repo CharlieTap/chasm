@@ -5,21 +5,19 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
-internal typealias MemorySizeExecutor = (Store, Stack, MemoryInstruction.MemorySize) -> Result<Unit, InvocationError>
-
 internal inline fun MemorySizeExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: MemoryInstruction.MemorySize,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     val frame = stack.peekFrame().bind()
     val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
     val memory = store.memory(memoryAddress).bind()
