@@ -8,9 +8,9 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.element
@@ -20,19 +20,14 @@ import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
-internal typealias CallIndirectExecutor = (Store, Stack, ControlInstruction.CallIndirect) -> Result<Unit, InvocationError>
-
 internal inline fun CallIndirectExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: ControlInstruction.CallIndirect,
 ): Result<Unit, InvocationError> =
     CallIndirectExecutor(
-        store = store,
-        stack = stack,
+        context = context,
         tableIndex = instruction.tableIndex,
         typeIndex = instruction.typeIndex,
         tailRecursion = false,
@@ -41,8 +36,7 @@ internal inline fun CallIndirectExecutor(
     )
 
 internal inline fun CallIndirectExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     tableIndex: Index.TableIndex,
     typeIndex: Index.TypeIndex,
     tailRecursion: Boolean,
@@ -50,6 +44,7 @@ internal inline fun CallIndirectExecutor(
     crossinline wasmFunctionCall: WasmFunctionCall,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
     val frame = stack.peekFrame().bind()
 
     val tableAddress = frame.state.module.tableAddress(tableIndex).bind()

@@ -5,6 +5,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -12,30 +13,25 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias TryTableExecutor = (Store, Stack, ControlInstruction.TryTable) -> Result<Unit, InvocationError>
 
 internal inline fun TryTableExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: ControlInstruction.TryTable,
 ): Result<Unit, InvocationError> = TryTableExecutor(
-    store = store,
-    stack = stack,
+    context = context,
     instruction = instruction,
     expander = ::BlockTypeExpander,
     blockExecutor = ::InstructionBlockExecutor,
 )
 
 internal inline fun TryTableExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: ControlInstruction.TryTable,
     crossinline expander: BlockTypeExpander,
     crossinline blockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack) = context
     val frame = stack.peekFrame().bind()
     val functionType = expander(frame.state.module, instruction.blockType).bind()
 

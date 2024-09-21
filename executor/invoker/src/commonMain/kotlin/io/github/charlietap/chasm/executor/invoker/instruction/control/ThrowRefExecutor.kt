@@ -6,6 +6,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.exception
@@ -19,17 +20,14 @@ import io.github.charlietap.chasm.executor.runtime.ext.tagAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
-internal typealias ThrowRefExecutor = (Store, Stack, ControlInstruction.ThrowRef) -> Result<Unit, InvocationError>
-
 internal inline fun ThrowRefExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: ControlInstruction.ThrowRef,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
     val ref = stack.popReference().bind()
 
     val exceptionRef = if (ref is ReferenceValue.Null) {

@@ -4,37 +4,34 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.ext.popFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias CallRefExecutor = (Store, Stack) -> Result<Unit, InvocationError>
 
 internal inline fun CallRefExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
+    instruction: ControlInstruction.CallRef,
 ): Result<Unit, InvocationError> =
     CallRefExecutor(
-        store = store,
-        stack = stack,
+        context = context,
         tailRecursion = false,
         hostFunctionCall = ::HostFunctionCall,
         wasmFunctionCall = ::WasmFunctionCall,
     )
 
 internal inline fun CallRefExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     tailRecursion: Boolean,
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
     val value = stack.popFunctionAddress().bind()
 
     when (val instance = store.function(value.address).bind()) {

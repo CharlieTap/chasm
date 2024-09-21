@@ -5,31 +5,26 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias IfExecutor = (Store, Stack, ControlInstruction.If) -> Result<Unit, InvocationError>
 
 internal inline fun IfExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: ControlInstruction.If,
 ): Result<Unit, InvocationError> =
     IfExecutor(
-        store = store,
-        stack = stack,
+        context = context,
         instruction = instruction,
         blockExecutor = ::BlockExecutor,
     )
 
 internal inline fun IfExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instruction: ControlInstruction.If,
     crossinline blockExecutor: BlockExecutor,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     val firstBlock = stack.popI32().bind() != 0
 
     if (firstBlock) {

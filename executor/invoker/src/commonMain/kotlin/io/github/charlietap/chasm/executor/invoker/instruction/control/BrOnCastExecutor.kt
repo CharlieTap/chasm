@@ -9,14 +9,13 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.peekReference
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
@@ -26,19 +25,17 @@ import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubs
 import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
-internal typealias BrOnCastExecutor = (Store, Stack, Index.LabelIndex, ReferenceType, ReferenceType, Boolean) -> Result<Unit, InvocationError>
+internal typealias BrOnCastExecutor = (ExecutionContext, Index.LabelIndex, ReferenceType, ReferenceType, Boolean) -> Result<Unit, InvocationError>
 
 internal inline fun BrOnCastExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     labelIndex: Index.LabelIndex,
     referenceType1: ReferenceType,
     referenceType2: ReferenceType,
     breakIfMatches: Boolean,
 ): Result<Unit, InvocationError> =
     BrOnCastExecutor(
-        store = store,
-        stack = stack,
+        context = context,
         labelIndex = labelIndex,
         referenceType1 = referenceType1,
         referenceType2 = referenceType2,
@@ -51,8 +48,7 @@ internal inline fun BrOnCastExecutor(
 
 @Suppress("UNUSED_PARAMETER")
 internal inline fun BrOnCastExecutor(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     labelIndex: Index.LabelIndex,
     referenceType1: ReferenceType,
     referenceType2: ReferenceType,
@@ -63,6 +59,7 @@ internal inline fun BrOnCastExecutor(
     crossinline breakExecutor: BreakExecutor,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
     val frame = stack.peekFrame().bind()
     val moduleInstance = frame.state.module
 

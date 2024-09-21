@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -29,16 +30,13 @@ class CallIndirectExecutorTest {
     @Test
     fun `can execute a call indirect through a table to a wasm function and return a result`() {
 
-        val stack = stack()
-
+        val functionAddress = functionAddress()
         val typeIndex = typeIndex(0u)
         val functionType = functionType()
         val definedType = functionType.definedType()
         val functionInstance = wasmFunctionInstance(
             type = definedType,
         )
-
-        val functionAddress = functionAddress()
 
         val tableIndex = tableIndex(0u)
         val tableAddress = tableAddress()
@@ -47,12 +45,15 @@ class CallIndirectExecutorTest {
         )
         val elementIndex = 0
 
-        stack.push(Stack.Entry.Value(i32(elementIndex)))
-
+        val stack = stack()
         val store = store(
             functions = mutableListOf(functionInstance),
             tables = mutableListOf(tableInstance),
         )
+        val context = executionContext(stack, store)
+
+        stack.push(Stack.Entry.Value(i32(elementIndex)))
+
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress),
             tableAddresses = mutableListOf(tableAddress),
@@ -80,15 +81,13 @@ class CallIndirectExecutorTest {
             fail("Host function should not be called in this scenario")
         }
 
-        val actual = CallIndirectExecutor(store, stack, tableIndex, typeIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
+        val actual = CallIndirectExecutor(context, tableIndex, typeIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
 
         assertEquals(Ok(Unit), actual)
     }
 
     @Test
     fun `can execute a call to a host function and return a result`() {
-
-        val stack = stack()
 
         val typeIndex = typeIndex(0u)
         val functionType = functionType()
@@ -105,12 +104,15 @@ class CallIndirectExecutorTest {
         )
         val elementIndex = 0
 
-        stack.push(Stack.Entry.Value(i32(elementIndex)))
-
+        val stack = stack()
         val store = store(
             functions = mutableListOf(functionInstance),
             tables = mutableListOf(tableInstance),
         )
+        val context = executionContext(stack, store)
+
+        stack.push(Stack.Entry.Value(i32(elementIndex)))
+
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress),
             tableAddresses = mutableListOf(tableAddress),
@@ -137,7 +139,7 @@ class CallIndirectExecutorTest {
             Ok(Unit)
         }
 
-        val actual = CallIndirectExecutor(store, stack, tableIndex, typeIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
+        val actual = CallIndirectExecutor(context, tableIndex, typeIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
 
         assertEquals(Ok(Unit), actual)
     }

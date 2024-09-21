@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.Executor
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.module.labelIndex
@@ -43,9 +44,8 @@ class ControlInstructionExecutorTest {
         val functionIndex = Index.FunctionIndex(0u)
         val instruction = ControlInstruction.Call(functionIndex)
 
-        val callExecutor: CallExecutor = { _store, _stack, _instruction ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val callExecutor: Executor<ControlInstruction.Call> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -70,9 +70,8 @@ class ControlInstructionExecutorTest {
         val tableIndex = Index.TableIndex(0u)
         val instruction = ControlInstruction.CallIndirect(typeIndex, tableIndex)
 
-        val callIndirectExecutor: CallIndirectExecutor = { _store, _stack, _instruction ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val callIndirectExecutor: Executor<ControlInstruction.CallIndirect> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -96,9 +95,8 @@ class ControlInstructionExecutorTest {
         val functionIndex = Index.FunctionIndex(0u)
         val instruction = ControlInstruction.ReturnCall(functionIndex)
 
-        val returnCallExecutor: ReturnCallExecutor = { _store, _stack, _instruction ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val returnCallExecutor: Executor<ControlInstruction.ReturnCall> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -123,9 +121,8 @@ class ControlInstructionExecutorTest {
         val tableIndex = Index.TableIndex(0u)
         val instruction = ControlInstruction.ReturnCallIndirect(typeIndex, tableIndex)
 
-        val returnCallIndirectExecutor: ReturnCallIndirectExecutor = { _store, _stack, _instruction ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val returnCallIndirectExecutor: Executor<ControlInstruction.ReturnCallIndirect> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -149,9 +146,9 @@ class ControlInstructionExecutorTest {
         val typeIndex = typeIndex()
         val instruction = ControlInstruction.CallRef(typeIndex)
 
-        val callRefExecutor: CallRefExecutor = { _store, _stack ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val callRefExecutor: Executor<ControlInstruction.CallRef> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -174,9 +171,9 @@ class ControlInstructionExecutorTest {
         val typeIndex = typeIndex()
         val instruction = ControlInstruction.ReturnCallRef(typeIndex)
 
-        val returnCallRefExecutor: ReturnCallRefExecutor = { _store, _stack ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val returnCallRefExecutor: Executor<ControlInstruction.ReturnCallRef> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -226,11 +223,9 @@ class ControlInstructionExecutorTest {
         val blockType = ControlInstruction.BlockType.Empty
         val instruction = ControlInstruction.Loop(blockType, emptyList())
 
-        val loopExecutor: LoopExecutor = { _store, _stack, _blockType, _instruction ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(blockType, _blockType)
-            assertEquals(emptyList(), _instruction)
+        val loopExecutor: Executor<ControlInstruction.Loop> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -253,9 +248,8 @@ class ControlInstructionExecutorTest {
         val blockType = ControlInstruction.BlockType.Empty
         val instruction = ControlInstruction.If(blockType, emptyList(), null)
 
-        val ifExecutor: IfExecutor = { _store, _stack, _instruction ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val ifExecutor: Executor<ControlInstruction.If> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -304,8 +298,8 @@ class ControlInstructionExecutorTest {
         val labelIndex = Index.LabelIndex(0u)
         val instruction = ControlInstruction.BrIf(labelIndex)
 
-        val brIfExecutor: BrIfExecutor = { _stack, _instruction ->
-            assertEquals(stack, _stack)
+        val brIfExecutor: Executor<ControlInstruction.BrIf> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -329,8 +323,8 @@ class ControlInstructionExecutorTest {
         val defaultLabelIndex = Index.LabelIndex(0u)
         val instruction = ControlInstruction.BrTable(emptyList(), defaultLabelIndex)
 
-        val brTableExecutor: BrTableExecutor = { _stack, _instruction ->
-            assertEquals(stack, _stack)
+        val brTableExecutor: Executor<ControlInstruction.BrTable> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -354,8 +348,8 @@ class ControlInstructionExecutorTest {
         val labelIndex = labelIndex()
         val instruction = ControlInstruction.BrOnNull(labelIndex)
 
-        val brOnNullExecutor: BrOnNullExecutor = { _stack, _instruction ->
-            assertEquals(stack, _stack)
+        val brOnNullExecutor: Executor<ControlInstruction.BrOnNull> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -379,8 +373,8 @@ class ControlInstructionExecutorTest {
         val labelIndex = labelIndex()
         val instruction = ControlInstruction.BrOnNonNull(labelIndex)
 
-        val brOnNonNullExecutor: BrOnNonNullExecutor = { _stack, _instruction ->
-            assertEquals(stack, _stack)
+        val brOnNonNullExecutor: Executor<ControlInstruction.BrOnNonNull> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
             Ok(Unit)
         }
@@ -407,9 +401,8 @@ class ControlInstructionExecutorTest {
         val instruction = ControlInstruction.BrOnCast(labelIndex, srcReferenceType, dstReferenceType)
         val breakIfMatches = true
 
-        val brOnCastExecutor: BrOnCastExecutor = { _store, _stack, _labelIndex, _srcReferenceType, _dstReferenceType, _breakIfMatches ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val brOnCastExecutor: BrOnCastExecutor = { _context, _labelIndex, _srcReferenceType, _dstReferenceType, _breakIfMatches ->
+            assertEquals(context, _context)
             assertEquals(labelIndex, _labelIndex)
             assertEquals(srcReferenceType, _srcReferenceType)
             assertEquals(dstReferenceType, _dstReferenceType)
@@ -440,9 +433,8 @@ class ControlInstructionExecutorTest {
         val instruction = ControlInstruction.BrOnCastFail(labelIndex, srcReferenceType, dstReferenceType)
         val breakIfMatches = false
 
-        val brOnCastExecutor: BrOnCastExecutor = { _store, _stack, _labelIndex, _srcReferenceType, _dstReferenceType, _breakIfMatches ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val brOnCastExecutor: BrOnCastExecutor = { _context, _labelIndex, _srcReferenceType, _dstReferenceType, _breakIfMatches ->
+            assertEquals(context, _context)
             assertEquals(labelIndex, _labelIndex)
             assertEquals(srcReferenceType, _srcReferenceType)
             assertEquals(dstReferenceType, _dstReferenceType)
@@ -469,8 +461,9 @@ class ControlInstructionExecutorTest {
 
         val instruction = ControlInstruction.Return
 
-        val returnExecutor: ReturnExecutor = { _stack ->
-            assertEquals(stack, _stack)
+        val returnExecutor: Executor<ControlInstruction.Return> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -484,27 +477,27 @@ class ControlInstructionExecutorTest {
     }
 
     companion object {
-        fun callExecutor(): CallExecutor = { _, _, _ ->
+        fun callExecutor(): Executor<ControlInstruction.Call> = { _, _ ->
             fail()
         }
 
-        fun callIndirectExecutor(): CallIndirectExecutor = { _, _, _ ->
+        fun callIndirectExecutor(): Executor<ControlInstruction.CallIndirect> = { _, _ ->
             fail()
         }
 
-        fun returnCallExecutor(): ReturnCallExecutor = { _, _, _ ->
+        fun returnCallExecutor(): Executor<ControlInstruction.ReturnCall> = { _, _ ->
             fail()
         }
 
-        fun returnCallIndirectExecutor(): ReturnCallIndirectExecutor = { _, _, _ ->
+        fun returnCallIndirectExecutor(): Executor<ControlInstruction.ReturnCallIndirect> = { _, _ ->
             fail()
         }
 
-        fun callRefExecutor(): CallRefExecutor = { _, _ ->
+        fun callRefExecutor(): Executor<ControlInstruction.CallRef> = { _, _ ->
             fail()
         }
 
-        fun returnCallRefExecutor(): ReturnCallRefExecutor = { _, _ ->
+        fun returnCallRefExecutor(): Executor<ControlInstruction.ReturnCallRef> = { _, _ ->
             fail()
         }
 
@@ -512,11 +505,11 @@ class ControlInstructionExecutorTest {
             fail()
         }
 
-        fun loopExecutor(): LoopExecutor = { _, _, _, _ ->
+        fun loopExecutor(): Executor<ControlInstruction.Loop> = { _, _ ->
             fail()
         }
 
-        fun ifExecutor(): IfExecutor = { _, _, _ ->
+        fun ifExecutor(): Executor<ControlInstruction.If> = { _, _ ->
             fail()
         }
 
@@ -524,64 +517,64 @@ class ControlInstructionExecutorTest {
             fail()
         }
 
-        fun brIfExecutor(): BrIfExecutor = { _, _ ->
+        fun brIfExecutor(): Executor<ControlInstruction.BrIf> = { _, _ ->
             fail()
         }
 
-        fun brTableExecutor(): BrTableExecutor = { _, _ ->
+        fun brTableExecutor(): Executor<ControlInstruction.BrTable> = { _, _ ->
             fail()
         }
 
-        fun brOnNullExecutor(): BrOnNullExecutor = { _, _ ->
+        fun brOnNullExecutor(): Executor<ControlInstruction.BrOnNull> = { _, _ ->
             fail()
         }
 
-        fun brOnNonNullExecutor(): BrOnNonNullExecutor = { _, _ ->
+        fun brOnNonNullExecutor(): Executor<ControlInstruction.BrOnNonNull> = { _, _ ->
             fail()
         }
 
-        fun brOnCastExecutor(): BrOnCastExecutor = { _, _, _, _, _, _ ->
+        fun brOnCastExecutor(): BrOnCastExecutor = { _, _, _, _, _ ->
             fail()
         }
 
-        fun returnExecutor(): ReturnExecutor = { _ ->
+        fun returnExecutor(): Executor<ControlInstruction.Return> = { _, _ ->
             fail()
         }
 
-        fun throwExecutor(): ThrowExecutor = { _, _, _ ->
+        fun throwExecutor(): Executor<ControlInstruction.Throw> = { _, _ ->
             fail()
         }
 
-        fun throwRefExecutor(): ThrowRefExecutor = { _, _, _ ->
+        fun throwRefExecutor(): Executor<ControlInstruction.ThrowRef> = { _, _ ->
             fail()
         }
 
-        fun tryTableExecutor(): TryTableExecutor = { _, _, _ ->
+        fun tryTableExecutor(): Executor<ControlInstruction.TryTable> = { _, _ ->
             fail()
         }
 
         fun controlInstructionExecutor(
             context: ExecutionContext,
             instruction: ControlInstruction,
-            callExecutor: CallExecutor = callExecutor(),
-            callIndirectExecutor: CallIndirectExecutor = callIndirectExecutor(),
-            returnCallExecutor: ReturnCallExecutor = returnCallExecutor(),
-            returnCallIndirectExecutor: ReturnCallIndirectExecutor = returnCallIndirectExecutor(),
-            callRefExecutor: CallRefExecutor = callRefExecutor(),
-            returnCallRefExecutor: ReturnCallRefExecutor = returnCallRefExecutor(),
+            callExecutor: Executor<ControlInstruction.Call> = callExecutor(),
+            callIndirectExecutor: Executor<ControlInstruction.CallIndirect> = callIndirectExecutor(),
+            returnCallExecutor: Executor<ControlInstruction.ReturnCall> = returnCallExecutor(),
+            returnCallIndirectExecutor: Executor<ControlInstruction.ReturnCallIndirect> = returnCallIndirectExecutor(),
+            callRefExecutor: Executor<ControlInstruction.CallRef> = callRefExecutor(),
+            returnCallRefExecutor: Executor<ControlInstruction.ReturnCallRef> = returnCallRefExecutor(),
             blockExecutor: BlockExecutor = blockExecutor(),
-            loopExecutor: LoopExecutor = loopExecutor(),
-            ifExecutor: IfExecutor = ifExecutor(),
+            loopExecutor: Executor<ControlInstruction.Loop> = loopExecutor(),
+            ifExecutor: Executor<ControlInstruction.If> = ifExecutor(),
             breakExecutor: BreakExecutor = breakExecutor(),
-            brIfExecutor: BrIfExecutor = brIfExecutor(),
-            brTableExecutor: BrTableExecutor = brTableExecutor(),
-            brOnNullExecutor: BrOnNullExecutor = brOnNullExecutor(),
-            brOnNonNullExecutor: BrOnNonNullExecutor = brOnNonNullExecutor(),
+            brIfExecutor: Executor<ControlInstruction.BrIf> = brIfExecutor(),
+            brTableExecutor: Executor<ControlInstruction.BrTable> = brTableExecutor(),
+            brOnNullExecutor: Executor<ControlInstruction.BrOnNull> = brOnNullExecutor(),
+            brOnNonNullExecutor: Executor<ControlInstruction.BrOnNonNull> = brOnNonNullExecutor(),
             brOnCastExecutor: BrOnCastExecutor = brOnCastExecutor(),
-            returnExecutor: ReturnExecutor = returnExecutor(),
-            throwExecutor: ThrowExecutor = throwExecutor(),
-            throwRefExecutor: ThrowRefExecutor = throwRefExecutor(),
-            tryTableExecutor: TryTableExecutor = tryTableExecutor(),
+            returnExecutor: Executor<ControlInstruction.Return> = returnExecutor(),
+            throwExecutor: Executor<ControlInstruction.Throw> = throwExecutor(),
+            throwRefExecutor: Executor<ControlInstruction.ThrowRef> = throwRefExecutor(),
+            tryTableExecutor: Executor<ControlInstruction.TryTable> = tryTableExecutor(),
         ) = ControlInstructionExecutor(
             context = context,
             instruction = instruction,

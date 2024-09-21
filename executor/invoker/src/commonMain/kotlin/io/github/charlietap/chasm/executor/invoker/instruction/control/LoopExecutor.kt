@@ -5,7 +5,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -13,35 +13,27 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias LoopExecutor = (Store, Stack, ControlInstruction.BlockType, List<Instruction>) -> Result<Unit, InvocationError>
 
 internal inline fun LoopExecutor(
-    store: Store,
-    stack: Stack,
-    blockType: ControlInstruction.BlockType,
-    instructions: List<Instruction>,
+    context: ExecutionContext,
+    instruction: ControlInstruction.Loop,
 ): Result<Unit, InvocationError> =
     LoopExecutor(
-        store = store,
-        stack = stack,
-        blockType = blockType,
-        instructions = instructions,
+        context = context,
+        instruction = instruction,
         expander = ::BlockTypeExpander,
         instructionBlockExecutor = ::InstructionBlockExecutor,
     )
 
-@Suppress("UNUSED_PARAMETER")
 internal inline fun LoopExecutor(
-    store: Store,
-    stack: Stack,
-    blockType: ControlInstruction.BlockType,
-    instructions: List<Instruction>,
+    context: ExecutionContext,
+    instruction: ControlInstruction.Loop,
     crossinline expander: BlockTypeExpander,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack) = context
+    val (blockType, instructions) = instruction
     val frame = stack.peekFrame().bind()
     val functionType = expander(frame.state.module, blockType).bind()
     val paramArity = functionType?.let {

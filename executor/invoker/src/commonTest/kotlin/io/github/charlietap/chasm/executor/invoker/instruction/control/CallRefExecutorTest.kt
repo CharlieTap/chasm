@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -25,9 +26,9 @@ class CallRefExecutorTest {
         val store = store(
             functions = mutableListOf(functionInstance),
         )
+        val context = executionContext(stack, store)
 
         val tailRecursion = false
-
         val wasmFunctionCall: WasmFunctionCall = { _store, _stack, _function, _tailRecursion ->
             assertEquals(store, _store)
             assertEquals(stack, _stack)
@@ -43,19 +44,22 @@ class CallRefExecutorTest {
 
         stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
 
-        val actual = CallRefExecutor(store, stack, tailRecursion, hostFunctionCall, wasmFunctionCall)
+        val actual = CallRefExecutor(context, tailRecursion, hostFunctionCall, wasmFunctionCall)
 
         assertEquals(Ok(Unit), actual)
     }
 
     @Test
     fun `can execute a call to a host function and return a result`() {
+
         val stack = stack()
         val functionInstance = hostFunctionInstance()
-        val functionAddress = functionAddress()
         val store = store(
             functions = mutableListOf(functionInstance),
         )
+        val context = executionContext(stack, store)
+
+        val functionAddress = functionAddress()
         val tailRecursion = false
 
         val wasmFunctionCall: WasmFunctionCall = { _, _, _, _ ->
@@ -72,7 +76,7 @@ class CallRefExecutorTest {
 
         stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
 
-        val actual = CallRefExecutor(store, stack, tailRecursion, hostFunctionCall, wasmFunctionCall)
+        val actual = CallRefExecutor(context, tailRecursion, hostFunctionCall, wasmFunctionCall)
 
         assertEquals(Ok(Unit), actual)
     }

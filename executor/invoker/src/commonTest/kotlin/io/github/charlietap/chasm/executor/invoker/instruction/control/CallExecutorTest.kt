@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.fixture.frame
@@ -23,11 +24,14 @@ class CallExecutorTest {
 
         val stack = stack()
         val functionInstance = wasmFunctionInstance()
-        val functionIndex = functionIndex(0u)
-        val functionAddress = functionAddress()
         val store = store(
             functions = mutableListOf(functionInstance),
         )
+        val context = executionContext(stack, store)
+
+        val functionIndex = functionIndex(0u)
+        val functionAddress = functionAddress()
+
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress),
         )
@@ -51,7 +55,7 @@ class CallExecutorTest {
 
         stack.push(frame)
 
-        val actual = CallExecutor(store, stack, functionIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
+        val actual = CallExecutor(context, functionIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
 
         assertEquals(Ok(Unit), actual)
     }
@@ -60,11 +64,14 @@ class CallExecutorTest {
     fun `can execute a call to a host function and return a result`() {
         val stack = stack()
         val functionInstance = hostFunctionInstance()
-        val functionIndex = functionIndex(0u)
-        val functionAddress = functionAddress()
         val store = store(
             functions = mutableListOf(functionInstance),
         )
+        val context = executionContext(stack, store)
+
+        val functionIndex = functionIndex(0u)
+        val functionAddress = functionAddress()
+
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress),
         )
@@ -87,7 +94,7 @@ class CallExecutorTest {
 
         stack.push(frame)
 
-        val actual = CallExecutor(store, stack, functionIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
+        val actual = CallExecutor(context, functionIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
 
         assertEquals(Ok(Unit), actual)
     }

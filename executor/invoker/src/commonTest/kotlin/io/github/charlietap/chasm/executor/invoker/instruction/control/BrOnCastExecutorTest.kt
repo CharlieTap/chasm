@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.frame
@@ -23,6 +24,7 @@ class BrOnCastExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val labelIndex = labelIndex()
         val srcReferenceType = referenceType()
         val dstReferenceType = referenceType()
@@ -68,8 +70,7 @@ class BrOnCastExecutorTest {
 
         val actual =
             BrOnCastExecutor(
-                store,
-                stack,
+                context,
                 labelIndex,
                 srcReferenceType,
                 dstReferenceType,
@@ -91,6 +92,7 @@ class BrOnCastExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val labelIndex = labelIndex()
         val srcReferenceType = referenceType()
         val dstReferenceType = referenceType()
@@ -135,8 +137,7 @@ class BrOnCastExecutorTest {
 
         val actual =
             BrOnCastExecutor(
-                store,
-                stack,
+                context,
                 labelIndex,
                 srcReferenceType,
                 dstReferenceType,
@@ -158,6 +159,7 @@ class BrOnCastExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val labelIndex = labelIndex()
         val srcReferenceType = referenceType()
         val dstReferenceType = referenceType()
@@ -202,8 +204,7 @@ class BrOnCastExecutorTest {
 
         val actual =
             BrOnCastExecutor(
-                store,
-                stack,
+                context,
                 labelIndex,
                 srcReferenceType,
                 dstReferenceType,
@@ -225,6 +226,7 @@ class BrOnCastExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val labelIndex = labelIndex()
         val srcReferenceType = referenceType()
         val dstReferenceType = referenceType()
@@ -269,8 +271,7 @@ class BrOnCastExecutorTest {
 
         val actual =
             BrOnCastExecutor(
-                store,
-                stack,
+                context,
                 labelIndex,
                 srcReferenceType,
                 dstReferenceType,
