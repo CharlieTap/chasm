@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -59,6 +61,7 @@ class ArrayFillExecutorTest {
         val store = store(
             arrays = mutableListOf(weakReference(arrayInstance)),
         )
+        val context = executionContext(stack, store)
         val frame = frame(
             state = frameState(
                 moduleInstance = moduleInstance(
@@ -80,7 +83,7 @@ class ArrayFillExecutorTest {
             fields = mutableListOf(fieldValue, fieldValue, expectedFieldValue, expectedFieldValue),
         )
 
-        val actual = ArrayFillExecutor(store, stack, typeIndex)
+        val actual = ArrayFillExecutor(context, AggregateInstruction.ArrayFill(typeIndex))
 
         assertEquals(Ok(Unit), actual)
         assertEquals(store.arrays[0].value, expectedInstance)

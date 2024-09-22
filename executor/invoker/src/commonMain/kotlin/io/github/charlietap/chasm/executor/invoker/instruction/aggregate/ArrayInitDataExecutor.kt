@@ -5,9 +5,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.ext.valueFromBytes
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -19,36 +20,29 @@ import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
-internal typealias ArrayInitDataExecutor = (Store, Stack, Index.TypeIndex, Index.DataIndex) -> Result<Unit, InvocationError>
-
 internal fun ArrayInitDataExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
-    dataIndex: Index.DataIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayInitData,
 ): Result<Unit, InvocationError> =
     ArrayInitDataExecutor(
-        store = store,
-        stack = stack,
-        typeIndex = typeIndex,
-        dataIndex = dataIndex,
+        context = context,
+        instruction = instruction,
         definedTypeExpander = ::DefinedTypeExpander,
         arraySetExecutor = ::ArraySetExecutor,
     )
 
 internal fun ArrayInitDataExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
-    dataIndex: Index.DataIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayInitData,
     definedTypeExpander: DefinedTypeExpander,
-    arraySetExecutor: ArraySetExecutor,
+    arraySetExecutor: Executor<AggregateInstruction.ArraySet>,
 ): Result<Unit, InvocationError> = binding {
 
+    val(stack, store) = context
+    val (typeIndex, dataIndex) = instruction
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(typeIndex).bind()
 
@@ -83,7 +77,7 @@ internal fun ArrayInitDataExecutor(
     stack.pushValue(NumberValue.I32(destinationOffsetInArray))
     stack.pushValue(element)
 
-    arraySetExecutor(store, stack, typeIndex).bind()
+    arraySetExecutor(context, AggregateInstruction.ArraySet(typeIndex)).bind()
 
     stack.pushValue(arrayReference)
 
@@ -91,5 +85,5 @@ internal fun ArrayInitDataExecutor(
     stack.pushValue(NumberValue.I32(sourceOffsetInByteArray + arrayElementSizeInBytes))
     stack.pushValue(NumberValue.I32(elementsToCopy - 1))
 
-    ArrayInitDataExecutor(store, stack, typeIndex, dataIndex, definedTypeExpander, arraySetExecutor).bind()
+    ArrayInitDataExecutor(context, instruction, definedTypeExpander, arraySetExecutor).bind()
 }

@@ -5,40 +5,34 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
-import io.github.charlietap.chasm.executor.runtime.store.Store
-
-internal typealias ArrayNewElementExecutor = (Store, Stack, Index.TypeIndex, Index.ElementIndex) -> Result<Unit, InvocationError>
 
 internal fun ArrayNewElementExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
-    elementIndex: Index.ElementIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayNewElement,
 ): Result<Unit, InvocationError> =
     ArrayNewElementExecutor(
-        store = store,
-        stack = stack,
-        typeIndex = typeIndex,
-        elementIndex = elementIndex,
+        context = context,
+        instruction = instruction,
         arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
     )
 
 internal inline fun ArrayNewElementExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
-    elementIndex: Index.ElementIndex,
-    crossinline arrayNewFixedExecutor: ArrayNewFixedExecutor,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayNewElement,
+    crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
+    val (typeIndex, elementIndex) = instruction
     val frame = stack.peekFrame().bind()
 
     val elementAddress = frame.state.module.elementAddress(elementIndex).bind()
@@ -58,5 +52,5 @@ internal inline fun ArrayNewElementExecutor(
             stack.pushValue(referenceValue)
         }
 
-    arrayNewFixedExecutor(store, stack, typeIndex, arrayLength.toUInt())
+    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt())).bind()
 }

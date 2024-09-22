@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -71,6 +73,7 @@ class ArrayCopyExecutorTest {
                 weakReference(dstArrayInstance),
             ),
         )
+        val context = executionContext(stack, store)
         val frame = frame(
             state = frameState(
                 moduleInstance = moduleInstance(
@@ -95,7 +98,7 @@ class ArrayCopyExecutorTest {
             fields = MutableList(4) { fillFieldValue },
         )
 
-        val actual = ArrayCopyExecutor(store, stack, srcTypeIndex, dstTypeIndex)
+        val actual = ArrayCopyExecutor(context, AggregateInstruction.ArrayCopy(srcTypeIndex, dstTypeIndex))
 
         assertEquals(Ok(Unit), actual)
         assertEquals(store.arrays[1].value, expectedInstance)

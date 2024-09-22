@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.ext.index
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.frame
@@ -52,6 +53,7 @@ class ArrayGetExecutorTest {
         val store = store(
             arrays = mutableListOf(weakReference(arrayInstance)),
         )
+        val context = executionContext(stack, store)
         val executionValue = executionValue()
 
         val frame = frame(
@@ -85,7 +87,7 @@ class ArrayGetExecutorTest {
 
         val expected = value(executionValue)
 
-        val actual = ArrayGetExecutor(store, stack, typeIndex, signedUnpack, definedTypeExpander, fieldUnpacker)
+        val actual = ArrayGetExecutor(context, typeIndex, signedUnpack, definedTypeExpander, fieldUnpacker)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())

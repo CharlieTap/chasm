@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.memory.ext.copyInto
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
@@ -62,6 +65,7 @@ class ArrayNewDataExecutorTest {
                 dataInstance,
             ),
         )
+        val context = executionContext(stack, store)
 
         val frame = frame(
             state = frameState(
@@ -83,16 +87,19 @@ class ArrayNewDataExecutorTest {
             arrayType
         }
 
-        val arrayNewFixedExecutor: ArrayNewFixedExecutor = { _store, _stack, _typeIndex, _size ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-            assertEquals(size, _size)
-
+        val arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(AggregateInstruction.ArrayNewFixed(typeIndex, size), _instruction)
             Ok(Unit)
         }
 
-        val actual = ArrayNewDataExecutor(store, stack, typeIndex, dataIndex, definedTypeExpander, arrayNewFixedExecutor)
+        val actual =
+            ArrayNewDataExecutor(
+                context,
+                AggregateInstruction.ArrayNewData(typeIndex, dataIndex),
+                definedTypeExpander,
+                arrayNewFixedExecutor,
+            )
 
         assertEquals(Ok(Unit), actual)
         assertEquals(2, stack.valuesDepth())

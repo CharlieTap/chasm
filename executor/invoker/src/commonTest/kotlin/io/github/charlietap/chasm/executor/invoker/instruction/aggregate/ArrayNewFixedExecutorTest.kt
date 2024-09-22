@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -29,6 +31,7 @@ class ArrayNewFixedExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val size = 2u
         val typeIndex = typeIndex(0u)
         val definedType = definedType()
@@ -79,7 +82,7 @@ class ArrayNewFixedExecutorTest {
         )
         val expected = value(ReferenceValue.Array(Address.Array(0), expectedInstance))
 
-        val actual = ArrayNewFixedExecutor(store, stack, typeIndex, size, definedTypeExpander, fieldPacker)
+        val actual = ArrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size), definedTypeExpander, fieldPacker)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(store.arrays[0].value, expectedInstance)

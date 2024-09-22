@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -29,6 +31,7 @@ class StructNewExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val typeIndex = typeIndex(0u)
         val definedType = definedType()
 
@@ -78,7 +81,7 @@ class StructNewExecutorTest {
         )
         val expected = value(ReferenceValue.Struct(Address.Struct(0), expectedInstance))
 
-        val actual = StructNewExecutor(store, stack, typeIndex, definedTypeExpander, fieldPacker)
+        val actual = StructNewExecutor(context, AggregateInstruction.StructNew(typeIndex), definedTypeExpander, fieldPacker)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(store.structs[0].value, expectedInstance)

@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -53,6 +54,7 @@ class StructSetExecutorTest {
         val store = store(
             structs = mutableListOf(weakReference(structInstance)),
         )
+        val context = executionContext(stack, store)
 
         val frame = frame(
             state = frameState(
@@ -90,7 +92,7 @@ class StructSetExecutorTest {
             fields = mutableListOf(updatedFieldValue),
         )
 
-        val actual = StructSetExecutor(store, stack, instruction, definedTypeExpander, fieldPacker)
+        val actual = StructSetExecutor(context, instruction, definedTypeExpander, fieldPacker)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(store.structs[0].value, expectedInstance)

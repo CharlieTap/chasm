@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.stack
@@ -20,11 +22,12 @@ class ExternConvertAnyExecutorTest {
     fun `can execute the ExternConvertAny instruction when the value is ref null and return a correct result`() {
 
         val stack = stack()
+        val context = executionContext(stack)
         val nullRef = nullReferenceValue()
 
         stack.pushValue(nullRef)
 
-        val actual = ExternConvertAnyExecutor(stack)
+        val actual = ExternConvertAnyExecutor(context, AggregateInstruction.ExternConvertAny)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(ReferenceValue.Null(AbstractHeapType.Extern), stack.popValueOrNull()?.value)
@@ -34,6 +37,7 @@ class ExternConvertAnyExecutorTest {
     fun `can execute the ExternConvertAny instruction when the value is a non null ref and return a correct result`() {
 
         val stack = stack()
+        val context = executionContext(stack)
 
         val nonNullReferenceValues = setOf(
             i31ReferenceValue(),
@@ -46,7 +50,7 @@ class ExternConvertAnyExecutorTest {
         nonNullReferenceValues.forEach { referenceValue ->
             stack.pushValue(referenceValue)
 
-            val actual = ExternConvertAnyExecutor(stack)
+            val actual = ExternConvertAnyExecutor(context, AggregateInstruction.ExternConvertAny)
 
             assertEquals(Ok(Unit), actual)
             assertEquals(ReferenceValue.Extern(referenceValue), stack.popValueOrNull()?.value)

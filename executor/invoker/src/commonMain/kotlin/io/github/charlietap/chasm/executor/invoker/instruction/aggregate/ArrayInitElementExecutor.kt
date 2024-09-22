@@ -5,8 +5,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -17,36 +18,29 @@ import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
-internal typealias ArrayInitElementExecutor = (Store, Stack, Index.TypeIndex, Index.ElementIndex) -> Result<Unit, InvocationError>
-
 internal fun ArrayInitElementExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
-    elementIndex: Index.ElementIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayInitElement,
 ): Result<Unit, InvocationError> =
     ArrayInitElementExecutor(
-        store = store,
-        stack = stack,
-        typeIndex = typeIndex,
-        elementIndex = elementIndex,
+        context = context,
+        instruction = instruction,
         definedTypeExpander = ::DefinedTypeExpander,
         arraySetExecutor = ::ArraySetExecutor,
     )
 
 internal fun ArrayInitElementExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
-    elementIndex: Index.ElementIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayInitElement,
     definedTypeExpander: DefinedTypeExpander,
-    arraySetExecutor: ArraySetExecutor,
+    arraySetExecutor: Executor<AggregateInstruction.ArraySet>,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
+    val (typeIndex, elementIndex) = instruction
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(typeIndex).bind()
 
@@ -77,7 +71,7 @@ internal fun ArrayInitElementExecutor(
     stack.pushValue(NumberValue.I32(destinationOffsetInArray))
     stack.pushValue(element)
 
-    arraySetExecutor(store, stack, typeIndex).bind()
+    arraySetExecutor(context, AggregateInstruction.ArraySet(typeIndex)).bind()
 
     stack.pushValue(arrayReference)
 
@@ -85,5 +79,5 @@ internal fun ArrayInitElementExecutor(
     stack.pushValue(NumberValue.I32(sourceOffsetInElementSegment + 1))
     stack.pushValue(NumberValue.I32(elementsToCopy - 1))
 
-    ArrayInitElementExecutor(store, stack, typeIndex, elementIndex, definedTypeExpander, arraySetExecutor).bind()
+    ArrayInitElementExecutor(context, instruction, definedTypeExpander, arraySetExecutor).bind()
 }

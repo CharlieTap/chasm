@@ -5,9 +5,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.ext.valueFromBytes
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.bitWidth
@@ -17,35 +18,28 @@ import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
-internal typealias ArrayNewDataExecutor = (Store, Stack, Index.TypeIndex, Index.DataIndex) -> Result<Unit, InvocationError>
-
 internal fun ArrayNewDataExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
-    dataIndex: Index.DataIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayNewData,
 ): Result<Unit, InvocationError> =
     ArrayNewDataExecutor(
-        store = store,
-        stack = stack,
-        typeIndex = typeIndex,
-        dataIndex = dataIndex,
+        context = context,
+        instruction = instruction,
         definedTypeExpander = ::DefinedTypeExpander,
         arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
     )
 
 internal inline fun ArrayNewDataExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
-    dataIndex: Index.DataIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayNewData,
     crossinline definedTypeExpander: DefinedTypeExpander,
-    crossinline arrayNewFixedExecutor: ArrayNewFixedExecutor,
+    crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
+    val (typeIndex, dataIndex) = instruction
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(typeIndex).bind()
 
@@ -72,5 +66,5 @@ internal inline fun ArrayNewDataExecutor(
         stack.pushValue(value)
     }
 
-    arrayNewFixedExecutor(store, stack, typeIndex, arrayLength.toUInt())
+    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt())).bind()
 }

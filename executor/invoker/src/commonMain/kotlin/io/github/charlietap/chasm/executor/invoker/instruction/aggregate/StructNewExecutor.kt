@@ -4,8 +4,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -14,36 +14,31 @@ import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.weakref.weakReference
 
-internal typealias StructNewExecutor = (Store, Stack, Index.TypeIndex) -> Result<Unit, InvocationError>
-
 internal fun StructNewExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.StructNew,
 ): Result<Unit, InvocationError> =
     StructNewExecutor(
-        store = store,
-        stack = stack,
-        typeIndex = typeIndex,
+        context = context,
+        instruction = instruction,
         definedTypeExpander = ::DefinedTypeExpander,
         fieldPacker = ::FieldPacker,
     )
 
 internal inline fun StructNewExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.StructNew,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.definedType(typeIndex).bind()
+    val definedType = frame.state.module.definedType(instruction.typeIndex).bind()
 
     val structType = definedTypeExpander(definedType).structType().bind()
 

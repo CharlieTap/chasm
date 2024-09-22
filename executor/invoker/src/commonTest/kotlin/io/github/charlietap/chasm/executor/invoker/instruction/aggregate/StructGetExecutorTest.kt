@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.frame
@@ -30,6 +31,7 @@ class StructGetExecutorTest {
     fun `can execute the StructGetSX instruction and return a correct result`() {
 
         val stack = stack()
+
         val typeIndex = typeIndex(0u)
         val fieldIndex = fieldIndex(0u)
         val definedType = definedType()
@@ -50,6 +52,7 @@ class StructGetExecutorTest {
         val store = store(
             structs = mutableListOf(weakReference(structInstance)),
         )
+        val context = executionContext(stack, store)
         val executionValue = executionValue()
 
         val frame = frame(
@@ -81,7 +84,7 @@ class StructGetExecutorTest {
 
         val expected = value(executionValue)
 
-        val actual = StructGetExecutor(store, stack, typeIndex, fieldIndex, signedUnpack, definedTypeExpander, fieldUnpacker)
+        val actual = StructGetExecutor(context, typeIndex, fieldIndex, signedUnpack, definedTypeExpander, fieldUnpacker)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())

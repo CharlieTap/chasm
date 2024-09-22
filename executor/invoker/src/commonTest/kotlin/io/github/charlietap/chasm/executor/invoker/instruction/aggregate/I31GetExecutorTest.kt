@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.stack
@@ -16,6 +17,7 @@ class I31GetExecutorTest {
     fun `can execute the I31GetExecutor with signed extension and return a correct result`() {
 
         val stack = stack()
+        val context = executionContext(stack)
         val signedExtension = true
         val i32 = 117
         val i31 = i31ReferenceValue()
@@ -31,7 +33,7 @@ class I31GetExecutorTest {
             fail("Unsigned extender should not be called in this scenario")
         }
 
-        val actual = I31GetExecutor(stack, signedExtension, i31SignedExtender, i31UnsignedExtender)
+        val actual = I31GetExecutor(context, signedExtension, i31SignedExtender, i31UnsignedExtender)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(i32(i32), stack.popValueOrNull()?.value)
@@ -41,6 +43,7 @@ class I31GetExecutorTest {
     fun `can execute the I31GetExecutor with unsigned extension and return a correct result`() {
 
         val stack = stack()
+        val context = executionContext(stack)
         val signedExtension = false
         val i32 = 117
         val i31 = i31ReferenceValue()
@@ -56,7 +59,7 @@ class I31GetExecutorTest {
             i32
         }
 
-        val actual = I31GetExecutor(stack, signedExtension, i31SignedExtender, i31UnsignedExtender)
+        val actual = I31GetExecutor(context, signedExtension, i31SignedExtender, i31UnsignedExtender)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(i32(i32), stack.popValueOrNull()?.value)

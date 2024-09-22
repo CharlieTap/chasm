@@ -2,8 +2,29 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.fixture.instruction.anyConvertExternInstruction
+import io.github.charlietap.chasm.fixture.instruction.arrayFillInstruction
+import io.github.charlietap.chasm.fixture.instruction.arrayGetInstruction
+import io.github.charlietap.chasm.fixture.instruction.arrayGetSignedInstruction
+import io.github.charlietap.chasm.fixture.instruction.arrayGetUnsignedInstruction
+import io.github.charlietap.chasm.fixture.instruction.arrayNewDataInstruction
+import io.github.charlietap.chasm.fixture.instruction.arrayNewDefaultInstruction
+import io.github.charlietap.chasm.fixture.instruction.arrayNewElementInstruction
+import io.github.charlietap.chasm.fixture.instruction.arrayNewFixedInstruction
+import io.github.charlietap.chasm.fixture.instruction.arraySetInstruction
+import io.github.charlietap.chasm.fixture.instruction.externConvertAnyInstruction
+import io.github.charlietap.chasm.fixture.instruction.i31GetSignedInstruction
+import io.github.charlietap.chasm.fixture.instruction.i31GetUnsignedInstruction
+import io.github.charlietap.chasm.fixture.instruction.refI31Instruction
+import io.github.charlietap.chasm.fixture.instruction.structGetInstruction
+import io.github.charlietap.chasm.fixture.instruction.structGetSignedInstruction
+import io.github.charlietap.chasm.fixture.instruction.structGetUnsignedInstruction
+import io.github.charlietap.chasm.fixture.instruction.structNewDefaultInstruction
+import io.github.charlietap.chasm.fixture.instruction.structNewInstruction
+import io.github.charlietap.chasm.fixture.instruction.structSetInstruction
 import io.github.charlietap.chasm.fixture.module.dataIndex
 import io.github.charlietap.chasm.fixture.module.elementIndex
 import io.github.charlietap.chasm.fixture.module.fieldIndex
@@ -24,12 +45,11 @@ class AggregateInstructionExecutorTest {
         val context = executionContext(stack, store)
         val typeIndex = typeIndex()
 
-        val instruction = AggregateInstruction.StructNew(typeIndex)
+        val instruction = structNewInstruction(typeIndex)
 
-        val structNewExecutor: StructNewExecutor = { _store, _stack, _typeIndex ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
+        val structNewExecutor: Executor<AggregateInstruction.StructNew> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -50,12 +70,11 @@ class AggregateInstructionExecutorTest {
         val context = executionContext(stack, store)
         val typeIndex = typeIndex()
 
-        val instruction = AggregateInstruction.StructNewDefault(typeIndex)
+        val instruction = structNewDefaultInstruction(typeIndex)
 
-        val structNewDefaultExecutor: StructNewDefaultExecutor = { _store, _stack, _typeIndex ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
+        val structNewDefaultExecutor: Executor<AggregateInstruction.StructNewDefault> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -75,15 +94,11 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.StructGet(typeIndex(), fieldIndex())
+        val instruction = structGetInstruction(typeIndex(), fieldIndex())
 
-        val structGetExecutor: StructGetExecutor = { _store, _stack, _typeIndex, _fieldIndex, _signedUnpack ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(instruction.typeIndex, _typeIndex)
-            assertEquals(instruction.fieldIndex, _fieldIndex)
-            assertEquals(true, _signedUnpack)
-
+        val structGetExecutor: Executor<AggregateInstruction.StructGet> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -103,22 +118,18 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.StructGetSigned(typeIndex(), fieldIndex())
+        val instruction = structGetSignedInstruction(typeIndex(), fieldIndex())
 
-        val structGetExecutor: StructGetExecutor = { _store, _stack, _typeIndex, _fieldIndex, _signedUnpack ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(instruction.typeIndex, _typeIndex)
-            assertEquals(instruction.fieldIndex, _fieldIndex)
-            assertEquals(true, _signedUnpack)
-
+        val structGetExecutor: Executor<AggregateInstruction.StructGetSigned> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
         val actual = aggregateInstructionExecutor(
             context = context,
             instruction = instruction,
-            structGetExecutor = structGetExecutor,
+            structGetSignedExecutor = structGetExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -131,22 +142,18 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.StructGetUnsigned(typeIndex(), fieldIndex())
+        val instruction = structGetUnsignedInstruction(typeIndex(), fieldIndex())
 
-        val structGetExecutor: StructGetExecutor = { _store, _stack, _typeIndex, _fieldIndex, _signedUnpack ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(instruction.typeIndex, _typeIndex)
-            assertEquals(instruction.fieldIndex, _fieldIndex)
-            assertEquals(false, _signedUnpack)
-
+        val structGetExecutor: Executor<AggregateInstruction.StructGetUnsigned> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
         val actual = aggregateInstructionExecutor(
             context = context,
             instruction = instruction,
-            structGetExecutor = structGetExecutor,
+            structGetUnsignedExecutor = structGetExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -159,13 +166,11 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.StructSet(typeIndex(), fieldIndex())
+        val instruction = structSetInstruction(typeIndex(), fieldIndex())
 
-        val structSetExecutor: StructSetExecutor = { _store, _stack, _instruction ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val structSetExecutor: Executor<AggregateInstruction.StructSet> = { _context, _instruction ->
+            assertEquals(context, _context)
             assertEquals(instruction, _instruction)
-
             Ok(Unit)
         }
 
@@ -187,14 +192,11 @@ class AggregateInstructionExecutorTest {
 
         val typeIndex = typeIndex()
         val size = 0u
-        val instruction = AggregateInstruction.ArrayNewFixed(typeIndex, size)
+        val instruction = arrayNewFixedInstruction(typeIndex, size)
 
-        val arrayNewFixedExecutor: ArrayNewFixedExecutor = { _store, _stack, _typeIndex, _size ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-            assertEquals(size, _size)
-
+        val arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -215,13 +217,11 @@ class AggregateInstructionExecutorTest {
         val context = executionContext(stack, store)
 
         val typeIndex = typeIndex()
-        val instruction = AggregateInstruction.ArrayNewDefault(typeIndex)
+        val instruction = arrayNewDefaultInstruction(typeIndex)
 
-        val arrayNewDefaultExecutor: ArrayNewDefaultExecutor = { _store, _stack, _typeIndex ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-
+        val arrayNewDefaultExecutor: Executor<AggregateInstruction.ArrayNewDefault> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -243,40 +243,18 @@ class AggregateInstructionExecutorTest {
 
         val typeIndex = typeIndex()
         val dataIndex = dataIndex()
-        val instruction = AggregateInstruction.ArrayNewData(typeIndex, dataIndex)
+        val instruction = arrayNewDataInstruction(typeIndex, dataIndex)
 
-        val arrayNewDataExecutor: ArrayNewDataExecutor = { _store, _stack, _typeIndex, _dataIndex ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-            assertEquals(dataIndex, _dataIndex)
-
+        val arrayNewDataExecutor: Executor<AggregateInstruction.ArrayNewData> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
-        val actual = AggregateInstructionExecutor(
+        val actual = aggregateInstructionExecutor(
             context = context,
             instruction = instruction,
-            structNewExecutor = structNewExecutor(),
-            structNewDefaultExecutor = structNewDefaultExecutor(),
-            structGetExecutor = structGetExecutor(),
-            structSetExecutor = structSetExecutor(),
-            arrayNewFixedExecutor = arrayNewFixedExecutor(),
-            arrayNewExecutor = arrayNewExecutor(),
-            arrayNewDefaultExecutor = arrayNewDefaultExecutor(),
             arrayNewDataExecutor = arrayNewDataExecutor,
-            arrayNewElementExecutor = arrayNewElementExecutor(),
-            arrayGetExecutor = arrayGetExecutor(),
-            arraySetExecutor = arraySetExecutor(),
-            arrayLenExecutor = arrayLenExecutor(),
-            refI31Executor = refI31Executor(),
-            i31GetExecutor = i31GetExecutor(),
-            arrayFillExecutor = arrayFillExecutor(),
-            arrayCopyExecutor = arrayCopyExecutor(),
-            arrayInitDataExecutor = arrayInitDataExecutor(),
-            arrayInitElementExecutor = arrayInitElementExecutor(),
-            anyConvertExternExecutor = anyConvertExternExecutor(),
-            externConvertAnyExecutor = externConvertAnyExecutor(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -291,14 +269,11 @@ class AggregateInstructionExecutorTest {
 
         val typeIndex = typeIndex()
         val elementIndex = elementIndex()
-        val instruction = AggregateInstruction.ArrayNewElement(typeIndex, elementIndex)
+        val instruction = arrayNewElementInstruction(typeIndex, elementIndex)
 
-        val arrayNewElementExecutor: ArrayNewElementExecutor = { _store, _stack, _typeIndex, _elementIndex ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-            assertEquals(elementIndex, _elementIndex)
-
+        val arrayNewElementExecutor: Executor<AggregateInstruction.ArrayNewElement> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -319,14 +294,11 @@ class AggregateInstructionExecutorTest {
         val context = executionContext(stack, store)
 
         val typeIndex = typeIndex()
-        val instruction = AggregateInstruction.ArrayGet(typeIndex)
+        val instruction = arrayGetInstruction(typeIndex)
 
-        val arrayGetExecutor: ArrayGetExecutor = { _store, _stack, _typeIndex, _signedUnpack ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-            assertEquals(true, _signedUnpack)
-
+        val arrayGetExecutor: Executor<AggregateInstruction.ArrayGet> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -347,21 +319,18 @@ class AggregateInstructionExecutorTest {
         val context = executionContext(stack, store)
 
         val typeIndex = typeIndex()
-        val instruction = AggregateInstruction.ArrayGetSigned(typeIndex)
+        val instruction = arrayGetSignedInstruction(typeIndex)
 
-        val arrayGetExecutor: ArrayGetExecutor = { _store, _stack, _typeIndex, _signedUnpack ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-            assertEquals(true, _signedUnpack)
-
+        val arrayGetExecutor: Executor<AggregateInstruction.ArrayGetSigned> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
         val actual = aggregateInstructionExecutor(
             context = context,
             instruction = instruction,
-            arrayGetExecutor = arrayGetExecutor,
+            arrayGetSignedExecutor = arrayGetExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -375,21 +344,18 @@ class AggregateInstructionExecutorTest {
         val context = executionContext(stack, store)
 
         val typeIndex = typeIndex()
-        val instruction = AggregateInstruction.ArrayGetUnsigned(typeIndex)
+        val instruction = arrayGetUnsignedInstruction(typeIndex)
 
-        val arrayGetExecutor: ArrayGetExecutor = { _store, _stack, _typeIndex, _signedUnpack ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-            assertEquals(false, _signedUnpack)
-
+        val arrayGetExecutor: Executor<AggregateInstruction.ArrayGetUnsigned> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
         val actual = aggregateInstructionExecutor(
             context = context,
             instruction = instruction,
-            arrayGetExecutor = arrayGetExecutor,
+            arrayGetUnsignedExecutor = arrayGetExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -403,13 +369,11 @@ class AggregateInstructionExecutorTest {
         val context = executionContext(stack, store)
 
         val typeIndex = typeIndex()
-        val instruction = AggregateInstruction.ArraySet(typeIndex)
+        val instruction = arraySetInstruction(typeIndex)
 
-        val arraySetExecutor: ArraySetExecutor = { _store, _stack, _typeIndex ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-
+        val arraySetExecutor: Executor<AggregateInstruction.ArraySet> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -429,11 +393,11 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.RefI31
+        val instruction = refI31Instruction()
 
-        val refI31Executor: RefI31Executor = { _stack ->
-            assertEquals(stack, _stack)
-
+        val refI31Executor: Executor<AggregateInstruction.RefI31> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -453,19 +417,18 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.I31GetSigned
+        val instruction = i31GetSignedInstruction()
 
-        val i31GetExecutor: I31GetExecutor = { _stack, _signedExtension ->
-            assertEquals(stack, _stack)
-            assertEquals(true, _signedExtension)
-
+        val i31GetExecutor: Executor<AggregateInstruction.I31GetSigned> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
         val actual = aggregateInstructionExecutor(
             context = context,
             instruction = instruction,
-            i31GetExecutor = i31GetExecutor,
+            i31GetSignedExecutor = i31GetExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -478,19 +441,18 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.I31GetUnsigned
+        val instruction = i31GetUnsignedInstruction()
 
-        val i31GetExecutor: I31GetExecutor = { _stack, _signedExtension ->
-            assertEquals(stack, _stack)
-            assertEquals(false, _signedExtension)
-
+        val i31GetExecutor: Executor<AggregateInstruction.I31GetUnsigned> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
         val actual = aggregateInstructionExecutor(
             context = context,
             instruction = instruction,
-            i31GetExecutor = i31GetExecutor,
+            i31GetUnsignedExecutor = i31GetExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -504,13 +466,11 @@ class AggregateInstructionExecutorTest {
         val context = executionContext(stack, store)
 
         val typeIndex = typeIndex()
-        val instruction = AggregateInstruction.ArrayFill(typeIndex)
+        val instruction = arrayFillInstruction(typeIndex)
 
-        val arrayFillExecutor: ArrayFillExecutor = { _store, _stack, _typeIndex ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-
+        val arrayFillExecutor: Executor<AggregateInstruction.ArrayFill> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -530,11 +490,11 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.AnyConvertExtern
+        val instruction = anyConvertExternInstruction()
 
-        val anyConvertExternExecutor: AnyConvertExternExecutor = { _stack ->
-            assertEquals(stack, _stack)
-
+        val anyConvertExternExecutor: Executor<AggregateInstruction.AnyConvertExtern> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -554,11 +514,11 @@ class AggregateInstructionExecutorTest {
         val stack = stack()
         val context = executionContext(stack, store)
 
-        val instruction = AggregateInstruction.ExternConvertAny
+        val instruction = externConvertAnyInstruction()
 
-        val externConvertAnyExecutor: ExternConvertAnyExecutor = { _stack ->
-            assertEquals(stack, _stack)
-
+        val externConvertAnyExecutor: Executor<AggregateInstruction.ExternConvertAny> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -572,115 +532,142 @@ class AggregateInstructionExecutorTest {
     }
 
     companion object {
-        fun structNewExecutor(): StructNewExecutor = { _, _, _ ->
+        fun structNewExecutor(): Executor<AggregateInstruction.StructNew> = { _, _ ->
             fail("StructNewExecutor should not be called in this scenario")
         }
 
-        fun structNewDefaultExecutor(): StructNewDefaultExecutor = { _, _, _ ->
+        fun structNewDefaultExecutor(): Executor<AggregateInstruction.StructNewDefault> = { _, _ ->
             fail("StructNewDefaultExecutor should not be called in this scenario")
         }
 
-        fun structGetExecutor(): StructGetExecutor = { _, _, _, _, _ ->
+        fun structGetExecutor(): Executor<AggregateInstruction.StructGet> = { _, _ ->
             fail("StructGetExecutor should not be called in this scenario")
         }
 
-        fun structSetExecutor(): StructSetExecutor = { _, _, _ ->
+        fun structGetSignedExecutor(): Executor<AggregateInstruction.StructGetSigned> = { _, _ ->
+            fail("StructGetExecutor should not be called in this scenario")
+        }
+
+        fun structGetUnsignedExecutor(): Executor<AggregateInstruction.StructGetUnsigned> = { _, _ ->
+            fail("StructGetExecutor should not be called in this scenario")
+        }
+
+        fun structSetExecutor(): Executor<AggregateInstruction.StructSet> = { _, _ ->
             fail("StructSetExecutor should not be called in this scenario")
         }
 
-        fun arrayNewFixedExecutor(): ArrayNewFixedExecutor = { _, _, _, _ ->
+        fun arrayNewFixedExecutor(): Executor<AggregateInstruction.ArrayNewFixed> = { _, _ ->
             fail("ArrayNewFixedExecutor should not be called in this scenario")
         }
 
-        fun arrayNewExecutor(): ArrayNewExecutor = { _, _, _ ->
+        fun arrayNewExecutor(): Executor<AggregateInstruction.ArrayNew> = { _, _ ->
             fail("ArrayNewExecutor should not be called in this scenario")
         }
 
-        fun arrayNewDefaultExecutor(): ArrayNewDefaultExecutor = { _, _, _ ->
+        fun arrayNewDefaultExecutor(): Executor<AggregateInstruction.ArrayNewDefault> = { _, _ ->
             fail("ArrayNewDefaultExecutor should not be called in this scenario")
         }
 
-        fun arrayNewDataExecutor(): ArrayNewDataExecutor = { _, _, _, _ ->
+        fun arrayNewDataExecutor(): Executor<AggregateInstruction.ArrayNewData> = { _, _ ->
             fail("ArrayNewDataExecutor should not be called in this scenario")
         }
 
-        fun arrayNewElementExecutor(): ArrayNewElementExecutor = { _, _, _, _ ->
+        fun arrayNewElementExecutor(): Executor<AggregateInstruction.ArrayNewElement> = { _, _ ->
             fail("ArrayNewElementExecutor should not be called in this scenario")
         }
 
-        fun arrayGetExecutor(): ArrayGetExecutor = { _, _, _, _ ->
+        fun arrayGetExecutor(): Executor<AggregateInstruction.ArrayGet> = { _, _ ->
             fail("ArrayGetExecutor should not be called in this scenario")
         }
 
-        fun arraySetExecutor(): ArraySetExecutor = { _, _, _ ->
+        fun arrayGetSignedExecutor(): Executor<AggregateInstruction.ArrayGetSigned> = { _, _ ->
+            fail("ArrayGetExecutor should not be called in this scenario")
+        }
+
+        fun arrayGetUnsignedExecutor(): Executor<AggregateInstruction.ArrayGetUnsigned> = { _, _ ->
+            fail("ArrayGetExecutor should not be called in this scenario")
+        }
+
+        fun arraySetExecutor(): Executor<AggregateInstruction.ArraySet> = { _, _ ->
             fail("ArraySetExecutor should not be called in this scenario")
         }
 
-        fun arrayLenExecutor(): ArrayLenExecutor = { _, _ ->
+        fun arrayLenExecutor(): Executor<AggregateInstruction.ArrayLen> = { _, _ ->
             fail("ArrayLenExecutor should not be called in this scenario")
         }
 
-        fun refI31Executor(): RefI31Executor = { _ ->
+        fun refI31Executor(): Executor<AggregateInstruction.RefI31> = { _, _ ->
             fail("RefI31Executor should not be called in this scenario")
         }
 
-        fun i31GetExecutor(): I31GetExecutor = { _, _ ->
+        fun i31GetSignedExecutor(): Executor<AggregateInstruction.I31GetSigned> = { _, _ ->
             fail("I31GetExecutor should not be called in this scenario")
         }
 
-        fun arrayFillExecutor(): ArrayFillExecutor = { _, _, _ ->
+        fun i31GetUnsignedExecutor(): Executor<AggregateInstruction.I31GetUnsigned> = { _, _ ->
+            fail("I31GetExecutor should not be called in this scenario")
+        }
+
+        fun arrayFillExecutor(): Executor<AggregateInstruction.ArrayFill> = { _, _ ->
             fail("ArrayFillExecutor should not be called in this scenario")
         }
 
-        fun arrayCopyExecutor(): ArrayCopyExecutor = { _, _, _, _ ->
+        fun arrayCopyExecutor(): Executor<AggregateInstruction.ArrayCopy> = { _, _ ->
             fail("ArrayCopyExecutor should not be called in this scenario")
         }
 
-        fun arrayInitDataExecutor(): ArrayInitDataExecutor = { _, _, _, _ ->
+        fun arrayInitDataExecutor(): Executor<AggregateInstruction.ArrayInitData> = { _, _ ->
             fail("ArrayInitDataExecutor should not be called in this scenario")
         }
 
-        fun arrayInitElementExecutor(): ArrayInitElementExecutor = { _, _, _, _ ->
+        fun arrayInitElementExecutor(): Executor<AggregateInstruction.ArrayInitElement> = { _, _ ->
             fail("ArrayInitElementExecutor should not be called in this scenario")
         }
 
-        fun anyConvertExternExecutor(): AnyConvertExternExecutor = { _ ->
+        fun anyConvertExternExecutor(): Executor<AggregateInstruction.AnyConvertExtern> = { _, _ ->
             fail("AnyConvertExternExecutor should not be called in this scenario")
         }
 
-        fun externConvertAnyExecutor(): ExternConvertAnyExecutor = { _ ->
+        fun externConvertAnyExecutor(): Executor<AggregateInstruction.ExternConvertAny> = { _, _ ->
             fail("ExternConvertAnyExecutor should not be called in this scenario")
         }
 
         fun aggregateInstructionExecutor(
             context: ExecutionContext,
             instruction: AggregateInstruction,
-            structNewExecutor: StructNewExecutor = structNewExecutor(),
-            structNewDefaultExecutor: StructNewDefaultExecutor = structNewDefaultExecutor(),
-            structGetExecutor: StructGetExecutor = structGetExecutor(),
-            structSetExecutor: StructSetExecutor = structSetExecutor(),
-            arrayNewFixedExecutor: ArrayNewFixedExecutor = arrayNewFixedExecutor(),
-            arrayNewExecutor: ArrayNewExecutor = arrayNewExecutor(),
-            arrayNewDefaultExecutor: ArrayNewDefaultExecutor = arrayNewDefaultExecutor(),
-            arrayNewDataExecutor: ArrayNewDataExecutor = arrayNewDataExecutor(),
-            arrayNewElementExecutor: ArrayNewElementExecutor = arrayNewElementExecutor(),
-            arrayGetExecutor: ArrayGetExecutor = arrayGetExecutor(),
-            arraySetExecutor: ArraySetExecutor = arraySetExecutor(),
-            arrayLenExecutor: ArrayLenExecutor = arrayLenExecutor(),
-            refI31Executor: RefI31Executor = refI31Executor(),
-            i31GetExecutor: I31GetExecutor = i31GetExecutor(),
-            arrayFillExecutor: ArrayFillExecutor = arrayFillExecutor(),
-            arrayCopyExecutor: ArrayCopyExecutor = arrayCopyExecutor(),
-            arrayInitDataExecutor: ArrayInitDataExecutor = arrayInitDataExecutor(),
-            arrayInitElementExecutor: ArrayInitElementExecutor = arrayInitElementExecutor(),
-            anyConvertExternExecutor: AnyConvertExternExecutor = anyConvertExternExecutor(),
-            externConvertAnyExecutor: ExternConvertAnyExecutor = externConvertAnyExecutor(),
+            structNewExecutor: Executor<AggregateInstruction.StructNew> = structNewExecutor(),
+            structNewDefaultExecutor: Executor<AggregateInstruction.StructNewDefault> = structNewDefaultExecutor(),
+            structGetExecutor: Executor<AggregateInstruction.StructGet> = structGetExecutor(),
+            structGetSignedExecutor: Executor<AggregateInstruction.StructGetSigned> = structGetSignedExecutor(),
+            structGetUnsignedExecutor: Executor<AggregateInstruction.StructGetUnsigned> = structGetUnsignedExecutor(),
+            structSetExecutor: Executor<AggregateInstruction.StructSet> = structSetExecutor(),
+            arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed> = arrayNewFixedExecutor(),
+            arrayNewExecutor: Executor<AggregateInstruction.ArrayNew> = arrayNewExecutor(),
+            arrayNewDefaultExecutor: Executor<AggregateInstruction.ArrayNewDefault> = arrayNewDefaultExecutor(),
+            arrayNewDataExecutor: Executor<AggregateInstruction.ArrayNewData> = arrayNewDataExecutor(),
+            arrayNewElementExecutor: Executor<AggregateInstruction.ArrayNewElement> = arrayNewElementExecutor(),
+            arrayGetExecutor: Executor<AggregateInstruction.ArrayGet> = arrayGetExecutor(),
+            arrayGetSignedExecutor: Executor<AggregateInstruction.ArrayGetSigned> = arrayGetSignedExecutor(),
+            arrayGetUnsignedExecutor: Executor<AggregateInstruction.ArrayGetUnsigned> = arrayGetUnsignedExecutor(),
+            arraySetExecutor: Executor<AggregateInstruction.ArraySet> = arraySetExecutor(),
+            arrayLenExecutor: Executor<AggregateInstruction.ArrayLen> = arrayLenExecutor(),
+            refI31Executor: Executor<AggregateInstruction.RefI31> = refI31Executor(),
+            i31GetSignedExecutor: Executor<AggregateInstruction.I31GetSigned> = i31GetSignedExecutor(),
+            i31GetUnsignedExecutor: Executor<AggregateInstruction.I31GetUnsigned> = i31GetUnsignedExecutor(),
+            arrayFillExecutor: Executor<AggregateInstruction.ArrayFill> = arrayFillExecutor(),
+            arrayCopyExecutor: Executor<AggregateInstruction.ArrayCopy> = arrayCopyExecutor(),
+            arrayInitDataExecutor: Executor<AggregateInstruction.ArrayInitData> = arrayInitDataExecutor(),
+            arrayInitElementExecutor: Executor<AggregateInstruction.ArrayInitElement> = arrayInitElementExecutor(),
+            anyConvertExternExecutor: Executor<AggregateInstruction.AnyConvertExtern> = anyConvertExternExecutor(),
+            externConvertAnyExecutor: Executor<AggregateInstruction.ExternConvertAny> = externConvertAnyExecutor(),
         ) = AggregateInstructionExecutor(
             context = context,
             instruction = instruction,
             structNewExecutor = structNewExecutor,
             structNewDefaultExecutor = structNewDefaultExecutor,
             structGetExecutor = structGetExecutor,
+            structGetSignedExecutor = structGetSignedExecutor,
+            structGetUnsignedExecutor = structGetUnsignedExecutor,
             structSetExecutor = structSetExecutor,
             arrayNewFixedExecutor = arrayNewFixedExecutor,
             arrayNewExecutor = arrayNewExecutor,
@@ -688,10 +675,13 @@ class AggregateInstructionExecutorTest {
             arrayNewDataExecutor = arrayNewDataExecutor,
             arrayNewElementExecutor = arrayNewElementExecutor,
             arrayGetExecutor = arrayGetExecutor,
+            arrayGetSignedExecutor = arrayGetSignedExecutor,
+            arrayGetUnsignedExecutor = arrayGetUnsignedExecutor,
             arraySetExecutor = arraySetExecutor,
             arrayLenExecutor = arrayLenExecutor,
             refI31Executor = refI31Executor,
-            i31GetExecutor = i31GetExecutor,
+            i31GetSignedExecutor = i31GetSignedExecutor,
+            i31GetUnsignedExecutor = i31GetUnsignedExecutor,
             arrayFillExecutor = arrayFillExecutor,
             arrayCopyExecutor = arrayCopyExecutor,
             arrayInitDataExecutor = arrayInitDataExecutor,

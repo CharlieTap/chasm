@@ -4,40 +4,37 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
-internal typealias StructNewDefaultExecutor = (Store, Stack, Index.TypeIndex) -> Result<Unit, InvocationError>
-
 internal fun StructNewDefaultExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.StructNewDefault,
 ): Result<Unit, InvocationError> =
     StructNewDefaultExecutor(
-        store = store,
-        stack = stack,
-        typeIndex = typeIndex,
+        context = context,
+        instruction = instruction,
         definedTypeExpander = ::DefinedTypeExpander,
         structNewExecutor = ::StructNewExecutor,
     )
 
 internal inline fun StructNewDefaultExecutor(
-    store: Store,
-    stack: Stack,
-    typeIndex: Index.TypeIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.StructNewDefault,
     crossinline definedTypeExpander: DefinedTypeExpander,
-    crossinline structNewExecutor: StructNewExecutor,
+    crossinline structNewExecutor: Executor<AggregateInstruction.StructNew>,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack) = context
+    val typeIndex = instruction.typeIndex
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(typeIndex).bind()
 
@@ -47,5 +44,5 @@ internal inline fun StructNewDefaultExecutor(
         stack.pushValue(value)
     }
 
-    structNewExecutor(store, stack, typeIndex)
+    structNewExecutor(context, AggregateInstruction.StructNew(typeIndex)).bind()
 }

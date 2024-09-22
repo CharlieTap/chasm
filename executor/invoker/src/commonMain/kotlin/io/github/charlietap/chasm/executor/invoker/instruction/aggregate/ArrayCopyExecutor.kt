@@ -5,9 +5,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -15,35 +15,29 @@ import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
-internal typealias ArrayCopyExecutor = (Store, Stack, Index.TypeIndex, Index.TypeIndex) -> Result<Unit, InvocationError>
-
 internal fun ArrayCopyExecutor(
-    store: Store,
-    stack: Stack,
-    srcTypeIndex: Index.TypeIndex,
-    destTypeIndex: Index.TypeIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayCopy,
 ): Result<Unit, InvocationError> =
     ArrayCopyExecutor(
-        store = store,
-        stack = stack,
-        destTypeIndex = destTypeIndex,
+        context = context,
+        instruction = instruction,
         definedTypeExpander = ::DefinedTypeExpander,
     )
 
 internal fun ArrayCopyExecutor(
-    store: Store,
-    stack: Stack,
-    destTypeIndex: Index.TypeIndex,
+    context: ExecutionContext,
+    instruction: AggregateInstruction.ArrayCopy,
     definedTypeExpander: DefinedTypeExpander,
 ): Result<Unit, InvocationError> = binding {
 
     // x = dest
     // y = src
+    val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val destDefinedType = frame.state.module.definedType(destTypeIndex).bind()
+    val destDefinedType = frame.state.module.definedType(instruction.destinationTypeIndex).bind()
 
     val destArrayType = definedTypeExpander(destDefinedType).arrayType().bind()
     if (destArrayType.fieldType.mutability != Mutability.Var) {

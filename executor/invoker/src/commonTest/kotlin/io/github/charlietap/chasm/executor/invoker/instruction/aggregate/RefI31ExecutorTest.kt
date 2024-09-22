@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.stack
@@ -15,6 +17,7 @@ class RefI31ExecutorTest {
     fun `can execute the RefI31 instruction and return a correct result`() {
 
         val stack = stack()
+        val context = executionContext(stack)
         val i32 = 117
         val i31 = i31ReferenceValue()
 
@@ -25,7 +28,7 @@ class RefI31ExecutorTest {
             i31
         }
 
-        val actual = RefI31Executor(stack, i31Wrapper)
+        val actual = RefI31Executor(context, AggregateInstruction.RefI31, i31Wrapper)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(i31, stack.popValueOrNull()?.value)

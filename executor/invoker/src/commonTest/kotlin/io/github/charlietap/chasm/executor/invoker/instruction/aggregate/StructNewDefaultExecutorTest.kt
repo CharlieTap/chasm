@@ -1,6 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.invoker.Executor
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -24,6 +27,7 @@ class StructNewDefaultExecutorTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(stack, store)
         val typeIndex = typeIndex(0u)
         val definedType = definedType()
 
@@ -50,17 +54,16 @@ class StructNewDefaultExecutorTest {
             structType
         }
 
-        val structNewExecutor: StructNewExecutor = { _store, _stack, _typeIndex ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(typeIndex, _typeIndex)
-
+        val structNewExecutor: Executor<AggregateInstruction.StructNew> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(AggregateInstruction.StructNew(typeIndex), _instruction)
             Ok(Unit)
         }
 
         val expected = value(fieldType.default().value)
 
-        val actual = StructNewDefaultExecutor(store, stack, typeIndex, definedTypeExpander, structNewExecutor)
+        val actual =
+            StructNewDefaultExecutor(context, AggregateInstruction.StructNewDefault(typeIndex), definedTypeExpander, structNewExecutor)
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
