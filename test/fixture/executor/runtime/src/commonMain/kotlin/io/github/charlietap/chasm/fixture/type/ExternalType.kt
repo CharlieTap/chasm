@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.type
 
-import io.github.charlietap.chasm.ast.type.DefinedType
+import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType
@@ -9,8 +9,8 @@ import io.github.charlietap.chasm.executor.runtime.type.ExternalType
 fun externalType(): ExternalType = functionExternalType()
 
 fun functionExternalType(
-    definedType: DefinedType = definedType(),
-) = ExternalType.Function(definedType)
+    functionType: FunctionType = functionType(),
+) = ExternalType.Function(functionType)
 
 fun tableExternalType(
     tableType: TableType = tableType(),

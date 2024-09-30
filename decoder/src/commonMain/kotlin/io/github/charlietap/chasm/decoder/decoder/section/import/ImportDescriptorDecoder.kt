@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.decoder.decoder.type.table.TableTypeDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.tag.TagTypeDecoder
 import io.github.charlietap.chasm.decoder.error.SectionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.ext.functionType
 
 internal fun ImportDescriptorDecoder(
     context: DecoderContext,
@@ -41,7 +42,13 @@ internal fun ImportDescriptorDecoder(
 ): Result<Import.Descriptor, WasmDecodeError> = binding {
 
     when (val descriptorType = context.reader.ubyte().bind()) {
-        IMPORT_DESCRIPTOR_TYPE_FUNCTION -> Import.Descriptor.Function(typeIndexDecoder(context).bind())
+        IMPORT_DESCRIPTOR_TYPE_FUNCTION -> {
+            val typeIndex = typeIndexDecoder(context).bind()
+            val type = context.definedTypes
+                .getOrNull(typeIndex.idx.toInt())
+                ?.functionType() ?: Err(SectionDecodeError.UnknownImportDescriptor(descriptorType)).bind()
+            Import.Descriptor.Function(type)
+        }
         IMPORT_DESCRIPTOR_TYPE_TABLE -> Import.Descriptor.Table(tableTypeDecoder(context).bind())
         IMPORT_DESCRIPTOR_TYPE_MEMORY -> Import.Descriptor.Memory(memTypeDecoder(context).bind())
         IMPORT_DESCRIPTOR_TYPE_GLOBAL -> Import.Descriptor.Global(globalTypeDecoder(context).bind())

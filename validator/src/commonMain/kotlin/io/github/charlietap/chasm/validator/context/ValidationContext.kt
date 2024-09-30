@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType
@@ -63,16 +62,11 @@ internal data class ValidationContext(
     }
 
     val functions by lazy {
-        val importedFunctions = module.imports.fold(mutableListOf<FunctionType>()) { acc, import ->
-            val descriptor = import.descriptor
-            if (descriptor is Import.Descriptor.Function) {
-                val functionType = types[descriptor.typeIndex.idx.toInt()].functionType()
-                functionType?.results?.let {
-                    acc += functionType
-                }
-            }
-            acc
-        }
+        val importedFunctions = module.imports.asSequence()
+            .map(Import::descriptor)
+            .filterIsInstance<Import.Descriptor.Function>()
+            .map(Import.Descriptor.Function::type)
+            .toList()
         val moduleFunctions = module.functions.mapNotNull { function ->
             types[function.typeIndex.idx.toInt()].functionType()
         }

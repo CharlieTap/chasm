@@ -52,7 +52,7 @@ class ImportModuleTest {
         val expectedFunctionImport = Import(
             moduleName = NameValue("env"),
             entityName = NameValue("externalFunction"),
-            descriptor = Import.Descriptor.Function(Index.TypeIndex(0u)),
+            descriptor = Import.Descriptor.Function(expectedFunctionType),
         )
 
         val expectedTableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u, 2u))

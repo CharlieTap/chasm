@@ -15,6 +15,10 @@ import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
+import io.github.charlietap.chasm.fixture.module.type
+import io.github.charlietap.chasm.fixture.module.typeIndex
+import io.github.charlietap.chasm.fixture.type.functionRecursiveType
+import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.fixture.type.tagType
 import kotlin.test.Test
@@ -28,14 +32,22 @@ class ImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_FUNCTION
 
-        val typeIndex = Index.TypeIndex(117u)
-        val expected = Ok(Import.Descriptor.Function(typeIndex))
+        val functionType = functionType()
+        val expected = Ok(Import.Descriptor.Function(functionType))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
         }
-        val context = decoderContext(reader)
+        val context = decoderContext(
+            reader = reader,
+            types = mutableListOf(
+                type(
+                    recursiveType = functionRecursiveType(functionType),
+                ),
+            ),
+        )
 
+        val typeIndex = typeIndex(0u)
         val typeIndexDecoder: Decoder<Index.TypeIndex> = {
             Ok(typeIndex)
         }

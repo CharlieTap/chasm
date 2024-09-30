@@ -7,22 +7,20 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.executor.instantiator.classification.ClassifiedExternalValue
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.type.ExternalType
 
-internal typealias ImportValidator = (ModuleInstance, Import, ClassifiedExternalValue) -> Result<Unit, InstantiationError.UnexpectedImport>
+internal typealias ImportValidator = (Import, ClassifiedExternalValue) -> Result<Unit, InstantiationError.UnexpectedImport>
 
 internal fun ImportValidator(
-    instance: ModuleInstance,
     import: Import,
     classified: ClassifiedExternalValue,
 ): Result<Unit, InstantiationError.UnexpectedImport> = binding {
     val matches = when (val descriptor = import.descriptor) {
         is Import.Descriptor.Function -> {
-            val type = instance.types[descriptor.typeIndex.idx.toInt()]
+            val type = descriptor.type
 
             val externType = when (classified.type) {
-                is ExternalType.Function -> Ok(classified.type.definedType)
+                is ExternalType.Function -> Ok(classified.type.functionType)
                 else -> Err(InstantiationError.UnexpectedImport(import.moduleName.name, import.entityName.name))
             }.bind()
 

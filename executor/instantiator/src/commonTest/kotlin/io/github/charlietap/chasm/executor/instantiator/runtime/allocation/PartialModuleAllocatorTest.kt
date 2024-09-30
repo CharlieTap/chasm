@@ -99,7 +99,7 @@ class PartialModuleAllocatorTest {
         }
 
         val validatorIter = module.imports.iterator()
-        val validator: ImportValidator = { _, _import, _classified ->
+        val validator: ImportValidator = { _import, _classified ->
             assertEquals(validatorIter.next(), _import)
             assertEquals(classifiedExternalValue, _classified)
             Ok(Unit)

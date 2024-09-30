@@ -58,7 +58,7 @@ internal fun PartialModuleAllocator(
     // before the ModuleInstantiator is called
     module.imports.forEachIndexed { idx, import ->
         val classified = classifiedImports[idx]
-        importValidator(instance, import, classified).bind()
+        importValidator(import, classified).bind()
     }
 
     imports.forEach { import ->

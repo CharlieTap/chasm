@@ -2,23 +2,20 @@ package io.github.charlietap.chasm.executor.instantiator.import
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.ast.module.Import as ModuleImport
 
-internal typealias ImportDescriptorMatcher = (Store, Module, ModuleImport.Descriptor, ExternalValue) -> Result<Boolean, ModuleTrapError>
+internal typealias ImportDescriptorMatcher = (Store, ModuleImport.Descriptor, ExternalValue) -> Result<Boolean, ModuleTrapError>
 
 internal fun ImportDescriptorMatcher(
     store: Store,
-    module: Module,
     descriptor: ModuleImport.Descriptor,
     externalValue: ExternalValue,
 ): Result<Boolean, ModuleTrapError> =
     ImportDescriptorMatcher(
         store = store,
-        module = module,
         descriptor = descriptor,
         externalValue = externalValue,
         functionImportMatcher = ::FunctionImportMatcher,
@@ -30,7 +27,6 @@ internal fun ImportDescriptorMatcher(
 
 internal fun ImportDescriptorMatcher(
     store: Store,
-    module: Module,
     descriptor: ModuleImport.Descriptor,
     externalValue: ExternalValue,
     functionImportMatcher: FunctionImportMatcher,
@@ -41,7 +37,7 @@ internal fun ImportDescriptorMatcher(
 ): Result<Boolean, ModuleTrapError> = binding {
     when (descriptor) {
         is ModuleImport.Descriptor.Function -> if (externalValue is ExternalValue.Function) {
-            functionImportMatcher(store, module, descriptor, externalValue).bind()
+            functionImportMatcher(store, descriptor, externalValue).bind()
         } else {
             false
         }

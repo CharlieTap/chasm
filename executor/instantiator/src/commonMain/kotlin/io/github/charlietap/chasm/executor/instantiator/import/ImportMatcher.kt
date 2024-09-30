@@ -33,7 +33,7 @@ internal fun ImportMatcher(
         imports.firstOrNull { (moduleName, entityName, externalValue) ->
             moduleImport.moduleName.name == moduleName &&
                 moduleImport.entityName.name == entityName &&
-                descriptorMatcher(store, module, moduleImport.descriptor, externalValue).bind()
+                descriptorMatcher(store, moduleImport.descriptor, externalValue).bind()
         }?.third ?: Err(InstantiationError.MissingImport).bind<Nothing>()
     }
 }
