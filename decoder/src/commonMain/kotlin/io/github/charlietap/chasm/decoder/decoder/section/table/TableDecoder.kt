@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.type.TableType
@@ -30,6 +31,10 @@ internal fun TableDecoder(
 
     val opcode = context.reader.peek().ubyte().bind()
 
+    val tableImportCount = context.imports.count { it.descriptor is Import.Descriptor.Table }
+    val index = tableImportCount + context.index
+    val tableIndex = Index.TableIndex(index.toUInt())
+
     when (opcode) {
         OPCODE_TABLE_WITH_EXPRESSION -> {
 
@@ -38,14 +43,14 @@ internal fun TableDecoder(
 
             val tableType = tableTypeDecoder(context).bind()
             val initExpression = expressionDecoder(context).bind()
-            Table(Index.TableIndex(0u), tableType, initExpression)
+            Table(tableIndex, tableType, initExpression)
         }
         else -> {
             val tableType = tableTypeDecoder(context).bind()
             val heapType = tableType.referenceType.heapType
 
             val initExpression = Expression(listOf(ReferenceInstruction.RefNull(heapType)))
-            Table(Index.TableIndex(0u), tableType, initExpression)
+            Table(tableIndex, tableType, initExpression)
         }
     }
 }

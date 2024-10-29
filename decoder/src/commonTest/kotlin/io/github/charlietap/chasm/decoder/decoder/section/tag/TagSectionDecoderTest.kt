@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.decoder.decoder.section.tag
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
@@ -21,8 +20,7 @@ class TagSectionDecoderTest {
         val tag = tag()
         val tagSection = TagSection(
             listOf(
-                tag.copy(Index.TagIndex(0u)),
-                tag.copy(Index.TagIndex(1u)),
+                tag,
             ),
         )
         val expected = Ok(tagSection)
@@ -32,7 +30,7 @@ class TagSectionDecoderTest {
         }
 
         val vectorDecoder: VectorDecoder<Tag> = { _, _ ->
-            Ok(Vector(listOf(tag, tag)))
+            Ok(Vector(listOf(tag)))
         }
 
         val context = decoderContext()

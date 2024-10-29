@@ -4,9 +4,13 @@ import io.github.charlietap.chasm.decoder.reader.WasmBinaryReader
 
 internal data class DecoderContext(
     val reader: WasmBinaryReader,
-    val sectionContext: SectionContext = SectionContextImpl(),
     val blockContext: BlockContext = BlockContextImpl(),
+    val moduleContext: ModuleContext = ModuleContextImpl(),
+    val sectionContext: SectionContext = SectionContextImpl(),
     val typeContext: TypeContext = TypeContextImpl(),
-) : SectionContext by sectionContext,
-    BlockContext by blockContext,
-    TypeContext by typeContext
+    val vectorContext: VectorContext = VectorContextImpl(),
+) : BlockContext by blockContext,
+    ModuleContext by moduleContext,
+    SectionContext by sectionContext,
+    TypeContext by typeContext,
+    VectorContext by vectorContext

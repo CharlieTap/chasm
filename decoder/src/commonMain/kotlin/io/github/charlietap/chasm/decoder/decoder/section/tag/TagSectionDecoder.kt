@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.decoder.decoder.section.tag
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
@@ -25,11 +24,7 @@ internal fun TagSectionDecoder(
     vectorDecoder: VectorDecoder<Tag> = ::VectorDecoder,
 ): Result<TagSection, WasmDecodeError> = binding {
 
-    val tags = vectorDecoder(context, tagDecoder).bind().vector.mapIndexed { idx, tag ->
-        tag.copy(
-            index = Index.TagIndex(idx.toUInt()),
-        )
-    }
+    val tags = vectorDecoder(context, tagDecoder).bind()
 
-    TagSection(tags)
+    TagSection(tags.vector)
 }

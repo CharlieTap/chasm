@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Global
+import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
@@ -25,7 +26,13 @@ internal fun GlobalDecoder(
     globalTypeDecoder: Decoder<GlobalType>,
     expressionDecoder: Decoder<Expression>,
 ): Result<Global, WasmDecodeError> = binding {
+
     val type = globalTypeDecoder(context).bind()
     val expression = expressionDecoder(context).bind()
-    Global(Index.GlobalIndex(0u), type, expression)
+
+    val globalImportCount = context.imports.count { it.descriptor is Import.Descriptor.Global }
+    val index = globalImportCount + context.index
+    val globalIndex = Index.GlobalIndex(index.toUInt())
+
+    Global(globalIndex, type, expression)
 }

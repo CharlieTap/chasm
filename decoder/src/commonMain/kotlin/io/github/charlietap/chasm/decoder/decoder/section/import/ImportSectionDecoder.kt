@@ -24,7 +24,8 @@ internal fun ImportSectionDecoder(
     vectorDecoder: VectorDecoder<Import>,
 ): Result<ImportSection, WasmDecodeError> = binding {
 
-    val imports = vectorDecoder(context, importDecoder).bind()
+    val imports = vectorDecoder(context, importDecoder).bind().vector
 
-    ImportSection(imports.vector)
+    context.imports = imports
+    ImportSection(imports)
 }

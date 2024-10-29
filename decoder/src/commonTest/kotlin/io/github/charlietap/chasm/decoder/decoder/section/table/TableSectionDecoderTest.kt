@@ -5,15 +5,15 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.decoder.decoder.Decoder
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorLength
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorLengthDecoder
+import io.github.charlietap.chasm.decoder.decoder.vector.Vector
+import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.section.TableSection
-import io.github.charlietap.chasm.fixture.module.tableIndex
 import io.github.charlietap.chasm.fixture.type.tableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class TableSectionDecoderTest {
 
@@ -24,15 +24,14 @@ class TableSectionDecoderTest {
         val context = decoderContext(reader)
         val tableType = tableType()
         val table = Table(Index.TableIndex(0u), tableType, Expression.EMPTY)
-        val expected = Ok(TableSection(listOf(table, table.copy(idx = tableIndex(1u)))))
-
-        val vectorDecoder: VectorLengthDecoder = { _reader ->
-            assertEquals(reader, _reader)
-            Ok(VectorLength(2u))
-        }
+        val expected = Ok(TableSection(listOf(table)))
 
         val tableDecoder: Decoder<Table> = { _ ->
-            Ok(table)
+            fail("TableDecoder should not be called directly")
+        }
+
+        val vectorDecoder: VectorDecoder<Table> = { _, _ ->
+            Ok(Vector(listOf(table)))
         }
 
         val actual = TableSectionDecoder(context, vectorDecoder, tableDecoder)

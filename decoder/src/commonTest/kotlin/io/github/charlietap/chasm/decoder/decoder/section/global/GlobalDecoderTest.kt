@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
+import io.github.charlietap.chasm.fixture.module.globalImport
 import io.github.charlietap.chasm.fixture.module.globalIndex
 import io.github.charlietap.chasm.fixture.type.globalType
 import kotlin.test.Test
@@ -16,7 +17,12 @@ class GlobalDecoderTest {
     @Test
     fun `can decode an encoded global`() {
 
-        val context = decoderContext()
+        val context = decoderContext(
+            index = 2,
+            imports = listOf(
+                globalImport(),
+            ),
+        )
 
         val globalType = globalType()
         val globalTypeDecoder: Decoder<GlobalType> = { _ ->
@@ -28,7 +34,7 @@ class GlobalDecoderTest {
             Ok(expression)
         }
 
-        val index = globalIndex(0u)
+        val index = globalIndex(3u)
         val expected = Ok(Global(index, globalType, expression))
         val actual = GlobalDecoder(context, globalTypeDecoder, expressionDecoder)
 

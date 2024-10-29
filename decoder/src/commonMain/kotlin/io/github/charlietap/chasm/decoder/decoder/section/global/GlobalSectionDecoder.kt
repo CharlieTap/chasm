@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.decoder.decoder.section.global
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Global
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
@@ -25,9 +24,7 @@ internal fun GlobalSectionDecoder(
     globalDecoder: Decoder<Global>,
 ): Result<GlobalSection, WasmDecodeError> = binding {
 
-    val globals = vectorDecoder(context, globalDecoder).bind().vector.mapIndexed { idx, global ->
-        global.copy(idx = Index.GlobalIndex(idx.toUInt()))
-    }
+    val globals = vectorDecoder(context, globalDecoder).bind()
 
-    GlobalSection(globals)
+    GlobalSection(globals.vector)
 }

@@ -15,7 +15,8 @@ internal fun <T> VectorDecoder(
 
     val vecLength = context.reader.uint().bind()
 
-    val vector = List(vecLength.toInt()) {
+    val vector = List(vecLength.toInt()) { index ->
+        context.index = index
         subDecoder(context).bind()
     }
 

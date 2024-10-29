@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.MemorySection
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class MemorySectionDecoderTest {
 
@@ -23,16 +24,16 @@ class MemorySectionDecoderTest {
         val memory = Memory(Index.MemoryIndex(0u), memoryType)
         val expected = Ok(MemorySection(listOf(memory)))
 
-        val memoryTypeDecoder: Decoder<MemoryType> = {
-            Ok(memoryType)
+        val memoryDecoder: Decoder<Memory> = {
+            fail("MemoryDecoder should not be called directly")
         }
 
-        val vectorDecoder: VectorDecoder<MemoryType> = { _, _ ->
-            Ok(Vector(listOf(memoryType)))
+        val vectorDecoder: VectorDecoder<Memory> = { _, _ ->
+            Ok(Vector(listOf(memory)))
         }
 
         val context = decoderContext()
-        val actual = MemorySectionDecoder(context, vectorDecoder, memoryTypeDecoder)
+        val actual = MemorySectionDecoder(context, vectorDecoder, memoryDecoder)
 
         assertEquals(expected, actual)
     }

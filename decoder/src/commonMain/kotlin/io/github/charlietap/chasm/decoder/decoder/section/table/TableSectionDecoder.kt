@@ -2,12 +2,10 @@ package io.github.charlietap.chasm.decoder.decoder.section.table
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
-import io.github.charlietap.chasm.decoder.decoder.vector.BinaryVectorLengthDecoder
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorLengthDecoder
+import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.section.TableSection
 
@@ -16,23 +14,17 @@ internal fun TableSectionDecoder(
 ): Result<TableSection, WasmDecodeError> =
     TableSectionDecoder(
         context = context,
-        vectorLengthDecoder = ::BinaryVectorLengthDecoder,
+        vectorDecoder = ::VectorDecoder,
         tableDecoder = ::TableDecoder,
     )
 
 internal fun TableSectionDecoder(
     context: DecoderContext,
-    vectorLengthDecoder: VectorLengthDecoder = ::BinaryVectorLengthDecoder,
+    vectorDecoder: VectorDecoder<Table>,
     tableDecoder: Decoder<Table>,
 ): Result<TableSection, WasmDecodeError> = binding {
 
-    val vectorLength = vectorLengthDecoder(context.reader).bind()
+    val tables = vectorDecoder(context, tableDecoder).bind()
 
-    val tables = (0u..<vectorLength.length).map { idx ->
-        tableDecoder(context).bind().copy(
-            idx = Index.TableIndex(idx),
-        )
-    }
-
-    TableSection(tables)
+    TableSection(tables.vector)
 }

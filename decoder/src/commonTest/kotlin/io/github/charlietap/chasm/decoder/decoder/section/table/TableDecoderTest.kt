@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.fixture.instruction.expression
 import io.github.charlietap.chasm.fixture.module.table
+import io.github.charlietap.chasm.fixture.module.tableImport
 import io.github.charlietap.chasm.fixture.module.tableIndex
 import io.github.charlietap.chasm.fixture.type.tableType
 import kotlin.test.Test
@@ -27,9 +28,15 @@ class TableDecoderTest {
             Ok(0x00u)
         }
         val reader = FakeWasmBinaryReader(fakePeekReader = { peekReader })
-        val context = decoderContext(reader)
+        val context = decoderContext(
+            reader = reader,
+            index = 2,
+            imports = listOf(
+                tableImport(),
+            ),
+        )
 
-        val tableIndex = tableIndex()
+        val tableIndex = tableIndex(3u)
         val tableType = tableType()
         val table = table(
             idx = tableIndex,
@@ -69,9 +76,15 @@ class TableDecoderTest {
             fakeUByteReader = fakeUByteReader,
             fakePeekReader = { peekReader },
         )
-        val context = decoderContext(reader)
+        val context = decoderContext(
+            reader = reader,
+            index = 2,
+            imports = listOf(
+                tableImport(),
+            ),
+        )
 
-        val tableIndex = tableIndex()
+        val tableIndex = tableIndex(3u)
         val tableType = tableType()
         val initExpression = expression()
         val table = table(

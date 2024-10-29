@@ -9,34 +9,29 @@ import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.GlobalSection
-import io.github.charlietap.chasm.fixture.module.globalIndex
 import io.github.charlietap.chasm.fixture.type.globalType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class GlobalSectionDecoderTest {
 
     @Test
     fun `can decode an encoded global section`() {
 
-        val global1 = Global(
+        val global = Global(
             idx = Index.GlobalIndex(0u),
             type = globalType(),
             initExpression = Expression(),
         )
-        val global2 = Global(
-            idx = Index.GlobalIndex(0u),
-            type = globalType(),
-            initExpression = Expression(),
-        )
-        val expected = Ok(GlobalSection(listOf(global1, global2.copy(idx = globalIndex(1u)))))
+        val expected = Ok(GlobalSection(listOf(global)))
 
         val globalDecoder: Decoder<Global> = { _ ->
-            Ok(global1)
+            fail("GlobalDecoder should not be called directly")
         }
 
         val vectorDecoder: VectorDecoder<Global> = { _, _ ->
-            Ok(Vector(listOf(global1, global2)))
+            Ok(Vector(listOf(global)))
         }
 
         val context = decoderContext()
