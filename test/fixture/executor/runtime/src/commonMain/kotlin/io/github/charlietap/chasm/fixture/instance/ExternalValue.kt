@@ -20,3 +20,7 @@ fun memoryExternalValue(
 fun globalExternalValue(
     address: Address.Global = globalAddress(),
 ) = ExternalValue.Global(address)
+
+fun tagExternalValue(
+    address: Address.Tag = tagAddress(),
+) = ExternalValue.Tag(address)
