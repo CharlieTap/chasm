@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import io.github.charlietap.sweet.plugin.ext.backtrackCollectingDirectoriesUntil
 import io.github.charlietap.sweet.plugin.ext.snakeCaseToPascalCase
 import java.io.File
 
@@ -24,7 +25,11 @@ fun testFileSpec(
 
     val testName = test.nameWithoutExtension.snakeCaseToPascalCase()
     val testClassName = if(test.path.contains("proposal")) {
-        val modifiedTestPackage = testPackage + ".proposal." + test.parentFile.name
+        val directories = test.backtrackCollectingDirectoriesUntil { file ->
+            file.parentFile.name == "proposal"
+        }
+        val subPackage = "proposal." + directories.asReversed().joinToString(".")
+        val modifiedTestPackage = "$testPackage.$subPackage"
         ClassName(modifiedTestPackage, testName)
     } else {
         val modifiedTestPackage = testPackage + "." + test.parentFile.name

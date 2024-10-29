@@ -1,7 +1,9 @@
 package io.github.charlietap.sweet.plugin.task
 
 import io.github.charlietap.sweet.plugin.action.GenerateTestAction
+import io.github.charlietap.sweet.plugin.ext.backtrackCollectingDirectoriesUntil
 import io.github.charlietap.sweet.plugin.ext.snakeCaseToPascalCase
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileTree
@@ -49,13 +51,21 @@ abstract class GenerateTestsTask : DefaultTask() {
 
             if(change.file.isDirectory) return@forEach
 
-            val testPackageDirPath = testPackageName.get().replace(".", "/")
+            val testPackageDirPath = testPackageName.get().replace(".", File.separator)
             val testPackageDir = outputDirectory.dir(testPackageDirPath).get()
             val name = change.file.nameWithoutExtension.snakeCaseToPascalCase() + "Test.kt"
 
-            val test = if(change.file.path.contains("proposal")) {
-                val dir = "proposal/${change.file.parentFile.name}"
-                testPackageDir.dir(dir).file(name)
+            val test = if(change.file.path.contains(DIRECTORY_PROPOSAL)) {
+
+                val directories = change.file.backtrackCollectingDirectoriesUntil { file ->
+                    file.parentFile.name == DIRECTORY_PROPOSAL
+                }
+                var outputDirectory = testPackageDir.dir(DIRECTORY_PROPOSAL)
+                directories.asReversed().forEach { directory ->
+                    outputDirectory = outputDirectory.dir(directory)
+                }
+
+                outputDirectory.file(name)
             } else {
                 testPackageDir.dir(change.file.nameWithoutExtension).file(name)
             }
@@ -71,7 +81,6 @@ abstract class GenerateTestsTask : DefaultTask() {
                 ChangeType.ADDED -> {
                     queueJobToGenerateTest(change, test)
                 }
-                null -> Unit
             }
         }
     }
@@ -87,5 +96,9 @@ abstract class GenerateTestsTask : DefaultTask() {
             testPackage = testPackageName
             testFile = generatedTestFile
         }
+    }
+
+    private companion object {
+        const val DIRECTORY_PROPOSAL = "proposal"
     }
 }
