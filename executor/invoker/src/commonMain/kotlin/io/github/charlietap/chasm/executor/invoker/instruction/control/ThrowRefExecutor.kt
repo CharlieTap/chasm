@@ -76,7 +76,6 @@ internal inline fun ThrowRefExecutor(
                 stack.pushInstruction(ModuleInstruction(ControlInstruction.Br(catchHandler.labelIndex)))
             }
             catchHandler is ControlInstruction.CatchHandler.CatchAll -> {
-                println("in catch all")
                 stack.pushInstruction(ModuleInstruction(ControlInstruction.Br(catchHandler.labelIndex)))
             }
             catchHandler is ControlInstruction.CatchHandler.CatchAllRef -> {
