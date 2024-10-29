@@ -19,7 +19,7 @@ internal class FunctionTypeMapper(
     override fun bimap(input: InternalFunctionType): FunctionType {
         return FunctionType(
             input.params.types.map(valueTypeMapper::bimap),
-            input.params.types.map(valueTypeMapper::bimap),
+            input.results.types.map(valueTypeMapper::bimap),
         )
     }
 
