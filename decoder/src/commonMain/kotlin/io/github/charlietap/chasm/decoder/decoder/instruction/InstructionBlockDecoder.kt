@@ -14,9 +14,9 @@ internal fun InstructionBlockDecoder(
     ::InstructionDecoder,
 )
 
-internal fun InstructionBlockDecoder(
+internal inline fun InstructionBlockDecoder(
     context: DecoderContext,
-    instructionDecoder: Decoder<Instruction>,
+    crossinline instructionDecoder: Decoder<Instruction>,
 ): Result<List<Instruction>, WasmDecodeError> = binding {
     val instructions = mutableListOf<Instruction>()
     do {

@@ -18,9 +18,9 @@ internal fun TypeDecoder(
         typeDecoder = ::RecursiveTypeDecoder,
     )
 
-internal fun TypeDecoder(
+internal inline fun TypeDecoder(
     context: DecoderContext,
-    typeDecoder: Decoder<RecursiveType>,
+    crossinline typeDecoder: Decoder<RecursiveType>,
 ): Result<Type, WasmDecodeError> = binding {
 
     val type = typeDecoder(context).bind()

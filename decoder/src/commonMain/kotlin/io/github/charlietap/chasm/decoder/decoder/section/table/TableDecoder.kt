@@ -23,10 +23,10 @@ internal fun TableDecoder(
         expressionDecoder = ::ExpressionDecoder,
     )
 
-internal fun TableDecoder(
+internal inline fun TableDecoder(
     context: DecoderContext,
-    tableTypeDecoder: Decoder<TableType>,
-    expressionDecoder: Decoder<Expression>,
+    crossinline tableTypeDecoder: Decoder<TableType>,
+    crossinline expressionDecoder: Decoder<Expression>,
 ): Result<Table, WasmDecodeError> = binding {
 
     val opcode = context.reader.peek().ubyte().bind()

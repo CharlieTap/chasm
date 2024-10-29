@@ -21,9 +21,9 @@ internal fun TableInstructionDecoder(
         tableIndexDecoder = ::TableIndexDecoder,
     )
 
-internal fun TableInstructionDecoder(
+internal inline fun TableInstructionDecoder(
     context: DecoderContext,
-    tableIndexDecoder: Decoder<Index.TableIndex>,
+    crossinline tableIndexDecoder: Decoder<Index.TableIndex>,
 ): Result<TableInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte().bind()) {
         TABLE_GET -> {

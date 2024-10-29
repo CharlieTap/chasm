@@ -21,10 +21,10 @@ internal fun TagTypeDecoder(
         typeIndexDecoder = ::TypeIndexDecoder,
     )
 
-internal fun TagTypeDecoder(
+internal inline fun TagTypeDecoder(
     context: DecoderContext,
-    attributeDecoder: Decoder<TagType.Attribute>,
-    typeIndexDecoder: Decoder<Index.TypeIndex>,
+    crossinline attributeDecoder: Decoder<TagType.Attribute>,
+    crossinline typeIndexDecoder: Decoder<Index.TypeIndex>,
 ): Result<TagType, WasmDecodeError> = binding {
 
     val attribute = attributeDecoder(context).bind()

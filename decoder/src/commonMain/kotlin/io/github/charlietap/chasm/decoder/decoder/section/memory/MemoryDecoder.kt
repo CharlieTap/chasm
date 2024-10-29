@@ -18,9 +18,9 @@ internal fun MemoryDecoder(
     memoryTypeDecoder = ::MemoryTypeDecoder,
 )
 
-internal fun MemoryDecoder(
+internal inline fun MemoryDecoder(
     context: DecoderContext,
-    memoryTypeDecoder: Decoder<MemoryType>,
+    crossinline memoryTypeDecoder: Decoder<MemoryType>,
 ): Result<Memory, WasmDecodeError> = binding {
 
     val type = memoryTypeDecoder(context).bind()

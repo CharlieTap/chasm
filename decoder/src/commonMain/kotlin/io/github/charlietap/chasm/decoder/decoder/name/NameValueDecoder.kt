@@ -15,15 +15,15 @@ internal fun NameValueDecoder(
     context: DecoderContext,
 ): Result<NameValue, WasmDecodeError> = NameValueDecoder(context, ::BinaryByteVectorDecoder)
 
-internal fun NameValueDecoder(
+internal inline fun NameValueDecoder(
     context: DecoderContext,
-    vectorDecoder: ByteVectorDecoder,
+    crossinline vectorDecoder: ByteVectorDecoder,
 ): Result<NameValue, WasmDecodeError> = binding {
 
     val vector = vectorDecoder(context.reader).bind()
     val name = try {
         Ok(vector.bytes.asByteArray().decodeToString(throwOnInvalidSequence = true))
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         Err(ValueDecodeError.InvalidName(vector.bytes))
     }.bind()
 

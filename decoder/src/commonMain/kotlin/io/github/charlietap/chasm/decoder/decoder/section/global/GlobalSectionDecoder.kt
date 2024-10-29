@@ -18,10 +18,10 @@ internal fun GlobalSectionDecoder(
         globalDecoder = ::GlobalDecoder,
     )
 
-internal fun GlobalSectionDecoder(
+internal inline fun GlobalSectionDecoder(
     context: DecoderContext,
-    vectorDecoder: VectorDecoder<Global>,
-    globalDecoder: Decoder<Global>,
+    crossinline vectorDecoder: VectorDecoder<Global>,
+    noinline globalDecoder: Decoder<Global>,
 ): Result<GlobalSection, WasmDecodeError> = binding {
 
     val globals = vectorDecoder(context, globalDecoder).bind()

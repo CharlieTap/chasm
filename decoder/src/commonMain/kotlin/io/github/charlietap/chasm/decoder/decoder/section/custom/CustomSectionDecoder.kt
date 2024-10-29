@@ -23,9 +23,9 @@ internal fun CustomSectionDecoder(
     nameValueDecoder = ::NameValueDecoder,
 )
 
-internal fun CustomSectionDecoder(
+internal inline fun CustomSectionDecoder(
     context: DecoderContext,
-    nameValueDecoder: Decoder<NameValue>,
+    crossinline nameValueDecoder: Decoder<NameValue>,
 ) = binding {
     val (nameResult, bytesConsumed) = context.reader.trackBytes {
         nameValueDecoder(context)

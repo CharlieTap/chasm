@@ -18,10 +18,10 @@ internal fun ExportDecoder(
         exportDescriptorDecoder = ::ExportDescriptorDecoder,
     )
 
-internal fun ExportDecoder(
+internal inline fun ExportDecoder(
     context: DecoderContext,
-    nameValueDecoder: Decoder<NameValue>,
-    exportDescriptorDecoder: Decoder<Export.Descriptor>,
+    crossinline nameValueDecoder: Decoder<NameValue>,
+    crossinline exportDescriptorDecoder: Decoder<Export.Descriptor>,
 ): Result<Export, WasmDecodeError> = binding {
 
     val name = nameValueDecoder(context).bind()

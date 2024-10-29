@@ -60,22 +60,22 @@ internal fun SectionDecoder(
         typeSectionDecoder = ::TypeSectionDecoder,
     )
 
-internal fun SectionDecoder(
+internal inline fun SectionDecoder(
     context: DecoderContext,
-    customSectionDecoder: Decoder<CustomSection>,
-    codeSectionDecoder: Decoder<CodeSection>,
-    dataSectionDecoder: Decoder<DataSection>,
-    dataCountSectionDecoder: Decoder<DataCountSection>,
-    elementSectionDecoder: Decoder<ElementSection>,
-    importSectionDecoder: Decoder<ImportSection>,
-    exportSectionDecoder: Decoder<ExportSection>,
-    functionSectionDecoder: Decoder<FunctionSection>,
-    globalSectionDecoder: Decoder<GlobalSection>,
-    memorySectionDecoder: Decoder<MemorySection>,
-    startSectionDecoder: Decoder<StartSection>,
-    tableSectionDecoder: Decoder<TableSection>,
-    tagSectionDecoder: Decoder<TagSection>,
-    typeSectionDecoder: Decoder<TypeSection>,
+    crossinline customSectionDecoder: Decoder<CustomSection>,
+    crossinline codeSectionDecoder: Decoder<CodeSection>,
+    crossinline dataSectionDecoder: Decoder<DataSection>,
+    crossinline dataCountSectionDecoder: Decoder<DataCountSection>,
+    crossinline elementSectionDecoder: Decoder<ElementSection>,
+    crossinline importSectionDecoder: Decoder<ImportSection>,
+    crossinline exportSectionDecoder: Decoder<ExportSection>,
+    crossinline functionSectionDecoder: Decoder<FunctionSection>,
+    crossinline globalSectionDecoder: Decoder<GlobalSection>,
+    crossinline memorySectionDecoder: Decoder<MemorySection>,
+    crossinline startSectionDecoder: Decoder<StartSection>,
+    crossinline tableSectionDecoder: Decoder<TableSection>,
+    crossinline tagSectionDecoder: Decoder<TagSection>,
+    crossinline typeSectionDecoder: Decoder<TypeSection>,
 ): Result<Section, WasmDecodeError> = binding {
 
     val (section, bytesConsumed) = context.reader.trackBytes {

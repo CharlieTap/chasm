@@ -16,9 +16,9 @@ internal fun LocalEntryDecoder(
         valueTypeDecoder = ::ValueTypeDecoder,
     )
 
-internal fun LocalEntryDecoder(
+internal inline fun LocalEntryDecoder(
     context: DecoderContext,
-    valueTypeDecoder: Decoder<ValueType>,
+    crossinline valueTypeDecoder: Decoder<ValueType>,
 ): Result<LocalEntry, WasmDecodeError> = binding {
 
     val count = context.reader.uint().bind()

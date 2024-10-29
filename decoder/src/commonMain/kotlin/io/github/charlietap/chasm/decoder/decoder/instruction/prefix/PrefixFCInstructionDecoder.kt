@@ -47,12 +47,12 @@ internal fun PrefixFCInstructionDecoder(
         tableIndexDecoder = ::TableIndexDecoder,
     )
 
-internal fun PrefixFCInstructionDecoder(
+internal inline fun PrefixFCInstructionDecoder(
     context: DecoderContext,
-    dataIndexDecoder: Decoder<Index.DataIndex>,
-    elementIndexDecoder: Decoder<Index.ElementIndex>,
-    memoryIndexDecoder: Decoder<Index.MemoryIndex>,
-    tableIndexDecoder: Decoder<Index.TableIndex>,
+    crossinline dataIndexDecoder: Decoder<Index.DataIndex>,
+    crossinline elementIndexDecoder: Decoder<Index.ElementIndex>,
+    crossinline memoryIndexDecoder: Decoder<Index.MemoryIndex>,
+    crossinline tableIndexDecoder: Decoder<Index.TableIndex>,
 ): Result<Instruction, WasmDecodeError> = binding {
 
     when (val opcode = context.reader.uint().bind()) {

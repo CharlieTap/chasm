@@ -23,11 +23,11 @@ internal fun CodeEntryDecoder(
         vectorDecoder = ::VectorDecoder,
     )
 
-internal fun CodeEntryDecoder(
+internal inline fun CodeEntryDecoder(
     context: DecoderContext,
-    localEntryDecoder: Decoder<LocalEntry>,
-    expressionDecoder: Decoder<Expression>,
-    vectorDecoder: VectorDecoder<LocalEntry>,
+    noinline localEntryDecoder: Decoder<LocalEntry>,
+    crossinline expressionDecoder: Decoder<Expression>,
+    crossinline vectorDecoder: VectorDecoder<LocalEntry>,
 ): Result<CodeEntry, WasmDecodeError> = binding {
 
     val size = context.reader.uint().bind()

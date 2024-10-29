@@ -17,9 +17,9 @@ internal fun IfDecoder(
     instructionDecoder = ::InstructionDecoder,
 )
 
-internal fun IfDecoder(
+internal inline fun IfDecoder(
     context: DecoderContext,
-    instructionDecoder: Decoder<Instruction>,
+    crossinline instructionDecoder: Decoder<Instruction>,
 ): Result<Pair<List<Instruction>, List<Instruction>?>, WasmDecodeError> = binding {
     val instructions = mutableListOf<Instruction>()
     var elseInstructions: MutableList<Instruction>? = null

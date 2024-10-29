@@ -18,10 +18,10 @@ internal fun DataSectionDecoder(
     vectorDecoder = ::VectorDecoder,
 )
 
-internal fun DataSectionDecoder(
+internal inline fun DataSectionDecoder(
     context: DecoderContext,
-    segmentDecoder: Decoder<DataSegment>,
-    vectorDecoder: VectorDecoder<DataSegment>,
+    noinline segmentDecoder: Decoder<DataSegment>,
+    crossinline vectorDecoder: VectorDecoder<DataSegment>,
 ): Result<DataSection, WasmDecodeError> = binding {
 
     val segments = vectorDecoder(context, segmentDecoder).bind().vector.mapIndexed { idx, segment ->

@@ -44,11 +44,11 @@ internal fun MemoryInstructionDecoder(
         memorySizeDecoder = ::MemorySizeInstructionDecoder,
     )
 
-internal fun MemoryInstructionDecoder(
+internal inline fun MemoryInstructionDecoder(
     context: DecoderContext,
-    memArgWithIndexDecoder: Decoder<MemArgWithIndex>,
-    memoryGrowDecoder: Decoder<MemoryInstruction.MemoryGrow>,
-    memorySizeDecoder: Decoder<MemoryInstruction.MemorySize>,
+    crossinline memArgWithIndexDecoder: Decoder<MemArgWithIndex>,
+    crossinline memoryGrowDecoder: Decoder<MemoryInstruction.MemoryGrow>,
+    crossinline memorySizeDecoder: Decoder<MemoryInstruction.MemorySize>,
 ): Result<MemoryInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte().bind()) {
         I32_LOAD -> {

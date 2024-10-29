@@ -20,9 +20,9 @@ internal fun BlockTypeDecoder(
     valueTypeDecoder = ::ValueTypeDecoder,
 )
 
-internal fun BlockTypeDecoder(
+internal inline fun BlockTypeDecoder(
     context: DecoderContext,
-    valueTypeDecoder: Decoder<ValueType>,
+    crossinline valueTypeDecoder: Decoder<ValueType>,
 ): Result<BlockType, WasmDecodeError> = binding {
 
     val firstByte = context.reader.peek().ubyte().bind()

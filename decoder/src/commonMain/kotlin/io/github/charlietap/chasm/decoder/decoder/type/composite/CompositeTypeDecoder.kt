@@ -25,11 +25,11 @@ internal fun CompositeTypeDecoder(
         arrayTypeDecoder = ::ArrayTypeDecoder,
     )
 
-internal fun CompositeTypeDecoder(
+internal inline fun CompositeTypeDecoder(
     context: DecoderContext,
-    functionTypeDecoder: Decoder<FunctionType>,
-    structTypeDecoder: Decoder<StructType>,
-    arrayTypeDecoder: Decoder<ArrayType>,
+    crossinline functionTypeDecoder: Decoder<FunctionType>,
+    crossinline structTypeDecoder: Decoder<StructType>,
+    crossinline arrayTypeDecoder: Decoder<ArrayType>,
 ): Result<CompositeType, WasmDecodeError> = binding {
     when (val compositeTypeByte = context.reader.ubyte().bind()) {
         ARRAY_COMPOSITE_TYPE -> CompositeType.Array(arrayTypeDecoder(context).bind())

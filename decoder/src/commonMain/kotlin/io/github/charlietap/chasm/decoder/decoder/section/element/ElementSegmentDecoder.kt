@@ -33,15 +33,15 @@ internal fun ElementSegmentDecoder(
         functionIndexVectorDecoder = ::VectorDecoder,
     )
 
-internal fun ElementSegmentDecoder(
+internal inline fun ElementSegmentDecoder(
     context: DecoderContext,
-    elementKindDecoder: Decoder<ElementKind>,
-    expressionDecoder: Decoder<Expression>,
-    functionIndexDecoder: Decoder<Index.FunctionIndex>,
-    tableIndexDecoder: Decoder<Index.TableIndex>,
-    referenceTypeDecoder: Decoder<ReferenceType>,
-    expressionVectorDecoder: VectorDecoder<Expression>,
-    functionIndexVectorDecoder: VectorDecoder<Index.FunctionIndex>,
+    crossinline elementKindDecoder: Decoder<ElementKind>,
+    noinline expressionDecoder: Decoder<Expression>,
+    noinline functionIndexDecoder: Decoder<Index.FunctionIndex>,
+    crossinline tableIndexDecoder: Decoder<Index.TableIndex>,
+    crossinline referenceTypeDecoder: Decoder<ReferenceType>,
+    crossinline expressionVectorDecoder: VectorDecoder<Expression>,
+    crossinline functionIndexVectorDecoder: VectorDecoder<Index.FunctionIndex>,
 ): Result<ElementSegment, WasmDecodeError> = binding {
 
     val elemIndexPlaceholder = Index.ElementIndex(0u)

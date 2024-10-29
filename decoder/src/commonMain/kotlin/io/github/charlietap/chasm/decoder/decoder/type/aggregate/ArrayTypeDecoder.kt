@@ -16,9 +16,9 @@ internal fun ArrayTypeDecoder(
         fieldTypeDecoder = ::FieldTypeDecoder,
     )
 
-internal fun ArrayTypeDecoder(
+internal inline fun ArrayTypeDecoder(
     context: DecoderContext,
-    fieldTypeDecoder: Decoder<FieldType>,
+    crossinline fieldTypeDecoder: Decoder<FieldType>,
 ): Result<ArrayType, WasmDecodeError> = binding {
 
     val fieldType = fieldTypeDecoder(context).bind()

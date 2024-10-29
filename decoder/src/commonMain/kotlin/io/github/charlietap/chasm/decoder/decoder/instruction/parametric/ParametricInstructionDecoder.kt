@@ -24,10 +24,10 @@ internal fun ParametricInstructionDecoder(
         valueTypeDecoder = ::ValueTypeDecoder,
     )
 
-internal fun ParametricInstructionDecoder(
+internal inline fun ParametricInstructionDecoder(
     context: DecoderContext,
-    vectorDecoder: VectorDecoder<ValueType>,
-    valueTypeDecoder: Decoder<ValueType>,
+    crossinline vectorDecoder: VectorDecoder<ValueType>,
+    noinline valueTypeDecoder: Decoder<ValueType>,
 ): Result<ParametricInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte().bind()) {
         DROP -> {

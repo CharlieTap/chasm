@@ -18,10 +18,10 @@ internal fun TagSectionDecoder(
         vectorDecoder = ::VectorDecoder,
     )
 
-internal fun TagSectionDecoder(
+internal inline fun TagSectionDecoder(
     context: DecoderContext,
-    tagDecoder: Decoder<Tag>,
-    vectorDecoder: VectorDecoder<Tag> = ::VectorDecoder,
+    noinline tagDecoder: Decoder<Tag>,
+    crossinline vectorDecoder: VectorDecoder<Tag> = ::VectorDecoder,
 ): Result<TagSection, WasmDecodeError> = binding {
 
     val tags = vectorDecoder(context, tagDecoder).bind()

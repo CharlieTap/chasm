@@ -18,10 +18,10 @@ internal fun ImportDecoder(
         importDescriptorDecoder = ::ImportDescriptorDecoder,
     )
 
-internal fun ImportDecoder(
+internal inline fun ImportDecoder(
     context: DecoderContext,
-    nameValueDecoder: Decoder<NameValue>,
-    importDescriptorDecoder: Decoder<Import.Descriptor>,
+    crossinline nameValueDecoder: Decoder<NameValue>,
+    crossinline importDescriptorDecoder: Decoder<Import.Descriptor>,
 ): Result<Import, WasmDecodeError> = binding {
 
     val moduleName = nameValueDecoder(context).bind()

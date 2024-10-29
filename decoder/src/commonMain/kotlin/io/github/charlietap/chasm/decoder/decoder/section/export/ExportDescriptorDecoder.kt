@@ -27,13 +27,13 @@ internal fun ExportDescriptorDecoder(
         tagIndexDecoder = ::TagIndexDecoder,
     )
 
-internal fun ExportDescriptorDecoder(
+internal inline fun ExportDescriptorDecoder(
     context: DecoderContext,
-    functionIndexDecoder: Decoder<Index.FunctionIndex>,
-    globalIndexDecoder: Decoder<Index.GlobalIndex>,
-    memIndexDecoder: Decoder<Index.MemoryIndex>,
-    tableIndexDecoder: Decoder<Index.TableIndex>,
-    tagIndexDecoder: Decoder<Index.TagIndex>,
+    crossinline functionIndexDecoder: Decoder<Index.FunctionIndex>,
+    crossinline globalIndexDecoder: Decoder<Index.GlobalIndex>,
+    crossinline memIndexDecoder: Decoder<Index.MemoryIndex>,
+    crossinline tableIndexDecoder: Decoder<Index.TableIndex>,
+    crossinline tagIndexDecoder: Decoder<Index.TagIndex>,
 ): Result<Export.Descriptor, WasmDecodeError> = binding {
 
     when (val descriptorType = context.reader.ubyte().bind()) {

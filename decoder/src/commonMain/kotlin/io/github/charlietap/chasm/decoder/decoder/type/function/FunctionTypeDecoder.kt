@@ -16,9 +16,9 @@ internal fun FunctionTypeDecoder(
     ::ResultTypeDecoder,
 )
 
-internal fun FunctionTypeDecoder(
+internal inline fun FunctionTypeDecoder(
     context: DecoderContext,
-    resultTypeDecoder: Decoder<ResultType>,
+    crossinline resultTypeDecoder: Decoder<ResultType>,
 ): Result<FunctionType, WasmDecodeError> = binding {
 
     val params = resultTypeDecoder(context).bind()

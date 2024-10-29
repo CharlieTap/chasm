@@ -28,10 +28,10 @@ internal fun ValueTypeDecoder(
         referenceTypeDecoder = ::ReferenceTypeDecoder,
     )
 
-internal fun ValueTypeDecoder(
+internal inline fun ValueTypeDecoder(
     context: DecoderContext,
-    numberTypeDecoder: Decoder<NumberType>,
-    referenceTypeDecoder: Decoder<ReferenceType>,
+    crossinline numberTypeDecoder: Decoder<NumberType>,
+    crossinline referenceTypeDecoder: Decoder<ReferenceType>,
 ): Result<ValueType, WasmDecodeError> = binding {
     when (val byte = context.reader.peek().ubyte().bind()) {
         in NUMBER_TYPE_RANGE -> {

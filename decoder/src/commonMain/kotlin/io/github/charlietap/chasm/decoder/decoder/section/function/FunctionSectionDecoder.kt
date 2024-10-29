@@ -19,10 +19,10 @@ internal fun FunctionSectionDecoder(
         typeIndexDecoder = ::TypeIndexDecoder,
     )
 
-internal fun FunctionSectionDecoder(
+internal inline fun FunctionSectionDecoder(
     context: DecoderContext,
-    vectorDecoder: VectorDecoder<Index.TypeIndex>,
-    typeIndexDecoder: Decoder<Index.TypeIndex>,
+    crossinline vectorDecoder: VectorDecoder<Index.TypeIndex>,
+    noinline typeIndexDecoder: Decoder<Index.TypeIndex>,
 ): Result<FunctionSection, WasmDecodeError> = binding {
 
     val indices = vectorDecoder(context, typeIndexDecoder).bind()

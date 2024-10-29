@@ -20,9 +20,9 @@ internal fun ReferenceInstructionDecoder(
         heapTypeDecoder = ::HeapTypeDecoder,
     )
 
-internal fun ReferenceInstructionDecoder(
+internal inline fun ReferenceInstructionDecoder(
     context: DecoderContext,
-    heapTypeDecoder: Decoder<HeapType>,
+    crossinline heapTypeDecoder: Decoder<HeapType>,
 ): Result<ReferenceInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte().bind()) {
         REF_NULL -> {

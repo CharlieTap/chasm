@@ -18,10 +18,10 @@ internal fun TypeSectionDecoder(
         typeDecoder = ::TypeDecoder,
     )
 
-internal fun TypeSectionDecoder(
+internal inline fun TypeSectionDecoder(
     context: DecoderContext,
-    vectorDecoder: VectorDecoder<Type>,
-    typeDecoder: Decoder<Type>,
+    crossinline vectorDecoder: VectorDecoder<Type>,
+    noinline typeDecoder: Decoder<Type>,
 ): Result<TypeSection, WasmDecodeError> = binding {
 
     val types = vectorDecoder(context, typeDecoder).bind().vector

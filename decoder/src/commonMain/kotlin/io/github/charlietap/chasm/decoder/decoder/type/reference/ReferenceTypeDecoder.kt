@@ -20,10 +20,10 @@ internal fun ReferenceTypeDecoder(
         abstractHeapTypeDecoder = ::AbstractHeapTypeDecoder,
     )
 
-internal fun ReferenceTypeDecoder(
+internal inline fun ReferenceTypeDecoder(
     context: DecoderContext,
-    heapTypeDecoder: Decoder<HeapType>,
-    abstractHeapTypeDecoder: Decoder<AbstractHeapType>,
+    crossinline heapTypeDecoder: Decoder<HeapType>,
+    crossinline abstractHeapTypeDecoder: Decoder<AbstractHeapType>,
 ): Result<ReferenceType, WasmDecodeError> = binding {
     when (context.reader.peek().ubyte().bind()) {
         REFERENCE_TYPE_REF -> {

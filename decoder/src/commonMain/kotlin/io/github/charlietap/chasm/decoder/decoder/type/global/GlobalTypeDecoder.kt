@@ -19,10 +19,10 @@ internal fun GlobalTypeDecoder(
     mutabilityDecoder = ::MutabilityDecoder,
 )
 
-internal fun GlobalTypeDecoder(
+internal inline fun GlobalTypeDecoder(
     context: DecoderContext,
-    valueTypeDecoder: Decoder<ValueType>,
-    mutabilityDecoder: Decoder<Mutability>,
+    crossinline valueTypeDecoder: Decoder<ValueType>,
+    crossinline mutabilityDecoder: Decoder<Mutability>,
 ): Result<GlobalType, WasmDecodeError> = binding {
     val valueType = valueTypeDecoder(context).bind()
     val mutability = mutabilityDecoder(context).bind()

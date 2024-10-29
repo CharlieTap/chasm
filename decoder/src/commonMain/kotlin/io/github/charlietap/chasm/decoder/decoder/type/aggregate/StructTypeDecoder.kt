@@ -18,10 +18,10 @@ internal fun StructTypeDecoder(
         vectorDecoder = ::VectorDecoder,
     )
 
-internal fun StructTypeDecoder(
+internal inline fun StructTypeDecoder(
     context: DecoderContext,
-    fieldTypeDecoder: Decoder<FieldType>,
-    vectorDecoder: VectorDecoder<FieldType>,
+    noinline fieldTypeDecoder: Decoder<FieldType>,
+    crossinline vectorDecoder: VectorDecoder<FieldType>,
 ): Result<StructType, WasmDecodeError> = binding {
 
     val fieldTypes = vectorDecoder(context, fieldTypeDecoder).bind()

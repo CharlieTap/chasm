@@ -17,9 +17,9 @@ internal fun MemorySizeInstructionDecoder(
         memoryIndexDecoder = ::MemoryIndexDecoder,
     )
 
-internal fun MemorySizeInstructionDecoder(
+internal inline fun MemorySizeInstructionDecoder(
     context: DecoderContext,
-    memoryIndexDecoder: Decoder<Index.MemoryIndex>,
+    crossinline memoryIndexDecoder: Decoder<Index.MemoryIndex>,
 ): Result<MemoryInstruction.MemorySize, WasmDecodeError> = binding {
     val index = memoryIndexDecoder(context).bind()
     MemoryInstruction.MemorySize(index)

@@ -18,10 +18,10 @@ internal fun CodeSectionDecoder(
         vectorDecoder = ::VectorDecoder,
     )
 
-internal fun CodeSectionDecoder(
+internal inline fun CodeSectionDecoder(
     context: DecoderContext,
-    codeEntryDecoder: Decoder<CodeEntry>,
-    vectorDecoder: VectorDecoder<CodeEntry>,
+    noinline codeEntryDecoder: Decoder<CodeEntry>,
+    crossinline vectorDecoder: VectorDecoder<CodeEntry>,
 ): Result<CodeSection, WasmDecodeError> = binding {
 
     val indices = vectorDecoder(context, codeEntryDecoder).bind()

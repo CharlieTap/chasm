@@ -18,9 +18,9 @@ internal fun HeapTypeDecoder(
         abstractHeapTypeDecoder = ::AbstractHeapTypeDecoder,
     )
 
-internal fun HeapTypeDecoder(
+internal inline fun HeapTypeDecoder(
     context: DecoderContext,
-    abstractHeapTypeDecoder: Decoder<AbstractHeapType>,
+    crossinline abstractHeapTypeDecoder: Decoder<AbstractHeapType>,
 ): Result<HeapType, WasmDecodeError> = binding {
     when (context.reader.peek().ubyte().bind()) {
         in ABSTRACT_HEAP_TYPE_RANGE -> {

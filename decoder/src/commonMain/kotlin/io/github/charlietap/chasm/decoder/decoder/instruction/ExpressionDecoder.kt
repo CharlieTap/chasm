@@ -19,10 +19,10 @@ internal fun ExpressionDecoder(
         ::InstructionBlockDecoder,
     )
 
-internal fun ExpressionDecoder(
+internal inline fun ExpressionDecoder(
     context: DecoderContext,
-    scope: Scope<UByte>,
-    instructionBlockDecoder: Decoder<List<Instruction>>,
+    crossinline scope: Scope<UByte>,
+    crossinline instructionBlockDecoder: Decoder<List<Instruction>>,
 ): Result<Expression, WasmDecodeError> = binding {
 
     val scopedContext = scope(context, END).bind()

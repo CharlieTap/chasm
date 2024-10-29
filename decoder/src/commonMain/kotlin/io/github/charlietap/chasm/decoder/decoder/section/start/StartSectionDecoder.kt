@@ -18,9 +18,9 @@ internal fun StartSectionDecoder(
         functionIndexDecoder = ::FunctionIndexDecoder,
     )
 
-internal fun StartSectionDecoder(
+internal inline fun StartSectionDecoder(
     context: DecoderContext,
-    functionIndexDecoder: Decoder<Index.FunctionIndex>,
+    crossinline functionIndexDecoder: Decoder<Index.FunctionIndex>,
 ): Result<StartSection, WasmDecodeError> = binding {
 
     val functionIndex = functionIndexDecoder(context).bind()

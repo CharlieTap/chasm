@@ -61,20 +61,20 @@ internal fun ControlInstructionDecoder(
         labelVectorDecoder = ::VectorDecoder,
     )
 
-internal fun ControlInstructionDecoder(
+internal inline fun ControlInstructionDecoder(
     context: DecoderContext,
-    scope: Scope<UByte>,
-    blockTypeDecoder: Decoder<ControlInstruction.BlockType>,
-    instructionBlockDecoder: Decoder<List<Instruction>>,
-    ifDecoder: Decoder<Pair<List<Instruction>, List<Instruction>?>>,
-    functionIndexDecoder: Decoder<Index.FunctionIndex>,
-    handlerDecoder: Decoder<ControlInstruction.CatchHandler>,
-    tagIndexDecoder: Decoder<TagIndex>,
-    typeIndexDecoder: Decoder<Index.TypeIndex>,
-    tableIndexDecoder: Decoder<Index.TableIndex>,
-    labelIndexDecoder: Decoder<Index.LabelIndex>,
-    handlerVectorDecoder: VectorDecoder<ControlInstruction.CatchHandler>,
-    labelVectorDecoder: VectorDecoder<Index.LabelIndex>,
+    crossinline scope: Scope<UByte>,
+    crossinline blockTypeDecoder: Decoder<ControlInstruction.BlockType>,
+    crossinline instructionBlockDecoder: Decoder<List<Instruction>>,
+    crossinline ifDecoder: Decoder<Pair<List<Instruction>, List<Instruction>?>>,
+    crossinline functionIndexDecoder: Decoder<Index.FunctionIndex>,
+    noinline handlerDecoder: Decoder<ControlInstruction.CatchHandler>,
+    crossinline tagIndexDecoder: Decoder<TagIndex>,
+    crossinline typeIndexDecoder: Decoder<Index.TypeIndex>,
+    crossinline tableIndexDecoder: Decoder<Index.TableIndex>,
+    noinline labelIndexDecoder: Decoder<Index.LabelIndex>,
+    crossinline handlerVectorDecoder: VectorDecoder<ControlInstruction.CatchHandler>,
+    crossinline labelVectorDecoder: VectorDecoder<Index.LabelIndex>,
 ): Result<ControlInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte().bind()) {
         UNREACHABLE -> ControlInstruction.Unreachable

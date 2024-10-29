@@ -23,11 +23,11 @@ internal fun SubTypeDecoder(
         compositeTypeDecoder = ::CompositeTypeDecoder,
     )
 
-internal fun SubTypeDecoder(
+internal inline fun SubTypeDecoder(
     context: DecoderContext,
-    typeIndexDecoder: Decoder<Index.TypeIndex>,
-    vectorDecoder: VectorDecoder<Index.TypeIndex>,
-    compositeTypeDecoder: Decoder<CompositeType>,
+    noinline typeIndexDecoder: Decoder<Index.TypeIndex>,
+    crossinline vectorDecoder: VectorDecoder<Index.TypeIndex>,
+    crossinline compositeTypeDecoder: Decoder<CompositeType>,
 ): Result<SubType, WasmDecodeError> = binding {
     when (context.reader.peek().ubyte().bind()) {
         OPEN_SUB_TYPE -> {

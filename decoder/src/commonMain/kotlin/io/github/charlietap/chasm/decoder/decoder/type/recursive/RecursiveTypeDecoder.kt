@@ -18,10 +18,10 @@ internal fun RecursiveTypeDecoder(
         vectorDecoder = ::VectorDecoder,
     )
 
-internal fun RecursiveTypeDecoder(
+internal inline fun RecursiveTypeDecoder(
     context: DecoderContext,
-    subTypeDecoder: Decoder<SubType>,
-    vectorDecoder: VectorDecoder<SubType>,
+    noinline subTypeDecoder: Decoder<SubType>,
+    crossinline vectorDecoder: VectorDecoder<SubType>,
 ): Result<RecursiveType, WasmDecodeError> = binding {
     when (context.reader.peek().ubyte().bind()) {
         MULTIPLE_SUBTYPES_RECURSIVE_TYPE -> {

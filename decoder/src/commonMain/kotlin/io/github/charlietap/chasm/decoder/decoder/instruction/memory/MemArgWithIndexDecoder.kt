@@ -20,10 +20,10 @@ internal fun MemArgWithIndexDecoder(
         exponentValidator = ::AlignmentExponentValidator,
     )
 
-internal fun MemArgWithIndexDecoder(
+internal inline fun MemArgWithIndexDecoder(
     context: DecoderContext,
-    memoryIndexDecoder: Decoder<Index.MemoryIndex>,
-    exponentValidator: AlignmentExponentValidator,
+    crossinline memoryIndexDecoder: Decoder<Index.MemoryIndex>,
+    crossinline exponentValidator: AlignmentExponentValidator,
 ): Result<MemArgWithIndex, WasmDecodeError> = binding {
 
     val exponent = context.reader.uint().bind()

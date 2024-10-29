@@ -17,9 +17,9 @@ internal fun MemoryGrowInstructionDecoder(
         memoryIndexDecoder = ::MemoryIndexDecoder,
     )
 
-internal fun MemoryGrowInstructionDecoder(
+internal inline fun MemoryGrowInstructionDecoder(
     context: DecoderContext,
-    memoryIndexDecoder: Decoder<Index.MemoryIndex>,
+    crossinline memoryIndexDecoder: Decoder<Index.MemoryIndex>,
 ): Result<MemoryInstruction.MemoryGrow, WasmDecodeError> = binding {
     val index = memoryIndexDecoder(context).bind()
     MemoryInstruction.MemoryGrow(index)

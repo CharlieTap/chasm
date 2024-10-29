@@ -20,10 +20,10 @@ internal fun PrefixInstructionDecoder(
         prefixFCInstructionDecoder = ::PrefixFCInstructionDecoder,
     )
 
-internal fun PrefixInstructionDecoder(
+internal inline fun PrefixInstructionDecoder(
     context: DecoderContext,
-    prefixFBInstructionDecoder: Decoder<Instruction>,
-    prefixFCInstructionDecoder: Decoder<Instruction>,
+    crossinline prefixFBInstructionDecoder: Decoder<Instruction>,
+    crossinline prefixFCInstructionDecoder: Decoder<Instruction>,
 ): Result<Instruction, WasmDecodeError> = binding {
 
     val prefix = context.reader.ubyte().bind()

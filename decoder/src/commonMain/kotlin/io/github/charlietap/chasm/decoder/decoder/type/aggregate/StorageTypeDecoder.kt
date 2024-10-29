@@ -24,10 +24,10 @@ internal fun StorageTypeDecoder(
         valueTypeDecoder = ::ValueTypeDecoder,
     )
 
-internal fun StorageTypeDecoder(
+internal inline fun StorageTypeDecoder(
     context: DecoderContext,
-    packedTypeDecoder: Decoder<PackedType>,
-    valueTypeDecoder: Decoder<ValueType>,
+    crossinline packedTypeDecoder: Decoder<PackedType>,
+    crossinline valueTypeDecoder: Decoder<ValueType>,
 ): Result<StorageType, WasmDecodeError> = binding {
     when (val encoded = context.reader.peek().ubyte().bind()) {
         in NUMBER_TYPE_RANGE,

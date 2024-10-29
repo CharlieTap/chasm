@@ -25,11 +25,11 @@ internal fun DataSegmentDecoder(
         byteVectorDecoder = ::BinaryByteVectorDecoder,
     )
 
-internal fun DataSegmentDecoder(
+internal inline fun DataSegmentDecoder(
     context: DecoderContext,
-    expressionDecoder: Decoder<Expression>,
-    memoryIndexDecoder: Decoder<Index.MemoryIndex>,
-    byteVectorDecoder: ByteVectorDecoder,
+    crossinline expressionDecoder: Decoder<Expression>,
+    crossinline memoryIndexDecoder: Decoder<Index.MemoryIndex>,
+    crossinline byteVectorDecoder: ByteVectorDecoder,
 ): Result<DataSegment, WasmDecodeError> = binding {
 
     val dataIndexPlaceholder = Index.DataIndex(0u)

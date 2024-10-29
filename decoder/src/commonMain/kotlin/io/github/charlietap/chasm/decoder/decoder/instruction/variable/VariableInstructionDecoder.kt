@@ -26,10 +26,10 @@ internal fun VariableInstructionDecoder(
         globalIndexDecoder = ::GlobalIndexDecoder,
     )
 
-internal fun VariableInstructionDecoder(
+internal inline fun VariableInstructionDecoder(
     context: DecoderContext,
-    localIndexDecoder: Decoder<Index.LocalIndex>,
-    globalIndexDecoder: Decoder<Index.GlobalIndex>,
+    crossinline localIndexDecoder: Decoder<Index.LocalIndex>,
+    crossinline globalIndexDecoder: Decoder<Index.GlobalIndex>,
 ): Result<VariableInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte().bind()) {
         LOCAL_GET -> {

@@ -19,10 +19,10 @@ internal fun FieldTypeDecoder(
         mutabilityDecoder = ::MutabilityDecoder,
     )
 
-internal fun FieldTypeDecoder(
+internal inline fun FieldTypeDecoder(
     context: DecoderContext,
-    storageTypeDecoder: Decoder<StorageType>,
-    mutabilityDecoder: Decoder<Mutability>,
+    crossinline storageTypeDecoder: Decoder<StorageType>,
+    crossinline mutabilityDecoder: Decoder<Mutability>,
 ): Result<FieldType, WasmDecodeError> = binding {
     val storageType = storageTypeDecoder(context).bind()
     val mutability = mutabilityDecoder(context).bind()

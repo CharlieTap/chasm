@@ -18,10 +18,10 @@ internal fun ResultTypeDecoder(
     ::ValueTypeDecoder,
 )
 
-internal fun ResultTypeDecoder(
+internal inline fun ResultTypeDecoder(
     context: DecoderContext,
-    vectorDecoder: VectorDecoder<ValueType>,
-    valueTypeDecoder: Decoder<ValueType>,
+    crossinline vectorDecoder: VectorDecoder<ValueType>,
+    noinline valueTypeDecoder: Decoder<ValueType>,
 ): Result<ResultType, WasmDecodeError> = binding {
     val valueTypes = vectorDecoder(context, valueTypeDecoder).bind()
     ResultType(valueTypes.vector)

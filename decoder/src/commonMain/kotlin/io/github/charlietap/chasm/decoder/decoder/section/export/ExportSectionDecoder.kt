@@ -18,10 +18,10 @@ internal fun ExportSectionDecoder(
         vectorDecoder = ::VectorDecoder,
     )
 
-internal fun ExportSectionDecoder(
+internal inline fun ExportSectionDecoder(
     context: DecoderContext,
-    exportDecoder: Decoder<Export>,
-    vectorDecoder: VectorDecoder<Export>,
+    noinline exportDecoder: Decoder<Export>,
+    crossinline vectorDecoder: VectorDecoder<Export>,
 ): Result<ExportSection, WasmDecodeError> = binding {
 
     val exports = vectorDecoder(context, exportDecoder).bind()

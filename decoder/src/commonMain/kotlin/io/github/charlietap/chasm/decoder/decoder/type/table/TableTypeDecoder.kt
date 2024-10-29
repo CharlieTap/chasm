@@ -19,10 +19,10 @@ internal fun TableTypeDecoder(
     limitsDecoder = ::LimitsDecoder,
 )
 
-internal fun TableTypeDecoder(
+internal inline fun TableTypeDecoder(
     context: DecoderContext,
-    referenceTypeDecoder: Decoder<ReferenceType>,
-    limitsDecoder: Decoder<Limits>,
+    crossinline referenceTypeDecoder: Decoder<ReferenceType>,
+    crossinline limitsDecoder: Decoder<Limits>,
 ): Result<TableType, WasmDecodeError> = binding {
     val referenceType = referenceTypeDecoder(context).bind()
     val limits = limitsDecoder(context).bind()

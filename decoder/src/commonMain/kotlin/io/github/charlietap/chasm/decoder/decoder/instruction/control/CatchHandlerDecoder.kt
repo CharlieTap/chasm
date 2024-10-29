@@ -20,10 +20,10 @@ internal fun CatchHandlerDecoder(
     tagIndexDecoder = ::TagIndexDecoder,
 )
 
-internal fun CatchHandlerDecoder(
+internal inline fun CatchHandlerDecoder(
     context: DecoderContext,
-    labelIndexDecoder: Decoder<Index.LabelIndex>,
-    tagIndexDecoder: Decoder<Index.TagIndex>,
+    crossinline labelIndexDecoder: Decoder<Index.LabelIndex>,
+    crossinline tagIndexDecoder: Decoder<Index.TagIndex>,
 ): Result<ControlInstruction.CatchHandler, WasmDecodeError> = binding {
 
     val handler = context.reader.ubyte().bind()

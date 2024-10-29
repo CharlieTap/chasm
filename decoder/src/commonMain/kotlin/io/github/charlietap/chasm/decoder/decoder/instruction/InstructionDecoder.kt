@@ -43,17 +43,17 @@ internal fun InstructionDecoder(
     vectorInstructionDecoder = ::VectorInstructionDecoder,
 )
 
-internal fun InstructionDecoder(
+internal inline fun InstructionDecoder(
     context: DecoderContext,
-    numericInstructionDecoder: Decoder<NumericInstruction>,
-    referenceInstructionDecoder: Decoder<ReferenceInstruction>,
-    parametricInstructionDecoder: Decoder<ParametricInstruction>,
-    variableInstructionDecoder: Decoder<VariableInstruction>,
-    tableInstructionDecoder: Decoder<TableInstruction>,
-    memoryInstructionDecoder: Decoder<MemoryInstruction>,
-    controlInstructionDecoder: Decoder<ControlInstruction>,
-    prefixInstructionDecoder: Decoder<Instruction>,
-    vectorInstructionDecoder: Decoder<VectorInstruction>,
+    crossinline numericInstructionDecoder: Decoder<NumericInstruction>,
+    crossinline referenceInstructionDecoder: Decoder<ReferenceInstruction>,
+    crossinline parametricInstructionDecoder: Decoder<ParametricInstruction>,
+    crossinline variableInstructionDecoder: Decoder<VariableInstruction>,
+    crossinline tableInstructionDecoder: Decoder<TableInstruction>,
+    crossinline memoryInstructionDecoder: Decoder<MemoryInstruction>,
+    crossinline controlInstructionDecoder: Decoder<ControlInstruction>,
+    crossinline prefixInstructionDecoder: Decoder<Instruction>,
+    crossinline vectorInstructionDecoder: Decoder<VectorInstruction>,
 ): Result<Instruction, WasmDecodeError> = binding {
     val opcode = context.reader.peek().ubyte().bind()
     when {

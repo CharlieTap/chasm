@@ -39,15 +39,15 @@ internal fun PrefixFBInstructionDecoder(
         castFlagsDecoder = ::CastFlagsDecoder,
     )
 
-internal fun PrefixFBInstructionDecoder(
+internal inline fun PrefixFBInstructionDecoder(
     context: DecoderContext,
-    dataIndexDecoder: Decoder<Index.DataIndex>,
-    elementIndexDecoder: Decoder<Index.ElementIndex>,
-    fieldIndexDecoder: Decoder<Index.FieldIndex>,
-    typeIndexDecoder: Decoder<Index.TypeIndex>,
-    heapTypeDecoder: Decoder<HeapType>,
-    labelIndexDecoder: Decoder<Index.LabelIndex>,
-    castFlagsDecoder: Decoder<CastFlags>,
+    crossinline dataIndexDecoder: Decoder<Index.DataIndex>,
+    crossinline elementIndexDecoder: Decoder<Index.ElementIndex>,
+    crossinline fieldIndexDecoder: Decoder<Index.FieldIndex>,
+    crossinline typeIndexDecoder: Decoder<Index.TypeIndex>,
+    crossinline heapTypeDecoder: Decoder<HeapType>,
+    crossinline labelIndexDecoder: Decoder<Index.LabelIndex>,
+    crossinline castFlagsDecoder: Decoder<CastFlags>,
 ): Result<Instruction, WasmDecodeError> = binding {
 
     when (val opcode = context.reader.uint().bind()) {

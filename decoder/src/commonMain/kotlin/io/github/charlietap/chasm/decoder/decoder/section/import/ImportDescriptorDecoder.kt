@@ -32,13 +32,13 @@ internal fun ImportDescriptorDecoder(
         typeIndexDecoder = ::TypeIndexDecoder,
     )
 
-internal fun ImportDescriptorDecoder(
+internal inline fun ImportDescriptorDecoder(
     context: DecoderContext,
-    globalTypeDecoder: Decoder<GlobalType>,
-    memTypeDecoder: Decoder<MemoryType>,
-    tableTypeDecoder: Decoder<TableType>,
-    tagTypeDecoder: Decoder<TagType>,
-    typeIndexDecoder: Decoder<Index.TypeIndex>,
+    crossinline globalTypeDecoder: Decoder<GlobalType>,
+    crossinline memTypeDecoder: Decoder<MemoryType>,
+    crossinline tableTypeDecoder: Decoder<TableType>,
+    crossinline tagTypeDecoder: Decoder<TagType>,
+    crossinline typeIndexDecoder: Decoder<Index.TypeIndex>,
 ): Result<Import.Descriptor, WasmDecodeError> = binding {
 
     when (val descriptorType = context.reader.ubyte().bind()) {

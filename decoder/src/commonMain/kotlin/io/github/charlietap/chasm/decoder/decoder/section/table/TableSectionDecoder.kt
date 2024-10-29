@@ -18,10 +18,10 @@ internal fun TableSectionDecoder(
         tableDecoder = ::TableDecoder,
     )
 
-internal fun TableSectionDecoder(
+internal inline fun TableSectionDecoder(
     context: DecoderContext,
-    vectorDecoder: VectorDecoder<Table>,
-    tableDecoder: Decoder<Table>,
+    crossinline vectorDecoder: VectorDecoder<Table>,
+    noinline tableDecoder: Decoder<Table>,
 ): Result<TableSection, WasmDecodeError> = binding {
 
     val tables = vectorDecoder(context, tableDecoder).bind()

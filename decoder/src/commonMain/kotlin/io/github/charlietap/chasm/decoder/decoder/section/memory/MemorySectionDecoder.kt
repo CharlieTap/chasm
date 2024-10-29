@@ -18,10 +18,10 @@ internal fun MemorySectionDecoder(
         memoryDecoder = ::MemoryDecoder,
     )
 
-internal fun MemorySectionDecoder(
+internal inline fun MemorySectionDecoder(
     context: DecoderContext,
-    vectorDecoder: VectorDecoder<Memory>,
-    memoryDecoder: Decoder<Memory>,
+    crossinline vectorDecoder: VectorDecoder<Memory>,
+    noinline memoryDecoder: Decoder<Memory>,
 ): Result<MemorySection, WasmDecodeError> = binding {
 
     val memories = vectorDecoder(context, memoryDecoder).bind()
