@@ -1,38 +1,41 @@
 package io.github.charlietap.chasm.decoder.decoder.section.type
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Type
-import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorLength
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorLengthDecoder
+import io.github.charlietap.chasm.decoder.decoder.vector.Vector
+import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.TypeSection
-import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.module.type
+import io.github.charlietap.chasm.fixture.module.typeIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class TypeSectionDecoderTest {
 
     @Test
     fun `can decode an encoded type section`() {
 
-        val vectorLengthDecoder: VectorLengthDecoder = {
-            Ok(VectorLength(2u))
+        val context = decoderContext(
+            index = 117,
+        )
+
+        val type = type(typeIndex(117u))
+        val typeDecoder: Decoder<Type> = {
+            fail("TypeDecoder should not be called directly")
         }
-        val recursiveType = recursiveType()
-        val recursiveTypeDecoder: Decoder<RecursiveType> = {
-            Ok(recursiveType)
+        val vectorDecoder: VectorDecoder<Type> = { _, _ ->
+            Ok(Vector(listOf(type)))
         }
-        val context = decoderContext()
-        val actual = TypeSectionDecoder(context, vectorLengthDecoder, recursiveTypeDecoder)
+
+        val actual = TypeSectionDecoder(context, vectorDecoder, typeDecoder)
 
         val expected = Ok(
             TypeSection(
                 listOf(
-                    Type(Index.TypeIndex(0u), recursiveType),
-                    Type(Index.TypeIndex(1u), recursiveType),
+                    type,
                 ),
             ),
         )
