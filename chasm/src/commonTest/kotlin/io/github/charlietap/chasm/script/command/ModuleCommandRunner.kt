@@ -15,7 +15,9 @@ fun ModuleCommandRunner(
     context: ScriptContext,
     command: ModuleCommand,
 ): CommandResult {
-    val moduleFilePath = context.binaryDirectory + "/" + command.filename
+
+    val moduleFilename = command.binaryFilename ?: command.filename
+    val moduleFilePath = context.binaryDirectory + "/" + moduleFilename
     val bytes = moduleFilePath.readBytesFromPath()
 
     return module(bytes).flatMap { module ->

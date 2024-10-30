@@ -69,14 +69,14 @@ configure<PublishingConventionsExtension> {
 }
 
 configure<WasmTestSuiteGenPluginExtension> {
-    wasmToolsVersion = "1.216.0"
+    wasmToolsVersion = "1.219.0"
     testSuiteCommit = "7c3ec23ab19b37c68976b555f9491752cbda6d5f"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm"
     proposals = listOf("tail-call", "extended-const", "multi-memory", "exception-handling")
     excludes = listOf(
         "simd_*/**", "**/simd_*",
-        "align.wast", "binary.wast", "global.wast", "imports.wast", "memory.wast", "comments.wast",
+        "align.wast", "binary.wast", "global.wast", "imports.wast", "memory.wast",
         "proposals/exception-handling/binary.wast",
         "proposals/exception-handling/imports.wast",
     )
