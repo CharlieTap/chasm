@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.executor.memory.ext.copyInto
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
-import io.github.charlietap.chasm.fixture.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.instance.dataAddress
 import io.github.charlietap.chasm.fixture.instance.dataInstance
@@ -28,7 +27,6 @@ import io.github.charlietap.chasm.fixture.type.varMutability
 import io.github.charlietap.chasm.fixture.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.value.i32
-import io.github.charlietap.chasm.weakref.weakReference
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -60,7 +58,6 @@ class ArrayInitDataExecutorTest {
             ),
         )
 
-        val arrayAddress = arrayAddress(0)
         val arrayInstance = arrayInstance(
             definedType = definedType,
             fields = MutableList(4) { fieldValue },
@@ -73,9 +70,6 @@ class ArrayInitDataExecutorTest {
             bytes = data,
         )
         val store = store(
-            arrays = mutableListOf(
-                weakReference(arrayInstance),
-            ),
             data = mutableListOf(
                 dataInstance,
             ),
@@ -96,7 +90,7 @@ class ArrayInitDataExecutorTest {
 
         stack.push(frame)
 
-        stack.pushValue(arrayReferenceValue(arrayAddress))
+        stack.pushValue(arrayReferenceValue(arrayInstance))
         stack.pushValue(i32(0))
         stack.pushValue(i32(0))
         stack.pushValue(i32(1))
@@ -114,7 +108,7 @@ class ArrayInitDataExecutorTest {
         val actual = ArrayInitDataExecutor(context, AggregateInstruction.ArrayInitData(typeIndex, dataIndex))
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(store.arrays[0].value, expectedInstance)
+        assertEquals(expectedInstance, arrayInstance)
         assertEquals(0, stack.valuesDepth())
     }
 }

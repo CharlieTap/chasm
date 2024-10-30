@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
@@ -79,12 +78,11 @@ class StructNewExecutorTest {
             definedType = definedType,
             fields = mutableListOf(fieldValue1, fieldValue2),
         )
-        val expected = value(ReferenceValue.Struct(Address.Struct(0), expectedInstance))
+        val expected = value(ReferenceValue.Struct(expectedInstance))
 
         val actual = StructNewExecutor(context, AggregateInstruction.StructNew(typeIndex), definedTypeExpander, fieldPacker)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(store.structs[0].value, expectedInstance)
         assertEquals(1, stack.valuesDepth())
         assertEquals(expected, stack.popValueOrNull())
     }

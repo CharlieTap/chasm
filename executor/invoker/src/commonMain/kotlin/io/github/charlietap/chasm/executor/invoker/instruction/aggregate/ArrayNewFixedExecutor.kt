@@ -13,10 +13,8 @@ import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.weakref.weakReference
 
 internal fun ArrayNewFixedExecutor(
     context: ExecutionContext,
@@ -36,7 +34,7 @@ internal inline fun ArrayNewFixedExecutor(
     crossinline fieldPacker: FieldPacker,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val (stack) = context
     val (typeIndex, size) = instruction
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(typeIndex).bind()
@@ -49,11 +47,7 @@ internal inline fun ArrayNewFixedExecutor(
     }.asReversed()
 
     val instance = ArrayInstance(definedType, fields)
-
-    store.arrays.add(weakReference(instance))
-
-    val address = Address.Array(store.arrays.size - 1)
-    val reference = ReferenceValue.Array(address, instance)
+    val reference = ReferenceValue.Array(instance)
 
     stack.pushValue(reference)
 }

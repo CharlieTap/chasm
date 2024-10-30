@@ -6,12 +6,10 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
-import io.github.charlietap.chasm.fixture.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.arrayCompositeType
 import io.github.charlietap.chasm.fixture.type.arrayType
 import io.github.charlietap.chasm.fixture.type.definedType
@@ -24,7 +22,6 @@ import io.github.charlietap.chasm.fixture.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
 import io.github.charlietap.chasm.fixture.value.i32
-import io.github.charlietap.chasm.weakref.weakReference
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -57,23 +54,16 @@ class ArrayCopyExecutorTest {
         val fillValue = i32(117)
         val fillFieldValue = executionFieldValue(fillValue)
 
-        val srcArrayAddress = arrayAddress(0)
         val srcArrayInstance = arrayInstance(
             definedType = definedType,
             fields = MutableList(4) { fillFieldValue },
         )
-        val dstArrayAddress = arrayAddress(1)
         val dstArrayInstance = arrayInstance(
             definedType = definedType,
             fields = MutableList(4) { fieldValue },
         )
-        val store = store(
-            arrays = mutableListOf(
-                weakReference(srcArrayInstance),
-                weakReference(dstArrayInstance),
-            ),
-        )
-        val context = executionContext(stack, store)
+
+        val context = executionContext(stack)
         val frame = frame(
             state = frameState(
                 moduleInstance = moduleInstance(
@@ -87,9 +77,9 @@ class ArrayCopyExecutorTest {
 
         stack.push(frame)
 
-        stack.pushValue(arrayReferenceValue(dstArrayAddress))
+        stack.pushValue(arrayReferenceValue(dstArrayInstance))
         stack.pushValue(i32(0))
-        stack.pushValue(arrayReferenceValue(srcArrayAddress))
+        stack.pushValue(arrayReferenceValue(srcArrayInstance))
         stack.pushValue(i32(0))
         stack.pushValue(i32(4))
 
@@ -101,7 +91,7 @@ class ArrayCopyExecutorTest {
         val actual = ArrayCopyExecutor(context, AggregateInstruction.ArrayCopy(srcTypeIndex, dstTypeIndex))
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(store.arrays[1].value, expectedInstance)
+        assertEquals(expectedInstance, dstArrayInstance)
         assertEquals(0, stack.valuesDepth())
     }
 }

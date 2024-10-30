@@ -13,7 +13,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.field
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popStructReference
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -35,7 +34,7 @@ internal inline fun StructSetExecutor(
     crossinline fieldPacker: FieldPacker,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val (stack) = context
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(instruction.typeIndex).bind()
 
@@ -45,7 +44,7 @@ internal inline fun StructSetExecutor(
     val executionValue = stack.popValue().bind().value
 
     val structRef = stack.popStructReference().bind()
-    val structInstance = store.struct(structRef.address).bind()
+    val structInstance = structRef.instance
 
     val fieldValue = fieldPacker(executionValue, fieldType).bind()
 

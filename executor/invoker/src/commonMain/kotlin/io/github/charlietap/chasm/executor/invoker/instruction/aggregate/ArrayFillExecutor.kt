@@ -8,7 +8,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -35,12 +34,12 @@ internal fun ArrayFillExecutor(
     fieldPacker: FieldPacker,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val (stack) = context
     val elementsToFill = stack.popI32().bind()
     val fillValue = stack.popValue().bind()
     val arrayElementOffset = stack.popI32().bind()
     val arrayReference = stack.popArrayReference().bind()
-    val arrayInstance = store.array(arrayReference.address).bind()
+    val arrayInstance = arrayReference.instance
 
     if (arrayElementOffset + elementsToFill > arrayInstance.fields.size) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()

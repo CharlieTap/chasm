@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.field
@@ -38,7 +37,7 @@ internal inline fun ArrayGetExecutor(
     crossinline fieldUnpacker: FieldUnpacker,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val (stack) = context
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(typeIndex).bind()
 
@@ -48,7 +47,7 @@ internal inline fun ArrayGetExecutor(
     val fieldIndex = stack.popI32().bind()
     val arrayRef = stack.popArrayReference().bind()
 
-    val arrayInstance = store.array(arrayRef.address).bind()
+    val arrayInstance = arrayRef.instance
 
     val fieldValue = arrayInstance.field(Index.FieldIndex(fieldIndex.toUInt())).bind()
 

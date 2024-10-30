@@ -7,13 +7,11 @@ import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
-import io.github.charlietap.chasm.fixture.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.fieldIndex
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.arrayCompositeType
 import io.github.charlietap.chasm.fixture.type.arrayType
 import io.github.charlietap.chasm.fixture.type.definedType
@@ -23,7 +21,6 @@ import io.github.charlietap.chasm.fixture.value.executionValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
 import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.weakref.weakReference
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -45,15 +42,11 @@ class ArrayGetExecutorTest {
                 fieldType = fieldType,
             ),
         )
-        val arrayAddress = arrayAddress(0)
         val arrayInstance = arrayInstance(
             definedType = definedType,
             fields = mutableListOf(fieldValue),
         )
-        val store = store(
-            arrays = mutableListOf(weakReference(arrayInstance)),
-        )
-        val context = executionContext(stack, store)
+        val context = executionContext(stack)
         val executionValue = executionValue()
 
         val frame = frame(
@@ -66,7 +59,7 @@ class ArrayGetExecutorTest {
 
         stack.push(frame)
 
-        val arrayReference = ReferenceValue.Array(arrayAddress, arrayInstance)
+        val arrayReference = ReferenceValue.Array(arrayInstance)
         stack.pushValue(arrayReference)
 
         stack.pushValue(i32(fieldIndex.index()))

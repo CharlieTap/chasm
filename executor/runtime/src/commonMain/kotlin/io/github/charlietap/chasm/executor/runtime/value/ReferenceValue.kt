@@ -17,9 +17,11 @@ sealed interface ReferenceValue : ExecutionValue {
     @JvmInline
     value class I31(val value: UInt) : ReferenceValue
 
-    data class Struct(val address: Address.Struct, private val reference: StructInstance) : ReferenceValue
+    @JvmInline
+    value class Struct(val instance: StructInstance) : ReferenceValue
 
-    data class Array(val address: Address.Array, private val reference: ArrayInstance) : ReferenceValue
+    @JvmInline
+    value class Array(val instance: ArrayInstance) : ReferenceValue
 
     @JvmInline
     value class Function(val address: Address.Function) : ReferenceValue

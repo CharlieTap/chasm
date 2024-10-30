@@ -13,10 +13,8 @@ import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.weakref.weakReference
 
 internal fun StructNewExecutor(
     context: ExecutionContext,
@@ -36,7 +34,7 @@ internal inline fun StructNewExecutor(
     crossinline fieldPacker: FieldPacker,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val (stack) = context
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(instruction.typeIndex).bind()
 
@@ -48,11 +46,7 @@ internal inline fun StructNewExecutor(
     }.asReversed()
 
     val instance = StructInstance(definedType, fields.toMutableList())
-
-    store.structs.add(weakReference(instance))
-
-    val address = Address.Struct(store.structs.size - 1)
-    val reference = ReferenceValue.Struct(address, instance)
+    val reference = ReferenceValue.Struct(instance)
 
     stack.pushValue(reference)
 }

@@ -5,11 +5,9 @@ import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.instance.functionAddress
 import io.github.charlietap.chasm.fixture.instance.hostAddress
-import io.github.charlietap.chasm.fixture.instance.structAddress
 import io.github.charlietap.chasm.fixture.instance.structInstance
 import io.github.charlietap.chasm.fixture.type.heapType
 
@@ -28,19 +26,15 @@ fun i31ReferenceValue(
 )
 
 fun structReferenceValue(
-    address: Address.Struct = structAddress(),
-    reference: StructInstance = structInstance(),
+    instance: StructInstance = structInstance(),
 ) = ReferenceValue.Struct(
-    address = address,
-    reference = reference,
+    instance = instance,
 )
 
 fun arrayReferenceValue(
-    address: Address.Array = arrayAddress(),
-    reference: ArrayInstance = arrayInstance(),
+    instance: ArrayInstance = arrayInstance(),
 ) = ReferenceValue.Array(
-    address = address,
-    reference = reference,
+    instance = instance,
 )
 
 fun functionReferenceValue(

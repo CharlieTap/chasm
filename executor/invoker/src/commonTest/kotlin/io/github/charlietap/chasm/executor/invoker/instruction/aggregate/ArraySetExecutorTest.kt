@@ -7,13 +7,11 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
-import io.github.charlietap.chasm.fixture.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.module.fieldIndex
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.arrayCompositeType
 import io.github.charlietap.chasm.fixture.type.arrayType
 import io.github.charlietap.chasm.fixture.type.definedType
@@ -24,7 +22,6 @@ import io.github.charlietap.chasm.fixture.value.executionValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
 import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.weakref.weakReference
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -47,15 +44,11 @@ class ArraySetExecutorTest {
             ),
         )
 
-        val arrayAddress = arrayAddress(0)
         val arrayInstance = arrayInstance(
             definedType = definedType,
             fields = mutableListOf(fieldValue),
         )
-        val store = store(
-            arrays = mutableListOf(weakReference(arrayInstance)),
-        )
-        val context = executionContext(stack, store)
+        val context = executionContext(stack)
 
         val frame = frame(
             state = frameState(
@@ -67,7 +60,7 @@ class ArraySetExecutorTest {
 
         stack.push(frame)
 
-        val referenceValue = arrayReferenceValue(arrayAddress)
+        val referenceValue = arrayReferenceValue(arrayInstance)
         stack.pushValue(referenceValue)
 
         val executionValue = executionValue()
@@ -96,6 +89,6 @@ class ArraySetExecutorTest {
         val actual = ArraySetExecutor(context, AggregateInstruction.ArraySet(typeIndex), definedTypeExpander, fieldPacker)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(store.arrays[0].value, expectedInstance)
+        assertEquals(expectedInstance, arrayInstance)
     }
 }

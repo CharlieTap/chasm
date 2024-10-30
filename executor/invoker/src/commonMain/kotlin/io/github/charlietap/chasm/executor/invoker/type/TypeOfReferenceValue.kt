@@ -31,12 +31,12 @@ internal fun TypeOfReferenceValue(
 ): ReferenceType? = when (value) {
     is ReferenceValue.Null -> bottomOfHeapType(value.heapType, moduleInstance.types)?.let(::RefNull)
     is ReferenceValue.Struct -> {
-        store.structs.getOrNull(value.address.address)?.value?.definedType?.let { definedType ->
+        value.instance.definedType.let { definedType ->
             Ref(ConcreteHeapType.Defined(definedType))
         }
     }
     is ReferenceValue.Array -> {
-        store.arrays.getOrNull(value.address.address)?.value?.definedType?.let { definedType ->
+        value.instance.definedType.let { definedType ->
             Ref(ConcreteHeapType.Defined(definedType))
         }
     }

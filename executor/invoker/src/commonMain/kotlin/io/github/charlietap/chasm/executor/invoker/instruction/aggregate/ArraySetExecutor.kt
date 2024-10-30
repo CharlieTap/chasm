@@ -7,7 +7,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -34,7 +33,7 @@ internal inline fun ArraySetExecutor(
     crossinline fieldPacker: FieldPacker,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val (stack) = context
     val typeIndex = instruction.typeIndex
     val frame = stack.peekFrame().bind()
     val definedType = frame.state.module.definedType(typeIndex).bind()
@@ -46,8 +45,7 @@ internal inline fun ArraySetExecutor(
     val fieldIndex = stack.popI32().bind()
     val arrayReference = stack.popArrayReference().bind()
 
-    val arrayInstance = store.array(arrayReference.address).bind()
-
+    val arrayInstance = arrayReference.instance
     val fieldValue = fieldPacker(value.value, arrayType.fieldType).bind()
 
     arrayInstance.fields[fieldIndex] = fieldValue

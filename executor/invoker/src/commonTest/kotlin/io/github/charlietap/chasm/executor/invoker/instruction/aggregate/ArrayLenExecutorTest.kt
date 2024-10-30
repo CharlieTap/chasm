@@ -4,15 +4,12 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
-import io.github.charlietap.chasm.fixture.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
 import io.github.charlietap.chasm.fixture.value.i32
-import io.github.charlietap.chasm.weakref.weakReference
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -24,17 +21,13 @@ class ArrayLenExecutorTest {
         val stack = stack()
         val fieldValue = fieldValue()
 
-        val arrayAddress = arrayAddress(0)
         val arrayInstance = arrayInstance(
             definedType = definedType(),
             fields = mutableListOf(fieldValue, fieldValue, fieldValue),
         )
-        val store = store(
-            arrays = mutableListOf(weakReference(arrayInstance)),
-        )
-        val context = executionContext(stack, store)
+        val context = executionContext(stack)
 
-        val referenceValue = arrayReferenceValue(arrayAddress)
+        val referenceValue = arrayReferenceValue(arrayInstance)
         stack.pushValue(referenceValue)
 
         val actual = ArrayLenExecutor(context, AggregateInstruction.ArrayLen)

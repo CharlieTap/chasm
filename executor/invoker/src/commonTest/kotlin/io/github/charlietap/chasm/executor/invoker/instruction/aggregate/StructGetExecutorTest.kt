@@ -7,12 +7,10 @@ import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instance.structAddress
 import io.github.charlietap.chasm.fixture.instance.structInstance
 import io.github.charlietap.chasm.fixture.module.fieldIndex
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.fieldType
 import io.github.charlietap.chasm.fixture.type.structCompositeType
@@ -21,7 +19,6 @@ import io.github.charlietap.chasm.fixture.value
 import io.github.charlietap.chasm.fixture.value.executionValue
 import io.github.charlietap.chasm.fixture.value.fieldValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.weakref.weakReference
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -44,15 +41,11 @@ class StructGetExecutorTest {
                 listOf(fieldType),
             ),
         )
-        val structAddress = structAddress(0)
         val structInstance = structInstance(
             definedType = definedType,
             fields = mutableListOf(fieldValue),
         )
-        val store = store(
-            structs = mutableListOf(weakReference(structInstance)),
-        )
-        val context = executionContext(stack, store)
+        val context = executionContext(stack)
         val executionValue = executionValue()
 
         val frame = frame(
@@ -65,7 +58,7 @@ class StructGetExecutorTest {
 
         stack.push(frame)
 
-        val structReference = ReferenceValue.Struct(structAddress, structInstance)
+        val structReference = ReferenceValue.Struct(structInstance)
         stack.pushValue(structReference)
 
         val definedTypeExpander: DefinedTypeExpander = {

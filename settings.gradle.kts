@@ -47,7 +47,6 @@ include(":executor:runtime")
 
 include(":libs:sse2")
 include(":libs:stack")
-include(":libs:weakref")
 
 include(":stream")
 

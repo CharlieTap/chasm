@@ -24,7 +24,6 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
-                api(projects.libs.weakref)
                 api(libs.result)
             }
         }

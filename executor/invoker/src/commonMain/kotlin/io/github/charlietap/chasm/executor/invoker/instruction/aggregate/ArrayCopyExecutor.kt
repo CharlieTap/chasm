@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -35,7 +34,7 @@ internal fun ArrayCopyExecutor(
 
     // x = dest
     // y = src
-    val (stack, store) = context
+    val (stack) = context
     val frame = stack.peekFrame().bind()
     val destDefinedType = frame.state.module.definedType(instruction.destinationTypeIndex).bind()
 
@@ -46,15 +45,12 @@ internal fun ArrayCopyExecutor(
 
     val elementsToCopy = stack.popI32().bind()
     val sourceOffset = stack.popI32().bind()
-
     val srcReference = stack.popArrayReference().bind()
-
     val destinationOffset = stack.popI32().bind()
-
     val destReference = stack.popArrayReference().bind()
 
-    val source = store.array(srcReference.address).bind()
-    val destination = store.array(destReference.address).bind()
+    val source = srcReference.instance
+    val destination = destReference.instance
 
     if (destinationOffset + elementsToCopy > destination.fields.size) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
