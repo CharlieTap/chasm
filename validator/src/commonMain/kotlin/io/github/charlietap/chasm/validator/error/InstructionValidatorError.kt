@@ -28,4 +28,6 @@ sealed interface InstructionValidatorError : ModuleValidatorError {
     data object MutationOfAConstGlobal : InstructionValidatorError
 
     data object ConstInstructionExpected : InstructionValidatorError
+
+    data object CallIndirectOnNonFunction : InstructionValidatorError
 }

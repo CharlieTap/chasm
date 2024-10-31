@@ -70,7 +70,7 @@ configure<PublishingConventionsExtension> {
 
 configure<WasmTestSuiteGenPluginExtension> {
     wasmToolsVersion = "1.219.0"
-    testSuiteCommit = "7c3ec23ab19b37c68976b555f9491752cbda6d5f"
+    testSuiteCommit = "eeb6dac81be81151da0958ed955aba91230c1f25"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm"
     proposals = listOf("tail-call", "extended-const", "multi-memory", "exception-handling")
