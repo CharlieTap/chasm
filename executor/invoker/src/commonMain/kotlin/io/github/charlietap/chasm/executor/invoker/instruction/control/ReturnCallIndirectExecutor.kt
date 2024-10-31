@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
 
 internal inline fun ReturnCallIndirectExecutor(
     context: ExecutionContext,
@@ -20,4 +21,5 @@ internal inline fun ReturnCallIndirectExecutor(
         tailRecursion = true,
         hostFunctionCall = ::HostFunctionCall,
         wasmFunctionCall = ::WasmFunctionCall,
+        definedTypeMatcher = ::DefinedTypeMatcher,
     )

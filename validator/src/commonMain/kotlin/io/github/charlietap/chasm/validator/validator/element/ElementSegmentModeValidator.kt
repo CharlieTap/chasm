@@ -46,7 +46,7 @@ internal fun ElementSegmentModeValidator(
             val tableType = context.tableType(mode.tableIndex).bind()
             val segmentType = context.elementSegmentType().bind()
 
-            if (!typeMatcher(tableType.referenceType, segmentType, context)) {
+            if (!typeMatcher(segmentType, tableType.referenceType, context)) {
                 Err(TypeValidatorError.TypeMismatch).bind<Unit>()
             }
 

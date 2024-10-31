@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
-import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
@@ -39,25 +38,29 @@ internal data class ValidationContext(
     TypeMatcherContext {
 
     val types by lazy {
-        module.types.map(Type::recursiveType).fold(mutableListOf<DefinedType>()) { acc, recursiveType ->
-            val size = acc.size
+        try {
+            module.types.map(Type::recursiveType).fold(mutableListOf<DefinedType>()) { acc, recursiveType ->
+                val size = acc.size
 
-            val substitutor: ConcreteHeapTypeSubstitutor = { heapType ->
-                when (heapType) {
-                    is ConcreteHeapType.TypeIndex -> {
-                        ConcreteHeapType.Defined(acc[heapType.index.idx.toInt()])
+                val substitutor: ConcreteHeapTypeSubstitutor = { heapType ->
+                    when (heapType) {
+                        is ConcreteHeapType.TypeIndex -> {
+                            ConcreteHeapType.Defined(acc[heapType.index.idx.toInt()])
+                        }
+                        else -> heapType
                     }
-                    else -> heapType
+                }
+
+                acc.apply {
+                    addAll(
+                        DefinedTypeRoller(size, recursiveType).map { definedType ->
+                            DefinedTypeSubstitutor(definedType, substitutor)
+                        },
+                    )
                 }
             }
-
-            acc.apply {
-                addAll(
-                    DefinedTypeRoller(size, recursiveType).map { definedType ->
-                        DefinedTypeSubstitutor(definedType, substitutor)
-                    },
-                )
-            }
+        } catch (_: IndexOutOfBoundsException) {
+            emptyList()
         }
     }
 
@@ -68,7 +71,7 @@ internal data class ValidationContext(
             .map(Import.Descriptor.Function::type)
             .toList()
         val moduleFunctions = module.functions.mapNotNull { function ->
-            types[function.typeIndex.idx.toInt()].functionType()
+            types.getOrNull(function.typeIndex.idx.toInt())
         }
         importedFunctions + moduleFunctions
     }
@@ -131,7 +134,7 @@ internal data class ValidationContext(
 
     override fun lookup(): DefinedTypeLookup {
         return { index ->
-            types[index.idx.toInt()]
+            types.getOrNull(index.idx.toInt())
         }
     }
 

@@ -18,7 +18,7 @@ internal fun RecursiveTypeSubstitutor(
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     subTypeSubstitutor: TypeSubstitutor<SubType>,
 ): RecursiveType = RecursiveType(
-    recursiveType.subTypes.map { subType ->
+    subTypes = recursiveType.subTypes.map { subType ->
         subTypeSubstitutor(subType, concreteHeapTypeSubstitutor)
     },
 )

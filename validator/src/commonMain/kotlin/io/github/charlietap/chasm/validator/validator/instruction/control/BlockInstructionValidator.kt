@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.validator.ext.pop
 import io.github.charlietap.chasm.validator.ext.popValues
 import io.github.charlietap.chasm.validator.ext.pushValues
 import io.github.charlietap.chasm.validator.validator.instruction.InstructionBlockValidator
+import io.github.charlietap.chasm.validator.validator.type.BlockTypeValidator
 
 internal fun BlockInstructionValidator(
     context: ValidationContext,
@@ -21,14 +22,18 @@ internal fun BlockInstructionValidator(
     BlockInstructionValidator(
         context = context,
         instruction = instruction,
+        blockTypeValidator = ::BlockTypeValidator,
         instructionBlockValidator = ::InstructionBlockValidator,
     )
 
-internal fun BlockInstructionValidator(
+internal inline fun BlockInstructionValidator(
     context: ValidationContext,
     instruction: ControlInstruction.Block,
-    instructionBlockValidator: Validator<List<Instruction>>,
+    crossinline blockTypeValidator: Validator<ControlInstruction.BlockType>,
+    crossinline instructionBlockValidator: Validator<List<Instruction>>,
 ): Result<Unit, ModuleValidatorError> = binding {
+
+    blockTypeValidator(context, instruction.blockType).bind()
 
     val functionType = context.functionType(instruction.blockType).bind()
 

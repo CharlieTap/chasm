@@ -37,6 +37,7 @@ class ChasmScriptRunner(
             val result = try {
                 commandRunner(context, command)
             } catch (e: Exception) {
+                println(e.stackTraceToString())
                 return ScriptResult.Failure(command, e.toString())
             }
 

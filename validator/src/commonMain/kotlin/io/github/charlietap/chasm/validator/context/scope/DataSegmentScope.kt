@@ -14,9 +14,6 @@ internal fun DataSegmentScope(
     context: ValidationContext,
     segment: DataSegment,
 ): Result<ValidationContext, ModuleValidatorError> = context.copy(
-    module = context.module.copy(
-        globals = emptyList(),
-    ),
     expressionContext = ExpressionContextImpl(
         expressionResultType = ResultType(listOf(ValueType.Number(NumberType.I32))),
     ),

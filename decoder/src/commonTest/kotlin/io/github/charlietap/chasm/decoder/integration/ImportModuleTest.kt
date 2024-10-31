@@ -23,6 +23,7 @@ import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -52,7 +53,7 @@ class ImportModuleTest {
         val expectedFunctionImport = Import(
             moduleName = NameValue("env"),
             entityName = NameValue("externalFunction"),
-            descriptor = Import.Descriptor.Function(expectedFunctionType),
+            descriptor = Import.Descriptor.Function(expectedFunctionType.definedType()),
         )
 
         val expectedTableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u, 2u))

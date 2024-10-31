@@ -3,7 +3,10 @@ package io.github.charlietap.chasm.validator.context.scope
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Function
-import io.github.charlietap.chasm.ast.module.Local
+import io.github.charlietap.chasm.ast.type.InitializationStatus
+import io.github.charlietap.chasm.ast.type.LocalType
+import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.stack.stackOf
 import io.github.charlietap.chasm.validator.context.FunctionContextImpl
 import io.github.charlietap.chasm.validator.context.Label
@@ -25,10 +28,27 @@ internal fun FunctionScope(
         unreachable = false,
     )
 
+    val params = functionType.params.types.map { param ->
+        LocalType(InitializationStatus.SET, param)
+    }
+    val locals = function.locals.map { local ->
+        val status = when (val type = local.type) {
+            is ValueType.Number,
+            is ValueType.Vector,
+            -> InitializationStatus.SET
+            is ValueType.Reference -> when (type.referenceType) {
+                is ReferenceType.Ref -> InitializationStatus.UNSET
+                is ReferenceType.RefNull -> InitializationStatus.SET
+            }
+            is ValueType.Bottom -> InitializationStatus.UNSET
+        }
+        LocalType(status, local.type)
+    }
+
     context.copy(
         functionContext = FunctionContextImpl(
             labels = stackOf(label),
-            locals = (functionType.params.types + function.locals.map(Local::type)).toMutableList(),
+            locals = (params + locals).toMutableList(),
             result = functionType.results,
         ),
     )

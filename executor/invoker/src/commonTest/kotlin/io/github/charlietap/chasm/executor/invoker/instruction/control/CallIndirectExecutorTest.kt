@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
@@ -21,6 +22,7 @@ import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.value.i32
 import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.type.matching.TypeMatcher
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -81,7 +83,19 @@ class CallIndirectExecutorTest {
             fail("Host function should not be called in this scenario")
         }
 
-        val actual = CallIndirectExecutor(context, tableIndex, typeIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
+        val definedTypeMatcher: TypeMatcher<DefinedType> = { _, _, _ ->
+            true
+        }
+
+        val actual = CallIndirectExecutor(
+            context = context,
+            tableIndex = tableIndex,
+            typeIndex = typeIndex,
+            tailRecursion = tailRecursion,
+            hostFunctionCall = hostFunctionCall,
+            wasmFunctionCall = wasmFunctionCall,
+            definedTypeMatcher = definedTypeMatcher,
+        )
 
         assertEquals(Ok(Unit), actual)
     }
@@ -139,7 +153,19 @@ class CallIndirectExecutorTest {
             Ok(Unit)
         }
 
-        val actual = CallIndirectExecutor(context, tableIndex, typeIndex, tailRecursion, hostFunctionCall, wasmFunctionCall)
+        val definedTypeMatcher: TypeMatcher<DefinedType> = { _, _, _ ->
+            true
+        }
+
+        val actual = CallIndirectExecutor(
+            context = context,
+            tableIndex = tableIndex,
+            typeIndex = typeIndex,
+            tailRecursion = tailRecursion,
+            hostFunctionCall = hostFunctionCall,
+            wasmFunctionCall = wasmFunctionCall,
+            definedTypeMatcher = definedTypeMatcher,
+        )
 
         assertEquals(Ok(Unit), actual)
     }

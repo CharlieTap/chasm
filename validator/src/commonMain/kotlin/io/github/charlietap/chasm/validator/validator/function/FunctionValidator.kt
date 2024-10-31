@@ -5,6 +5,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Function
+import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.context.scope.FunctionScope
@@ -15,6 +16,7 @@ import io.github.charlietap.chasm.validator.ext.pop
 import io.github.charlietap.chasm.validator.ext.popValues
 import io.github.charlietap.chasm.validator.ext.resultType
 import io.github.charlietap.chasm.validator.validator.instruction.InstructionBlockValidator
+import io.github.charlietap.chasm.validator.validator.type.ValueTypeValidator
 
 internal fun FunctionValidator(
     context: ValidationContext,
@@ -25,6 +27,7 @@ internal fun FunctionValidator(
         function = function,
         scope = ::FunctionScope,
         instructionBlockValidator = ::InstructionBlockValidator,
+        valueTypeValidator = ::ValueTypeValidator,
     )
 
 internal fun FunctionValidator(
@@ -32,9 +35,14 @@ internal fun FunctionValidator(
     function: Function,
     scope: Scope<Function>,
     instructionBlockValidator: Validator<List<Instruction>>,
+    valueTypeValidator: Validator<ValueType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val scopedContext = scope(context, function).bind()
+
+    function.locals.forEach { local ->
+        valueTypeValidator(context, local.type).bind()
+    }
 
     instructionBlockValidator(scopedContext, function.body.instructions).bind()
 

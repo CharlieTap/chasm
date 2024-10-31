@@ -61,7 +61,7 @@ class ElementModuleTest {
 
         val elementSegment = ElementSegment(
             idx = Index.ElementIndex(0u),
-            type = ReferenceType.RefNull(AbstractHeapType.Func),
+            type = ReferenceType.Ref(AbstractHeapType.Func),
             initExpressions = listOf(Expression(ReferenceInstruction.RefFunc(Index.FunctionIndex(0u)))),
             mode = ElementSegment.Mode.Active(
                 tableIndex = Index.TableIndex(0u),

@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
-internal fun DefinedTypeMatcher(
+fun DefinedTypeMatcher(
     type1: DefinedType,
     type2: DefinedType,
     context: TypeMatcherContext,
@@ -28,7 +28,7 @@ internal inline fun DefinedTypeMatcher(
     crossinline definedTypeUnroller: DefinedTypeUnroller,
     crossinline heapTypeMatcher: TypeMatcher<HeapType>,
 ): Boolean = when {
-    type1 == type2 -> true
+    type1 === type2 -> true
     else -> {
         val substitution = context.substitution()
         if (definedTypeSubstitutor(type1, substitution) == definedTypeSubstitutor(type2, substitution)) {

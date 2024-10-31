@@ -57,14 +57,14 @@ internal inline fun ElementSegmentDecoder(
                 Expression(listOf(ReferenceInstruction.RefFunc(idx)))
             }
 
-            ElementSegment(elemIndexPlaceholder, ReferenceType.RefNull(AbstractHeapType.Func), expressions, mode)
+            ElementSegment(elemIndexPlaceholder, ReferenceType.Ref(AbstractHeapType.Func), expressions, mode)
         }
         SEGMENT_TYPE_PASSIVE_FUNCREFS -> {
 
             val elemKind = elementKindDecoder(context).bind()
             val refType = elemKind.let { kind ->
                 when (kind) {
-                    ElementKind.FuncRef -> ReferenceType.RefNull(AbstractHeapType.Func)
+                    ElementKind.FuncRef -> ReferenceType.Ref(AbstractHeapType.Func)
                 }
             }
 
@@ -87,7 +87,7 @@ internal inline fun ElementSegmentDecoder(
             val elemKind = elementKindDecoder(context).bind()
             val refType = elemKind.let { kind ->
                 when (kind) {
-                    ElementKind.FuncRef -> ReferenceType.RefNull(AbstractHeapType.Func)
+                    ElementKind.FuncRef -> ReferenceType.Ref(AbstractHeapType.Func)
                 }
             }
 
@@ -103,7 +103,7 @@ internal inline fun ElementSegmentDecoder(
             val elemKind = elementKindDecoder(context).bind()
             val refType = elemKind.let { kind ->
                 when (kind) {
-                    ElementKind.FuncRef -> ReferenceType.RefNull(AbstractHeapType.Func)
+                    ElementKind.FuncRef -> ReferenceType.Ref(AbstractHeapType.Func)
                 }
             }
 

@@ -30,4 +30,6 @@ sealed interface InstructionValidatorError : ModuleValidatorError {
     data object ConstInstructionExpected : InstructionValidatorError
 
     data object CallIndirectOnNonFunction : InstructionValidatorError
+
+    data object UninitialisedLocal : InstructionValidatorError
 }

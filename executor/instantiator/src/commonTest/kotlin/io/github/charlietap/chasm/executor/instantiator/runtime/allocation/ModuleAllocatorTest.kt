@@ -12,6 +12,8 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.global.Global
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
+import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
@@ -19,6 +21,7 @@ import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.instance.tagAddress
+import io.github.charlietap.chasm.fixture.instruction.expression
 import io.github.charlietap.chasm.fixture.module.dataSegment
 import io.github.charlietap.chasm.fixture.module.elementSegment
 import io.github.charlietap.chasm.fixture.module.export
@@ -62,13 +65,11 @@ class ModuleAllocatorTest {
         val tag = tag()
         val global = global()
         val globalInitValue = i32(117)
-        val globalInitValues = listOf(globalInitValue)
         val tableInitValue = ReferenceValue.Null(heapType())
         val tableInitValues = listOf(tableInitValue)
         val refType = ReferenceType.RefNull(AbstractHeapType.Extern)
-        val elementSegment = elementSegment(type = refType)
-        val refVals = listOf(ReferenceValue.Null(AbstractHeapType.Extern))
-        val elementSegmentReferences = listOf(refVals)
+        val elementSegment = elementSegment(type = refType, initExpressions = listOf(expression()))
+        val elementSegmentRef = ReferenceValue.Null(AbstractHeapType.Extern)
         val bytes = ubyteArrayOf()
         val dataSegment = dataSegment(initData = bytes)
 
@@ -118,6 +119,7 @@ class ModuleAllocatorTest {
             dataSegments = listOf(dataSegment),
             exports = exports,
         )
+        val context = InstantiationContext(store, module)
 
         val functionAddress = Address.Function(1)
 
@@ -159,7 +161,7 @@ class ModuleAllocatorTest {
         val elementAllocator: ElementAllocator = { _store, _refType, _refValues ->
             assertEquals(store, _store)
             assertEquals(refType, _refType)
-            assertEquals(refVals, _refValues)
+            assertEquals(listOf(elementSegmentRef), _refValues)
 
             elementAddress
         }
@@ -180,6 +182,11 @@ class ModuleAllocatorTest {
             tableAddresses = mutableListOf(importTableAddress),
         )
 
+        val expressionValues = sequenceOf(globalInitValue, elementSegmentRef).iterator()
+        val expressionEvaluator: ExpressionEvaluator = { _, _, _, _ ->
+            Ok(expressionValues.next())
+        }
+
         val expected = ModuleInstance(
             types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
@@ -197,12 +204,10 @@ class ModuleAllocatorTest {
         )
 
         val actual = ModuleAllocator(
-            store = store,
-            module = module,
+            context = context,
             instance = partial,
-            globalInitValues = globalInitValues,
             tableInitValues = tableInitValues,
-            elementSegmentReferences = elementSegmentReferences,
+            evaluator = expressionEvaluator,
             tableAllocator = tableAllocator,
             memoryAllocator = memoryAllocator,
             tagAllocator = tagAllocator,

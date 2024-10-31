@@ -19,5 +19,5 @@ internal fun FunctionTypeMatcher(
     type2: FunctionType,
     context: TypeMatcherContext,
     resultTypeMatcher: TypeMatcher<ResultType>,
-): Boolean = resultTypeMatcher(type1.params, type2.params, context) &&
+): Boolean = resultTypeMatcher(type2.params, type1.params, context) &&
     resultTypeMatcher(type1.results, type2.results, context)

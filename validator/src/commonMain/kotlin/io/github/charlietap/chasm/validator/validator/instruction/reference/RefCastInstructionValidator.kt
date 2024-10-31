@@ -38,5 +38,5 @@ internal fun RefCastInstructionValidator(
     val expected = ValueType.Reference(ReferenceType.RefNull(superType))
     context.pop(expected).bind()
 
-    context.push(ValueType.Reference(expected.referenceType))
+    context.push(ValueType.Reference(instruction.referenceType))
 }
