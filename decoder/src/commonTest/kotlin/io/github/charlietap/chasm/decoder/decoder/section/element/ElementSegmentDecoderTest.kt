@@ -46,7 +46,7 @@ class ElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(AbstractHeapType.Func),
+                ReferenceType.Ref(AbstractHeapType.Func),
                 listOf(
                     Expression(ReferenceInstruction.RefFunc(functionIndex1)),
                     Expression(ReferenceInstruction.RefFunc(functionIndex2)),
@@ -96,7 +96,7 @@ class ElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(AbstractHeapType.Func),
+                ReferenceType.Ref(AbstractHeapType.Func),
                 listOf(
                     Expression(ReferenceInstruction.RefFunc(functionIndex1)),
                     Expression(ReferenceInstruction.RefFunc(functionIndex2)),
@@ -148,7 +148,7 @@ class ElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(AbstractHeapType.Func),
+                ReferenceType.Ref(AbstractHeapType.Func),
                 listOf(
                     Expression(ReferenceInstruction.RefFunc(functionIndex1)),
                     Expression(ReferenceInstruction.RefFunc(functionIndex2)),
@@ -207,7 +207,7 @@ class ElementSegmentDecoderTest {
         val expected = Ok(
             ElementSegment(
                 elementIndex,
-                ReferenceType.RefNull(AbstractHeapType.Func),
+                ReferenceType.Ref(AbstractHeapType.Func),
                 listOf(
                     Expression(ReferenceInstruction.RefFunc(functionIndex1)),
                     Expression(ReferenceInstruction.RefFunc(functionIndex2)),

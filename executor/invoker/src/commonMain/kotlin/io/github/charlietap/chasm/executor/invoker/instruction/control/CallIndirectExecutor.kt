@@ -8,6 +8,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
@@ -21,6 +22,8 @@ import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
+import io.github.charlietap.chasm.type.matching.TypeMatcher
 
 internal inline fun CallIndirectExecutor(
     context: ExecutionContext,
@@ -33,6 +36,7 @@ internal inline fun CallIndirectExecutor(
         tailRecursion = false,
         hostFunctionCall = ::HostFunctionCall,
         wasmFunctionCall = ::WasmFunctionCall,
+        definedTypeMatcher = ::DefinedTypeMatcher,
     )
 
 internal inline fun CallIndirectExecutor(
@@ -42,6 +46,7 @@ internal inline fun CallIndirectExecutor(
     tailRecursion: Boolean,
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
+    crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack, store) = context
@@ -62,7 +67,7 @@ internal inline fun CallIndirectExecutor(
 
     val functionInstance = store.function(address).bind()
 
-    if (functionInstance.type != functionType) {
+    if (!definedTypeMatcher(functionInstance.type, functionType, context)) {
         Err(InvocationError.IndirectCallHasIncorrectFunctionType).bind<Unit>()
     }
 

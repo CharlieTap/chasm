@@ -36,10 +36,20 @@ internal fun HeapTypeMatcher(
     type1 is AbstractHeapType.Bottom -> true
     type1 is AbstractHeapType && type2 is AbstractHeapType -> abstractHeapTypeMatcher(type1, type2, context)
     type1 is ConcreteHeapType.TypeIndex && type2 !is ConcreteHeapType.TypeIndex -> {
-        HeapTypeMatcher(ConcreteHeapType.Defined(context.lookup()(type1.index)), type2, context)
+        val definedType1 = context.lookup()(type1.index)
+        if (definedType1 != null) {
+            HeapTypeMatcher(ConcreteHeapType.Defined(definedType1), type2, context)
+        } else {
+            false
+        }
     }
     type2 is ConcreteHeapType.TypeIndex && type1 !is ConcreteHeapType.TypeIndex -> {
-        HeapTypeMatcher(type1, ConcreteHeapType.Defined(context.lookup()(type2.index)), context)
+        val definedType2 = context.lookup()(type2.index)
+        if (definedType2 != null) {
+            HeapTypeMatcher(type1, ConcreteHeapType.Defined(definedType2), context)
+        } else {
+            false
+        }
     }
     type1 is ConcreteHeapType.Defined && type2 is ConcreteHeapType.Defined -> definedTypeMatcher(
         type1.definedType,
@@ -49,10 +59,6 @@ internal fun HeapTypeMatcher(
     type1 is ConcreteHeapType.Defined && type2 !is ConcreteHeapType.Defined -> CompositeTypeHeapTypeMatcher(
         definedTypeExpander(type1.definedType),
         type2,
-    )
-    type1 !is ConcreteHeapType.Defined && type2 is ConcreteHeapType.Defined -> CompositeTypeHeapTypeMatcher(
-        definedTypeExpander(type2.definedType),
-        type1,
     )
     else -> type1 == type2
 }

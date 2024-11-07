@@ -1,20 +1,20 @@
 package io.github.charlietap.chasm.fixture.module
 
 import io.github.charlietap.chasm.ast.module.Import
-import io.github.charlietap.chasm.ast.type.FunctionType
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.ast.value.NameValue
-import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.fixture.type.tagType
 
 fun functionImportDescriptor(
-    type: FunctionType = functionType(),
+    type: DefinedType = definedType(),
 ) = Import.Descriptor.Function(
     type = type,
 )

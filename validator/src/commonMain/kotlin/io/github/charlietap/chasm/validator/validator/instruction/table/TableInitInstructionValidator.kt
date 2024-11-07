@@ -33,7 +33,7 @@ internal fun TableInitInstructionValidator(
     val tableType = context.tableType(instruction.tableIdx).bind()
     val elementSegmentReferenceType = context.referenceType(instruction.elemIdx).bind()
 
-    if (!typeMatcher(tableType.referenceType, elementSegmentReferenceType, context)) {
+    if (!typeMatcher(elementSegmentReferenceType, tableType.referenceType, context)) {
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()
     }
 

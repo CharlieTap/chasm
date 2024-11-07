@@ -5,12 +5,11 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.type.ext.definedType
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
-import io.github.charlietap.chasm.validator.ext.functionType
 import io.github.charlietap.chasm.validator.ext.pushRef
+import io.github.charlietap.chasm.validator.ext.type
 
 internal fun RefFuncInstructionValidator(
     context: ValidationContext,
@@ -20,8 +19,8 @@ internal fun RefFuncInstructionValidator(
     if (instruction.funcIdx !in context.refs) {
         Err(InstructionValidatorError.UnknownReference).bind<Unit>()
     }
-    val functionType = context.functionType(instruction.funcIdx).bind()
-    val concreteHeapType = ConcreteHeapType.Defined(functionType.definedType())
+    val functionType = context.type(instruction.funcIdx).bind()
+    val concreteHeapType = ConcreteHeapType.Defined(functionType)
 
     context.pushRef(concreteHeapType)
 }

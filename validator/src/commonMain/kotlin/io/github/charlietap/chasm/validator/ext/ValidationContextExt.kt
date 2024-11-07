@@ -9,11 +9,11 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
+import io.github.charlietap.chasm.ast.type.LocalType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ResultType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.validator.context.ValidationContext
@@ -25,7 +25,7 @@ import io.github.charlietap.chasm.validator.error.TypeValidatorError
 internal inline fun ValidationContext.type(
     index: Index.FunctionIndex,
 ): Result<DefinedType, ModuleValidatorError> {
-    return types.getOrNull(index.idx.toInt()).toResultOr {
+    return functions.getOrNull(index.idx.toInt()).toResultOr {
         FunctionValidatorError.UnknownType
     }
 }
@@ -41,7 +41,7 @@ internal inline fun ValidationContext.type(
 internal inline fun ValidationContext.functionType(
     index: Index.FunctionIndex,
 ): Result<FunctionType, ModuleValidatorError> {
-    return functions.getOrNull(index.idx.toInt()).toResultOr {
+    return functions.getOrNull(index.idx.toInt())?.functionType().toResultOr {
         FunctionValidatorError.UnknownType
     }
 }
@@ -79,7 +79,7 @@ internal inline fun ValidationContext.elementSegmentType(): Result<ReferenceType
 
 internal inline fun ValidationContext.localType(
     index: Index.LocalIndex,
-): Result<ValueType, ModuleValidatorError> {
+): Result<LocalType, ModuleValidatorError> {
     return locals.getOrNull(index.idx.toInt()).toResultOr {
         InstructionValidatorError.UnknownLocal
     }

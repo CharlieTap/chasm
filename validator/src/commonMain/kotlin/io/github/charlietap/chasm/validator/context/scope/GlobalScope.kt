@@ -13,7 +13,9 @@ internal fun GlobalScope(
     global: Global,
 ): Result<ValidationContext, ModuleValidatorError> = context.copy(
     module = context.module.copy(
-        globals = emptyList(),
+        globals = context.module.globals.filter { glob ->
+            glob.idx.idx < global.idx.idx
+        },
     ),
     expressionContext = ExpressionContextImpl(
         expressionResultType = ResultType(listOf(global.type.valueType)),

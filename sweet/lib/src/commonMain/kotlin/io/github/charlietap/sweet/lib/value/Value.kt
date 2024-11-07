@@ -23,14 +23,54 @@ sealed interface Value {
     data class F64(val value: String? = null) : Value
 
     @Serializable
+    @SerialName("anyref")
+    data class AnyRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("arrayref")
+    data class ArrayRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("refnull")
+    data class BottomRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("eqref")
+    data class EqRef(val value: String? = null): Value
+
+    @Serializable
     @SerialName("exnref")
-    data class Exception(val value: String? = null): Value
+    data class ExceptionRef(val value: String? = null): Value
 
     @Serializable
     @SerialName("externref")
-    data class Extern(val value: String? = null): Value
+    data class ExternRef(val value: String? = null): Value
 
     @Serializable
     @SerialName("funcref")
-    data class Func(val value: String? = null): Value
+    data class FuncRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("i31ref")
+    data class I31Ref(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("nullref")
+    data class NullRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("nullfuncref")
+    data class NullFuncRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("nullexnref")
+    data class NullExceptionRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("nullexternref")
+    data class NullExternRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("structref")
+    data class StructRef(val value: String? = null): Value
 }

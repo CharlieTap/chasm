@@ -7,6 +7,7 @@ internal fun HeapTypeSubstitutor(
     heapType: HeapType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
 ): HeapType = when (heapType) {
-    is ConcreteHeapType -> concreteHeapTypeSubstitutor(heapType)
+    is ConcreteHeapType.TypeIndex -> concreteHeapTypeSubstitutor(heapType)
+    is ConcreteHeapType.RecursiveTypeIndex -> concreteHeapTypeSubstitutor(heapType)
     else -> heapType
 }

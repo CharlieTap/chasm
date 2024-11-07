@@ -32,7 +32,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
         val downloadWasmToolsTask = project.tasks.register<DownloadWasmToolsTask>(
             TASK_NAME_DOWNLOAD_WASM_TOOLS,
         ) {
-            description = TASK_DESCRIPTION_DOWNLOAD_WABT
+            description = TASK_DESCRIPTION_DOWNLOAD_WT
             group = GROUP
 
             wasmToolsVersion.set(extension.wasmToolsVersion)
@@ -42,7 +42,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
         val resolveWasmToolsTask = project.tasks.register<ResolveWasmToolsTask>(
             TASK_NAME_RESOLVE_WASM_TOOLS,
         ) {
-            description = TASK_DESCRIPTION_RESOLVE_W2J
+            description = TASK_DESCRIPTION_RESOLVE_WT
             group = GROUP
 
             wasmToolsVersion.set(extension.wasmToolsVersion)
@@ -117,8 +117,8 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
         const val TASK_NAME_GENERATE_TESTS = "generateTests"
 
         const val TASK_DESCRIPTION_SYNC_SUITE = "Clones/Updates the wasm test suite to the given commit"
-        const val TASK_DESCRIPTION_DOWNLOAD_WABT = "Downloads and extracts the web assembly binary toolkit"
-        const val TASK_DESCRIPTION_RESOLVE_W2J = "Resolves for wastjson on the local filesystem"
+        const val TASK_DESCRIPTION_DOWNLOAD_WT = "Downloads and extracts the wasm-tools"
+        const val TASK_DESCRIPTION_RESOLVE_WT = "Resolves wasm-tools on the local filesystem"
         const val TASK_DESCRIPTION_PREPARE_SUITE = "Prepare the wasm test suite for generation by running wast2json"
         const val TASK_DESCRIPTION_GENERATE_TESTS = "Generate tests from the web assembly testsuite"
     }

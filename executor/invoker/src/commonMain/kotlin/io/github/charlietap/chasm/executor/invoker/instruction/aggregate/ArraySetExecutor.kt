@@ -2,6 +2,7 @@
 
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
@@ -47,6 +48,10 @@ internal inline fun ArraySetExecutor(
 
     val arrayInstance = arrayReference.instance
     val fieldValue = fieldPacker(value.value, arrayType.fieldType).bind()
+
+    if (fieldIndex !in arrayInstance.fields.indices) {
+        Err(InvocationError.Trap.TrapEncountered).bind()
+    }
 
     arrayInstance.fields[fieldIndex] = fieldValue
 }

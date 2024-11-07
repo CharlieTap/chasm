@@ -14,9 +14,6 @@ internal fun ElementSegmentScope(
     context: ValidationContext,
     segment: ElementSegment,
 ): Result<ValidationContext, ModuleValidatorError> = context.copy(
-    module = context.module.copy(
-        globals = emptyList(),
-    ),
     elementSegmentContext = ElementSegmentContextImpl(
         elementSegmentType = segment.type,
     ),

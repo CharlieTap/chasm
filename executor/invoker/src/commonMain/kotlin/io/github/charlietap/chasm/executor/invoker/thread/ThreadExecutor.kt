@@ -33,6 +33,7 @@ internal fun ThreadExecutor(
     val context = ExecutionContext(
         stack = stack,
         store = configuration.store,
+        instance = thread.frame.state.module,
     )
 
     stack.push(thread.frame)

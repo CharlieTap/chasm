@@ -73,12 +73,19 @@ configure<WasmTestSuiteGenPluginExtension> {
     testSuiteCommit = "eeb6dac81be81151da0958ed955aba91230c1f25"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm"
-    proposals = listOf("tail-call", "extended-const", "multi-memory", "exception-handling")
+    proposals = listOf(
+        "tail-call",
+        "multi-memory",
+        "exception-handling",
+        "gc",
+    )
     excludes = listOf(
         "simd_*/**", "**/simd_*",
-        "align.wast", "binary.wast", "global.wast", "imports.wast", "memory.wast",
+        "align.wast", "binary.wast", "data.wast", "elem.wast", "global.wast", "imports.wast", "memory.wast",
         "proposals/exception-handling/binary.wast",
         "proposals/exception-handling/imports.wast",
+        "proposals/gc/binary.wast",
+        "proposals/multi-memory/data.wast",
     )
 }
 

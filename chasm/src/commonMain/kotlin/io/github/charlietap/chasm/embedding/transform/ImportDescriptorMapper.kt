@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.embedding.shapes.GlobalType
 import io.github.charlietap.chasm.embedding.shapes.MemoryType
 import io.github.charlietap.chasm.embedding.shapes.TableType
 import io.github.charlietap.chasm.embedding.shapes.TagType
+import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.ast.type.FunctionType as InternalFunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType as InternalGlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType as InternalMemoryType
@@ -24,7 +25,7 @@ internal class ImportDescriptorMapper(
     override fun map(input: Import.Descriptor): ExternalType {
         return when (input) {
             is Import.Descriptor.Function -> {
-                val type = functionTypeMapper.bimap(input.type)
+                val type = functionTypeMapper.bimap(input.type.functionType()!!)
                 ExternalType.Function(type)
             }
             is Import.Descriptor.Global -> {

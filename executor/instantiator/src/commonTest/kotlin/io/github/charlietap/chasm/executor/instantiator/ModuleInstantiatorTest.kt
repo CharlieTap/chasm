@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
+import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
@@ -25,6 +26,7 @@ import io.github.charlietap.chasm.fixture.store
 import io.github.charlietap.chasm.fixture.type.heapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.fixture.instance.import as runtimeImport
 
 class ModuleInstantiatorTest {
 
@@ -49,26 +51,23 @@ class ModuleInstantiatorTest {
             elementSegments = listOf(elementSegment),
             startFunction = startFunction,
         )
-        val imports = listOf(ExternalValue.Function(Address.Function(0)))
+        val context = InstantiationContext(store, module)
+        val imports = listOf(runtimeImport(externalValue = ExternalValue.Function(Address.Function(0))))
 
         val partialInstance = moduleInstance(
             functionAddresses = mutableListOf(Address.Function(0)),
         )
-        val pallocator: PartialModuleAllocator = { eStore, eModule, eExterns ->
-            assertEquals(store, eStore)
-            assertEquals(module, eModule)
-            assertEquals(imports, eExterns)
+        val pallocator: PartialModuleAllocator = { _context, _imports ->
+            assertEquals(context, _context)
+            assertEquals(imports, _imports)
 
             Ok(partialInstance)
         }
 
-        val allocator: ModuleAllocator = { eStore, eModule, eInstance, eGlobalInit, eTableInit, eElemRefs ->
-            assertEquals(store, eStore)
-            assertEquals(module, eModule)
-            assertEquals(partialInstance, eInstance)
-            assertEquals(emptyList(), eGlobalInit)
-            assertEquals(listOf(ReferenceValue.Null(heapType())), eTableInit)
-            assertEquals(listOf(emptyList()), eElemRefs)
+        val allocator: ModuleAllocator = { _context, _instance, _tableInitExpressions ->
+            assertEquals(context, _context)
+            assertEquals(partialInstance, _instance)
+            assertEquals(listOf(ReferenceValue.Null(heapType())), _tableInitExpressions)
 
             Ok(partialInstance)
         }

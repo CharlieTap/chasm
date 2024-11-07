@@ -18,9 +18,9 @@ import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
 import io.github.charlietap.chasm.fixture.module.type
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
-import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.fixture.type.tagType
+import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -32,8 +32,9 @@ class ImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_FUNCTION
 
-        val functionType = functionType()
-        val expected = Ok(Import.Descriptor.Function(functionType))
+        val recursiveType = functionRecursiveType()
+        val functionType = DefinedTypeFactory(listOf(recursiveType))
+        val expected = Ok(Import.Descriptor.Function(functionType.first()))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
@@ -42,7 +43,7 @@ class ImportDescriptorDecoderTest {
             reader = reader,
             types = mutableListOf(
                 type(
-                    recursiveType = functionRecursiveType(functionType),
+                    recursiveType = recursiveType,
                 ),
             ),
         )

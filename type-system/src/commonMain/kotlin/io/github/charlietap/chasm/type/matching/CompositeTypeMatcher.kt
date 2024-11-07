@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.StructType
 
-internal fun CompositeTypeMatcher(
+fun CompositeTypeMatcher(
     type1: CompositeType,
     type2: CompositeType,
     context: TypeMatcherContext,

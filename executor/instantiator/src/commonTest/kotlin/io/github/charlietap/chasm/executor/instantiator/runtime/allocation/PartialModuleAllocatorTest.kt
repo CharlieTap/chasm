@@ -6,13 +6,12 @@ import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
-import io.github.charlietap.chasm.executor.instantiator.classification.ClassifiedExternalValue
-import io.github.charlietap.chasm.executor.instantiator.classification.ExternalValueClassifier
-import io.github.charlietap.chasm.executor.instantiator.validation.ImportValidator
+import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.instance.externalValue
 import io.github.charlietap.chasm.fixture.instance.functionAddress
 import io.github.charlietap.chasm.fixture.instance.globalAddress
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
@@ -31,13 +30,13 @@ import io.github.charlietap.chasm.fixture.module.table
 import io.github.charlietap.chasm.fixture.module.tableImportDescriptor
 import io.github.charlietap.chasm.fixture.module.type
 import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.externalType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.type.ext.definedType
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.fixture.instance.import as runtimeImport
 
 class PartialModuleAllocatorTest {
 
@@ -72,10 +71,10 @@ class PartialModuleAllocatorTest {
         val importMemoryAddress = memoryAddress()
         val importGlobalAddress = globalAddress()
         val imports = listOf(
-            ExternalValue.Function(importFunctionAddress),
-            ExternalValue.Table(importTableAddress),
-            ExternalValue.Memory(importMemoryAddress),
-            ExternalValue.Global(importGlobalAddress),
+            runtimeImport(externalValue = ExternalValue.Function(importFunctionAddress)),
+            runtimeImport(externalValue = ExternalValue.Table(importTableAddress)),
+            runtimeImport(externalValue = ExternalValue.Memory(importMemoryAddress)),
+            runtimeImport(externalValue = ExternalValue.Global(importGlobalAddress)),
         )
 
         val module = module(
@@ -89,20 +88,10 @@ class PartialModuleAllocatorTest {
             imports = listOf(moduleFunctionImport, moduleTableImport, moduleMemoryImport, moduleGlobalImport),
             exports = emptyList(),
         )
+        val context = InstantiationContext(store, module)
 
-        val importIter = imports.iterator()
-        val classifiedExternalValue = ClassifiedExternalValue(externalType(), externalValue())
-        val classifier: ExternalValueClassifier = { _store, _externalValue ->
-            assertEquals(store, _store)
-            assertEquals(importIter.next(), _externalValue)
-            Ok(classifiedExternalValue)
-        }
-
-        val validatorIter = module.imports.iterator()
-        val validator: ImportValidator = { _import, _classified ->
-            assertEquals(validatorIter.next(), _import)
-            assertEquals(classifiedExternalValue, _classified)
-            Ok(Unit)
+        val importMatcher: ImportMatcher = { _, _ ->
+            Ok(imports.map(Import::externalValue))
         }
 
         val expected = ModuleInstance(
@@ -117,13 +106,11 @@ class PartialModuleAllocatorTest {
         )
 
         val actual = PartialModuleAllocator(
-            store = store,
-            module = module,
+            context = context,
             imports = imports,
             wasmFunctionAllocator = ::WasmFunctionAllocator,
             typeAllocator = ::DefinedTypeFactory,
-            classifier = classifier,
-            importValidator = validator,
+            importMatcher = importMatcher,
         )
 
         assertEquals(Ok(expected), actual)
