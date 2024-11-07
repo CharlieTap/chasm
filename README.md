@@ -66,6 +66,7 @@ Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/charliet
 - Globals
 - Memories
 - Tables
+- Tags
 
 For the most part imports will actually be exports from other modules, this is the mechanism that wasm uses to share data/behaviour between modules.
 However you can also allocate them separately using the factory functions:
@@ -75,6 +76,7 @@ val function = function(store, functionType, hostFunction)
 val global = global(store, globalType, initialValue)
 val memory = memory(store, memoryType)
 val table = table(store, tableType, initialValue)
+val tag = tag(store, tagType)
 ```
 
 Once you have your importables you can pass them in at instantiation time.
