@@ -4,7 +4,6 @@ import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.moduleInfo
-import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ExportDefinition
 import io.github.charlietap.chasm.embedding.shapes.ExternalType
 import io.github.charlietap.chasm.embedding.shapes.FunctionType
@@ -18,7 +17,8 @@ import io.github.charlietap.chasm.embedding.shapes.Mutability
 import io.github.charlietap.chasm.embedding.shapes.TableType
 import io.github.charlietap.chasm.embedding.shapes.TagType
 import io.github.charlietap.chasm.embedding.shapes.ValueType
-import io.github.charlietap.chasm.embedding.shapes.flatMap
+import io.github.charlietap.chasm.embedding.shapes.getOrNull
+import io.github.charlietap.chasm.embedding.shapes.map
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -53,9 +53,9 @@ class ModuleInfoTest {
         val byteStream = Resource(FILE_DIR + "module_info.wasm").readBytes()
         val reader = FakeSourceReader(byteStream)
 
-        val actual = module(reader).flatMap { module ->
+        val actual = module(reader).map { module ->
             moduleInfo(module)
-        }
+        }.getOrNull()
 
         val expected = ModuleInfo(
             imports = listOf(
@@ -109,7 +109,7 @@ class ModuleInfoTest {
             ),
         )
 
-        assertEquals(ChasmResult.Success(expected), actual)
+        assertEquals(expected, actual)
     }
 
     companion object {
