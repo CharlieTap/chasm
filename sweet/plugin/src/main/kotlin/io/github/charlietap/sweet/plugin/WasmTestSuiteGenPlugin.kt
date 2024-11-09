@@ -5,6 +5,7 @@ import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import io.github.charlietap.sweet.plugin.task.PrepareTestSuiteTask
 import io.github.charlietap.sweet.plugin.task.ResolveWasmToolsTask
 import io.github.charlietap.sweet.plugin.task.SyncRepositoryTask
+import io.github.charlietap.sweet.plugin.task.TestMatrixTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.create
@@ -91,6 +92,18 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             outputDirectory.set(extension.testSuiteTestsDirectory)
         }
 
+        val matrixTask = project.tasks.register<TestMatrixTask>(
+            TASK_NAME_MATRIX,
+        ) {
+            description = TASK_DESCRIPTION_MATRIX
+            group = GROUP
+
+            testFiles.apply {
+                from(generateTestsTask.flatMap { it.outputDirectory })
+                builtBy(generateTestsTask)
+            }
+        }
+
         project.tasks.named {
             it.contains("compileTestKotlin")
         }.configureEach {
@@ -115,11 +128,13 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
         const val TASK_NAME_RESOLVE_WASM_TOOLS = "resolveWasmTools"
         const val TASK_NAME_PREPARE_SUITE = "prepareTestSuite"
         const val TASK_NAME_GENERATE_TESTS = "generateTests"
+        const val TASK_NAME_MATRIX = "testMatrix"
 
         const val TASK_DESCRIPTION_SYNC_SUITE = "Clones/Updates the wasm test suite to the given commit"
         const val TASK_DESCRIPTION_DOWNLOAD_WT = "Downloads and extracts the wasm-tools"
         const val TASK_DESCRIPTION_RESOLVE_WT = "Resolves wasm-tools on the local filesystem"
         const val TASK_DESCRIPTION_PREPARE_SUITE = "Prepare the wasm test suite for generation by running wast2json"
         const val TASK_DESCRIPTION_GENERATE_TESTS = "Generate tests from the web assembly testsuite"
+        const val TASK_DESCRIPTION_MATRIX = "Generates a test matrix over the generated test files"
     }
 }
