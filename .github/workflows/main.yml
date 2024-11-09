@@ -9,7 +9,14 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ macos-14, ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest, windows-latest ]
+        task: [ build ]
+        include:
+          - os: macos-latest
+            task: macosArm64Test
+          - os: macos-latest
+            task: iosSimulatorArm64Test
     uses: ./.github/workflows/build.yml
     with:
       runner: ${{ matrix.os }}
+      task: ${{ matrix.task }}

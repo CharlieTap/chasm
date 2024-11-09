@@ -8,12 +8,22 @@ on:
         description: 'The machine runner the workflow should run on'
         default: macos-latest
         required: true
+      task:
+        type: string
+        description: 'The gradle task to run'
+        default: build
+        required: true
   workflow_dispatch:
     inputs:
       runner:
         type: string
         description: 'The machine runner the workflow should run on'
         default: macos-latest
+        required: true
+      task:
+        type: string
+        description: 'The gradle task to run'
+        default: build
         required: true
 
 jobs:
@@ -36,4 +46,4 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Execute Gradle build
-        run: ./gradlew build
+        run: ./gradlew ${{ inputs.task }}
