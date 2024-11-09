@@ -23,10 +23,10 @@ internal fun InstructionBlockValidator(
         instructionValidator = ::InstructionValidator,
     )
 
-internal fun InstructionBlockValidator(
+internal inline fun InstructionBlockValidator(
     context: ValidationContext,
     instructions: List<Instruction>,
-    instructionValidator: Validator<Instruction>,
+    crossinline instructionValidator: Validator<Instruction>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val locals = context.locals.map(LocalType::status)

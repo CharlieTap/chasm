@@ -24,10 +24,10 @@ internal fun TableInitInstructionValidator(
         typeMatcher = ::ReferenceTypeMatcher,
     )
 
-internal fun TableInitInstructionValidator(
+internal inline fun TableInitInstructionValidator(
     context: ValidationContext,
     instruction: TableInstruction.TableInit,
-    typeMatcher: TypeMatcher<ReferenceType>,
+    crossinline typeMatcher: TypeMatcher<ReferenceType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val tableType = context.tableType(instruction.tableIdx).bind()

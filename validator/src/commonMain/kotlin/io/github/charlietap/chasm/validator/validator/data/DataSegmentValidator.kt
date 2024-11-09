@@ -20,11 +20,11 @@ internal fun DataSegmentValidator(
         segmentModeValidator = ::DataSegmentModeValidator,
     )
 
-internal fun DataSegmentValidator(
+internal inline fun DataSegmentValidator(
     context: ValidationContext,
     segment: DataSegment,
-    scope: Scope<DataSegment>,
-    segmentModeValidator: Validator<DataSegment.Mode>,
+    crossinline scope: Scope<DataSegment>,
+    crossinline segmentModeValidator: Validator<DataSegment.Mode>,
 ): Result<Unit, ModuleValidatorError> = binding {
     val scopedContext = scope(context, segment).bind()
     segmentModeValidator(scopedContext, segment.mode).bind()

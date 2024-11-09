@@ -23,10 +23,10 @@ internal fun TableCopyInstructionValidator(
         typeMatcher = ::ReferenceTypeMatcher,
     )
 
-internal fun TableCopyInstructionValidator(
+internal inline fun TableCopyInstructionValidator(
     context: ValidationContext,
     instruction: TableInstruction.TableCopy,
-    typeMatcher: TypeMatcher<ReferenceType>,
+    crossinline typeMatcher: TypeMatcher<ReferenceType>,
 ): Result<Unit, ModuleValidatorError> = binding {
     val srcTableType = context.tableType(instruction.srcTableIdx).bind()
     val dstTableType = context.tableType(instruction.destTableIdx).bind()

@@ -19,10 +19,10 @@ internal fun TableTypeValidator(
         limitsValidator = ::LimitsValidator,
     )
 
-internal fun TableTypeValidator(
+internal inline fun TableTypeValidator(
     context: ValidationContext,
     type: TableType,
-    limitsValidator: Validator<Limits>,
+    crossinline limitsValidator: Validator<Limits>,
 ): Result<Unit, ModuleValidatorError> = binding {
     limitsValidator(context, type.limits).bind()
 }

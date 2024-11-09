@@ -25,10 +25,10 @@ internal fun RefTestInstructionValidator(
         topOfHeapType = ::TopOfHeapType,
     )
 
-internal fun RefTestInstructionValidator(
+internal inline fun RefTestInstructionValidator(
     context: ValidationContext,
     instruction: ReferenceInstruction.RefTest,
-    topOfHeapType: TopOf<HeapType>,
+    crossinline topOfHeapType: TopOf<HeapType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val superType = topOfHeapType(instruction.referenceType.heapType, context.types).toResultOr {

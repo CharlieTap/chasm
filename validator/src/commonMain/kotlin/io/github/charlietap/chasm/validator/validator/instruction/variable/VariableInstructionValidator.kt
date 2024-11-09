@@ -20,14 +20,14 @@ internal fun VariableInstructionValidator(
         localTeeValidator = ::LocalTeeInstructionValidator,
     )
 
-internal fun VariableInstructionValidator(
+internal inline fun VariableInstructionValidator(
     context: ValidationContext,
     instruction: VariableInstruction,
-    globalGetValidator: Validator<VariableInstruction.GlobalGet>,
-    globalSetValidator: Validator<VariableInstruction.GlobalSet>,
-    localGetValidator: Validator<VariableInstruction.LocalGet>,
-    localSetValidator: Validator<VariableInstruction.LocalSet>,
-    localTeeValidator: Validator<VariableInstruction.LocalTee>,
+    crossinline globalGetValidator: Validator<VariableInstruction.GlobalGet>,
+    crossinline globalSetValidator: Validator<VariableInstruction.GlobalSet>,
+    crossinline localGetValidator: Validator<VariableInstruction.LocalGet>,
+    crossinline localSetValidator: Validator<VariableInstruction.LocalSet>,
+    crossinline localTeeValidator: Validator<VariableInstruction.LocalTee>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
         is VariableInstruction.GlobalGet -> globalGetValidator(context, instruction)

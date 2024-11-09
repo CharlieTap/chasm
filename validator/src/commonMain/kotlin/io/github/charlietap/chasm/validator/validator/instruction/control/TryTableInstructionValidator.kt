@@ -34,11 +34,11 @@ internal fun TryTableInstructionValidator(
     typeMatcher = ::ValueTypeMatcher,
 )
 
-internal fun TryTableInstructionValidator(
+internal inline fun TryTableInstructionValidator(
     context: ValidationContext,
     instruction: ControlInstruction.TryTable,
-    instructionBlockValidator: Validator<List<Instruction>>,
-    typeMatcher: TypeMatcher<ValueType>,
+    crossinline instructionBlockValidator: Validator<List<Instruction>>,
+    crossinline typeMatcher: TypeMatcher<ValueType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val functionType = context.functionType(instruction.blockType).bind()

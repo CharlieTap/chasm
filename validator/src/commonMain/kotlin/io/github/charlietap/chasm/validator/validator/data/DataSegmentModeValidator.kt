@@ -21,10 +21,10 @@ internal fun DataSegmentModeValidator(
         expressionValidator = ::ExpressionValidator,
     )
 
-internal fun DataSegmentModeValidator(
+internal inline fun DataSegmentModeValidator(
     context: ValidationContext,
     mode: DataSegment.Mode,
-    expressionValidator: Validator<Expression>,
+    crossinline expressionValidator: Validator<Expression>,
 ): Result<Unit, ModuleValidatorError> = binding {
     when (mode) {
         is DataSegment.Mode.Active -> {

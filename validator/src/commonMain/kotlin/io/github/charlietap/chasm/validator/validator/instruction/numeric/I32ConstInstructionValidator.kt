@@ -22,10 +22,10 @@ internal fun I32ConstInstructionValidator(
         instructionTypeValidator = ::InstructionTypeValidator,
     )
 
-internal fun I32ConstInstructionValidator(
+internal inline fun I32ConstInstructionValidator(
     context: ValidationContext,
     instruction: NumericInstruction.I32Const,
-    instructionTypeValidator: Validator<InstructionType>,
+    crossinline instructionTypeValidator: Validator<InstructionType>,
 ): Result<Unit, ModuleValidatorError> = binding {
     val instructionType = InstructionType(
         inputs = ResultType(emptyList()),

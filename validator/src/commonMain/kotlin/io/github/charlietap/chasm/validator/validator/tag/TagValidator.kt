@@ -19,10 +19,10 @@ internal fun TagValidator(
         typeValidator = ::TagTypeValidator,
     )
 
-internal fun TagValidator(
+internal inline fun TagValidator(
     context: ValidationContext,
     tag: Tag,
-    typeValidator: Validator<TagType>,
+    crossinline typeValidator: Validator<TagType>,
 ): Result<Unit, ModuleValidatorError> = binding {
     typeValidator(context, tag.type).bind()
 }

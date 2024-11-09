@@ -30,12 +30,12 @@ internal fun ElementSegmentModeValidator(
         typeMatcher = ::ReferenceTypeMatcher,
     )
 
-internal fun ElementSegmentModeValidator(
+internal inline fun ElementSegmentModeValidator(
     context: ValidationContext,
     mode: ElementSegment.Mode,
-    scope: Scope<ElementSegment.Mode>,
-    expressionValidator: Validator<Expression>,
-    typeMatcher: TypeMatcher<ReferenceType>,
+    crossinline scope: Scope<ElementSegment.Mode>,
+    crossinline expressionValidator: Validator<Expression>,
+    crossinline typeMatcher: TypeMatcher<ReferenceType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val scopedContext = scope(context, mode).bind()

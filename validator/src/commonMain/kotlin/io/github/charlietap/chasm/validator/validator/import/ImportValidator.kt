@@ -17,10 +17,10 @@ internal fun ImportValidator(
         functionImportValidator = ::FunctionImportValidator,
     )
 
-internal fun ImportValidator(
+internal inline fun ImportValidator(
     context: ValidationContext,
     import: Import,
-    functionImportValidator: Validator<Import.Descriptor.Function>,
+    crossinline functionImportValidator: Validator<Import.Descriptor.Function>,
 ): Result<Unit, ModuleValidatorError> = binding {
     when (val descriptor = import.descriptor) {
         is Import.Descriptor.Function -> functionImportValidator(context, descriptor).bind()

@@ -22,16 +22,16 @@ internal fun ReferenceInstructionValidator(
         refTestValidator = ::RefTestInstructionValidator,
     )
 
-internal fun ReferenceInstructionValidator(
+internal inline fun ReferenceInstructionValidator(
     context: ValidationContext,
     instruction: ReferenceInstruction,
-    refFuncValidator: Validator<ReferenceInstruction.RefFunc>,
-    refIsNullValidator: Validator<ReferenceInstruction.RefIsNull>,
-    refAsNonNullValidator: Validator<ReferenceInstruction.RefAsNonNull>,
-    refCastValidator: Validator<ReferenceInstruction.RefCast>,
-    refEqValidator: Validator<ReferenceInstruction.RefEq>,
-    refNullValidator: Validator<ReferenceInstruction.RefNull>,
-    refTestValidator: Validator<ReferenceInstruction.RefTest>,
+    crossinline refFuncValidator: Validator<ReferenceInstruction.RefFunc>,
+    crossinline refIsNullValidator: Validator<ReferenceInstruction.RefIsNull>,
+    crossinline refAsNonNullValidator: Validator<ReferenceInstruction.RefAsNonNull>,
+    crossinline refCastValidator: Validator<ReferenceInstruction.RefCast>,
+    crossinline refEqValidator: Validator<ReferenceInstruction.RefEq>,
+    crossinline refNullValidator: Validator<ReferenceInstruction.RefNull>,
+    crossinline refTestValidator: Validator<ReferenceInstruction.RefTest>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
         is ReferenceInstruction.RefFunc -> refFuncValidator(context, instruction)

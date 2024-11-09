@@ -49,19 +49,19 @@ internal fun InstructionValidator(
         instructionTypeValidator = ::InstructionTypeValidator,
     )
 
-internal fun InstructionValidator(
+internal inline fun InstructionValidator(
     context: ValidationContext,
     instruction: Instruction,
-    aggregateInstructionValidator: Validator<AggregateInstruction>,
-    controlInstructionValidator: Validator<ControlInstruction>,
-    memoryInstructionValidator: Validator<MemoryInstruction>,
-    numericInstructionValidator: Validator<NumericInstruction>,
-    parametricInstructionValidator: Validator<ParametricInstruction>,
-    referenceInstructionValidator: Validator<ReferenceInstruction>,
-    tableInstructionValidator: Validator<TableInstruction>,
-    variableInstructionValidator: Validator<VariableInstruction>,
-    instructionTypeResolver: InstructionTypeResolver<Instruction>,
-    instructionTypeValidator: Validator<InstructionType>,
+    crossinline aggregateInstructionValidator: Validator<AggregateInstruction>,
+    crossinline controlInstructionValidator: Validator<ControlInstruction>,
+    crossinline memoryInstructionValidator: Validator<MemoryInstruction>,
+    crossinline numericInstructionValidator: Validator<NumericInstruction>,
+    crossinline parametricInstructionValidator: Validator<ParametricInstruction>,
+    crossinline referenceInstructionValidator: Validator<ReferenceInstruction>,
+    crossinline tableInstructionValidator: Validator<TableInstruction>,
+    crossinline variableInstructionValidator: Validator<VariableInstruction>,
+    crossinline instructionTypeResolver: InstructionTypeResolver<Instruction>,
+    crossinline instructionTypeValidator: Validator<InstructionType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     if (

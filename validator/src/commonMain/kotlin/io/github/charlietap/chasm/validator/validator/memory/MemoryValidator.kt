@@ -22,11 +22,11 @@ internal fun MemoryValidator(
         typeValidator = ::MemoryTypeValidator,
     )
 
-internal fun MemoryValidator(
+internal inline fun MemoryValidator(
     context: ValidationContext,
     memory: Memory,
-    scope: Scope<Memory>,
-    typeValidator: Validator<MemoryType>,
+    crossinline scope: Scope<Memory>,
+    crossinline typeValidator: Validator<MemoryType>,
 ): Result<Unit, ModuleValidatorError> = binding {
     val scopedContext = scope(context, memory).bind()
     typeValidator(scopedContext, memory.type).bind()

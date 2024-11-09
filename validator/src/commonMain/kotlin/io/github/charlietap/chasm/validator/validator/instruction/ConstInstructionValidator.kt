@@ -25,10 +25,10 @@ internal fun ConstInstructionValidator(
         instructionValidator = ::InstructionValidator,
     )
 
-internal fun ConstInstructionValidator(
+internal inline fun ConstInstructionValidator(
     context: ValidationContext,
     instruction: Instruction,
-    instructionValidator: Validator<Instruction>,
+    crossinline instructionValidator: Validator<Instruction>,
 ): Result<Unit, ModuleValidatorError> = binding {
     when (instruction) {
         is AggregateInstruction.AnyConvertExtern,

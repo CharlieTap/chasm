@@ -23,17 +23,17 @@ internal fun TableInstructionValidator(
         tableSizeValidator = ::TableSizeInstructionValidator,
     )
 
-internal fun TableInstructionValidator(
+internal inline fun TableInstructionValidator(
     context: ValidationContext,
     instruction: TableInstruction,
-    elementDropValidator: Validator<TableInstruction.ElemDrop>,
-    tableCopyValidator: Validator<TableInstruction.TableCopy>,
-    tableFillValidator: Validator<TableInstruction.TableFill>,
-    tableGetValidator: Validator<TableInstruction.TableGet>,
-    tableSetValidator: Validator<TableInstruction.TableSet>,
-    tableGrowValidator: Validator<TableInstruction.TableGrow>,
-    tableInitValidator: Validator<TableInstruction.TableInit>,
-    tableSizeValidator: Validator<TableInstruction.TableSize>,
+    crossinline elementDropValidator: Validator<TableInstruction.ElemDrop>,
+    crossinline tableCopyValidator: Validator<TableInstruction.TableCopy>,
+    crossinline tableFillValidator: Validator<TableInstruction.TableFill>,
+    crossinline tableGetValidator: Validator<TableInstruction.TableGet>,
+    crossinline tableSetValidator: Validator<TableInstruction.TableSet>,
+    crossinline tableGrowValidator: Validator<TableInstruction.TableGrow>,
+    crossinline tableInitValidator: Validator<TableInstruction.TableInit>,
+    crossinline tableSizeValidator: Validator<TableInstruction.TableSize>,
 ): Result<Unit, ModuleValidatorError> {
     return when (instruction) {
         is TableInstruction.ElemDrop -> elementDropValidator(context, instruction)

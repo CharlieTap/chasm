@@ -19,10 +19,10 @@ internal fun MemoryTypeValidator(
         limitsValidator = ::LimitsValidator,
     )
 
-internal fun MemoryTypeValidator(
+internal inline fun MemoryTypeValidator(
     context: ValidationContext,
     type: MemoryType,
-    limitsValidator: Validator<Limits>,
+    crossinline limitsValidator: Validator<Limits>,
 ): Result<Unit, ModuleValidatorError> = binding {
     limitsValidator(context, type.limits).bind()
 }

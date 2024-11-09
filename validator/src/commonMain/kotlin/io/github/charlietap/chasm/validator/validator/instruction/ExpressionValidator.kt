@@ -25,11 +25,11 @@ internal fun ExpressionValidator(
         constInstructionValidator = ::ConstInstructionValidator,
     )
 
-internal fun ExpressionValidator(
+internal inline fun ExpressionValidator(
     context: ValidationContext,
     expression: Expression,
-    scope: Scope<Expression>,
-    constInstructionValidator: Validator<Instruction>,
+    crossinline scope: Scope<Expression>,
+    crossinline constInstructionValidator: Validator<Instruction>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val scopedContext = scope(context, expression).bind()

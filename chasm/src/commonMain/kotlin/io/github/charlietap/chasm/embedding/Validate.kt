@@ -9,11 +9,10 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.validator.WasmModuleValidator
-import io.github.charlietap.chasm.validator.WasmModuleValidatorImpl
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 
 fun validate(module: Module): ChasmResult<Module, ValidationError> {
-    return validate(module, ::WasmModuleValidatorImpl)
+    return validate(module, ::WasmModuleValidator)
 }
 
 internal fun validate(

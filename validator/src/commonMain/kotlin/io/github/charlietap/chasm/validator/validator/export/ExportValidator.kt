@@ -23,14 +23,14 @@ internal fun ExportValidator(
         tagExportValidator = ::TagExportValidator,
     )
 
-internal fun ExportValidator(
+internal inline fun ExportValidator(
     context: ValidationContext,
     export: Export,
-    functionExportValidator: Validator<Export.Descriptor.Function>,
-    globalExportValidator: Validator<Export.Descriptor.Global>,
-    memoryExportValidator: Validator<Export.Descriptor.Memory>,
-    tableExportValidator: Validator<Export.Descriptor.Table>,
-    tagExportValidator: Validator<Export.Descriptor.Tag>,
+    crossinline functionExportValidator: Validator<Export.Descriptor.Function>,
+    crossinline globalExportValidator: Validator<Export.Descriptor.Global>,
+    crossinline memoryExportValidator: Validator<Export.Descriptor.Memory>,
+    crossinline tableExportValidator: Validator<Export.Descriptor.Table>,
+    crossinline tagExportValidator: Validator<Export.Descriptor.Tag>,
 ): Result<Unit, ModuleValidatorError> = binding {
     when (val descriptor = export.descriptor) {
         is Export.Descriptor.Function -> functionExportValidator(context, descriptor).bind()

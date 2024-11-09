@@ -30,10 +30,10 @@ internal fun ArrayCopyInstructionValidator(
         storageTypeMatcher = ::StorageTypeMatcher,
     )
 
-internal fun ArrayCopyInstructionValidator(
+internal inline fun ArrayCopyInstructionValidator(
     context: ValidationContext,
     instruction: AggregateInstruction.ArrayCopy,
-    storageTypeMatcher: TypeMatcher<StorageType>,
+    crossinline storageTypeMatcher: TypeMatcher<StorageType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val srcDefinedType = context.type(instruction.sourceTypeIndex).bind()

@@ -30,12 +30,12 @@ internal fun FunctionValidator(
         valueTypeValidator = ::ValueTypeValidator,
     )
 
-internal fun FunctionValidator(
+internal inline fun FunctionValidator(
     context: ValidationContext,
     function: Function,
-    scope: Scope<Function>,
-    instructionBlockValidator: Validator<List<Instruction>>,
-    valueTypeValidator: Validator<ValueType>,
+    crossinline scope: Scope<Function>,
+    crossinline instructionBlockValidator: Validator<List<Instruction>>,
+    crossinline valueTypeValidator: Validator<ValueType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val scopedContext = scope(context, function).bind()

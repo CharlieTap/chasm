@@ -31,10 +31,10 @@ internal fun ArrayNewElementInstructionValidator(
         ::ReferenceTypeMatcher,
     )
 
-internal fun ArrayNewElementInstructionValidator(
+internal inline fun ArrayNewElementInstructionValidator(
     context: ValidationContext,
     instruction: AggregateInstruction.ArrayNewElement,
-    referenceTypeMatcher: TypeMatcher<ReferenceType>,
+    crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val definedType = context.type(instruction.typeIndex).bind()

@@ -32,10 +32,10 @@ internal fun ArrayInitElemInstructionValidator(
         referenceTypeMatcher = ::ReferenceTypeMatcher,
     )
 
-internal fun ArrayInitElemInstructionValidator(
+internal inline fun ArrayInitElemInstructionValidator(
     context: ValidationContext,
     instruction: AggregateInstruction.ArrayInitElement,
-    referenceTypeMatcher: TypeMatcher<ReferenceType>,
+    crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val definedType = context.type(instruction.typeIndex).bind()
