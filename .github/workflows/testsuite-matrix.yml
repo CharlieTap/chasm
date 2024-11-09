@@ -1,0 +1,47 @@
+name: Gradle task workflow 🔨
+
+on:
+  workflow_call:
+    inputs:
+      matrix:
+        type: string
+        description: 'The testsuite matrix'
+        required: true
+      runner:
+        type: string
+        description: 'The machine runner the workflow should run on'
+        default: macos-latest
+        required: true
+      task:
+        type: string
+        description: 'The gradle task to run'
+        default: build
+        required: true
+  workflow_dispatch:
+    inputs:
+      matrix:
+        type: string
+        description: 'The testsuite matrix'
+        required: true
+      runner:
+        type: string
+        description: 'The machine runner the workflow should run on'
+        default: macos-latest
+        required: true
+      task:
+        type: string
+        description: 'The gradle task to run'
+        default: build
+        required: true
+
+jobs:
+
+  run-test-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        tasks: ${{ fromJSON(inputs.matrix) }}
+    uses: ./.github/workflows/task-runner.yml
+    with:
+      runner: ${{ inputs.runner }}
+      task: chasm:${{ inputs.task }} ${{ matrix.tasks }}

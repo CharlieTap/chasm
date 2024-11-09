@@ -6,12 +6,19 @@ on:
       - main
 
 jobs:
-  build:
+
+  lint:
+    uses: ./.github/workflows/task-runner.yml
+    with:
+      runner: ubuntu-latest
+      task: lintKotlin
+
+  test:
     strategy:
       matrix:
         include:
           - os: macos-latest
-            task: lintKotlin jvmTest
+            task: jvmTest
           - os: macos-latest
             task: macosArm64Test
           - os: macos-latest
