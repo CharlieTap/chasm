@@ -52,13 +52,13 @@ abstract class TestMatrixTask : DefaultTask() {
         }
 
         val commands = taskLists.map { list ->
-            list.joinToString(separator = " ", prefix = "--tests \"", postfix = "\"")
+            list.joinToString(separator = "\" --tests \"", prefix = "--tests \"", postfix = "\"")
         }
 
         println(Json.encodeToString(ListSerializer(String.serializer()), commands))
     }
 
     private companion object {
-        const val MAX_PARALLELISM = 20
+        const val MAX_PARALLELISM = 5
     }
 }
