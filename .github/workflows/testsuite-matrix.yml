@@ -51,7 +51,8 @@ jobs:
         id: matrix
         run: |
           MATRIX=$(./gradlew testMatrix)
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          echo $MATRIX
+          echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
 
   run-tests:
     needs: generate-matrix
