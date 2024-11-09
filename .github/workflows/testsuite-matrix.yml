@@ -50,7 +50,7 @@ jobs:
       - name: Run the test matrix task
         id: matrix
         run: |
-          MATRIX=$(./gradlew testMatrix)
+          MATRIX=$(./gradlew -q testMatrix)
           echo $MATRIX
           echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
 
