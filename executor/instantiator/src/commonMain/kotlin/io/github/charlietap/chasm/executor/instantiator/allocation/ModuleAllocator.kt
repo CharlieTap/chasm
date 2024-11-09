@@ -51,17 +51,17 @@ internal fun ModuleAllocator(
         dataAllocator = ::DataAllocator,
     )
 
-internal fun ModuleAllocator(
+internal inline fun ModuleAllocator(
     context: InstantiationContext,
     instance: ModuleInstance,
     tableInitValues: List<ReferenceValue>,
-    evaluator: ExpressionEvaluator,
-    tableAllocator: TableAllocator,
-    memoryAllocator: MemoryAllocator,
-    tagAllocator: TagAllocator,
-    globalAllocator: GlobalAllocator,
-    elementAllocator: ElementAllocator,
-    dataAllocator: DataAllocator,
+    crossinline evaluator: ExpressionEvaluator,
+    crossinline tableAllocator: TableAllocator,
+    crossinline memoryAllocator: MemoryAllocator,
+    crossinline tagAllocator: TagAllocator,
+    crossinline globalAllocator: GlobalAllocator,
+    crossinline elementAllocator: ElementAllocator,
+    crossinline dataAllocator: DataAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val (store, module) = context

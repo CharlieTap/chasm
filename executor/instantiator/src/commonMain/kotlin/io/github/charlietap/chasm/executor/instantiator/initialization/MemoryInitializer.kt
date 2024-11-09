@@ -27,11 +27,11 @@ internal fun MemoryInitializer(
         evaluator = ::ExpressionEvaluator,
     )
 
-internal fun MemoryInitializer(
+internal inline fun MemoryInitializer(
     store: Store,
     instance: ModuleInstance,
     module: Module,
-    evaluator: ExpressionEvaluator,
+    crossinline evaluator: ExpressionEvaluator,
 ): Result<Unit, ModuleTrapError> = binding {
 
     module.dataSegments.filter { segment ->

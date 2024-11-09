@@ -27,11 +27,11 @@ internal fun TableInitializer(
         evaluator = ::ExpressionEvaluator,
     )
 
-internal fun TableInitializer(
+internal inline fun TableInitializer(
     store: Store,
     instance: ModuleInstance,
     module: Module,
-    evaluator: ExpressionEvaluator,
+    crossinline evaluator: ExpressionEvaluator,
 ): Result<Unit, InvocationError> = binding {
 
     module.elementSegments.filter { segment ->

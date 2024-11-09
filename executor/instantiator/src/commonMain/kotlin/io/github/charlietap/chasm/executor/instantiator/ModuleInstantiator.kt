@@ -36,16 +36,16 @@ fun ModuleInstantiator(
         memoryInitializer = ::MemoryInitializer,
     )
 
-internal fun ModuleInstantiator(
+internal inline fun ModuleInstantiator(
     store: Store,
     module: Module,
     imports: List<Import>,
-    partialAllocator: PartialModuleAllocator,
-    allocator: ModuleAllocator,
-    invoker: FunctionInvoker,
-    evaluator: ExpressionEvaluator,
-    tableInitializer: TableInitializer,
-    memoryInitializer: MemoryInitializer,
+    crossinline partialAllocator: PartialModuleAllocator,
+    crossinline allocator: ModuleAllocator,
+    crossinline invoker: FunctionInvoker,
+    crossinline evaluator: ExpressionEvaluator,
+    crossinline tableInitializer: TableInitializer,
+    crossinline memoryInitializer: MemoryInitializer,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val context = InstantiationContext(store, module)

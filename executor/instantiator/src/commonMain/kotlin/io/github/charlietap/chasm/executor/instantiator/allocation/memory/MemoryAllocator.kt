@@ -18,10 +18,10 @@ fun MemoryAllocator(
     memoryFactory = ::LinearMemoryFactoryImpl,
 )
 
-internal fun MemoryAllocator(
+internal inline fun MemoryAllocator(
     store: Store,
     type: MemoryType,
-    memoryFactory: LinearMemoryFactory,
+    crossinline memoryFactory: LinearMemoryFactory,
 ): Address.Memory {
     val memory = memoryFactory(type.limits.min.toInt(), type.limits.max?.toInt())
     val instance = MemoryInstance(type, memory)

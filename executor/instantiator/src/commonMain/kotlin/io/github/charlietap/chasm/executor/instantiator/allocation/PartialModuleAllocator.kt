@@ -32,12 +32,12 @@ internal fun PartialModuleAllocator(
         importMatcher = ::ImportMatcher,
     )
 
-internal fun PartialModuleAllocator(
+internal inline fun PartialModuleAllocator(
     context: InstantiationContext,
     imports: List<Import>,
-    wasmFunctionAllocator: WasmFunctionAllocator,
-    typeAllocator: DefinedTypeFactory,
-    importMatcher: ImportMatcher,
+    crossinline wasmFunctionAllocator: WasmFunctionAllocator,
+    crossinline typeAllocator: DefinedTypeFactory,
+    crossinline importMatcher: ImportMatcher,
 ): Result<ModuleInstance, InstantiationError> = binding {
 
     val (store, module) = context
