@@ -59,6 +59,6 @@ abstract class TestMatrixTask : DefaultTask() {
     }
 
     private companion object {
-        const val MAX_PARALLELISM = 256
+        const val MAX_PARALLELISM = 20
     }
 }
