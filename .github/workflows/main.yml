@@ -11,7 +11,7 @@ jobs:
       matrix:
         include:
           - os: macos-latest
-            task: lintKotlin jvmTest
+            task: jvmTest
           - os: macos-latest
             task: macosArm64Test
           - os: macos-latest
@@ -24,3 +24,9 @@ jobs:
     with:
       runner: ${{ matrix.os }}
       task: ${{ matrix.task }}
+
+  lint:
+    uses: ./.github/workflows/task-runner.yml
+    with:
+      runner: macos-latest
+      task: lintKotlin

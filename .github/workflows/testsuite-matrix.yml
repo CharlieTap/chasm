@@ -29,6 +29,8 @@ on:
 jobs:
   generate-matrix:
     runs-on: macos-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
 
       - name: Clone Repo
@@ -50,6 +52,7 @@ jobs:
         run: |
           MATRIX=$(./gradlew testMatrix)
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
   run-tests:
     needs: generate-matrix
     strategy:
