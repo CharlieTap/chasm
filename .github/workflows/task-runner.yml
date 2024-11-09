@@ -1,4 +1,4 @@
-name: Build 🔨
+name: Gradle task workflow 🔨
 
 on:
   workflow_call:

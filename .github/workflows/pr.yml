@@ -20,7 +20,7 @@ jobs:
             task: linuxX64Test
           - os: windows-latest
             task: mingwX64Test
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/task-runner.yml
     with:
       runner: ${{ matrix.os }}
       task: ${{ matrix.task }}
