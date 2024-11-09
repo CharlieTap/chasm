@@ -72,7 +72,7 @@ configure<WasmTestSuiteGenPluginExtension> {
     wasmToolsVersion = "1.219.0"
     testSuiteCommit = "eeb6dac81be81151da0958ed955aba91230c1f25"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
-    testPackageName = "io.github.charlietap.chasm"
+    testPackageName = "io.github.charlietap.chasm.testsuite"
     proposals = listOf(
         "tail-call",
         "multi-memory",
