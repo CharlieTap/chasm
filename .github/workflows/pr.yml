@@ -6,7 +6,16 @@ on:
       - main
 
 jobs:
+
+  generate-matrix:
+    uses: ./.github/workflows/task-runner.yml
+    with:
+      runner: macos-latest
+      task: testMatrix
+      result: true
+
   build:
+    needs: generate-matrix
     strategy:
       matrix:
         include:
@@ -22,11 +31,12 @@ jobs:
             task: mingwX64Test
     uses: ./.github/workflows/testsuite-matrix.yml
     with:
+      matrix: ${{ needs.generate-matrix.outputs.result }}
       runner: ${{ matrix.os }}
       task: ${{ matrix.task }}
 
   lint:
     uses: ./.github/workflows/task-runner.yml
     with:
-      runner: macos-latest
+      runner: ubuntu-latest
       task: lintKotlin

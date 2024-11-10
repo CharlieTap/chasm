@@ -3,6 +3,10 @@ name: Gradle task workflow 🔨
 on:
   workflow_call:
     inputs:
+      matrix:
+        type: string
+        description: 'The testsuite matrix'
+        required: true
       runner:
         type: string
         description: 'The machine runner the workflow should run on'
@@ -15,6 +19,10 @@ on:
         required: true
   workflow_dispatch:
     inputs:
+      matrix:
+        type: string
+        description: 'The testsuite matrix'
+        required: true
       runner:
         type: string
         description: 'The machine runner the workflow should run on'
@@ -27,39 +35,12 @@ on:
         required: true
 
 jobs:
-  generate-matrix:
-    runs-on: macos-latest
-    outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-    steps:
 
-      - name: Clone Repo
-        uses: actions/checkout@v4
-
-      - name: Set up jdk@21
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'corretto'
-          java-version: '21'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
-      - name: Run the test matrix task
-        id: matrix
-        run: |
-          MATRIX=$(./gradlew -q testMatrix)
-          echo $MATRIX
-          echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
-
-  run-tests:
-    needs: generate-matrix
+  run-test-matrix:
     strategy:
       fail-fast: false
       matrix:
-        tasks: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
+        tasks: ${{ fromJSON(inputs.matrix) }}
     uses: ./.github/workflows/task-runner.yml
     with:
       runner: ${{ inputs.runner }}

@@ -13,6 +13,11 @@ on:
         description: 'The gradle task to run'
         default: build
         required: true
+      result:
+        type: boolean
+        description: 'If the workflow has an output result'
+        default: false
+        required: false
   workflow_dispatch:
     inputs:
       runner:
@@ -25,9 +30,16 @@ on:
         description: 'The gradle task to run'
         default: build
         required: true
+      result:
+        type: boolean
+        description: 'If the workflow has an output result'
+        default: false
+        required: false
 
 jobs:
   build:
+    outputs:
+      result: ${{ steps.result.outputs.result }}
     runs-on: ${{ inputs.runner }}
     steps:
 
@@ -45,5 +57,14 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Execute Gradle build
+      - name: Execute Gradle task
+        if: ${{ !inputs.result }}
         run: ./gradlew ${{ inputs.task }}
+
+      - name: Execute Gradle task with result
+        id: result
+        if: ${{ inputs.result }}
+        run: |
+          RESULT=$(./gradlew -q ${{ inputs.task }})
+          echo $RESULT
+          echo "result=${RESULT}" >> $GITHUB_OUTPUT
