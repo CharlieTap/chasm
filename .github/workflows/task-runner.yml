@@ -18,6 +18,10 @@ on:
         description: 'If the workflow has an output result'
         default: false
         required: false
+    outputs:
+      result:
+        description: "The result from the task execution"
+        value: ${{ jobs.task.outputs.result }}
   workflow_dispatch:
     inputs:
       runner:
@@ -37,7 +41,7 @@ on:
         required: false
 
 jobs:
-  build:
+  task:
     outputs:
       result: ${{ steps.result.outputs.result }}
     runs-on: ${{ inputs.runner }}
