@@ -23,9 +23,9 @@ internal fun ThreadExecutor(
         instructionExecutor = ::ExecutionInstructionExecutor,
     )
 
-internal fun ThreadExecutor(
+internal inline fun ThreadExecutor(
     configuration: Configuration,
-    instructionExecutor: Executor<ExecutionInstruction>,
+    crossinline instructionExecutor: Executor<ExecutionInstruction>,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
     val thread = configuration.thread

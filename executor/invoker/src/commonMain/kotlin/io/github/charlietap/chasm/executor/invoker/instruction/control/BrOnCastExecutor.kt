@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
@@ -21,7 +19,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 internal typealias BrOnCastExecutor = (ExecutionContext, Index.LabelIndex, ReferenceType, ReferenceType, Boolean) -> Result<Unit, InvocationError>
 
-internal inline fun BrOnCastExecutor(
+internal fun BrOnCastExecutor(
     context: ExecutionContext,
     labelIndex: Index.LabelIndex,
     referenceType1: ReferenceType,

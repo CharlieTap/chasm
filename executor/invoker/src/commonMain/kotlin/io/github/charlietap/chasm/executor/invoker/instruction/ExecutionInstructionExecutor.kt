@@ -20,11 +20,11 @@ internal fun ExecutionInstructionExecutor(
         moduleInstructionExecutor = ::ModuleInstructionExecutor,
     )
 
-internal fun ExecutionInstructionExecutor(
+internal inline fun ExecutionInstructionExecutor(
     context: ExecutionContext,
     instruction: ExecutionInstruction,
-    adminInstructionExecutor: Executor<AdminInstruction>,
-    moduleInstructionExecutor: Executor<ModuleInstruction>,
+    crossinline adminInstructionExecutor: Executor<AdminInstruction>,
+    crossinline moduleInstructionExecutor: Executor<ModuleInstruction>,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is AdminInstruction -> adminInstructionExecutor(context, instruction).bind()

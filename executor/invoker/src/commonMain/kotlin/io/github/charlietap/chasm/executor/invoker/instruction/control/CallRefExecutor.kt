@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
@@ -13,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.ext.popFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 
-internal inline fun CallRefExecutor(
+internal fun CallRefExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.CallRef,
 ): Result<Unit, InvocationError> =

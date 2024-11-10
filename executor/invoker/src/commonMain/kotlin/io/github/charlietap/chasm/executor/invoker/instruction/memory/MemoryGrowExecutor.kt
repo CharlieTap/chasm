@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Result
@@ -17,7 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
-internal inline fun MemoryGrowExecutor(
+internal fun MemoryGrowExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryGrow,
 ): Result<Unit, InvocationError> =

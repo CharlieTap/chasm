@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
@@ -11,7 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
-internal inline fun BrOnNullExecutor(
+internal fun BrOnNullExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.BrOnNull,
 ): Result<Unit, InvocationError> =

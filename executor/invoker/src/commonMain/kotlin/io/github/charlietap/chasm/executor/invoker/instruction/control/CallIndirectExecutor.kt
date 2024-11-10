@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Err
@@ -25,7 +23,7 @@ import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 
-internal inline fun CallIndirectExecutor(
+internal fun CallIndirectExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.CallIndirect,
 ): Result<Unit, InvocationError> =

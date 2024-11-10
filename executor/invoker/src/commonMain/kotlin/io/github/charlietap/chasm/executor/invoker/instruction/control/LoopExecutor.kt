@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
@@ -14,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 
-internal inline fun LoopExecutor(
+internal fun LoopExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Loop,
 ): Result<Unit, InvocationError> =

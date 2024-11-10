@@ -23,11 +23,11 @@ fun TypeOfReferenceValue(
     bottomOfHeapType = ::BottomOfHeapType,
 )
 
-internal fun TypeOfReferenceValue(
+internal inline fun TypeOfReferenceValue(
     value: ReferenceValue,
     store: Store,
     moduleInstance: ModuleInstance,
-    bottomOfHeapType: BottomOf<HeapType>,
+    crossinline bottomOfHeapType: BottomOf<HeapType>,
 ): ReferenceType? = when (value) {
     is ReferenceValue.Null -> bottomOfHeapType(value.heapType, moduleInstance.types)?.let(::RefNull)
     is ReferenceValue.Struct -> {

@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Err
@@ -17,7 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 
-internal inline fun MemoryInitExecutor(
+internal fun MemoryInitExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryInit,
 ): Result<Unit, InvocationError> =
@@ -27,10 +25,10 @@ internal inline fun MemoryInitExecutor(
         memoryInstanceInitialiser = ::MemoryInstanceInitialiserImpl,
     )
 
-internal fun MemoryInitExecutor(
+internal inline fun MemoryInitExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryInit,
-    memoryInstanceInitialiser: MemoryInstanceInitialiser,
+    crossinline memoryInstanceInitialiser: MemoryInstanceInitialiser,
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()

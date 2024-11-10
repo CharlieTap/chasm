@@ -42,17 +42,17 @@ internal fun ModuleInstructionExecutor(
         variableInstructionExecutor = ::VariableInstructionExecutor,
     )
 
-internal fun ModuleInstructionExecutor(
+internal inline fun ModuleInstructionExecutor(
     context: ExecutionContext,
     instruction: ModuleInstruction,
-    aggregateInstructionExecutor: Executor<AggregateInstruction>,
-    controlInstructionExecutor: Executor<ControlInstruction>,
-    memoryInstructionExecutor: Executor<MemoryInstruction>,
-    numericInstructionExecutor: Executor<NumericInstruction>,
-    parametricInstructionExecutor: Executor<ParametricInstruction>,
-    tableInstructionExecutor: Executor<TableInstruction>,
-    referenceInstructionExecutor: Executor<ReferenceInstruction>,
-    variableInstructionExecutor: Executor<VariableInstruction>,
+    crossinline aggregateInstructionExecutor: Executor<AggregateInstruction>,
+    crossinline controlInstructionExecutor: Executor<ControlInstruction>,
+    crossinline memoryInstructionExecutor: Executor<MemoryInstruction>,
+    crossinline numericInstructionExecutor: Executor<NumericInstruction>,
+    crossinline parametricInstructionExecutor: Executor<ParametricInstruction>,
+    crossinline tableInstructionExecutor: Executor<TableInstruction>,
+    crossinline referenceInstructionExecutor: Executor<ReferenceInstruction>,
+    crossinline variableInstructionExecutor: Executor<VariableInstruction>,
 ): Result<Unit, InvocationError> = binding {
     when (val moduleInstruction = instruction.instruction) {
         is AggregateInstruction -> aggregateInstructionExecutor(context, moduleInstruction).bind()

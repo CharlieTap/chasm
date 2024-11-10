@@ -26,10 +26,10 @@ internal fun ArrayCopyExecutor(
         definedTypeExpander = ::DefinedTypeExpander,
     )
 
-internal fun ArrayCopyExecutor(
+internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayCopy,
-    definedTypeExpander: DefinedTypeExpander,
+    crossinline definedTypeExpander: DefinedTypeExpander,
 ): Result<Unit, InvocationError> = binding {
 
     // x = dest

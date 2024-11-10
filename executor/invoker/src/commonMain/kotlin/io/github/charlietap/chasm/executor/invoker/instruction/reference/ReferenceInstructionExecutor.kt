@@ -23,16 +23,16 @@ internal fun ReferenceInstructionExecutor(
         refCastExecutor = ::RefCastExecutor,
     )
 
-internal fun ReferenceInstructionExecutor(
+internal inline fun ReferenceInstructionExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction,
-    refNullExecutor: Executor<ReferenceInstruction.RefNull>,
-    refIsNullExecutor: Executor<ReferenceInstruction.RefIsNull>,
-    refFuncExecutor: Executor<ReferenceInstruction.RefFunc>,
-    refAsNonNullExecutor: Executor<ReferenceInstruction.RefAsNonNull>,
-    refEqExecutor: Executor<ReferenceInstruction.RefEq>,
-    refTestExecutor: Executor<ReferenceInstruction.RefTest>,
-    refCastExecutor: Executor<ReferenceInstruction.RefCast>,
+    crossinline refNullExecutor: Executor<ReferenceInstruction.RefNull>,
+    crossinline refIsNullExecutor: Executor<ReferenceInstruction.RefIsNull>,
+    crossinline refFuncExecutor: Executor<ReferenceInstruction.RefFunc>,
+    crossinline refAsNonNullExecutor: Executor<ReferenceInstruction.RefAsNonNull>,
+    crossinline refEqExecutor: Executor<ReferenceInstruction.RefEq>,
+    crossinline refTestExecutor: Executor<ReferenceInstruction.RefTest>,
+    crossinline refCastExecutor: Executor<ReferenceInstruction.RefCast>,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is ReferenceInstruction.RefNull -> refNullExecutor(context, instruction).bind()

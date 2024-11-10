@@ -22,13 +22,12 @@ internal fun AdminInstructionExecutor(
         labelInstructionExecutor = ::LabelInstructionExecutor,
     )
 
-@Suppress("UNUSED_PARAMETER")
-internal fun AdminInstructionExecutor(
+internal inline fun AdminInstructionExecutor(
     context: ExecutionContext,
     instruction: AdminInstruction,
-    frameInstructionExecutor: Executor<AdminInstruction.Frame>,
-    handlerInstructionExecutor: Executor<AdminInstruction.Handler>,
-    labelInstructionExecutor: Executor<AdminInstruction.Label>,
+    crossinline frameInstructionExecutor: Executor<AdminInstruction.Frame>,
+    crossinline handlerInstructionExecutor: Executor<AdminInstruction.Handler>,
+    crossinline labelInstructionExecutor: Executor<AdminInstruction.Label>,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is AdminInstruction.Frame -> frameInstructionExecutor(context, instruction).bind()

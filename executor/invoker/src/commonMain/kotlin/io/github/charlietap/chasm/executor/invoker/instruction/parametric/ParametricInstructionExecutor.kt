@@ -19,12 +19,12 @@ internal fun ParametricInstructionExecutor(
         selectWithTypeExecutor = ::SelectWithTypeExecutor,
     )
 
-internal fun ParametricInstructionExecutor(
+internal inline fun ParametricInstructionExecutor(
     context: ExecutionContext,
     instruction: ParametricInstruction,
-    dropExecutor: Executor<ParametricInstruction.Drop>,
-    selectExecutor: Executor<ParametricInstruction.Select>,
-    selectWithTypeExecutor: Executor<ParametricInstruction.SelectWithType>,
+    crossinline dropExecutor: Executor<ParametricInstruction.Drop>,
+    crossinline selectExecutor: Executor<ParametricInstruction.Select>,
+    crossinline selectWithTypeExecutor: Executor<ParametricInstruction.SelectWithType>,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is ParametricInstruction.Drop -> dropExecutor(context, instruction).bind()

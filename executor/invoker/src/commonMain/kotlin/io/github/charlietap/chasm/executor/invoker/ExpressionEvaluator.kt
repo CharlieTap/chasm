@@ -30,12 +30,12 @@ fun ExpressionEvaluator(
         threadExecutor = ::ThreadExecutor,
     )
 
-fun ExpressionEvaluator(
+internal inline fun ExpressionEvaluator(
     store: Store,
     instance: ModuleInstance,
     expression: Expression,
     arity: Arity.Return,
-    threadExecutor: ThreadExecutor,
+    crossinline threadExecutor: ThreadExecutor,
 ): Result<ExecutionValue?, InvocationError> {
 
     val thread = Thread(

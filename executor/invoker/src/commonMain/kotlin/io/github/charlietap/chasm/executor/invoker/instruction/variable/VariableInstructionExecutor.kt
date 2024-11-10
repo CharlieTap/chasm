@@ -21,14 +21,14 @@ internal fun VariableInstructionExecutor(
         globalSetExecutor = ::GlobalSetExecutor,
     )
 
-internal fun VariableInstructionExecutor(
+internal inline fun VariableInstructionExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction,
-    localGetExecutor: Executor<VariableInstruction.LocalGet>,
-    localSetExecutor: Executor<VariableInstruction.LocalSet>,
-    localTeeExecutor: Executor<VariableInstruction.LocalTee>,
-    globalGetExecutor: Executor<VariableInstruction.GlobalGet>,
-    globalSetExecutor: Executor<VariableInstruction.GlobalSet>,
+    crossinline localGetExecutor: Executor<VariableInstruction.LocalGet>,
+    crossinline localSetExecutor: Executor<VariableInstruction.LocalSet>,
+    crossinline localTeeExecutor: Executor<VariableInstruction.LocalTee>,
+    crossinline globalGetExecutor: Executor<VariableInstruction.GlobalGet>,
+    crossinline globalSetExecutor: Executor<VariableInstruction.GlobalSet>,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is VariableInstruction.LocalGet -> localGetExecutor(context, instruction).bind()

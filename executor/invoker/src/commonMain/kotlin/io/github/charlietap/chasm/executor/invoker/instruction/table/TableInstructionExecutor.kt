@@ -24,17 +24,17 @@ internal fun TableInstructionExecutor(
         tableSizeExecutor = ::TableSizeExecutor,
     )
 
-internal fun TableInstructionExecutor(
+internal inline fun TableInstructionExecutor(
     context: ExecutionContext,
     instruction: TableInstruction,
-    tableInitExecutor: Executor<TableInstruction.TableInit>,
-    elementDropExecutor: Executor<TableInstruction.ElemDrop>,
-    tableCopyExecutor: Executor<TableInstruction.TableCopy>,
-    tableFillExecutor: Executor<TableInstruction.TableFill>,
-    tableGetExecutor: Executor<TableInstruction.TableGet>,
-    tableGrowExecutor: Executor<TableInstruction.TableGrow>,
-    tableSetExecutor: Executor<TableInstruction.TableSet>,
-    tableSizeExecutor: Executor<TableInstruction.TableSize>,
+    crossinline tableInitExecutor: Executor<TableInstruction.TableInit>,
+    crossinline elementDropExecutor: Executor<TableInstruction.ElemDrop>,
+    crossinline tableCopyExecutor: Executor<TableInstruction.TableCopy>,
+    crossinline tableFillExecutor: Executor<TableInstruction.TableFill>,
+    crossinline tableGetExecutor: Executor<TableInstruction.TableGet>,
+    crossinline tableGrowExecutor: Executor<TableInstruction.TableGrow>,
+    crossinline tableSetExecutor: Executor<TableInstruction.TableSet>,
+    crossinline tableSizeExecutor: Executor<TableInstruction.TableSize>,
 ): Result<Unit, InvocationError> = binding {
     when (instruction) {
         is TableInstruction.TableInit -> tableInitExecutor(context, instruction).bind()

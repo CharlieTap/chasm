@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Err
@@ -15,7 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 
-internal inline fun MemoryCopyExecutor(
+internal fun MemoryCopyExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryCopy,
 ): Result<Unit, InvocationError> =
@@ -25,10 +23,10 @@ internal inline fun MemoryCopyExecutor(
         memoryInstanceCopier = ::MemoryInstanceCopierImpl,
     )
 
-internal fun MemoryCopyExecutor(
+internal inline fun MemoryCopyExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryCopy,
-    memoryInstanceCopier: MemoryInstanceCopier,
+    crossinline memoryInstanceCopier: MemoryInstanceCopier,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack, store) = context

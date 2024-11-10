@@ -33,11 +33,11 @@ fun FunctionInvoker(
         threadExecutor = ::ThreadExecutor,
     )
 
-internal fun FunctionInvoker(
+internal inline fun FunctionInvoker(
     store: Store,
     address: Address.Function,
     values: List<ExecutionValue>,
-    threadExecutor: ThreadExecutor,
+    crossinline threadExecutor: ThreadExecutor,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
     val function = store.function(address).bind() as FunctionInstance.WasmFunction

@@ -27,11 +27,11 @@ internal fun ArrayFillExecutor(
         fieldPacker = ::FieldPacker,
     )
 
-internal fun ArrayFillExecutor(
+internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayFill,
-    definedTypeExpander: DefinedTypeExpander,
-    fieldPacker: FieldPacker,
+    crossinline definedTypeExpander: DefinedTypeExpander,
+    crossinline fieldPacker: FieldPacker,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack) = context
