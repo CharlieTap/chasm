@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation(gradleApi())
     implementation(libs.dokka.gradle.plugin)
+    implementation(libs.gradle.maven.publish.plugin)
 }
 
 kotlin {
