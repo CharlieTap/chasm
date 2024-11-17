@@ -29,7 +29,7 @@ Additionally, the runtime supports the following proposals
 
 ```kotlin
 dependencies {
-    implementation("io.github.charlietap.chasm:chasm:0.9.1")
+    implementation("io.github.charlietap.chasm:chasm:0.9.2")
 }
 ```
 
