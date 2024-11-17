@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.validator.validator.instruction
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
@@ -13,13 +12,9 @@ import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
-import io.github.charlietap.chasm.ast.type.InstructionType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
-import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
-import io.github.charlietap.chasm.validator.resolver.InstructionTypeResolver
-import io.github.charlietap.chasm.validator.resolver.InstructionTypeResolverImpl
 import io.github.charlietap.chasm.validator.validator.instruction.aggregate.AggregateInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.control.ControlInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.memory.MemoryInstructionValidator
@@ -28,7 +23,6 @@ import io.github.charlietap.chasm.validator.validator.instruction.parametric.Par
 import io.github.charlietap.chasm.validator.validator.instruction.reference.ReferenceInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.table.TableInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.variable.VariableInstructionValidator
-import io.github.charlietap.chasm.validator.validator.type.InstructionTypeValidator
 
 internal fun InstructionValidator(
     context: ValidationContext,
@@ -45,8 +39,6 @@ internal fun InstructionValidator(
         referenceInstructionValidator = ::ReferenceInstructionValidator,
         tableInstructionValidator = ::TableInstructionValidator,
         variableInstructionValidator = ::VariableInstructionValidator,
-        instructionTypeResolver = ::InstructionTypeResolverImpl,
-        instructionTypeValidator = ::InstructionTypeValidator,
     )
 
 internal inline fun InstructionValidator(
@@ -60,17 +52,7 @@ internal inline fun InstructionValidator(
     crossinline referenceInstructionValidator: Validator<ReferenceInstruction>,
     crossinline tableInstructionValidator: Validator<TableInstruction>,
     crossinline variableInstructionValidator: Validator<VariableInstruction>,
-    crossinline instructionTypeResolver: InstructionTypeResolver<Instruction>,
-    crossinline instructionTypeValidator: Validator<InstructionType>,
 ): Result<Unit, ModuleValidatorError> = binding {
-
-    if (
-        instruction is NumericInstruction
-    ) {
-        val type = instructionTypeResolver(context, instruction).bind()
-        instructionTypeValidator(context, type).bind()
-    }
-
     when (instruction) {
         is AggregateInstruction -> aggregateInstructionValidator(context, instruction).bind()
         is ControlInstruction -> controlInstructionValidator(context, instruction).bind()
@@ -81,6 +63,5 @@ internal inline fun InstructionValidator(
         is TableInstruction -> tableInstructionValidator(context, instruction).bind()
         is VariableInstruction -> variableInstructionValidator(context, instruction).bind()
         is VectorInstruction -> Unit
-        else -> Err(InstructionValidatorError.UnknownInstruction).bind<Unit>()
     }
 }
