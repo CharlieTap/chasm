@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.fixture.module.type
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
@@ -99,7 +100,7 @@ class ImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_MEMORY
 
-        val memoryType = MemoryType(Limits(117u))
+        val memoryType = memoryType(Limits(117u), false)
         val expected = Ok(Import.Descriptor.Memory(memoryType))
 
         val reader = FakeUByteReader {

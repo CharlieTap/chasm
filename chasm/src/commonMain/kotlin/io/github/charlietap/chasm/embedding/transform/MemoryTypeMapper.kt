@@ -9,11 +9,11 @@ internal class MemoryTypeMapper(
     private val limitsMapper: BidirectionalMapper<Limits, InternalLimits> = LimitsMapper,
 ) : BidirectionalMapper<MemoryType, InternalMemoryType> {
     override fun map(input: MemoryType): InternalMemoryType {
-        return InternalMemoryType(limitsMapper.map(input.limits))
+        return InternalMemoryType(limitsMapper.map(input.limits), input.shared)
     }
 
     override fun bimap(input: InternalMemoryType): MemoryType {
-        return MemoryType(limitsMapper.bimap(input.limits))
+        return MemoryType(limitsMapper.bimap(input.limits), input.shared)
     }
 
     companion object {

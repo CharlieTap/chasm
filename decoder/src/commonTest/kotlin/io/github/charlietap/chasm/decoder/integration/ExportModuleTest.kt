@@ -18,7 +18,6 @@ import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.ReferenceType
@@ -29,6 +28,8 @@ import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.limits
+import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -78,7 +79,7 @@ class ExportModuleTest {
             descriptor = Export.Descriptor.Table(Index.TableIndex(0u)),
         )
 
-        val expectedMemoryType = MemoryType(Limits(1u))
+        val expectedMemoryType = memoryType(limits(1u))
         val expectedMemory = Memory(
             idx = Index.MemoryIndex(0u),
             type = expectedMemoryType,

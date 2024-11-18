@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.integration
 
+import io.github.charlietap.chasm.embedding.fixture.publicMemoryType
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.memory
@@ -10,7 +11,6 @@ import io.github.charlietap.chasm.embedding.shapes.HeapType
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Limits
-import io.github.charlietap.chasm.embedding.shapes.MemoryType
 import io.github.charlietap.chasm.embedding.shapes.Mutability
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.TableType
@@ -52,7 +52,7 @@ class ImportTest {
             globalExternal,
         )
 
-        val memoryType = MemoryType(Limits(1u))
+        val memoryType = publicMemoryType(Limits(1u))
         val memoryExternal = memory(store, memoryType)
 
         val memoryImport = Import(

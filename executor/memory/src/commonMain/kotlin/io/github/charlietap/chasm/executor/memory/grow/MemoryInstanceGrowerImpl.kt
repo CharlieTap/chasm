@@ -19,7 +19,7 @@ fun MemoryGrowerImpl(
     val newLimits = memoryInstance.type.limits.copy(
         min = memoryInstance.type.limits.min + pagesToAdd.toUInt(),
     )
-    val newType = MemoryType(newLimits)
+    val newType = MemoryType(newLimits, false)
 
     MemoryInstance(newType, newData)
 }

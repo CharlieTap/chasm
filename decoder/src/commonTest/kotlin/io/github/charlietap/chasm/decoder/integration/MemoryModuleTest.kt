@@ -5,11 +5,11 @@ import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.module.module
+import io.github.charlietap.chasm.fixture.type.limits
+import io.github.charlietap.chasm.fixture.type.memoryType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -24,8 +24,8 @@ class MemoryModuleTest {
 
         val expectedMemory = Memory(
             idx = Index.MemoryIndex(0u),
-            type = MemoryType(
-                limits = Limits(1u, 2u),
+            type = memoryType(
+                limits = limits(1u, 2u),
             ),
         )
 

@@ -21,5 +21,5 @@ internal inline fun MemoryTypeDecoder(
     crossinline limitsDecoder: Decoder<Limits>,
 ): Result<MemoryType, WasmDecodeError> = binding {
     val limits = limitsDecoder(context).bind()
-    MemoryType(limits)
+    MemoryType(limits, false)
 }

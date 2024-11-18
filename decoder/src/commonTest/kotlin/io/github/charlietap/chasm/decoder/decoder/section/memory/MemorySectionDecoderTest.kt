@@ -4,12 +4,12 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.MemorySection
+import io.github.charlietap.chasm.fixture.type.memoryType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -20,7 +20,7 @@ class MemorySectionDecoderTest {
     fun `can decode an encoded memory section`() {
 
         val limits = Limits(117u, 121u)
-        val memoryType = MemoryType(limits)
+        val memoryType = memoryType(limits)
         val memory = Memory(Index.MemoryIndex(0u), memoryType)
         val expected = Ok(MemorySection(listOf(memory)))
 

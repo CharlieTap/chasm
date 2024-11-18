@@ -29,7 +29,7 @@ class MemoryGrowerImplTest {
         )
 
         val expected = MemoryInstance(
-            type = MemoryType(limits.copy(3u)),
+            type = MemoryType(limits.copy(3u), false),
             data = ByteArrayLinearMemory(LinearMemory.Pages(3)),
         )
 

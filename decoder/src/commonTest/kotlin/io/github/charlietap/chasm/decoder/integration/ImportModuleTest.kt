@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.SubType
@@ -21,6 +20,8 @@ import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.module.module
 import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.limits
+import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.type.ext.definedType
@@ -64,7 +65,7 @@ class ImportModuleTest {
             descriptor = Import.Descriptor.Table(expectedTableType),
         )
 
-        val expectedMemoryType = MemoryType(Limits(1u, 2u))
+        val expectedMemoryType = memoryType(limits(1u, 2u))
 
         val expectedMemoryImport = Import(
             moduleName = NameValue("env"),

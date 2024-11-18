@@ -2,11 +2,11 @@ package io.github.charlietap.chasm.decoder.decoder.type.memory
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
+import io.github.charlietap.chasm.fixture.type.memoryType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,7 +19,7 @@ class MemoryTypeDecoderTest {
         val limitsDecoder: Decoder<Limits> = {
             Ok(limits)
         }
-        val expected = Ok(MemoryType(limits))
+        val expected = Ok(memoryType(limits))
 
         val actual = MemoryTypeDecoder(decoderContext(), limitsDecoder)
         assertEquals(expected, actual)

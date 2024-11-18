@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
@@ -56,6 +57,7 @@ internal inline fun ModuleInstructionExecutor(
 ): Result<Unit, InvocationError> = binding {
     when (val moduleInstruction = instruction.instruction) {
         is AggregateInstruction -> aggregateInstructionExecutor(context, moduleInstruction).bind()
+        is AtomicMemoryInstruction -> Err(InvocationError.UnimplementedInstruction(instruction)).bind<Unit>()
         is ControlInstruction -> controlInstructionExecutor(context, moduleInstruction).bind()
         is MemoryInstruction -> memoryInstructionExecutor(context, moduleInstruction).bind()
         is NumericInstruction -> numericInstructionExecutor(context, moduleInstruction).bind()

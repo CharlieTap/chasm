@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.decoder.FakeSourceReader
+import io.github.charlietap.chasm.embedding.fixture.publicMemoryType
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.ExportDefinition
@@ -11,7 +12,6 @@ import io.github.charlietap.chasm.embedding.shapes.GlobalType
 import io.github.charlietap.chasm.embedding.shapes.HeapType
 import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.embedding.shapes.Limits
-import io.github.charlietap.chasm.embedding.shapes.MemoryType
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.embedding.shapes.Mutability
 import io.github.charlietap.chasm.embedding.shapes.TableType
@@ -39,8 +39,8 @@ class ModuleInfoTest {
         val importedGlobalType = GlobalType(ValueType.Number.I32, Mutability.Const)
         val exportedGlobalType = GlobalType(ValueType.Number.I32, Mutability.Variable)
 
-        val importedMemoryType = MemoryType(Limits(1u))
-        val exportedMemoryType = MemoryType(Limits(2u))
+        val importedMemoryType = publicMemoryType(Limits(1u))
+        val exportedMemoryType = publicMemoryType(Limits(2u))
 
         val importedTableType = TableType(Limits(1u), ValueType.Reference.RefNull(HeapType.Func))
         val exportedTableType = TableType(Limits(2u), ValueType.Reference.RefNull(HeapType.Func))
