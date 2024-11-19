@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.ast.type.SharedStatus
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.limits.LimitsDecoder
@@ -18,8 +19,8 @@ internal fun MemoryTypeDecoder(
 
 internal inline fun MemoryTypeDecoder(
     context: DecoderContext,
-    crossinline limitsDecoder: Decoder<Limits>,
+    crossinline limitsDecoder: Decoder<Pair<Limits, SharedStatus>>,
 ): Result<MemoryType, WasmDecodeError> = binding {
-    val limits = limitsDecoder(context).bind()
-    MemoryType(limits, false)
+    val (limits, shared) = limitsDecoder(context).bind()
+    MemoryType(limits, shared)
 }

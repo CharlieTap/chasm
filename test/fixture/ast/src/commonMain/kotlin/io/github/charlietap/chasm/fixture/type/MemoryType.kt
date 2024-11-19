@@ -2,10 +2,11 @@ package io.github.charlietap.chasm.fixture.type
 
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.ast.type.SharedStatus
 
 fun memoryType(
     limits: Limits = limits(),
-    shared: Boolean = false,
+    shared: SharedStatus = unsharedStatus(),
 ) = MemoryType(
     limits = limits,
     shared = shared,

@@ -4,12 +4,16 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.ast.type.SharedStatus
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
+import io.github.charlietap.chasm.fixture.type.limits
+import io.github.charlietap.chasm.fixture.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.type.sharedStatus
+import io.github.charlietap.chasm.fixture.type.tableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -24,18 +28,19 @@ class TableTypeDecoderTest {
         }
         val context = decoderContext(reader)
 
-        val refType = ReferenceType.RefNull(AbstractHeapType.Func)
+        val refType = refNullReferenceType(AbstractHeapType.Func)
         val referenceTypeDecoder: Decoder<ReferenceType> = { _context ->
             assertEquals(context, _context)
             Ok(refType)
         }
 
-        val limits = Limits(117u, 121u)
-        val limitsDecoder: Decoder<Limits> = {
-            Ok(limits)
+        val limits = limits(117u, 121u)
+        val status = sharedStatus()
+        val limitsDecoder: Decoder<Pair<Limits, SharedStatus>> = {
+            Ok(limits to status)
         }
 
-        val expected = Ok(TableType(refType, limits))
+        val expected = Ok(tableType(refType, limits))
 
         val actual = TableTypeDecoder(
             context,

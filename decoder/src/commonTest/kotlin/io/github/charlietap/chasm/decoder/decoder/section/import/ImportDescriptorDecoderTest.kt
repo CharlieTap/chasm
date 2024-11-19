@@ -1,13 +1,11 @@
 package io.github.charlietap.chasm.decoder.decoder.section.import
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.MemoryType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
@@ -15,11 +13,19 @@ import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
+import io.github.charlietap.chasm.fixture.module.functionImportDescriptor
+import io.github.charlietap.chasm.fixture.module.globalImportDescriptor
+import io.github.charlietap.chasm.fixture.module.memoryImportDescriptor
+import io.github.charlietap.chasm.fixture.module.tableImportDescriptor
+import io.github.charlietap.chasm.fixture.module.tagImportDescriptor
 import io.github.charlietap.chasm.fixture.module.type
 import io.github.charlietap.chasm.fixture.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
+import io.github.charlietap.chasm.fixture.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
@@ -35,7 +41,7 @@ class ImportDescriptorDecoderTest {
 
         val recursiveType = functionRecursiveType()
         val functionType = DefinedTypeFactory(listOf(recursiveType))
-        val expected = Ok(Import.Descriptor.Function(functionType.first()))
+        val expected = Ok(functionImportDescriptor(functionType.first()))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
@@ -71,8 +77,8 @@ class ImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_TABLE
 
-        val tableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(117u))
-        val expected = Ok(Import.Descriptor.Table(tableType))
+        val tableType = tableType(refNullReferenceType(AbstractHeapType.Func), Limits(117u))
+        val expected = Ok(tableImportDescriptor(tableType))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
@@ -100,8 +106,8 @@ class ImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_MEMORY
 
-        val memoryType = memoryType(Limits(117u), false)
-        val expected = Ok(Import.Descriptor.Memory(memoryType))
+        val memoryType = memoryType(limits(117u))
+        val expected = Ok(memoryImportDescriptor(memoryType))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
@@ -130,7 +136,7 @@ class ImportDescriptorDecoderTest {
         val descriptor = IMPORT_DESCRIPTOR_TYPE_GLOBAL
 
         val globalType = globalType()
-        val expected = Ok(Import.Descriptor.Global(globalType))
+        val expected = Ok(globalImportDescriptor(globalType))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
@@ -159,7 +165,7 @@ class ImportDescriptorDecoderTest {
         val descriptor = IMPORT_DESCRIPTOR_TYPE_TAG
 
         val tagType = tagType()
-        val expected = Ok(Import.Descriptor.Tag(tagType))
+        val expected = Ok(tagImportDescriptor(tagType))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
