@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.ast.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
-import kotlin.jvm.JvmInline
 
 sealed interface AtomicMemoryInstruction : Instruction {
 
@@ -79,14 +78,8 @@ sealed interface AtomicMemoryInstruction : Instruction {
     data class I64CompareExchange16(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : AtomicMemoryInstruction
     data class I64CompareExchange32(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : AtomicMemoryInstruction
 
-    @JvmInline
-    value class Notify(val memoryIndex: Index.MemoryIndex) : AtomicMemoryInstruction
-
-    @JvmInline
-    value class I32Wait(val memoryIndex: Index.MemoryIndex) : AtomicMemoryInstruction
-
-    @JvmInline
-    value class I64Wait(val memoryIndex: Index.MemoryIndex) : AtomicMemoryInstruction
-
+    data class Notify(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : AtomicMemoryInstruction
+    data class I32Wait(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : AtomicMemoryInstruction
+    data class I64Wait(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : AtomicMemoryInstruction
     data object Fence : AtomicMemoryInstruction
 }

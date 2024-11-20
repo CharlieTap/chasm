@@ -11,20 +11,20 @@ import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
-import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.ControlInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.memory.MemoryInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.numeric.NumericInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.parametric.ParametricInstructionDecoder
-import io.github.charlietap.chasm.decoder.decoder.instruction.prefix.PrefixInstructionDecoder
+import io.github.charlietap.chasm.decoder.decoder.instruction.prefix.PREFIX_FB
+import io.github.charlietap.chasm.decoder.decoder.instruction.prefix.PREFIX_FE
+import io.github.charlietap.chasm.decoder.decoder.instruction.prefix.PrefixedInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.reference.REF_AS_NON_NULL
 import io.github.charlietap.chasm.decoder.decoder.instruction.reference.REF_NULL
 import io.github.charlietap.chasm.decoder.decoder.instruction.reference.ReferenceInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.table.TableInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.variable.VariableInstructionDecoder
-import io.github.charlietap.chasm.decoder.decoder.instruction.vector.VectorInstructionDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
@@ -39,8 +39,7 @@ internal fun InstructionDecoder(
     tableInstructionDecoder = ::TableInstructionDecoder,
     memoryInstructionDecoder = ::MemoryInstructionDecoder,
     controlInstructionDecoder = ::ControlInstructionDecoder,
-    prefixInstructionDecoder = ::PrefixInstructionDecoder,
-    vectorInstructionDecoder = ::VectorInstructionDecoder,
+    prefixInstructionDecoder = ::PrefixedInstructionDecoder,
 )
 
 internal inline fun InstructionDecoder(
@@ -53,7 +52,6 @@ internal inline fun InstructionDecoder(
     crossinline memoryInstructionDecoder: Decoder<MemoryInstruction>,
     crossinline controlInstructionDecoder: Decoder<ControlInstruction>,
     crossinline prefixInstructionDecoder: Decoder<Instruction>,
-    crossinline vectorInstructionDecoder: Decoder<VectorInstruction>,
 ): Result<Instruction, WasmDecodeError> = binding {
     val opcode = context.reader.peek().ubyte().bind()
     when {
@@ -65,7 +63,6 @@ internal inline fun InstructionDecoder(
         MEMORY_OPCODES.contains(opcode) -> memoryInstructionDecoder(context).bind()
         CONTROL_OPCODES.contains(opcode) -> controlInstructionDecoder(context).bind()
         PREFIXED_OPCODES.contains(opcode) -> prefixInstructionDecoder(context).bind()
-        VECTOR_OPCODES.contains(opcode) -> vectorInstructionDecoder(context).bind()
 
         else -> Err(InstructionDecodeError.UnknownInstruction(opcode)).bind<Instruction>()
     }
@@ -73,42 +70,6 @@ internal inline fun InstructionDecoder(
 
 private fun Set<UIntRange>.contains(opcode: UByte): Boolean = any { range ->
     range.contains(opcode)
-}
-
-internal val NUMERIC_OPCODES: Set<UIntRange> by lazy {
-    setOf(
-        I32_CONST..I64_EXTEND32_S,
-    )
-}
-
-internal val REFERENCE_OPCODES: Set<UIntRange> by lazy {
-    setOf(
-        REF_NULL..REF_AS_NON_NULL,
-    )
-}
-
-internal val PARAMETRIC_OPCODES: Set<UIntRange> by lazy {
-    setOf(
-        DROP..SELECT_W_TYPE,
-    )
-}
-
-internal val VARIABLE_OPCODES: Set<UIntRange> by lazy {
-    setOf(
-        LOCAL_GET..GLOBAL_SET,
-    )
-}
-
-internal val TABLE_OPCODES: Set<UIntRange> by lazy {
-    setOf(
-        TABLE_GET..TABLE_SET,
-    )
-}
-
-internal val MEMORY_OPCODES: Set<UIntRange> by lazy {
-    setOf(
-        I32_LOAD..MEMORY_GROW,
-    )
 }
 
 internal val CONTROL_OPCODES: Set<UIntRange> by lazy {
@@ -121,14 +82,44 @@ internal val CONTROL_OPCODES: Set<UIntRange> by lazy {
     )
 }
 
-internal val VECTOR_OPCODES by lazy {
+internal val NUMERIC_OPCODES: Set<UIntRange> by lazy {
     setOf(
-        PREFIX_FD..PREFIX_FD,
+        I32_CONST..I64_EXTEND32_S,
+    )
+}
+
+internal val MEMORY_OPCODES: Set<UIntRange> by lazy {
+    setOf(
+        I32_LOAD..MEMORY_GROW,
+    )
+}
+
+internal val PARAMETRIC_OPCODES: Set<UIntRange> by lazy {
+    setOf(
+        DROP..SELECT_W_TYPE,
+    )
+}
+
+internal val REFERENCE_OPCODES: Set<UIntRange> by lazy {
+    setOf(
+        REF_NULL..REF_AS_NON_NULL,
+    )
+}
+
+internal val TABLE_OPCODES: Set<UIntRange> by lazy {
+    setOf(
+        TABLE_GET..TABLE_SET,
+    )
+}
+
+internal val VARIABLE_OPCODES: Set<UIntRange> by lazy {
+    setOf(
+        LOCAL_GET..GLOBAL_SET,
     )
 }
 
 internal val PREFIXED_OPCODES by lazy {
     setOf(
-        PREFIX_FB..PREFIX_FC,
+        PREFIX_FB..PREFIX_FE,
     )
 }

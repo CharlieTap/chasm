@@ -8,6 +8,9 @@ sealed interface InstructionDecodeError : WasmDecodeError {
     value class UnknownInstruction(val byte: UByte) : InstructionDecodeError
 
     @JvmInline
+    value class InvalidAtomicMemoryInstruction(val opcode: UInt) : InstructionDecodeError
+
+    @JvmInline
     value class InvalidNumericInstruction(val byte: UByte) : InstructionDecodeError
 
     @JvmInline

@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
-import io.github.charlietap.chasm.decoder.decoder.instruction.PREFIX_FB
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.CastFlags
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.CastFlagsDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.Nullability
@@ -25,10 +24,10 @@ import io.github.charlietap.chasm.decoder.decoder.type.heap.HeapTypeDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
-internal fun PrefixFBInstructionDecoder(
+internal fun GCInstructionDecoder(
     context: DecoderContext,
 ): Result<Instruction, WasmDecodeError> =
-    PrefixFBInstructionDecoder(
+    GCInstructionDecoder(
         context = context,
         dataIndexDecoder = ::DataIndexDecoder,
         elementIndexDecoder = ::ElementIndexDecoder,
@@ -39,7 +38,7 @@ internal fun PrefixFBInstructionDecoder(
         castFlagsDecoder = ::CastFlagsDecoder,
     )
 
-internal inline fun PrefixFBInstructionDecoder(
+internal inline fun GCInstructionDecoder(
     context: DecoderContext,
     crossinline dataIndexDecoder: Decoder<Index.DataIndex>,
     crossinline elementIndexDecoder: Decoder<Index.ElementIndex>,

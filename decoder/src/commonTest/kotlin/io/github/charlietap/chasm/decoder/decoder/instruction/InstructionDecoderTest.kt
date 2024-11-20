@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
-import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
@@ -60,7 +59,6 @@ class InstructionDecoderTest {
                     neverMemoryInstructionDecoder,
                     neverControlInstructionDecoder,
                     neverPrefixInstructionDecoder,
-                    neverVectorInstructionDecoder,
                 )
 
                 assertEquals(Ok(NumericInstruction.I32Eq), actual)
@@ -104,7 +102,6 @@ class InstructionDecoderTest {
                     neverMemoryInstructionDecoder,
                     neverControlInstructionDecoder,
                     neverPrefixInstructionDecoder,
-                    neverVectorInstructionDecoder,
                 )
 
                 assertEquals(Ok(ReferenceInstruction.RefIsNull), actual)
@@ -148,7 +145,6 @@ class InstructionDecoderTest {
                     neverMemoryInstructionDecoder,
                     neverControlInstructionDecoder,
                     neverPrefixInstructionDecoder,
-                    neverVectorInstructionDecoder,
                 )
 
                 assertEquals(Ok(ParametricInstruction.Drop), actual)
@@ -193,7 +189,6 @@ class InstructionDecoderTest {
                     neverMemoryInstructionDecoder,
                     neverControlInstructionDecoder,
                     neverPrefixInstructionDecoder,
-                    neverVectorInstructionDecoder,
                 )
 
                 assertEquals(Ok(expected), actual)
@@ -238,7 +233,6 @@ class InstructionDecoderTest {
                     neverMemoryInstructionDecoder,
                     neverControlInstructionDecoder,
                     neverPrefixInstructionDecoder,
-                    neverVectorInstructionDecoder,
                 )
 
                 assertEquals(Ok(expected), actual)
@@ -283,7 +277,6 @@ class InstructionDecoderTest {
                     memoryInstructionDecoder,
                     neverControlInstructionDecoder,
                     neverPrefixInstructionDecoder,
-                    neverVectorInstructionDecoder,
                 )
 
                 assertEquals(Ok(expected), actual)
@@ -328,7 +321,6 @@ class InstructionDecoderTest {
                     neverMemoryInstructionDecoder,
                     controlInstructionDecoder,
                     neverPrefixInstructionDecoder,
-                    neverVectorInstructionDecoder,
                 )
 
                 assertEquals(Ok(expected), actual)
@@ -373,52 +365,6 @@ class InstructionDecoderTest {
                     neverMemoryInstructionDecoder,
                     neverControlInstructionDecoder,
                     prefixInstructionDecoder,
-                    neverVectorInstructionDecoder,
-                )
-
-                assertEquals(Ok(expected), actual)
-            }
-        }
-    }
-
-    @Test
-    fun `can decode a vector instruction`() {
-
-        var opcode: UByte = 0u
-        val context = decoderContext(
-            reader = FakeWasmBinaryReader(
-                fakePeekReader = {
-                    FakeUByteReader {
-                        Ok(opcode)
-                    }
-                },
-            ),
-        )
-
-        val expected = VectorInstruction.V128Or
-        val vectorInstructionDecoder: Decoder<VectorInstruction> = { ctx ->
-            assertEquals(context, ctx)
-            Ok(expected)
-        }
-
-        VECTOR_OPCODES.forEach { range ->
-
-            range.forEach { uint ->
-
-                val byte = uint.toUByte()
-                opcode = byte
-
-                val actual = InstructionDecoder(
-                    context,
-                    neverNumericInstructionDecoder,
-                    neverReferenceInstructionDecoder,
-                    neverParametricInstructionDecoder,
-                    neverVariableInstructionDecoder,
-                    neverTableInstructionDecoder,
-                    neverMemoryInstructionDecoder,
-                    neverControlInstructionDecoder,
-                    neverPrefixInstructionDecoder,
-                    vectorInstructionDecoder,
                 )
 
                 assertEquals(Ok(expected), actual)
@@ -452,7 +398,6 @@ class InstructionDecoderTest {
             neverMemoryInstructionDecoder,
             neverControlInstructionDecoder,
             neverPrefixInstructionDecoder,
-            neverVectorInstructionDecoder,
         )
 
         assertEquals(expected, actual)
@@ -489,10 +434,6 @@ class InstructionDecoderTest {
 
         private val neverPrefixInstructionDecoder: Decoder<Instruction> = {
             error("PrefixInstructionDecoder should not be called in this scenario")
-        }
-
-        private val neverVectorInstructionDecoder: Decoder<VectorInstruction> = {
-            error("VectorInstructionDecoder should not be called in this scenario")
         }
     }
 }

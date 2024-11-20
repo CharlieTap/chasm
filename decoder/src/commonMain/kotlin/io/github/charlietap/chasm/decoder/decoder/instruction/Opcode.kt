@@ -204,30 +204,3 @@ internal const val I64_STORE16: UByte = 0x3Du
 internal const val I64_STORE32: UByte = 0x3Eu
 internal const val MEMORY_SIZE: UByte = 0x3Fu
 internal const val MEMORY_GROW: UByte = 0x40u
-
-internal const val PREFIX_FB: UByte = 0xFBu
-internal const val PREFIX_FC: UByte = 0xFCu
-internal const val PREFIX_FD: UByte = 0xFDu
-
-// prefixed
-
-internal const val I32_TRUNC_SAT_F32_S: UInt = 0u
-internal const val I32_TRUNC_SAT_F32_U: UInt = 1u
-internal const val I32_TRUNC_SAT_F64_S: UInt = 2u
-internal const val I32_TRUNC_SAT_F64_U: UInt = 3u
-internal const val I64_TRUNC_SAT_F32_S: UInt = 4u
-internal const val I64_TRUNC_SAT_F32_U: UInt = 5u
-internal const val I64_TRUNC_SAT_F64_S: UInt = 6u
-internal const val I64_TRUNC_SAT_F64_U: UInt = 7u
-
-internal const val MEMORY_INIT: UInt = 8u
-internal const val DATA_DROP: UInt = 9u
-internal const val MEMORY_COPY: UInt = 10u
-internal const val MEMORY_FILL: UInt = 11u
-
-internal const val TABLE_INIT: UInt = 12u
-internal const val ELEM_DROP: UInt = 13u
-internal const val TABLE_COPY: UInt = 14u
-internal const val TABLE_GROW: UInt = 15u
-internal const val TABLE_SIZE: UInt = 16u
-internal const val TABLE_FILL: UInt = 17u

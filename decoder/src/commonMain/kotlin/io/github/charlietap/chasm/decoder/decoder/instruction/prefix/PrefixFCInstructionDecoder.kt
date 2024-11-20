@@ -10,25 +10,6 @@ import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
-import io.github.charlietap.chasm.decoder.decoder.instruction.DATA_DROP
-import io.github.charlietap.chasm.decoder.decoder.instruction.ELEM_DROP
-import io.github.charlietap.chasm.decoder.decoder.instruction.I32_TRUNC_SAT_F32_S
-import io.github.charlietap.chasm.decoder.decoder.instruction.I32_TRUNC_SAT_F32_U
-import io.github.charlietap.chasm.decoder.decoder.instruction.I32_TRUNC_SAT_F64_S
-import io.github.charlietap.chasm.decoder.decoder.instruction.I32_TRUNC_SAT_F64_U
-import io.github.charlietap.chasm.decoder.decoder.instruction.I64_TRUNC_SAT_F32_S
-import io.github.charlietap.chasm.decoder.decoder.instruction.I64_TRUNC_SAT_F32_U
-import io.github.charlietap.chasm.decoder.decoder.instruction.I64_TRUNC_SAT_F64_S
-import io.github.charlietap.chasm.decoder.decoder.instruction.I64_TRUNC_SAT_F64_U
-import io.github.charlietap.chasm.decoder.decoder.instruction.MEMORY_COPY
-import io.github.charlietap.chasm.decoder.decoder.instruction.MEMORY_FILL
-import io.github.charlietap.chasm.decoder.decoder.instruction.MEMORY_INIT
-import io.github.charlietap.chasm.decoder.decoder.instruction.PREFIX_FC
-import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_COPY
-import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_FILL
-import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_GROW
-import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_INIT
-import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_SIZE
 import io.github.charlietap.chasm.decoder.decoder.section.index.DataIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.ElementIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.MemoryIndexDecoder
@@ -118,3 +99,24 @@ internal inline fun PrefixFCInstructionDecoder(
         else -> Err(InstructionDecodeError.InvalidPrefixInstruction(PREFIX_FC, opcode)).bind<Instruction>()
     }
 }
+
+internal const val I32_TRUNC_SAT_F32_S: UInt = 0u
+internal const val I32_TRUNC_SAT_F32_U: UInt = 1u
+internal const val I32_TRUNC_SAT_F64_S: UInt = 2u
+internal const val I32_TRUNC_SAT_F64_U: UInt = 3u
+internal const val I64_TRUNC_SAT_F32_S: UInt = 4u
+internal const val I64_TRUNC_SAT_F32_U: UInt = 5u
+internal const val I64_TRUNC_SAT_F64_S: UInt = 6u
+internal const val I64_TRUNC_SAT_F64_U: UInt = 7u
+
+internal const val MEMORY_INIT: UInt = 8u
+internal const val DATA_DROP: UInt = 9u
+internal const val MEMORY_COPY: UInt = 10u
+internal const val MEMORY_FILL: UInt = 11u
+
+internal const val TABLE_INIT: UInt = 12u
+internal const val ELEM_DROP: UInt = 13u
+internal const val TABLE_COPY: UInt = 14u
+internal const val TABLE_GROW: UInt = 15u
+internal const val TABLE_SIZE: UInt = 16u
+internal const val TABLE_FILL: UInt = 17u

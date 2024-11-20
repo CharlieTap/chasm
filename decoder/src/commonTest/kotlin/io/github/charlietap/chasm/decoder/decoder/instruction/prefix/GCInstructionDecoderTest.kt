@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
-import io.github.charlietap.chasm.decoder.decoder.instruction.PREFIX_FB
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.CastFlags
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.Nullability
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
@@ -26,7 +25,7 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 import io.github.charlietap.chasm.decoder.decoder.instruction.prefix.ARRAY_NEW_FIXED as ARRAY_NEW_FIXED1
 
-class PrefixFBInstructionDecoderTest {
+class GCInstructionDecoderTest {
 
     @Test
     fun `can decode an encoded br on cast instruction`() {
@@ -59,7 +58,7 @@ class PrefixFBInstructionDecoderTest {
             ReferenceType.Ref(heapType),
         )
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -104,7 +103,7 @@ class PrefixFBInstructionDecoderTest {
             ReferenceType.Ref(heapType),
         )
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -128,7 +127,7 @@ class PrefixFBInstructionDecoderTest {
 
         val reader = FakeUIntReader { Ok(opcode) }
         val context = decoderContext(reader)
-        val actual = PrefixFBInstructionDecoder(context)
+        val actual = GCInstructionDecoder(context)
 
         assertEquals(expected, actual)
     }
@@ -148,7 +147,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.StructNew(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -177,7 +176,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.StructNewDefault(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -212,7 +211,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.StructGet(typeIndex, fieldIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -247,7 +246,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.StructGetSigned(typeIndex, fieldIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -282,7 +281,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.StructGetUnsigned(typeIndex, fieldIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -317,7 +316,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.StructSet(typeIndex, fieldIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -346,7 +345,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayNew(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -375,7 +374,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayNewDefault(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -406,7 +405,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayNewFixed(typeIndex, size)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -441,7 +440,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayNewData(typeIndex, dataIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = dataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -476,7 +475,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayNewElement(typeIndex, elementIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = elementIndexDecoder,
@@ -505,7 +504,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayGet(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -534,7 +533,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayGetSigned(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -563,7 +562,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayGetUnsigned(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -592,7 +591,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArraySet(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -621,7 +620,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayLen
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -650,7 +649,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayFill(typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -679,7 +678,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayCopy(typeIndex, typeIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -714,7 +713,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayInitData(typeIndex, dataIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = dataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -749,7 +748,7 @@ class PrefixFBInstructionDecoderTest {
 
         val expected = AggregateInstruction.ArrayInitElement(typeIndex, elementIndex)
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = elementIndexDecoder,
@@ -780,7 +779,7 @@ class PrefixFBInstructionDecoderTest {
             ReferenceType.Ref(heapType),
         )
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -811,7 +810,7 @@ class PrefixFBInstructionDecoderTest {
             ReferenceType.RefNull(heapType),
         )
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -842,7 +841,7 @@ class PrefixFBInstructionDecoderTest {
             ReferenceType.Ref(heapType),
         )
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -873,7 +872,7 @@ class PrefixFBInstructionDecoderTest {
             ReferenceType.RefNull(heapType),
         )
 
-        val actual = PrefixFBInstructionDecoder(
+        val actual = GCInstructionDecoder(
             context = context,
             dataIndexDecoder = neverDataIndexDecoder,
             elementIndexDecoder = neverElementIndexDecoder,
@@ -906,7 +905,7 @@ class PrefixFBInstructionDecoderTest {
 
             opcode = _opcode
 
-            val actual = PrefixFBInstructionDecoder(
+            val actual = GCInstructionDecoder(
                 context = context,
                 dataIndexDecoder = neverDataIndexDecoder,
                 elementIndexDecoder = neverElementIndexDecoder,
