@@ -39,255 +39,255 @@ internal inline fun AtomicMemoryInstructionDecoder(
         ATOMIC_FENCE -> AtomicMemoryInstruction.Fence
         I32_ATOMIC_LOAD -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Load.I32.I32Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_LOAD -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Load.I64.I64Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_LOAD8_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32Load8U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Load.I32.I32Load8U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_LOAD8_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64Load8U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Load.I64.I64Load8U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_LOAD16_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32Load16U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Load.I32.I32Load16U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_LOAD16_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64Load16U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Load.I64.I64Load16U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_LOAD32_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64Load32U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Load.I64.I64Load32U(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_STORE -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32Store(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Store.I32.I32Store(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_STORE -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64Store(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Store.I64.I64Store(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_STORE8 -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32Store8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Store.I32.I32Store8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_STORE8 -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64Store8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Store.I64.I64Store8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_STORE16 -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32Store16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Store.I32.I32Store16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_STORE16 -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64Store16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Store.I64.I64Store16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_STORE32 -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64Store32(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.Store.I64.I64Store32(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW_ADD -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWriteAdd(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteAdd(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW_ADD -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWriteAdd(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteAdd(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW_SUB -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWriteSub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteSub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW_SUB -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWriteSub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteSub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW_AND -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWriteAnd(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteAnd(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW_AND -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWriteAnd(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteAnd(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW_OR -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWriteOr(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteOr(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW_OR -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWriteOr(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteOr(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW_XOR -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWriteXor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteXor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW_XOR -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWriteXor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteXor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW_XCHG -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWriteExchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteExchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW_XCHG -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWriteExchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteExchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW8_ADD_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite8Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW16_ADD_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite16Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW8_ADD_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite8Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW16_ADD_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite16Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW32_ADD_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite32Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Add(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW8_SUB_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite8Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW16_SUB_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite16Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW8_SUB_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite8Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW16_SUB_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite16Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW32_SUB_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite32Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Sub(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW8_AND_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite8And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW16_AND_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite16And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW8_AND_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite8And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW16_AND_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite16And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW32_AND_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite32And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32And(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW8_OR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite8Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW16_OR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite16Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW8_OR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite8Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW16_OR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite16Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW32_OR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite32Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Or(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW8_XOR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite8Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW16_XOR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite16Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW8_XOR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite8Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW16_XOR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite16Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW32_XOR_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite32Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Xor(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW8_XCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite8Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW16_XCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32ReadModifyWrite16Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW8_XCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite8Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW16_XCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite16Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW32_XCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64ReadModifyWrite32Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Exchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW_CMPXCHG -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32CompareExchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.CompareExchange.I32.I32CompareExchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW_CMPXCHG -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64CompareExchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW8_CMPXCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32CompareExchange8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.CompareExchange.I32.I32CompareExchange8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I32_ATOMIC_RMW16_CMPXCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I32CompareExchange16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.CompareExchange.I32.I32CompareExchange16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW8_CMPXCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64CompareExchange8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange8(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW16_CMPXCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64CompareExchange16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange16(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         I64_ATOMIC_RMW32_CMPXCHG_U -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
-            AtomicMemoryInstruction.I64CompareExchange32(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
+            AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange32(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
         else -> Err(InstructionDecodeError.InvalidAtomicMemoryInstruction(opcode)).bind<AtomicMemoryInstruction>()
     }

@@ -17,6 +17,7 @@ import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.instruction.aggregate.AggregateInstructionValidator
+import io.github.charlietap.chasm.validator.validator.instruction.atomic.AtomicMemoryInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.control.ControlInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.memory.MemoryInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.numeric.NumericInstructionValidator
@@ -33,6 +34,7 @@ internal fun InstructionValidator(
         context = context,
         instruction = instruction,
         aggregateInstructionValidator = ::AggregateInstructionValidator,
+        atomicMemoryInstructionValidator = ::AtomicMemoryInstructionValidator,
         controlInstructionValidator = ::ControlInstructionValidator,
         memoryInstructionValidator = ::MemoryInstructionValidator,
         numericInstructionValidator = ::NumericInstructionValidator,
@@ -46,6 +48,7 @@ internal inline fun InstructionValidator(
     context: ValidationContext,
     instruction: Instruction,
     crossinline aggregateInstructionValidator: Validator<AggregateInstruction>,
+    crossinline atomicMemoryInstructionValidator: Validator<AtomicMemoryInstruction>,
     crossinline controlInstructionValidator: Validator<ControlInstruction>,
     crossinline memoryInstructionValidator: Validator<MemoryInstruction>,
     crossinline numericInstructionValidator: Validator<NumericInstruction>,
@@ -56,7 +59,7 @@ internal inline fun InstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
     when (instruction) {
         is AggregateInstruction -> aggregateInstructionValidator(context, instruction).bind()
-        is AtomicMemoryInstruction -> Unit
+        is AtomicMemoryInstruction -> atomicMemoryInstructionValidator(context, instruction).bind()
         is ControlInstruction -> controlInstructionValidator(context, instruction).bind()
         is NumericInstruction -> numericInstructionValidator(context, instruction).bind()
         is MemoryInstruction -> memoryInstructionValidator(context, instruction).bind()

@@ -36,7 +36,7 @@ fun atomicFenceInstruction() = AtomicMemoryInstruction.Fence
 fun i32AtomicLoadInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32Load(
+) = AtomicMemoryInstruction.Load.I32.I32Load(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -44,7 +44,7 @@ fun i32AtomicLoadInstruction(
 fun i64AtomicLoadInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64Load(
+) = AtomicMemoryInstruction.Load.I64.I64Load(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -52,7 +52,7 @@ fun i64AtomicLoadInstruction(
 fun i32AtomicStoreInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32Store(
+) = AtomicMemoryInstruction.Store.I32.I32Store(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -60,7 +60,7 @@ fun i32AtomicStoreInstruction(
 fun i64AtomicStoreInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64Store(
+) = AtomicMemoryInstruction.Store.I64.I64Store(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -68,7 +68,7 @@ fun i64AtomicStoreInstruction(
 fun i32AtomicLoad8UInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32Load8U(
+) = AtomicMemoryInstruction.Load.I32.I32Load8U(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -76,7 +76,7 @@ fun i32AtomicLoad8UInstruction(
 fun i64AtomicLoad8UInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64Load8U(
+) = AtomicMemoryInstruction.Load.I64.I64Load8U(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -84,7 +84,7 @@ fun i64AtomicLoad8UInstruction(
 fun i32AtomicLoad16UInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32Load16U(
+) = AtomicMemoryInstruction.Load.I32.I32Load16U(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -92,7 +92,7 @@ fun i32AtomicLoad16UInstruction(
 fun i64AtomicLoad16UInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64Load16U(
+) = AtomicMemoryInstruction.Load.I64.I64Load16U(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -100,7 +100,7 @@ fun i64AtomicLoad16UInstruction(
 fun i64AtomicLoad32UInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64Load32U(
+) = AtomicMemoryInstruction.Load.I64.I64Load32U(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -108,7 +108,7 @@ fun i64AtomicLoad32UInstruction(
 fun i32AtomicStore8Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32Store8(
+) = AtomicMemoryInstruction.Store.I32.I32Store8(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -116,7 +116,7 @@ fun i32AtomicStore8Instruction(
 fun i64AtomicStore8Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64Store8(
+) = AtomicMemoryInstruction.Store.I64.I64Store8(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -124,7 +124,7 @@ fun i64AtomicStore8Instruction(
 fun i32AtomicStore16Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32Store16(
+) = AtomicMemoryInstruction.Store.I32.I32Store16(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -132,7 +132,7 @@ fun i32AtomicStore16Instruction(
 fun i64AtomicStore16Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64Store16(
+) = AtomicMemoryInstruction.Store.I64.I64Store16(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -140,7 +140,7 @@ fun i64AtomicStore16Instruction(
 fun i64AtomicStore32Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64Store32(
+) = AtomicMemoryInstruction.Store.I64.I64Store32(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -148,7 +148,7 @@ fun i64AtomicStore32Instruction(
 fun i32AtomicReadModifyWriteAddInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWriteAdd(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteAdd(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -156,7 +156,7 @@ fun i32AtomicReadModifyWriteAddInstruction(
 fun i64AtomicReadModifyWriteAddInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWriteAdd(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteAdd(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -164,7 +164,7 @@ fun i64AtomicReadModifyWriteAddInstruction(
 fun i32AtomicReadModifyWriteSubInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWriteSub(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteSub(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -172,7 +172,7 @@ fun i32AtomicReadModifyWriteSubInstruction(
 fun i64AtomicReadModifyWriteSubInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWriteSub(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteSub(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -180,7 +180,7 @@ fun i64AtomicReadModifyWriteSubInstruction(
 fun i32AtomicReadModifyWriteAndInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWriteAnd(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteAnd(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -188,7 +188,7 @@ fun i32AtomicReadModifyWriteAndInstruction(
 fun i64AtomicReadModifyWriteAndInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWriteAnd(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteAnd(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -196,7 +196,7 @@ fun i64AtomicReadModifyWriteAndInstruction(
 fun i32AtomicReadModifyWriteOrInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWriteOr(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteOr(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -204,7 +204,7 @@ fun i32AtomicReadModifyWriteOrInstruction(
 fun i64AtomicReadModifyWriteOrInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWriteOr(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteOr(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -212,7 +212,7 @@ fun i64AtomicReadModifyWriteOrInstruction(
 fun i32AtomicReadModifyWriteXorInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWriteXor(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteXor(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -220,7 +220,7 @@ fun i32AtomicReadModifyWriteXorInstruction(
 fun i64AtomicReadModifyWriteXorInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWriteXor(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteXor(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -228,7 +228,7 @@ fun i64AtomicReadModifyWriteXorInstruction(
 fun i32AtomicReadModifyWriteExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWriteExchange(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWriteExchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -236,7 +236,7 @@ fun i32AtomicReadModifyWriteExchangeInstruction(
 fun i64AtomicReadModifyWriteExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWriteExchange(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWriteExchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -244,7 +244,7 @@ fun i64AtomicReadModifyWriteExchangeInstruction(
 fun i32AtomicReadModifyWrite8AddInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite8Add(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Add(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -252,7 +252,7 @@ fun i32AtomicReadModifyWrite8AddInstruction(
 fun i32AtomicReadModifyWrite8SubInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite8Sub(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Sub(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -260,7 +260,7 @@ fun i32AtomicReadModifyWrite8SubInstruction(
 fun i32AtomicReadModifyWrite8AndInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite8And(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8And(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -268,7 +268,7 @@ fun i32AtomicReadModifyWrite8AndInstruction(
 fun i32AtomicReadModifyWrite8OrInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite8Or(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Or(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -276,7 +276,7 @@ fun i32AtomicReadModifyWrite8OrInstruction(
 fun i32AtomicReadModifyWrite8XorInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite8Xor(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Xor(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -284,7 +284,7 @@ fun i32AtomicReadModifyWrite8XorInstruction(
 fun i32AtomicReadModifyWrite8ExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite8Exchange(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite8Exchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -292,7 +292,7 @@ fun i32AtomicReadModifyWrite8ExchangeInstruction(
 fun i64AtomicReadModifyWrite8AddInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite8Add(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Add(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -300,7 +300,7 @@ fun i64AtomicReadModifyWrite8AddInstruction(
 fun i64AtomicReadModifyWrite8SubInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite8Sub(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Sub(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -308,7 +308,7 @@ fun i64AtomicReadModifyWrite8SubInstruction(
 fun i64AtomicReadModifyWrite8AndInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite8And(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8And(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -316,7 +316,7 @@ fun i64AtomicReadModifyWrite8AndInstruction(
 fun i64AtomicReadModifyWrite8OrInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite8Or(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Or(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -324,7 +324,7 @@ fun i64AtomicReadModifyWrite8OrInstruction(
 fun i64AtomicReadModifyWrite8XorInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite8Xor(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Xor(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -332,7 +332,7 @@ fun i64AtomicReadModifyWrite8XorInstruction(
 fun i64AtomicReadModifyWrite8ExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite8Exchange(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite8Exchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -340,7 +340,7 @@ fun i64AtomicReadModifyWrite8ExchangeInstruction(
 fun i32AtomicReadModifyWrite16AddInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite16Add(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Add(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -348,7 +348,7 @@ fun i32AtomicReadModifyWrite16AddInstruction(
 fun i32AtomicReadModifyWrite16SubInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite16Sub(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Sub(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -356,7 +356,7 @@ fun i32AtomicReadModifyWrite16SubInstruction(
 fun i32AtomicReadModifyWrite16AndInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite16And(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16And(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -364,7 +364,7 @@ fun i32AtomicReadModifyWrite16AndInstruction(
 fun i32AtomicReadModifyWrite16OrInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite16Or(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Or(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -372,7 +372,7 @@ fun i32AtomicReadModifyWrite16OrInstruction(
 fun i32AtomicReadModifyWrite16XorInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite16Xor(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Xor(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -380,7 +380,7 @@ fun i32AtomicReadModifyWrite16XorInstruction(
 fun i32AtomicReadModifyWrite16ExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32ReadModifyWrite16Exchange(
+) = AtomicMemoryInstruction.ReadModifyWrite.I32.I32ReadModifyWrite16Exchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -388,7 +388,7 @@ fun i32AtomicReadModifyWrite16ExchangeInstruction(
 fun i64AtomicReadModifyWrite16AddInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite16Add(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Add(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -396,7 +396,7 @@ fun i64AtomicReadModifyWrite16AddInstruction(
 fun i64AtomicReadModifyWrite16SubInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite16Sub(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Sub(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -404,7 +404,7 @@ fun i64AtomicReadModifyWrite16SubInstruction(
 fun i64AtomicReadModifyWrite16AndInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite16And(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16And(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -412,7 +412,7 @@ fun i64AtomicReadModifyWrite16AndInstruction(
 fun i64AtomicReadModifyWrite16OrInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite16Or(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Or(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -420,7 +420,7 @@ fun i64AtomicReadModifyWrite16OrInstruction(
 fun i64AtomicReadModifyWrite16XorInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite16Xor(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Xor(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -428,7 +428,7 @@ fun i64AtomicReadModifyWrite16XorInstruction(
 fun i64AtomicReadModifyWrite16ExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite16Exchange(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite16Exchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -436,7 +436,7 @@ fun i64AtomicReadModifyWrite16ExchangeInstruction(
 fun i64AtomicReadModifyWrite32AddInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite32Add(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Add(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -444,7 +444,7 @@ fun i64AtomicReadModifyWrite32AddInstruction(
 fun i64AtomicReadModifyWrite32SubInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite32Sub(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Sub(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -452,7 +452,7 @@ fun i64AtomicReadModifyWrite32SubInstruction(
 fun i64AtomicReadModifyWrite32AndInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite32And(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32And(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -460,7 +460,7 @@ fun i64AtomicReadModifyWrite32AndInstruction(
 fun i64AtomicReadModifyWrite32OrInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite32Or(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Or(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -468,7 +468,7 @@ fun i64AtomicReadModifyWrite32OrInstruction(
 fun i64AtomicReadModifyWrite32XorInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite32Xor(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Xor(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -476,7 +476,7 @@ fun i64AtomicReadModifyWrite32XorInstruction(
 fun i64AtomicReadModifyWrite32ExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64ReadModifyWrite32Exchange(
+) = AtomicMemoryInstruction.ReadModifyWrite.I64.I64ReadModifyWrite32Exchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -484,7 +484,7 @@ fun i64AtomicReadModifyWrite32ExchangeInstruction(
 fun i32AtomicCompareExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32CompareExchange(
+) = AtomicMemoryInstruction.CompareExchange.I32.I32CompareExchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -492,7 +492,7 @@ fun i32AtomicCompareExchangeInstruction(
 fun i64AtomicCompareExchangeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64CompareExchange(
+) = AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -500,7 +500,7 @@ fun i64AtomicCompareExchangeInstruction(
 fun i32AtomicCompareExchange8Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32CompareExchange8(
+) = AtomicMemoryInstruction.CompareExchange.I32.I32CompareExchange8(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -508,7 +508,7 @@ fun i32AtomicCompareExchange8Instruction(
 fun i64AtomicCompareExchange8Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64CompareExchange8(
+) = AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange8(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -516,7 +516,7 @@ fun i64AtomicCompareExchange8Instruction(
 fun i32AtomicCompareExchange16Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I32CompareExchange16(
+) = AtomicMemoryInstruction.CompareExchange.I32.I32CompareExchange16(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -524,7 +524,7 @@ fun i32AtomicCompareExchange16Instruction(
 fun i64AtomicCompareExchange16Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64CompareExchange16(
+) = AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange16(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
@@ -532,7 +532,7 @@ fun i64AtomicCompareExchange16Instruction(
 fun i64AtomicCompareExchange32Instruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
     memArg: MemArg = memArg(),
-) = AtomicMemoryInstruction.I64CompareExchange32(
+) = AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange32(
     memoryIndex = memoryIndex,
     memArg = memArg,
 )
