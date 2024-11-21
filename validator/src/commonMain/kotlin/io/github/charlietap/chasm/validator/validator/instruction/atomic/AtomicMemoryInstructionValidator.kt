@@ -40,7 +40,7 @@ internal inline fun AtomicMemoryInstructionValidator(
         is AtomicMemoryInstruction.Notify -> {
 
             memoryIndexValidator(context, instruction.memoryIndex).bind()
-            memArgValidator(context, instruction.memArg).bind()
+            // TODO memArgValidator(context, instruction.memArg).bind()
 
             context.popI32().bind()
             context.popI32().bind()
@@ -50,7 +50,7 @@ internal inline fun AtomicMemoryInstructionValidator(
         is AtomicMemoryInstruction.I32Wait -> {
 
             memoryIndexValidator(context, instruction.memoryIndex).bind()
-            memArgValidator(context, instruction.memArg).bind()
+            // TODO memArgValidator(context, instruction.memArg).bind()
 
             context.popI64().bind()
             context.popI32().bind()
@@ -61,7 +61,7 @@ internal inline fun AtomicMemoryInstructionValidator(
         is AtomicMemoryInstruction.I64Wait -> {
 
             memoryIndexValidator(context, instruction.memoryIndex).bind()
-            memArgValidator(context, instruction.memArg).bind()
+            // TODO memArgValidator(context, instruction.memArg).bind()
 
             context.popI64().bind()
             context.popI64().bind()
@@ -72,7 +72,7 @@ internal inline fun AtomicMemoryInstructionValidator(
         is AtomicMemoryInstruction.Load -> {
 
             memoryIndexValidator(context, instruction.memoryIndex).bind()
-            memArgValidator(context, instruction.memArg).bind()
+            // TODO memArgValidator(context, instruction.memArg).bind()
 
             context.popI32().bind()
 
@@ -85,7 +85,7 @@ internal inline fun AtomicMemoryInstructionValidator(
         is AtomicMemoryInstruction.Store -> {
 
             memoryIndexValidator(context, instruction.memoryIndex).bind()
-            memArgValidator(context, instruction.memArg).bind()
+            // TODO memArgValidator(context, instruction.memArg).bind()
 
             val valueType = when (instruction) {
                 is AtomicMemoryInstruction.Store.I32 -> ValueType.Number(NumberType.I32)
@@ -97,7 +97,7 @@ internal inline fun AtomicMemoryInstructionValidator(
         is AtomicMemoryInstruction.ReadModifyWrite -> {
 
             memoryIndexValidator(context, instruction.memoryIndex).bind()
-            memArgValidator(context, instruction.memArg).bind()
+            // TODO memArgValidator(context, instruction.memArg).bind()
 
             val valueType = when (instruction) {
                 is AtomicMemoryInstruction.ReadModifyWrite.I32 -> ValueType.Number(NumberType.I32)
@@ -112,7 +112,7 @@ internal inline fun AtomicMemoryInstructionValidator(
         is AtomicMemoryInstruction.CompareExchange -> {
 
             memoryIndexValidator(context, instruction.memoryIndex).bind()
-            memArgValidator(context, instruction.memArg).bind()
+            // TODO memArgValidator(context, instruction.memArg).bind()
 
             val valueType = when (instruction) {
                 is AtomicMemoryInstruction.CompareExchange.I32 -> ValueType.Number(NumberType.I32)
