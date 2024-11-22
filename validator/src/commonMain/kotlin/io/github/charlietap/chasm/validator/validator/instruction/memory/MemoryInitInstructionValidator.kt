@@ -1,24 +1,36 @@
 package io.github.charlietap.chasm.validator.validator.instruction.memory
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
-import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.ext.popI32
+import io.github.charlietap.chasm.validator.validator.index.DataIndexValidator
+import io.github.charlietap.chasm.validator.validator.index.MemoryIndexValidator
 
 internal fun MemoryInitInstructionValidator(
     context: ValidationContext,
     instruction: MemoryInstruction.MemoryInit,
+): Result<Unit, ModuleValidatorError> =
+    MemoryInitInstructionValidator(
+        context = context,
+        instruction = instruction,
+        dataIndexValidator = ::DataIndexValidator,
+        memoryIndexValidator = ::MemoryIndexValidator,
+    )
+
+internal inline fun MemoryInitInstructionValidator(
+    context: ValidationContext,
+    instruction: MemoryInstruction.MemoryInit,
+    crossinline dataIndexValidator: Validator<Index.DataIndex>,
+    crossinline memoryIndexValidator: Validator<Index.MemoryIndex>,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (context.memories.isEmpty()) {
-        Err(InstructionValidatorError.UnknownMemory).bind<Unit>()
-    }
-    if (instruction.dataIndex.idx.toInt() !in context.module.dataSegments.indices) {
-        Err(InstructionValidatorError.UnknownDataSegment).bind<Unit>()
-    }
+
+    dataIndexValidator(context, instruction.dataIndex).bind()
+    memoryIndexValidator(context, instruction.memoryIndex).bind()
 
     repeat(3) {
         context.popI32().bind()

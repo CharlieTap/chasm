@@ -15,6 +15,8 @@ import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
+import io.github.charlietap.chasm.validator.context.scope.InstructionScope
+import io.github.charlietap.chasm.validator.context.scope.Scope
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.instruction.aggregate.AggregateInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.atomic.AtomicMemoryInstructionValidator
@@ -33,6 +35,7 @@ internal fun InstructionValidator(
     InstructionValidator(
         context = context,
         instruction = instruction,
+        scope = ::InstructionScope,
         aggregateInstructionValidator = ::AggregateInstructionValidator,
         atomicMemoryInstructionValidator = ::AtomicMemoryInstructionValidator,
         controlInstructionValidator = ::ControlInstructionValidator,
@@ -47,6 +50,7 @@ internal fun InstructionValidator(
 internal inline fun InstructionValidator(
     context: ValidationContext,
     instruction: Instruction,
+    crossinline scope: Scope<Instruction>,
     crossinline aggregateInstructionValidator: Validator<AggregateInstruction>,
     crossinline atomicMemoryInstructionValidator: Validator<AtomicMemoryInstruction>,
     crossinline controlInstructionValidator: Validator<ControlInstruction>,
@@ -57,16 +61,17 @@ internal inline fun InstructionValidator(
     crossinline tableInstructionValidator: Validator<TableInstruction>,
     crossinline variableInstructionValidator: Validator<VariableInstruction>,
 ): Result<Unit, ModuleValidatorError> = binding {
+    val scopedContext = scope(context, instruction).bind()
     when (instruction) {
-        is AggregateInstruction -> aggregateInstructionValidator(context, instruction).bind()
-        is AtomicMemoryInstruction -> atomicMemoryInstructionValidator(context, instruction).bind()
-        is ControlInstruction -> controlInstructionValidator(context, instruction).bind()
-        is NumericInstruction -> numericInstructionValidator(context, instruction).bind()
-        is MemoryInstruction -> memoryInstructionValidator(context, instruction).bind()
-        is ParametricInstruction -> parametricInstructionValidator(context, instruction).bind()
-        is ReferenceInstruction -> referenceInstructionValidator(context, instruction).bind()
-        is TableInstruction -> tableInstructionValidator(context, instruction).bind()
-        is VariableInstruction -> variableInstructionValidator(context, instruction).bind()
+        is AggregateInstruction -> aggregateInstructionValidator(scopedContext, instruction).bind()
+        is AtomicMemoryInstruction -> atomicMemoryInstructionValidator(scopedContext, instruction).bind()
+        is ControlInstruction -> controlInstructionValidator(scopedContext, instruction).bind()
+        is NumericInstruction -> numericInstructionValidator(scopedContext, instruction).bind()
+        is MemoryInstruction -> memoryInstructionValidator(scopedContext, instruction).bind()
+        is ParametricInstruction -> parametricInstructionValidator(scopedContext, instruction).bind()
+        is ReferenceInstruction -> referenceInstructionValidator(scopedContext, instruction).bind()
+        is TableInstruction -> tableInstructionValidator(scopedContext, instruction).bind()
+        is VariableInstruction -> variableInstructionValidator(scopedContext, instruction).bind()
         is VectorInstruction -> Unit
     }
 }

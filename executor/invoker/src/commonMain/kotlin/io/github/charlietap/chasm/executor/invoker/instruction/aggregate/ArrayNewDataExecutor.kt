@@ -5,13 +5,13 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.invoker.Executor
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
-import io.github.charlietap.chasm.executor.runtime.ext.bitWidth
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
+import io.github.charlietap.chasm.type.ext.bitWidth
 
 internal fun ArrayNewDataExecutor(
     context: ExecutionContext,
@@ -50,7 +51,9 @@ internal inline fun ArrayNewDataExecutor(
     val arrayLength = stack.popI32().bind()
     val arrayStartOffsetInSegment = stack.popI32().bind()
 
-    val arrayElementSizeInBytes = arrayType.fieldType.bitWidth().bind() / 8
+    val arrayElementSizeInBytes = arrayType.fieldType.bitWidth().toResultOr {
+        InvocationError.UnobservableBitWidth
+    }.bind() / 8
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * arrayElementSizeInBytes)
 
     if (arrayEndOffsetInSegment > dataInstance.bytes.size) {
