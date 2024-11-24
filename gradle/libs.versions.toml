@@ -41,7 +41,7 @@ kotlinter = "4.2.0"
 kot-compile-testing = "1.5.0"
 
 kotlinx-atomic-fu = "0.23.1"
-kotlinx-benchmark = "0.4.10"
+kotlinx-benchmark = "0.4.13"
 kotlinx-coroutines = "1.8.0"
 kotlinx-datetime = "0.5.0"
 kotlinx-io = "0.5.3"
