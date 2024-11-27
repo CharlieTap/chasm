@@ -36,6 +36,7 @@ dependencyResolutionManagement {
 }
 
 include(":ast")
+include(":benchmark")
 include(":chasm")
 
 include(":decoder")

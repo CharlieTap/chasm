@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 
-internal fun ExecutionInstructionExecutor(
+fun ExecutionInstructionExecutor(
     context: ExecutionContext,
     instruction: ExecutionInstruction,
 ): Result<Unit, InvocationError> =

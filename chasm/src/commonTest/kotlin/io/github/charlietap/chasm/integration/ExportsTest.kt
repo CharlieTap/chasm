@@ -47,7 +47,7 @@ class ExportsTest {
                 name = "exported_function",
                 value = publicFunction(
                     reference = functionExternalValue(
-                        address = functionAddress(0)
+                        address = functionAddress(0),
                     ),
                 ),
             ),
@@ -55,32 +55,32 @@ class ExportsTest {
                 name = "exported_global",
                 value = publicGlobal(
                     reference = globalExternalValue(
-                        address = globalAddress(0)
-                    )
+                        address = globalAddress(0),
+                    ),
                 ),
             ),
             publicExport(
                 name = "exported_memory",
                 value = publicMemory(
                     reference = memoryExternalValue(
-                        address = memoryAddress(0)
-                    )
+                        address = memoryAddress(0),
+                    ),
                 ),
             ),
             publicExport(
                 name = "exported_table",
                 value = publicTable(
                     reference = tableExternalValue(
-                        address = tableAddress(0)
-                    )
+                        address = tableAddress(0),
+                    ),
                 ),
             ),
             publicExport(
                 name = "exported_tag",
                 value = publicTag(
                     reference = tagExternalValue(
-                        address = tagAddress(0)
-                    )
+                        address = tagAddress(0),
+                    ),
                 ),
             ),
         )

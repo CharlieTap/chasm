@@ -1,0 +1,83 @@
+name: Benchmark ⌛
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        description: 'The machine runner the workflow should run on'
+        default: macos-latest
+        required: false
+      branch:
+        type: string
+        description: 'The branch to be benchmarked'
+        required: true
+      should-commit-benchmark:
+        type: boolean
+        description: 'If the produced report should be commited to the active branch'
+        default: false
+        required: false
+  workflow_dispatch:
+    inputs:
+      runner:
+        type: string
+        description: 'The machine runner the workflow should run on'
+        default: macos-latest
+        required: true
+      branch:
+        type: string
+        description: 'The branch to be benchmarked'
+        required: true
+      should-commit-benchmark:
+        type: boolean
+        description: 'If the produced report should be committed to the active branch'
+        default: false
+        required: false
+
+jobs:
+  build:
+    runs-on: ${{ inputs.runner }}
+    permissions:
+      contents: write
+    steps:
+
+      - name: Clone Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Set up jdk@21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Execute Gradle build
+        run: ./gradlew benchmark
+
+      - name: Upload any new reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            **/build/**/*Benchmark.csv
+            **/build/**/*Benchmark.json
+
+      - name: Move benchmark files
+        run: |
+          mkdir -p benchmark/reports
+          find benchmark -type f \( -iname '*benchmark.json' -o -iname '*benchmark.csv' \) -exec mv {} ./benchmark/reports/ \;
+
+      - name: Commit benchmark files
+        if: ${{ inputs.should-commit-benchmark }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add benchmark/*
+          git commit -m "Commit benchmark results" -a
+          git push

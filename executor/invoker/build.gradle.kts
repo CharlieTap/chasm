@@ -25,11 +25,11 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.executor.runtime)
+                api(projects.typeSystem)
                 api(libs.result)
 
                 implementation(projects.executor.memory)
                 implementation(projects.libs.sse2)
-                implementation(projects.typeSystem)
             }
         }
 
