@@ -80,7 +80,7 @@ class I32LoadInstructionBenchmark {
 
     @TearDown
     fun cleanup() {
-        context.stack.empty()
+        context.stack.clear()
         context.store.memories.clear()
     }
 

@@ -81,7 +81,7 @@ class I32StoreInstructionBenchmark {
 
     @TearDown
     fun cleanup() {
-        context.stack.empty()
+        context.stack.clear()
         context.store.memories.clear()
     }
 

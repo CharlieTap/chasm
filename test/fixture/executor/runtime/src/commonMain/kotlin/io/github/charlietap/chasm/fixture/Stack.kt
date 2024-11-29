@@ -10,10 +10,10 @@ import io.github.charlietap.chasm.fixture.instruction.executionInstruction
 import io.github.charlietap.chasm.fixture.value.executionValue
 
 fun stack(
-    frames: ArrayDeque<Stack.Entry.ActivationFrame> = ArrayDeque(),
-    instructions: ArrayDeque<Stack.Entry.Instruction> = ArrayDeque(),
-    labels: ArrayDeque<Stack.Entry.Label> = ArrayDeque(),
-    values: ArrayDeque<Stack.Entry.Value> = ArrayDeque(),
+    frames: List<Stack.Entry.ActivationFrame> = emptyList(),
+    instructions: List<Stack.Entry.Instruction> = emptyList(),
+    labels: List<Stack.Entry.Label> = emptyList(),
+    values: List<Stack.Entry.Value> = emptyList(),
 ) = Stack(
     frames = frames,
     instructions = instructions,

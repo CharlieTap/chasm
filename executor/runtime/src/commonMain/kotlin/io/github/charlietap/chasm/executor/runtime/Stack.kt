@@ -6,13 +6,33 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import kotlin.jvm.JvmInline
+import io.github.charlietap.chasm.stack.Stack as InternalStack
 
 data class Stack(
-    private val frames: ArrayDeque<Entry.ActivationFrame> = ArrayDeque(INITIAL_CAPACITY),
-    private val instructions: ArrayDeque<Entry.Instruction> = ArrayDeque(INITIAL_CAPACITY),
-    private val labels: ArrayDeque<Entry.Label> = ArrayDeque(INITIAL_CAPACITY),
-    private val values: ArrayDeque<Entry.Value> = ArrayDeque(INITIAL_CAPACITY),
+    private val frames: InternalStack<Entry.ActivationFrame> = InternalStack(INITIAL_CAPACITY),
+    private val instructions: InternalStack<Entry.Instruction> = InternalStack(INITIAL_CAPACITY),
+    private val labels: InternalStack<Entry.Label> = InternalStack(INITIAL_CAPACITY),
+    private val values: InternalStack<Entry.Value> = InternalStack(INITIAL_CAPACITY),
 ) {
+    constructor(
+        frames: List<Entry.ActivationFrame>,
+        instructions: List<Entry.Instruction>,
+        labels: List<Entry.Label>,
+        values: List<Entry.Value>,
+    ) : this() {
+        frames.forEach { frame ->
+            this.frames.push(frame)
+        }
+        instructions.forEach { instruction ->
+            this.instructions.push(instruction)
+        }
+        labels.forEach { label ->
+            this.labels.push(label)
+        }
+        values.forEach { value ->
+            this.values.push(value)
+        }
+    }
 
     constructor(
         entries: Sequence<Entry>,
@@ -28,81 +48,83 @@ data class Stack(
     }
 
     fun push(frame: Entry.ActivationFrame) {
-        frames.addLast(frame)
-        instructions.addLast(Entry.Instruction(AdminInstruction.Frame(frame)))
+        frames.push(frame)
+        instructions.push(Entry.Instruction(AdminInstruction.Frame(frame)))
     }
 
     fun push(handler: Entry.ExceptionHandler) {
-        instructions.addLast(Entry.Instruction(AdminInstruction.Handler(handler)))
+        instructions.push(Entry.Instruction(AdminInstruction.Handler(handler)))
     }
 
-    fun push(instruction: Entry.Instruction) = instructions.addLast(instruction)
+    fun push(instruction: Entry.Instruction) = instructions.push(instruction)
 
     fun push(label: Entry.Label) {
-        labels.addLast(label)
-        instructions.addLast(Entry.Instruction(AdminInstruction.Label(label)))
+        labels.push(label)
+        instructions.push(Entry.Instruction(AdminInstruction.Label(label)))
     }
 
-    fun push(value: Entry.Value) = values.addLast(value)
+    fun push(value: Entry.Value) = values.push(value)
 
-    fun popFrameOrNull(): Entry.ActivationFrame? = frames.removeLastOrNull()
+    fun popFrameOrNull(): Entry.ActivationFrame? = frames.popOrNull()
 
-    fun popInstructionOrNull(): Entry.Instruction? = instructions.removeLastOrNull()
+    fun popInstructionOrNull(): Entry.Instruction? = instructions.popOrNull()
 
-    fun popLabelOrNull(): Entry.Label? = labels.removeLastOrNull()
+    fun popLabelOrNull(): Entry.Label? = labels.popOrNull()
 
-    fun popValueOrNull(): Entry.Value? = values.removeLastOrNull()
+    fun popValueOrNull(): Entry.Value? = values.popOrNull()
 
-    fun peekFrameOrNull(): Entry.ActivationFrame? = frames.lastOrNull()
+    fun peekFrameOrNull(): Entry.ActivationFrame? = frames.peekOrNull()
 
-    fun peekInstructionOrNull(): Entry.Instruction? = instructions.lastOrNull()
+    fun peekInstructionOrNull(): Entry.Instruction? = instructions.peekOrNull()
 
-    fun peekLabelOrNull(): Entry.Label? = labels.lastOrNull()
+    fun peekLabelOrNull(): Entry.Label? = labels.peekOrNull()
 
-    fun peekValueOrNull(): Entry.Value? = values.lastOrNull()
+    fun peekValueOrNull(): Entry.Value? = values.peekOrNull()
 
-    fun peekNthFrameOrNull(n: Int): Entry.ActivationFrame? = frames.getOrNull(frames.lastIndex - n)
+    fun peekNthFrameOrNull(n: Int): Entry.ActivationFrame? = frames.peekNthOrNull(n)
 
-    fun peekNthLabelOrNull(n: Int): Entry.Label? = labels.getOrNull(labels.lastIndex - n)
+    fun peekNthLabelOrNull(n: Int): Entry.Label? = labels.peekNthOrNull(n)
 
-    fun peekNthValueOrNull(n: Int): Entry.Value? = values.getOrNull(values.lastIndex - n)
+    fun peekNthValueOrNull(n: Int): Entry.Value? = values.peekNthOrNull(n)
 
-    fun size() = frames.size + instructions.size + labels.size + values.size
+    fun size() = frames.depth() + instructions.depth() + labels.depth() + values.depth()
 
-    fun framesDepth() = frames.size
+    fun framesDepth() = frames.depth()
 
-    fun instructionsDepth() = instructions.size
+    fun instructionsDepth() = instructions.depth()
 
-    fun labelsDepth() = labels.size
+    fun labelsDepth() = labels.depth()
 
-    fun valuesDepth() = values.size
+    fun valuesDepth() = values.depth()
 
-    fun empty() {
-        frames.removeAll { true }
-        instructions.removeAll { true }
-        labels.removeAll { true }
-        values.removeAll { true }
+    fun clear() {
+        frames.clear()
+        instructions.clear()
+        labels.clear()
+        values.clear()
     }
 
-    fun frames() = frames
+    fun clearValues() = values.clear()
 
-    fun instructions() = instructions
+    fun frames() = frames.entries()
 
-    fun labels() = labels
+    fun instructions() = instructions.entries()
 
-    fun values() = values
+    fun labels() = labels.entries()
+
+    fun values() = values.entries()
 
     fun fill(stack: Stack) {
-        stack.frames.forEach { entry ->
+        stack.frames.entries().forEach { entry ->
             push(entry)
         }
-        stack.instructions.forEach { entry ->
+        stack.instructions.entries().forEach { entry ->
             push(entry)
         }
-        stack.labels.forEach { entry ->
+        stack.labels.entries().forEach { entry ->
             push(entry)
         }
-        stack.values.forEach { entry ->
+        stack.values.entries().forEach { entry ->
             push(entry)
         }
     }
