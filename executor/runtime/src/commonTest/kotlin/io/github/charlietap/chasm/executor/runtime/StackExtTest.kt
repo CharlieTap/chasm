@@ -344,9 +344,7 @@ class StackExtTest {
 
         val frame = frame()
         val stack = stack(
-            frames = ArrayDeque(
-                List(Stack.MAX_DEPTH) { frame },
-            ),
+            frames = List(Stack.MAX_DEPTH) { frame },
         )
 
         val actual = stack.pushFrame(frame)

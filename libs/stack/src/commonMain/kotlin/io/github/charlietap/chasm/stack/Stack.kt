@@ -1,19 +1,39 @@
 package io.github.charlietap.chasm.stack
 
-class Stack<T>(
-    private val entries: ArrayDeque<T> = ArrayDeque(),
+import androidx.collection.CircularArray
+import kotlin.jvm.JvmInline
+
+@JvmInline
+value class Stack<T>(
+    private val entries: CircularArray<T>,
 ) {
+    constructor(capacity: Int = MIN_CAPACITY) : this(CircularArray(capacity))
+
     fun push(value: T) = entries.addLast(value)
 
-    fun popOrNull(): T? = entries.removeLastOrNull()
+    fun popOrNull(): T? = try {
+        entries.popLast()
+    } catch (_: Exception) {
+        null
+    }
 
-    fun peekOrNull(): T? = entries.lastOrNull()
+    fun peekOrNull(): T? = try {
+        entries.last
+    } catch (_: Exception) {
+        null
+    }
 
-    fun peekNthOrNull(n: Int) = entries.getOrNull(entries.lastIndex - n)
+    fun peekNthOrNull(n: Int): T? = try {
+        entries[(entries.size() - 1) - n ]
+    } catch (_: Exception) {
+        null
+    }
 
-    fun depth(): Int = entries.size
+    fun depth(): Int = entries.size()
 
-    fun entries(): ArrayDeque<T> = entries
+    fun entries(): List<T> = List(entries.size()) { entries[it] }
 
-    fun clear() = entries.removeAll { true }
+    fun clear() = entries.clear()
 }
+
+private const val MIN_CAPACITY = 256

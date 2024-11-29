@@ -24,6 +24,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
+                api(projects.libs.stack)
                 api(libs.result)
             }
         }

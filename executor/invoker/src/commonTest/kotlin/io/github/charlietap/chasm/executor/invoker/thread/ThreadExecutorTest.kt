@@ -49,25 +49,19 @@ class ThreadExecutorTest {
         val instructions = (thread.instructions + listOf(AdminInstruction.Frame(frame))).asSequence().iterator()
 
         val stack1 = stack(
-            values = ArrayDeque(
-                listOf(
-                    Value(locals[0]),
-                    Value(locals[1]),
-                ),
+            values = listOf(
+                Value(locals[0]),
+                Value(locals[1]),
             ),
         )
         val stack2 = stack(
-            values = ArrayDeque(
-                listOf(
-                    Value(i32(6)),
-                ),
+            values = listOf(
+                Value(i32(6)),
             ),
         )
         val stack3 = stack(
-            values = ArrayDeque(
-                listOf(
-                    Value(i32(0)),
-                ),
+            values = listOf(
+                Value(i32(0)),
             ),
         )
         val inputStacks = sequenceOf(stack1, stack2, stack3).iterator()
@@ -82,7 +76,7 @@ class ThreadExecutorTest {
             assertEquals(configuration.store, context.store)
             assertEquals(inputStack.values(), context.stack.values())
 
-            context.stack.values().removeAll { true }
+            context.stack.clearValues()
             context.stack.fill(outputStack)
 
             if (instruction is AdminInstruction.Frame) {
