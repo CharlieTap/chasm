@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import kotlin.jvm.JvmInline
 import io.github.charlietap.chasm.stack.Stack as InternalStack
 
 data class Stack(
@@ -136,8 +135,7 @@ data class Stack(
     }
 
     sealed interface Entry {
-        @JvmInline
-        value class Value(val value: ExecutionValue) : Entry
+        data class Value(val value: ExecutionValue) : Entry
 
         data class Label(
             val arity: Arity,
@@ -157,11 +155,9 @@ data class Stack(
             )
         }
 
-        @JvmInline
-        value class Instruction(val instruction: ExecutionInstruction) : Entry
+        data class Instruction(val instruction: ExecutionInstruction) : Entry
 
-        @JvmInline
-        value class ExceptionHandler(val handlers: List<ControlInstruction.CatchHandler>)
+        data class ExceptionHandler(val handlers: List<ControlInstruction.CatchHandler>)
     }
 
     companion object {
