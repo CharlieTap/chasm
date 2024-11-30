@@ -136,8 +136,8 @@ data class Stack(
     }
 
     sealed interface Entry {
-        @JvmInline
-        value class Value(val value: ExecutionValue) : Entry
+
+        data class Value(val value: ExecutionValue) : Entry
 
         data class Label(
             val arity: Arity,

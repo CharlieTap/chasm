@@ -1,39 +1,74 @@
 package io.github.charlietap.chasm.stack
 
-import androidx.collection.CircularArray
-import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmOverloads
 
-@JvmInline
-value class Stack<T>(
-    private val entries: CircularArray<T>,
-) {
-    constructor(capacity: Int = MIN_CAPACITY) : this(CircularArray(capacity))
+class Stack<T>
+    @JvmOverloads
+    constructor(minCapacity: Int = MIN_CAPACITY) {
 
-    fun push(value: T) = entries.addLast(value)
+        private var elements: Array<T?>
+        private var top = 0
 
-    fun popOrNull(): T? = try {
-        entries.popLast()
-    } catch (_: Exception) {
-        null
+        init {
+            val arrayCapacity: Int =
+                if (minCapacity.countOneBits() != 1) {
+                    (minCapacity - 1).takeHighestOneBit() shl 1
+                } else {
+                    minCapacity
+                }
+            @Suppress("UNCHECKED_CAST")
+            elements = arrayOfNulls<Any?>(arrayCapacity) as Array<T?>
+        }
+
+        fun push(value: T) {
+            elements[top] = value
+            top++
+            if (top == elements.size) {
+                doubleCapacity()
+            }
+        }
+
+        fun popOrNull(): T? = try {
+            top--
+            val value = elements[top]
+            elements[top] = null
+            value
+        } catch (_: Exception) {
+            null
+        }
+
+        fun peekOrNull(): T? = try {
+            elements[top - 1]
+        } catch (_: Exception) {
+            null
+        }
+
+        fun peekNthOrNull(n: Int): T? = try {
+            elements[top - 1 - n]
+        } catch (_: Exception) {
+            null
+        }
+
+        fun depth(): Int = top
+
+        fun clear() {
+            for (i in 0 until top) {
+                elements[i] = null
+            }
+            top = 0
+        }
+
+        fun entries() = buildList {
+            for (i in 0 until top) {
+                @Suppress("UNCHECKED_CAST")
+                add(elements[i] as T)
+            }
+        }
+
+        private fun doubleCapacity() {
+            val newCapacity = elements.size * 2
+            elements = elements.copyOf(newCapacity)
+        }
     }
-
-    fun peekOrNull(): T? = try {
-        entries.last
-    } catch (_: Exception) {
-        null
-    }
-
-    fun peekNthOrNull(n: Int): T? = try {
-        entries[(entries.size() - 1) - n ]
-    } catch (_: Exception) {
-        null
-    }
-
-    fun depth(): Int = entries.size()
-
-    fun entries(): List<T> = List(entries.size()) { entries[it] }
-
-    fun clear() = entries.clear()
-}
 
 private const val MIN_CAPACITY = 256

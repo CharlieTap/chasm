@@ -21,7 +21,6 @@ kotlin {
 
         commonMain {
             dependencies {
-                api(libs.androidx.collections.kmp)
                 api(libs.result)
             }
         }

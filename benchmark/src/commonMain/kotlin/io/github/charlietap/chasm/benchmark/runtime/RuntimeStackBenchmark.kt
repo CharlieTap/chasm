@@ -1,11 +1,16 @@
 package io.github.charlietap.chasm.benchmark.runtime
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
+import io.github.charlietap.chasm.executor.runtime.ext.peekLabel
+import io.github.charlietap.chasm.executor.runtime.ext.peekValue
+import io.github.charlietap.chasm.executor.runtime.ext.popFrame
+import io.github.charlietap.chasm.executor.runtime.ext.popLabel
+import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.label
+import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.value
-import io.github.charlietap.chasm.stack.stackOf
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -23,9 +28,9 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class StackBenchmark {
+class RuntimeStackBenchmark {
 
-    private val stack = stackOf<Stack.Entry>()
+    private val stack = stack()
 
     private val frame = frame()
     private val label = label()
@@ -39,69 +44,69 @@ class StackBenchmark {
     @Benchmark
     fun peekFrame(blackhole: Blackhole) {
         stack.push(frame)
-        val result = stack.peekOrNull()
-        stack.clear()
+        val result = stack.peekFrame()
+        stack.clearFrames()
         blackhole.consume(result)
     }
 
     @Benchmark
     fun pushFrame(blackhole: Blackhole) {
         val result = stack.push(frame)
-        stack.clear()
+        stack.clearFrames()
         blackhole.consume(result)
     }
 
     @Benchmark
     fun popFrame(blackhole: Blackhole) {
         stack.push(frame)
-        val result = stack.popOrNull()
-        stack.clear()
+        val result = stack.popFrame()
+        stack.clearFrames()
         blackhole.consume(result)
     }
 
     @Benchmark
     fun peekLabel(blackhole: Blackhole) {
         stack.push(label)
-        val result = stack.peekOrNull()
-        stack.clear()
+        val result = stack.peekLabel()
+        stack.clearLabels()
         blackhole.consume(result)
     }
 
     @Benchmark
     fun pushLabel(blackhole: Blackhole) {
         val result = stack.push(label)
-        stack.clear()
+        stack.clearLabels()
         blackhole.consume(result)
     }
 
     @Benchmark
     fun popLabel(blackhole: Blackhole) {
         stack.push(label)
-        val result = stack.popOrNull()
-        stack.clear()
+        val result = stack.popLabel()
+        stack.clearLabels()
         blackhole.consume(result)
     }
 
     @Benchmark
     fun peekValue(blackhole: Blackhole) {
         stack.push(value)
-        val result = stack.peekOrNull()
-        stack.clear()
+        val result = stack.peekValue()
+        stack.clearValues()
         blackhole.consume(result)
     }
 
     @Benchmark
     fun pushValue(blackhole: Blackhole) {
         val result = stack.push(value)
-        stack.clear()
+        stack.clearValues()
         blackhole.consume(result)
     }
 
     @Benchmark
     fun popValue(blackhole: Blackhole) {
         stack.push(value)
-        val result = stack.popOrNull()
-        stack.clear()
+        val result = stack.popValue()
+        stack.clearValues()
         blackhole.consume(result)
     }
 }
