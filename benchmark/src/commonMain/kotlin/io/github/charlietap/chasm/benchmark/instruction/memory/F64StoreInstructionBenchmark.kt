@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.i32StoreInstruction
+import io.github.charlietap.chasm.fixture.instruction.f64StoreInstruction
 import io.github.charlietap.chasm.fixture.instruction.memArg
 import io.github.charlietap.chasm.fixture.instruction.moduleInstruction
 import io.github.charlietap.chasm.fixture.module.memoryIndex
@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.unsharedStatus
 import io.github.charlietap.chasm.fixture.value
+import io.github.charlietap.chasm.fixture.value.f64
 import io.github.charlietap.chasm.fixture.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
@@ -38,7 +39,7 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class I32StoreInstructionBenchmark {
+class F64StoreInstructionBenchmark {
 
     private val context = ExecutionContext(
         stack = stack(),
@@ -47,7 +48,7 @@ class I32StoreInstructionBenchmark {
     )
 
     private val instruction = moduleInstruction(
-        i32StoreInstruction(
+        f64StoreInstruction(
             memoryIndex = memoryIndex(0u),
             memArg = memArg(0u, 0u),
         ),
@@ -68,7 +69,7 @@ class I32StoreInstructionBenchmark {
     )
 
     private val baseAddress = value(i32(0))
-    private val value = value(i32())
+    private val value = value(f64())
 
     @Setup()
     fun setup() {

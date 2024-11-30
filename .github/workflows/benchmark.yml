@@ -58,7 +58,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Execute Gradle build
-        run: ./gradlew benchmark
+        run: ./gradlew benchmark --no-configuration-cache
 
       - name: Upload any new reports
         uses: actions/upload-artifact@v4

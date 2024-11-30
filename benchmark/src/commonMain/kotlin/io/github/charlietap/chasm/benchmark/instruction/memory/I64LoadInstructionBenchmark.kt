@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.i32StoreInstruction
+import io.github.charlietap.chasm.fixture.instruction.i64LoadInstruction
 import io.github.charlietap.chasm.fixture.instruction.memArg
 import io.github.charlietap.chasm.fixture.instruction.moduleInstruction
 import io.github.charlietap.chasm.fixture.module.memoryIndex
@@ -38,7 +38,7 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class I32StoreInstructionBenchmark {
+class I64LoadInstructionBenchmark {
 
     private val context = ExecutionContext(
         stack = stack(),
@@ -47,7 +47,7 @@ class I32StoreInstructionBenchmark {
     )
 
     private val instruction = moduleInstruction(
-        i32StoreInstruction(
+        i64LoadInstruction(
             memoryIndex = memoryIndex(0u),
             memArg = memArg(0u, 0u),
         ),
@@ -68,9 +68,8 @@ class I32StoreInstructionBenchmark {
     )
 
     private val baseAddress = value(i32(0))
-    private val value = value(i32())
 
-    @Setup()
+    @Setup
     fun setup() {
         context.apply {
             instance.memAddresses.add(0, memoryAddress(0))
@@ -88,7 +87,6 @@ class I32StoreInstructionBenchmark {
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
         context.stack.push(baseAddress)
-        context.stack.push(value)
         val result = ExecutionInstructionExecutor(context, instruction)
         context.stack.clearValues()
         blackhole.consume(result)

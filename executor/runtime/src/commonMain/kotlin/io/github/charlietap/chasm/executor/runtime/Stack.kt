@@ -104,6 +104,12 @@ data class Stack(
         values.clear()
     }
 
+    fun clearInstructions() = instructions.clear()
+
+    fun clearLabels() = labels.clear()
+
+    fun clearFrames() = frames.clear()
+
     fun clearValues() = values.clear()
 
     fun frames() = frames.entries()
