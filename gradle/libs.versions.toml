@@ -12,7 +12,7 @@ java-compiler-version = "21"
 java-bytecode-version = "11"
 
 android-build-tools-plugin = "8.3.2"
-versions-plugin = "0.47.0"
+versions-plugin = "0.51.0"
 
 androidx-appcompat = "1.6.1"
 androidx-collection = "1.5.0-alpha06"
