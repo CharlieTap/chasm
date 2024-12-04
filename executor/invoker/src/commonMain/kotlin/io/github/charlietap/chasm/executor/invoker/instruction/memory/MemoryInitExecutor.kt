@@ -6,7 +6,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.init.MemoryInstanceInitialiser
-import io.github.charlietap.chasm.executor.memory.init.MemoryInstanceInitialiserImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
@@ -22,7 +21,7 @@ internal fun MemoryInitExecutor(
     MemoryInitExecutor(
         context = context,
         instruction = instruction,
-        memoryInstanceInitialiser = ::MemoryInstanceInitialiserImpl,
+        memoryInstanceInitialiser = ::MemoryInstanceInitialiser,
     )
 
 internal inline fun MemoryInitExecutor(
@@ -42,7 +41,7 @@ internal inline fun MemoryInitExecutor(
     val sourceOffset = stack.popI32().bind()
     val destinationOffset = stack.popI32().bind()
 
-    if (bytesToCopy < 0 || (sourceOffset + bytesToCopy) > data.bytes.size || (destinationOffset + bytesToCopy) > memory.data.size()) {
+    if (bytesToCopy < 0 || (sourceOffset + bytesToCopy) > data.bytes.size || (destinationOffset + bytesToCopy) > memory.size()) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }
 

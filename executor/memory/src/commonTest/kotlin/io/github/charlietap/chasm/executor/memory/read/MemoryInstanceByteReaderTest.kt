@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.memory.read
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
-import io.github.charlietap.chasm.executor.memory.LinearMemoryInteractorImpl
+import io.github.charlietap.chasm.executor.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
@@ -17,7 +17,7 @@ class MemoryInstanceByteReaderTest {
     fun `can read bytes from linear memory using a buffer `() {
 
         val memoryArray = byteArrayOf(0, 0, 117, 118, 0, 0)
-        val memory = ByteArrayLinearMemory(min = LinearMemory.Pages(1), max = LinearMemory.Pages(1), memory = memoryArray)
+        val memory = ByteArrayLinearMemory(memory = memoryArray)
         val instance = memoryInstance(data = memory)
 
         val memoryPointer = 2
@@ -30,7 +30,7 @@ class MemoryInstanceByteReaderTest {
             memoryPointer = memoryPointer,
             bytesToRead = 2,
             bufferPointer = bufferPointer,
-            linearMemoryInteractor = ::LinearMemoryInteractorImpl,
+            linearMemoryInteractor = ::OptimisticBoundsChecker,
         )
 
         assertEquals(Ok(buffer), actual)
@@ -40,7 +40,7 @@ class MemoryInstanceByteReaderTest {
     @Test
     fun `error if returned if read is out of the memory's bounds `() {
 
-        val memory = ByteArrayLinearMemory(min = LinearMemory.Pages(1))
+        val memory = ByteArrayLinearMemory(pages = LinearMemory.Pages(1))
         val instance = memoryInstance(data = memory)
 
         val memoryPointer = LinearMemory.PAGE_SIZE
@@ -53,7 +53,7 @@ class MemoryInstanceByteReaderTest {
             memoryPointer = memoryPointer,
             bytesToRead = 1,
             bufferPointer = bufferPointer,
-            linearMemoryInteractor = ::LinearMemoryInteractorImpl,
+            linearMemoryInteractor = ::OptimisticBoundsChecker,
         )
 
         assertEquals(Err(InvocationError.MemoryOperationOutOfBounds), actual)
@@ -62,7 +62,7 @@ class MemoryInstanceByteReaderTest {
     @Test
     fun `error if returned if read is out of the buffer's bounds `() {
 
-        val memory = ByteArrayLinearMemory(min = LinearMemory.Pages(1))
+        val memory = ByteArrayLinearMemory(pages = LinearMemory.Pages(1))
         val instance = memoryInstance(data = memory)
 
         val memoryPointer = 0
@@ -75,7 +75,7 @@ class MemoryInstanceByteReaderTest {
             memoryPointer = memoryPointer,
             bytesToRead = 1,
             bufferPointer = bufferPointer,
-            linearMemoryInteractor = ::LinearMemoryInteractorImpl,
+            linearMemoryInteractor = ::OptimisticBoundsChecker,
         )
 
         assertEquals(Err(InvocationError.MemoryOperationOutOfBounds), actual)

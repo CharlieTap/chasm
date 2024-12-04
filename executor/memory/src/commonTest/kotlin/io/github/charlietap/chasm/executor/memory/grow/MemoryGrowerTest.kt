@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.fixture.type.sharedStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MemoryGrowerImplTest {
+class MemoryGrowerTest {
 
     @Test
     fun `can grow a memory instance`() {
@@ -34,7 +34,7 @@ class MemoryGrowerImplTest {
             data = ByteArrayLinearMemory(LinearMemory.Pages(3)),
         )
 
-        val actual = MemoryGrowerImpl(instance, additionalPages.amount)
+        val actual = MemoryInstanceGrower(instance, additionalPages.amount)
 
         assertEquals(Ok(expected), actual)
     }
@@ -47,7 +47,7 @@ class MemoryGrowerImplTest {
         val type = memoryType(limits)
         val error = InvocationError.MemoryGrowExceedsLimits(2, 2)
 
-        val memory = ByteArrayLinearMemory(LinearMemory.Pages(1), LinearMemory.Pages(2))
+        val memory = ByteArrayLinearMemory(LinearMemory.Pages(1))
 
         val instance = memoryInstance(
             type = type,
@@ -56,7 +56,7 @@ class MemoryGrowerImplTest {
 
         val expected = Err(error)
 
-        val actual = MemoryGrowerImpl(instance, additionalPages.amount)
+        val actual = MemoryInstanceGrower(instance, additionalPages.amount)
 
         assertEquals(expected, actual)
     }

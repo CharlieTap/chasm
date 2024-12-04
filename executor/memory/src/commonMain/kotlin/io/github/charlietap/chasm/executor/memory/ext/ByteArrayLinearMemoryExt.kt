@@ -2,24 +2,19 @@
 
 package io.github.charlietap.chasm.executor.memory.ext
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 
 internal inline fun ByteArrayLinearMemory.grow(
     additionalPages: LinearMemory.Pages,
 ): Result<LinearMemory, InvocationError.MemoryGrowExceedsLimits> {
 
-    val proposedNumberOfPages = min.amount + additionalPages.amount
+    val newSize = memory.size + (additionalPages.amount * PAGE_SIZE)
+    val newMemory = memory.copyOf(newSize)
 
-    if (proposedNumberOfPages > max.amount) {
-        return Err(InvocationError.MemoryGrowExceedsLimits(additionalPages.amount, max.amount))
-    }
-
-    val newMemory = memory.copyOf(proposedNumberOfPages * LinearMemory.PAGE_SIZE)
-
-    return Ok(ByteArrayLinearMemory(LinearMemory.Pages(proposedNumberOfPages), max, newMemory))
+    return Ok(ByteArrayLinearMemory(newMemory))
 }

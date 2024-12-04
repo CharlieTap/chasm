@@ -6,7 +6,7 @@ import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceLongReaderImpl
+import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceLongReader
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 
@@ -38,6 +38,6 @@ internal inline fun I64SizedSignedLoadExecutor(
     memoryIndex,
     memArg,
     sizeInBytes,
-    ::MemoryInstanceLongReaderImpl,
+    ::MemoryInstanceLongReader,
     ::I64,
 )

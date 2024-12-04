@@ -7,7 +7,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.fill.MemoryInstanceFiller
-import io.github.charlietap.chasm.executor.memory.fill.MemoryInstanceFillerImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
@@ -21,7 +20,7 @@ internal fun MemoryFillExecutor(
     MemoryFillExecutor(
         context = context,
         instruction = instruction,
-        memoryInstanceFiller = ::MemoryInstanceFillerImpl,
+        memoryInstanceFiller = ::MemoryInstanceFiller,
     )
 
 internal inline fun MemoryFillExecutor(

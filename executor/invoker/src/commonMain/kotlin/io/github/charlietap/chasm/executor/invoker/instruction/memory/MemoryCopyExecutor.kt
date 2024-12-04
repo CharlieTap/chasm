@@ -6,7 +6,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.copy.MemoryInstanceCopier
-import io.github.charlietap.chasm.executor.memory.copy.MemoryInstanceCopierImpl
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
@@ -20,7 +19,7 @@ internal fun MemoryCopyExecutor(
     MemoryCopyExecutor(
         context = context,
         instruction = instruction,
-        memoryInstanceCopier = ::MemoryInstanceCopierImpl,
+        memoryInstanceCopier = ::MemoryInstanceCopier,
     )
 
 internal inline fun MemoryCopyExecutor(

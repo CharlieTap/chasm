@@ -22,7 +22,7 @@ internal inline fun MemorySizeExecutor(
     val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
     val memory = store.memory(memoryAddress).bind()
 
-    val sizeInPages = memory.data.min.amount
+    val currentSizeInPages = memory.type.limits.min.toInt()
 
-    stack.push(Stack.Entry.Value(NumberValue.I32(sizeInPages)))
+    stack.push(Stack.Entry.Value(NumberValue.I32(currentSizeInPages)))
 }

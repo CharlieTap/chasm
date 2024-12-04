@@ -6,7 +6,7 @@ import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceLongWriterImpl
+import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceLongWriter
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popI64
@@ -40,5 +40,5 @@ internal inline fun I64StoreSizedExecutor(
     memArg,
     sizeInBytes,
     Stack::popI64,
-    ::MemoryInstanceLongWriterImpl,
+    ::MemoryInstanceLongWriter,
 )

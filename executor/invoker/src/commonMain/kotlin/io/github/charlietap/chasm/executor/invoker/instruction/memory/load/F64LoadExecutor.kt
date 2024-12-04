@@ -5,7 +5,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceDoubleReaderImpl
+import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceDoubleReader
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 
@@ -29,6 +29,6 @@ internal inline fun F64LoadExecutor(
     instruction.memoryIndex,
     instruction.memArg,
     Double.SIZE_BYTES,
-    ::MemoryInstanceDoubleReaderImpl,
+    ::MemoryInstanceDoubleReader,
     ::F64,
 )

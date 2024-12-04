@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceByteReader
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceByteReaderImpl
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 
@@ -24,7 +23,7 @@ fun readByte(
         store = store,
         memory = memory,
         pointer = pointer,
-        byteReader = ::MemoryInstanceByteReaderImpl,
+        byteReader = ::MemoryInstanceByteReader,
     )
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)

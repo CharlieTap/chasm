@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceBytesWriter
-import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceBytesWriterImpl
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 
@@ -26,7 +25,7 @@ fun writeBytes(
         memory = memory,
         pointer = pointer,
         bytes = bytes,
-        bytesWriter = ::MemoryInstanceBytesWriterImpl,
+        bytesWriter = ::MemoryInstanceBytesWriter,
     )
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)

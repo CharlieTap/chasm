@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.benchmark.instruction.memory
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutor
-import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactoryImpl
+import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
@@ -58,7 +58,7 @@ class I32StoreInstructionBenchmark {
             limits = limits(1u),
             shared = unsharedStatus(),
         ),
-        data = LinearMemoryFactoryImpl(1, null),
+        data = LinearMemoryFactory(1),
     )
 
     private val frame = frame(

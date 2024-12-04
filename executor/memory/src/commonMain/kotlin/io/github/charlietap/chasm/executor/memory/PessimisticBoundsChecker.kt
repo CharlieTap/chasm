@@ -6,22 +6,19 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 
-internal inline fun <T> LinearMemoryInteractorImpl(
-    memory: LinearMemory,
-    offset: Int,
+internal typealias PessimisticBoundsChecker<T> = (Int, Int, MemoryInstance, () -> T) -> Result<T, InvocationError.MemoryOperationOutOfBounds>
+
+internal inline fun <T> PessimisticBoundsChecker(
+    address: Int,
     size: Int,
+    instance: MemoryInstance,
     crossinline operation: () -> T,
 ): Result<T, InvocationError.MemoryOperationOutOfBounds> {
-    val lastByte = offset + size
-
-    return if (offset >= 0 && size >= 0 && lastByte > 0 && lastByte <= memory.size()) {
-        try {
-            Ok(operation())
-        } catch (_: IndexOutOfBoundsException) {
-            Err(InvocationError.MemoryOperationOutOfBounds)
-        }
+    val lastByte = address + size
+    return if (address >= 0 && size >= 0 && lastByte > 0 && lastByte <= instance.size()) {
+        Ok(operation())
     } else {
         Err(InvocationError.MemoryOperationOutOfBounds)
     }

@@ -4,8 +4,7 @@ package io.github.charlietap.chasm.executor.memory.read
 
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
-import io.github.charlietap.chasm.executor.memory.LinearMemoryInteractor
-import io.github.charlietap.chasm.executor.memory.LinearMemoryInteractorImpl
+import io.github.charlietap.chasm.executor.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 
@@ -24,7 +23,7 @@ fun MemoryInstanceBytesReader(
         memoryPointer = memoryPointer,
         bytesToRead = bytesToRead,
         bufferPointer = bufferPointer,
-        linearMemoryInteractor = ::LinearMemoryInteractorImpl,
+        linearMemoryInteractor = ::OptimisticBoundsChecker,
     )
 
 internal inline fun MemoryInstanceBytesReader(
@@ -33,7 +32,7 @@ internal inline fun MemoryInstanceBytesReader(
     memoryPointer: Int,
     bytesToRead: Int,
     bufferPointer: Int,
-    linearMemoryInteractor: LinearMemoryInteractor<ByteArray>,
-): Result<ByteArray, InvocationError.MemoryOperationOutOfBounds> = linearMemoryInteractor(instance.data, memoryPointer, bytesToRead) {
+    linearMemoryInteractor: OptimisticBoundsChecker<ByteArray>,
+): Result<ByteArray, InvocationError.MemoryOperationOutOfBounds> = linearMemoryInteractor {
     (instance.data as ByteArrayLinearMemory).memory.copyInto(buffer, bufferPointer, memoryPointer, memoryPointer + bytesToRead)
 }
