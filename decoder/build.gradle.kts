@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlinx.test.resources)
 
     alias(libs.plugins.conventions.kmp)
-    alias(libs.plugins.conventions.linting)
+    //alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
 }
 

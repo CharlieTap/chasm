@@ -25,13 +25,13 @@ internal fun CompositeTypeMatcher(
     arrayTypeMatcher: TypeMatcher<ArrayType>,
     functionTypeMatcher: TypeMatcher<FunctionType>,
     structTypeMatcher: TypeMatcher<StructType>,
-): Boolean = when {
-    type1 is CompositeType.Array && type2 is CompositeType.Array -> arrayTypeMatcher(type1.arrayType, type2.arrayType, context)
-    type1 is CompositeType.Function && type2 is CompositeType.Function -> functionTypeMatcher(
+): Boolean = when(type1) {
+    is CompositeType.Array if type2 is CompositeType.Array -> arrayTypeMatcher(type1.arrayType, type2.arrayType, context)
+    is CompositeType.Function if type2 is CompositeType.Function -> functionTypeMatcher(
         type1.functionType,
         type2.functionType,
         context,
     )
-    type1 is CompositeType.Struct && type2 is CompositeType.Struct -> structTypeMatcher(type1.structType, type2.structType, context)
+    is CompositeType.Struct if type2 is CompositeType.Struct -> structTypeMatcher(type1.structType, type2.structType, context)
     else -> false
 }

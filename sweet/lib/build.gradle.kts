@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 
     alias(libs.plugins.conventions.kmp)
-    alias(libs.plugins.conventions.linting)
+    //alias(libs.plugins.conventions.linting)
 }
 
 group = "io.github.charlietap.sweet"

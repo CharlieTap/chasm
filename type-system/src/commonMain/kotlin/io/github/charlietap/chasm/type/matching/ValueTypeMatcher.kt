@@ -25,10 +25,10 @@ internal fun ValueTypeMatcher(
     numberTypeMatcher: TypeMatcher<NumberType>,
     vectorTypeMatcher: TypeMatcher<VectorType>,
     referenceTypeMatcher: TypeMatcher<ReferenceType>,
-): Boolean = when {
-    type1 is ValueType.Number && type2 is ValueType.Number -> numberTypeMatcher(type1.numberType, type2.numberType, context)
-    type1 is ValueType.Vector && type2 is ValueType.Vector -> vectorTypeMatcher(type1.vectorType, type2.vectorType, context)
-    type1 is ValueType.Reference && type2 is ValueType.Reference -> referenceTypeMatcher(type1.referenceType, type2.referenceType, context)
-    type1 is ValueType.Bottom -> true
+): Boolean = when(type1) {
+    is ValueType.Number if type2 is ValueType.Number -> numberTypeMatcher(type1.numberType, type2.numberType, context)
+    is ValueType.Vector if type2 is ValueType.Vector -> vectorTypeMatcher(type1.vectorType, type2.vectorType, context)
+    is ValueType.Reference if type2 is ValueType.Reference -> referenceTypeMatcher(type1.referenceType, type2.referenceType, context)
+    is ValueType.Bottom -> true
     else -> false
 }

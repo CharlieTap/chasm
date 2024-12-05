@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.validator.ext
 
 import com.github.michaelbull.result.Result

@@ -8,10 +8,10 @@ typealias ValueMatcher = (Value, Value) -> Boolean
 fun ValueMatcher(
     first: Value,
     second: Value,
-): Boolean = when {
-    first is Value.Number.F32 && second is Value.Number.F32 -> compareFloats(first.value, second.value)
-    first is Value.Number.F64 && second is Value.Number.F64 -> compareDoubles(first.value, second.value)
-    first is Value.Reference.Null -> {
+): Boolean = when(first) {
+    is Value.Number.F32 if second is Value.Number.F32 -> compareFloats(first.value, second.value)
+    is Value.Number.F64 if second is Value.Number.F64 -> compareDoubles(first.value, second.value)
+    is Value.Reference.Null -> {
         when (first.heapType) {
             is HeapType.Any ->
                 second == Value.Reference.Null(HeapType.Any) ||

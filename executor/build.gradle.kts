@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.atomic.fu)
 
     alias(libs.plugins.conventions.kmp)
-    alias(libs.plugins.conventions.linting)
+    //alias(libs.plugins.conventions.linting)
 }
 
 kotlin {

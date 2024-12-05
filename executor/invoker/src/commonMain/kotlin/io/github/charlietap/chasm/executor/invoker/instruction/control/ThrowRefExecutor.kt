@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Err
@@ -61,24 +59,24 @@ internal inline fun ThrowRefExecutor(
             else -> false
         }
 
-        when {
-            catchHandler is ControlInstruction.CatchHandler.Catch && tagMatches -> {
+        when(catchHandler) {
+            is ControlInstruction.CatchHandler.Catch if tagMatches -> {
                 instance.fields.asReversed().forEach { field ->
                     stack.pushValue(field)
                 }
                 stack.pushInstruction(ModuleInstruction(ControlInstruction.Br(catchHandler.labelIndex)))
             }
-            catchHandler is ControlInstruction.CatchHandler.CatchRef && tagMatches -> {
+            is ControlInstruction.CatchHandler.CatchRef if tagMatches -> {
                 instance.fields.asReversed().forEach { field ->
                     stack.pushValue(field)
                 }
                 stack.pushValue(exceptionRef)
                 stack.pushInstruction(ModuleInstruction(ControlInstruction.Br(catchHandler.labelIndex)))
             }
-            catchHandler is ControlInstruction.CatchHandler.CatchAll -> {
+            is ControlInstruction.CatchHandler.CatchAll -> {
                 stack.pushInstruction(ModuleInstruction(ControlInstruction.Br(catchHandler.labelIndex)))
             }
-            catchHandler is ControlInstruction.CatchHandler.CatchAllRef -> {
+            is ControlInstruction.CatchHandler.CatchAllRef -> {
                 stack.pushValue(exceptionRef)
                 stack.pushInstruction(ModuleInstruction(ControlInstruction.Br(catchHandler.labelIndex)))
             }

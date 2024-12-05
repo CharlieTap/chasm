@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Result
@@ -22,11 +20,11 @@ internal inline fun RefEqExecutor(
     val referenceValue1 = stack.popValue().bind().value
     val referenceValue2 = stack.popValue().bind().value
 
-    val equal = when {
-        referenceValue1 is ReferenceValue.Array && referenceValue2 is ReferenceValue.Array -> referenceValue1.instance === referenceValue2.instance
-        referenceValue1 is ReferenceValue.I31 && referenceValue2 is ReferenceValue.I31 -> referenceValue1.value == referenceValue2.value
-        referenceValue1 is ReferenceValue.Null && referenceValue2 is ReferenceValue.Null -> true
-        referenceValue1 is ReferenceValue.Struct && referenceValue2 is ReferenceValue.Struct -> referenceValue1.instance === referenceValue2.instance
+    val equal = when(referenceValue1) {
+        is ReferenceValue.Array if referenceValue2 is ReferenceValue.Array -> referenceValue1.instance === referenceValue2.instance
+        is ReferenceValue.I31 if referenceValue2 is ReferenceValue.I31 -> referenceValue1.value == referenceValue2.value
+        is ReferenceValue.Null if referenceValue2 is ReferenceValue.Null -> true
+        is ReferenceValue.Struct if referenceValue2 is ReferenceValue.Struct -> referenceValue1.instance === referenceValue2.instance
         else -> referenceValue1 === referenceValue2
     }
 

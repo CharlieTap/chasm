@@ -28,14 +28,14 @@ internal fun HeapTypeMatcher(
     abstractHeapTypeMatcher: TypeMatcher<AbstractHeapType>,
     definedTypeExpander: DefinedTypeExpander,
     definedTypeMatcher: TypeMatcher<DefinedType>,
-): Boolean = when {
-    type1 is AbstractHeapType.None -> HeapTypeMatcher(type2, AbstractHeapType.Any, context)
-    type1 is AbstractHeapType.NoFunc -> HeapTypeMatcher(type2, AbstractHeapType.Func, context)
-    type1 is AbstractHeapType.NoException -> HeapTypeMatcher(type2, AbstractHeapType.Exception, context)
-    type1 is AbstractHeapType.NoExtern -> HeapTypeMatcher(type2, AbstractHeapType.Extern, context)
-    type1 is AbstractHeapType.Bottom -> true
-    type1 is AbstractHeapType && type2 is AbstractHeapType -> abstractHeapTypeMatcher(type1, type2, context)
-    type1 is ConcreteHeapType.TypeIndex && type2 !is ConcreteHeapType.TypeIndex -> {
+): Boolean = when(type1) {
+    is AbstractHeapType.Bottom -> true
+    is AbstractHeapType.None -> HeapTypeMatcher(type2, AbstractHeapType.Any, context)
+    is AbstractHeapType.NoFunc -> HeapTypeMatcher(type2, AbstractHeapType.Func, context)
+    is AbstractHeapType.NoException -> HeapTypeMatcher(type2, AbstractHeapType.Exception, context)
+    is AbstractHeapType.NoExtern -> HeapTypeMatcher(type2, AbstractHeapType.Extern, context)
+    is AbstractHeapType if type2 is AbstractHeapType -> abstractHeapTypeMatcher(type1, type2, context)
+    is ConcreteHeapType.TypeIndex if type2 !is ConcreteHeapType.TypeIndex -> {
         val definedType1 = context.lookup()(type1.index)
         if (definedType1 != null) {
             HeapTypeMatcher(ConcreteHeapType.Defined(definedType1), type2, context)
@@ -43,7 +43,7 @@ internal fun HeapTypeMatcher(
             false
         }
     }
-    type2 is ConcreteHeapType.TypeIndex && type1 !is ConcreteHeapType.TypeIndex -> {
+    !is ConcreteHeapType.TypeIndex if type2 is ConcreteHeapType.TypeIndex  -> {
         val definedType2 = context.lookup()(type2.index)
         if (definedType2 != null) {
             HeapTypeMatcher(type1, ConcreteHeapType.Defined(definedType2), context)
@@ -51,12 +51,12 @@ internal fun HeapTypeMatcher(
             false
         }
     }
-    type1 is ConcreteHeapType.Defined && type2 is ConcreteHeapType.Defined -> definedTypeMatcher(
+    is ConcreteHeapType.Defined if type2 is ConcreteHeapType.Defined -> definedTypeMatcher(
         type1.definedType,
         type2.definedType,
         context,
     )
-    type1 is ConcreteHeapType.Defined && type2 !is ConcreteHeapType.Defined -> CompositeTypeHeapTypeMatcher(
+    is ConcreteHeapType.Defined if type2 !is ConcreteHeapType.Defined -> CompositeTypeHeapTypeMatcher(
         definedTypeExpander(type1.definedType),
         type2,
     )
