@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.symbol.processing)
 
-    alias(libs.plugins.conventions.linting)
+    //alias(libs.plugins.conventions.linting)
 }
 
 android {

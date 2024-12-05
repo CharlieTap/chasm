@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.type.expansion
 
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction

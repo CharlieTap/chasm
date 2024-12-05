@@ -7,14 +7,14 @@ internal fun AbstractHeapTypeMatcher(
     type1: AbstractHeapType,
     type2: AbstractHeapType,
     context: TypeMatcherContext,
-): Boolean = when {
-    type1 is AbstractHeapType.Eq && type2 is AbstractHeapType.Any -> true
-    type1 is AbstractHeapType.Struct && type2 is AbstractHeapType.Any -> true
-    type1 is AbstractHeapType.Array && type2 is AbstractHeapType.Any -> true
-    type1 is AbstractHeapType.I31 && type2 is AbstractHeapType.Any -> true
-    type1 is AbstractHeapType.I31 && type2 is AbstractHeapType.Eq -> true
-    type1 is AbstractHeapType.Struct && type2 is AbstractHeapType.Eq -> true
-    type1 is AbstractHeapType.Array && type2 is AbstractHeapType.Eq -> true
-    type1 is AbstractHeapType.Extern && type2 is AbstractHeapType.Extern -> true
+): Boolean = when(type1) {
+    is AbstractHeapType.Eq if type2 is AbstractHeapType.Any -> true
+    is AbstractHeapType.Struct if type2 is AbstractHeapType.Any -> true
+    is AbstractHeapType.Array if type2 is AbstractHeapType.Any -> true
+    is AbstractHeapType.I31 if type2 is AbstractHeapType.Any -> true
+    is AbstractHeapType.I31 if type2 is AbstractHeapType.Eq -> true
+    is AbstractHeapType.Struct if type2 is AbstractHeapType.Eq -> true
+    is AbstractHeapType.Array if type2 is AbstractHeapType.Eq -> true
+    is AbstractHeapType.Extern if type2 is AbstractHeapType.Extern -> true
     else -> type1 == type2
 }

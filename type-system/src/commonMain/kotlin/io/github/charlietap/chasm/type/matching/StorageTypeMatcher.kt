@@ -22,8 +22,8 @@ internal fun StorageTypeMatcher(
     context: TypeMatcherContext,
     packedTypeMatcher: TypeMatcher<PackedType>,
     valueTypeMatcher: TypeMatcher<ValueType>,
-): Boolean = when {
-    type1 is StorageType.Packed && type2 is StorageType.Packed -> packedTypeMatcher(type1.type, type2.type, context)
-    type1 is StorageType.Value && type2 is StorageType.Value -> valueTypeMatcher(type1.type, type2.type, context)
+): Boolean = when(type1) {
+    is StorageType.Packed if type2 is StorageType.Packed -> packedTypeMatcher(type1.type, type2.type, context)
+    is StorageType.Value if type2 is StorageType.Value -> valueTypeMatcher(type1.type, type2.type, context)
     else -> false
 }

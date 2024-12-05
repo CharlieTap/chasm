@@ -19,14 +19,14 @@ internal fun ReferenceTypeMatcher(
     type2: ReferenceType,
     context: TypeMatcherContext,
     heapTypeMatcher: TypeMatcher<HeapType>,
-): Boolean = when {
-    type1 is ReferenceType.Ref && type2 is ReferenceType.Ref -> {
+): Boolean = when(type1) {
+    is ReferenceType.Ref if type2 is ReferenceType.Ref -> {
         heapTypeMatcher(type1.heapType, type2.heapType, context)
     }
-    type1 is ReferenceType.RefNull && type2 is ReferenceType.RefNull -> {
+    is ReferenceType.RefNull if type2 is ReferenceType.RefNull -> {
         heapTypeMatcher(type1.heapType, type2.heapType, context)
     }
-    type1 is ReferenceType.Ref && type2 is ReferenceType.RefNull -> {
+    is ReferenceType.Ref if type2 is ReferenceType.RefNull -> {
         heapTypeMatcher(type1.heapType, type2.heapType, context)
     }
     else -> false

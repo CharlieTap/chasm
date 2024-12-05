@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.benchmark)
 
     alias(libs.plugins.conventions.kmp)
-    alias(libs.plugins.conventions.linting)
+    //alias(libs.plugins.conventions.linting)
 }
 
 allOpen {

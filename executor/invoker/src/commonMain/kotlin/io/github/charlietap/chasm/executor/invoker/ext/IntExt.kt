@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.ext
 
 internal inline fun Int.divu(other: Int): Int = this.toUInt().div(other.toUInt()).toInt()
