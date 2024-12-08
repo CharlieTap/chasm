@@ -6,12 +6,14 @@ import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstruct
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
+import io.github.charlietap.chasm.fixture.instance.dataAddress
+import io.github.charlietap.chasm.fixture.instance.dataInstance
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.i32Load16UInstruction
-import io.github.charlietap.chasm.fixture.instruction.memArg
+import io.github.charlietap.chasm.fixture.instruction.memoryInitInstruction
 import io.github.charlietap.chasm.fixture.instruction.moduleInstruction
+import io.github.charlietap.chasm.fixture.module.dataIndex
 import io.github.charlietap.chasm.fixture.module.memoryIndex
 import io.github.charlietap.chasm.fixture.stack
 import io.github.charlietap.chasm.fixture.store
@@ -38,7 +40,7 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class I32Load16UInstructionBenchmark {
+class MemoryInitInstructionBenchmark {
 
     private val context = ExecutionContext(
         stack = stack(),
@@ -47,9 +49,9 @@ class I32Load16UInstructionBenchmark {
     )
 
     private val instruction = moduleInstruction(
-        i32Load16UInstruction(
+        memoryInitInstruction(
             memoryIndex = memoryIndex(0u),
-            memArg = memArg(0u, 0u),
+            dataIdx = dataIndex(0u),
         ),
     )
 
@@ -61,20 +63,28 @@ class I32Load16UInstructionBenchmark {
         data = LinearMemoryFactory(1),
     )
 
+    private val dataInstance = dataInstance(
+        UByteArray(1000) { i -> 117u },
+    )
+
     private val frame = frame(
         state = frameState(
             moduleInstance = context.instance,
         ),
     )
 
-    private val baseAddress = value(i32(0))
+    private val srcOffset = value(i32(0))
+    private val destOffset = value(i32(0))
+    private val bytesToCopy = value(i32(200))
 
     @Setup
     fun setup() {
         context.apply {
             instance.memAddresses.add(0, memoryAddress(0))
+            instance.dataAddresses.add(0, dataAddress(0))
             stack.push(frame)
             store.memories.add(0, memoryInstance)
+            store.data.add(0, dataInstance)
         }
     }
 
@@ -86,7 +96,9 @@ class I32Load16UInstructionBenchmark {
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.stack.push(baseAddress)
+        context.stack.push(destOffset)
+        context.stack.push(srcOffset)
+        context.stack.push(bytesToCopy)
         val result = ExecutionInstructionExecutor(context, instruction)
         context.stack.clearValues()
         blackhole.consume(result)

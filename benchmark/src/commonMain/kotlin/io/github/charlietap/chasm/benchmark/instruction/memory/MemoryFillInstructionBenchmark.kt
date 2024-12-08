@@ -9,8 +9,7 @@ import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.i32Store16Instruction
-import io.github.charlietap.chasm.fixture.instruction.memArg
+import io.github.charlietap.chasm.fixture.instruction.memoryFillInstruction
 import io.github.charlietap.chasm.fixture.instruction.moduleInstruction
 import io.github.charlietap.chasm.fixture.module.memoryIndex
 import io.github.charlietap.chasm.fixture.stack
@@ -38,7 +37,7 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class I32Store16InstructionBenchmark {
+class MemoryFillInstructionBenchmark {
 
     private val context = ExecutionContext(
         stack = stack(),
@@ -47,9 +46,8 @@ class I32Store16InstructionBenchmark {
     )
 
     private val instruction = moduleInstruction(
-        i32Store16Instruction(
+        memoryFillInstruction(
             memoryIndex = memoryIndex(0u),
-            memArg = memArg(0u, 0u),
         ),
     )
 
@@ -67,10 +65,11 @@ class I32Store16InstructionBenchmark {
         ),
     )
 
-    private val baseAddress = value(i32(0))
-    private val value = value(i32())
+    private val offset = value(i32(0))
+    private val fillValue = value(i32(117))
+    private val bytesToFill = value(i32(200))
 
-    @Setup()
+    @Setup
     fun setup() {
         context.apply {
             instance.memAddresses.add(0, memoryAddress(0))
@@ -87,8 +86,9 @@ class I32Store16InstructionBenchmark {
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.stack.push(baseAddress)
-        context.stack.push(value)
+        context.stack.push(offset)
+        context.stack.push(fillValue)
+        context.stack.push(bytesToFill)
         val result = ExecutionInstructionExecutor(context, instruction)
         context.stack.clearValues()
         blackhole.consume(result)

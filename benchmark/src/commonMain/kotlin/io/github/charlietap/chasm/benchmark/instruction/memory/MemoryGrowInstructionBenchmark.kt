@@ -9,8 +9,7 @@ import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.i32Load16SInstruction
-import io.github.charlietap.chasm.fixture.instruction.memArg
+import io.github.charlietap.chasm.fixture.instruction.memoryGrowInstruction
 import io.github.charlietap.chasm.fixture.instruction.moduleInstruction
 import io.github.charlietap.chasm.fixture.module.memoryIndex
 import io.github.charlietap.chasm.fixture.stack
@@ -38,7 +37,7 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class I32Load16SInstructionBenchmark {
+class MemoryGrowInstructionBenchmark {
 
     private val context = ExecutionContext(
         stack = stack(),
@@ -47,9 +46,8 @@ class I32Load16SInstructionBenchmark {
     )
 
     private val instruction = moduleInstruction(
-        i32Load16SInstruction(
+        memoryGrowInstruction(
             memoryIndex = memoryIndex(0u),
-            memArg = memArg(0u, 0u),
         ),
     )
 
@@ -67,7 +65,7 @@ class I32Load16SInstructionBenchmark {
         ),
     )
 
-    private val baseAddress = value(i32(0))
+    private val pagesToGrow = value(i32(200))
 
     @Setup
     fun setup() {
@@ -86,7 +84,7 @@ class I32Load16SInstructionBenchmark {
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.stack.push(baseAddress)
+        context.stack.push(pagesToGrow)
         val result = ExecutionInstructionExecutor(context, instruction)
         context.stack.clearValues()
         blackhole.consume(result)
