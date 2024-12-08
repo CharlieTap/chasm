@@ -53,8 +53,12 @@ class BoltPlugin : Plugin<Project> {
             enabledKmpTargets.forEach { targetName ->
                 kotlinExtension.targets.findByName(targetName)?.let { target ->
                     if (target is KotlinNativeTarget) {
-                        target.compilations.getByName("main").cinterops.create(packageName) {
+                        val cinterop = target.compilations.getByName("main").cinterops.create(packageName) {
                             defFile(configureCinteropTask.flatMap { it.outputFile })
+                        }
+
+                        project.tasks.named(cinterop.interopProcessingTaskName).configure {
+                            dependsOn(configureCinteropTask)
                         }
                     }
                 } ?: println("Target $targetName not found or is not a KotlinNativeTarget")
