@@ -1,5 +1,4 @@
 
-import io.github.charlietap.sweet.plugin.WasmTestSuiteGenPluginExtension
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -14,6 +13,27 @@ plugins {
     alias(libs.plugins.conventions.kmp)
     alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
+}
+
+sweet {
+    wasmToolsVersion = "1.219.0"
+    testSuiteCommit = "eeb6dac81be81151da0958ed955aba91230c1f25"
+    scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
+    testPackageName = "io.github.charlietap.chasm.testsuite"
+    proposals = listOf(
+        "tail-call",
+        "multi-memory",
+        "exception-handling",
+        "gc",
+    )
+    excludes = listOf(
+        "simd_*/**", "**/simd_*",
+        "align.wast", "binary.wast", "data.wast", "elem.wast", "global.wast", "imports.wast", "memory.wast",
+        "proposals/exception-handling/binary.wast",
+        "proposals/exception-handling/imports.wast",
+        "proposals/gc/binary.wast",
+        "proposals/multi-memory/data.wast",
+    )
 }
 
 kotlin {
@@ -66,27 +86,6 @@ kotlin {
 configure<PublishingConventionsExtension> {
     name = "chasm"
     description = "A wasm runtime for Kotlin Multiplatform"
-}
-
-configure<WasmTestSuiteGenPluginExtension> {
-    wasmToolsVersion = "1.219.0"
-    testSuiteCommit = "eeb6dac81be81151da0958ed955aba91230c1f25"
-    scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
-    testPackageName = "io.github.charlietap.chasm.testsuite"
-    proposals = listOf(
-        "tail-call",
-        "multi-memory",
-        "exception-handling",
-        "gc",
-    )
-    excludes = listOf(
-        "simd_*/**", "**/simd_*",
-        "align.wast", "binary.wast", "data.wast", "elem.wast", "global.wast", "imports.wast", "memory.wast",
-        "proposals/exception-handling/binary.wast",
-        "proposals/exception-handling/imports.wast",
-        "proposals/gc/binary.wast",
-        "proposals/multi-memory/data.wast",
-    )
 }
 
 tasks.withType<KotlinCompile>().configureEach {

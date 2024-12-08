@@ -2,12 +2,20 @@
 
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceFloatReader
+import io.github.charlietap.chasm.executor.memory.BoundsChecker
+import io.github.charlietap.chasm.executor.memory.OptimisticBoundsChecker
+import io.github.charlietap.chasm.executor.memory.read.F32Reader
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
+import io.github.charlietap.chasm.executor.runtime.ext.memory
+import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
+import io.github.charlietap.chasm.executor.runtime.ext.popI32
+import io.github.charlietap.chasm.executor.runtime.ext.pushf32
 
 internal inline fun F32LoadExecutor(
     context: ExecutionContext,
@@ -16,19 +24,32 @@ internal inline fun F32LoadExecutor(
     F32LoadExecutor(
         context = context,
         instruction = instruction,
-        loadNumberValueExecutor = ::LoadNumberValueExecutor,
+        boundsChecker = ::OptimisticBoundsChecker,
+        reader = ::F32Reader,
     )
 
 internal inline fun F32LoadExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.F32Load,
-    crossinline loadNumberValueExecutor: LoadNumberValueExecutor<Float>,
-): Result<Unit, InvocationError> = loadNumberValueExecutor(
-    context.store,
-    context.stack,
-    instruction.memoryIndex,
-    instruction.memArg,
-    Float.SIZE_BYTES,
-    ::MemoryInstanceFloatReader,
-    ::F32,
-)
+    crossinline boundsChecker: BoundsChecker<Float>,
+    crossinline reader: F32Reader,
+): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
+    val frame = stack.peekFrame().bind()
+    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
+    val memory = store.memory(memoryAddress).bind()
+
+    val baseAddress = stack.popI32().bind()
+    val offset = instruction.memArg.offset.toInt()
+    val effectiveAddress = baseAddress + offset
+
+    if (baseAddress < 0 || offset < 0) {
+        Err(InvocationError.MemoryOperationOutOfBounds).bind<Unit>()
+    }
+
+    val result = boundsChecker(effectiveAddress, Float.SIZE_BYTES, memory.size) {
+        reader(memory.data, effectiveAddress).bind()
+    }.bind()
+
+    stack.pushf32(result)
+}

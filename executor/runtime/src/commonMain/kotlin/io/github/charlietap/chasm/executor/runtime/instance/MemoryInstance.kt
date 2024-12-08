@@ -10,5 +10,10 @@ data class MemoryInstance(
     val type: MemoryType,
     val data: LinearMemory,
 ) {
-    inline fun size() = type.limits.min.toInt() * PAGE_SIZE
+    val bounds by lazy {
+        0..<size
+    }
+    val size by lazy {
+        type.limits.min.toInt() * PAGE_SIZE
+    }
 }

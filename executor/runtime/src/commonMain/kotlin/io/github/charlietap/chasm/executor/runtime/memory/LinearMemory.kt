@@ -5,7 +5,7 @@ import kotlin.jvm.JvmInline
 interface LinearMemory {
 
     @JvmInline
-    value class Pages(val amount: Int)
+    value class Pages(val amount: UInt)
 
     companion object {
         const val PAGE_SIZE = 65536
