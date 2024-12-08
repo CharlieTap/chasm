@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.kotlin.symbol.processing) apply false
+    alias(libs.plugins.bolt) apply false
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.gradle.maven.publish) apply false
     alias(libs.plugins.wasm.testsuite) apply false

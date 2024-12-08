@@ -4,13 +4,14 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceByteWriter
+import io.github.charlietap.chasm.executor.memory.write.BytesWriter
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.store
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class WriteByteTest {
@@ -25,10 +26,13 @@ class WriteByteTest {
         val pointer = 118
         val byte: Byte = 117
 
-        val byteWriter: MemoryInstanceByteWriter = { _instance, _pointer, _byte ->
-            assertEquals(instance, _instance)
+        val bytesWriter: BytesWriter = { _memory, _size, _buffer, _pointer, _bytes, _bufferPointer ->
+            assertEquals(instance.data, _memory)
+            assertEquals(instance.size, _size)
+            assertContentEquals(byteArrayOf(byte), _buffer)
             assertEquals(pointer, _pointer)
-            assertEquals(byte, _byte)
+            assertEquals(1, _bytes)
+            assertEquals(0, _bufferPointer)
 
             Ok(Unit)
         }
@@ -40,7 +44,7 @@ class WriteByteTest {
             memory = memory,
             pointer = pointer,
             byte = byte,
-            byteWriter = byteWriter,
+            bytesWriter = bytesWriter,
         )
 
         assertEquals(expected, actual)

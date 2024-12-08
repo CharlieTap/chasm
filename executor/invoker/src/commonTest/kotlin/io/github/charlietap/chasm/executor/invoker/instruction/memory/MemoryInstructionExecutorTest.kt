@@ -6,12 +6,6 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.Executor
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.I32SizedSignedLoadExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.I32SizedUnsignedLoadExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.I64SizedSignedLoadExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.I64SizedUnsignedLoadExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32StoreSizedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreSizedExecutor
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.fixture.instruction.i64Load32SInstruction
 import io.github.charlietap.chasm.fixture.instruction.i64Load32UInstruction
@@ -40,11 +34,9 @@ class MemoryInstructionExecutorTest {
             memArg,
         )
 
-        val i64SizedSignedLoadExecutor: I64SizedSignedLoadExecutor = { _context, _memIndex, _memarg, _bytes ->
+        val i64Load32SExecutor: Executor<MemoryInstruction.I64Load32S> = { _context, _instruction ->
             assertEquals(context, _context)
-            assertEquals(memoryIndex, _memIndex)
-            assertEquals(memArg, _memarg)
-            assertEquals(4, _bytes)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -52,7 +44,7 @@ class MemoryInstructionExecutorTest {
         val actual = memoryInstructionExecutor(
             context = context,
             instruction = instruction,
-            i64SizedSignedLoadExecutor = i64SizedSignedLoadExecutor,
+            i64Load32SExecutor = i64Load32SExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -72,11 +64,9 @@ class MemoryInstructionExecutorTest {
             memArg,
         )
 
-        val i64SizedUnsignedLoadExecutor: I64SizedUnsignedLoadExecutor = { _context, _memIndex, _memarg, _bytes ->
+        val i64Load32UExecutor: Executor<MemoryInstruction.I64Load32U> = { _context, _instruction ->
             assertEquals(context, _context)
-            assertEquals(memoryIndex, _memIndex)
-            assertEquals(memArg, _memarg)
-            assertEquals(4, _bytes)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -84,7 +74,7 @@ class MemoryInstructionExecutorTest {
         val actual = memoryInstructionExecutor(
             context = context,
             instruction = instruction,
-            i64SizedUnsignedLoadExecutor = i64SizedUnsignedLoadExecutor,
+            i64Load32UExecutor = i64Load32UExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -104,11 +94,9 @@ class MemoryInstructionExecutorTest {
             memArg,
         )
 
-        val i64StoreSizedExecutor: I64StoreSizedExecutor = { _context, _memIdx, _memarg, _bytes ->
+        val i64StoreSizedExecutor: Executor<MemoryInstruction.I64Store32> = { _context, _instruction ->
             assertEquals(context, _context)
-            assertEquals(memoryIndex, _memIdx)
-            assertEquals(memArg, _memarg)
-            assertEquals(4, _bytes)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -116,7 +104,7 @@ class MemoryInstructionExecutorTest {
         val actual = memoryInstructionExecutor(
             context = context,
             instruction = instruction,
-            i64StoreSizedExecutor = i64StoreSizedExecutor,
+            i64Store32Executor = i64StoreSizedExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -151,24 +139,48 @@ class MemoryInstructionExecutorTest {
             fail("I32LoadExecutor should not be called in this scenario")
         }
 
-        fun i32SizedSignedLoadExecutor(): I32SizedSignedLoadExecutor = { _, _, _, _ ->
-            fail("I32SizedSignedLoadExecutor should not be called in this scenario")
+        fun i32Load8SExecutor(): Executor<MemoryInstruction.I32Load8S> = { _, _ ->
+            fail("I32Load8SExecutor should not be called in this scenario")
         }
 
-        fun i32SizedUnsignedLoadExecutor(): I32SizedUnsignedLoadExecutor = { _, _, _, _ ->
-            fail("I32SizedUnsignedLoadExecutor should not be called in this scenario")
+        fun i32Load8UExecutor(): Executor<MemoryInstruction.I32Load8U> = { _, _ ->
+            fail("I32Load8UExecutor should not be called in this scenario")
+        }
+
+        fun i32Load16SExecutor(): Executor<MemoryInstruction.I32Load16S> = { _, _ ->
+            fail("I32Load16SExecutor should not be called in this scenario")
+        }
+
+        fun i32Load16UExecutor(): Executor<MemoryInstruction.I32Load16U> = { _, _ ->
+            fail("I32Load16UExecutor should not be called in this scenario")
         }
 
         fun i64LoadExecutor(): Executor<MemoryInstruction.I64Load> = { _, _ ->
             fail("I64LoadExecutor should not be called in this scenario")
         }
 
-        fun i64SizedSignedLoadExecutor(): I64SizedSignedLoadExecutor = { _, _, _, _ ->
-            fail("I64SizedSignedLoadExecutor should not be called in this scenario")
+        fun i64Load8SExecutor(): Executor<MemoryInstruction.I64Load8S> = { _, _ ->
+            fail("I64Load8SExecutor should not be called in this scenario")
         }
 
-        fun i64SizedUnsignedLoadExecutor(): I64SizedUnsignedLoadExecutor = { _, _, _, _ ->
-            fail("I64SizedUnsignedLoadExecutor should not be called in this scenario")
+        fun i64Load8UExecutor(): Executor<MemoryInstruction.I64Load8U> = { _, _ ->
+            fail("I64Load8UExecutor should not be called in this scenario")
+        }
+
+        fun i64Load16SExecutor(): Executor<MemoryInstruction.I64Load16S> = { _, _ ->
+            fail("I64Load16SExecutor should not be called in this scenario")
+        }
+
+        fun i64Load16UExecutor(): Executor<MemoryInstruction.I64Load16U> = { _, _ ->
+            fail("I64Load16UExecutor should not be called in this scenario")
+        }
+
+        fun i64Load32SExecutor(): Executor<MemoryInstruction.I64Load32S> = { _, _ ->
+            fail("I64Load32SExecutor should not be called in this scenario")
+        }
+
+        fun i64Load32UExecutor(): Executor<MemoryInstruction.I64Load32U> = { _, _ ->
+            fail("I64Load32UExecutor should not be called in this scenario")
         }
 
         fun f32LoadExecutor(): Executor<MemoryInstruction.F32Load> = { _, _ ->
@@ -183,16 +195,28 @@ class MemoryInstructionExecutorTest {
             fail("I32StoreExecutor should not be called in this scenario")
         }
 
-        fun i32StoreSizedExecutor(): I32StoreSizedExecutor = { _, _, _, _ ->
-            fail("I32StoreSizedExecutor should not be called in this scenario")
+        fun i32Store8Executor(): Executor<MemoryInstruction.I32Store8> = { _, _ ->
+            fail("I32Store8Executor should not be called in this scenario")
+        }
+
+        fun i32Store16Executor(): Executor<MemoryInstruction.I32Store16> = { _, _ ->
+            fail("I32Store16Executor should not be called in this scenario")
         }
 
         fun i64StoreExecutor(): Executor<MemoryInstruction.I64Store> = { _, _ ->
             fail("I64StoreExecutor should not be called in this scenario")
         }
 
-        fun i64StoreSizedExecutor(): I64StoreSizedExecutor = { _, _, _, _ ->
-            fail("I64StoreSizedExecutor should not be called in this scenario")
+        fun i64Store8Executor(): Executor<MemoryInstruction.I64Store8> = { _, _ ->
+            fail("I64Store8Executor should not be called in this scenario")
+        }
+
+        fun i64Store16Executor(): Executor<MemoryInstruction.I64Store16> = { _, _ ->
+            fail("I64Store16Executor should not be called in this scenario")
+        }
+
+        fun i64Store32Executor(): Executor<MemoryInstruction.I64Store32> = { _, _ ->
+            fail("I64Store32Executor should not be called in this scenario")
         }
 
         fun f32StoreExecutor(): Executor<MemoryInstruction.F32Store> = { _, _ ->
@@ -213,17 +237,26 @@ class MemoryInstructionExecutorTest {
             memoryCopyExecutor: Executor<MemoryInstruction.MemoryCopy> = memoryCopyExecutor(),
             dataDropExecutor: Executor<MemoryInstruction.DataDrop> = dataDropExecutor(),
             i32LoadExecutor: Executor<MemoryInstruction.I32Load> = i32LoadExecutor(),
-            i32SizedSignedLoadExecutor: I32SizedSignedLoadExecutor = i32SizedSignedLoadExecutor(),
-            i32SizedUnsignedLoadExecutor: I32SizedUnsignedLoadExecutor = i32SizedUnsignedLoadExecutor(),
+            i32Load8SExecutor: Executor<MemoryInstruction.I32Load8S> = i32Load8SExecutor(),
+            i32Load8UExecutor: Executor<MemoryInstruction.I32Load8U> = i32Load8UExecutor(),
+            i32Load16SExecutor: Executor<MemoryInstruction.I32Load16S> = i32Load16SExecutor(),
+            i32Load16UExecutor: Executor<MemoryInstruction.I32Load16U> = i32Load16UExecutor(),
             i64LoadExecutor: Executor<MemoryInstruction.I64Load> = i64LoadExecutor(),
-            i64SizedSignedLoadExecutor: I64SizedSignedLoadExecutor = i64SizedSignedLoadExecutor(),
-            i64SizedUnsignedLoadExecutor: I64SizedUnsignedLoadExecutor = i64SizedUnsignedLoadExecutor(),
+            i64Load8SExecutor: Executor<MemoryInstruction.I64Load8S> = i64Load8SExecutor(),
+            i64Load8UExecutor: Executor<MemoryInstruction.I64Load8U> = i64Load8UExecutor(),
+            i64Load16SExecutor: Executor<MemoryInstruction.I64Load16S> = i64Load16SExecutor(),
+            i64Load16UExecutor: Executor<MemoryInstruction.I64Load16U> = i64Load16UExecutor(),
+            i64Load32SExecutor: Executor<MemoryInstruction.I64Load32S> = i64Load32SExecutor(),
+            i64Load32UExecutor: Executor<MemoryInstruction.I64Load32U> = i64Load32UExecutor(),
             f32LoadExecutor: Executor<MemoryInstruction.F32Load> = f32LoadExecutor(),
             f64LoadExecutor: Executor<MemoryInstruction.F64Load> = f64LoadExecutor(),
             i32StoreExecutor: Executor<MemoryInstruction.I32Store> = i32StoreExecutor(),
-            i32StoreSizedExecutor: I32StoreSizedExecutor = i32StoreSizedExecutor(),
+            i32Store8Executor: Executor<MemoryInstruction.I32Store8> = i32Store8Executor(),
+            i32Store16Executor: Executor<MemoryInstruction.I32Store16> = i32Store16Executor(),
             i64StoreExecutor: Executor<MemoryInstruction.I64Store> = i64StoreExecutor(),
-            i64StoreSizedExecutor: I64StoreSizedExecutor = i64StoreSizedExecutor(),
+            i64Store8Executor: Executor<MemoryInstruction.I64Store8> = i64Store8Executor(),
+            i64Store16Executor: Executor<MemoryInstruction.I64Store16> = i64Store16Executor(),
+            i64Store32Executor: Executor<MemoryInstruction.I64Store32> = i64Store32Executor(),
             f32StoreExecutor: Executor<MemoryInstruction.F32Store> = f32StoreExecutor(),
             f64StoreExecutor: Executor<MemoryInstruction.F64Store> = f64StoreExecutor(),
         ): Result<Unit, InvocationError> {
@@ -237,17 +270,26 @@ class MemoryInstructionExecutorTest {
                 memoryCopyExecutor = memoryCopyExecutor,
                 dataDropExecutor = dataDropExecutor,
                 i32LoadExecutor = i32LoadExecutor,
-                i32SizedSignedLoadExecutor = i32SizedSignedLoadExecutor,
-                i32SizedUnsignedLoadExecutor = i32SizedUnsignedLoadExecutor,
+                i32Load8SExecutor = i32Load8SExecutor,
+                i32Load8UExecutor = i32Load8UExecutor,
+                i32Load16SExecutor = i32Load16SExecutor,
+                i32Load16UExecutor = i32Load16UExecutor,
                 i64LoadExecutor = i64LoadExecutor,
-                i64SizedSignedLoadExecutor = i64SizedSignedLoadExecutor,
-                i64SizedUnsignedLoadExecutor = i64SizedUnsignedLoadExecutor,
+                i64Load8SExecutor = i64Load8SExecutor,
+                i64Load8UExecutor = i64Load8UExecutor,
+                i64Load16SExecutor = i64Load16SExecutor,
+                i64Load16UExecutor = i64Load16UExecutor,
+                i64Load32SExecutor = i64Load32SExecutor,
+                i64Load32UExecutor = i64Load32UExecutor,
                 f32LoadExecutor = f32LoadExecutor,
                 f64LoadExecutor = f64LoadExecutor,
                 i32StoreExecutor = i32StoreExecutor,
-                i32StoreSizedExecutor = i32StoreSizedExecutor,
+                i32Store8Executor = i32Store8Executor,
+                i32Store16Executor = i32Store16Executor,
                 i64StoreExecutor = i64StoreExecutor,
-                i64StoreSizedExecutor = i64StoreSizedExecutor,
+                i64Store8Executor = i64Store8Executor,
+                i64Store16Executor = i64Store16Executor,
+                i64Store32Executor = i64Store32Executor,
                 f32StoreExecutor = f32StoreExecutor,
                 f64StoreExecutor = f64StoreExecutor,
             )

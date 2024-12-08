@@ -5,7 +5,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.init.MemoryInstanceInitialiser
+import io.github.charlietap.chasm.executor.memory.init.LinearMemoryInitialiser
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
@@ -21,13 +21,13 @@ internal fun MemoryInitExecutor(
     MemoryInitExecutor(
         context = context,
         instruction = instruction,
-        memoryInstanceInitialiser = ::MemoryInstanceInitialiser,
+        linearMemoryInitialiser = ::LinearMemoryInitialiser,
     )
 
 internal inline fun MemoryInitExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryInit,
-    crossinline memoryInstanceInitialiser: MemoryInstanceInitialiser,
+    crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
@@ -41,12 +41,19 @@ internal inline fun MemoryInitExecutor(
     val sourceOffset = stack.popI32().bind()
     val destinationOffset = stack.popI32().bind()
 
-    if (bytesToCopy < 0 || (sourceOffset + bytesToCopy) > data.bytes.size || (destinationOffset + bytesToCopy) > memory.size()) {
+    if (
+        bytesToCopy < 0 ||
+        sourceOffset < 0 ||
+        destinationOffset < 0 ||
+        (sourceOffset + bytesToCopy) > data.bytes.size ||
+        (destinationOffset + bytesToCopy) > memory.size
+    ) {
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }
 
-    val srcRange = sourceOffset..<(sourceOffset + bytesToCopy)
-    val dstRange = destinationOffset..<(destinationOffset + bytesToCopy)
+    if (bytesToCopy == 0) {
+        return@binding
+    }
 
-    memoryInstanceInitialiser(data, memory, srcRange, dstRange).bind()
+    linearMemoryInitialiser(data.bytes, memory.data, sourceOffset, destinationOffset, bytesToCopy).bind()
 }

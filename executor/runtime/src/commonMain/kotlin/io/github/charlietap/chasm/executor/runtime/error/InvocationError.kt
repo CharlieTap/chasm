@@ -57,7 +57,11 @@ sealed interface InvocationError : ModuleTrapError {
         val maxPages: Int,
     ) : InvocationError
 
+    data object MemoryGrowFailed : InvocationError
+
     data object MemoryOperationOutOfBounds : InvocationError
+
+    data object InvalidPointer : InvocationError
 
     data object InvalidAddress : InvocationError
 

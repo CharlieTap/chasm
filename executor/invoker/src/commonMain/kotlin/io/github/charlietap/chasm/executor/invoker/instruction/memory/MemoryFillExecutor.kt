@@ -6,7 +6,9 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.fill.MemoryInstanceFiller
+import io.github.charlietap.chasm.executor.memory.BoundsChecker
+import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
+import io.github.charlietap.chasm.executor.memory.fill.LinearMemoryFiller
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
@@ -20,13 +22,15 @@ internal fun MemoryFillExecutor(
     MemoryFillExecutor(
         context = context,
         instruction = instruction,
-        memoryInstanceFiller = ::MemoryInstanceFiller,
+        boundsChecker = ::PessimisticBoundsChecker,
+        filler = ::LinearMemoryFiller,
     )
 
 internal inline fun MemoryFillExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryFill,
-    crossinline memoryInstanceFiller: MemoryInstanceFiller,
+    crossinline boundsChecker: BoundsChecker<Unit>,
+    crossinline filler: LinearMemoryFiller,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack, store) = context
@@ -38,5 +42,7 @@ internal inline fun MemoryFillExecutor(
     val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
     val memory = store.memory(memoryAddress).bind()
 
-    memoryInstanceFiller(memory, offset..(offset + bytesToFill), fillValue.toByte()).bind()
+    boundsChecker(offset, bytesToFill, memory.size) {
+        filler(memory.data, offset, bytesToFill, fillValue.toByte())
+    }.bind()
 }
