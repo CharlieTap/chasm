@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceBytesWriter
+import io.github.charlietap.chasm.executor.memory.write.BytesWriter
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryExternalValue
@@ -23,12 +23,15 @@ class WriteBytesTest {
         val address = memoryAddress()
         val memory = publicMemory(memoryExternalValue(address))
         val pointer = 118
-        val bytes: ByteArray = byteArrayOf(117, 118)
+        val buffer: ByteArray = byteArrayOf(117, 118)
 
-        val bytesWriter: MemoryInstanceBytesWriter = { _instance, _pointer, _bytes ->
-            assertEquals(instance, _instance)
+        val bytesWriter: BytesWriter = { _memory, _size, _buffer, _pointer, _bytes, _bufferPointer ->
+            assertEquals(instance.data, _memory)
+            assertEquals(instance.size, _size)
+            assertEquals(buffer, _buffer)
             assertEquals(pointer, _pointer)
-            assertEquals(bytes, _bytes)
+            assertEquals(2, _bytes)
+            assertEquals(0, _bufferPointer)
 
             Ok(Unit)
         }
@@ -39,7 +42,7 @@ class WriteBytesTest {
             store = store,
             memory = memory,
             pointer = pointer,
-            bytes = bytes,
+            bytes = buffer,
             bytesWriter = bytesWriter,
         )
 

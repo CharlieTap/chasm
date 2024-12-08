@@ -16,8 +16,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
 
-        val extension = project.extensions
-            .create<WasmTestSuiteGenPluginExtension>("chasm-testsuite-plugin-extension")
+        val extension = project.extensions.create<WasmTestSuiteGenPluginExtension>("sweet")
 
         val syncRepositoryTask = project.tasks.register<SyncRepositoryTask>(
             TASK_NAME_SYNC_SUITE,

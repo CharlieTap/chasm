@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReader
+import io.github.charlietap.chasm.executor.memory.read.BytesReader
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.instance.memoryExternalValue
@@ -28,8 +28,8 @@ class ReadBytesTest {
         val bufferPointer = 117
         val bytes: ByteArray = byteArrayOf(117, 118)
 
-        val bytesReader: MemoryInstanceBytesReader = { _instance, _buffer, _memoryPointer, _bytesToRead, _bufferPointer ->
-            assertEquals(instance, _instance)
+        val bytesReader: BytesReader = { _memory, _buffer, _memoryPointer, _bytesToRead, _bufferPointer ->
+            assertEquals(instance.data, _memory)
             assertEquals(buffer, _buffer)
             assertEquals(memoryPointer, _memoryPointer)
             assertEquals(bytesToRead, _bytesToRead)

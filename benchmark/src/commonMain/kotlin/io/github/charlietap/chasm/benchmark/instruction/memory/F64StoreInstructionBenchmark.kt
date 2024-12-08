@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutor
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
+import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.memoryAddress
@@ -59,7 +60,7 @@ class F64StoreInstructionBenchmark {
             limits = limits(1u),
             shared = unsharedStatus(),
         ),
-        data = LinearMemoryFactory(1),
+        data = LinearMemoryFactory(LinearMemory.Pages(1u)),
     )
 
     private val frame = frame(

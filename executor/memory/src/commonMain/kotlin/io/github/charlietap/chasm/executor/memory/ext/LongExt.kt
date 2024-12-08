@@ -2,7 +2,7 @@
 
 package io.github.charlietap.chasm.executor.memory.ext
 
-internal inline fun Long.copyInto(buffer: ByteArray, offset: Int) {
+inline fun Long.copyInto(buffer: ByteArray, offset: Int) {
     buffer[offset] = (this and 0xFF).toByte()
     buffer[offset + 1] = (this shr 8 and 0xFF).toByte()
     buffer[offset + 2] = (this shr 16 and 0xFF).toByte()
@@ -13,6 +13,6 @@ internal inline fun Long.copyInto(buffer: ByteArray, offset: Int) {
     buffer[offset + 7] = (this shr 56 and 0xFF).toByte()
 }
 
-internal inline fun Long.copyInto(buffer: ByteArray, offset: Int, size: Int) = repeat(size) { index ->
+inline fun Long.copyInto(buffer: ByteArray, offset: Int, size: Int) = repeat(size) { index ->
     buffer[offset + index] = (this shr (8 * index) and 0xFFL).toByte()
 }
