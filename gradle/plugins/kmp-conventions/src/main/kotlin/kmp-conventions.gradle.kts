@@ -17,14 +17,10 @@ fun KotlinMultiplatformExtension.unixTargets() = setOf(
     linuxX64(),
 )
 
-fun KotlinMultiplatformExtension.nativeTargets() = setOf(
-    mingwX64()
-) + unixTargets()
-
 kotlin {
 
     jvm()
-    nativeTargets()
+    unixTargets()
 
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))

@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceByteWriter
+import io.github.charlietap.chasm.executor.memory.write.BytesWriter
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 
@@ -25,7 +25,7 @@ fun writeByte(
         memory = memory,
         pointer = pointer,
         byte = byte,
-        byteWriter = ::MemoryInstanceByteWriter,
+        bytesWriter = ::BytesWriter,
     )
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
@@ -36,8 +36,8 @@ internal fun writeByte(
     memory: Memory,
     pointer: Int,
     byte: Byte,
-    byteWriter: MemoryInstanceByteWriter,
+    bytesWriter: BytesWriter,
 ): Result<Unit, ModuleTrapError> = binding {
     val instance = store.store.memory(memory.reference.address).bind()
-    byteWriter(instance, pointer, byte).bind()
+    bytesWriter(instance.data, instance.size, byteArrayOf(byte), pointer, 1, 0).bind()
 }

@@ -3,11 +3,16 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.store
 
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.write.MemoryInstanceIntWriter
-import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.memory.BoundsChecker
+import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
+import io.github.charlietap.chasm.executor.memory.write.I32Writer
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.memory
+import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 
 internal inline fun I32StoreExecutor(
@@ -17,19 +22,27 @@ internal inline fun I32StoreExecutor(
     I32StoreExecutor(
         context = context,
         instruction = instruction,
-        storeNumberValueExecutor = ::StoreNumberValueExecutor,
+        boundsChecker = ::PessimisticBoundsChecker,
+        writer = ::I32Writer,
     )
 
 internal inline fun I32StoreExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Store,
-    storeNumberValueExecutor: StoreNumberValueExecutor<Int>,
-): Result<Unit, InvocationError> = storeNumberValueExecutor(
-    context.store,
-    context.stack,
-    instruction.memoryIndex,
-    instruction.memArg,
-    Int.SIZE_BYTES,
-    Stack::popI32,
-    ::MemoryInstanceIntWriter,
-)
+    crossinline boundsChecker: BoundsChecker<Unit>,
+    crossinline writer: I32Writer,
+): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
+    val frame = stack.peekFrame().bind()
+    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
+    val memory = store.memory(memoryAddress).bind()
+
+    val valueToStore = stack.popI32().bind()
+
+    val baseAddress = stack.popI32().bind()
+    val effectiveAddress = baseAddress + instruction.memArg.offset.toInt()
+
+    boundsChecker(effectiveAddress, Int.SIZE_BYTES, memory.size) {
+        writer(memory.data, effectiveAddress, valueToStore).bind()
+    }.bind()
+}

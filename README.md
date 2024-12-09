@@ -8,7 +8,6 @@
 ![badge][badge-ios]
 ![badge][badge-linux]
 ![badge][badge-mac]
-![badge][badge-windows]
 
 ---
 

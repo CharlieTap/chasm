@@ -18,6 +18,22 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import kotlin.jvm.JvmName
 
+inline fun Stack.pushI32(i32: Int) {
+    push(Stack.Entry.Value(I32(i32)))
+}
+
+inline fun Stack.pushI64(i64: Long) {
+    push(Stack.Entry.Value(I64(i64)))
+}
+
+inline fun Stack.pushf32(f32: Float) {
+    push(Stack.Entry.Value(F32(f32)))
+}
+
+inline fun Stack.pushf64(f64: Double) {
+    push(Stack.Entry.Value(F64(f64)))
+}
+
 inline fun Stack.pushFrame(frame: Stack.Entry.ActivationFrame): Result<Unit, InvocationError> {
     return if (framesDepth() < MAX_DEPTH) {
         push(frame)

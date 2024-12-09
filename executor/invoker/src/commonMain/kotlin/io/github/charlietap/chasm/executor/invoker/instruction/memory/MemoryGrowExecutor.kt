@@ -2,16 +2,18 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import com.github.michaelbull.result.fold
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.grow.MemoryInstanceGrower
+import io.github.charlietap.chasm.executor.memory.grow.LinearMemoryGrower
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
+import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
 internal fun MemoryGrowExecutor(
@@ -21,13 +23,13 @@ internal fun MemoryGrowExecutor(
     MemoryGrowExecutor(
         context = context,
         instruction = instruction,
-        memoryInstanceGrower = ::MemoryInstanceGrower,
+        grower = ::LinearMemoryGrower,
     )
 
 internal inline fun MemoryGrowExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryGrow,
-    crossinline memoryInstanceGrower: MemoryInstanceGrower,
+    crossinline grower: LinearMemoryGrower,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack, store) = context
@@ -38,12 +40,18 @@ internal inline fun MemoryGrowExecutor(
     val currentSizeInPages = memory.type.limits.min.toInt()
     val pagesToAdd = stack.popI32().bind()
 
-    val result = memoryInstanceGrower(memory, pagesToAdd)
-
-    result.fold({ newMemory ->
-        store.memories[memoryAddress.address] = newMemory
-        stack.push(Stack.Entry.Value(NumberValue.I32(currentSizeInPages)))
-    }, {
+    val max = memory.type.limits.max?.toInt() ?: LinearMemory.MAX_PAGES
+    if (memory.type.limits.min.toInt() + pagesToAdd > max) {
         stack.push(Stack.Entry.Value(NumberValue.I32(-1)))
-    })
+    } else {
+
+        val newLimits = memory.type.limits.copy(
+            min = memory.type.limits.min + pagesToAdd.toUInt(),
+        )
+        val newType = MemoryType(newLimits, memory.type.shared)
+        val newMemory = grower(memory.data, pagesToAdd).bind()
+
+        store.memories[memoryAddress.address] = MemoryInstance(newType, newMemory)
+        stack.push(Stack.Entry.Value(NumberValue.I32(currentSizeInPages)))
+    }
 }

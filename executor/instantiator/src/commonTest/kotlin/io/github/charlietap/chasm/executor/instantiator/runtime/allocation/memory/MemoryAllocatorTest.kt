@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.memo
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.memory.linearMemory
 import io.github.charlietap.chasm.fixture.store
@@ -27,7 +28,7 @@ class MemoryAllocatorTest {
 
         val memory = linearMemory()
         val memoryFactory: LinearMemoryFactory = { pages ->
-            assertEquals(min, pages)
+            assertEquals(LinearMemory.Pages(min.toUInt()), pages)
             memory
         }
 

@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.memory.read.MemoryInstanceBytesReader
+import io.github.charlietap.chasm.executor.memory.read.BytesReader
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 
@@ -29,7 +29,7 @@ fun readBytes(
         memoryPointer = memoryPointer,
         bytesToRead = bytesToRead,
         bufferPointer = bufferPointer,
-        bytesReader = ::MemoryInstanceBytesReader,
+        bytesReader = ::BytesReader,
     )
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
@@ -42,8 +42,8 @@ internal fun readBytes(
     memoryPointer: Int,
     bytesToRead: Int,
     bufferPointer: Int,
-    bytesReader: MemoryInstanceBytesReader,
+    bytesReader: BytesReader,
 ): Result<ByteArray, ModuleTrapError> = binding {
     val instance = store.store.memory(memory.reference.address).bind()
-    bytesReader(instance, buffer, memoryPointer, bytesToRead, bufferPointer).bind()
+    bytesReader(instance.data, buffer, memoryPointer, bytesToRead, bufferPointer).bind()
 }

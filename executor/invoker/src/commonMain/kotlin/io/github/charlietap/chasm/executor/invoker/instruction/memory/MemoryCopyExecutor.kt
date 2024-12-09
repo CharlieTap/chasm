@@ -5,8 +5,9 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.memory.copy.MemoryInstanceCopier
+import io.github.charlietap.chasm.executor.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.ext.contains
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -19,13 +20,13 @@ internal fun MemoryCopyExecutor(
     MemoryCopyExecutor(
         context = context,
         instruction = instruction,
-        memoryInstanceCopier = ::MemoryInstanceCopier,
+        copier = ::LinearMemoryCopier,
     )
 
 internal inline fun MemoryCopyExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryCopy,
-    crossinline memoryInstanceCopier: MemoryInstanceCopier,
+    crossinline copier: LinearMemoryCopier,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack, store) = context
@@ -39,12 +40,15 @@ internal inline fun MemoryCopyExecutor(
     val sourceOffset = stack.popI32().bind()
     val destinationOffset = stack.popI32().bind()
 
-    if (bytesToCopy < 0) {
+    if (
+        bytesToCopy < 0 ||
+        !srcMemory.bounds.contains(sourceOffset..<sourceOffset + bytesToCopy) ||
+        !dstMemory.bounds.contains(destinationOffset..<destinationOffset + bytesToCopy)
+    ) {
         Err(InvocationError.MemoryOperationOutOfBounds).bind<Unit>()
     }
 
-    val srcRange = sourceOffset..<(sourceOffset + bytesToCopy)
-    val dstRange = destinationOffset..<(destinationOffset + bytesToCopy)
+    if (bytesToCopy == 0) return@binding
 
-    memoryInstanceCopier(srcMemory, dstMemory, srcRange, dstRange).bind()
+    copier(srcMemory.data, dstMemory.data, sourceOffset, destinationOffset, bytesToCopy).bind()
 }

@@ -57,6 +57,7 @@ result = "2.0.0"
 android-application = { id = "com.android.application", version.ref = "android-build-tools-plugin" }
 android-lib = { id = "com.android.library", version.ref = "android-build-tools-plugin" }
 android-test = { id = "com.android.test", version.ref = "android-build-tools-plugin" }
+bolt = { id = "io.github.charlietap.bolt.plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref="dependency-analysis" }
 dokka = { id = "org.jetbrains.dokka", version.ref="dokka" }
