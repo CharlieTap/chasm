@@ -20,7 +20,7 @@ androidx-core = "1.13.0"
 androidx-lifecycle = "2.7.0"
 
 compose-compiler = "1.5.12"
-compose-core = "1.6.6"
+compose-core = "1.7.5"
 compose-activity = "1.9.3"
 compose-viewmodel = "2.7.0"
 
