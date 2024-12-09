@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
+import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
@@ -21,17 +22,30 @@ internal typealias BrOnCastExecutor = (ExecutionContext, Index.LabelIndex, Refer
 
 internal fun BrOnCastExecutor(
     context: ExecutionContext,
-    labelIndex: Index.LabelIndex,
-    referenceType1: ReferenceType,
-    referenceType2: ReferenceType,
-    breakIfMatches: Boolean,
+    instruction: ControlInstruction.BrOnCast,
 ): Result<Unit, InvocationError> =
     BrOnCastExecutor(
         context = context,
-        labelIndex = labelIndex,
-        referenceType1 = referenceType1,
-        referenceType2 = referenceType2,
-        breakIfMatches = breakIfMatches,
+        labelIndex = instruction.labelIndex,
+        referenceType1 = instruction.srcReferenceType,
+        referenceType2 = instruction.dstReferenceType,
+        breakIfMatches = true,
+        referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
+        referenceTypeMatcher = ::ReferenceTypeMatcher,
+        typeOfReferenceValue = ::TypeOfReferenceValue,
+        breakExecutor = ::BreakExecutor,
+    )
+
+internal fun BrOnCastFailExecutor(
+    context: ExecutionContext,
+    instruction: ControlInstruction.BrOnCastFail,
+): Result<Unit, InvocationError> =
+    BrOnCastExecutor(
+        context = context,
+        labelIndex = instruction.labelIndex,
+        referenceType1 = instruction.srcReferenceType,
+        referenceType2 = instruction.dstReferenceType,
+        breakIfMatches = false,
         referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
         referenceTypeMatcher = ::ReferenceTypeMatcher,
         typeOfReferenceValue = ::TypeOfReferenceValue,

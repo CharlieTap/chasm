@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
@@ -30,10 +29,13 @@ internal fun ControlInstructionExecutor(
         brOnNullExecutor = ::BrOnNullExecutor,
         brOnNonNullExecutor = ::BrOnNonNullExecutor,
         brOnCastExecutor = ::BrOnCastExecutor,
+        brOnCastFailExecutor = ::BrOnCastFailExecutor,
+        nopExecutor = ::NopExecutor,
         returnExecutor = ::ReturnExecutor,
         throwExecutor = ::ThrowExecutor,
         throwRefExecutor = ::ThrowRefExecutor,
         tryTableExecutor = ::TryTableExecutor,
+        unreachableExecutor = ::UnreachableExecutor,
     )
 
 internal inline fun ControlInstructionExecutor(
@@ -45,28 +47,30 @@ internal inline fun ControlInstructionExecutor(
     crossinline returnCallIndirectExecutor: Executor<ControlInstruction.ReturnCallIndirect>,
     crossinline callRefExecutor: Executor<ControlInstruction.CallRef>,
     crossinline returnCallRefExecutor: Executor<ControlInstruction.ReturnCallRef>,
-    crossinline blockExecutor: BlockExecutor,
+    crossinline blockExecutor: Executor<ControlInstruction.Block>,
     crossinline loopExecutor: Executor<ControlInstruction.Loop>,
     crossinline ifExecutor: Executor<ControlInstruction.If>,
-    crossinline breakExecutor: BreakExecutor,
+    crossinline breakExecutor: Executor<ControlInstruction.Br>,
     crossinline brIfExecutor: Executor<ControlInstruction.BrIf>,
     crossinline brTableExecutor: Executor<ControlInstruction.BrTable>,
     crossinline brOnNullExecutor: Executor<ControlInstruction.BrOnNull>,
     crossinline brOnNonNullExecutor: Executor<ControlInstruction.BrOnNonNull>,
-    crossinline brOnCastExecutor: BrOnCastExecutor,
+    crossinline brOnCastExecutor: Executor<ControlInstruction.BrOnCast>,
+    crossinline brOnCastFailExecutor: Executor<ControlInstruction.BrOnCastFail>,
+    crossinline nopExecutor: Executor<ControlInstruction.Nop>,
     crossinline returnExecutor: Executor<ControlInstruction.Return>,
     crossinline throwExecutor: Executor<ControlInstruction.Throw>,
     crossinline throwRefExecutor: Executor<ControlInstruction.ThrowRef>,
     crossinline tryTableExecutor: Executor<ControlInstruction.TryTable>,
+    crossinline unreachableExecutor: Executor<ControlInstruction.Unreachable>,
 ): Result<Unit, InvocationError> = binding {
-    val (stack, store) = context
     when (instruction) {
-        is ControlInstruction.Nop -> Unit
-        is ControlInstruction.Unreachable -> Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
-        is ControlInstruction.Block -> blockExecutor(store, stack, instruction.blockType, instruction.instructions).bind()
+        is ControlInstruction.Nop -> nopExecutor(context, instruction).bind()
+        is ControlInstruction.Unreachable -> unreachableExecutor(context, instruction).bind()
+        is ControlInstruction.Block -> blockExecutor(context, instruction).bind()
         is ControlInstruction.Loop -> loopExecutor(context, instruction).bind()
         is ControlInstruction.If -> ifExecutor(context, instruction).bind()
-        is ControlInstruction.Br -> breakExecutor(stack, instruction.labelIndex).bind()
+        is ControlInstruction.Br -> breakExecutor(context, instruction).bind()
         is ControlInstruction.BrIf -> brIfExecutor(context, instruction).bind()
         is ControlInstruction.BrTable -> brTableExecutor(context, instruction).bind()
         is ControlInstruction.BrOnNull -> brOnNullExecutor(context, instruction).bind()
@@ -78,10 +82,8 @@ internal inline fun ControlInstructionExecutor(
         is ControlInstruction.ReturnCallIndirect -> returnCallIndirectExecutor(context, instruction).bind()
         is ControlInstruction.CallRef -> callRefExecutor(context, instruction).bind()
         is ControlInstruction.ReturnCallRef -> returnCallRefExecutor(context, instruction).bind()
-        is ControlInstruction.BrOnCast ->
-            brOnCastExecutor(context, instruction.labelIndex, instruction.srcReferenceType, instruction.dstReferenceType, true).bind()
-        is ControlInstruction.BrOnCastFail ->
-            brOnCastExecutor(context, instruction.labelIndex, instruction.srcReferenceType, instruction.dstReferenceType, false).bind()
+        is ControlInstruction.BrOnCast -> brOnCastExecutor(context, instruction).bind()
+        is ControlInstruction.BrOnCastFail -> brOnCastFailExecutor(context, instruction).bind()
         is ControlInstruction.Throw -> throwExecutor(context, instruction).bind()
         is ControlInstruction.ThrowRef -> throwRefExecutor(context, instruction).bind()
         is ControlInstruction.TryTable -> tryTableExecutor(context, instruction).bind()

@@ -6,6 +6,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
+import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -16,6 +17,17 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal typealias BlockExecutor = (Store, Stack, ControlInstruction.BlockType, List<Instruction>) -> Result<Unit, InvocationError>
+
+internal inline fun BlockExecutor(
+    context: ExecutionContext,
+    instruction: ControlInstruction.Block,
+): Result<Unit, InvocationError> =
+    BlockExecutor(
+        store = context.store,
+        stack = context.stack,
+        blockType = instruction.blockType,
+        instructions = instruction.instructions,
+    )
 
 internal inline fun BlockExecutor(
     store: Store,

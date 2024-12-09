@@ -26,9 +26,16 @@ class ControlInstructionExecutorTest {
 
         val instruction = ControlInstruction.Nop
 
+        val nopExecutor: Executor<ControlInstruction.Nop> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
+            Ok(Unit)
+        }
+
         val actual = controlInstructionExecutor(
             context = context,
             instruction = instruction,
+            nopExecutor = nopExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -196,11 +203,9 @@ class ControlInstructionExecutorTest {
         val blockType = ControlInstruction.BlockType.Empty
         val instruction = ControlInstruction.Block(blockType, emptyList())
 
-        val blockExecutor: BlockExecutor = { _store, _stack, _blockType, _instruction ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(blockType, _blockType)
-            assertEquals(emptyList(), _instruction)
+        val blockExecutor: Executor<ControlInstruction.Block> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
             Ok(Unit)
         }
 
@@ -273,9 +278,10 @@ class ControlInstructionExecutorTest {
         val labelIndex = Index.LabelIndex(0u)
         val instruction = ControlInstruction.Br(labelIndex)
 
-        val breakExecutor: BreakExecutor = { _stack, _labelIndex ->
-            assertEquals(stack, _stack)
-            assertEquals(labelIndex, _labelIndex)
+        val breakExecutor: Executor<ControlInstruction.Br> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
+
             Ok(Unit)
         }
 
@@ -399,14 +405,10 @@ class ControlInstructionExecutorTest {
         val srcReferenceType = referenceType()
         val dstReferenceType = referenceType()
         val instruction = ControlInstruction.BrOnCast(labelIndex, srcReferenceType, dstReferenceType)
-        val breakIfMatches = true
 
-        val brOnCastExecutor: BrOnCastExecutor = { _context, _labelIndex, _srcReferenceType, _dstReferenceType, _breakIfMatches ->
+        val brOnCastExecutor: Executor<ControlInstruction.BrOnCast> = { _context, _instruction ->
             assertEquals(context, _context)
-            assertEquals(labelIndex, _labelIndex)
-            assertEquals(srcReferenceType, _srcReferenceType)
-            assertEquals(dstReferenceType, _dstReferenceType)
-            assertEquals(breakIfMatches, _breakIfMatches)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -431,14 +433,10 @@ class ControlInstructionExecutorTest {
         val srcReferenceType = referenceType()
         val dstReferenceType = referenceType()
         val instruction = ControlInstruction.BrOnCastFail(labelIndex, srcReferenceType, dstReferenceType)
-        val breakIfMatches = false
 
-        val brOnCastExecutor: BrOnCastExecutor = { _context, _labelIndex, _srcReferenceType, _dstReferenceType, _breakIfMatches ->
+        val brOnCastFailExecutor: Executor<ControlInstruction.BrOnCastFail> = { _context, _instruction ->
             assertEquals(context, _context)
-            assertEquals(labelIndex, _labelIndex)
-            assertEquals(srcReferenceType, _srcReferenceType)
-            assertEquals(dstReferenceType, _dstReferenceType)
-            assertEquals(breakIfMatches, _breakIfMatches)
+            assertEquals(instruction, _instruction)
 
             Ok(Unit)
         }
@@ -446,7 +444,7 @@ class ControlInstructionExecutorTest {
         val actual = controlInstructionExecutor(
             context = context,
             instruction = instruction,
-            brOnCastExecutor = brOnCastExecutor,
+            brOnCastFailExecutor = brOnCastFailExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -471,6 +469,30 @@ class ControlInstructionExecutorTest {
             context = context,
             instruction = instruction,
             returnExecutor = returnExecutor,
+        )
+
+        assertEquals(Ok(Unit), actual)
+    }
+
+    @Test
+    fun ` can execute an unreachable instruction`() {
+
+        val store = store()
+        val stack = stack()
+        val context = executionContext(stack, store)
+
+        val instruction = ControlInstruction.Unreachable
+
+        val unreachableExecutor: Executor<ControlInstruction.Unreachable> = { _context, _instruction ->
+            assertEquals(context, _context)
+            assertEquals(instruction, _instruction)
+            Ok(Unit)
+        }
+
+        val actual = controlInstructionExecutor(
+            context = context,
+            instruction = instruction,
+            unreachableExecutor = unreachableExecutor,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -501,7 +523,7 @@ class ControlInstructionExecutorTest {
             fail()
         }
 
-        fun blockExecutor(): BlockExecutor = { _, _, _, _ ->
+        fun blockExecutor(): Executor<ControlInstruction.Block> = { _, _ ->
             fail()
         }
 
@@ -513,7 +535,7 @@ class ControlInstructionExecutorTest {
             fail()
         }
 
-        fun breakExecutor(): BreakExecutor = { _, _ ->
+        fun breakExecutor(): Executor<ControlInstruction.Br> = { _, _ ->
             fail()
         }
 
@@ -533,7 +555,15 @@ class ControlInstructionExecutorTest {
             fail()
         }
 
-        fun brOnCastExecutor(): BrOnCastExecutor = { _, _, _, _, _ ->
+        fun brOnCastExecutor(): Executor<ControlInstruction.BrOnCast> = { _, _ ->
+            fail()
+        }
+
+        fun brOnCastFailExecutor(): Executor<ControlInstruction.BrOnCastFail> = { _, _ ->
+            fail()
+        }
+
+        fun nopExecutor(): Executor<ControlInstruction.Nop> = { _, _ ->
             fail()
         }
 
@@ -553,6 +583,10 @@ class ControlInstructionExecutorTest {
             fail()
         }
 
+        fun unreachableExecutor(): Executor<ControlInstruction.Unreachable> = { _, _ ->
+            fail()
+        }
+
         fun controlInstructionExecutor(
             context: ExecutionContext,
             instruction: ControlInstruction,
@@ -562,19 +596,22 @@ class ControlInstructionExecutorTest {
             returnCallIndirectExecutor: Executor<ControlInstruction.ReturnCallIndirect> = returnCallIndirectExecutor(),
             callRefExecutor: Executor<ControlInstruction.CallRef> = callRefExecutor(),
             returnCallRefExecutor: Executor<ControlInstruction.ReturnCallRef> = returnCallRefExecutor(),
-            blockExecutor: BlockExecutor = blockExecutor(),
+            blockExecutor: Executor<ControlInstruction.Block> = blockExecutor(),
             loopExecutor: Executor<ControlInstruction.Loop> = loopExecutor(),
             ifExecutor: Executor<ControlInstruction.If> = ifExecutor(),
-            breakExecutor: BreakExecutor = breakExecutor(),
+            breakExecutor: Executor<ControlInstruction.Br> = breakExecutor(),
             brIfExecutor: Executor<ControlInstruction.BrIf> = brIfExecutor(),
             brTableExecutor: Executor<ControlInstruction.BrTable> = brTableExecutor(),
             brOnNullExecutor: Executor<ControlInstruction.BrOnNull> = brOnNullExecutor(),
             brOnNonNullExecutor: Executor<ControlInstruction.BrOnNonNull> = brOnNonNullExecutor(),
-            brOnCastExecutor: BrOnCastExecutor = brOnCastExecutor(),
+            brOnCastExecutor: Executor<ControlInstruction.BrOnCast> = brOnCastExecutor(),
+            brOnCastFailExecutor: Executor<ControlInstruction.BrOnCastFail> = brOnCastFailExecutor(),
+            nopExecutor: Executor<ControlInstruction.Nop> = nopExecutor(),
             returnExecutor: Executor<ControlInstruction.Return> = returnExecutor(),
             throwExecutor: Executor<ControlInstruction.Throw> = throwExecutor(),
             throwRefExecutor: Executor<ControlInstruction.ThrowRef> = throwRefExecutor(),
             tryTableExecutor: Executor<ControlInstruction.TryTable> = tryTableExecutor(),
+            unreachableExecutor: Executor<ControlInstruction.Unreachable> = unreachableExecutor(),
         ) = ControlInstructionExecutor(
             context = context,
             instruction = instruction,
@@ -593,10 +630,13 @@ class ControlInstructionExecutorTest {
             brOnNullExecutor = brOnNullExecutor,
             brOnNonNullExecutor = brOnNonNullExecutor,
             brOnCastExecutor = brOnCastExecutor,
+            brOnCastFailExecutor = brOnCastFailExecutor,
+            nopExecutor = nopExecutor,
             returnExecutor = returnExecutor,
             tryTableExecutor = tryTableExecutor,
             throwExecutor = throwExecutor,
             throwRefExecutor = throwRefExecutor,
+            unreachableExecutor = unreachableExecutor,
         )
     }
 }
