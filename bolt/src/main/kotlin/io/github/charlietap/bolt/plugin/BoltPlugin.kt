@@ -4,7 +4,6 @@ import io.github.charlietap.bolt.plugin.task.ConfigureCInteropTask
 import io.github.charlietap.bolt.plugin.task.DownloadArchivesTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -53,7 +52,7 @@ class BoltPlugin : Plugin<Project> {
             enabledKmpTargets.forEach { targetName ->
                 kotlinExtension.targets.findByName(targetName)?.let { target ->
                     if (target is KotlinNativeTarget) {
-                        val cinterop = target.compilations.getByName("main").cinterops.create(packageName) {
+                        val cinterop = target.compilations.getByName("main").cinterops.create(GROUP) {
                             defFile(configureCinteropTask.flatMap { it.outputFile })
                         }
 
