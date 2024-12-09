@@ -13,6 +13,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.konan.file.File
 
 @CacheableTask
 abstract class ConfigureCInteropTask : DefaultTask() {
@@ -43,7 +44,7 @@ abstract class ConfigureCInteropTask : DefaultTask() {
     }
 
     private val compilerOpts by lazy {
-        "-I" + artifactsDir.get().asFile.absolutePath
+        "-I" + artifactsDir.get().asFile.absolutePath.normaliseSeparators()
     }
 
     @TaskAction
@@ -65,7 +66,7 @@ abstract class ConfigureCInteropTask : DefaultTask() {
         targets.forEach { target ->
 
             val (ext, llvm) = libraryPaths(target)
-            val libraryPaths = "libraryPaths.$ext = ${artifactsDir.get().asFile.absolutePath}/$llvm\n"
+            val libraryPaths = "libraryPaths.$ext = ${artifactsDir.get().asFile.absolutePath.normaliseSeparators()}/$llvm\n"
 
             defFile.appendText(libraryPaths)
         }
@@ -81,5 +82,9 @@ abstract class ConfigureCInteropTask : DefaultTask() {
         "linuxX64" -> "linux_x64" to "x86_64-unknown-linux-gnu"
         "mingwX64" -> "mingw_x64" to "x86_64-pc-windows-gnu"
         else -> throw GradleException("Unsupported Kotlin Multiplatform Target: $target")
+    }
+
+    private companion object {
+        fun String.normaliseSeparators(): String = replace("\\", "/")
     }
 }
