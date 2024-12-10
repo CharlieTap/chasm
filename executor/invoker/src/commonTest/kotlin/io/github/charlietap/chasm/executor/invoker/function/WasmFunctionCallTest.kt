@@ -114,7 +114,6 @@ class WasmFunctionCallTest {
             store = store,
             stack = stack,
             instance = functionInstance,
-            tailRecursion = false,
             instructionBlockExecutor = instructionBlockExecutor,
         )
 
@@ -203,11 +202,10 @@ class WasmFunctionCallTest {
             Ok(Unit)
         }
 
-        val actual = WasmFunctionCall(
+        val actual = ReturnWasmFunctionCall(
             store = store,
             stack = stack,
             instance = functionInstance,
-            tailRecursion = true,
             instructionBlockExecutor = instructionBlockExecutor,
         )
 

@@ -40,11 +40,10 @@ class CallExecutorTest {
         )
         val tailRecursion = true
 
-        val wasmFunctionCall: WasmFunctionCall = { _store, _stack, _function, _tailRecursion ->
+        val wasmFunctionCall: WasmFunctionCall = { _store, _stack, _function ->
             assertEquals(store, _store)
             assertEquals(stack, _stack)
             assertEquals(functionInstance, _function)
-            assertEquals(tailRecursion, _tailRecursion)
 
             Ok(Unit)
         }
@@ -80,7 +79,7 @@ class CallExecutorTest {
         )
         val tailRecursion = false
 
-        val wasmFunctionCall: WasmFunctionCall = { _, _, _, _ ->
+        val wasmFunctionCall: WasmFunctionCall = { _, _, _ ->
             fail("Wasm function should not be called in this scenario")
         }
 

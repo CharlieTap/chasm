@@ -70,11 +70,10 @@ class CallIndirectExecutorTest {
 
         val tailRecursion = true
 
-        val wasmFunctionCall: WasmFunctionCall = { _store, _stack, _function, _tailRecursion ->
+        val wasmFunctionCall: WasmFunctionCall = { _store, _stack, _function ->
             assertEquals(store, _store)
             assertEquals(stack, _stack)
             assertEquals(_function, functionInstance)
-            assertEquals(_tailRecursion, tailRecursion)
 
             Ok(Unit)
         }
@@ -141,7 +140,7 @@ class CallIndirectExecutorTest {
 
         val tailRecursion = false
 
-        val wasmFunctionCall: WasmFunctionCall = { _, _, _, _ ->
+        val wasmFunctionCall: WasmFunctionCall = { _, _, _ ->
             fail("Host function should not be called in this scenario")
         }
 

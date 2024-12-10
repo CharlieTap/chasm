@@ -34,6 +34,6 @@ internal inline fun CallRefExecutor(
 
     when (val instance = store.function(value.address).bind()) {
         is FunctionInstance.HostFunction -> hostFunctionCall(store, stack, instance).bind()
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, instance, tailRecursion).bind()
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, instance).bind()
     }
 }

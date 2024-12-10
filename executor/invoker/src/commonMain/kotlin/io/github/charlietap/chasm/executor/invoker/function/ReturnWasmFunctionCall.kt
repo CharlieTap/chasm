@@ -10,21 +10,23 @@ import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.default
+import io.github.charlietap.chasm.executor.runtime.ext.popFrame
+import io.github.charlietap.chasm.executor.runtime.ext.popInstruction
+import io.github.charlietap.chasm.executor.runtime.ext.popLabel
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-internal typealias WasmFunctionCall = (Store, Stack, FunctionInstance.WasmFunction) -> Result<Unit, InvocationError>
-
-internal inline fun WasmFunctionCall(
+internal inline fun ReturnWasmFunctionCall(
     store: Store,
     stack: Stack,
     instance: FunctionInstance.WasmFunction,
 ): Result<Unit, InvocationError> =
-    WasmFunctionCall(
+    ReturnWasmFunctionCall(
         store = store,
         stack = stack,
         instance = instance,
@@ -32,36 +34,39 @@ internal inline fun WasmFunctionCall(
     )
 
 @Suppress("UNUSED_PARAMETER")
-internal inline fun WasmFunctionCall(
+internal inline fun ReturnWasmFunctionCall(
     store: Store,
     stack: Stack,
     instance: FunctionInstance.WasmFunction,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
 
+    val frame = stack.popFrame().bind()
     val type = instance.functionType().bind()
-    val params = type.params.types.size
+    var params = type.params.types.size
     val results = type.results.types.size
 
     val locals = MutableList<ExecutionValue>(params + instance.function.locals.size) { ExecutionValue.Uninitialised }
     for (i in (params - 1) downTo 0) {
         locals[i] = stack.popValue().bind().value
     }
-    var idx = params
     for (local in instance.function.locals) {
-        locals[idx++] = local.type.default().bind()
+        locals[params++] = local.type.default().bind()
     }
 
-    val frame = Stack.Entry.ActivationFrame(
-        arity = Arity.Return(results),
-        stackLabelsDepth = stack.labelsDepth(),
-        stackValuesDepth = stack.valuesDepth(),
-        state = Stack.Entry.ActivationFrame.State(
-            locals = locals.toMutableList(),
-            module = instance.module,
-        ),
-    )
+    do {
+        val instruction = stack.popInstruction().bind()
+    } while (instruction.instruction !is AdminInstruction.Frame)
 
+    while (stack.labelsDepth() > frame.stackLabelsDepth) {
+        stack.popLabel().bind()
+    }
+
+    while (stack.valuesDepth() > frame.stackValuesDepth) {
+        stack.popValue().bind()
+    }
+
+    frame.state.locals = locals
     stack.pushFrame(frame).bind()
 
     val label = Stack.Entry.Label(

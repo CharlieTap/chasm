@@ -38,6 +38,6 @@ internal inline fun CallExecutor(
 
     when (val instance = store.function(address).bind()) {
         is FunctionInstance.HostFunction -> hostFunctionCall(store, stack, instance).bind()
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, instance, tailRecursion).bind()
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, instance).bind()
     }
 }

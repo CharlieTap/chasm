@@ -152,7 +152,7 @@ data class Stack(
             val state: State,
         ) : Entry {
             data class State(
-                val locals: MutableList<ExecutionValue>,
+                var locals: MutableList<ExecutionValue>,
                 val module: ModuleInstance,
             )
         }
