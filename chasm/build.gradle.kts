@@ -21,7 +21,6 @@ sweet {
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm.testsuite"
     proposals = listOf(
-        "tail-call",
         "multi-memory",
         "exception-handling",
         "gc",
