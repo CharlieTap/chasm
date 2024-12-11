@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime
 
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import kotlin.jvm.JvmInline
@@ -50,10 +49,7 @@ data class Stack(
 
     fun push(instruction: Entry.Instruction) = instructions.push(instruction)
 
-    fun push(label: Entry.Label) {
-        labels.push(label)
-        instructions.push(Entry.Instruction(AdminInstruction.Label(label)))
-    }
+    fun push(label: Entry.Label) = labels.push(label)
 
     fun push(value: Entry.Value) = values.push(value)
 

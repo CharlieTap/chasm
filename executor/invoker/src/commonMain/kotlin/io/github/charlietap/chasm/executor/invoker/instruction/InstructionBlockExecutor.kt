@@ -5,6 +5,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
@@ -22,15 +23,16 @@ internal inline fun InstructionBlockExecutor(
 ): Result<Unit, InvocationError> = binding {
 
     handler?.let {
-        stack.push(Stack.Entry.Instruction(AdminInstruction.Handler(handler)))
+        stack.push(Instruction(AdminInstruction.Handler(handler)))
     }
     stack.push(label)
+    stack.push(Instruction(AdminInstruction.Label(label)))
 
     params.asReversed().forEach { value ->
         stack.push(Stack.Entry.Value(value))
     }
 
     instructions.asReversed().forEach { instruction ->
-        stack.push(Stack.Entry.Instruction(instruction))
+        stack.push(Instruction(instruction))
     }
 }
