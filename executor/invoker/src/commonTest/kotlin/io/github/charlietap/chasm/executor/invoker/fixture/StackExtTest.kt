@@ -5,9 +5,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.instruction
 import io.github.charlietap.chasm.fixture.stack
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,17 +17,14 @@ class StackExtTest {
 
         val stack = stack()
         val frame = frame()
-        val instruction = instruction(AdminInstruction.Frame(frame))
 
         val actual = stack.pushFrame(frame)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(2, stack.size())
+        assertEquals(1, stack.size())
 
         val frameEntry = stack.popFrameOrNull()
         assertEquals(frame, frameEntry)
-        val instructionEntry = stack.popInstructionOrNull()
-        assertEquals(instruction, instructionEntry)
     }
 
     @Test

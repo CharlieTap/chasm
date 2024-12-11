@@ -10,8 +10,10 @@ import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.invoker.ext.pushFrame
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
@@ -190,6 +192,7 @@ class WasmFunctionCallTest {
         )
 
         stack.pushFrame(frame)
+        stack.push(Instruction(AdminInstruction.Frame(frame)))
 
         val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params, _handler ->
             assertEquals(stack, _stack)

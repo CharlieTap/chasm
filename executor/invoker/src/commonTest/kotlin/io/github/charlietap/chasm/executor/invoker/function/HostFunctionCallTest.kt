@@ -4,9 +4,11 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
+import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.fixture.frame
 import io.github.charlietap.chasm.fixture.frameState
 import io.github.charlietap.chasm.fixture.instance.moduleInstance
@@ -99,6 +101,7 @@ class HostFunctionCallTest {
         )
 
         stack.pushFrame(frame)
+        stack.push(Instruction(AdminInstruction.Frame(frame)))
 
         val functionType = functionType(
             params = resultType(
