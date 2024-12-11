@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.ext.exception
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popFrame
@@ -41,15 +42,15 @@ internal inline fun ThrowRefExecutor(
 
     val handler = jumpToHandlerInstruction(stack).bind()
 
-    if (handler.handlers.isEmpty()) {
+    if (handler.instructions.isEmpty()) {
         stack.pushValue(ReferenceValue.Exception(exceptionRef.address))
         stack.pushInstruction(ModuleInstruction(ControlInstruction.ThrowRef))
     } else {
 
         val frame = stack.peekFrame().bind()
 
-        val catchHandler = handler.handlers.first()
-        val otherHandlers = handler.handlers.drop(1)
+        val catchHandler = handler.instructions.first()
+        val otherHandlers = handler.instructions.drop(1)
 
         val tagMatches = when (catchHandler) {
             is ControlInstruction.CatchHandler.Catch -> {
@@ -83,7 +84,8 @@ internal inline fun ThrowRefExecutor(
                 stack.pushInstruction(ModuleInstruction(ControlInstruction.Br(catchHandler.labelIndex)))
             }
             else -> {
-                stack.push(Stack.Entry.ExceptionHandler(otherHandlers))
+                val instruction = AdminInstruction.Handler(ExceptionHandler(otherHandlers))
+                stack.push(Stack.Entry.Instruction(instruction))
                 stack.pushValue(exceptionRef)
                 stack.pushInstruction(ModuleInstruction(ControlInstruction.ThrowRef))
             }
@@ -91,7 +93,7 @@ internal inline fun ThrowRefExecutor(
     }
 }
 
-private fun jumpToHandlerInstruction(stack: Stack): Result<Stack.Entry.ExceptionHandler, InvocationError> = binding {
+private fun jumpToHandlerInstruction(stack: Stack): Result<ExceptionHandler, InvocationError> = binding {
 
     var instruction: ExecutionInstruction?
     do {

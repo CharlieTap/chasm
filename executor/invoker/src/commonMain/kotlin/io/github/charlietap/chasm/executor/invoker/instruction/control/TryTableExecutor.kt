@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockE
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
@@ -55,8 +56,8 @@ internal inline fun TryTableExecutor(
         continuation = emptyList(),
     )
 
-    val handler = Stack.Entry.ExceptionHandler(
-        handlers = instruction.handlers,
+    val handler = ExceptionHandler(
+        instructions = instruction.handlers,
     )
 
     blockExecutor(stack, label, executionInstructions, params, handler).bind()

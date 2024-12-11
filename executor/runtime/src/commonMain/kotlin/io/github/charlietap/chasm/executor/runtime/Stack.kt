@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.runtime
 
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
@@ -50,10 +49,6 @@ data class Stack(
     fun push(frame: Entry.ActivationFrame) {
         frames.push(frame)
         instructions.push(Entry.Instruction(AdminInstruction.Frame(frame)))
-    }
-
-    fun push(handler: Entry.ExceptionHandler) {
-        instructions.push(Entry.Instruction(AdminInstruction.Handler(handler)))
     }
 
     fun push(instruction: Entry.Instruction) = instructions.push(instruction)
@@ -159,9 +154,6 @@ data class Stack(
 
         @JvmInline
         value class Instruction(val instruction: ExecutionInstruction) : Entry
-
-        @JvmInline
-        value class ExceptionHandler(val handlers: List<ControlInstruction.CatchHandler>)
     }
 
     companion object {

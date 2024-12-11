@@ -6,21 +6,23 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-internal typealias InstructionBlockExecutor = (Stack, Stack.Entry.Label, List<ExecutionInstruction>, List<ExecutionValue>, Stack.Entry.ExceptionHandler?) -> Result<Unit, InvocationError>
+internal typealias InstructionBlockExecutor = (Stack, Stack.Entry.Label, List<ExecutionInstruction>, List<ExecutionValue>, ExceptionHandler?) -> Result<Unit, InvocationError>
 
 internal inline fun InstructionBlockExecutor(
     stack: Stack,
     label: Stack.Entry.Label,
     instructions: List<ExecutionInstruction>,
     params: List<ExecutionValue>,
-    handler: Stack.Entry.ExceptionHandler?,
+    handler: ExceptionHandler?,
 ): Result<Unit, InvocationError> = binding {
 
     handler?.let {
-        stack.push(handler)
+        stack.push(Stack.Entry.Instruction(AdminInstruction.Handler(handler)))
     }
     stack.push(label)
 
