@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.executor.invoker.ext.pushFrame
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.ext.default
@@ -188,7 +189,7 @@ class WasmFunctionCallTest {
             ),
         )
 
-        stack.push(frame)
+        stack.pushFrame(frame)
 
         val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params, _handler ->
             assertEquals(stack, _stack)

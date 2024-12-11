@@ -8,8 +8,10 @@ import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
+import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -37,12 +39,13 @@ internal inline fun ThreadExecutor(
     )
 
     stack.push(thread.frame)
+    stack.push(Instruction(AdminInstruction.Frame(thread.frame)))
     thread.frame.state.locals.forEach { local ->
         stack.push(Stack.Entry.Value(local))
     }
 
     thread.instructions.asReversed().forEach { instruction ->
-        stack.push(Stack.Entry.Instruction(instruction))
+        stack.push(Instruction(instruction))
     }
 
     while (true) {

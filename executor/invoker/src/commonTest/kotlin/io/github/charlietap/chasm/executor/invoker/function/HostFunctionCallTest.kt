@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.invoker.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -34,7 +35,7 @@ class HostFunctionCallTest {
             ),
         )
 
-        stack.push(frame)
+        stack.pushFrame(frame)
 
         val functionType = functionType(
             params = resultType(
@@ -97,7 +98,7 @@ class HostFunctionCallTest {
             ),
         )
 
-        stack.push(frame)
+        stack.pushFrame(frame)
 
         val functionType = functionType(
             params = resultType(

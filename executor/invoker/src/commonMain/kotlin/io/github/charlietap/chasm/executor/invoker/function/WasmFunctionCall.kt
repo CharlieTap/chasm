@@ -5,13 +5,13 @@ package io.github.charlietap.chasm.executor.invoker.function
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.ext.functionType
+import io.github.charlietap.chasm.executor.invoker.ext.pushFrame
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store

@@ -46,10 +46,7 @@ data class Stack(
         }
     }
 
-    fun push(frame: Entry.ActivationFrame) {
-        frames.push(frame)
-        instructions.push(Entry.Instruction(AdminInstruction.Frame(frame)))
-    }
+    fun push(frame: Entry.ActivationFrame) = frames.push(frame)
 
     fun push(instruction: Entry.Instruction) = instructions.push(instruction)
 
