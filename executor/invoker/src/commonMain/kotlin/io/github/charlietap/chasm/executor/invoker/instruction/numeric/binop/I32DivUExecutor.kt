@@ -5,12 +5,12 @@ package io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.ext.divu
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.executor.runtime.ext.peekNthValue
+import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 
 internal inline fun I32DivUExecutor(

@@ -2,24 +2,26 @@ package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
-import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.frameState
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.module.function
-import io.github.charlietap.chasm.fixture.returnArity
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.functionType
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.ast.module.functionIndex
+import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.executor.runtime.configuration
+import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.frameState
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.callRuntimeInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.thread
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,24 +33,29 @@ class FunctionInvokerTest {
     fun `can invoke a function and return a result`() {
 
         val locals = mutableListOf<ExecutionValue>(i32(117))
-        val address = Address.Function(0)
+        val address = functionAddress(0)
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(address),
         )
         val functionType = functionType()
         val definedType = functionType.definedType()
-        val function = function()
-        val functionInstance = FunctionInstance.WasmFunction(
+        val function = runtimeFunction()
+        val functionInstance = wasmFunctionInstance(
             definedType,
             moduleInstance,
             function,
         )
-
         val store = store(
             functions = mutableListOf(functionInstance),
         )
 
-        val thread = Thread(
+        val callDispatchable = dispatchableInstruction()
+        val callDispatcher: Dispatcher<ControlInstruction.Call> = { instruction ->
+            assertEquals(callRuntimeInstruction(functionIndex(0u)), instruction)
+            callDispatchable
+        }
+
+        val thread = thread(
             frame(
                 arity = returnArity(functionType.results.types.size),
                 state = frameState(
@@ -56,9 +63,11 @@ class FunctionInvokerTest {
                     moduleInstance,
                 ),
             ),
-            listOf(ModuleInstruction(ControlInstruction.Call(Index.FunctionIndex(0u)))),
+            listOf(
+                callDispatchable,
+            ),
         )
-        val expectedConfig = Configuration(store, thread)
+        val expectedConfig = configuration(store, thread)
 
         val threadExecutor: ThreadExecutor = { config ->
             assertEquals(expectedConfig, config)
@@ -69,6 +78,7 @@ class FunctionInvokerTest {
             store = store,
             address = address,
             values = locals,
+            callDispatcher = callDispatcher,
             threadExecutor = threadExecutor,
         )
 
@@ -79,12 +89,12 @@ class FunctionInvokerTest {
     fun `throws error if address does not exist`() {
 
         val locals = mutableListOf<ExecutionValue>(i32(117))
-        val address = Address.Function(0)
+        val address = functionAddress(0)
         val moduleInstance = moduleInstance()
         val functionType = functionType()
         val definedType = functionType.definedType()
-        val function = function()
-        val functionInstance = FunctionInstance.WasmFunction(
+        val function = runtimeFunction()
+        val functionInstance = wasmFunctionInstance(
             definedType,
             moduleInstance,
             function,
@@ -94,6 +104,9 @@ class FunctionInvokerTest {
             functions = mutableListOf(functionInstance),
         )
 
+        val callDispatcher: Dispatcher<ControlInstruction.Call> = { _ ->
+            fail("call dispatcher should not be called")
+        }
         val threadExecutor: ThreadExecutor = { _ ->
             fail("thread executor should not be called")
         }
@@ -102,6 +115,7 @@ class FunctionInvokerTest {
             store = store,
             address = address,
             values = locals,
+            callDispatcher = callDispatcher,
             threadExecutor = threadExecutor,
         )
 

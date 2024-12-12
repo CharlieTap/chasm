@@ -4,10 +4,10 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
-import io.github.charlietap.chasm.fixture.module.tag
-import io.github.charlietap.chasm.fixture.module.tagImport
-import io.github.charlietap.chasm.fixture.module.tagIndex
-import io.github.charlietap.chasm.fixture.type.tagType
+import io.github.charlietap.chasm.fixture.ast.module.tag
+import io.github.charlietap.chasm.fixture.ast.module.tagImport
+import io.github.charlietap.chasm.fixture.ast.module.tagIndex
+import io.github.charlietap.chasm.fixture.ast.type.tagType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,18 +1,18 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.instance.globalAddress
-import io.github.charlietap.chasm.fixture.instance.globalInstance
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.module.globalIndex
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.value
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
+import io.github.charlietap.chasm.fixture.ast.module.globalIndex
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.value
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

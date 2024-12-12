@@ -2,76 +2,105 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
+import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.module.elementSegment
-import io.github.charlietap.chasm.fixture.module.module
-import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.fixture.ast.instruction.elemDropInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.expression
+import io.github.charlietap.chasm.fixture.ast.instruction.i32ConstInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.tableInitInstruction
+import io.github.charlietap.chasm.fixture.ast.module.activeElementSegmentMode
+import io.github.charlietap.chasm.fixture.ast.module.declarativeElementSegmentMode
+import io.github.charlietap.chasm.fixture.ast.module.elementIndex
+import io.github.charlietap.chasm.fixture.ast.module.elementSegment
+import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.module.tableIndex
+import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
 class TableInitializerTest {
 
     @Test
     fun `can initialize a table on a module instance`() {
 
-        val activeTableIndex = Index.TableIndex(0u)
-        val activeExpression = Expression(
+        val activeTableIndex = tableIndex(0u)
+        val activeOffsetExpression = expression(
             listOf(
-                NumericInstruction.I32Const(117),
+                i32ConstInstruction(117),
             ),
         )
         val activeSegment = elementSegment(
-            idx = Index.ElementIndex(0u),
-            mode = ElementSegment.Mode.Active(
+            idx = elementIndex(0u),
+            mode = activeElementSegmentMode(
                 tableIndex = activeTableIndex,
-                offsetExpr = activeExpression,
+                offsetExpr = activeOffsetExpression,
             ),
         )
         val declarativeSegment = elementSegment(
-            idx = Index.ElementIndex(1u),
-            mode = ElementSegment.Mode.Declarative,
+            idx = elementIndex(1u),
+            mode = declarativeElementSegmentMode(),
         )
 
         val store = store()
-        val instance = moduleInstance()
         val module = module(
             elementSegments = listOf(activeSegment, declarativeSegment),
         )
+        val context = instantiationContext(
+            store = store,
+            module = module,
+        )
+        val instance = moduleInstance()
 
-        val expression1 = Expression(
-            activeExpression.instructions + listOf(
-                NumericInstruction.I32Const(0),
-                NumericInstruction.I32Const(activeSegment.initExpressions.size),
-                TableInstruction.TableInit(activeSegment.idx, (activeSegment.mode as ElementSegment.Mode.Active).tableIndex),
-                TableInstruction.ElemDrop(activeSegment.idx),
+        val expression1 = expression(
+            activeOffsetExpression.instructions + listOf(
+                i32ConstInstruction(0),
+                i32ConstInstruction(activeSegment.initExpressions.size),
+                tableInitInstruction(activeSegment.idx, (activeSegment.mode as ElementSegment.Mode.Active).tableIndex),
+                elemDropInstruction(activeSegment.idx),
             ),
         )
-        val expression2 = Expression(
-            listOf(TableInstruction.ElemDrop(declarativeSegment.idx)),
+        val expression2 = expression(
+            listOf(elemDropInstruction(declarativeSegment.idx)),
         )
         val expressions = sequenceOf(expression1, expression2).iterator()
 
-        val evaluator: ExpressionEvaluator = { eStore, eInstance, eExpression, eArity ->
-            assertEquals(store, eStore)
-            assertEquals(instance, eInstance)
-            assertEquals(expressions.next(), eExpression)
-            assertEquals(Arity.Return.SIDE_EFFECT, eArity)
+        val runtimeExpression1 = runtimeExpression()
+        val runtimeExpression2 = runtimeExpression()
+        val runtimeExpressions = sequenceOf(
+            runtimeExpression1,
+            runtimeExpression1,
+            runtimeExpression2,
+            runtimeExpression2,
+        ).iterator()
+
+        val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _expression ->
+            assertEquals(context, _context)
+            assertEquals(expressions.next(), _expression)
+
+            Ok(runtimeExpressions.next())
+        }
+
+        val evaluator: ExpressionEvaluator = { _store, _instance, _expression, _arity ->
+            assertEquals(store, _store)
+            assertEquals(instance, _instance)
+            assertEquals(runtimeExpressions.next(), _expression)
+            assertEquals(Arity.Return.SIDE_EFFECT, _arity)
 
             Ok(null)
         }
 
         val actual = TableInitializer(
-            store = store,
+            context = context,
             instance = instance,
-            module = module,
             evaluator = evaluator,
+            expressionPredecoder = expressionPredecoder,
         )
 
         assertEquals(Ok(Unit), actual)

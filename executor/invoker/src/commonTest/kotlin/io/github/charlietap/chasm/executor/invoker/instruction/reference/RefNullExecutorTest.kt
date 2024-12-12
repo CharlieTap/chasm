@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.type.heapType
-import io.github.charlietap.chasm.fixture.value
+import io.github.charlietap.chasm.fixture.ast.type.heapType
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.value
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

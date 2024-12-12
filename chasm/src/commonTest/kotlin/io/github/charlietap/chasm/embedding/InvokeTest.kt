@@ -11,12 +11,12 @@ import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.transform.ValueMapper
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.fixture.instance.exportInstance
-import io.github.charlietap.chasm.fixture.instance.functionAddress
-import io.github.charlietap.chasm.fixture.instance.functionExternalValue
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.value.i32
-import io.github.charlietap.chasm.fixture.value.nameValue
+import io.github.charlietap.chasm.fixture.ast.value.nameValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.exportInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

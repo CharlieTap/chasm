@@ -14,12 +14,12 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
-import io.github.charlietap.chasm.fixture.module.module
-import io.github.charlietap.chasm.fixture.type.f32ValueType
-import io.github.charlietap.chasm.fixture.type.i32ValueType
-import io.github.charlietap.chasm.fixture.type.i64ValueType
-import io.github.charlietap.chasm.fixture.type.recursiveType
-import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.type.f32ValueType
+import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
+import io.github.charlietap.chasm.fixture.ast.type.recursiveType
+import io.github.charlietap.chasm.fixture.ast.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -8,9 +8,9 @@ import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
-import io.github.charlietap.chasm.fixture.type.i32ValueType
-import io.github.charlietap.chasm.fixture.type.i64ValueType
-import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
+import io.github.charlietap.chasm.fixture.ast.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

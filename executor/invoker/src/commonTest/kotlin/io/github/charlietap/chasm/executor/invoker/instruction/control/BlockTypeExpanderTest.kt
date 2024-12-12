@@ -3,11 +3,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.type.functionType
-import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.fixture.type.valueType
+import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.ast.type.resultType
+import io.github.charlietap.chasm.fixture.ast.type.valueType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,7 +32,7 @@ class BlockTypeExpanderTest {
 
         val blockType = ControlInstruction.BlockType.ValType(valueType)
 
-        val expected = FunctionType(resultType(emptyList()), resultType(listOf(valueType)))
+        val expected = functionType(resultType(emptyList()), resultType(listOf(valueType)))
 
         val actual = BlockTypeExpander(instance, blockType)
 

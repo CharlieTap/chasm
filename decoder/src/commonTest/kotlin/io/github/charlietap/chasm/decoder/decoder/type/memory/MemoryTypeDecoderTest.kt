@@ -7,9 +7,9 @@ import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
-import io.github.charlietap.chasm.fixture.type.limits
-import io.github.charlietap.chasm.fixture.type.memoryType
-import io.github.charlietap.chasm.fixture.type.sharedStatus
+import io.github.charlietap.chasm.fixture.ast.type.limits
+import io.github.charlietap.chasm.fixture.ast.type.memoryType
+import io.github.charlietap.chasm.fixture.ast.type.sharedStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

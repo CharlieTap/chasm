@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUIntReader
-import io.github.charlietap.chasm.fixture.module.memoryIndex
+import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

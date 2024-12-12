@@ -4,14 +4,14 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popInstruction
 import io.github.charlietap.chasm.executor.runtime.ext.popLabel
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal inline fun ReturnExecutor(
     context: ExecutionContext,
@@ -26,7 +26,7 @@ internal inline fun ReturnExecutor(
 
     do {
         val instruction = stack.popInstruction().bind()
-    } while (instruction.instruction !is AdminInstruction.Frame)
+    } while (instruction.tag != InstructionTag.FRAME)
 
     while (stack.labelsDepth() > frame.stackLabelsDepth) {
         stack.popLabel().bind()

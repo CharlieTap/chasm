@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.benchmark.runtime
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.label
-import io.github.charlietap.chasm.fixture.value
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.label
+import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.stack.stackOf
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode

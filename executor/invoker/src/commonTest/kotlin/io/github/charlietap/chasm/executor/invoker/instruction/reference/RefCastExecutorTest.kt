@@ -9,13 +9,13 @@ import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.instruction.refCastInstruction
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.refNullReferenceType
-import io.github.charlietap.chasm.fixture.type.referenceType
-import io.github.charlietap.chasm.fixture.value.referenceValue
+import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ast.type.referenceType
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refCastRuntimeInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.value.referenceValue
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 import kotlin.test.Test
@@ -63,7 +63,7 @@ class RefCastExecutorTest {
 
         val actual = RefCastExecutor(
             context = context,
-            instruction = refCastInstruction(referenceType),
+            instruction = refCastRuntimeInstruction(referenceType),
             referenceTypeSubstitutor = referenceTypeSubstitutor,
             referenceTypeMatcher = referenceTypeMatcher,
             typeOfReferenceValue = typeOfReferenceValue,
@@ -114,7 +114,7 @@ class RefCastExecutorTest {
 
         val actual = RefCastExecutor(
             context = context,
-            instruction = refCastInstruction(referenceType),
+            instruction = refCastRuntimeInstruction(referenceType),
             referenceTypeSubstitutor = referenceTypeSubstitutor,
             referenceTypeMatcher = referenceTypeMatcher,
             typeOfReferenceValue = typeOfReferenceValue,

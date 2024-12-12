@@ -5,9 +5,11 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAl
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.limits
-import io.github.charlietap.chasm.fixture.type.tableType
+import io.github.charlietap.chasm.fixture.ast.type.limits
+import io.github.charlietap.chasm.fixture.ast.type.tableType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -25,12 +27,12 @@ class TableAllocatorTest {
         val limits = limits(min.toUInt())
         val type = tableType(limits = limits)
 
-        val refValue = ReferenceValue.Null(AbstractHeapType.Func)
+        val refValue = nullReferenceValue(AbstractHeapType.Func)
         val elements = Array<ReferenceValue>(min) {
             refValue
         }
 
-        val expected = TableInstance(
+        val expected = tableInstance(
             type = type,
             elements = elements,
         )

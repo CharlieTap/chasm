@@ -7,12 +7,12 @@ import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.instance.functionAddress
-import io.github.charlietap.chasm.fixture.instance.tableAddress
-import io.github.charlietap.chasm.fixture.instance.tableExternalValue
-import io.github.charlietap.chasm.fixture.instance.tableInstance
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.value.functionReferenceValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.value.functionReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

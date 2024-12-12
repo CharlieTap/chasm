@@ -35,10 +35,10 @@ import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.instruction.memArg
-import io.github.charlietap.chasm.fixture.instruction.memoryGrowInstruction
-import io.github.charlietap.chasm.fixture.instruction.memorySizeInstruction
-import io.github.charlietap.chasm.fixture.module.memoryIndex
+import io.github.charlietap.chasm.fixture.ast.instruction.memArg
+import io.github.charlietap.chasm.fixture.ast.instruction.memoryGrowInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.memorySizeInstruction
+import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

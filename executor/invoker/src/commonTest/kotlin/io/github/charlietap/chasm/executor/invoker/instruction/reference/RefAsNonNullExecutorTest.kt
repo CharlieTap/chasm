@@ -4,12 +4,13 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.instance.functionAddress
-import io.github.charlietap.chasm.fixture.instruction.refAsNonNullInstruction
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.type.heapType
-import io.github.charlietap.chasm.fixture.value
+import io.github.charlietap.chasm.fixture.ast.type.heapType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refAsNonNullRuntimeInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.value
+import io.github.charlietap.chasm.fixture.executor.runtime.value.functionReferenceValue
+import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,13 +21,13 @@ class RefAsNonNullExecutorTest {
 
         val stack = stack()
         val context = executionContext(stack)
-        val value = ReferenceValue.Function(functionAddress())
+        val value = functionReferenceValue(functionAddress())
 
         stack.push(value(value))
 
         val actual = RefAsNonNullExecutor(
             context = context,
-            instruction = refAsNonNullInstruction(),
+            instruction = refAsNonNullRuntimeInstruction(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -40,11 +41,11 @@ class RefAsNonNullExecutorTest {
         val stack = stack()
         val context = executionContext(stack)
 
-        stack.push(value(ReferenceValue.Null(heapType())))
+        stack.push(value(nullReferenceValue(heapType())))
 
         val actual = RefAsNonNullExecutor(
             context = context,
-            instruction = refAsNonNullInstruction(),
+            instruction = refAsNonNullRuntimeInstruction(),
         )
 
         assertEquals(Err(InvocationError.Trap.TrapEncountered), actual)

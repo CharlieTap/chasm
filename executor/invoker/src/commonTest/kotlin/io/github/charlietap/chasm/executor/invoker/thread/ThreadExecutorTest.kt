@@ -1,23 +1,19 @@
 package io.github.charlietap.chasm.executor.invoker.thread
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.invoker.Executor
-import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Value
-import io.github.charlietap.chasm.executor.runtime.Thread
-import io.github.charlietap.chasm.executor.runtime.ext.popFrame
-import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
+import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
+import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.frameState
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.returnArity
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.executor.runtime.configuration
+import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.frameState
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.thread
+import io.github.charlietap.chasm.fixture.executor.runtime.value
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -36,57 +32,38 @@ class ThreadExecutorTest {
             ),
         )
 
-        val thread = Thread(
+        val instructionDispatchable = dispatchableInstruction { context ->
+            assertEquals(2, context.stack.valuesDepth())
+            assertEquals(1, context.stack.instructionsDepth())
+            context.stack.clearValues()
+            context.stack.push(value(i32(0)))
+            Ok(Unit)
+        }
+        val thread = thread(
             frame = frame,
-            instructions = listOf(NumericInstruction.I32Mul, NumericInstruction.I32Eqz).map(::ModuleInstruction),
+            instructions = listOf(
+                instructionDispatchable,
+            ),
         )
 
-        val configuration = Configuration(
+        val configuration = configuration(
             store = store(),
             thread = thread,
         )
 
-        val instructions = (thread.instructions + listOf(AdminInstruction.Frame(frame))).asSequence().iterator()
-
-        val stack1 = stack(
-            values = listOf(
-                Value(locals[0]),
-                Value(locals[1]),
-            ),
-        )
-        val stack2 = stack(
-            values = listOf(
-                Value(i32(6)),
-            ),
-        )
-        val stack3 = stack(
-            values = listOf(
-                Value(i32(0)),
-            ),
-        )
-        val inputStacks = sequenceOf(stack1, stack2, stack3).iterator()
-        val outputStacks = sequenceOf(stack2, stack3, stack3).iterator()
-
-        val instructionExecutor: Executor<ExecutionInstruction> = { context, instruction ->
-
-            val inputStack = inputStacks.next()
-            val outputStack = outputStacks.next()
-
-            assertEquals(instructions.next(), instruction)
-            assertEquals(configuration.store, context.store)
-            assertEquals(inputStack.values(), context.stack.values())
-
-            context.stack.clearValues()
-            context.stack.fill(outputStack)
-
-            if (instruction is AdminInstruction.Frame) {
-                context.stack.popFrame()
-            }
-
+        val frameDispatchable = dispatchableInstruction { context ->
+            assertEquals(0, context.stack.instructionsDepth())
             Ok(Unit)
         }
+        val frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame> = { _frame ->
+            assertEquals(frame, _frame)
+            frameDispatchable
+        }
 
-        val actual = ThreadExecutor(configuration, instructionExecutor)
+        val actual = ThreadExecutor(
+            configuration = configuration,
+            frameDispatcher = frameDispatcher,
+        )
 
         assertEquals(Ok(listOf(i32(0))), actual)
     }

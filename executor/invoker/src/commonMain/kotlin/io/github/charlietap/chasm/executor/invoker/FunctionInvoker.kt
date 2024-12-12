@@ -3,8 +3,9 @@ package io.github.charlietap.chasm.executor.invoker
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
@@ -14,7 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -30,6 +31,7 @@ fun FunctionInvoker(
         store = store,
         address = address,
         values = values,
+        callDispatcher = ::CallDispatcher,
         threadExecutor = ::ThreadExecutor,
     )
 
@@ -37,6 +39,7 @@ internal inline fun FunctionInvoker(
     store: Store,
     address: Address.Function,
     values: List<ExecutionValue>,
+    crossinline callDispatcher: Dispatcher<ControlInstruction.Call>,
     crossinline threadExecutor: ThreadExecutor,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
@@ -46,8 +49,9 @@ internal inline fun FunctionInvoker(
     if (index == -1) Err(InvocationError.InvalidAddress).bind<List<ExecutionValue>>()
 
     val functionType = function.functionType().bind()
-
-    val instruction = ControlInstruction.Call(Index.FunctionIndex(index.toUInt()))
+    val instruction = callDispatcher(
+        ControlInstruction.Call(Index.FunctionIndex(index.toUInt())),
+    )
 
     val thread = Thread(
         Stack.Entry.ActivationFrame(
@@ -59,7 +63,7 @@ internal inline fun FunctionInvoker(
                 function.module,
             ),
         ),
-        listOf(ModuleInstruction(instruction)),
+        listOf(instruction),
     )
 
     val configuration = Configuration(

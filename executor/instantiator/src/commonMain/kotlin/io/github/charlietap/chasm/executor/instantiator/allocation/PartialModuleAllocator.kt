@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.function.Wasm
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.addFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addMemoryAddress
@@ -18,12 +19,12 @@ import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 
-internal typealias PartialModuleAllocator = (InstantiationContext, List<Import>) -> Result<ModuleInstance, InstantiationError>
+internal typealias PartialModuleAllocator = (InstantiationContext, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
 
 internal fun PartialModuleAllocator(
     context: InstantiationContext,
     imports: List<Import>,
-): Result<ModuleInstance, InstantiationError> =
+): Result<ModuleInstance, ModuleTrapError> =
     PartialModuleAllocator(
         context = context,
         imports = imports,
@@ -38,9 +39,9 @@ internal inline fun PartialModuleAllocator(
     crossinline wasmFunctionAllocator: WasmFunctionAllocator,
     crossinline typeAllocator: DefinedTypeFactory,
     crossinline importMatcher: ImportMatcher,
-): Result<ModuleInstance, InstantiationError> = binding {
+): Result<ModuleInstance, ModuleTrapError> = binding {
 
-    val (store, module) = context
+    val module = context.module
 
     val instance = ModuleInstance(typeAllocator(module.types.map(Type::recursiveType)))
 
@@ -59,7 +60,7 @@ internal inline fun PartialModuleAllocator(
     }
 
     module.functions.forEach { function ->
-        val address = wasmFunctionAllocator(store, instance, function).bind()
+        val address = wasmFunctionAllocator(context, instance, function).bind()
         instance.addFunctionAddress(address)
     }
 

@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.executor.runtime
 
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.label
-import io.github.charlietap.chasm.fixture.returnArity
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.value
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.label
+import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.value
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

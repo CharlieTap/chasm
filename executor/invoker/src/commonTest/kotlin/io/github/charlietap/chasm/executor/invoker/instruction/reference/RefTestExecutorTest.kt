@@ -7,14 +7,14 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.instruction.refTestInstruction
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.refNullReferenceType
-import io.github.charlietap.chasm.fixture.type.referenceType
-import io.github.charlietap.chasm.fixture.value.i32
-import io.github.charlietap.chasm.fixture.value.referenceValue
+import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ast.type.referenceType
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refTestRuntimeInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
+import io.github.charlietap.chasm.fixture.executor.runtime.value.referenceValue
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 import kotlin.test.Test
@@ -62,7 +62,7 @@ class RefTestExecutorTest {
 
         val actual = RefTestExecutor(
             context = context,
-            instruction = refTestInstruction(referenceType),
+            instruction = refTestRuntimeInstruction(referenceType),
             referenceTypeSubstitutor = referenceTypeSubstitutor,
             referenceTypeMatcher = referenceTypeMatcher,
             typeOfReferenceValue = typeOfReferenceValue,
@@ -113,7 +113,7 @@ class RefTestExecutorTest {
 
         val actual = RefTestExecutor(
             context = context,
-            instruction = refTestInstruction(referenceType),
+            instruction = refTestRuntimeInstruction(referenceType),
             referenceTypeSubstitutor = referenceTypeSubstitutor,
             referenceTypeMatcher = referenceTypeMatcher,
             typeOfReferenceValue = typeOfReferenceValue,

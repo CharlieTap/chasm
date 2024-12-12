@@ -19,7 +19,7 @@ import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.shapes.ValueType
 import io.github.charlietap.chasm.embedding.table
 import io.github.charlietap.chasm.embedding.tag
-import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.fixture.executor.runtime.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

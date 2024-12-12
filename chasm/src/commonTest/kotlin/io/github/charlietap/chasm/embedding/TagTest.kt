@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicTag
 import io.github.charlietap.chasm.embedding.fixture.publicTagType
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.type.tagType
+import io.github.charlietap.chasm.fixture.ast.type.tagType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

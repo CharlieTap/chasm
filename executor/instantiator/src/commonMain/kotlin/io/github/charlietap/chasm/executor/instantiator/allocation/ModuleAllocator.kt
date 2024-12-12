@@ -6,6 +6,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.toResultOr
+import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
@@ -14,6 +15,8 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.memory.Memory
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.predecoding.ExpressionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -30,6 +33,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import kotlin.jvm.JvmName
+import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
 internal typealias ModuleAllocator = (InstantiationContext, ModuleInstance, List<ReferenceValue>) -> Result<ModuleInstance, ModuleTrapError>
 
@@ -49,6 +53,7 @@ internal fun ModuleAllocator(
         globalAllocator = ::GlobalAllocator,
         elementAllocator = ::ElementAllocator,
         dataAllocator = ::DataAllocator,
+        expressionPredecoder = ::ExpressionPredecoder,
     )
 
 internal inline fun ModuleAllocator(
@@ -62,6 +67,7 @@ internal inline fun ModuleAllocator(
     crossinline globalAllocator: GlobalAllocator,
     crossinline elementAllocator: ElementAllocator,
     crossinline dataAllocator: DataAllocator,
+    crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val (store, module) = context
@@ -82,7 +88,8 @@ internal inline fun ModuleAllocator(
     }
 
     module.globals.forEachIndexed { idx, global ->
-        val value = evaluator(store, instance, global.initExpression, Arity.Return(1)).flatMap { initialValue ->
+        val initExpression = expressionPredecoder(context, global.initExpression).bind()
+        val value = evaluator(store, instance, initExpression, Arity.Return(1)).flatMap { initialValue ->
             initialValue.toResultOr { InvocationError.MissingStackValue }
         }.bind()
         val address = globalAllocator(store, global.type, value)
@@ -92,6 +99,7 @@ internal inline fun ModuleAllocator(
     module.elementSegments.forEachIndexed { idx, elementSegment ->
         val elementSegmentReferences = module.elementSegments.map { segment ->
             segment.initExpressions.map { initExpression ->
+                val initExpression = expressionPredecoder(context, initExpression).bind()
                 evaluator(store, instance, initExpression, Arity.Return(1)).bind() as ReferenceValue
             }
         }

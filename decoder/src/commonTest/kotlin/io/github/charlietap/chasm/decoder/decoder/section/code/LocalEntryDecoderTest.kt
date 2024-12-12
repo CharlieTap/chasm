@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUIntReader
-import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
