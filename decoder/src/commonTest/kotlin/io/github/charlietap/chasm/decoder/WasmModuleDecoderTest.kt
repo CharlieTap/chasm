@@ -15,7 +15,7 @@ import io.github.charlietap.chasm.decoder.section.ImportSection
 import io.github.charlietap.chasm.decoder.section.Section
 import io.github.charlietap.chasm.decoder.section.SectionSize
 import io.github.charlietap.chasm.decoder.section.SectionType
-import io.github.charlietap.chasm.fixture.module.module
+import io.github.charlietap.chasm.fixture.ast.module.module
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

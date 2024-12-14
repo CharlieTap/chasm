@@ -11,8 +11,8 @@ import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
-import io.github.charlietap.chasm.fixture.module.module
-import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
-import io.github.charlietap.chasm.fixture.module.globalImport
-import io.github.charlietap.chasm.fixture.module.globalIndex
-import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.ast.module.globalImport
+import io.github.charlietap.chasm.fixture.ast.module.globalIndex
+import io.github.charlietap.chasm.fixture.ast.type.globalType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

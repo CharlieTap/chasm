@@ -1,21 +1,17 @@
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.ast.instruction.TableInstruction
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Thread
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.frameState
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.returnArity
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.executor.runtime.configuration
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.frameState
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.thread
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -27,11 +23,9 @@ class ExpressionEvaluatorTest {
         val store = store()
         val instance = moduleInstance()
 
-        val expression = Expression(
-            listOf(NumericInstruction.I32Const(177)),
-        )
+        val expression = runtimeExpression()
 
-        val thread = Thread(
+        val thread = thread(
             frame(
                 arity = returnArity(1),
                 state = frameState(
@@ -39,9 +33,9 @@ class ExpressionEvaluatorTest {
                     moduleInstance = instance,
                 ),
             ),
-            expression.instructions.map(::ModuleInstruction),
+            expression.instructions,
         )
-        val expectedConfig = Configuration(store, thread)
+        val expectedConfig = configuration(store, thread)
 
         val threadExecutor: ThreadExecutor = { config ->
             assertEquals(expectedConfig, config)
@@ -65,11 +59,9 @@ class ExpressionEvaluatorTest {
         val store = store()
         val instance = moduleInstance()
 
-        val expression = Expression(
-            listOf(TableInstruction.ElemDrop(Index.ElementIndex(0u))),
-        )
+        val expression = runtimeExpression()
 
-        val thread = Thread(
+        val thread = thread(
             frame(
                 arity = Arity.Return.SIDE_EFFECT,
                 state = frameState(
@@ -77,9 +69,9 @@ class ExpressionEvaluatorTest {
                     instance,
                 ),
             ),
-            expression.instructions.map(::ModuleInstruction),
+            expression.instructions,
         )
-        val expectedConfig = Configuration(store, thread)
+        val expectedConfig = configuration(store, thread)
 
         val threadExecutor: ThreadExecutor = { config ->
             assertEquals(expectedConfig, config)

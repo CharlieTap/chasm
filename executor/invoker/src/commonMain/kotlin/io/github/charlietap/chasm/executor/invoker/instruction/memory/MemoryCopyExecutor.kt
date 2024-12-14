@@ -3,17 +3,17 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.contains
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
+import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
-internal fun MemoryCopyExecutor(
+fun MemoryCopyExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryCopy,
 ): Result<Unit, InvocationError> =

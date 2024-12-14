@@ -25,6 +25,7 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.libs.stack)
+                api(projects.typeSystem)
                 api(libs.result)
             }
         }

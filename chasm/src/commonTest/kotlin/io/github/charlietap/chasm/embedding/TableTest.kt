@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.fixture.publicTableType
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.type.tableType
+import io.github.charlietap.chasm.fixture.ast.type.tableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -2,15 +2,17 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.func
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.module.function
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.ast.module.function
+import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,10 +27,17 @@ class WasmFunctionAllocatorTest {
         val store = store(
             functions = functions,
         )
+        val context = instantiationContext(
+            store = store,
+        )
 
         val type = functionType().definedType()
+        val typeIndex = typeIndex(0u)
         val wasmFunction = function(
-            typeIndex = Index.TypeIndex(0u),
+            typeIndex = typeIndex,
+        )
+        val runtimeFunction = runtimeFunction(
+            typeIndex = typeIndex,
         )
 
         val moduleInstance = moduleInstance(
@@ -37,11 +46,11 @@ class WasmFunctionAllocatorTest {
 
         val expectedInstance = FunctionInstance.WasmFunction(
             type = type,
-            function = wasmFunction,
+            function = runtimeFunction,
             module = moduleInstance,
         )
 
-        val actual = WasmFunctionAllocator(store, moduleInstance, wasmFunction)
+        val actual = WasmFunctionAllocator(context, moduleInstance, wasmFunction)
 
         assertEquals(Ok(Address.Function(0)), actual)
         assertEquals(expectedInstance, functions[0])
@@ -53,8 +62,11 @@ class WasmFunctionAllocatorTest {
         val store = store(
             functions = functions,
         )
+        val context = instantiationContext(
+            store = store,
+        )
 
-        val typeIndex = Index.TypeIndex(0u)
+        val typeIndex = typeIndex(0u)
         val wasmFunction = function(
             typeIndex = typeIndex,
         )
@@ -67,7 +79,7 @@ class WasmFunctionAllocatorTest {
             ),
         )
 
-        val actual = WasmFunctionAllocator(store, moduleInstance, wasmFunction)
+        val actual = WasmFunctionAllocator(context, moduleInstance, wasmFunction)
 
         assertEquals(expected, actual)
         assertTrue(functions.isEmpty())

@@ -1,11 +1,12 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.element
 
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,9 +20,9 @@ class ElementAllocatorTest {
             elements = elements,
         )
 
-        val refType = ReferenceType.RefNull(AbstractHeapType.Func)
+        val refType = refNullReferenceType(AbstractHeapType.Func)
 
-        val expected = ElementInstance(
+        val expected = elementInstance(
             type = refType,
             elements = arrayOf(),
         )

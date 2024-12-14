@@ -2,32 +2,33 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.expect
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.label
-import io.github.charlietap.chasm.fixture.module.function
-import io.github.charlietap.chasm.fixture.module.local
-import io.github.charlietap.chasm.fixture.returnArity
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.functionType
-import io.github.charlietap.chasm.fixture.type.i32ValueType
-import io.github.charlietap.chasm.fixture.type.i64ValueType
-import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.ast.module.local
+import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
+import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ast.type.referenceValueType
+import io.github.charlietap.chasm.fixture.ast.type.resultType
+import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.label
+import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -56,14 +57,18 @@ class WasmFunctionCallTest {
         )
         val definedType = functionType.definedType()
 
-        val function = function(
+        val function = runtimeFunction(
             locals = listOf(
-                local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
+                local(
+                    type = referenceValueType(
+                        refNullReferenceType(AbstractHeapType.Func),
+                    ),
+                ),
             ),
-            body = Expression(
+            body = runtimeExpression(
                 listOf(
-                    NumericInstruction.I32GeS,
-                    NumericInstruction.I32GeU,
+                    dispatchableInstruction(),
+                    dispatchableInstruction(),
                 ),
             ),
         )
@@ -100,14 +105,23 @@ class WasmFunctionCallTest {
                 module = functionInstance.module,
             ),
         )
+        val frameDispatchable = dispatchableInstruction()
+        val frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame> = { frame ->
+            frameDispatchable
+        }
+        val expectedFrameInstruction = Instruction(
+            instruction = frameDispatchable,
+            tag = Stack.Entry.InstructionTag.FRAME,
+        )
 
         val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params, _handler ->
             assertEquals(stack, _stack)
             assertEquals(label, _label)
-            assertEquals(function.body.instructions.map(::ModuleInstruction), _instructions)
+            assertEquals(function.body.instructions, _instructions)
             assertEquals(emptyList(), _params)
 
             assertEquals(frame, stack.peekFrameOrNull())
+            assertEquals(expectedFrameInstruction, stack.peekInstructionOrNull())
             assertEquals(1, stack.framesDepth())
 
             Ok(Unit)
@@ -118,6 +132,7 @@ class WasmFunctionCallTest {
             stack = stack,
             instance = functionInstance,
             instructionBlockExecutor = instructionBlockExecutor,
+            frameDispatcher = frameDispatcher,
         )
 
         assertEquals(Ok(Unit), actual)
@@ -146,14 +161,14 @@ class WasmFunctionCallTest {
         )
         val definedType = functionType.definedType()
 
-        val function = function(
+        val function = runtimeFunction(
             locals = listOf(
                 local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
-            body = Expression(
+            body = runtimeExpression(
                 listOf(
-                    NumericInstruction.I32GeS,
-                    NumericInstruction.I32GeU,
+                    dispatchableInstruction(),
+                    dispatchableInstruction(),
                 ),
             ),
         )
@@ -190,14 +205,24 @@ class WasmFunctionCallTest {
                 module = functionInstance.module,
             ),
         )
+        val frameDispatchable = dispatchableInstruction()
+        val frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame> = { _frame ->
+            assertEquals(frame, _frame)
+            frameDispatchable
+        }
 
         stack.pushFrame(frame)
-        stack.push(Instruction(AdminInstruction.Frame(frame)))
+        stack.push(
+            Instruction(
+                instruction = frameDispatchable,
+                tag = Stack.Entry.InstructionTag.FRAME,
+            ),
+        )
 
         val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params, _handler ->
             assertEquals(stack, _stack)
             assertEquals(label, _label)
-            assertEquals(function.body.instructions.map(::ModuleInstruction), _instructions)
+            assertEquals(function.body.instructions, _instructions)
             assertEquals(emptyList(), _params)
 
             assertEquals(frame, stack.peekFrameOrNull())
@@ -211,6 +236,7 @@ class WasmFunctionCallTest {
             stack = stack,
             instance = functionInstance,
             instructionBlockExecutor = instructionBlockExecutor,
+            frameDispatcher = frameDispatcher,
         )
 
         assertEquals(Ok(Unit), actual)

@@ -11,8 +11,8 @@ import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.instruction.memoryCopyInstruction
-import io.github.charlietap.chasm.fixture.module.memoryIndex
+import io.github.charlietap.chasm.fixture.ast.instruction.memoryCopyInstruction
+import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

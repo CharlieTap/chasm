@@ -11,8 +11,8 @@ import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
-import io.github.charlietap.chasm.fixture.module.dataIndex
-import io.github.charlietap.chasm.fixture.module.dataSegment
+import io.github.charlietap.chasm.fixture.ast.module.dataIndex
+import io.github.charlietap.chasm.fixture.ast.module.dataSegment
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

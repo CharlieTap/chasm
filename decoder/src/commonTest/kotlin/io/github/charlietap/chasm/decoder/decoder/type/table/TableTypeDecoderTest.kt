@@ -10,10 +10,10 @@ import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
-import io.github.charlietap.chasm.fixture.type.limits
-import io.github.charlietap.chasm.fixture.type.refNullReferenceType
-import io.github.charlietap.chasm.fixture.type.sharedStatus
-import io.github.charlietap.chasm.fixture.type.tableType
+import io.github.charlietap.chasm.fixture.ast.type.limits
+import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ast.type.sharedStatus
+import io.github.charlietap.chasm.fixture.ast.type.tableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

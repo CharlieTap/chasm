@@ -9,9 +9,9 @@ import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.ElementSection
-import io.github.charlietap.chasm.fixture.module.elementIndex
-import io.github.charlietap.chasm.fixture.module.elementSegment
-import io.github.charlietap.chasm.fixture.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ast.module.elementIndex
+import io.github.charlietap.chasm.fixture.ast.module.elementSegment
+import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.runtime
 
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import kotlin.jvm.JvmInline
 import io.github.charlietap.chasm.stack.Stack as InternalStack
 
 data class Stack(
@@ -130,7 +130,7 @@ data class Stack(
         data class Label(
             val arity: Arity,
             val stackValuesDepth: Int,
-            val continuation: List<ExecutionInstruction>,
+            val continuation: List<DispatchableInstruction>,
         ) : Entry
 
         data class ActivationFrame(
@@ -145,8 +145,18 @@ data class Stack(
             )
         }
 
-        @JvmInline
-        value class Instruction(val instruction: ExecutionInstruction) : Entry
+        enum class InstructionTag {
+            NON_ADMIN,
+            FRAME,
+            LABEL,
+            HANDLER,
+        }
+
+        data class Instruction(
+            val instruction: DispatchableInstruction,
+            val tag: InstructionTag = InstructionTag.NON_ADMIN,
+            val handler: ExceptionHandler? = null,
+        ) : Entry
     }
 
     companion object {

@@ -4,8 +4,8 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
-import io.github.charlietap.chasm.fixture.instruction.memoryGrowInstruction
-import io.github.charlietap.chasm.fixture.module.memoryIndex
+import io.github.charlietap.chasm.fixture.ast.instruction.memoryGrowInstruction
+import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

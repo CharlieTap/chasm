@@ -5,28 +5,33 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
-import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
+import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.module.elementSegment
-import io.github.charlietap.chasm.fixture.module.function
-import io.github.charlietap.chasm.fixture.module.global
-import io.github.charlietap.chasm.fixture.module.import
-import io.github.charlietap.chasm.fixture.module.module
-import io.github.charlietap.chasm.fixture.module.startFunction
-import io.github.charlietap.chasm.fixture.module.table
-import io.github.charlietap.chasm.fixture.returnArity
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.heapType
+import io.github.charlietap.chasm.fixture.ast.instruction.expression
+import io.github.charlietap.chasm.fixture.ast.module.elementSegment
+import io.github.charlietap.chasm.fixture.ast.module.function
+import io.github.charlietap.chasm.fixture.ast.module.global
+import io.github.charlietap.chasm.fixture.ast.module.import
+import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.module.startFunction
+import io.github.charlietap.chasm.fixture.ast.module.table
+import io.github.charlietap.chasm.fixture.ast.type.heapType
+import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
+import io.github.charlietap.chasm.fixture.executor.runtime.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import io.github.charlietap.chasm.fixture.instance.import as runtimeImport
+import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
 
 class ModuleInstantiatorTest {
 
@@ -36,7 +41,11 @@ class ModuleInstantiatorTest {
         val store = store()
         val import = import()
         val global = global()
-        val tableInitExpression = Expression(listOf(ReferenceInstruction.RefNull(heapType())))
+        val tableInitExpression = expression(
+            instructions = listOf(
+                ReferenceInstruction.RefNull(heapType()),
+            ),
+        )
         val table = table(
             initExpression = tableInitExpression,
         )
@@ -51,11 +60,11 @@ class ModuleInstantiatorTest {
             elementSegments = listOf(elementSegment),
             startFunction = startFunction,
         )
-        val context = InstantiationContext(store, module)
-        val imports = listOf(runtimeImport(externalValue = ExternalValue.Function(Address.Function(0))))
+        val context = instantiationContext(store, module)
+        val imports = listOf(runtimeImport(externalValue = functionExternalValue(functionAddress(0))))
 
         val partialInstance = moduleInstance(
-            functionAddresses = mutableListOf(Address.Function(0)),
+            functionAddresses = mutableListOf(functionAddress(0)),
         )
         val pallocator: PartialModuleAllocator = { _context, _imports ->
             assertEquals(context, _context)
@@ -72,40 +81,42 @@ class ModuleInstantiatorTest {
             Ok(partialInstance)
         }
 
-        val evaluator: ExpressionEvaluator = { eStore, eInstance, eExpression, eArity ->
-            assertEquals(store, eStore)
-            assertEquals(partialInstance, eInstance)
-            assertEquals(returnArity(1), eArity)
+        val evaluator: ExpressionEvaluator = { _store, _instance, _expression, _arity ->
+            assertEquals(store, _store)
+            assertEquals(partialInstance, _instance)
+            assertEquals(returnArity(1), _arity)
 
-            if (eExpression.instructions.isEmpty()) {
-                Ok(null)
-            } else {
-                Ok(ReferenceValue.Null(heapType()))
-            }
+            Ok(ReferenceValue.Null(heapType()))
         }
 
-        val invoker: FunctionInvoker = { eStore, eAddress, eLocals ->
-            assertEquals(store, eStore)
-            assertEquals(Address.Function(0), eAddress)
-            assertEquals(emptyList(), eLocals)
+        val invoker: FunctionInvoker = { _store, _address, _locals ->
+            assertEquals(store, _store)
+            assertEquals(Address.Function(0), _address)
+            assertEquals(emptyList(), _locals)
 
             Ok(emptyList())
         }
 
-        val tableInitializer: TableInitializer = { eStore, eInstance, eModule ->
-            assertEquals(store, eStore)
-            assertEquals(partialInstance, eInstance)
-            assertEquals(module, eModule)
+        val tableInitializer: TableInitializer = { _context, _instance ->
+            assertEquals(context, _context)
+            assertEquals(partialInstance, _instance)
 
             Ok(Unit)
         }
 
-        val memoryInitializer: MemoryInitializer = { eStore, eInstance, eModule ->
-            assertEquals(store, eStore)
-            assertEquals(partialInstance, eInstance)
-            assertEquals(module, eModule)
+        val memoryInitializer: MemoryInitializer = { _context, _instance ->
+            assertEquals(context, _context)
+            assertEquals(partialInstance, _instance)
 
             Ok(Unit)
+        }
+
+        val runtimeTableInitExpression = runtimeExpression()
+        val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _expression ->
+            assertEquals(context, _context)
+            assertEquals(tableInitExpression, _expression)
+
+            Ok(runtimeTableInitExpression)
         }
 
         val actual = ModuleInstantiator(
@@ -118,6 +129,7 @@ class ModuleInstantiatorTest {
             evaluator = evaluator,
             tableInitializer = tableInitializer,
             memoryInitializer = memoryInitializer,
+            expressionPredecoder = expressionPredecoder,
         )
 
         assertEquals(Ok(partialInstance), actual)

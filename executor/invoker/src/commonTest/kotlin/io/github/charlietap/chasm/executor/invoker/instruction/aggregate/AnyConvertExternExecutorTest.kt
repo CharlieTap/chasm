@@ -1,15 +1,15 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
+import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.value.externReferenceValue
-import io.github.charlietap.chasm.fixture.value.nullReferenceValue
-import io.github.charlietap.chasm.fixture.value.referenceValue
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.value.externReferenceValue
+import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
+import io.github.charlietap.chasm.fixture.executor.runtime.value.referenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

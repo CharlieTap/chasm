@@ -1,25 +1,24 @@
 package io.github.charlietap.chasm.benchmark.instruction.memory
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
-import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
-import io.github.charlietap.chasm.executor.invoker.instruction.ExecutionInstructionExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.memory.MemoryCopyExecutor
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.frameState
-import io.github.charlietap.chasm.fixture.instance.memoryAddress
-import io.github.charlietap.chasm.fixture.instance.memoryInstance
-import io.github.charlietap.chasm.fixture.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.instruction.memoryCopyInstruction
-import io.github.charlietap.chasm.fixture.instruction.moduleInstruction
-import io.github.charlietap.chasm.fixture.module.memoryIndex
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.limits
-import io.github.charlietap.chasm.fixture.type.memoryType
-import io.github.charlietap.chasm.fixture.type.unsharedStatus
-import io.github.charlietap.chasm.fixture.value
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
+import io.github.charlietap.chasm.fixture.ast.type.limits
+import io.github.charlietap.chasm.fixture.ast.type.memoryType
+import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.frameState
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.memoryCopyRuntimeInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.executor.runtime.value
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -46,11 +45,9 @@ class MemoryCopyInstructionBenchmark {
         instance = moduleInstance(),
     )
 
-    private val instruction = moduleInstruction(
-        memoryCopyInstruction(
-            srcMemoryIndex = memoryIndex(0u),
-            dstMemoryIndex = memoryIndex(0u),
-        ),
+    private val instruction = memoryCopyRuntimeInstruction(
+        srcMemoryIndex = memoryIndex(0u),
+        dstMemoryIndex = memoryIndex(0u),
     )
 
     private val memoryInstance = memoryInstance(
@@ -91,7 +88,7 @@ class MemoryCopyInstructionBenchmark {
         context.stack.push(dstOffset)
         context.stack.push(srcOffset)
         context.stack.push(bytesToCopy)
-        val result = ExecutionInstructionExecutor(context, instruction)
+        val result = MemoryCopyExecutor(context, instruction)
         context.stack.clearValues()
         blackhole.consume(result)
     }

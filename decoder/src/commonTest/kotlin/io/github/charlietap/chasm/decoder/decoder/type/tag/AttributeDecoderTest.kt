@@ -5,7 +5,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.decoder.error.SectionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
-import io.github.charlietap.chasm.fixture.type.exceptionAttribute
+import io.github.charlietap.chasm.fixture.ast.type.exceptionAttribute
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

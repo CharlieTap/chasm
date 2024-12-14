@@ -21,8 +21,8 @@ import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
-import io.github.charlietap.chasm.fixture.module.module
-import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

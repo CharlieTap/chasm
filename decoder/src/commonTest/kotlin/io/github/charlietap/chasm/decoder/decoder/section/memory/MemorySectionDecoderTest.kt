@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.MemorySection
-import io.github.charlietap.chasm.fixture.type.memoryType
+import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

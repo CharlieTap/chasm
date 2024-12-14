@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.GlobalSection
-import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.ast.type.globalType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

@@ -3,12 +3,12 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.instance.functionAddress
-import io.github.charlietap.chasm.fixture.instruction.refIsNullInstruction
-import io.github.charlietap.chasm.fixture.stack
-import io.github.charlietap.chasm.fixture.type.heapType
-import io.github.charlietap.chasm.fixture.value
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.ast.type.heapType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refIsNullRuntimeInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.value
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -27,7 +27,7 @@ class RefIsNullExecutorTest {
 
         val actual = RefIsNullExecutor(
             context = context,
-            instruction = refIsNullInstruction(),
+            instruction = refIsNullRuntimeInstruction(),
         )
 
         assertEquals(Ok(Unit), actual)
@@ -47,7 +47,7 @@ class RefIsNullExecutorTest {
 
         val actual = RefIsNullExecutor(
             context = context,
-            instruction = refIsNullInstruction(),
+            instruction = refIsNullRuntimeInstruction(),
         )
 
         assertEquals(Ok(Unit), actual)

@@ -5,9 +5,9 @@ import io.github.charlietap.chasm.embedding.fixture.publicGlobalType
 import io.github.charlietap.chasm.embedding.fixture.publicI32
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.instance.globalExternalValue
-import io.github.charlietap.chasm.fixture.type.globalType
-import io.github.charlietap.chasm.fixture.value.i32
+import io.github.charlietap.chasm.fixture.ast.type.globalType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,42 +1,44 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
-import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.instance.functionAddress
-import io.github.charlietap.chasm.fixture.instance.globalAddress
-import io.github.charlietap.chasm.fixture.instance.memoryAddress
-import io.github.charlietap.chasm.fixture.instance.tableAddress
-import io.github.charlietap.chasm.fixture.module.dataSegment
-import io.github.charlietap.chasm.fixture.module.elementSegment
-import io.github.charlietap.chasm.fixture.module.function
-import io.github.charlietap.chasm.fixture.module.functionImportDescriptor
-import io.github.charlietap.chasm.fixture.module.global
-import io.github.charlietap.chasm.fixture.module.globalImportDescriptor
-import io.github.charlietap.chasm.fixture.module.import
-import io.github.charlietap.chasm.fixture.module.memory
-import io.github.charlietap.chasm.fixture.module.memoryImportDescriptor
-import io.github.charlietap.chasm.fixture.module.module
-import io.github.charlietap.chasm.fixture.module.table
-import io.github.charlietap.chasm.fixture.module.tableImportDescriptor
-import io.github.charlietap.chasm.fixture.module.type
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.functionRecursiveType
-import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.ast.module.dataSegment
+import io.github.charlietap.chasm.fixture.ast.module.elementSegment
+import io.github.charlietap.chasm.fixture.ast.module.function
+import io.github.charlietap.chasm.fixture.ast.module.functionImportDescriptor
+import io.github.charlietap.chasm.fixture.ast.module.global
+import io.github.charlietap.chasm.fixture.ast.module.globalImportDescriptor
+import io.github.charlietap.chasm.fixture.ast.module.import
+import io.github.charlietap.chasm.fixture.ast.module.memory
+import io.github.charlietap.chasm.fixture.ast.module.memoryImportDescriptor
+import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.module.table
+import io.github.charlietap.chasm.fixture.ast.module.tableImportDescriptor
+import io.github.charlietap.chasm.fixture.ast.module.type
+import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.fixture.ast.type.functionRecursiveType
+import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.type.ext.definedType
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import io.github.charlietap.chasm.fixture.instance.import as runtimeImport
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
 
 class PartialModuleAllocatorTest {
 
@@ -44,8 +46,8 @@ class PartialModuleAllocatorTest {
     fun `can allocate a partial module instance`() {
 
         val store = store()
-        val typeIndex = Index.TypeIndex(0u)
-        val functionAddress = Address.Function(0)
+        val typeIndex = typeIndex(0u)
+        val functionAddress = functionAddress(0)
         val function = function(typeIndex = typeIndex)
         val functionType = functionType()
         val recursiveType = functionRecursiveType(functionType)
@@ -56,7 +58,7 @@ class PartialModuleAllocatorTest {
         val table = table()
         val memory = memory()
         val global = global()
-        val refType = ReferenceType.RefNull(AbstractHeapType.Extern)
+        val refType = refNullReferenceType(AbstractHeapType.Extern)
         val elementSegment = elementSegment(type = refType)
         val bytes = ubyteArrayOf()
         val dataSegment = dataSegment(initData = bytes)
@@ -71,10 +73,10 @@ class PartialModuleAllocatorTest {
         val importMemoryAddress = memoryAddress()
         val importGlobalAddress = globalAddress()
         val imports = listOf(
-            runtimeImport(externalValue = ExternalValue.Function(importFunctionAddress)),
-            runtimeImport(externalValue = ExternalValue.Table(importTableAddress)),
-            runtimeImport(externalValue = ExternalValue.Memory(importMemoryAddress)),
-            runtimeImport(externalValue = ExternalValue.Global(importGlobalAddress)),
+            runtimeImport(externalValue = functionExternalValue(importFunctionAddress)),
+            runtimeImport(externalValue = tableExternalValue(importTableAddress)),
+            runtimeImport(externalValue = memoryExternalValue(importMemoryAddress)),
+            runtimeImport(externalValue = globalExternalValue(importGlobalAddress)),
         )
 
         val module = module(
@@ -88,7 +90,7 @@ class PartialModuleAllocatorTest {
             imports = listOf(moduleFunctionImport, moduleTableImport, moduleMemoryImport, moduleGlobalImport),
             exports = emptyList(),
         )
-        val context = InstantiationContext(store, module)
+        val context = instantiationContext(store, module)
 
         val importMatcher: ImportMatcher = { _, _ ->
             Ok(imports.map(Import::externalValue))

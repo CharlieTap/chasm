@@ -7,8 +7,8 @@ import io.github.charlietap.chasm.ast.type.StorageType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.type.mutability
-import io.github.charlietap.chasm.fixture.type.storageType
+import io.github.charlietap.chasm.fixture.ast.type.mutability
+import io.github.charlietap.chasm.fixture.ast.type.storageType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

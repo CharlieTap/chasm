@@ -18,4 +18,6 @@ sealed interface InstantiationError : ModuleTrapError {
     data object DataSegmentMemoryIndexNotZero : InstantiationError
 
     data object ClassificationError : InstantiationError
+
+    data object PredecodingError : InstantiationError
 }

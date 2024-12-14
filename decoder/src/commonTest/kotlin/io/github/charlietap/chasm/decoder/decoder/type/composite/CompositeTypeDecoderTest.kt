@@ -8,9 +8,9 @@ import io.github.charlietap.chasm.ast.type.StructType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
-import io.github.charlietap.chasm.fixture.type.arrayType
-import io.github.charlietap.chasm.fixture.type.functionType
-import io.github.charlietap.chasm.fixture.type.structType
+import io.github.charlietap.chasm.fixture.ast.type.arrayType
+import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.ast.type.structType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

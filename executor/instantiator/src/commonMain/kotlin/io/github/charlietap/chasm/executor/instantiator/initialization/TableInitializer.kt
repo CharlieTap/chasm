@@ -6,34 +6,36 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
-import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.predecoding.ExpressionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
-internal typealias TableInitializer = (Store, ModuleInstance, Module) -> Result<Unit, InvocationError>
+internal typealias TableInitializer = (InstantiationContext, ModuleInstance) -> Result<Unit, ModuleTrapError>
 
 internal fun TableInitializer(
-    store: Store,
+    context: InstantiationContext,
     instance: ModuleInstance,
-    module: Module,
-): Result<Unit, InvocationError> =
+): Result<Unit, ModuleTrapError> =
     TableInitializer(
-        store = store,
+        context = context,
         instance = instance,
-        module = module,
         evaluator = ::ExpressionEvaluator,
+        expressionPredecoder = ::ExpressionPredecoder,
     )
 
 internal inline fun TableInitializer(
-    store: Store,
+    context: InstantiationContext,
     instance: ModuleInstance,
-    module: Module,
     crossinline evaluator: ExpressionEvaluator,
-): Result<Unit, InvocationError> = binding {
+    crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
+): Result<Unit, ModuleTrapError> = binding {
 
+    val (store, module) = context
     module.elementSegments.filter { segment ->
         segment.mode is ElementSegment.Mode.Active
     }.forEach { segment ->
@@ -47,15 +49,19 @@ internal inline fun TableInitializer(
                 TableInstruction.ElemDrop(segment.idx),
             ),
         )
-        evaluator(store, instance, expression, Arity.Return.SIDE_EFFECT).bind()
+        val runtimeExpression = expressionPredecoder(context, expression).bind()
+        evaluator(store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
     }
 
     module.elementSegments.filter { segment ->
         segment.mode is ElementSegment.Mode.Declarative
     }.forEach { segment ->
         val expression = Expression(
-            instructions = listOf(TableInstruction.ElemDrop(segment.idx)),
+            instructions = listOf(
+                TableInstruction.ElemDrop(segment.idx),
+            ),
         )
-        evaluator(store, instance, expression, Arity.Return.SIDE_EFFECT).bind()
+        val runtimeExpression = expressionPredecoder(context, expression).bind()
+        evaluator(store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
     }
 }

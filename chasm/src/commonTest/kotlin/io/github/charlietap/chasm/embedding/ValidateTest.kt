@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicModule
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
-import io.github.charlietap.chasm.fixture.module.module
+import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.validator.WasmModuleValidator
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
 import kotlin.test.Test

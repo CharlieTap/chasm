@@ -4,19 +4,19 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
-import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
+import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-internal typealias BlockExecutor = (Store, Stack, ControlInstruction.BlockType, List<Instruction>) -> Result<Unit, InvocationError>
+internal typealias BlockExecutor = (Store, Stack, BlockType, List<DispatchableInstruction>) -> Result<Unit, InvocationError>
 
 internal inline fun BlockExecutor(
     context: ExecutionContext,
@@ -32,8 +32,8 @@ internal inline fun BlockExecutor(
 internal inline fun BlockExecutor(
     store: Store,
     stack: Stack,
-    blockType: ControlInstruction.BlockType,
-    instructions: List<Instruction>,
+    blockType: BlockType,
+    instructions: List<DispatchableInstruction>,
 ): Result<Unit, InvocationError> =
     BlockExecutor(
         store = store,
@@ -48,8 +48,8 @@ internal inline fun BlockExecutor(
 internal inline fun BlockExecutor(
     store: Store,
     stack: Stack,
-    blockType: ControlInstruction.BlockType,
-    instructions: List<Instruction>,
+    blockType: BlockType,
+    instructions: List<DispatchableInstruction>,
     crossinline expander: BlockTypeExpander,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
@@ -70,5 +70,5 @@ internal inline fun BlockExecutor(
         continuation = emptyList(),
     )
 
-    instructionBlockExecutor(stack, label, instructions.map(::ModuleInstruction), params, null).bind()
+    instructionBlockExecutor(stack, label, instructions, params, null).bind()
 }

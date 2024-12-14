@@ -2,15 +2,16 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
+import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.LoopDispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal fun LoopExecutor(
     context: ExecutionContext,
@@ -21,6 +22,7 @@ internal fun LoopExecutor(
         instruction = instruction,
         expander = ::BlockTypeExpander,
         instructionBlockExecutor = ::InstructionBlockExecutor,
+        loopDispatcher = ::LoopDispatcher,
     )
 
 internal inline fun LoopExecutor(
@@ -28,6 +30,7 @@ internal inline fun LoopExecutor(
     instruction: ControlInstruction.Loop,
     crossinline expander: BlockTypeExpander,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
+    crossinline loopDispatcher: Dispatcher<ControlInstruction.Loop>,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack) = context
@@ -38,8 +41,6 @@ internal inline fun LoopExecutor(
         Arity.Argument(functionType.params.types.size)
     } ?: Arity.Argument.NULLARY
 
-    val executionInstructions = instructions.map(::ModuleInstruction)
-
     val params = List(paramArity.value) {
         stack.popValue().bind().value
     }
@@ -47,8 +48,10 @@ internal inline fun LoopExecutor(
     val label = Stack.Entry.Label(
         arity = paramArity,
         stackValuesDepth = stack.valuesDepth(),
-        continuation = listOf(ModuleInstruction(ControlInstruction.Loop(blockType, instructions))),
+        continuation = listOf(
+            loopDispatcher(ControlInstruction.Loop(blockType, instructions)),
+        ),
     )
 
-    instructionBlockExecutor(stack, label, executionInstructions, params, null).bind()
+    instructionBlockExecutor(stack, label, instructions, params, null).bind()
 }

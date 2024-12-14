@@ -4,18 +4,19 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
+import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -31,6 +32,7 @@ internal inline fun WasmFunctionCall(
         stack = stack,
         instance = instance,
         instructionBlockExecutor = ::InstructionBlockExecutor,
+        frameDispatcher = ::FrameDispatcher,
     )
 
 @Suppress("UNUSED_PARAMETER")
@@ -39,6 +41,7 @@ internal inline fun WasmFunctionCall(
     stack: Stack,
     instance: FunctionInstance.WasmFunction,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
+    crossinline frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame>,
 ): Result<Unit, InvocationError> = binding {
 
     val type = instance.functionType().bind()
@@ -65,7 +68,7 @@ internal inline fun WasmFunctionCall(
     )
 
     stack.pushFrame(frame).bind()
-    stack.push(Instruction(AdminInstruction.Frame(frame)))
+    stack.push(Instruction(frameDispatcher(frame), InstructionTag.FRAME))
 
     val label = Stack.Entry.Label(
         arity = Arity.Return(results),
@@ -73,5 +76,5 @@ internal inline fun WasmFunctionCall(
         continuation = emptyList(),
     )
 
-    instructionBlockExecutor(stack, label, instance.function.body.instructions.map(::ModuleInstruction), emptyList(), null).bind()
+    instructionBlockExecutor(stack, label, instance.function.body.instructions, emptyList(), null).bind()
 }

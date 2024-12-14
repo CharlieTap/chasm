@@ -14,8 +14,8 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
-import io.github.charlietap.chasm.fixture.frame
-import io.github.charlietap.chasm.fixture.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

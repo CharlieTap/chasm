@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.ImportSection
-import io.github.charlietap.chasm.fixture.module.import
+import io.github.charlietap.chasm.fixture.ast.module.import
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

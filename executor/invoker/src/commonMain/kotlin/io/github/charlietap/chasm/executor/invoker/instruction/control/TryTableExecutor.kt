@@ -4,16 +4,15 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.invoker.context.ExecutionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.instruction.ModuleInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal inline fun TryTableExecutor(
     context: ExecutionContext,
@@ -44,8 +43,6 @@ internal inline fun TryTableExecutor(
         Arity.Return(functionType.results.types.size)
     } ?: Arity.Return.SIDE_EFFECT
 
-    val executionInstructions = instruction.instructions.map(::ModuleInstruction)
-
     val params = List(paramArity.value) {
         stack.popValue().bind().value
     }
@@ -60,5 +57,5 @@ internal inline fun TryTableExecutor(
         instructions = instruction.handlers,
     )
 
-    blockExecutor(stack, label, executionInstructions, params, handler).bind()
+    blockExecutor(stack, label, instruction.instructions, params, handler).bind()
 }

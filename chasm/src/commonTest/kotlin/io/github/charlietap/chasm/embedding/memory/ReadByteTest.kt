@@ -6,10 +6,10 @@ import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.executor.memory.read.BytesReader
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.fixture.instance.memoryAddress
-import io.github.charlietap.chasm.fixture.instance.memoryExternalValue
-import io.github.charlietap.chasm.fixture.instance.memoryInstance
-import io.github.charlietap.chasm.fixture.store
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.store
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

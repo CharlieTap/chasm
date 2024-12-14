@@ -5,10 +5,11 @@ import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.memory.linearMemory
-import io.github.charlietap.chasm.fixture.store
-import io.github.charlietap.chasm.fixture.type.limits
-import io.github.charlietap.chasm.fixture.type.memoryType
+import io.github.charlietap.chasm.fixture.ast.type.limits
+import io.github.charlietap.chasm.fixture.ast.type.memoryType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.memory.linearMemory
+import io.github.charlietap.chasm.fixture.executor.runtime.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -32,7 +33,7 @@ class MemoryAllocatorTest {
             memory
         }
 
-        val expected = MemoryInstance(
+        val expected = memoryInstance(
             type = type,
             data = memory,
         )

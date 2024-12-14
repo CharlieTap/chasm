@@ -13,8 +13,8 @@ import io.github.charlietap.chasm.decoder.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.type.packedType
-import io.github.charlietap.chasm.fixture.type.valueType
+import io.github.charlietap.chasm.fixture.ast.type.packedType
+import io.github.charlietap.chasm.fixture.ast.type.valueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

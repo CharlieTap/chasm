@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.type.subType
+import io.github.charlietap.chasm.fixture.ast.type.subType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
