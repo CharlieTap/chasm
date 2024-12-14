@@ -29,6 +29,4 @@ dependencyResolutionManagement {
     }
 }
 
-include("plugin")
-
 rootProject.name = "bolt-gradle-plugin"

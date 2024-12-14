@@ -14,6 +14,10 @@ plugins {
 
 kotlin {
 
+    compilerOptions {
+        freeCompilerArgs.add("-Xsuppress-warning=ASSIGNED_VALUE_IS_NEVER_READ")
+    }
+
     sourceSets {
 
         all {
