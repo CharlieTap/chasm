@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Result
@@ -36,7 +34,9 @@ internal inline fun StructSetExecutor(
 
     val (stack) = context
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.definedType(instruction.typeIndex).bind()
+    val definedType = frame.state.module
+        .definedType(instruction.typeIndex)
+        .bind()
 
     val structType = definedTypeExpander(definedType).structType().bind()
     val fieldType = structType.field(instruction.fieldIndex).bind()

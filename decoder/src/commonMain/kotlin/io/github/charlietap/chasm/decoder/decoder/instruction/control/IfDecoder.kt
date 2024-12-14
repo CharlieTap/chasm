@@ -26,7 +26,10 @@ internal inline fun IfDecoder(
 
     var activeInstructions = instructions
     do {
-        val opcode = context.reader.peek().ubyte().bind()
+        val opcode = context.reader
+            .peek()
+            .ubyte()
+            .bind()
         if (opcode != ELSE) {
             if (opcode != END) {
                 activeInstructions += instructionDecoder(context).bind()

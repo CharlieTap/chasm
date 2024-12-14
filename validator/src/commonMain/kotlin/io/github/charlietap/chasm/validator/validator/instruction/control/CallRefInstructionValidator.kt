@@ -21,12 +21,15 @@ internal fun CallRefInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val definedType = context.type(instruction.typeIndex).bind()
-    val functionType = definedType.functionType().toResultOr {
-        TypeValidatorError.TypeMismatch
-    }.bind()
+    val functionType = definedType
+        .functionType()
+        .toResultOr {
+            TypeValidatorError.TypeMismatch
+        }.bind()
 
-    context.popValues(
-        functionType.params.types + listOf(ValueType.Reference(ReferenceType.RefNull(ConcreteHeapType.Defined(definedType)))),
-    ).bind()
+    context
+        .popValues(
+            functionType.params.types + listOf(ValueType.Reference(ReferenceType.RefNull(ConcreteHeapType.Defined(definedType)))),
+        ).bind()
     context.pushValues(functionType.results.types)
 }

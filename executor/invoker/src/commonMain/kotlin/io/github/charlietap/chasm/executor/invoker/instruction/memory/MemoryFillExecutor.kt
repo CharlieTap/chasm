@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Result
@@ -39,7 +37,9 @@ internal inline fun MemoryFillExecutor(
     val offset = stack.popI32().bind()
 
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
+    val memoryAddress = frame.state.module
+        .memoryAddress(instruction.memoryIndex)
+        .bind()
     val memory = store.memory(memoryAddress).bind()
 
     boundsChecker(offset, bytesToFill, memory.size) {

@@ -14,8 +14,9 @@ actual inline fun F64Reader(
     address: Int,
 ): Result<Double, InvocationError> {
     val byteArray = (memory as ByteArrayLinearMemory).memory
-    val value = byteArray.sliceArray(
-        address until (address + Double.SIZE_BYTES),
-    ).toDoubleLittleEndian()
+    val value = byteArray
+        .sliceArray(
+            address until (address + Double.SIZE_BYTES),
+        ).toDoubleLittleEndian()
     return Ok(value)
 }

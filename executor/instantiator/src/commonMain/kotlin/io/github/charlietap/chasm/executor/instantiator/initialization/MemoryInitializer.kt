@@ -36,21 +36,22 @@ internal inline fun MemoryInitializer(
 ): Result<Unit, ModuleTrapError> = binding {
 
     val module = context.module
-    module.dataSegments.filter { segment ->
-        segment.mode is DataSegment.Mode.Active
-    }.forEach { segment ->
-        val mode = segment.mode as DataSegment.Mode.Active
-        val size = segment.initData.size
-        val expression = Expression(
-            mode.offset.instructions + listOf(
-                NumericInstruction.I32Const(0),
-                NumericInstruction.I32Const(size),
-                MemoryInstruction.MemoryInit(mode.memoryIndex, segment.idx),
-                MemoryInstruction.DataDrop(segment.idx),
-            ),
-        )
-        val runtimeExpression = expressionPredecoder(context, expression).bind()
+    module.dataSegments
+        .filter { segment ->
+            segment.mode is DataSegment.Mode.Active
+        }.forEach { segment ->
+            val mode = segment.mode as DataSegment.Mode.Active
+            val size = segment.initData.size
+            val expression = Expression(
+                mode.offset.instructions + listOf(
+                    NumericInstruction.I32Const(0),
+                    NumericInstruction.I32Const(size),
+                    MemoryInstruction.MemoryInit(mode.memoryIndex, segment.idx),
+                    MemoryInstruction.DataDrop(segment.idx),
+                ),
+            )
+            val runtimeExpression = expressionPredecoder(context, expression).bind()
 
-        evaluator(context.store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
-    }
+            evaluator(context.store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
+        }
 }

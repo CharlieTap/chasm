@@ -25,8 +25,7 @@ fun readGlobal(
         store = store,
         global = global,
         valueMapper = ValueMapper.instance,
-    )
-        .mapError(ModuleTrapError::toString)
+    ).mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

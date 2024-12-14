@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Err
@@ -72,10 +70,14 @@ internal inline fun ThrowRefExecutor(
 
         val tagMatches = when (catchHandler) {
             is CatchHandler.Catch -> {
-                address == frame.state.module.tagAddress(catchHandler.tagIndex).bind()
+                address == frame.state.module
+                    .tagAddress(catchHandler.tagIndex)
+                    .bind()
             }
             is CatchHandler.CatchRef -> {
-                address == frame.state.module.tagAddress(catchHandler.tagIndex).bind()
+                address == frame.state.module
+                    .tagAddress(catchHandler.tagIndex)
+                    .bind()
             }
             else -> false
         }

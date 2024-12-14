@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.validator.ext
 
 import com.github.michaelbull.result.Err
@@ -35,9 +33,11 @@ internal inline fun ValidationContext.pop(): Result<ValueType, ModuleValidatorEr
     if (operands.depth() == label.operandsDepth && label.unreachable) {
         ValueType.Bottom(BottomType)
     } else {
-        operands.popOrNull().toResultOr {
-            TypeValidatorError.TypeMismatch
-        }.bind()
+        operands
+            .popOrNull()
+            .toResultOr {
+                TypeValidatorError.TypeMismatch
+            }.bind()
     }
 }
 
@@ -113,9 +113,11 @@ internal inline fun ValidationContext.peekValues(
     crossinline typeMatcher: TypeMatcher<ValueType> = ::ValueTypeMatcher,
 ): Result<List<ValueType>, ModuleValidatorError> = binding {
     expected.asReversed().mapIndexed { index, valueType ->
-        val actual = operands.peekNth(index).mapError {
-            TypeValidatorError.TypeMismatch
-        }.bind()
+        val actual = operands
+            .peekNth(index)
+            .mapError {
+                TypeValidatorError.TypeMismatch
+            }.bind()
 
         if (!typeMatcher(actual, valueType, this@peekValues)) {
             Err(TypeValidatorError.TypeMismatch).bind<Unit>()

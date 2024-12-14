@@ -22,7 +22,12 @@ internal inline fun HeapTypeDecoder(
     context: DecoderContext,
     crossinline abstractHeapTypeDecoder: Decoder<AbstractHeapType>,
 ): Result<HeapType, WasmDecodeError> = binding {
-    when (context.reader.peek().ubyte().bind()) {
+    when (
+        context.reader
+            .peek()
+            .ubyte()
+            .bind()
+    ) {
         in ABSTRACT_HEAP_TYPE_RANGE -> {
             abstractHeapTypeDecoder(context).bind()
         }

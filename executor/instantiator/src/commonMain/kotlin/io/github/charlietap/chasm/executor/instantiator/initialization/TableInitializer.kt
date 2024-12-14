@@ -36,32 +36,34 @@ internal inline fun TableInitializer(
 ): Result<Unit, ModuleTrapError> = binding {
 
     val (store, module) = context
-    module.elementSegments.filter { segment ->
-        segment.mode is ElementSegment.Mode.Active
-    }.forEach { segment ->
-        val expressionCount = segment.initExpressions.size
-        val mode = segment.mode as ElementSegment.Mode.Active
-        val expression = Expression(
-            instructions = mode.offsetExpr.instructions + listOf(
-                NumericInstruction.I32Const(0),
-                NumericInstruction.I32Const(expressionCount),
-                TableInstruction.TableInit(segment.idx, mode.tableIndex),
-                TableInstruction.ElemDrop(segment.idx),
-            ),
-        )
-        val runtimeExpression = expressionPredecoder(context, expression).bind()
-        evaluator(store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
-    }
+    module.elementSegments
+        .filter { segment ->
+            segment.mode is ElementSegment.Mode.Active
+        }.forEach { segment ->
+            val expressionCount = segment.initExpressions.size
+            val mode = segment.mode as ElementSegment.Mode.Active
+            val expression = Expression(
+                instructions = mode.offsetExpr.instructions + listOf(
+                    NumericInstruction.I32Const(0),
+                    NumericInstruction.I32Const(expressionCount),
+                    TableInstruction.TableInit(segment.idx, mode.tableIndex),
+                    TableInstruction.ElemDrop(segment.idx),
+                ),
+            )
+            val runtimeExpression = expressionPredecoder(context, expression).bind()
+            evaluator(store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
+        }
 
-    module.elementSegments.filter { segment ->
-        segment.mode is ElementSegment.Mode.Declarative
-    }.forEach { segment ->
-        val expression = Expression(
-            instructions = listOf(
-                TableInstruction.ElemDrop(segment.idx),
-            ),
-        )
-        val runtimeExpression = expressionPredecoder(context, expression).bind()
-        evaluator(store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
-    }
+    module.elementSegments
+        .filter { segment ->
+            segment.mode is ElementSegment.Mode.Declarative
+        }.forEach { segment ->
+            val expression = Expression(
+                instructions = listOf(
+                    TableInstruction.ElemDrop(segment.idx),
+                ),
+            )
+            val runtimeExpression = expressionPredecoder(context, expression).bind()
+            evaluator(store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
+        }
 }

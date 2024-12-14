@@ -26,8 +26,7 @@ fun writeByte(
         pointer = pointer,
         byte = byte,
         bytesWriter = ::BytesWriter,
-    )
-        .mapError(ModuleTrapError::toString)
+    ).mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.relop
 
 import com.github.michaelbull.result.Result

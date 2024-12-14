@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Result
@@ -20,7 +18,9 @@ internal inline fun RefFuncExecutor(
     val (stack) = context
     val frame = stack.peekFrame().bind()
 
-    val functionAddress = frame.state.module.functionAddress(instruction.funcIdx).bind()
+    val functionAddress = frame.state.module
+        .functionAddress(instruction.funcIdx)
+        .bind()
 
     stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
 }

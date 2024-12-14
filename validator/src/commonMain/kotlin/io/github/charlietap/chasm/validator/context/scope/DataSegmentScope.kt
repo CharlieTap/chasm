@@ -13,8 +13,9 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 internal fun DataSegmentScope(
     context: ValidationContext,
     segment: DataSegment,
-): Result<ValidationContext, ModuleValidatorError> = context.copy(
-    expressionContext = ExpressionContextImpl(
-        expressionResultType = ResultType(listOf(ValueType.Number(NumberType.I32))),
-    ),
-).let(::Ok)
+): Result<ValidationContext, ModuleValidatorError> = context
+    .copy(
+        expressionContext = ExpressionContextImpl(
+            expressionResultType = ResultType(listOf(ValueType.Number(NumberType.I32))),
+        ),
+    ).let(::Ok)

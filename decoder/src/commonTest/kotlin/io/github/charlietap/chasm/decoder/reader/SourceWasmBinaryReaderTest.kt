@@ -114,7 +114,9 @@ class SourceWasmBinaryReaderTest {
     @Test
     fun `can read a leb128 encoded int and forward it on`() {
         val expected: Result<Int, WasmDecodeError> = Ok(128)
-        val source = Leb128.Integer.TWO_BYTES_SIGNED_POSITIVE.asSequence().iterator()
+        val source = Leb128.Integer.TWO_BYTES_SIGNED_POSITIVE
+            .asSequence()
+            .iterator()
         val sourceReader = FakeByteSourceReader {
             source.next()
         }
@@ -139,7 +141,9 @@ class SourceWasmBinaryReaderTest {
     @Test
     fun `can read a leb128 encoded uint and forward it on`() {
         val expected: Result<UInt, WasmDecodeError> = Ok(128u)
-        val source = Leb128.Integer.TWO_BYTES_UNSIGNED.asSequence().iterator()
+        val source = Leb128.Integer.TWO_BYTES_UNSIGNED
+            .asSequence()
+            .iterator()
         val sourceReader = FakeByteSourceReader {
             source.next().toByte()
         }
@@ -164,7 +168,9 @@ class SourceWasmBinaryReaderTest {
     @Test
     fun `can read a leb128 encoded long and forward it on`() {
         val expected: Result<Long, WasmDecodeError> = Ok(Long.MAX_VALUE)
-        val source = Leb128.Long.TEN_BYTES_SIGNED_POSITIVE.asSequence().iterator()
+        val source = Leb128.Long.TEN_BYTES_SIGNED_POSITIVE
+            .asSequence()
+            .iterator()
         val sourceReader = FakeByteSourceReader {
             source.next()
         }

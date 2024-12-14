@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
@@ -41,11 +39,15 @@ internal fun ArrayInitDataExecutor(
     val(stack, store) = context
     val (typeIndex, dataIndex) = instruction
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.definedType(typeIndex).bind()
+    val definedType = frame.state.module
+        .definedType(typeIndex)
+        .bind()
 
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
-    val dataAddress = frame.state.module.dataAddress(dataIndex).bind()
+    val dataAddress = frame.state.module
+        .dataAddress(dataIndex)
+        .bind()
     val dataInstance = store.data(dataAddress).bind()
 
     val elementsToCopy = stack.popI32().bind()
@@ -55,9 +57,11 @@ internal fun ArrayInitDataExecutor(
     val arrayReference = stack.popArrayReference().bind()
     val arrayInstance = arrayReference.instance
 
-    val arrayElementSizeInBytes = arrayType.fieldType.bitWidth().toResultOr {
-        InvocationError.UnobservableBitWidth
-    }.bind() / 8
+    val arrayElementSizeInBytes = arrayType.fieldType
+        .bitWidth()
+        .toResultOr {
+            InvocationError.UnobservableBitWidth
+        }.bind() / 8
 
     if (
         (arrayOffset + elementsToCopy > arrayInstance.fields.size) ||

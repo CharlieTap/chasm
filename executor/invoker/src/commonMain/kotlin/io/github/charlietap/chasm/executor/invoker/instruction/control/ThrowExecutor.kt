@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
@@ -37,7 +35,9 @@ internal inline fun ThrowExecutor(
 
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val address = frame.state.module.tagAddress(instruction.tagIndex).bind()
+    val address = frame.state.module
+        .tagAddress(instruction.tagIndex)
+        .bind()
 
     val instance = store.tag(address).bind()
     val functionType = instance.type.type

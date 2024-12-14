@@ -10,4 +10,7 @@ typealias MemoryInstanceSizer = (MemoryInstance) -> Result<Int, InvocationError>
 
 fun MemoryInstanceSizerImpl(
     instance: MemoryInstance,
-): Result<Int, InvocationError> = Ok(instance.type.limits.min.toInt() * LinearMemory.PAGE_SIZE)
+): Result<Int, InvocationError> = Ok(
+    instance.type.limits.min
+        .toInt() * LinearMemory.PAGE_SIZE,
+)

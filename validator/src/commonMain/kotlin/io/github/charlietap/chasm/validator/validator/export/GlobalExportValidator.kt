@@ -26,7 +26,8 @@ internal inline fun GlobalExportValidator(
     descriptor: Export.Descriptor.Global,
     crossinline globalIndexValidator: Validator<Index.GlobalIndex>,
 ): Result<Unit, ModuleValidatorError> = binding {
-    globalIndexValidator(context, descriptor.globalIndex).mapError {
-        ExportValidatorError.UnknownGlobal
-    }.bind()
+    globalIndexValidator(context, descriptor.globalIndex)
+        .mapError {
+            ExportValidatorError.UnknownGlobal
+        }.bind()
 }

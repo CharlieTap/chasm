@@ -13,11 +13,12 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 internal fun ElementSegmentScope(
     context: ValidationContext,
     segment: ElementSegment,
-): Result<ValidationContext, ModuleValidatorError> = context.copy(
-    elementSegmentContext = ElementSegmentContextImpl(
-        elementSegmentType = segment.type,
-    ),
-    expressionContext = ExpressionContextImpl(
-        expressionResultType = ResultType(listOf(ValueType.Reference(segment.type))),
-    ),
-).let(::Ok)
+): Result<ValidationContext, ModuleValidatorError> = context
+    .copy(
+        elementSegmentContext = ElementSegmentContextImpl(
+            elementSegmentType = segment.type,
+        ),
+        expressionContext = ExpressionContextImpl(
+            expressionResultType = ResultType(listOf(ValueType.Reference(segment.type))),
+        ),
+    ).let(::Ok)

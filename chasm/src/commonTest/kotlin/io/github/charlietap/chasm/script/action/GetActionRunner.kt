@@ -19,9 +19,10 @@ fun GetActionRunner(
     val instance = context.instances[action.moduleName]!!
     val exports = exports(instance)
     val global = (
-        exports.firstOrNull {
-            it.value is Global && it.name == action.field
-        }?.value as? Global
+        exports
+            .firstOrNull {
+                it.value is Global && it.name == action.field
+            }?.value as? Global
     ) ?: return ActionResult.Failure(command, "exported global not found")
 
     val result = readGlobal(context.store, global)

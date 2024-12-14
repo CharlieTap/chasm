@@ -26,6 +26,10 @@ class TableTest {
 
         assertEquals(expected, actual)
         assertEquals(tableType(), store.store.tables[0].type)
-        assertEquals(0, store.store.tables[0].elements.size)
+        assertEquals(
+            0,
+            store.store.tables[0]
+                .elements.size,
+        )
     }
 }

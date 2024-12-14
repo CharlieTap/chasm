@@ -37,14 +37,18 @@ internal inline fun ArrayCopyInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val srcDefinedType = context.type(instruction.sourceTypeIndex).bind()
-    val srcArrayType = srcDefinedType.arrayType().toResultOr {
-        TypeValidatorError.TypeMismatch
-    }.bind()
+    val srcArrayType = srcDefinedType
+        .arrayType()
+        .toResultOr {
+            TypeValidatorError.TypeMismatch
+        }.bind()
 
     val dstDefinedType = context.type(instruction.destinationTypeIndex).bind()
-    val dstArrayType = dstDefinedType.arrayType().toResultOr {
-        TypeValidatorError.TypeMismatch
-    }.bind()
+    val dstArrayType = dstDefinedType
+        .arrayType()
+        .toResultOr {
+            TypeValidatorError.TypeMismatch
+        }.bind()
 
     if (!storageTypeMatcher(srcArrayType.fieldType.storageType, dstArrayType.fieldType.storageType, context)) {
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()

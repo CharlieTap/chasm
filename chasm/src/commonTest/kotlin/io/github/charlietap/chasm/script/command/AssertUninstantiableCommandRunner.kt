@@ -19,13 +19,14 @@ fun AssertUninstantiableCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + command.filename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    return module(bytes).flatMap { module ->
-        validate(module)
-    }.flatMap { module ->
-        instance(context.store, module, context.imports)
-    }.fold({
-        CommandResult.Failure(command, "instantiation succeeded when it shouldn't")
-    }) {
-        CommandResult.Success
-    }
+    return module(bytes)
+        .flatMap { module ->
+            validate(module)
+        }.flatMap { module ->
+            instance(context.store, module, context.imports)
+        }.fold({
+            CommandResult.Failure(command, "instantiation succeeded when it shouldn't")
+        }) {
+            CommandResult.Success
+        }
 }

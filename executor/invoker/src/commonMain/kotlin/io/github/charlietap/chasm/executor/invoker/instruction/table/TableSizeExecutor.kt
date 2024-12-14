@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import com.github.michaelbull.result.Result
@@ -21,7 +19,9 @@ internal inline fun TableSizeExecutor(
     val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
-    val tableAddress = frame.state.module.tableAddress(instruction.tableIdx).bind()
+    val tableAddress = frame.state.module
+        .tableAddress(instruction.tableIdx)
+        .bind()
     val tableInstance = store.table(tableAddress).bind()
 
     val tableSize = tableInstance.elements.size

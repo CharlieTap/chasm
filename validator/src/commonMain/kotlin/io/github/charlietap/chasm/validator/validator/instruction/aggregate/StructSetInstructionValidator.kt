@@ -24,9 +24,11 @@ internal fun StructSetInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val definedType = context.type(instruction.typeIndex).bind()
-    val structType = definedType.structType().toResultOr {
-        TypeValidatorError.TypeMismatch
-    }.bind()
+    val structType = definedType
+        .structType()
+        .toResultOr {
+            TypeValidatorError.TypeMismatch
+        }.bind()
 
     val fieldType = structType.fieldType(instruction.fieldIndex).bind()
     if (fieldType.mutability != Mutability.Var) {

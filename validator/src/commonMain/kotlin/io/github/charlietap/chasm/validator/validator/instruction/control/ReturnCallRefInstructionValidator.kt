@@ -37,18 +37,21 @@ internal inline fun ReturnCallRefInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val definedType = context.type(instruction.typeIndex).bind()
-    val functionType = definedType.functionType().toResultOr {
-        TypeValidatorError.TypeMismatch
-    }.bind()
+    val functionType = definedType
+        .functionType()
+        .toResultOr {
+            TypeValidatorError.TypeMismatch
+        }.bind()
 
     val result = context.result
     if (result == null || !resultTypeMatcher(functionType.results, result, context)) {
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()
     }
 
-    context.popValues(
-        functionType.params.types + listOf(ValueType.Reference(ReferenceType.RefNull(ConcreteHeapType.Defined(definedType)))),
-    ).bind()
+    context
+        .popValues(
+            functionType.params.types + listOf(ValueType.Reference(ReferenceType.RefNull(ConcreteHeapType.Defined(definedType)))),
+        ).bind()
     context.pushValues(functionType.results.types)
 
     context.popValues(context.result?.types?.asReversed() ?: emptyList()).bind()

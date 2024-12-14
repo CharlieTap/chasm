@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import com.github.michaelbull.result.Err
@@ -24,10 +22,14 @@ internal fun TableInitExecutor(
     val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
-    val tableAddress = frame.state.module.tableAddress(instruction.tableIdx).bind()
+    val tableAddress = frame.state.module
+        .tableAddress(instruction.tableIdx)
+        .bind()
     val tableInstance = store.table(tableAddress).bind()
 
-    val elementAddress = frame.state.module.elementAddress(instruction.elemIdx).bind()
+    val elementAddress = frame.state.module
+        .elementAddress(instruction.elemIdx)
+        .bind()
     val elementInstance = store.element(elementAddress).bind()
 
     val elementsToInitialise = stack.popI32().bind()
@@ -38,7 +40,9 @@ internal fun TableInitExecutor(
     val dstRange = tableOffset..<(tableOffset + elementsToInitialise)
 
     if (
-        elementsToInitialise < 0 || segmentOffset < 0 || tableOffset < 0 ||
+        elementsToInitialise < 0 ||
+        segmentOffset < 0 ||
+        tableOffset < 0 ||
         !elementInstance.elements.indices.contains(srcRange) ||
         !tableInstance.elements.indices.contains(dstRange)
     ) {

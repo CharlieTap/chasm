@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop
 
 import com.github.michaelbull.result.Err
@@ -16,7 +14,10 @@ internal inline fun I32RemSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32RemS,
 ): Result<Unit, InvocationError> = binding {
-    val operand2 = context.stack.peekNthValue(0).bind().value as I32
+    val operand2 = context.stack
+        .peekNthValue(0)
+        .bind()
+        .value as I32
 
     if (operand2.value == 0) {
         Err(InvocationError.CannotDivideIntegerByZero).bind()

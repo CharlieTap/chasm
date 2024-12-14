@@ -29,7 +29,12 @@ internal inline fun SubTypeDecoder(
     crossinline vectorDecoder: VectorDecoder<Index.TypeIndex>,
     crossinline compositeTypeDecoder: Decoder<CompositeType>,
 ): Result<SubType, WasmDecodeError> = binding {
-    when (context.reader.peek().ubyte().bind()) {
+    when (
+        context.reader
+            .peek()
+            .ubyte()
+            .bind()
+    ) {
         OPEN_SUB_TYPE -> {
             context.reader.ubyte().bind() // consume byte
             val typeIndices = vectorDecoder(context, typeIndexDecoder).bind()

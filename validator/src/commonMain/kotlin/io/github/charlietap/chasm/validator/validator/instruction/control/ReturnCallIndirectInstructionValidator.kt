@@ -43,9 +43,11 @@ internal inline fun ReturnCallIndirectInstructionValidator(
     }
 
     val definedType = context.type(instruction.typeIndex).bind()
-    val functionType = definedType.functionType().toResultOr {
-        InstructionValidatorError.UnknownFunction
-    }.bind()
+    val functionType = definedType
+        .functionType()
+        .toResultOr {
+            InstructionValidatorError.UnknownFunction
+        }.bind()
 
     if (functionType.results != context.result) {
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()

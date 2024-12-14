@@ -10,8 +10,9 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 internal fun InstructionScope(
     context: ValidationContext,
     instruction: Instruction,
-): Result<ValidationContext, ModuleValidatorError> = context.copy(
-    instructionContext = InstructionContextImpl(
-        instruction = instruction,
-    ),
-).let(::Ok)
+): Result<ValidationContext, ModuleValidatorError> = context
+    .copy(
+        instructionContext = InstructionContextImpl(
+            instruction = instruction,
+        ),
+    ).let(::Ok)

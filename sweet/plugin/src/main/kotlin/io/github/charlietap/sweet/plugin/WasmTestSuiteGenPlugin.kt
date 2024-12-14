@@ -91,7 +91,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             outputDirectory.set(extension.testSuiteTestsDirectory)
         }
 
-        val matrixTask = project.tasks.register<TestMatrixTask>(
+        project.tasks.register<TestMatrixTask>(
             TASK_NAME_MATRIX,
         ) {
             description = TASK_DESCRIPTION_MATRIX

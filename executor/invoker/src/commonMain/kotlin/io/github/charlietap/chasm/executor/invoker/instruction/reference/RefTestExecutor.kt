@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Result
@@ -49,7 +47,8 @@ internal inline fun RefTestExecutor(
 
     val otherReferenceValue = stack.popReference().bind()
     val otherReferenceType = typeOfReferenceValue(otherReferenceValue, store, moduleInstance)
-        .toResultOr { InvocationError.Trap.TrapEncountered }.bind()
+        .toResultOr { InvocationError.Trap.TrapEncountered }
+        .bind()
 
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
         stack.pushValue(NumberValue.I32(1))

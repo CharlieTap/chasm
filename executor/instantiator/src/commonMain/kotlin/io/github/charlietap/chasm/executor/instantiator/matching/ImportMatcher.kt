@@ -28,10 +28,11 @@ internal inline fun ImportMatcher(
 ): Result<List<ExternalValue>, ModuleTrapError> = binding {
     val (_, module) = context
     module.imports.map { moduleImport ->
-        imports.firstOrNull { (moduleName, entityName, externalValue) ->
-            moduleImport.moduleName.name == moduleName &&
-                moduleImport.entityName.name == entityName &&
-                descriptorMatcher(context, moduleImport.descriptor, externalValue).bind()
-        }?.externalValue ?: Err(InstantiationError.MissingImport).bind<Nothing>()
+        imports
+            .firstOrNull { (moduleName, entityName, externalValue) ->
+                moduleImport.moduleName.name == moduleName &&
+                    moduleImport.entityName.name == entityName &&
+                    descriptorMatcher(context, moduleImport.descriptor, externalValue).bind()
+            }?.externalValue ?: Err(InstantiationError.MissingImport).bind<Nothing>()
     }
 }

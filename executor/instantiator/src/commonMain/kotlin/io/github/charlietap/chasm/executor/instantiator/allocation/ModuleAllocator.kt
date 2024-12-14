@@ -89,9 +89,10 @@ internal inline fun ModuleAllocator(
 
     module.globals.forEachIndexed { idx, global ->
         val initExpression = expressionPredecoder(context, global.initExpression).bind()
-        val value = evaluator(store, instance, initExpression, Arity.Return(1)).flatMap { initialValue ->
-            initialValue.toResultOr { InvocationError.MissingStackValue }
-        }.bind()
+        val value = evaluator(store, instance, initExpression, Arity.Return(1))
+            .flatMap { initialValue ->
+                initialValue.toResultOr { InvocationError.MissingStackValue }
+            }.bind()
         val address = globalAllocator(store, global.type, value)
         instance.addGlobalAddress(address)
     }

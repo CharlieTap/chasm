@@ -53,9 +53,10 @@ class ModuleInfoTest {
         val byteStream = Resource(FILE_DIR + "module_info.wasm").readBytes()
         val reader = FakeSourceReader(byteStream)
 
-        val actual = module(reader).map { module ->
-            moduleInfo(module)
-        }.getOrNull()
+        val actual = module(reader)
+            .map { module ->
+                moduleInfo(module)
+            }.getOrNull()
 
         val expected = ModuleInfo(
             imports = listOf(

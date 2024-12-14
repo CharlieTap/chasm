@@ -20,7 +20,10 @@ internal inline fun InstructionBlockDecoder(
 ): Result<List<Instruction>, WasmDecodeError> = binding {
     val instructions = mutableListOf<Instruction>()
     do {
-        val opcode = context.reader.peek().ubyte().bind()
+        val opcode = context.reader
+            .peek()
+            .ubyte()
+            .bind()
         if (opcode != context.blockEndOpcode) {
             instructions += instructionDecoder(context).bind()
         } else {

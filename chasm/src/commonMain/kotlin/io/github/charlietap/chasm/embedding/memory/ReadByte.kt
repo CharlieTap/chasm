@@ -24,8 +24,7 @@ fun readByte(
         memory = memory,
         pointer = pointer,
         bytesReader = ::BytesReader,
-    )
-        .mapError(ModuleTrapError::toString)
+    ).mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

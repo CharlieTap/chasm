@@ -34,27 +34,33 @@ internal fun InstructionTypeValidator(
     val unreachable = if (context.result == null) {
         false
     } else {
-        val label = context.labels.peek().mapError {
-            TypeValidatorError.TypeMismatch
-        }.bind()
+        val label = context.labels
+            .peek()
+            .mapError {
+                TypeValidatorError.TypeMismatch
+            }.bind()
         label.unreachable
     }
 
     val blockUnderflow = if (context.result == null) {
         null
     } else {
-        val label = context.labels.peek().mapError {
-            TypeValidatorError.TypeMismatch
-        }.bind()
+        val label = context.labels
+            .peek()
+            .mapError {
+                TypeValidatorError.TypeMismatch
+            }.bind()
         label.operandsDepth
     }
 
     val startDepth = if (context.result == null) {
         0
     } else {
-        val label = context.labels.peek().mapError {
-            TypeValidatorError.TypeMismatch
-        }.bind()
+        val label = context.labels
+            .peek()
+            .mapError {
+                TypeValidatorError.TypeMismatch
+            }.bind()
         label.operandsDepth
     }
 
@@ -69,9 +75,11 @@ internal fun InstructionTypeValidator(
         val actualType = if (context.operands.depth() == startDepth && unreachable) {
             ValueType.Bottom(BottomType)
         } else {
-            context.operands.pop().mapError {
-                TypeValidatorError.TypeMismatch
-            }.bind()
+            context.operands
+                .pop()
+                .mapError {
+                    TypeValidatorError.TypeMismatch
+                }.bind()
         }
 
         // instruction types are contravariant in input

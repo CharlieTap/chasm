@@ -29,7 +29,10 @@ internal inline fun TableDecoder(
     crossinline expressionDecoder: Decoder<Expression>,
 ): Result<Table, WasmDecodeError> = binding {
 
-    val opcode = context.reader.peek().ubyte().bind()
+    val opcode = context.reader
+        .peek()
+        .ubyte()
+        .bind()
 
     val tableImportCount = context.imports.count { it.descriptor is Import.Descriptor.Table }
     val index = tableImportCount + context.index

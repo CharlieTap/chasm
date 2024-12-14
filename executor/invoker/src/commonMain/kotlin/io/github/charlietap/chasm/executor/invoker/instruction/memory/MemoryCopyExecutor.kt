@@ -31,9 +31,13 @@ internal inline fun MemoryCopyExecutor(
 
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val srcMemoryAddress = frame.state.module.memoryAddress(instruction.srcIndex).bind()
+    val srcMemoryAddress = frame.state.module
+        .memoryAddress(instruction.srcIndex)
+        .bind()
     val srcMemory = store.memory(srcMemoryAddress).bind()
-    val dstMemoryAddress = frame.state.module.memoryAddress(instruction.dstIndex).bind()
+    val dstMemoryAddress = frame.state.module
+        .memoryAddress(instruction.dstIndex)
+        .bind()
     val dstMemory = store.memory(dstMemoryAddress).bind()
 
     val bytesToCopy = stack.popI32().bind()

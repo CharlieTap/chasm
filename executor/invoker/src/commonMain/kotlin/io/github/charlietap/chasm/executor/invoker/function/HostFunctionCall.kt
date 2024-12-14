@@ -71,19 +71,24 @@ private fun classifyValue(valueType: ValueType, value: ExecutionValue?): Boolean
                     when (referenceType.heapType) {
                         is AbstractHeapType.Func ->
                             value is ReferenceValue.Function ||
-                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.Func
+                                value is ReferenceValue.Null &&
+                                value.heapType == AbstractHeapType.Func
                         is AbstractHeapType.Extern ->
                             value is ReferenceValue.Extern ||
-                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.Extern
+                                value is ReferenceValue.Null &&
+                                value.heapType == AbstractHeapType.Extern
                         is AbstractHeapType.Struct ->
                             value is ReferenceValue.Struct ||
-                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.Struct
+                                value is ReferenceValue.Null &&
+                                value.heapType == AbstractHeapType.Struct
                         is AbstractHeapType.Array ->
                             value is ReferenceValue.Array ||
-                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.Array
+                                value is ReferenceValue.Null &&
+                                value.heapType == AbstractHeapType.Array
                         is AbstractHeapType.I31 ->
                             value is ReferenceValue.I31 ||
-                                value is ReferenceValue.Null && value.heapType == AbstractHeapType.I31
+                                value is ReferenceValue.Null &&
+                                value.heapType == AbstractHeapType.I31
                         else -> false
                     }
                 is ReferenceType.Ref -> when (referenceType.heapType) {

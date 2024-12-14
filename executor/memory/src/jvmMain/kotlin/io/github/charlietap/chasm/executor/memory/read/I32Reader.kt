@@ -14,8 +14,9 @@ actual inline fun I32Reader(
     address: Int,
 ): Result<Int, InvocationError> {
     val byteArray = (memory as ByteArrayLinearMemory).memory
-    val value = byteArray.sliceArray(
-        address until (address + Int.SIZE_BYTES),
-    ).toIntLittleEndian()
+    val value = byteArray
+        .sliceArray(
+            address until (address + Int.SIZE_BYTES),
+        ).toIntLittleEndian()
     return Ok(value)
 }
