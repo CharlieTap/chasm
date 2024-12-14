@@ -26,7 +26,8 @@ internal inline fun FunctionExportValidator(
     descriptor: Export.Descriptor.Function,
     crossinline functionIndexValidator: Validator<Index.FunctionIndex>,
 ): Result<Unit, ModuleValidatorError> = binding {
-    functionIndexValidator(context, descriptor.functionIndex).mapError {
-        ExportValidatorError.UnknownFunction
-    }.bind()
+    functionIndexValidator(context, descriptor.functionIndex)
+        .mapError {
+            ExportValidatorError.UnknownFunction
+        }.bind()
 }

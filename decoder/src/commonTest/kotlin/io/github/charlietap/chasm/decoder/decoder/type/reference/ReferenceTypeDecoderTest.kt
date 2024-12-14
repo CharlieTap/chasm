@@ -74,7 +74,8 @@ class ReferenceTypeDecoderTest {
     @Test
     fun `can decode an encoded abstract heap type directly as a reference type`() {
 
-        val abstractHeapTypeMap = ABSTRACT_HEAP_TYPE_RANGE.map(UInt::toUByte)
+        val abstractHeapTypeMap = ABSTRACT_HEAP_TYPE_RANGE
+            .map(UInt::toUByte)
             .associateWith { Ok(ReferenceType.RefNull(AbstractHeapType.Func)) }
 
         var byte: UByte = 0u

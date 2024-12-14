@@ -25,9 +25,11 @@ internal fun StructGetSignedInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val definedType = context.type(instruction.typeIndex).bind()
-    val structType = definedType.structType().toResultOr {
-        TypeValidatorError.TypeMismatch
-    }.bind()
+    val structType = definedType
+        .structType()
+        .toResultOr {
+            TypeValidatorError.TypeMismatch
+        }.bind()
 
     context.pop(ValueType.Reference(ReferenceType.RefNull(ConcreteHeapType.Defined(definedType))))
 

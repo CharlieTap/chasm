@@ -9,8 +9,9 @@ import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 internal fun BlockScope(
     context: DecoderContext,
     blockEndOpcode: UByte,
-): Result<DecoderContext, WasmDecodeError> = context.copy(
-    blockContext = BlockContextImpl(
-        blockEndOpcode = blockEndOpcode,
-    ),
-).let(::Ok)
+): Result<DecoderContext, WasmDecodeError> = context
+    .copy(
+        blockContext = BlockContextImpl(
+            blockEndOpcode = blockEndOpcode,
+        ),
+    ).let(::Ok)

@@ -26,7 +26,8 @@ internal inline fun TableExportValidator(
     descriptor: Export.Descriptor.Table,
     crossinline tableIndexValidator: Validator<Index.TableIndex>,
 ): Result<Unit, ModuleValidatorError> = binding {
-    tableIndexValidator(context, descriptor.tableIndex).mapError {
-        ExportValidatorError.UnknownTable
-    }.bind()
+    tableIndexValidator(context, descriptor.tableIndex)
+        .mapError {
+            ExportValidatorError.UnknownTable
+        }.bind()
 }

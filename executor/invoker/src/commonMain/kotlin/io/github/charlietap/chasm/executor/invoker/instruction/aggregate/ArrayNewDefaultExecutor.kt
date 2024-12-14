@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Result
@@ -37,7 +35,9 @@ internal inline fun ArrayNewDefaultExecutor(
     val (stack) = context
     val typeIndex = instruction.typeIndex
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.definedType(typeIndex).bind()
+    val definedType = frame.state.module
+        .definedType(typeIndex)
+        .bind()
 
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 

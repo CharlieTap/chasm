@@ -25,9 +25,11 @@ internal fun ArrayGetInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val definedType = context.type(instruction.typeIndex).bind()
-    val arrayType = definedType.arrayType().toResultOr {
-        TypeValidatorError.TypeMismatch
-    }.bind()
+    val arrayType = definedType
+        .arrayType()
+        .toResultOr {
+            TypeValidatorError.TypeMismatch
+        }.bind()
 
     if (arrayType.fieldType.storageType is StorageType.Packed) {
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()

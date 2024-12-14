@@ -67,7 +67,8 @@ internal data class ValidationContext(
     }
 
     val functions by lazy {
-        val importedFunctions = module.imports.asSequence()
+        val importedFunctions = module.imports
+            .asSequence()
             .map(Import::descriptor)
             .filterIsInstance<Import.Descriptor.Function>()
             .map(Import.Descriptor.Function::type)

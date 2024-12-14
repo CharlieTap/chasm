@@ -41,9 +41,11 @@ internal inline fun CallIndirectValidator(
     }
 
     val definedType = context.type(instruction.typeIndex).bind()
-    val functionType = definedType.functionType().toResultOr {
-        InstructionValidatorError.UnknownFunction
-    }.bind()
+    val functionType = definedType
+        .functionType()
+        .toResultOr {
+            InstructionValidatorError.UnknownFunction
+        }.bind()
 
     context.popI32().bind()
     context.popValues(functionType.params.types).bind()

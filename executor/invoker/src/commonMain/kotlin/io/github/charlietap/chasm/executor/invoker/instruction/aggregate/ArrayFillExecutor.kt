@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
@@ -48,7 +46,9 @@ internal inline fun ArrayFillExecutor(
     if (elementsToFill == 0) return@binding
 
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.definedType(instruction.typeIndex).bind()
+    val definedType = frame.state.module
+        .definedType(instruction.typeIndex)
+        .bind()
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
     repeat(elementsToFill) { fillOffset ->

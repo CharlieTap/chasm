@@ -14,9 +14,10 @@ fun HostModuleResolver(store: Store): Instance {
 
     val hostModuleFile = Resource(FILE_HOST_MODULE)
 
-    return module(hostModuleFile.readBytes()).flatMap { module ->
-        instance(store, module, emptyList())
-    }.expect("Failed to instantiate script host module")
+    return module(hostModuleFile.readBytes())
+        .flatMap { module ->
+            instance(store, module, emptyList())
+        }.expect("Failed to instantiate script host module")
 }
 
 private const val FILE_HOST_MODULE = "src/commonTest/resources/script/spectest-host.wasm"

@@ -15,14 +15,16 @@ internal fun LimitsDecoder(
     context: DecoderContext,
 ): Result<Pair<Limits, SharedStatus>, WasmDecodeError> = binding {
 
-    val (hasMaximum, sharedStatus) = context.reader.ubyte().flatMap { byte ->
-        when (byte) {
-            LIMIT_NO_MAX -> Ok(false to SharedStatus.Unshared)
-            LIMIT_MAX_UNSHARED -> Ok(true to SharedStatus.Unshared)
-            LIMIT_MAX_SHARED -> Ok(true to SharedStatus.Shared)
-            else -> Err(TypeDecodeError.UnknownLimitsFlag(byte))
-        }
-    }.bind()
+    val (hasMaximum, sharedStatus) = context.reader
+        .ubyte()
+        .flatMap { byte ->
+            when (byte) {
+                LIMIT_NO_MAX -> Ok(false to SharedStatus.Unshared)
+                LIMIT_MAX_UNSHARED -> Ok(true to SharedStatus.Unshared)
+                LIMIT_MAX_SHARED -> Ok(true to SharedStatus.Shared)
+                else -> Err(TypeDecodeError.UnknownLimitsFlag(byte))
+            }
+        }.bind()
 
     val minimum = context.reader.uint().bind()
 

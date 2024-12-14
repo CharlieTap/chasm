@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
@@ -21,9 +19,11 @@ internal inline fun BlockTypeExpander(
     when (type) {
         is BlockType.Empty -> null
         is BlockType.SignedTypeIndex -> {
-            instance.types[type.typeIndex.idx.toInt()].functionType().toResultOr {
-                InvocationError.FunctionCompositeTypeExpected
-            }.bind()
+            instance.types[type.typeIndex.idx.toInt()]
+                .functionType()
+                .toResultOr {
+                    InvocationError.FunctionCompositeTypeExpected
+                }.bind()
         }
         is BlockType.ValType -> {
             FunctionType(ResultType(emptyList()), ResultType(listOf(type.valueType)))

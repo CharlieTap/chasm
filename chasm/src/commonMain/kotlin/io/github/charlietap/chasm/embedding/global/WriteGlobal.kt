@@ -27,8 +27,7 @@ fun writeGlobal(
         global = global,
         value = value,
         valueMapper = ValueMapper.instance,
-    )
-        .mapError(ModuleTrapError::toString)
+    ).mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

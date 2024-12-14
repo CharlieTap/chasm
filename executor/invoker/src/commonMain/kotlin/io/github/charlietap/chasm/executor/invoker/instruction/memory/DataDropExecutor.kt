@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Result
@@ -17,7 +15,9 @@ internal inline fun DataDropExecutor(
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val dataAddress = frame.state.module.dataAddress(instruction.dataIdx).bind()
+    val dataAddress = frame.state.module
+        .dataAddress(instruction.dataIdx)
+        .bind()
     val dataInstance = DataInstance(ubyteArrayOf(), true)
     store.data[dataAddress.address] = dataInstance
 }

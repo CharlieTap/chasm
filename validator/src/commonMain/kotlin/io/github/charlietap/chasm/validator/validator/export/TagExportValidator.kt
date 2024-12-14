@@ -26,7 +26,8 @@ internal inline fun TagExportValidator(
     descriptor: Export.Descriptor.Tag,
     crossinline tagIndexValidator: Validator<Index.TagIndex>,
 ): Result<Unit, ModuleValidatorError> = binding {
-    tagIndexValidator(context, descriptor.tagIndex).mapError {
-        ExportValidatorError.UnknownTag
-    }.bind()
+    tagIndexValidator(context, descriptor.tagIndex)
+        .mapError {
+            ExportValidatorError.UnknownTag
+        }.bind()
 }

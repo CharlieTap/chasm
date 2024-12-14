@@ -33,7 +33,10 @@ internal inline fun PrefixedInstructionDecoder(
 ): Result<Instruction, WasmDecodeError> = binding {
 
     val prefix = context.reader.ubyte().bind()
-    val opcode = context.reader.peek().uint().bind()
+    val opcode = context.reader
+        .peek()
+        .uint()
+        .bind()
 
     when (prefix) {
         PREFIX_FB -> gcInstructionDecoder(context).bind()

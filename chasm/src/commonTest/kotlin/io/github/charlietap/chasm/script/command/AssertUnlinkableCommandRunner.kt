@@ -18,13 +18,14 @@ fun AssertUnlinkableCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + command.filename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    return module(bytes).flatMap { module ->
-        validate(module)
-    }.flatMap { module ->
-        instance(context.store, module, context.imports)
-    }.fold({ _ ->
-        CommandResult.Failure(command, "unlinkable module was instantiated when it should have failed")
-    }) {
-        CommandResult.Success
-    }
+    return module(bytes)
+        .flatMap { module ->
+            validate(module)
+        }.flatMap { module ->
+            instance(context.store, module, context.imports)
+        }.fold({ _ ->
+            CommandResult.Failure(command, "unlinkable module was instantiated when it should have failed")
+        }) {
+            CommandResult.Success
+        }
 }

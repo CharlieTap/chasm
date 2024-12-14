@@ -12,13 +12,14 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 internal fun TableScope(
     context: ValidationContext,
     table: Table,
-): Result<ValidationContext, ModuleValidatorError> = context.copy(
-    module = context.module.copy(
-        globals = emptyList(),
-    ),
-    expressionContext = ExpressionContextImpl(
-        expressionResultType = ResultType(
-            listOf(ValueType.Reference(table.type.referenceType)),
+): Result<ValidationContext, ModuleValidatorError> = context
+    .copy(
+        module = context.module.copy(
+            globals = emptyList(),
         ),
-    ),
-).let(::Ok)
+        expressionContext = ExpressionContextImpl(
+            expressionResultType = ResultType(
+                listOf(ValueType.Reference(table.type.referenceType)),
+            ),
+        ),
+    ).let(::Ok)

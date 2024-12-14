@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
 import com.github.michaelbull.result.Err
@@ -36,7 +34,9 @@ internal inline fun I64LoadExecutor(
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
+    val memoryAddress = frame.state.module
+        .memoryAddress(instruction.memoryIndex)
+        .bind()
     val memory = store.memory(memoryAddress).bind()
 
     val baseAddress = stack.popI32().bind()

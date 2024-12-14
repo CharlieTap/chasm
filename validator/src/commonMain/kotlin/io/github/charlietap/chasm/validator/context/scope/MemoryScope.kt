@@ -10,8 +10,9 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 internal fun MemoryScope(
     context: ValidationContext,
     memory: Memory,
-): Result<ValidationContext, ModuleValidatorError> = context.copy(
-    typeContext = TypeContextImpl(
-        limitsMaximum = 65536u,
-    ),
-).let(::Ok)
+): Result<ValidationContext, ModuleValidatorError> = context
+    .copy(
+        typeContext = TypeContextImpl(
+            limitsMaximum = 65536u,
+        ),
+    ).let(::Ok)

@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Result
@@ -18,7 +16,9 @@ internal inline fun GlobalGetExecutor(
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val address = frame.state.module.globalAddress(instruction.globalIdx).bind()
+    val address = frame.state.module
+        .globalAddress(instruction.globalIdx)
+        .bind()
     val global = store.global(address).bind()
     stack.push(Stack.Entry.Value(global.value))
 }

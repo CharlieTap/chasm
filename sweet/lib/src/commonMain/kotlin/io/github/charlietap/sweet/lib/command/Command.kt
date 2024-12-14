@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Command {
-    abstract val line: Int
+    val line: Int
 }

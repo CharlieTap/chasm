@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
@@ -36,7 +34,9 @@ internal inline fun ArrayCopyExecutor(
     // y = src
     val (stack) = context
     val frame = stack.peekFrame().bind()
-    val destDefinedType = frame.state.module.definedType(instruction.destinationTypeIndex).bind()
+    val destDefinedType = frame.state.module
+        .definedType(instruction.destinationTypeIndex)
+        .bind()
 
     val destArrayType = definedTypeExpander(destDefinedType).arrayType().bind()
     if (destArrayType.fieldType.mutability != Mutability.Var) {

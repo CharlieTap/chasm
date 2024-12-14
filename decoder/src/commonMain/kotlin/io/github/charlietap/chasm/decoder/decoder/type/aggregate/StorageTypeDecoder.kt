@@ -29,7 +29,12 @@ internal inline fun StorageTypeDecoder(
     crossinline packedTypeDecoder: Decoder<PackedType>,
     crossinline valueTypeDecoder: Decoder<ValueType>,
 ): Result<StorageType, WasmDecodeError> = binding {
-    when (val encoded = context.reader.peek().ubyte().bind()) {
+    when (
+        val encoded = context.reader
+            .peek()
+            .ubyte()
+            .bind()
+    ) {
         in NUMBER_TYPE_RANGE,
         in VECTOR_TYPE_RANGE,
         in REFERENCE_TYPE_RANGE,

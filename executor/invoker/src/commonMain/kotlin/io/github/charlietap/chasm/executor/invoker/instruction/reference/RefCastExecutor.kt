@@ -48,7 +48,8 @@ internal inline fun RefCastExecutor(
 
     val otherReferenceValue = stack.popReference().bind() // rt2
     val otherReferenceType = typeOfReferenceValue(otherReferenceValue, store, moduleInstance)
-        .toResultOr { InvocationError.Trap.TrapEncountered }.bind()
+        .toResultOr { InvocationError.Trap.TrapEncountered }
+        .bind()
 
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
         stack.pushValue(otherReferenceValue)

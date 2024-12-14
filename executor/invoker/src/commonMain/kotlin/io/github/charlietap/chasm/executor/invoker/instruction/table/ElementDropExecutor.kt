@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import com.github.michaelbull.result.Result
@@ -19,7 +17,9 @@ internal inline fun ElementDropExecutor(
     val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
-    val elementAddress = frame.state.module.elementAddress(instruction.elemIdx).bind()
+    val elementAddress = frame.state.module
+        .elementAddress(instruction.elemIdx)
+        .bind()
     val elementInstance = store.element(elementAddress).bind()
 
     store.elements[elementAddress.address] = elementInstance.copy(

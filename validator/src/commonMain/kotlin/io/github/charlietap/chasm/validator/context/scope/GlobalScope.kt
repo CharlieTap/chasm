@@ -11,13 +11,14 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 internal fun GlobalScope(
     context: ValidationContext,
     global: Global,
-): Result<ValidationContext, ModuleValidatorError> = context.copy(
-    module = context.module.copy(
-        globals = context.module.globals.filter { glob ->
-            glob.idx.idx < global.idx.idx
-        },
-    ),
-    expressionContext = ExpressionContextImpl(
-        expressionResultType = ResultType(listOf(global.type.valueType)),
-    ),
-).let(::Ok)
+): Result<ValidationContext, ModuleValidatorError> = context
+    .copy(
+        module = context.module.copy(
+            globals = context.module.globals.filter { glob ->
+                glob.idx.idx < global.idx.idx
+            },
+        ),
+        expressionContext = ExpressionContextImpl(
+            expressionResultType = ResultType(listOf(global.type.valueType)),
+        ),
+    ).let(::Ok)

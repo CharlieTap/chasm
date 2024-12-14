@@ -34,14 +34,20 @@ internal inline fun MemoryGrowExecutor(
 
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module.memoryAddress(instruction.memoryIndex).bind()
+    val memoryAddress = frame.state.module
+        .memoryAddress(instruction.memoryIndex)
+        .bind()
     val memory = store.memory(memoryAddress).bind()
 
-    val currentSizeInPages = memory.type.limits.min.toInt()
+    val currentSizeInPages = memory.type.limits.min
+        .toInt()
     val pagesToAdd = stack.popI32().bind()
 
-    val max = memory.type.limits.max?.toInt() ?: LinearMemory.MAX_PAGES
-    if (memory.type.limits.min.toInt() + pagesToAdd > max) {
+    val max = memory.type.limits.max
+        ?.toInt() ?: LinearMemory.MAX_PAGES
+    if (memory.type.limits.min
+            .toInt() + pagesToAdd > max
+    ) {
         stack.push(Stack.Entry.Value(NumberValue.I32(-1)))
     } else {
 

@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
@@ -35,7 +33,9 @@ internal inline fun ArrayNewElementExecutor(
     val (typeIndex, elementIndex) = instruction
     val frame = stack.peekFrame().bind()
 
-    val elementAddress = frame.state.module.elementAddress(elementIndex).bind()
+    val elementAddress = frame.state.module
+        .elementAddress(elementIndex)
+        .bind()
     val elementInstance = store.element(elementAddress).bind()
 
     val arrayLength = stack.popI32().bind()

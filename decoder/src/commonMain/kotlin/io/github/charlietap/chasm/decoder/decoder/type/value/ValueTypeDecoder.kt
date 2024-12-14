@@ -33,7 +33,12 @@ internal inline fun ValueTypeDecoder(
     crossinline numberTypeDecoder: Decoder<NumberType>,
     crossinline referenceTypeDecoder: Decoder<ReferenceType>,
 ): Result<ValueType, WasmDecodeError> = binding {
-    when (val byte = context.reader.peek().ubyte().bind()) {
+    when (
+        val byte = context.reader
+            .peek()
+            .ubyte()
+            .bind()
+    ) {
         in NUMBER_TYPE_RANGE -> {
             val numberType = numberTypeDecoder(context).bind()
             ValueType.Number(numberType)

@@ -14,8 +14,9 @@ actual inline fun F32Reader(
     address: Int,
 ): Result<Float, InvocationError> {
     val byteArray = (memory as ByteArrayLinearMemory).memory
-    val value = byteArray.sliceArray(
-        address until (address + Float.SIZE_BYTES),
-    ).toFloatLittleEndian()
+    val value = byteArray
+        .sliceArray(
+            address until (address + Float.SIZE_BYTES),
+        ).toFloatLittleEndian()
     return Ok(value)
 }

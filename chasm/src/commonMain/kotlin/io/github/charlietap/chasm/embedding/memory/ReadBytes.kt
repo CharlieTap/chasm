@@ -30,8 +30,7 @@ fun readBytes(
         bytesToRead = bytesToRead,
         bufferPointer = bufferPointer,
         bytesReader = ::BytesReader,
-    )
-        .mapError(ModuleTrapError::toString)
+    ).mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 

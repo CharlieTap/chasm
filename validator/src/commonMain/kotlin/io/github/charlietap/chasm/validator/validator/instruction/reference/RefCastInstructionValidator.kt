@@ -31,9 +31,10 @@ internal inline fun RefCastInstructionValidator(
     crossinline topOfHeapType: TopOf<HeapType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
-    val superType = topOfHeapType(instruction.referenceType.heapType, context.types).toResultOr {
-        TypeValidatorError.TypeMismatch
-    }.bind()
+    val superType = topOfHeapType(instruction.referenceType.heapType, context.types)
+        .toResultOr {
+            TypeValidatorError.TypeMismatch
+        }.bind()
 
     val expected = ValueType.Reference(ReferenceType.RefNull(superType))
     context.pop(expected).bind()

@@ -26,7 +26,8 @@ internal inline fun MemoryExportValidator(
     descriptor: Export.Descriptor.Memory,
     crossinline memoryIndexValidator: Validator<Index.MemoryIndex>,
 ): Result<Unit, ModuleValidatorError> = binding {
-    memoryIndexValidator(context, descriptor.memoryIndex).mapError {
-        ExportValidatorError.UnknownMemory
-    }.bind()
+    memoryIndexValidator(context, descriptor.memoryIndex)
+        .mapError {
+            ExportValidatorError.UnknownMemory
+        }.bind()
 }

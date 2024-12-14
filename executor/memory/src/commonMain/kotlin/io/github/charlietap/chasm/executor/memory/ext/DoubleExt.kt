@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.memory.ext
 
 inline fun Double.copyInto(buffer: ByteArray, offset: Int) {

@@ -25,7 +25,10 @@ internal inline fun BlockTypeDecoder(
     crossinline valueTypeDecoder: Decoder<ValueType>,
 ): Result<BlockType, WasmDecodeError> = binding {
 
-    val firstByte = context.reader.peek().ubyte().bind()
+    val firstByte = context.reader
+        .peek()
+        .ubyte()
+        .bind()
 
     when (firstByte) {
         BLOCK_TYPE_EMPTY -> {

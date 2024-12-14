@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
@@ -42,18 +40,24 @@ internal inline fun ArrayNewDataExecutor(
     val (stack, store) = context
     val (typeIndex, dataIndex) = instruction
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.definedType(typeIndex).bind()
+    val definedType = frame.state.module
+        .definedType(typeIndex)
+        .bind()
 
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
-    val dataAddress = frame.state.module.dataAddress(dataIndex).bind()
+    val dataAddress = frame.state.module
+        .dataAddress(dataIndex)
+        .bind()
     val dataInstance = store.data(dataAddress).bind()
 
     val arrayLength = stack.popI32().bind()
     val arrayStartOffsetInSegment = stack.popI32().bind()
 
-    val arrayElementSizeInBytes = arrayType.fieldType.bitWidth().toResultOr {
-        InvocationError.UnobservableBitWidth
-    }.bind() / 8
+    val arrayElementSizeInBytes = arrayType.fieldType
+        .bitWidth()
+        .toResultOr {
+            InvocationError.UnobservableBitWidth
+        }.bind() / 8
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * arrayElementSizeInBytes)
 
     if (arrayEndOffsetInSegment > dataInstance.bytes.size) {

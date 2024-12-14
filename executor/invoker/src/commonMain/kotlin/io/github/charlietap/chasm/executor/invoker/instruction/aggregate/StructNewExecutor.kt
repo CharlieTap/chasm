@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Result
@@ -36,14 +34,18 @@ internal inline fun StructNewExecutor(
 
     val (stack) = context
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module.definedType(instruction.typeIndex).bind()
+    val definedType = frame.state.module
+        .definedType(instruction.typeIndex)
+        .bind()
 
     val structType = definedTypeExpander(definedType).structType().bind()
 
-    val fields = structType.fields.asReversed().map { fieldType ->
-        val value = stack.popValue().bind().value
-        fieldPacker(value, fieldType).bind()
-    }.asReversed()
+    val fields = structType.fields
+        .asReversed()
+        .map { fieldType ->
+            val value = stack.popValue().bind().value
+            fieldPacker(value, fieldType).bind()
+        }.asReversed()
 
     val instance = StructInstance(definedType, fields.toMutableList())
     val reference = ReferenceValue.Struct(instance)

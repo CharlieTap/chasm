@@ -25,7 +25,12 @@ internal inline fun ReferenceTypeDecoder(
     crossinline heapTypeDecoder: Decoder<HeapType>,
     crossinline abstractHeapTypeDecoder: Decoder<AbstractHeapType>,
 ): Result<ReferenceType, WasmDecodeError> = binding {
-    when (context.reader.peek().ubyte().bind()) {
+    when (
+        context.reader
+            .peek()
+            .ubyte()
+            .bind()
+    ) {
         REFERENCE_TYPE_REF -> {
             context.reader.ubyte().bind() // consume byte
             ReferenceType.Ref(heapTypeDecoder(context).bind())

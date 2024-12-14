@@ -45,9 +45,10 @@ internal inline fun PartialModuleAllocator(
 
     val instance = ModuleInstance(typeAllocator(module.types.map(Type::recursiveType)))
 
-    val matchedImports = importMatcher(context, imports).mapError {
-        InstantiationError.MissingImport
-    }.bind()
+    val matchedImports = importMatcher(context, imports)
+        .mapError {
+            InstantiationError.MissingImport
+        }.bind()
 
     matchedImports.forEach { import ->
         when (import) {

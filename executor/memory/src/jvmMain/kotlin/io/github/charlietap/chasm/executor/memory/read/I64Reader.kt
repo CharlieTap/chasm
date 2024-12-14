@@ -14,8 +14,9 @@ actual inline fun I64Reader(
     address: Int,
 ): Result<Long, InvocationError> {
     val byteArray = (memory as ByteArrayLinearMemory).memory
-    val value = byteArray.sliceArray(
-        address until (address + Long.SIZE_BYTES),
-    ).toLongLittleEndian()
+    val value = byteArray
+        .sliceArray(
+            address until (address + Long.SIZE_BYTES),
+        ).toLongLittleEndian()
     return Ok(value)
 }

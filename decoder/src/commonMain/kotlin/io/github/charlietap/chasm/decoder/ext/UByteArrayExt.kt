@@ -14,6 +14,7 @@ internal fun UByteArray.magicNumber() = if (contentEquals(MAGIC_NUMBER)) {
     Err(WasmDecodeError.InvalidWasmFile(this))
 }
 
-internal fun UByteArray.version() = Version.entries.firstOrNull { version ->
-    contentEquals(version.number)
-}.toResultOr { WasmDecodeError.UnsupportedVersion(this) }
+internal fun UByteArray.version() = Version.entries
+    .firstOrNull { version ->
+        contentEquals(version.number)
+    }.toResultOr { WasmDecodeError.UnsupportedVersion(this) }

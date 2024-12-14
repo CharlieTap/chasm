@@ -17,11 +17,12 @@ fun AssertInvalidCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + command.filename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    return module(bytes).flatMap { module ->
-        validate(module)
-    }.fold({ _ ->
-        CommandResult.Failure(command, "invalid module was decoded when it should have failed")
-    }) {
-        CommandResult.Success
-    }
+    return module(bytes)
+        .flatMap { module ->
+            validate(module)
+        }.fold({ _ ->
+            CommandResult.Failure(command, "invalid module was decoded when it should have failed")
+        }) {
+            CommandResult.Success
+        }
 }

@@ -29,8 +29,7 @@ fun writeTable(
         elementIndex = elementIndex,
         value = value,
         referenceValueMapper = ReferenceValueMapper.instance,
-    )
-        .mapError(ModuleTrapError::toString)
+    ).mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
 
