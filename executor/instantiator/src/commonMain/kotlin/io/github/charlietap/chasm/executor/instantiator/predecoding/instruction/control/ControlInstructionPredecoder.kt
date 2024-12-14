@@ -1,6 +1,5 @@
-package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
+package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.control
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
@@ -19,7 +18,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrOnNullDisp
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrTableDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallIndirectDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallRefDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostFunctionCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.IfDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.LoopDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.NopDispatcher
@@ -31,13 +29,8 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowDispatc
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.TryTableDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.UnreachableDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.WasmFunctionCallDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.function
-import io.github.charlietap.chasm.executor.runtime.ext.functionAddress
-import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Block
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Br
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.BrIf
@@ -48,7 +41,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstructio
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.BrTable
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.CallIndirect
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.CallRef
-import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.HostFunctionCall
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.If
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Loop
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Nop
@@ -60,7 +52,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstructio
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.ThrowRef
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.TryTable
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Unreachable
-import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.WasmFunctionCall
 
 internal fun ControlInstructionPredecoder(
     context: InstantiationContext,
@@ -70,6 +61,7 @@ internal fun ControlInstructionPredecoder(
         context = context,
         instruction = instruction,
         instructionPredecoder = ::InstructionPredecoder,
+        callInstructionPredecoder = ::CallInstructionPredecoder,
         blockDispatcher = ::BlockDispatcher,
         brDispatcher = ::BrDispatcher,
         brIfDispatcher = ::BrIfDispatcher,
@@ -78,8 +70,6 @@ internal fun ControlInstructionPredecoder(
         brOnNonNullDispatcher = ::BrOnNonNullDispatcher,
         brOnNullDispatcher = ::BrOnNullDispatcher,
         brTableDispatcher = ::BrTableDispatcher,
-        wasmFunctionCallDispatcher = ::WasmFunctionCallDispatcher,
-        hostFunctionCallDispatcher = ::HostFunctionCallDispatcher,
         callIndirectDispatcher = ::CallIndirectDispatcher,
         callRefDispatcher = ::CallRefDispatcher,
         ifDispatcher = ::IfDispatcher,
@@ -99,6 +89,7 @@ internal inline fun ControlInstructionPredecoder(
     context: InstantiationContext,
     instruction: ControlInstruction,
     crossinline instructionPredecoder: Predecoder<Instruction, DispatchableInstruction>,
+    crossinline callInstructionPredecoder: Predecoder<ControlInstruction.Call, DispatchableInstruction>,
     crossinline blockDispatcher: Dispatcher<Block>,
     crossinline brDispatcher: Dispatcher<Br>,
     crossinline brIfDispatcher: Dispatcher<BrIf>,
@@ -107,8 +98,6 @@ internal inline fun ControlInstructionPredecoder(
     crossinline brOnNonNullDispatcher: Dispatcher<BrOnNonNull>,
     crossinline brOnNullDispatcher: Dispatcher<BrOnNull>,
     crossinline brTableDispatcher: Dispatcher<BrTable>,
-    crossinline wasmFunctionCallDispatcher: Dispatcher<WasmFunctionCall>,
-    crossinline hostFunctionCallDispatcher: Dispatcher<HostFunctionCall>,
     crossinline callIndirectDispatcher: Dispatcher<CallIndirect>,
     crossinline callRefDispatcher: Dispatcher<CallRef>,
     crossinline ifDispatcher: Dispatcher<If>,
@@ -154,19 +143,7 @@ internal inline fun ControlInstructionPredecoder(
                 defaultLabelIndex = instruction.defaultLabelIndex,
             ),
         )
-        is ControlInstruction.Call -> {
-            val address = context.instance?.functionAddress(instruction.functionIndex)?.bind()
-                ?: Err(InstantiationError.PredecodingError).bind()
-            val instance = context.store.function(address).bind()
-            when (instance) {
-                is FunctionInstance.HostFunction -> {
-                    hostFunctionCallDispatcher(HostFunctionCall(instance))
-                }
-                is FunctionInstance.WasmFunction -> {
-                    wasmFunctionCallDispatcher(WasmFunctionCall(instance))
-                }
-            }
-        }
+        is ControlInstruction.Call -> callInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.CallIndirect -> callIndirectDispatcher(
             CallIndirect(
                 typeIndex = instruction.typeIndex,

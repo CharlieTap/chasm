@@ -16,7 +16,6 @@ import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.AggregateInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.AtomicMemoryInstructionPredecoder
-import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.ControlInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.MemoryInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.NumericInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.ParametricInstructionPredecoder
@@ -24,6 +23,7 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.TableInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.VariableInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.VectorInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.control.ControlInstructionPredecoder
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 
