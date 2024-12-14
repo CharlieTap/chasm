@@ -46,7 +46,7 @@ internal inline fun ReturnWasmFunctionCall(
     var params = type.params.types.size
     val results = type.results.types.size
 
-    val locals = frame.state.locals
+    val locals = frame.locals
     locals.grow(params + instance.function.locals.size, ExecutionValue.Uninitialised)
     for (i in (params - 1) downTo 0) {
         locals[i] = stack.popValue().bind().value

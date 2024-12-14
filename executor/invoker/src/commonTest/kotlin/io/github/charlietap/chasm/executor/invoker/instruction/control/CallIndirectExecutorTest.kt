@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -63,7 +62,7 @@ class CallIndirectExecutorTest {
         )
 
         val frame = frame(
-            state = frameState(moduleInstance = moduleInstance),
+            instance = moduleInstance,
         )
 
         stack.push(frame)
@@ -132,7 +131,7 @@ class CallIndirectExecutorTest {
         )
 
         val frame = frame(
-            state = frameState(moduleInstance = moduleInstance),
+            instance = moduleInstance,
         )
 
         stack.push(frame)

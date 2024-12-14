@@ -22,24 +22,18 @@ fun stack(
     values = values,
 )
 
-fun frameState(
-    locals: MutableList<ExecutionValue> = mutableListOf(),
-    moduleInstance: ModuleInstance = moduleInstance(),
-) = Stack.Entry.ActivationFrame.State(
-    locals = locals,
-    module = moduleInstance,
-)
-
 fun frame(
     arity: Arity.Return = Arity.Return.SIDE_EFFECT,
+    instance: ModuleInstance = moduleInstance(),
+    locals: MutableList<ExecutionValue> = mutableListOf(),
     stackLabelsDepth: Int = 0,
     stackValuesDepth: Int = 0,
-    state: Stack.Entry.ActivationFrame.State = frameState(),
 ) = Stack.Entry.ActivationFrame(
     arity = arity,
     stackLabelsDepth = stackLabelsDepth,
     stackValuesDepth = stackValuesDepth,
-    state = state,
+    locals = locals,
+    instance = instance,
 )
 
 fun instruction(

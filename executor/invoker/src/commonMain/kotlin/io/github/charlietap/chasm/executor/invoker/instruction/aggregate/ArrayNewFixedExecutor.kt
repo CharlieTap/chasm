@@ -35,7 +35,7 @@ internal inline fun ArrayNewFixedExecutor(
     val (stack) = context
     val (typeIndex, size) = instruction
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module
+    val definedType = frame.instance
         .definedType(typeIndex)
         .bind()
 

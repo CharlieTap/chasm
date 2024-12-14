@@ -35,7 +35,7 @@ internal inline fun ThrowExecutor(
 
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val address = frame.state.module
+    val address = frame.instance
         .tagAddress(instruction.tagIndex)
         .bind()
 

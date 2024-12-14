@@ -16,7 +16,7 @@ internal inline fun GlobalGetExecutor(
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val address = frame.state.module
+    val address = frame.instance
         .globalAddress(instruction.globalIdx)
         .bind()
     val global = store.global(address).bind()

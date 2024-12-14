@@ -22,12 +22,12 @@ internal fun TableInitExecutor(
     val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
-    val tableAddress = frame.state.module
+    val tableAddress = frame.instance
         .tableAddress(instruction.tableIdx)
         .bind()
     val tableInstance = store.table(tableAddress).bind()
 
-    val elementAddress = frame.state.module
+    val elementAddress = frame.instance
         .elementAddress(instruction.elemIdx)
         .bind()
     val elementInstance = store.element(elementAddress).bind()

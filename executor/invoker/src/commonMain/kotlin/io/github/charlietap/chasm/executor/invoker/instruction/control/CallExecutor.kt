@@ -21,7 +21,7 @@ internal inline fun CallExecutor(
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val address = frame.state.module.functionAddresses[functionIndex.index()]
+    val address = frame.instance.functionAddresses[functionIndex.index()]
 
     when (val instance = store.function(address).bind()) {
         is FunctionInstance.HostFunction -> hostFunctionCall(context, instance).bind()

@@ -37,7 +37,7 @@ internal inline fun MemoryFillExecutor(
     val offset = stack.popI32().bind()
 
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module
+    val memoryAddress = frame.instance
         .memoryAddress(instruction.memoryIndex)
         .bind()
     val memory = store.memory(memoryAddress).bind()

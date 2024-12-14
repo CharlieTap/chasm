@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.runtime.configuration
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -57,10 +56,8 @@ class FunctionInvokerTest {
         val thread = thread(
             frame(
                 arity = returnArity(functionType.results.types.size),
-                state = frameState(
-                    locals,
-                    moduleInstance,
-                ),
+                locals = locals,
+                instance = moduleInstance,
             ),
             listOf(
                 callDispatchable,

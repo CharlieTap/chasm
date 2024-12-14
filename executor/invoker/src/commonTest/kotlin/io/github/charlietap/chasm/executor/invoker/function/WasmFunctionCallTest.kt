@@ -105,10 +105,8 @@ class WasmFunctionCallTest {
 
         val frame = frame(
             arity = returnArity(functionType.results.types.size),
-            state = Stack.Entry.ActivationFrame.State(
-                locals = locals,
-                module = functionInstance.module,
-            ),
+            locals = locals,
+            instance = functionInstance.module,
         )
         val frameDispatchable = dispatchableInstruction()
         val frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame> = { frame ->
@@ -208,10 +206,8 @@ class WasmFunctionCallTest {
 
         val frame = frame(
             arity = returnArity(functionType.results.types.size),
-            state = Stack.Entry.ActivationFrame.State(
-                locals = locals,
-                module = functionInstance.module,
-            ),
+            locals = locals,
+            instance = functionInstance.module,
         )
         val frameDispatchable = dispatchableInstruction()
         val frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame> = { _frame ->

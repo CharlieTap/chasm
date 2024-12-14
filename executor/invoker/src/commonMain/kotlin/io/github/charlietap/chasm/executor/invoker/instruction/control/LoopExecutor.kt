@@ -36,7 +36,7 @@ internal inline fun LoopExecutor(
     val (stack) = context
     val (blockType, instructions) = instruction
     val frame = stack.peekFrame().bind()
-    val functionType = expander(frame.state.module, blockType).bind()
+    val functionType = expander(frame.instance, blockType).bind()
     val paramArity = functionType?.let {
         Arity.Argument(functionType.params.types.size)
     } ?: Arity.Argument.NULLARY

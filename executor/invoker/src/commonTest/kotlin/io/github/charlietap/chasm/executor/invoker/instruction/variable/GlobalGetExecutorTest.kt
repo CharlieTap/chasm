@@ -38,10 +38,8 @@ class GlobalGetExecutorTest {
         val context = executionContext(stack, store)
 
         val frame = frame(
-            state = Stack.Entry.ActivationFrame.State(
-                locals = mutableListOf(),
-                module = moduleInstance,
-            ),
+            locals = mutableListOf(),
+            instance = moduleInstance,
         )
 
         stack.push(frame)

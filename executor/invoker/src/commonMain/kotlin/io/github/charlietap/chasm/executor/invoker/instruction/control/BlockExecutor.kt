@@ -53,7 +53,7 @@ internal inline fun BlockExecutor(
 ): Result<Unit, InvocationError> = binding {
 
     val frame = stack.peekFrame().bind()
-    val functionType = expander(frame.state.module, blockType).bind()
+    val functionType = expander(frame.instance, blockType).bind()
     val (paramArity, resultArity) = functionType?.let {
         Arity.Argument(functionType.params.types.size) to Arity.Return(functionType.results.types.size)
     } ?: (Arity.Argument.NULLARY to Arity.Return.SIDE_EFFECT)

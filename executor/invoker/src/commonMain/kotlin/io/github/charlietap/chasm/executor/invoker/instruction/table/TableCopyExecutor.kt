@@ -19,12 +19,12 @@ internal fun TableCopyExecutor(
     val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
-    val srcTableAddress = frame.state.module
+    val srcTableAddress = frame.instance
         .tableAddress(instruction.srcTableIdx)
         .bind()
     val srcTableInstance = store.table(srcTableAddress).bind() // taby
 
-    val dstTableAddress = frame.state.module
+    val dstTableAddress = frame.instance
         .tableAddress(instruction.destTableIdx)
         .bind()
     val dstTableInstance = store.table(dstTableAddress).bind() // tabx

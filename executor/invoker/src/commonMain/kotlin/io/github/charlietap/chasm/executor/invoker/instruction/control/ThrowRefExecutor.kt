@@ -70,12 +70,12 @@ internal inline fun ThrowRefExecutor(
 
         val tagMatches = when (catchHandler) {
             is CatchHandler.Catch -> {
-                address == frame.state.module
+                address == frame.instance
                     .tagAddress(catchHandler.tagIndex)
                     .bind()
             }
             is CatchHandler.CatchRef -> {
-                address == frame.state.module
+                address == frame.instance
                     .tagAddress(catchHandler.tagIndex)
                     .bind()
             }

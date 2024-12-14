@@ -32,7 +32,7 @@ internal inline fun I32Store8Executor(
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module
+    val memoryAddress = frame.instance
         .memoryAddress(instruction.memoryIndex)
         .bind()
     val memory = store.memory(memoryAddress).bind()

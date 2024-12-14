@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.module.elementIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -53,10 +52,8 @@ class ArrayNewElementExecutorTest {
         val context = executionContext(stack, store)
 
         val frame = frame(
-            state = frameState(
-                moduleInstance = moduleInstance(
-                    elemAddresses = mutableListOf(elementAddress),
-                ),
+            instance = moduleInstance(
+                elemAddresses = mutableListOf(elementAddress),
             ),
         )
 

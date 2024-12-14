@@ -31,12 +31,12 @@ internal inline fun MemoryInitExecutor(
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.state.module
+    val memoryAddress = frame.instance
         .memoryAddress(instruction.memoryIndex)
         .bind()
     val memory = store.memory(memoryAddress).bind()
 
-    val dataAddress = frame.state.module
+    val dataAddress = frame.instance
         .dataAddress(instruction.dataIndex)
         .bind()
     val data = store.data(dataAddress).bind()

@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.fixture.ast.module.functionIndex
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -36,7 +35,7 @@ class CallExecutorTest {
             functionAddresses = mutableListOf(functionAddress),
         )
         val frame = frame(
-            state = frameState(moduleInstance = moduleInstance),
+            instance = moduleInstance,
         )
         val tailRecursion = true
 
@@ -74,7 +73,7 @@ class CallExecutorTest {
             functionAddresses = mutableListOf(functionAddress),
         )
         val frame = frame(
-            state = frameState(moduleInstance = moduleInstance),
+            instance = moduleInstance,
         )
         val tailRecursion = false
 

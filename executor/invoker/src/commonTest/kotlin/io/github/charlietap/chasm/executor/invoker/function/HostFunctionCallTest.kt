@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
 import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.store
@@ -37,9 +36,7 @@ class HostFunctionCallTest {
             stack = stack,
         )
         val frame = frame(
-            state = frameState(
-                moduleInstance = moduleInstance(),
-            ),
+            instance = moduleInstance(),
         )
 
         stack.pushFrame(frame)
@@ -103,9 +100,7 @@ class HostFunctionCallTest {
             stack = stack,
         )
         val frame = frame(
-            state = frameState(
-                moduleInstance = moduleInstance(),
-            ),
+            instance = moduleInstance(),
         )
 
         stack.pushFrame(frame)

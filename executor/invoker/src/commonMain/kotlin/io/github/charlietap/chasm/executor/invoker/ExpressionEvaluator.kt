@@ -38,21 +38,19 @@ internal inline fun ExpressionEvaluator(
 ): Result<ExecutionValue?, InvocationError> {
 
     val thread = Thread(
-        Stack.Entry.ActivationFrame(
-            arity,
-            0,
-            0,
-            Stack.Entry.ActivationFrame.State(
-                mutableListOf(),
-                instance,
-            ),
+        frame = Stack.Entry.ActivationFrame(
+            arity = arity,
+            locals = mutableListOf(),
+            instance = instance,
+            stackLabelsDepth = 0,
+            stackValuesDepth = 0,
         ),
-        expression.instructions,
+        instructions = expression.instructions,
     )
 
     val configuration = Configuration(
-        store,
-        thread,
+        store = store,
+        thread = thread,
     )
 
     return threadExecutor(configuration).map { it.firstOrNull() }

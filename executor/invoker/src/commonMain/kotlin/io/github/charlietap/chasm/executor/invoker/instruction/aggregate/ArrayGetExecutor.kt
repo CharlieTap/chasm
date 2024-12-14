@@ -37,7 +37,7 @@ internal inline fun ArrayGetExecutor(
 
     val (stack) = context
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module
+    val definedType = frame.instance
         .definedType(typeIndex)
         .bind()
 

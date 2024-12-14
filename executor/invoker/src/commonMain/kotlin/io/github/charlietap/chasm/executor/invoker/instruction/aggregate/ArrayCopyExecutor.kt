@@ -34,7 +34,7 @@ internal inline fun ArrayCopyExecutor(
     // y = src
     val (stack) = context
     val frame = stack.peekFrame().bind()
-    val destDefinedType = frame.state.module
+    val destDefinedType = frame.instance
         .definedType(instruction.destinationTypeIndex)
         .bind()
 

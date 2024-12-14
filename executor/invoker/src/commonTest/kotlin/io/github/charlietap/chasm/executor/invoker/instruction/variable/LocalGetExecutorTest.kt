@@ -23,10 +23,8 @@ class LocalGetExecutorTest {
         val local = i32(117)
 
         val frame = frame(
-            state = Stack.Entry.ActivationFrame.State(
-                locals = mutableListOf(local),
-                module = moduleInstance(),
-            ),
+            locals = mutableListOf(local),
+            instance = moduleInstance(),
         )
 
         stack.push(frame)

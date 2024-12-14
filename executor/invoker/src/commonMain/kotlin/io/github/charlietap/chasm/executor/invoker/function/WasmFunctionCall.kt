@@ -56,10 +56,8 @@ internal inline fun WasmFunctionCall(
         arity = Arity.Return(results),
         stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth(),
-        state = Stack.Entry.ActivationFrame.State(
-            locals = locals,
-            module = instance.module,
-        ),
+        locals = locals,
+        instance = instance.module,
     )
 
     stack.pushFrame(frame).bind()

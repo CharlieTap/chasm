@@ -15,7 +15,7 @@ internal inline fun DataDropExecutor(
 ): Result<Unit, InvocationError> = binding {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
-    val dataAddress = frame.state.module
+    val dataAddress = frame.instance
         .dataAddress(instruction.dataIdx)
         .bind()
     val dataInstance = DataInstance(ubyteArrayOf(), true)

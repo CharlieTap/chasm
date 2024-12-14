@@ -56,7 +56,7 @@ class RefCastExecutorTest {
         val typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType> = { _refVal, _store, _instance ->
             assertEquals(referenceValue, _refVal)
             assertEquals(store, _store)
-            assertEquals(frame.state.module, _instance)
+            assertEquals(frame.instance, _instance)
 
             typeOfReferenceType
         }
@@ -107,7 +107,7 @@ class RefCastExecutorTest {
         val typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType> = { _refVal, _store, _instance ->
             assertEquals(referenceValue, _refVal)
             assertEquals(store, _store)
-            assertEquals(frame.state.module, _instance)
+            assertEquals(frame.instance, _instance)
 
             typeOfReferenceType
         }

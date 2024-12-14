@@ -22,7 +22,7 @@ internal inline fun TableGrowExecutor(
     val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
-    val tableAddress = frame.state.module
+    val tableAddress = frame.instance
         .tableAddress(instruction.tableIdx)
         .bind()
     val tableInstance = store.table(tableAddress).bind()

@@ -33,7 +33,7 @@ internal inline fun ArrayNewElementExecutor(
     val (typeIndex, elementIndex) = instruction
     val frame = stack.peekFrame().bind()
 
-    val elementAddress = frame.state.module
+    val elementAddress = frame.instance
         .elementAddress(elementIndex)
         .bind()
     val elementInstance = store.element(elementAddress).bind()

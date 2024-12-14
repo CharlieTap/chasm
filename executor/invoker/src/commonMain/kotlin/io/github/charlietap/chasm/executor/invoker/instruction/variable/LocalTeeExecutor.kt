@@ -19,5 +19,5 @@ internal inline fun LocalTeeExecutor(
     val value = stack.peekValue().bind()
     val frame = stack.peekFrame().bind()
 
-    frame.state.locals[instruction.localIdx.index()] = value.value
+    frame.locals[instruction.localIdx.index()] = value.value
 }

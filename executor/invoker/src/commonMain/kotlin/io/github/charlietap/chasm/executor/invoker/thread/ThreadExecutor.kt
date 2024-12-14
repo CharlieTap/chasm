@@ -33,12 +33,12 @@ internal fun ThreadExecutor(
     val context = ExecutionContext(
         stack = stack,
         store = configuration.store,
-        instance = thread.frame.state.module,
+        instance = thread.frame.instance,
     )
 
     stack.push(thread.frame)
     stack.push(Instruction(frameDispatcher(thread.frame)))
-    thread.frame.state.locals.forEach { local ->
+    thread.frame.locals.forEach { local ->
         stack.push(Stack.Entry.Value(local))
     }
 

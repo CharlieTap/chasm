@@ -17,7 +17,7 @@ internal inline fun LocalGetExecutor(
     val (stack) = context
     val frame = stack.peekFrame().bind()
 
-    frame.state.locals.getOrNull(instruction.localIdx.index())?.let { local ->
+    frame.locals.getOrNull(instruction.localIdx.index())?.let { local ->
         stack.push(Stack.Entry.Value(local))
     } ?: Err(InvocationError.MissingLocal).bind<Unit>()
 }

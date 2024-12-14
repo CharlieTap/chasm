@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.mutableFieldType
 import io.github.charlietap.chasm.fixture.ast.type.valueStorageType
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -68,11 +67,9 @@ class ArrayNewDataExecutorTest {
         val context = executionContext(stack, store)
 
         val frame = frame(
-            state = frameState(
-                moduleInstance = moduleInstance(
-                    types = mutableListOf(definedType),
-                    dataAddresses = mutableListOf(dataAddress),
-                ),
+            instance = moduleInstance(
+                types = mutableListOf(definedType),
+                dataAddresses = mutableListOf(dataAddress),
             ),
         )
 

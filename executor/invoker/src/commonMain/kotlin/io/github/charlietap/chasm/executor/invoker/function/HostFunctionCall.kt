@@ -37,7 +37,7 @@ internal fun HostFunctionCall(
 
     val functionContext = HostFunctionContext(
         store,
-        frame.state.module,
+        frame.instance,
     )
     val results = function.function.invoke(functionContext, params)
 

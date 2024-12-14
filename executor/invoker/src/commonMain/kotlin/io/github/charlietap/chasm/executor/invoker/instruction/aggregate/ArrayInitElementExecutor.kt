@@ -36,12 +36,12 @@ internal inline fun ArrayInitElementExecutor(
     val (stack, store) = context
     val (typeIndex, elementIndex) = instruction
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module
+    val definedType = frame.instance
         .definedType(typeIndex)
         .bind()
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
-    val elementAddress = frame.state.module
+    val elementAddress = frame.instance
         .elementAddress(elementIndex)
         .bind()
     val elementInstance = store.element(elementAddress).bind()

@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.fixture.ast.type.arrayType
 import io.github.charlietap.chasm.fixture.ast.type.definedType
 import io.github.charlietap.chasm.fixture.ast.type.fieldType
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
@@ -50,10 +49,8 @@ class ArrayGetExecutorTest {
         val executionValue = executionValue()
 
         val frame = frame(
-            state = frameState(
-                moduleInstance = moduleInstance(
-                    types = mutableListOf(definedType),
-                ),
+            instance = moduleInstance(
+                types = mutableListOf(definedType),
             ),
         )
 

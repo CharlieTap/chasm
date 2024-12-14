@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -58,9 +57,7 @@ class MemoryGrowInstructionBenchmark {
     )
 
     private val frame = frame(
-        state = frameState(
-            moduleInstance = context.instance,
-        ),
+        instance = context.instance,
     )
 
     private val pagesToGrow = value(i32(200))

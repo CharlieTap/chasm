@@ -17,7 +17,7 @@ internal inline fun ElementDropExecutor(
     val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
-    val elementAddress = frame.state.module
+    val elementAddress = frame.instance
         .elementAddress(instruction.elemIdx)
         .bind()
     val elementInstance = store.element(elementAddress).bind()

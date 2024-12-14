@@ -31,7 +31,7 @@ internal inline fun TryTableExecutor(
 
     val (stack) = context
     val frame = stack.peekFrame().bind()
-    val functionType = expander(frame.state.module, instruction.blockType).bind()
+    val functionType = expander(frame.instance, instruction.blockType).bind()
 
     val paramArity = functionType?.let {
         Arity.Argument(functionType.params.types.size)

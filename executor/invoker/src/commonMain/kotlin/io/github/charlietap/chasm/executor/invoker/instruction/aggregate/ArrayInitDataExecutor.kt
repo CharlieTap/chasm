@@ -39,13 +39,13 @@ internal fun ArrayInitDataExecutor(
     val(stack, store) = context
     val (typeIndex, dataIndex) = instruction
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module
+    val definedType = frame.instance
         .definedType(typeIndex)
         .bind()
 
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
-    val dataAddress = frame.state.module
+    val dataAddress = frame.instance
         .dataAddress(dataIndex)
         .bind()
     val dataInstance = store.data(dataAddress).bind()

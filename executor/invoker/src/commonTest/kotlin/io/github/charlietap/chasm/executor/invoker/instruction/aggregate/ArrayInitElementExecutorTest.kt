@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.ast.type.recursiveType
 import io.github.charlietap.chasm.fixture.ast.type.valueStorageType
 import io.github.charlietap.chasm.fixture.ast.type.varMutability
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementInstance
@@ -73,14 +72,12 @@ class ArrayInitElementExecutorTest {
         )
         val context = executionContext(stack, store)
         val frame = frame(
-            state = frameState(
-                moduleInstance = moduleInstance(
-                    types = mutableListOf(
-                        definedType,
-                    ),
-                    elemAddresses = mutableListOf(
-                        elementAddress,
-                    ),
+            instance = moduleInstance(
+                types = mutableListOf(
+                    definedType,
+                ),
+                elemAddresses = mutableListOf(
+                    elementAddress,
                 ),
             ),
         )

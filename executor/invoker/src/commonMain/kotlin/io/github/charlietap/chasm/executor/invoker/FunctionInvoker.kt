@@ -53,21 +53,19 @@ internal inline fun FunctionInvoker(
     )
 
     val thread = Thread(
-        Stack.Entry.ActivationFrame(
-            Arity.Return(functionType.results.types.size),
-            0,
-            0,
-            Stack.Entry.ActivationFrame.State(
-                values.toMutableList(),
-                function.module,
-            ),
+        frame = Stack.Entry.ActivationFrame(
+            arity = Arity.Return(functionType.results.types.size),
+            instance = function.module,
+            locals = values.toMutableList(),
+            stackLabelsDepth = 0,
+            stackValuesDepth = 0,
         ),
-        listOf(instruction),
+        instructions = listOf(instruction),
     )
 
     val configuration = Configuration(
-        store,
-        thread,
+        store = store,
+        thread = thread,
     )
 
     threadExecutor(configuration).bind()

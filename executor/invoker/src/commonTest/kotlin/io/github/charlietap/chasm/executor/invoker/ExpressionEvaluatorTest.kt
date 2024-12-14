@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.fixture.executor.runtime.configuration
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
@@ -28,10 +27,8 @@ class ExpressionEvaluatorTest {
         val thread = thread(
             frame(
                 arity = returnArity(1),
-                state = frameState(
-                    locals = mutableListOf(),
-                    moduleInstance = instance,
-                ),
+                locals = mutableListOf(),
+                instance = instance,
             ),
             expression.instructions,
         )
@@ -64,10 +61,8 @@ class ExpressionEvaluatorTest {
         val thread = thread(
             frame(
                 arity = Arity.Return.SIDE_EFFECT,
-                state = frameState(
-                    mutableListOf(),
-                    instance,
-                ),
+                locals = mutableListOf(),
+                instance = instance,
             ),
             expression.instructions,
         )

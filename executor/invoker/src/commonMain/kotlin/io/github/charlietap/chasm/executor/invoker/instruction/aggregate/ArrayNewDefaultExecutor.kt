@@ -35,7 +35,7 @@ internal inline fun ArrayNewDefaultExecutor(
     val (stack) = context
     val typeIndex = instruction.typeIndex
     val frame = stack.peekFrame().bind()
-    val definedType = frame.state.module
+    val definedType = frame.instance
         .definedType(typeIndex)
         .bind()
 

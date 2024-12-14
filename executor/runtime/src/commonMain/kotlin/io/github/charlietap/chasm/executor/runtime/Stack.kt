@@ -135,15 +135,11 @@ data class Stack(
 
         data class ActivationFrame(
             val arity: Arity.Return,
+            val instance: ModuleInstance,
+            var locals: MutableList<ExecutionValue>,
             val stackLabelsDepth: Int,
             val stackValuesDepth: Int,
-            val state: State,
-        ) : Entry {
-            data class State(
-                var locals: MutableList<ExecutionValue>,
-                val module: ModuleInstance,
-            )
-        }
+        ) : Entry
 
         enum class InstructionTag {
             NON_ADMIN,

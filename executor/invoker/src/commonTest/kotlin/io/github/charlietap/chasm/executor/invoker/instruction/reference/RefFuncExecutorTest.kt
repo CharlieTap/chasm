@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.module.functionIndex
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.frameState
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refFuncRuntimeInstruction
@@ -25,10 +24,8 @@ class RefFuncExecutorTest {
         val functionAddress = functionAddress()
 
         val frame = frame(
-            state = frameState(
-                moduleInstance = moduleInstance(
-                    functionAddresses = mutableListOf(functionAddress()),
-                ),
+            instance = moduleInstance(
+                functionAddresses = mutableListOf(functionAddress()),
             ),
         )
 

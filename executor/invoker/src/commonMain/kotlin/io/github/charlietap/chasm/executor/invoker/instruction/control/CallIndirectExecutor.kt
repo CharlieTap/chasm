@@ -50,12 +50,12 @@ internal inline fun CallIndirectExecutor(
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
 
-    val tableAddress = frame.state.module
+    val tableAddress = frame.instance
         .tableAddress(tableIndex)
         .bind()
     val tableInstance = store.table(tableAddress).bind()
 
-    val functionType = frame.state.module
+    val functionType = frame.instance
         .definedType(typeIndex)
         .bind()
 

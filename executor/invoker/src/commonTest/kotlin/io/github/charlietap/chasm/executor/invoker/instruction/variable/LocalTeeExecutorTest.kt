@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
 import io.github.charlietap.chasm.fixture.ast.module.localIndex
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
@@ -24,10 +23,8 @@ class LocalTeeExecutorTest {
         val local = i32(0)
 
         val frame = frame(
-            state = Stack.Entry.ActivationFrame.State(
-                locals = mutableListOf(local),
-                module = moduleInstance(),
-            ),
+            locals = mutableListOf(local),
+            instance = moduleInstance(),
         )
 
         stack.push(frame)
@@ -46,6 +43,6 @@ class LocalTeeExecutorTest {
         assertEquals(1, stack.framesDepth())
         assertEquals(1, stack.valuesDepth())
         assertEquals(value(expected), stack.popValueOrNull())
-        assertEquals(expected, frame.state.locals[0])
+        assertEquals(expected, frame.locals[0])
     }
 }

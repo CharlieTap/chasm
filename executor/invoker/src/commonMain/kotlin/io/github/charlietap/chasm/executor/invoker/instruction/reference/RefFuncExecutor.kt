@@ -18,7 +18,7 @@ internal inline fun RefFuncExecutor(
     val (stack) = context
     val frame = stack.peekFrame().bind()
 
-    val functionAddress = frame.state.module
+    val functionAddress = frame.instance
         .functionAddress(instruction.funcIdx)
         .bind()
 
