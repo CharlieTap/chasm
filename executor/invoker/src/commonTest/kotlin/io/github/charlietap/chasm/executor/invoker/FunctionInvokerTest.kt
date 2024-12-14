@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.fixture.ast.module.functionIndex
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.runtime.configuration
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
@@ -17,7 +16,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunct
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.instruction.callRuntimeInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.wasmFunctionCallRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.thread
@@ -50,8 +49,8 @@ class FunctionInvokerTest {
         )
 
         val callDispatchable = dispatchableInstruction()
-        val callDispatcher: Dispatcher<ControlInstruction.Call> = { instruction ->
-            assertEquals(callRuntimeInstruction(functionIndex(0u)), instruction)
+        val callDispatcher: Dispatcher<ControlInstruction.WasmFunctionCall> = { instruction ->
+            assertEquals(wasmFunctionCallRuntimeInstruction(functionInstance), instruction)
             callDispatchable
         }
 
@@ -104,7 +103,7 @@ class FunctionInvokerTest {
             functions = mutableListOf(functionInstance),
         )
 
-        val callDispatcher: Dispatcher<ControlInstruction.Call> = { _ ->
+        val callDispatcher: Dispatcher<ControlInstruction.WasmFunctionCall> = { _ ->
             fail("call dispatcher should not be called")
         }
         val threadExecutor: ThreadExecutor = { _ ->

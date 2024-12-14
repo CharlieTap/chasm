@@ -9,4 +9,13 @@ data class Function(
     val typeIndex: TypeIndex,
     val locals: List<Local>,
     val body: Expression,
-)
+) {
+    companion object {
+        val TEMP = Function(
+            idx = FunctionIndex(0u),
+            typeIndex = TypeIndex(0u),
+            locals = emptyList(),
+            body = Expression(),
+        )
+    }
+}

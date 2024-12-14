@@ -12,23 +12,21 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popInstruction
 import io.github.charlietap.chasm.executor.runtime.ext.popLabel
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 internal inline fun ReturnWasmFunctionCall(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
 ): Result<Unit, InvocationError> =
     ReturnWasmFunctionCall(
-        store = store,
-        stack = stack,
+        context = context,
         instance = instance,
         instructionBlockExecutor = ::InstructionBlockExecutor,
         frameDispatcher = ::FrameDispatcher,
@@ -36,13 +34,13 @@ internal inline fun ReturnWasmFunctionCall(
 
 @Suppress("UNUSED_PARAMETER")
 internal inline fun ReturnWasmFunctionCall(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
     crossinline frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame>,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack) = context
     val frame = stack.peekFrame().bind()
     val type = instance.functionType().bind()
     var params = type.params.types.size

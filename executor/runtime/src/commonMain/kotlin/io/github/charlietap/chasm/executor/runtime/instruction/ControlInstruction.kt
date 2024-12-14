@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandle
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import kotlin.jvm.JvmInline
 
 sealed interface ControlInstruction : ExecutionInstruction {
@@ -61,7 +62,10 @@ sealed interface ControlInstruction : ExecutionInstruction {
     value class ReturnCallRef(val typeIndex: Index.TypeIndex) : ControlInstruction
 
     @JvmInline
-    value class Call(val functionIndex: Index.FunctionIndex) : ControlInstruction
+    value class WasmFunctionCall(val instance: FunctionInstance.WasmFunction) : ControlInstruction
+
+    @JvmInline
+    value class HostFunctionCall(val instance: FunctionInstance.HostFunction) : ControlInstruction
 
     @JvmInline
     value class CallRef(val typeIndex: Index.TypeIndex) : ControlInstruction

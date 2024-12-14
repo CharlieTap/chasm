@@ -74,7 +74,7 @@ internal inline fun CallIndirectExecutor(
     }
 
     when (functionInstance) {
-        is FunctionInstance.HostFunction -> hostFunctionCall(store, stack, functionInstance).bind()
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, functionInstance).bind()
+        is FunctionInstance.HostFunction -> hostFunctionCall(context, functionInstance).bind()
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(context, functionInstance).bind()
     }
 }

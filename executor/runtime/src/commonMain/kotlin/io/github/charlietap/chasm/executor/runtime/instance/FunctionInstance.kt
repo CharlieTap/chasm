@@ -11,7 +11,7 @@ sealed class FunctionInstance {
     data class WasmFunction(
         override val type: DefinedType,
         val module: ModuleInstance,
-        val function: Function,
+        var function: Function,
     ) : FunctionInstance()
 
     data class HostFunction(

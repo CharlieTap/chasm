@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
@@ -40,6 +41,10 @@ class WasmFunctionCallTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(
+            store = store,
+            stack = stack,
+        )
 
         val functionType = functionType(
             params = resultType(
@@ -128,8 +133,7 @@ class WasmFunctionCallTest {
         }
 
         val actual = WasmFunctionCall(
-            store = store,
-            stack = stack,
+            context = context,
             instance = functionInstance,
             instructionBlockExecutor = instructionBlockExecutor,
             frameDispatcher = frameDispatcher,
@@ -144,6 +148,10 @@ class WasmFunctionCallTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(
+            store = store,
+            stack = stack,
+        )
 
         val functionType = functionType(
             params = resultType(
@@ -232,8 +240,7 @@ class WasmFunctionCallTest {
         }
 
         val actual = ReturnWasmFunctionCall(
-            store = store,
-            stack = stack,
+            context = context,
             instance = functionInstance,
             instructionBlockExecutor = instructionBlockExecutor,
             frameDispatcher = frameDispatcher,

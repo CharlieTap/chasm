@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
+import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitut
 data class InstantiationContext(
     val store: Store,
     val module: Module,
+    var instance: ModuleInstance? = null,
 ) : TypeMatcherContext {
 
     val types by lazy {

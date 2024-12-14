@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.fixture.ast.instruction.blockType
 import io.github.charlietap.chasm.fixture.ast.module.functionIndex
@@ -11,6 +12,7 @@ import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.referenceType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 
 fun controlRuntimeInstruction(): ControlInstruction = unreachableRuntimeInstruction()
 
@@ -110,10 +112,10 @@ fun returnCallRefRuntimeInstruction(
     typeIndex = typeIndex,
 )
 
-fun callRuntimeInstruction(
-    functionIndex: Index.FunctionIndex = functionIndex(),
-) = ControlInstruction.Call(
-    functionIndex = functionIndex,
+fun wasmFunctionCallRuntimeInstruction(
+    instance: FunctionInstance.WasmFunction = wasmFunctionInstance(),
+) = ControlInstruction.WasmFunctionCall(
+    instance = instance,
 )
 
 fun callRefRuntimeInstruction(

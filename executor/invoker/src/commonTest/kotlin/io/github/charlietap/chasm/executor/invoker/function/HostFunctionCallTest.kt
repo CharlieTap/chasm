@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -31,6 +32,10 @@ class HostFunctionCallTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(
+            store = store,
+            stack = stack,
+        )
         val frame = frame(
             state = frameState(
                 moduleInstance = moduleInstance(),
@@ -77,8 +82,7 @@ class HostFunctionCallTest {
         }
 
         val actual = HostFunctionCall(
-            store = store,
-            stack = stack,
+            context = context,
             function = functionInstance,
         )
 
@@ -94,6 +98,10 @@ class HostFunctionCallTest {
 
         val store = store()
         val stack = stack()
+        val context = executionContext(
+            store = store,
+            stack = stack,
+        )
         val frame = frame(
             state = frameState(
                 moduleInstance = moduleInstance(),
@@ -153,8 +161,7 @@ class HostFunctionCallTest {
         )
 
         val actual = HostFunctionCall(
-            store = store,
-            stack = stack,
+            context = context,
             function = functionInstance,
         )
 

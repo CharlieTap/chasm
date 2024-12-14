@@ -29,15 +29,14 @@ class CallRefExecutorTest {
         val context = executionContext(stack, store)
 
         val tailRecursion = false
-        val wasmFunctionCall: WasmFunctionCall = { _store, _stack, _function ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
+        val wasmFunctionCall: WasmFunctionCall = { _context, _function ->
+            assertEquals(context, _context)
             assertEquals(functionInstance, _function)
 
             Ok(Unit)
         }
 
-        val hostFunctionCall: HostFunctionCall = { _, _, _ ->
+        val hostFunctionCall: HostFunctionCall = { _, _ ->
             fail("Host function should not be called in this scenario")
         }
 
@@ -61,14 +60,13 @@ class CallRefExecutorTest {
         val functionAddress = functionAddress()
         val tailRecursion = false
 
-        val wasmFunctionCall: WasmFunctionCall = { _, _, _ ->
+        val wasmFunctionCall: WasmFunctionCall = { _, _ ->
             fail("Wasm function should not be called in this scenario")
         }
 
-        val hostFunctionCall: HostFunctionCall = { _store, _stack, _function ->
-            assertEquals(store, _store)
-            assertEquals(stack, _stack)
-            assertEquals(_function, functionInstance)
+        val hostFunctionCall: HostFunctionCall = { _context, _function ->
+            assertEquals(context, _context)
+            assertEquals(functionInstance, _function)
 
             Ok(Unit)
         }

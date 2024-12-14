@@ -11,24 +11,23 @@ import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunctionContext
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.VectorValue
 
-internal typealias HostFunctionCall = (Store, Stack, FunctionInstance.HostFunction) -> Result<Unit, InvocationError>
+internal typealias HostFunctionCall = (ExecutionContext, FunctionInstance.HostFunction) -> Result<Unit, InvocationError>
 
-@Suppress("UNUSED_PARAMETER")
 internal fun HostFunctionCall(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     function: FunctionInstance.HostFunction,
 ): Result<Unit, InvocationError> = binding {
+    val (stack, store) = context
     val frame = stack.peekFrame().bind()
     val type = function.functionType().bind()
 

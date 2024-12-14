@@ -33,7 +33,7 @@ internal inline fun CallRefExecutor(
     val value = stack.popFunctionAddress().bind()
 
     when (val instance = store.function(value.address).bind()) {
-        is FunctionInstance.HostFunction -> hostFunctionCall(store, stack, instance).bind()
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, instance).bind()
+        is FunctionInstance.HostFunction -> hostFunctionCall(context, instance).bind()
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(context, instance).bind()
     }
 }

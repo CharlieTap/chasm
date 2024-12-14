@@ -3,9 +3,8 @@ package io.github.charlietap.chasm.executor.invoker
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.WasmFunctionCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
@@ -31,7 +30,7 @@ fun FunctionInvoker(
         store = store,
         address = address,
         values = values,
-        callDispatcher = ::CallDispatcher,
+        callDispatcher = ::WasmFunctionCallDispatcher,
         threadExecutor = ::ThreadExecutor,
     )
 
@@ -39,7 +38,7 @@ internal inline fun FunctionInvoker(
     store: Store,
     address: Address.Function,
     values: List<ExecutionValue>,
-    crossinline callDispatcher: Dispatcher<ControlInstruction.Call>,
+    crossinline callDispatcher: Dispatcher<ControlInstruction.WasmFunctionCall>,
     crossinline threadExecutor: ThreadExecutor,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
@@ -50,7 +49,7 @@ internal inline fun FunctionInvoker(
 
     val functionType = function.functionType().bind()
     val instruction = callDispatcher(
-        ControlInstruction.Call(Index.FunctionIndex(index.toUInt())),
+        ControlInstruction.WasmFunctionCall(function),
     )
 
     val thread = Thread(

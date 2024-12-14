@@ -11,19 +11,6 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-
-internal fun CallExecutor(
-    context: ExecutionContext,
-    instruction: ControlInstruction.Call,
-): Result<Unit, InvocationError> =
-    CallExecutor(
-        context = context,
-        functionIndex = instruction.functionIndex,
-        tailRecursion = false,
-        hostFunctionCall = ::HostFunctionCall,
-        wasmFunctionCall = ::WasmFunctionCall,
-    )
 
 internal inline fun CallExecutor(
     context: ExecutionContext,
@@ -37,7 +24,7 @@ internal inline fun CallExecutor(
     val address = frame.state.module.functionAddresses[functionIndex.index()]
 
     when (val instance = store.function(address).bind()) {
-        is FunctionInstance.HostFunction -> hostFunctionCall(store, stack, instance).bind()
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(store, stack, instance).bind()
+        is FunctionInstance.HostFunction -> hostFunctionCall(context, instance).bind()
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(context, instance).bind()
     }
 }

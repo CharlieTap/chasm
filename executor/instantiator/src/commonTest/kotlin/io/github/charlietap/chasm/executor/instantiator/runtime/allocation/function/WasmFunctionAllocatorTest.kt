@@ -5,7 +5,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.functionType
@@ -50,9 +49,13 @@ class WasmFunctionAllocatorTest {
             module = moduleInstance,
         )
 
-        val actual = WasmFunctionAllocator(context, moduleInstance, wasmFunction)
+        val actual = WasmFunctionAllocator(
+            context = context,
+            moduleInstance = moduleInstance,
+            function = wasmFunction,
+        )
 
-        assertEquals(Ok(Address.Function(0)), actual)
+        assertEquals(Ok(Unit), actual)
         assertEquals(expectedInstance, functions[0])
     }
 

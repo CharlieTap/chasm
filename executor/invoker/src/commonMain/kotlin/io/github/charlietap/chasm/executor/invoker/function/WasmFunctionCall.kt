@@ -11,37 +11,34 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-internal typealias WasmFunctionCall = (Store, Stack, FunctionInstance.WasmFunction) -> Result<Unit, InvocationError>
+internal typealias WasmFunctionCall = (ExecutionContext, FunctionInstance.WasmFunction) -> Result<Unit, InvocationError>
 
 internal inline fun WasmFunctionCall(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
 ): Result<Unit, InvocationError> =
     WasmFunctionCall(
-        store = store,
-        stack = stack,
+        context = context,
         instance = instance,
         instructionBlockExecutor = ::InstructionBlockExecutor,
         frameDispatcher = ::FrameDispatcher,
     )
 
-@Suppress("UNUSED_PARAMETER")
 internal inline fun WasmFunctionCall(
-    store: Store,
-    stack: Stack,
+    context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
     crossinline frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame>,
 ): Result<Unit, InvocationError> = binding {
 
+    val (stack) = context
     val type = instance.functionType().bind()
     val params = type.params.types.size
     val results = type.results.types.size
@@ -60,7 +57,7 @@ internal inline fun WasmFunctionCall(
         stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth(),
         state = Stack.Entry.ActivationFrame.State(
-            locals = locals.toMutableList(),
+            locals = locals,
             module = instance.module,
         ),
     )
