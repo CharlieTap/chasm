@@ -56,7 +56,10 @@ sealed interface ControlInstruction : ExecutionInstruction {
     data object Return : ControlInstruction
 
     @JvmInline
-    value class ReturnCall(val functionIndex: Index.FunctionIndex) : ControlInstruction
+    value class ReturnWasmFunctionCall(val instance: FunctionInstance.WasmFunction) : ControlInstruction
+
+    @JvmInline
+    value class ReturnHostFunctionCall(val instance: FunctionInstance.HostFunction) : ControlInstruction
 
     @JvmInline
     value class ReturnCallRef(val typeIndex: Index.TypeIndex) : ControlInstruction

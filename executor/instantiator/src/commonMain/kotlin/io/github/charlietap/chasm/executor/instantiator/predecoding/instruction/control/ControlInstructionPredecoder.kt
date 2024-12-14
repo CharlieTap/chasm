@@ -21,7 +21,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallRefDispa
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.IfDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.LoopDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.NopDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnCallIndirectDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnCallRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnDispatcher
@@ -45,7 +44,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstructio
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Loop
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Nop
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Return
-import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.ReturnCall
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.ReturnCallIndirect
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.ReturnCallRef
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Throw
@@ -62,6 +60,7 @@ internal fun ControlInstructionPredecoder(
         instruction = instruction,
         instructionPredecoder = ::InstructionPredecoder,
         callInstructionPredecoder = ::CallInstructionPredecoder,
+        returnCallInstructionPredecoder = ::ReturnCallInstructionPredecoder,
         blockDispatcher = ::BlockDispatcher,
         brDispatcher = ::BrDispatcher,
         brIfDispatcher = ::BrIfDispatcher,
@@ -76,7 +75,6 @@ internal fun ControlInstructionPredecoder(
         loopDispatcher = ::LoopDispatcher,
         nopDispatcher = ::NopDispatcher,
         returnDispatcher = ::ReturnDispatcher,
-        returnCallDispatcher = ::ReturnCallDispatcher,
         returnCallIndirectDispatcher = ::ReturnCallIndirectDispatcher,
         returnCallRefDispatcher = ::ReturnCallRefDispatcher,
         throwDispatcher = ::ThrowDispatcher,
@@ -90,6 +88,7 @@ internal inline fun ControlInstructionPredecoder(
     instruction: ControlInstruction,
     crossinline instructionPredecoder: Predecoder<Instruction, DispatchableInstruction>,
     crossinline callInstructionPredecoder: Predecoder<ControlInstruction.Call, DispatchableInstruction>,
+    crossinline returnCallInstructionPredecoder: Predecoder<ControlInstruction.ReturnCall, DispatchableInstruction>,
     crossinline blockDispatcher: Dispatcher<Block>,
     crossinline brDispatcher: Dispatcher<Br>,
     crossinline brIfDispatcher: Dispatcher<BrIf>,
@@ -104,7 +103,6 @@ internal inline fun ControlInstructionPredecoder(
     crossinline loopDispatcher: Dispatcher<Loop>,
     crossinline nopDispatcher: Dispatcher<Nop>,
     crossinline returnDispatcher: Dispatcher<Return>,
-    crossinline returnCallDispatcher: Dispatcher<ReturnCall>,
     crossinline returnCallIndirectDispatcher: Dispatcher<ReturnCallIndirect>,
     crossinline returnCallRefDispatcher: Dispatcher<ReturnCallRef>,
     crossinline throwDispatcher: Dispatcher<Throw>,
@@ -166,7 +164,7 @@ internal inline fun ControlInstructionPredecoder(
         )
         is ControlInstruction.Nop -> nopDispatcher(Nop)
         is ControlInstruction.Return -> returnDispatcher(Return)
-        is ControlInstruction.ReturnCall -> returnCallDispatcher(ReturnCall(instruction.functionIndex))
+        is ControlInstruction.ReturnCall -> returnCallInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.ReturnCallIndirect -> returnCallIndirectDispatcher(
             ReturnCallIndirect(
                 typeIndex = instruction.typeIndex,

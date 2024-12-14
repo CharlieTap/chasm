@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.fixture.ast.instruction.blockType
-import io.github.charlietap.chasm.fixture.ast.module.functionIndex
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
@@ -100,10 +99,10 @@ fun brOnCastFailRuntimeInstruction(
 
 fun returnRuntimeInstruction() = ControlInstruction.Return
 
-fun returnCallRuntimeInstruction(
-    functionIndex: Index.FunctionIndex = functionIndex(),
-) = ControlInstruction.ReturnCall(
-    functionIndex = functionIndex,
+fun returnWasmFunctionCallRuntimeInstruction(
+    instance: FunctionInstance.WasmFunction = wasmFunctionInstance(),
+) = ControlInstruction.ReturnWasmFunctionCall(
+    instance = instance,
 )
 
 fun returnCallRefRuntimeInstruction(
