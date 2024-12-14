@@ -12,11 +12,10 @@ import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.default
-import io.github.charlietap.chasm.executor.runtime.ext.popFrame
+import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popInstruction
 import io.github.charlietap.chasm.executor.runtime.ext.popLabel
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -43,7 +42,7 @@ internal inline fun ReturnWasmFunctionCall(
     crossinline frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame>,
 ): Result<Unit, InvocationError> = binding {
 
-    val frame = stack.popFrame().bind()
+    val frame = stack.peekFrame().bind()
     val type = instance.functionType().bind()
     var params = type.params.types.size
     val results = type.results.types.size
@@ -69,7 +68,6 @@ internal inline fun ReturnWasmFunctionCall(
     }
 
     frame.state.locals = locals
-    stack.pushFrame(frame).bind()
     stack.push(Instruction(frameDispatcher(frame), InstructionTag.FRAME))
 
     val label = Stack.Entry.Label(
