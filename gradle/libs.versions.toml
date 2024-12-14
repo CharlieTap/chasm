@@ -27,7 +27,7 @@ compose-viewmodel = "2.7.0"
 dependency-analysis="1.18.0"
 dokka="1.9.20"
 
-faker = "1.14.0"
+faker = "1.16.0"
 gradle-maven-publish-plugin = "0.30.0"
 
 hilt-core = "2.50"
