@@ -5,6 +5,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.functionType
+import io.github.charlietap.chasm.executor.invoker.ext.grow
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -47,7 +48,8 @@ internal inline fun ReturnWasmFunctionCall(
     var params = type.params.types.size
     val results = type.results.types.size
 
-    val locals = MutableList<ExecutionValue>(params + instance.function.locals.size) { ExecutionValue.Uninitialised }
+    val locals = frame.state.locals
+    locals.grow(params + instance.function.locals.size, ExecutionValue.Uninitialised)
     for (i in (params - 1) downTo 0) {
         locals[i] = stack.popValue().bind().value
     }
@@ -67,7 +69,6 @@ internal inline fun ReturnWasmFunctionCall(
         stack.popValue().bind()
     }
 
-    frame.state.locals = locals
     stack.push(Instruction(frameDispatcher(frame), InstructionTag.FRAME))
 
     val label = Stack.Entry.Label(
