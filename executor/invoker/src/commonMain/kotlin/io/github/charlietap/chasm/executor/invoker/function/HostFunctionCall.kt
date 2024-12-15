@@ -20,6 +20,7 @@ import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.VectorValue
+import io.github.charlietap.chasm.host.HostFunctionException
 
 internal typealias HostFunctionCall = (ExecutionContext, FunctionInstance.HostFunction) -> Result<Unit, InvocationError>
 
@@ -39,7 +40,11 @@ internal fun HostFunctionCall(
         store,
         frame.instance,
     )
-    val results = function.function.invoke(functionContext, params)
+    val results = try {
+        function.function.invoke(functionContext, params)
+    } catch (e: HostFunctionException) {
+        Err(InvocationError.HostFunctionError(e.reason)).bind()
+    }
 
     type.results.types.forEachIndexed { index, valueType ->
         val result = results.getOrNull(index)

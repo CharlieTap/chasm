@@ -40,6 +40,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
+                api(projects.host)
                 api(projects.stream)
 
                 implementation(projects.ast)

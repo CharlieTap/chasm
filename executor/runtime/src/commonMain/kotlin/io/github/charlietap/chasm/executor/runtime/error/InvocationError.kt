@@ -117,6 +117,9 @@ sealed interface InvocationError : ModuleTrapError {
         val actualValue: ExecutionValue?,
     ) : InvocationError
 
+    @JvmInline
+    value class HostFunctionError(val error: String) : InvocationError
+
     data object ProgramFinishedInconsistentState : InvocationError
 
     sealed interface Trap : InvocationError {

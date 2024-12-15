@@ -22,6 +22,7 @@ kotlin {
                 api(libs.result)
 
                 implementation(projects.executor.memory)
+                implementation(projects.host)
                 implementation(projects.libs.sse2)
             }
         }

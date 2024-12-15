@@ -46,6 +46,8 @@ include(":executor:invoker")
 include(":executor:memory")
 include(":executor:runtime")
 
+include(":host")
+
 include(":libs:sse2")
 include(":libs:stack")
 
