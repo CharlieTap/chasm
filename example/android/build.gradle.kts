@@ -48,10 +48,6 @@ android {
     }
 }
 
-composeCompiler {
-    enableStrongSkippingMode = true
-}
-
 dependencies {
 
     implementation(libs.chasm.jvm)
