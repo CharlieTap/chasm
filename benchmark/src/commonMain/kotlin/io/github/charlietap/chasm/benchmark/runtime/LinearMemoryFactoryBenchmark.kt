@@ -23,5 +23,6 @@ class LinearMemoryFactoryBenchmark {
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
         val factory = LinearMemoryFactory(LinearMemory.Pages(200u))
+        blackhole.consume(factory)
     }
 }

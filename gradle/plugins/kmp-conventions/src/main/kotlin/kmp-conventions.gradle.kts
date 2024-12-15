@@ -28,6 +28,7 @@ kotlin {
 
         freeCompilerArgs.add("-Xsuppress-warning=NOTHING_TO_INLINE")
         freeCompilerArgs.add("-Xsuppress-warning=UNUSED_ANONYMOUS_PARAMETER")
+        freeCompilerArgs.add("-Xsuppress-warning=REDUNDANT_VISIBILITY_MODIFIER")
 
         freeCompilerArgs.add("-Xnon-local-break-continue")
         freeCompilerArgs.add("-Xwhen-guards")
