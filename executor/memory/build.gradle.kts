@@ -20,14 +20,6 @@ bolt {
 kotlin {
 
     sourceSets {
-
-        all {
-            languageSettings {
-                optIn("kotlin.ExperimentalUnsignedTypes")
-                optIn("kotlinx.cinterop.ExperimentalForeignApi")
-            }
-        }
-
        commonMain {
             dependencies {
                 api(projects.ast)

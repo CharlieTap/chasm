@@ -24,14 +24,6 @@ kotlin {
     }
 
     sourceSets {
-
-        all {
-            languageSettings {
-                optIn("kotlin.ExperimentalUnsignedTypes")
-                optIn("kotlinx.cinterop.ExperimentalForeignApi")
-            }
-        }
-
        commonMain {
             dependencies {}
         }

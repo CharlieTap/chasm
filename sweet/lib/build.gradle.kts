@@ -15,13 +15,6 @@ group = "io.github.charlietap.sweet"
 kotlin {
 
     sourceSets {
-
-        all {
-            languageSettings {
-                optIn("kotlin.ExperimentalUnsignedTypes")
-            }
-        }
-
        commonMain {
             dependencies {
                 api(libs.kotlinx.serialization)

@@ -11,13 +11,6 @@ plugins {
 kotlin {
 
     sourceSets {
-
-        all {
-            languageSettings {
-                optIn("kotlin.ExperimentalUnsignedTypes")
-            }
-        }
-
        commonMain {
             dependencies {
                 api(projects.executor.runtime)

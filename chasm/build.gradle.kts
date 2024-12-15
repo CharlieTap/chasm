@@ -38,13 +38,6 @@ sweet {
 kotlin {
 
     sourceSets {
-
-        all {
-            languageSettings {
-                optIn("kotlin.ExperimentalUnsignedTypes")
-            }
-        }
-
        commonMain {
             dependencies {
                 api(projects.stream)
