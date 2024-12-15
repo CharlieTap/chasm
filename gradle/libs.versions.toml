@@ -27,7 +27,6 @@ compose-viewmodel = "2.7.0"
 dependency-analysis="1.18.0"
 dokka="1.9.20"
 
-faker = "1.14.0"
 gradle-maven-publish-plugin = "0.30.0"
 
 hilt-core = "2.50"
@@ -38,7 +37,6 @@ junit = "4.13.2"
 kotlin = "2.1.0"
 k-poet = "1.18.1"
 kotlinter = "5.0.1"
-kot-compile-testing = "1.5.0"
 
 kotlinx-atomic-fu = "0.26.1"
 kotlinx-benchmark = "0.4.13"
@@ -102,16 +100,12 @@ androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-
 
 chasm-jvm = { module = "io.github.charlietap.chasm:chasm-jvm", version.ref = "version-name"}
 
-faker = { module = "io.github.serpro69:kotlin-faker", version.ref = "faker"}
-
 hilt-core = { module = "com.google.dagger:hilt-android", version.ref = "hilt-core"}
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt-core"}
 hilt-integrations-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-integrations"}
 
 junit = { module = "junit:junit", version.ref = "junit"}
 
-kotlin-compile-testing-core = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kot-compile-testing"}
-kotlin-compile-testing-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kot-compile-testing"}
 kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin"}
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "k-poet"}
 kotlin-reflection = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin"}
