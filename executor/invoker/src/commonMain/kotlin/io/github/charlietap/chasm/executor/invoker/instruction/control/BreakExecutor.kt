@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
@@ -44,10 +45,10 @@ internal inline fun BreakExecutor(
         jumpToInstruction(stack).bind()
     }
 
-    results.asReversed().forEach { value ->
+    results.forEachReversed { value ->
         stack.push(value)
     }
-    breakLabel.continuation.asReversed().forEach { instruction ->
+    breakLabel.continuation.forEachReversed { instruction ->
         stack.push(Stack.Entry.Instruction(instruction))
     }
 }

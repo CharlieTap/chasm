@@ -5,6 +5,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.LabelDispatcher
+import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
@@ -49,11 +50,11 @@ internal inline fun InstructionBlockExecutor(
     stack.push(label)
     stack.push(Instruction(labelDispatcher(label), InstructionTag.LABEL))
 
-    params.asReversed().forEach { value ->
+    params.forEachReversed { value ->
         stack.push(Stack.Entry.Value(value))
     }
 
-    instructions.asReversed().forEach { instruction ->
+    instructions.forEachReversed { instruction ->
         stack.push(Instruction(instruction))
     }
 }

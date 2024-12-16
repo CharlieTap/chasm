@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
+import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -84,7 +85,7 @@ internal inline fun ThrowRefExecutor(
 
         when {
             catchHandler is CatchHandler.Catch && tagMatches -> {
-                instance.fields.asReversed().forEach { field ->
+                instance.fields.forEachReversed { field ->
                     stack.pushValue(field)
                 }
                 stack.pushInstruction(
@@ -92,7 +93,7 @@ internal inline fun ThrowRefExecutor(
                 )
             }
             catchHandler is CatchHandler.CatchRef && tagMatches -> {
-                instance.fields.asReversed().forEach { field ->
+                instance.fields.forEachReversed { field ->
                     stack.pushValue(field)
                 }
                 stack.pushValue(exceptionRef)

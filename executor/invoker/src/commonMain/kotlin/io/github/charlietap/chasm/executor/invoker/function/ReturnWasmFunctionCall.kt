@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.invoker.ext.grow
 import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -45,7 +46,7 @@ internal inline fun ReturnWasmFunctionCall(
         stack.popValue().bind()
     }
 
-    instance.function.body.instructions.asReversed().forEach { instruction ->
+    instance.function.body.instructions.forEachReversed { instruction ->
         stack.push(Instruction(instruction))
     }
 }
