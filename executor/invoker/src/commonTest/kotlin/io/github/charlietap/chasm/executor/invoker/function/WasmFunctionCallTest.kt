@@ -118,11 +118,10 @@ class WasmFunctionCallTest {
             tag = Stack.Entry.InstructionTag.FRAME,
         )
 
-        val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params, _handler ->
+        val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _handler ->
             assertEquals(stack, _stack)
             assertEquals(label, _label)
             assertEquals(function.body.instructions, _instructions)
-            assertEquals(emptyList(), _params)
 
             assertEquals(frame, stack.peekFrameOrNull())
             assertEquals(expectedFrameInstruction, stack.peekInstructionOrNull())

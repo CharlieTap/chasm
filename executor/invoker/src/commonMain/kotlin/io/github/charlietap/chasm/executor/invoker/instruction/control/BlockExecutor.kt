@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
@@ -58,15 +57,11 @@ internal inline fun BlockExecutor(
         Arity.Argument(functionType.params.types.size) to Arity.Return(functionType.results.types.size)
     } ?: (Arity.Argument.NULLARY to Arity.Return.SIDE_EFFECT)
 
-    val params = List(paramArity.value) {
-        stack.popValue().bind().value
-    }
-
     val label = Stack.Entry.Label(
         arity = resultArity,
-        stackValuesDepth = stack.valuesDepth(),
+        stackValuesDepth = stack.valuesDepth() - paramArity.value,
         continuation = emptyList(),
     )
 
-    instructionBlockExecutor(stack, label, instructions, params, null).bind()
+    instructionBlockExecutor(stack, label, instructions, null).bind()
 }

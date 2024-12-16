@@ -12,22 +12,19 @@ import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-internal typealias InstructionBlockExecutor = (Stack, Stack.Entry.Label, List<DispatchableInstruction>, List<ExecutionValue>, ExceptionHandler?) -> Result<Unit, InvocationError>
+internal typealias InstructionBlockExecutor = (Stack, Stack.Entry.Label, List<DispatchableInstruction>, ExceptionHandler?) -> Result<Unit, InvocationError>
 
 internal inline fun InstructionBlockExecutor(
     stack: Stack,
     label: Stack.Entry.Label,
     instructions: List<DispatchableInstruction>,
-    params: List<ExecutionValue>,
     handler: ExceptionHandler?,
 ): Result<Unit, InvocationError> =
     InstructionBlockExecutor(
         stack = stack,
         label = label,
         instructions = instructions,
-        params = params,
         handler = handler,
         handlerDispatcher = ::HandlerDispatcher,
         labelDispatcher = ::LabelDispatcher,
@@ -37,7 +34,6 @@ internal inline fun InstructionBlockExecutor(
     stack: Stack,
     label: Stack.Entry.Label,
     instructions: List<DispatchableInstruction>,
-    params: List<ExecutionValue>,
     handler: ExceptionHandler?,
     crossinline handlerDispatcher: Dispatcher<ExceptionHandler>,
     crossinline labelDispatcher: Dispatcher<Stack.Entry.Label>,
@@ -49,10 +45,6 @@ internal inline fun InstructionBlockExecutor(
     }
     stack.push(label)
     stack.push(Instruction(labelDispatcher(label), InstructionTag.LABEL))
-
-    params.forEachReversed { value ->
-        stack.push(Stack.Entry.Value(value))
-    }
 
     instructions.forEachReversed { instruction ->
         stack.push(Instruction(instruction))

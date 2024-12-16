@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal inline fun TryTableExecutor(
@@ -41,13 +40,9 @@ internal inline fun TryTableExecutor(
         Arity.Return(functionType.results.types.size)
     } ?: Arity.Return.SIDE_EFFECT
 
-    val params = List(paramArity.value) {
-        stack.popValue().bind().value
-    }
-
     val label = Stack.Entry.Label(
         arity = returnArity,
-        stackValuesDepth = stack.valuesDepth(),
+        stackValuesDepth = stack.valuesDepth() - paramArity.value,
         continuation = emptyList(),
     )
 
@@ -55,5 +50,5 @@ internal inline fun TryTableExecutor(
         instructions = instruction.handlers,
     )
 
-    blockExecutor(stack, label, instruction.instructions, params, handler).bind()
+    blockExecutor(stack, label, instruction.instructions, handler).bind()
 }

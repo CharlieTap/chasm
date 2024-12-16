@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal fun LoopExecutor(
@@ -41,17 +40,13 @@ internal inline fun LoopExecutor(
         Arity.Argument(functionType.params.types.size)
     } ?: Arity.Argument.NULLARY
 
-    val params = List(paramArity.value) {
-        stack.popValue().bind().value
-    }
-
     val label = Stack.Entry.Label(
         arity = paramArity,
-        stackValuesDepth = stack.valuesDepth(),
+        stackValuesDepth = stack.valuesDepth() - paramArity.value,
         continuation = listOf(
             loopDispatcher(ControlInstruction.Loop(blockType, instructions)),
         ),
     )
 
-    instructionBlockExecutor(stack, label, instructions, params, null).bind()
+    instructionBlockExecutor(stack, label, instructions, null).bind()
 }

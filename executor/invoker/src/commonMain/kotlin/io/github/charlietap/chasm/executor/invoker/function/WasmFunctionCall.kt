@@ -69,5 +69,5 @@ internal inline fun WasmFunctionCall(
         continuation = emptyList(),
     )
 
-    instructionBlockExecutor(stack, label, instance.function.body.instructions, emptyList(), null).bind()
+    instructionBlockExecutor(stack, label, instance.function.body.instructions, null).bind()
 }
