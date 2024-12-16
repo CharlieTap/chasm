@@ -75,6 +75,21 @@ data class Stack(
 
     fun peekNthValueOrNull(n: Int): Entry.Value? = values.peekNthOrNull(n)
 
+    fun shrinkInstructions(
+        preserveTopN: Int,
+        depth: Int,
+    ) = instructions.shrink(preserveTopN, depth)
+
+    fun shrinkLabels(
+        preserveTopN: Int,
+        depth: Int,
+    ) = labels.shrink(preserveTopN, depth)
+
+    fun shrinkValues(
+        preserveTopN: Int,
+        depth: Int,
+    ) = values.shrink(preserveTopN, depth)
+
     fun size() = frames.depth() + instructions.depth() + labels.depth() + values.depth()
 
     fun framesDepth() = frames.depth()

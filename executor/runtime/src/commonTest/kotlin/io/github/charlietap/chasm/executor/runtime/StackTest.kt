@@ -79,4 +79,38 @@ class StackTest {
         assertEquals(value2, result1)
         assertEquals(value1, result2)
     }
+
+    @Test
+    fun `squash n returns the correct value`() {
+
+        val stack = stack()
+
+        val value1 = value(
+            i32(0),
+        )
+        val value2 = value(
+            i32(1),
+        )
+        val value3 = value(
+            i32(2),
+        )
+        val value4 = value(
+            i32(3),
+        )
+        val value5 = value(
+            i32(4),
+        )
+
+        stack.push(value1)
+        stack.push(value2)
+        stack.push(value3)
+        stack.push(value4)
+        stack.push(value5)
+
+        stack.shrinkValues(2, 1)
+
+        val expected = listOf(value1, value4, value5)
+
+        assertEquals(expected, stack.values())
+    }
 }
