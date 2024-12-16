@@ -30,7 +30,8 @@ class WasmFunctionAllocatorTest {
             store = store,
         )
 
-        val type = functionType().definedType()
+        val functionType = functionType()
+        val type = functionType.definedType()
         val typeIndex = typeIndex(0u)
         val wasmFunction = function(
             typeIndex = typeIndex,
@@ -45,6 +46,7 @@ class WasmFunctionAllocatorTest {
 
         val expectedInstance = FunctionInstance.WasmFunction(
             type = type,
+            functionType = functionType,
             function = runtimeFunction,
             module = moduleInstance,
         )

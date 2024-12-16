@@ -40,6 +40,7 @@ class FunctionInvokerTest {
         val function = runtimeFunction()
         val functionInstance = wasmFunctionInstance(
             definedType,
+            functionType,
             moduleInstance,
             function,
         )
@@ -92,6 +93,7 @@ class FunctionInvokerTest {
         val function = runtimeFunction()
         val functionInstance = wasmFunctionInstance(
             definedType,
+            functionType,
             moduleInstance,
             function,
         )

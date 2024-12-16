@@ -20,15 +20,16 @@ class HostFunctionAllocatorTest {
             functions = functions,
         )
 
-        val type = functionType()
+        val functionType = functionType()
         val hostFunction: HostFunction = { emptyList() }
 
         val expected = FunctionInstance.HostFunction(
-            type = type.definedType(),
+            type = functionType.definedType(),
+            functionType = functionType,
             function = hostFunction,
         )
 
-        val address = HostFunctionAllocator(store, type, hostFunction)
+        val address = HostFunctionAllocator(store, functionType, hostFunction)
 
         assertEquals(Address.Function(0), address)
         assertEquals(expected, functions[0])

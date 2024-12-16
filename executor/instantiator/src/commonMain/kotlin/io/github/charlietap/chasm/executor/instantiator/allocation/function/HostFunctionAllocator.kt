@@ -16,7 +16,7 @@ fun HostFunctionAllocator(
 ): Address.Function {
 
     val type = functionType.definedType()
-    val instance = FunctionInstance.HostFunction(type, function)
+    val instance = FunctionInstance.HostFunction(type, functionType, function)
 
     store.functions.add(instance)
 

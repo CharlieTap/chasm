@@ -66,6 +66,7 @@ class HostFunctionCallTest {
 
         val functionInstance = FunctionInstance.HostFunction(
             type = definedType,
+            functionType = functionType,
             function = hostFunction,
         )
 
@@ -136,6 +137,7 @@ class HostFunctionCallTest {
 
         val functionInstance = FunctionInstance.HostFunction(
             type = definedType,
+            functionType = functionType,
             function = hostFunction,
         )
 

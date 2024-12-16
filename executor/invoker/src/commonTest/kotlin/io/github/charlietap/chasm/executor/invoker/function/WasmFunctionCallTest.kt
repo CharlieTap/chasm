@@ -80,6 +80,7 @@ class WasmFunctionCallTest {
 
         val functionInstance = FunctionInstance.WasmFunction(
             type = definedType,
+            functionType = functionType,
             module = moduleInstance(),
             function = function,
         )
@@ -181,12 +182,9 @@ class WasmFunctionCallTest {
 
         val functionInstance = FunctionInstance.WasmFunction(
             type = definedType,
+            functionType = functionType,
             module = moduleInstance(),
             function = function,
-        )
-
-        val label = label(
-            arity = returnArity(functionType.params.types.size),
         )
 
         val params = listOf(
@@ -209,37 +207,18 @@ class WasmFunctionCallTest {
             locals = locals,
             instance = functionInstance.module,
         )
-        val frameDispatchable = dispatchableInstruction()
-        val frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame> = { _frame ->
-            assertEquals(frame, _frame)
-            frameDispatchable
-        }
 
         stack.pushFrame(frame)
         stack.push(
             Instruction(
-                instruction = frameDispatchable,
+                instruction = dispatchableInstruction(),
                 tag = Stack.Entry.InstructionTag.FRAME,
             ),
         )
 
-        val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _params, _handler ->
-            assertEquals(stack, _stack)
-            assertEquals(label, _label)
-            assertEquals(function.body.instructions, _instructions)
-            assertEquals(emptyList(), _params)
-
-            assertEquals(frame, stack.peekFrameOrNull())
-            assertEquals(1, stack.framesDepth())
-
-            Ok(Unit)
-        }
-
         val actual = ReturnWasmFunctionCall(
             context = context,
             instance = functionInstance,
-            instructionBlockExecutor = instructionBlockExecutor,
-            frameDispatcher = frameDispatcher,
         )
 
         assertEquals(Ok(Unit), actual)

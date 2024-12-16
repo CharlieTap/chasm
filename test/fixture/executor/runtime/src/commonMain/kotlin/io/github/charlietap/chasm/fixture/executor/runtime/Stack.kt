@@ -26,10 +26,12 @@ fun frame(
     arity: Arity.Return = Arity.Return.SIDE_EFFECT,
     instance: ModuleInstance = moduleInstance(),
     locals: MutableList<ExecutionValue> = mutableListOf(),
+    stackInstructionsDepth: Int = 0,
     stackLabelsDepth: Int = 0,
     stackValuesDepth: Int = 0,
 ) = Stack.Entry.ActivationFrame(
     arity = arity,
+    stackInstructionsDepth = stackInstructionsDepth,
     stackLabelsDepth = stackLabelsDepth,
     stackValuesDepth = stackValuesDepth,
     locals = locals,

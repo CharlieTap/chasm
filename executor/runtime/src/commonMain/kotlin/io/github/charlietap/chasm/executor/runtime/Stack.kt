@@ -137,6 +137,7 @@ data class Stack(
             val arity: Arity.Return,
             val instance: ModuleInstance,
             var locals: MutableList<ExecutionValue>,
+            val stackInstructionsDepth: Int,
             val stackLabelsDepth: Int,
             val stackValuesDepth: Int,
         ) : Entry

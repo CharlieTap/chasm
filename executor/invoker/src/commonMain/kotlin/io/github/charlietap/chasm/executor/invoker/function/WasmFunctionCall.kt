@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatcher
-import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
@@ -39,7 +38,7 @@ internal inline fun WasmFunctionCall(
 ): Result<Unit, InvocationError> = binding {
 
     val (stack) = context
-    val type = instance.functionType().bind()
+    val type = instance.functionType
     val params = type.params.types.size
     val results = type.results.types.size
 
@@ -54,6 +53,7 @@ internal inline fun WasmFunctionCall(
 
     val frame = Stack.Entry.ActivationFrame(
         arity = Arity.Return(results),
+        stackInstructionsDepth = stack.instructionsDepth(),
         stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth(),
         locals = locals,
