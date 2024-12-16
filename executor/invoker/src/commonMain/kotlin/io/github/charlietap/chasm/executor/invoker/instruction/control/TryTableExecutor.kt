@@ -50,6 +50,9 @@ internal inline fun TryTableExecutor(
 
     val handler = ExceptionHandler(
         instructions = instruction.handlers,
+        framesDepth = stack.framesDepth(),
+        labelsDepth = stack.labelsDepth(),
+        instructionsDepth = stack.instructionsDepth(),
     )
 
     blockExecutor(stack, label, instruction.instructions, handler).bind()

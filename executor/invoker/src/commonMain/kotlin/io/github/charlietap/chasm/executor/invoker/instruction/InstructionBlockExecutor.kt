@@ -40,6 +40,7 @@ internal inline fun InstructionBlockExecutor(
 ): Result<Unit, InvocationError> = binding {
 
     handler?.let {
+        stack.push(handler)
         val instruction = handlerDispatcher(handler)
         stack.push(Instruction(instruction, InstructionTag.HANDLER, handler))
     }

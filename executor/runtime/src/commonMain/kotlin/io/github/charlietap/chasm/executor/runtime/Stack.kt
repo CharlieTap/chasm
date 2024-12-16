@@ -8,18 +8,23 @@ import io.github.charlietap.chasm.stack.Stack as InternalStack
 
 data class Stack(
     private val frames: InternalStack<Entry.ActivationFrame> = InternalStack(INITIAL_CAPACITY),
+    private val handlers: InternalStack<ExceptionHandler> = InternalStack(INITIAL_CAPACITY),
     private val instructions: InternalStack<Entry.Instruction> = InternalStack(INITIAL_CAPACITY),
     private val labels: InternalStack<Entry.Label> = InternalStack(INITIAL_CAPACITY),
     private val values: InternalStack<Entry.Value> = InternalStack(INITIAL_CAPACITY),
 ) {
     constructor(
         frames: List<Entry.ActivationFrame>,
+        handlers: List<ExceptionHandler>,
         instructions: List<Entry.Instruction>,
         labels: List<Entry.Label>,
         values: List<Entry.Value>,
     ) : this() {
         frames.forEach { frame ->
             this.frames.push(frame)
+        }
+        handlers.forEach { handler ->
+            this.handlers.push(handler)
         }
         instructions.forEach { instruction ->
             this.instructions.push(instruction)
@@ -47,6 +52,8 @@ data class Stack(
 
     fun push(frame: Entry.ActivationFrame) = frames.push(frame)
 
+    fun push(handler: ExceptionHandler) = handlers.push(handler)
+
     fun push(instruction: Entry.Instruction) = instructions.push(instruction)
 
     fun push(label: Entry.Label) = labels.push(label)
@@ -54,6 +61,8 @@ data class Stack(
     fun push(value: Entry.Value) = values.push(value)
 
     fun popFrameOrNull(): Entry.ActivationFrame? = frames.popOrNull()
+
+    fun popHandlerOrNull(): ExceptionHandler? = handlers.popOrNull()
 
     fun popInstructionOrNull(): Entry.Instruction? = instructions.popOrNull()
 
@@ -75,6 +84,16 @@ data class Stack(
 
     fun peekNthValueOrNull(n: Int): Entry.Value? = values.peekNthOrNull(n)
 
+    fun shrinkFrames(
+        preserveTopN: Int,
+        depth: Int,
+    ) = frames.shrink(preserveTopN, depth)
+
+    fun shrinkHandlers(
+        preserveTopN: Int,
+        depth: Int,
+    ) = handlers.shrink(preserveTopN, depth)
+
     fun shrinkInstructions(
         preserveTopN: Int,
         depth: Int,
@@ -94,6 +113,8 @@ data class Stack(
 
     fun framesDepth() = frames.depth()
 
+    fun handlersDepth() = handlers.depth()
+
     fun instructionsDepth() = instructions.depth()
 
     fun labelsDepth() = labels.depth()
@@ -102,10 +123,13 @@ data class Stack(
 
     fun clear() {
         frames.clear()
+        handlers.clear()
         instructions.clear()
         labels.clear()
         values.clear()
     }
+
+    fun clearHandlers() = handlers.clear()
 
     fun clearInstructions() = instructions.clear()
 
@@ -117,6 +141,8 @@ data class Stack(
 
     fun frames() = frames.entries()
 
+    fun handlers() = handlers.entries()
+
     fun instructions() = instructions.entries()
 
     fun labels() = labels.entries()
@@ -125,6 +151,9 @@ data class Stack(
 
     fun fill(stack: Stack) {
         stack.frames.entries().forEach { entry ->
+            push(entry)
+        }
+        stack.handlers.entries().forEach { entry ->
             push(entry)
         }
         stack.instructions.entries().forEach { entry ->
@@ -154,6 +183,7 @@ data class Stack(
             val arity: Arity.Return,
             val instance: ModuleInstance,
             var locals: MutableList<ExecutionValue>,
+            val stackHandlersDepth: Int,
             val stackInstructionsDepth: Int,
             val stackLabelsDepth: Int,
             val stackValuesDepth: Int,

@@ -12,11 +12,13 @@ import io.github.charlietap.chasm.fixture.executor.runtime.value.executionValue
 
 fun stack(
     frames: List<Stack.Entry.ActivationFrame> = emptyList(),
+    handlers: List<ExceptionHandler> = emptyList(),
     instructions: List<Stack.Entry.Instruction> = emptyList(),
     labels: List<Stack.Entry.Label> = emptyList(),
     values: List<Stack.Entry.Value> = emptyList(),
 ) = Stack(
     frames = frames,
+    handlers = handlers,
     instructions = instructions,
     labels = labels,
     values = values,
@@ -26,11 +28,13 @@ fun frame(
     arity: Arity.Return = Arity.Return.SIDE_EFFECT,
     instance: ModuleInstance = moduleInstance(),
     locals: MutableList<ExecutionValue> = mutableListOf(),
+    stackHandlersDepth: Int = 0,
     stackInstructionsDepth: Int = 0,
     stackLabelsDepth: Int = 0,
     stackValuesDepth: Int = 0,
 ) = Stack.Entry.ActivationFrame(
     arity = arity,
+    stackHandlersDepth = stackHandlersDepth,
     stackInstructionsDepth = stackInstructionsDepth,
     stackLabelsDepth = stackLabelsDepth,
     stackValuesDepth = stackValuesDepth,

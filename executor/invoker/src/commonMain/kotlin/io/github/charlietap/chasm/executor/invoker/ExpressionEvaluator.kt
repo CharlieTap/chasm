@@ -42,6 +42,7 @@ internal inline fun ExpressionEvaluator(
             arity = arity,
             locals = mutableListOf(),
             instance = instance,
+            stackHandlersDepth = 0,
             stackInstructionsDepth = 0,
             stackLabelsDepth = 0,
             stackValuesDepth = 0,

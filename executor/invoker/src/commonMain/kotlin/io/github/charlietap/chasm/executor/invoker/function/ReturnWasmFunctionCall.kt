@@ -32,6 +32,7 @@ internal inline fun ReturnWasmFunctionCall(
         locals[params++] = local.type.default().bind()
     }
 
+    stack.shrinkHandlers(0, frame.stackHandlersDepth)
     // leave frame and label admin instructions on the stack
     stack.shrinkInstructions(0, frame.stackInstructionsDepth + 2)
     // leave top label in place

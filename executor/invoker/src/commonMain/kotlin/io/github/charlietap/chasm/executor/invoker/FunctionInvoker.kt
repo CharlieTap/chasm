@@ -57,6 +57,7 @@ internal inline fun FunctionInvoker(
             arity = Arity.Return(functionType.results.types.size),
             instance = function.module,
             locals = values.toMutableList(),
+            stackHandlersDepth = 0,
             stackInstructionsDepth = 0,
             stackLabelsDepth = 0,
             stackValuesDepth = 0,

@@ -53,6 +53,7 @@ internal inline fun WasmFunctionCall(
 
     val frame = Stack.Entry.ActivationFrame(
         arity = Arity.Return(results),
+        stackHandlersDepth = stack.handlersDepth(),
         stackInstructionsDepth = stack.instructionsDepth(),
         stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth(),

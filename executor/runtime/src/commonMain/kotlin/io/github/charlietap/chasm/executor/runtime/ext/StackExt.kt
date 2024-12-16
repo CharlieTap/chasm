@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Stack.Companion.MAX_DEPTH
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
@@ -73,6 +74,10 @@ inline fun Stack.peekNthValue(n: Int): Result<Stack.Entry.Value, InvocationError
 
 inline fun Stack.popFrame(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
     return popFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
+}
+
+inline fun Stack.popHandler(): Result<ExceptionHandler, InvocationError.UncaughtException> {
+    return popHandlerOrNull()?.let(::Ok) ?: Err(InvocationError.UncaughtException)
 }
 
 inline fun Stack.popInstruction(): Result<Stack.Entry.Instruction, InvocationError.MissingInstruction> {

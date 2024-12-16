@@ -16,8 +16,7 @@ import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
-import io.github.charlietap.chasm.executor.runtime.ext.popFrame
-import io.github.charlietap.chasm.executor.runtime.ext.popLabel
+import io.github.charlietap.chasm.executor.runtime.ext.popHandler
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.ext.pushInstruction
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
@@ -113,9 +112,11 @@ internal inline fun ThrowRefExecutor(
                 )
             }
             else -> {
-                val elseHandler = ExceptionHandler(otherHandlers)
-                val instruction = handlerDispatcher(elseHandler)
-                stack.push(Stack.Entry.Instruction(instruction, InstructionTag.HANDLER, elseHandler))
+
+                handler.instructions = otherHandlers
+                stack.push(handler)
+                val instruction = handlerDispatcher(handler)
+                stack.push(Stack.Entry.Instruction(instruction, InstructionTag.HANDLER, handler))
                 stack.pushValue(exceptionRef)
                 stack.pushInstruction(throwRefDispatcher(ControlInstruction.ThrowRef))
             }
@@ -125,19 +126,11 @@ internal inline fun ThrowRefExecutor(
 
 private fun jumpToHandlerInstruction(stack: Stack): Result<ExceptionHandler, InvocationError> = binding {
 
-    var instruction: Stack.Entry.Instruction?
-    do {
-        instruction = stack.popInstructionOrNull()
-        when (instruction?.tag) {
-            InstructionTag.LABEL -> stack.popLabel().bind()
-            InstructionTag.FRAME -> stack.popFrame().bind()
-            else -> Unit
-        }
-    } while (instruction?.tag != InstructionTag.HANDLER && instruction != null)
+    val handler = stack.popHandler().bind()
 
-    if (instruction?.tag == InstructionTag.HANDLER) {
-        instruction.handler!!
-    } else {
-        Err(InvocationError.UncaughtException).bind()
-    }
+    stack.shrinkLabels(0, handler.labelsDepth)
+    stack.shrinkFrames(0, handler.framesDepth)
+    stack.shrinkInstructions(0, handler.instructionsDepth)
+
+    handler
 }
