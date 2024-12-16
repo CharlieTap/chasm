@@ -7,8 +7,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatc
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.LabelDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
@@ -42,12 +40,12 @@ internal inline fun InstructionBlockExecutor(
     handler?.let {
         stack.push(handler)
         val instruction = handlerDispatcher(handler)
-        stack.push(Instruction(instruction, InstructionTag.HANDLER, handler))
+        stack.push(instruction)
     }
     stack.push(label)
-    stack.push(Instruction(labelDispatcher(label), InstructionTag.LABEL))
+    stack.push(labelDispatcher(label))
 
     instructions.forEachReversed { instruction ->
-        stack.push(Instruction(instruction))
+        stack.push(instruction)
     }
 }

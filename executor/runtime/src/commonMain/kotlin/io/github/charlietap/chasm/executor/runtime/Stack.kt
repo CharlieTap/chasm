@@ -9,14 +9,14 @@ import io.github.charlietap.chasm.stack.Stack as InternalStack
 data class Stack(
     private val frames: InternalStack<Entry.ActivationFrame> = InternalStack(INITIAL_CAPACITY),
     private val handlers: InternalStack<ExceptionHandler> = InternalStack(INITIAL_CAPACITY),
-    private val instructions: InternalStack<Entry.Instruction> = InternalStack(INITIAL_CAPACITY),
+    private val instructions: InternalStack<DispatchableInstruction> = InternalStack(INITIAL_CAPACITY),
     private val labels: InternalStack<Entry.Label> = InternalStack(INITIAL_CAPACITY),
     private val values: InternalStack<Entry.Value> = InternalStack(INITIAL_CAPACITY),
 ) {
     constructor(
         frames: List<Entry.ActivationFrame>,
         handlers: List<ExceptionHandler>,
-        instructions: List<Entry.Instruction>,
+        instructions: List<DispatchableInstruction>,
         labels: List<Entry.Label>,
         values: List<Entry.Value>,
     ) : this() {
@@ -43,7 +43,6 @@ data class Stack(
         entries.forEach { entry ->
             when (entry) {
                 is Entry.ActivationFrame -> push(entry)
-                is Entry.Instruction -> push(entry)
                 is Entry.Label -> push(entry)
                 is Entry.Value -> push(entry)
             }
@@ -54,7 +53,7 @@ data class Stack(
 
     fun push(handler: ExceptionHandler) = handlers.push(handler)
 
-    fun push(instruction: Entry.Instruction) = instructions.push(instruction)
+    fun push(instruction: DispatchableInstruction) = instructions.push(instruction)
 
     fun push(label: Entry.Label) = labels.push(label)
 
@@ -64,7 +63,7 @@ data class Stack(
 
     fun popHandlerOrNull(): ExceptionHandler? = handlers.popOrNull()
 
-    fun popInstructionOrNull(): Entry.Instruction? = instructions.popOrNull()
+    fun popInstructionOrNull(): DispatchableInstruction? = instructions.popOrNull()
 
     fun popLabelOrNull(): Entry.Label? = labels.popOrNull()
 
@@ -72,7 +71,7 @@ data class Stack(
 
     fun peekFrameOrNull(): Entry.ActivationFrame? = frames.peekOrNull()
 
-    fun peekInstructionOrNull(): Entry.Instruction? = instructions.peekOrNull()
+    fun peekInstructionOrNull(): DispatchableInstruction? = instructions.peekOrNull()
 
     fun peekLabelOrNull(): Entry.Label? = labels.peekOrNull()
 
@@ -187,19 +186,6 @@ data class Stack(
             val stackInstructionsDepth: Int,
             val stackLabelsDepth: Int,
             val stackValuesDepth: Int,
-        ) : Entry
-
-        enum class InstructionTag {
-            NON_ADMIN,
-            FRAME,
-            LABEL,
-            HANDLER,
-        }
-
-        data class Instruction(
-            val instruction: DispatchableInstruction,
-            val tag: InstructionTag = InstructionTag.NON_ADMIN,
-            val handler: ExceptionHandler? = null,
         ) : Entry
     }
 

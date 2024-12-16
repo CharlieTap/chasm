@@ -44,8 +44,6 @@ inline fun Stack.pushFrame(frame: Stack.Entry.ActivationFrame): Result<Unit, Inv
     }
 }
 
-inline fun Stack.pushInstruction(noinline instruction: DispatchableInstruction) = push(Stack.Entry.Instruction(instruction))
-
 inline fun Stack.pushValue(value: ExecutionValue) = push(Stack.Entry.Value(value))
 
 inline fun Stack.peekFrame(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
@@ -80,7 +78,7 @@ inline fun Stack.popHandler(): Result<ExceptionHandler, InvocationError.Uncaught
     return popHandlerOrNull()?.let(::Ok) ?: Err(InvocationError.UncaughtException)
 }
 
-inline fun Stack.popInstruction(): Result<Stack.Entry.Instruction, InvocationError.MissingInstruction> {
+inline fun Stack.popInstruction(): Result<DispatchableInstruction, InvocationError.MissingInstruction> {
     return popInstructionOrNull()?.let(::Ok) ?: Err(InvocationError.MissingInstruction)
 }
 

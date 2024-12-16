@@ -6,14 +6,13 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.value.executionValue
 
 fun stack(
     frames: List<Stack.Entry.ActivationFrame> = emptyList(),
     handlers: List<ExceptionHandler> = emptyList(),
-    instructions: List<Stack.Entry.Instruction> = emptyList(),
+    instructions: List<DispatchableInstruction> = emptyList(),
     labels: List<Stack.Entry.Label> = emptyList(),
     values: List<Stack.Entry.Value> = emptyList(),
 ) = Stack(
@@ -40,16 +39,6 @@ fun frame(
     stackValuesDepth = stackValuesDepth,
     locals = locals,
     instance = instance,
-)
-
-fun instruction(
-    instruction: DispatchableInstruction = dispatchableInstruction(),
-    tag: Stack.Entry.InstructionTag = Stack.Entry.InstructionTag.NON_ADMIN,
-    handler: ExceptionHandler? = null,
-) = Stack.Entry.Instruction(
-    instruction = instruction,
-    tag = tag,
-    handler = handler,
 )
 
 fun label(

@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -114,10 +113,7 @@ class WasmFunctionCallTest {
         val frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame> = { frame ->
             frameDispatchable
         }
-        val expectedFrameInstruction = Instruction(
-            instruction = frameDispatchable,
-            tag = Stack.Entry.InstructionTag.FRAME,
-        )
+        val expectedFrameInstruction = frameDispatchable
 
         val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _handler ->
             assertEquals(stack, _stack)
@@ -210,10 +206,7 @@ class WasmFunctionCallTest {
 
         stack.pushFrame(frame)
         stack.push(
-            Instruction(
-                instruction = dispatchableInstruction(),
-                tag = Stack.Entry.InstructionTag.FRAME,
-            ),
+            dispatchableInstruction(),
         )
 
         val actual = ReturnWasmFunctionCall(

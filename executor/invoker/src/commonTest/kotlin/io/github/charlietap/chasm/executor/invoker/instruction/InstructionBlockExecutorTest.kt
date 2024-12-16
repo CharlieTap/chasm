@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.label
@@ -44,11 +43,8 @@ class InstructionBlockExecutorTest {
         )
 
         val expectedInstructions = listOf(
-            Instruction(
-                labelInstruction,
-                Stack.Entry.InstructionTag.LABEL,
-            ),
-        ) + instructions.asReversed().map(::Instruction)
+            labelInstruction,
+        ) + instructions.asReversed()
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.labelsDepth())

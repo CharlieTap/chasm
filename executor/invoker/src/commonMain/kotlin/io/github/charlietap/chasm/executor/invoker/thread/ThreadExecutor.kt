@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatche
 import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
@@ -38,18 +37,18 @@ internal fun ThreadExecutor(
     )
 
     stack.push(thread.frame)
-    stack.push(Instruction(frameDispatcher(thread.frame)))
+    stack.push(frameDispatcher(thread.frame))
     thread.frame.locals.forEach { local ->
         stack.push(Stack.Entry.Value(local))
     }
 
     thread.instructions.forEachReversed { instruction ->
-        stack.push(Instruction(instruction))
+        stack.push(instruction)
     }
 
     while (true) {
-        val entry = stack.popInstructionOrNull() ?: break
-        entry.instruction(context).bind()
+        val instruction = stack.popInstructionOrNull() ?: break
+        instruction(context).bind()
     }
 
     val results = List(thread.frame.arity.value) {

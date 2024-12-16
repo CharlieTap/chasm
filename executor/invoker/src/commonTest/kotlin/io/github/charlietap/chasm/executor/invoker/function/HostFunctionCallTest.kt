@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -106,10 +105,7 @@ class HostFunctionCallTest {
 
         stack.pushFrame(frame)
         stack.push(
-            Instruction(
-                instruction = dispatchableInstruction(),
-                tag = Stack.Entry.InstructionTag.FRAME,
-            ),
+            dispatchableInstruction(),
         )
 
         val functionType = functionType(

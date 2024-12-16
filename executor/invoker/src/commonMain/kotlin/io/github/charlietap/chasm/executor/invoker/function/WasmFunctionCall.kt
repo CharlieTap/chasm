@@ -7,8 +7,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatche
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.Instruction
-import io.github.charlietap.chasm.executor.runtime.Stack.Entry.InstructionTag
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
@@ -62,7 +60,7 @@ internal inline fun WasmFunctionCall(
     )
 
     stack.pushFrame(frame).bind()
-    stack.push(Instruction(frameDispatcher(frame), InstructionTag.FRAME))
+    stack.push(frameDispatcher(frame))
 
     val label = Stack.Entry.Label(
         arity = Arity.Return(results),
