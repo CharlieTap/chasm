@@ -59,6 +59,8 @@ internal inline fun BlockExecutor(
 
     val label = Stack.Entry.Label(
         arity = resultArity,
+        stackInstructionsDepth = stack.instructionsDepth(),
+        stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth() - paramArity.value,
         continuation = emptyList(),
     )

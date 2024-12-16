@@ -65,6 +65,8 @@ internal inline fun WasmFunctionCall(
 
     val label = Stack.Entry.Label(
         arity = Arity.Return(results),
+        stackInstructionsDepth = stack.instructionsDepth(),
+        stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth(),
         continuation = emptyList(),
     )

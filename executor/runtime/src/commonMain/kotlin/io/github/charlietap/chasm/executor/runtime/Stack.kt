@@ -144,6 +144,8 @@ data class Stack(
 
         data class Label(
             val arity: Arity,
+            val stackInstructionsDepth: Int,
+            val stackLabelsDepth: Int,
             val stackValuesDepth: Int,
             val continuation: List<DispatchableInstruction>,
         ) : Entry

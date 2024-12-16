@@ -42,6 +42,8 @@ internal inline fun LoopExecutor(
 
     val label = Stack.Entry.Label(
         arity = paramArity,
+        stackInstructionsDepth = stack.instructionsDepth(),
+        stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth() - paramArity.value,
         continuation = listOf(
             loopDispatcher(ControlInstruction.Loop(blockType, instructions)),

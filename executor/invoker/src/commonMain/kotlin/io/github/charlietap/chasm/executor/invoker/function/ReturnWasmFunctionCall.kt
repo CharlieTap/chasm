@@ -9,8 +9,6 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
-import io.github.charlietap.chasm.executor.runtime.ext.popInstruction
-import io.github.charlietap.chasm.executor.runtime.ext.popLabel
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -34,17 +32,11 @@ internal inline fun ReturnWasmFunctionCall(
         locals[params++] = local.type.default().bind()
     }
 
-    while (stack.instructionsDepth() > frame.stackInstructionsDepth + 2) {
-        stack.popInstruction().bind()
-    }
-
-    while (stack.labelsDepth() > frame.stackLabelsDepth + 1) {
-        stack.popLabel().bind()
-    }
-
-    while (stack.valuesDepth() > frame.stackValuesDepth) {
-        stack.popValue().bind()
-    }
+    // leave frame and label admin instructions on the stack
+    stack.shrinkInstructions(0, frame.stackInstructionsDepth + 2)
+    // leave top label in place
+    stack.shrinkLabels(0, frame.stackLabelsDepth + 1)
+    stack.shrinkValues(0, frame.stackValuesDepth)
 
     instance.function.body.instructions.forEachReversed { instruction ->
         stack.push(Instruction(instruction))

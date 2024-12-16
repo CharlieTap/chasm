@@ -50,10 +50,14 @@ fun instruction(
 
 fun label(
     arity: Arity.Return = Arity.Return.SIDE_EFFECT,
+    stackInstructionsDepth: Int = 0,
+    stackLabelsDepth: Int = 0,
     stackValuesDepth: Int = 0,
     continuation: List<DispatchableInstruction> = emptyList(),
 ) = Stack.Entry.Label(
     arity = arity,
+    stackInstructionsDepth = stackInstructionsDepth,
+    stackLabelsDepth = stackLabelsDepth,
     stackValuesDepth = stackValuesDepth,
     continuation = continuation,
 )

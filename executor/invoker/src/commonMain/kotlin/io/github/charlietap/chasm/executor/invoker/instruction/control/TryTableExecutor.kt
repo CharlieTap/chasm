@@ -42,6 +42,8 @@ internal inline fun TryTableExecutor(
 
     val label = Stack.Entry.Label(
         arity = returnArity,
+        stackInstructionsDepth = stack.instructionsDepth(),
+        stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth() - paramArity.value,
         continuation = emptyList(),
     )

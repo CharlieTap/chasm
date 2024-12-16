@@ -87,6 +87,7 @@ class WasmFunctionCallTest {
 
         val label = label(
             arity = returnArity(functionType.params.types.size),
+            stackInstructionsDepth = 1,
         )
 
         val params = listOf(
