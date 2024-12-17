@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.ext.index
@@ -17,7 +16,5 @@ internal inline fun LocalGetExecutor(
     val (stack) = context
     val frame = stack.peekFrame().bind()
 
-    frame.locals.getOrNull(instruction.localIdx.index())?.let { local ->
-        stack.push(Stack.Entry.Value(local))
-    } ?: Err(InvocationError.MissingLocal).bind<Unit>()
+    stack.push(Stack.Entry.Value(frame.locals[instruction.localIdx.index()]))
 }
