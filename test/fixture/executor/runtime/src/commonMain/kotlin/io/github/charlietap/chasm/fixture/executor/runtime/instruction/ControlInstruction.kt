@@ -1,15 +1,15 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.fixture.ast.instruction.blockType
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.referenceType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 
@@ -20,27 +20,27 @@ fun unreachableRuntimeInstruction() = ControlInstruction.Unreachable
 fun nopRuntimeInstruction() = ControlInstruction.Nop
 
 fun blockRuntimeInstruction(
-    blockType: BlockType = blockType(),
+    functionType: FunctionType = functionType(),
     instructions: List<DispatchableInstruction> = emptyList(),
 ) = ControlInstruction.Block(
-    blockType = blockType,
+    functionType = functionType,
     instructions = instructions,
 )
 
 fun loopRuntimeInstruction(
-    blockType: BlockType = blockType(),
+    functionType: FunctionType = functionType(),
     instructions: List<DispatchableInstruction> = emptyList(),
 ) = ControlInstruction.Loop(
-    blockType = blockType,
+    functionType = functionType,
     instructions = instructions,
 )
 
 fun ifRuntimeInstruction(
-    blockType: BlockType = blockType(),
+    functionType: FunctionType = functionType(),
     thenInstructions: List<DispatchableInstruction> = emptyList(),
     elseInstructions: List<DispatchableInstruction>? = null,
 ) = ControlInstruction.If(
-    blockType = blockType,
+    functionType = functionType,
     thenInstructions = thenInstructions,
     elseInstructions = elseInstructions,
 )

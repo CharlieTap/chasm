@@ -26,8 +26,8 @@ internal inline fun IfExecutor(
     val firstBlock = stack.popI32().bind() != 0
 
     if (firstBlock) {
-        blockExecutor(store, stack, instruction.blockType, instruction.thenInstructions).bind()
+        blockExecutor(store, stack, instruction.functionType, instruction.thenInstructions).bind()
     } else {
-        blockExecutor(store, stack, instruction.blockType, instruction.elseInstructions ?: emptyList()).bind()
+        blockExecutor(store, stack, instruction.functionType, instruction.elseInstructions ?: emptyList()).bind()
     }
 }

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -14,13 +14,13 @@ sealed interface ControlInstruction : ExecutionInstruction {
 
     data object Nop : ControlInstruction
 
-    data class Block(val blockType: BlockType, val instructions: List<DispatchableInstruction>) : ControlInstruction
+    data class Block(val functionType: FunctionType, val instructions: List<DispatchableInstruction>) : ControlInstruction
 
-    data class Loop(val blockType: BlockType, val instructions: List<DispatchableInstruction>) : ControlInstruction
+    data class Loop(val functionType: FunctionType, val instructions: List<DispatchableInstruction>) : ControlInstruction
 
-    data class If(val blockType: BlockType, val thenInstructions: List<DispatchableInstruction>, val elseInstructions: List<DispatchableInstruction>?) : ControlInstruction
+    data class If(val functionType: FunctionType, val thenInstructions: List<DispatchableInstruction>, val elseInstructions: List<DispatchableInstruction>?) : ControlInstruction
 
-    data class TryTable(val blockType: BlockType, val handlers: List<CatchHandler>, val instructions: List<DispatchableInstruction>) : ControlInstruction
+    data class TryTable(val functionType: FunctionType, val handlers: List<CatchHandler>, val instructions: List<DispatchableInstruction>) : ControlInstruction
 
     @JvmInline
     value class Throw(val tagIndex: Index.TagIndex) : ControlInstruction

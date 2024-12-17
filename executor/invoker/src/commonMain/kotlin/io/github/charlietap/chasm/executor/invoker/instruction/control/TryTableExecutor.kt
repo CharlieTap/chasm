@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal inline fun TryTableExecutor(
@@ -17,28 +16,24 @@ internal inline fun TryTableExecutor(
 ): Result<Unit, InvocationError> = TryTableExecutor(
     context = context,
     instruction = instruction,
-    expander = ::BlockTypeExpander,
     blockExecutor = ::InstructionBlockExecutor,
 )
 
 internal inline fun TryTableExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.TryTable,
-    crossinline expander: BlockTypeExpander,
     crossinline blockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack) = context
-    val frame = stack.peekFrame().bind()
-    val functionType = expander(frame.instance, instruction.blockType).bind()
 
-    val paramArity = functionType?.let {
-        Arity.Argument(functionType.params.types.size)
-    } ?: Arity.Argument.NULLARY
+    val paramArity = instruction.functionType.let {
+        Arity.Argument(it.params.types.size)
+    }
 
-    val returnArity = functionType?.let {
-        Arity.Return(functionType.results.types.size)
-    } ?: Arity.Return.SIDE_EFFECT
+    val returnArity = instruction.functionType.let {
+        Arity.Return(it.results.types.size)
+    }
 
     val label = Stack.Entry.Label(
         arity = returnArity,

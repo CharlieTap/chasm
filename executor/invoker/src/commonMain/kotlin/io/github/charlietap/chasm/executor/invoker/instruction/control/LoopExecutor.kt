@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal fun LoopExecutor(
@@ -19,7 +18,6 @@ internal fun LoopExecutor(
     LoopExecutor(
         context = context,
         instruction = instruction,
-        expander = ::BlockTypeExpander,
         instructionBlockExecutor = ::InstructionBlockExecutor,
         loopDispatcher = ::LoopDispatcher,
     )
@@ -27,18 +25,15 @@ internal fun LoopExecutor(
 internal inline fun LoopExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Loop,
-    crossinline expander: BlockTypeExpander,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
     crossinline loopDispatcher: Dispatcher<ControlInstruction.Loop>,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack) = context
     val (blockType, instructions) = instruction
-    val frame = stack.peekFrame().bind()
-    val functionType = expander(frame.instance, blockType).bind()
-    val paramArity = functionType?.let {
-        Arity.Argument(functionType.params.types.size)
-    } ?: Arity.Argument.NULLARY
+    val paramArity = instruction.functionType.let {
+        Arity.Argument(it.params.types.size)
+    }
 
     val label = Stack.Entry.Label(
         arity = paramArity,
