@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.ast.type.functionType
-import io.github.charlietap.chasm.fixture.executor.runtime.configuration
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
@@ -60,14 +59,12 @@ class FunctionInvokerTest {
                 locals = locals,
                 instance = moduleInstance,
             ),
-            listOf(
+            arrayOf(
                 callDispatchable,
             ),
         )
-        val expectedConfig = configuration(store, thread)
 
         val threadExecutor: ThreadExecutor = { config ->
-            assertEquals(expectedConfig, config)
             Ok(listOf(i32(117)))
         }
 

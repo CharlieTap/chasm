@@ -21,7 +21,7 @@ fun nopRuntimeInstruction() = ControlInstruction.Nop
 
 fun blockRuntimeInstruction(
     functionType: FunctionType = functionType(),
-    instructions: List<DispatchableInstruction> = emptyList(),
+    instructions: Array<DispatchableInstruction> = emptyArray(),
 ) = ControlInstruction.Block(
     functionType = functionType,
     instructions = instructions,
@@ -29,7 +29,7 @@ fun blockRuntimeInstruction(
 
 fun loopRuntimeInstruction(
     functionType: FunctionType = functionType(),
-    instructions: List<DispatchableInstruction> = emptyList(),
+    instructions: Array<DispatchableInstruction> = emptyArray(),
 ) = ControlInstruction.Loop(
     functionType = functionType,
     instructions = instructions,
@@ -37,8 +37,8 @@ fun loopRuntimeInstruction(
 
 fun ifRuntimeInstruction(
     functionType: FunctionType = functionType(),
-    thenInstructions: List<DispatchableInstruction> = emptyList(),
-    elseInstructions: List<DispatchableInstruction>? = null,
+    thenInstructions: Array<DispatchableInstruction> = emptyArray(),
+    elseInstructions: Array<DispatchableInstruction>? = null,
 ) = ControlInstruction.If(
     functionType = functionType,
     thenInstructions = thenInstructions,

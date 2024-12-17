@@ -38,7 +38,7 @@ class ThreadExecutorTest {
         }
         val thread = thread(
             frame = frame,
-            instructions = listOf(
+            instructions = arrayOf(
                 instructionDispatchable,
             ),
         )

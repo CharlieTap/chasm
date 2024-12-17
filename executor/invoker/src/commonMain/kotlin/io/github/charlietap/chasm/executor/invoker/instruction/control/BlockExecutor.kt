@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-internal typealias BlockExecutor = (Store, Stack, FunctionType, List<DispatchableInstruction>) -> Result<Unit, InvocationError>
+internal typealias BlockExecutor = (Store, Stack, FunctionType, Array<DispatchableInstruction>) -> Result<Unit, InvocationError>
 
 internal inline fun BlockExecutor(
     context: ExecutionContext,
@@ -29,7 +29,7 @@ internal inline fun BlockExecutor(
     store: Store,
     stack: Stack,
     functionType: FunctionType,
-    instructions: List<DispatchableInstruction>,
+    instructions: Array<DispatchableInstruction>,
 ): Result<Unit, InvocationError> =
     BlockExecutor(
         store = store,
@@ -44,7 +44,7 @@ internal inline fun BlockExecutor(
     store: Store,
     stack: Stack,
     functionType: FunctionType,
-    instructions: List<DispatchableInstruction>,
+    instructions: Array<DispatchableInstruction>,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
 

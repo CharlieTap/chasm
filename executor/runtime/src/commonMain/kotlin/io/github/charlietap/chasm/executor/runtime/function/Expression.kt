@@ -4,10 +4,8 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class Expression(val instructions: List<DispatchableInstruction>) {
-    constructor(vararg instructions: DispatchableInstruction) : this(instructions.toList())
-
+value class Expression(val instructions: Array<DispatchableInstruction>) {
     companion object {
-        val EMPTY = Expression(emptyList())
+        val EMPTY = Expression(emptyArray())
     }
 }

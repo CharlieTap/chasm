@@ -41,11 +41,17 @@ internal inline fun TryTableInstructionPredecoder(
             InstantiationError.PredecodingError
         }.bind()
 
+    val instructions: Array<DispatchableInstruction> = Array(instruction.instructions.size) { idx ->
+        val reversedIndex = instruction.instructions.size - 1 - idx
+        val predispatch = instruction.instructions[reversedIndex]
+        instructionPredecoder(context, predispatch).bind()
+    }
+
     tryTableDispatcher(
         TryTable(
             functionType = functionType,
             handlers = instruction.handlers,
-            instructions = instruction.instructions.map { instructionPredecoder(context, it).bind() },
+            instructions = instructions,
         ),
     )
 }

@@ -70,7 +70,7 @@ class WasmFunctionCallTest {
                 ),
             ),
             body = runtimeExpression(
-                listOf(
+                arrayOf(
                     dispatchableInstruction(),
                     dispatchableInstruction(),
                 ),
@@ -169,7 +169,7 @@ class WasmFunctionCallTest {
                 local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
             body = runtimeExpression(
-                listOf(
+                arrayOf(
                     dispatchableInstruction(),
                     dispatchableInstruction(),
                 ),

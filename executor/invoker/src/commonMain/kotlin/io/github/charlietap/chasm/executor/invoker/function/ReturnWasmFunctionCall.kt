@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.invoker.ext.grow
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -38,7 +37,5 @@ internal inline fun ReturnWasmFunctionCall(
     stack.shrinkLabels(0, frame.stackLabelsDepth + 1)
     stack.shrinkValues(0, frame.stackValuesDepth)
 
-    instance.function.body.instructions.forEachReversed { instruction ->
-        stack.push(instruction)
-    }
+    stack.push(instance.function.body.instructions)
 }

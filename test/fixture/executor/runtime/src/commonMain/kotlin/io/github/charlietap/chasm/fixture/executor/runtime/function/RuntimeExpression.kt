@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.function.Expression
 
 fun runtimeExpression(
-    instructions: List<DispatchableInstruction> = emptyList(),
+    instructions: Array<DispatchableInstruction> = emptyArray(),
 ) = Expression(
     instructions = instructions,
 )

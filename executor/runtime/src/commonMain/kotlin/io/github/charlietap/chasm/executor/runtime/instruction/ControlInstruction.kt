@@ -14,13 +14,89 @@ sealed interface ControlInstruction : ExecutionInstruction {
 
     data object Nop : ControlInstruction
 
-    data class Block(val functionType: FunctionType, val instructions: List<DispatchableInstruction>) : ControlInstruction
+    data class Block(val functionType: FunctionType, val instructions: Array<DispatchableInstruction>) : ControlInstruction {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
 
-    data class Loop(val functionType: FunctionType, val instructions: List<DispatchableInstruction>) : ControlInstruction
+            other as Block
 
-    data class If(val functionType: FunctionType, val thenInstructions: List<DispatchableInstruction>, val elseInstructions: List<DispatchableInstruction>?) : ControlInstruction
+            if (functionType != other.functionType) return false
+            if (!instructions.contentEquals(other.instructions)) return false
 
-    data class TryTable(val functionType: FunctionType, val handlers: List<CatchHandler>, val instructions: List<DispatchableInstruction>) : ControlInstruction
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = functionType.hashCode()
+            result = 31 * result + instructions.contentHashCode()
+            return result
+        }
+    }
+
+    data class Loop(val functionType: FunctionType, val instructions: Array<DispatchableInstruction>) : ControlInstruction {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+
+            other as Loop
+
+            if (functionType != other.functionType) return false
+            if (!instructions.contentEquals(other.instructions)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = functionType.hashCode()
+            result = 31 * result + instructions.contentHashCode()
+            return result
+        }
+    }
+
+    data class If(val functionType: FunctionType, val thenInstructions: Array<DispatchableInstruction>, val elseInstructions: Array<DispatchableInstruction>?) : ControlInstruction {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+
+            other as If
+
+            if (functionType != other.functionType) return false
+            if (!thenInstructions.contentEquals(other.thenInstructions)) return false
+            if (!elseInstructions.contentEquals(other.elseInstructions)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = functionType.hashCode()
+            result = 31 * result + thenInstructions.contentHashCode()
+            result = 31 * result + (elseInstructions?.contentHashCode() ?: 0)
+            return result
+        }
+    }
+
+    data class TryTable(val functionType: FunctionType, val handlers: List<CatchHandler>, val instructions: Array<DispatchableInstruction>) : ControlInstruction {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+
+            other as TryTable
+
+            if (functionType != other.functionType) return false
+            if (handlers != other.handlers) return false
+            if (!instructions.contentEquals(other.instructions)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = functionType.hashCode()
+            result = 31 * result + handlers.hashCode()
+            result = 31 * result + instructions.contentHashCode()
+            return result
+        }
+    }
 
     @JvmInline
     value class Throw(val tagIndex: Index.TagIndex) : ControlInstruction

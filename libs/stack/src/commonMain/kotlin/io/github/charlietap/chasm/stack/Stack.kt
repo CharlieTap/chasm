@@ -28,6 +28,15 @@ class Stack<T>
             }
         }
 
+        fun pushAll(values: Array<T>) {
+            val requiredSize = top + values.size
+            while (requiredSize > elements.size) {
+                doubleCapacity()
+            }
+            values.copyInto(elements, startIndex = 0, endIndex = values.size, destinationOffset = top)
+            top += values.size
+        }
+
         fun popOrNull(): T? = try {
             top--
             val value = elements[top]

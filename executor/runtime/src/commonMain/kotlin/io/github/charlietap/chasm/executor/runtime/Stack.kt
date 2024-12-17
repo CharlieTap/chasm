@@ -59,6 +59,8 @@ data class Stack(
 
     fun push(value: Entry.Value) = values.push(value)
 
+    fun push(many: Array<DispatchableInstruction>) = instructions.pushAll(many)
+
     fun popFrameOrNull(): Entry.ActivationFrame? = frames.popOrNull()
 
     fun popHandlerOrNull(): ExceptionHandler? = handlers.popOrNull()

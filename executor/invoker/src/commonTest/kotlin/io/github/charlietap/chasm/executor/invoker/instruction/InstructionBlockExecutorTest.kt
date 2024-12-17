@@ -16,10 +16,9 @@ class InstructionBlockExecutorTest {
     fun `can execute an instruction block return a result`() {
 
         val stack = stack()
-
         val label = label()
 
-        val instructions = listOf(
+        val instructions = arrayOf(
             dispatchableInstruction(),
             dispatchableInstruction(),
         )
@@ -42,13 +41,13 @@ class InstructionBlockExecutorTest {
             labelDispatcher = labelDispatcher,
         )
 
-        val expectedInstructions = listOf(
+        val expectedInstructions = arrayOf(
             labelInstruction,
-        ) + instructions.asReversed()
+        ) + instructions
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.labelsDepth())
         assertEquals(label, stack.popLabelOrNull())
-        assertEquals(expectedInstructions, stack.instructions())
+        assertEquals(expectedInstructions.toList(), stack.instructions())
     }
 }

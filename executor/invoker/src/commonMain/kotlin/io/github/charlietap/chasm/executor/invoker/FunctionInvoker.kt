@@ -62,7 +62,7 @@ internal inline fun FunctionInvoker(
             stackLabelsDepth = 0,
             stackValuesDepth = 0,
         ),
-        instructions = listOf(instruction),
+        instructions = arrayOf(instruction),
     )
 
     val configuration = Configuration(

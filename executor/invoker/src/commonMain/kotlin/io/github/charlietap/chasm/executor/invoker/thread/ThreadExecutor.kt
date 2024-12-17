@@ -5,7 +5,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatcher
-import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -42,9 +41,7 @@ internal fun ThreadExecutor(
         stack.push(Stack.Entry.Value(local))
     }
 
-    thread.instructions.forEachReversed { instruction ->
-        stack.push(instruction)
-    }
+    stack.push(thread.instructions)
 
     while (true) {
         val instruction = stack.popInstructionOrNull() ?: break

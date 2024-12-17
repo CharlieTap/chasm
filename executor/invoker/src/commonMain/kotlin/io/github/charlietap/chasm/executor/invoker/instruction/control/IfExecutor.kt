@@ -28,6 +28,6 @@ internal inline fun IfExecutor(
     if (firstBlock) {
         blockExecutor(store, stack, instruction.functionType, instruction.thenInstructions).bind()
     } else {
-        blockExecutor(store, stack, instruction.functionType, instruction.elseInstructions ?: emptyList()).bind()
+        blockExecutor(store, stack, instruction.functionType, instruction.elseInstructions ?: emptyArray()).bind()
     }
 }

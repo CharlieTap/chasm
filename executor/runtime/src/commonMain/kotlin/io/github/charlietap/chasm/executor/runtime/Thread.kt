@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 
 data class Thread(
     val frame: Stack.Entry.ActivationFrame,
-    val instructions: List<DispatchableInstruction>,
+    val instructions: Array<DispatchableInstruction>,
 )

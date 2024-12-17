@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 
 fun thread(
     frame: Stack.Entry.ActivationFrame = frame(),
-    instructions: List<DispatchableInstruction> = emptyList(),
+    instructions: Array<DispatchableInstruction> = emptyArray(),
 ): Thread = Thread(
     frame = frame,
     instructions = instructions,
