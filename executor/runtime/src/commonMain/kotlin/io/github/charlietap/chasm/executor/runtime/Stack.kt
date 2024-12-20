@@ -183,17 +183,15 @@ data class Stack(
 
         data class Label(
             val arity: Int,
-            val stackInstructionsDepth: Int,
-            val stackLabelsDepth: Int,
-            val stackValuesDepth: Int,
+            val depths: StackDepths,
             val continuation: List<DispatchableInstruction>,
         ) : Entry
 
         data class ActivationFrame(
             val arity: Int,
+            val depths: StackDepths,
             val instance: ModuleInstance,
             var locals: MutableList<ExecutionValue>,
-            val depths: StackDepths,
         ) : Entry
     }
 

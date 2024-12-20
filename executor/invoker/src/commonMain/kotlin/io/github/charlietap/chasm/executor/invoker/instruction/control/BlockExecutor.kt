@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 internal typealias BlockExecutor = (Store, Stack, FunctionType, Array<DispatchableInstruction>) -> Result<Unit, InvocationError>
@@ -52,9 +53,11 @@ internal inline fun BlockExecutor(
 
     val label = Stack.Entry.Label(
         arity = results,
-        stackInstructionsDepth = stack.instructionsDepth(),
-        stackLabelsDepth = stack.labelsDepth(),
-        stackValuesDepth = stack.valuesDepth() - params,
+        depths = LabelStackDepths(
+            instructions = stack.instructionsDepth(),
+            labels = stack.labelsDepth(),
+            values = stack.valuesDepth() - params,
+        ),
         continuation = emptyList(),
     )
 

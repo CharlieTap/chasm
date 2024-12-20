@@ -29,9 +29,10 @@ internal inline fun BreakExecutor(
 
     val breakLabel = stack.peekNthLabel(labelIndex.index()).bind()
 
-    stack.shrinkInstructions(0, breakLabel.stackInstructionsDepth)
-    stack.shrinkLabels(0, breakLabel.stackLabelsDepth)
-    stack.shrinkValues(breakLabel.arity, breakLabel.stackValuesDepth)
+    val depths = breakLabel.depths
+    stack.shrinkInstructions(0, depths.instructions)
+    stack.shrinkLabels(0, depths.labels)
+    stack.shrinkValues(breakLabel.arity, depths.values)
 
     breakLabel.continuation.forEachReversed { instruction ->
         stack.push(instruction)

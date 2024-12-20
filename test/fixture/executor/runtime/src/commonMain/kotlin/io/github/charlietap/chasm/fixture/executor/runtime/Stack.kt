@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -38,6 +39,16 @@ fun frameStackDepths(
     values = values,
 )
 
+fun labelStackDepths(
+    instructions: Int = 0,
+    labels: Int = 0,
+    values: Int = 0,
+): StackDepths = LabelStackDepths(
+    instructions = instructions,
+    labels = labels,
+    values = values,
+)
+
 fun frame(
     arity: Int = 0,
     depths: StackDepths = stackDepths(),
@@ -52,15 +63,11 @@ fun frame(
 
 fun label(
     arity: Int = 0,
-    stackInstructionsDepth: Int = 0,
-    stackLabelsDepth: Int = 0,
-    stackValuesDepth: Int = 0,
+    depths: StackDepths = stackDepths(),
     continuation: List<DispatchableInstruction> = emptyList(),
 ) = Stack.Entry.Label(
     arity = arity,
-    stackInstructionsDepth = stackInstructionsDepth,
-    stackLabelsDepth = stackLabelsDepth,
-    stackValuesDepth = stackValuesDepth,
+    depths = depths,
     continuation = continuation,
 )
 

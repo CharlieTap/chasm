@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 
 internal fun LoopExecutor(
     context: ExecutionContext,
@@ -33,9 +34,11 @@ internal inline fun LoopExecutor(
 
     val label = Stack.Entry.Label(
         arity = params,
-        stackInstructionsDepth = stack.instructionsDepth(),
-        stackLabelsDepth = stack.labelsDepth(),
-        stackValuesDepth = stack.valuesDepth() - params,
+        depths = LabelStackDepths(
+            instructions = stack.instructionsDepth(),
+            labels = stack.labelsDepth(),
+            values = stack.valuesDepth() - params,
+        ),
         continuation = listOf(
             loopDispatcher(instruction),
         ),

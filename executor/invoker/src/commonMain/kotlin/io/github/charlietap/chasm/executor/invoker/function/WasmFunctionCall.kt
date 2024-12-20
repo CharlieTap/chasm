@@ -48,9 +48,10 @@ internal inline fun WasmFunctionCall(
         locals[idx++] = local.type.default().bind()
     }
 
+    val depths = stack.depths()
     val frame = Stack.Entry.ActivationFrame(
         arity = results,
-        depths = stack.depths(),
+        depths = depths,
         locals = locals,
         instance = instance.module,
     )
@@ -60,9 +61,7 @@ internal inline fun WasmFunctionCall(
 
     val label = Stack.Entry.Label(
         arity = results,
-        stackInstructionsDepth = stack.instructionsDepth(),
-        stackLabelsDepth = stack.labelsDepth(),
-        stackValuesDepth = stack.valuesDepth(),
+        depths = depths,
         continuation = emptyList(),
     )
 
