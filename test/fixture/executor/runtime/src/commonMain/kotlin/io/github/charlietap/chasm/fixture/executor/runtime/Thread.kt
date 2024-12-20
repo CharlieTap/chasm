@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.fixture.executor.runtime
 
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 
 fun thread(
-    frame: Stack.Entry.ActivationFrame = frame(),
+    frame: ActivationFrame = frame(),
     instructions: Array<DispatchableInstruction> = emptyArray(),
 ): Thread = Thread(
     frame = frame,

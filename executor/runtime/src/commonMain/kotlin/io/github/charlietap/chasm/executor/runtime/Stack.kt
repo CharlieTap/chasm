@@ -2,21 +2,22 @@ package io.github.charlietap.chasm.executor.runtime
 
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
+import io.github.charlietap.chasm.executor.runtime.stack.FrameStack
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.stack.Stack as InternalStack
 
 data class Stack(
-    private val frames: InternalStack<Entry.ActivationFrame> = InternalStack(INITIAL_CAPACITY),
+    private val frames: FrameStack = FrameStack(),
     private val handlers: InternalStack<ExceptionHandler> = InternalStack(INITIAL_CAPACITY),
     private val instructions: InternalStack<DispatchableInstruction> = InternalStack(INITIAL_CAPACITY),
     private val labels: InternalStack<Entry.Label> = InternalStack(INITIAL_CAPACITY),
     private val values: InternalStack<Entry.Value> = InternalStack(INITIAL_CAPACITY),
 ) {
     constructor(
-        frames: List<Entry.ActivationFrame>,
+        frames: List<ActivationFrame>,
         handlers: List<ExceptionHandler>,
         instructions: List<DispatchableInstruction>,
         labels: List<Entry.Label>,
@@ -44,7 +45,6 @@ data class Stack(
     ) : this() {
         entries.forEach { entry ->
             when (entry) {
-                is Entry.ActivationFrame -> push(entry)
                 is Entry.Label -> push(entry)
                 is Entry.Value -> push(entry)
             }
@@ -58,7 +58,7 @@ data class Stack(
         values = valuesDepth(),
     )
 
-    fun push(frame: Entry.ActivationFrame) = frames.push(frame)
+    fun push(frame: ActivationFrame) = frames.push(frame)
 
     fun push(handler: ExceptionHandler) = handlers.push(handler)
 
@@ -70,7 +70,7 @@ data class Stack(
 
     fun push(many: Array<DispatchableInstruction>) = instructions.pushAll(many)
 
-    fun popFrameOrNull(): Entry.ActivationFrame? = frames.popOrNull()
+    fun popFrameOrNull(): ActivationFrame? = frames.popOrNull()
 
     fun popHandlerOrNull(): ExceptionHandler? = handlers.popOrNull()
 
@@ -80,7 +80,7 @@ data class Stack(
 
     fun popValueOrNull(): Entry.Value? = values.popOrNull()
 
-    fun peekFrameOrNull(): Entry.ActivationFrame? = frames.peekOrNull()
+    fun peekFrameOrNull(): ActivationFrame? = frames.peekOrNull()
 
     fun peekInstructionOrNull(): DispatchableInstruction? = instructions.peekOrNull()
 
@@ -88,7 +88,7 @@ data class Stack(
 
     fun peekValueOrNull(): Entry.Value? = values.peekOrNull()
 
-    fun peekNthFrameOrNull(n: Int): Entry.ActivationFrame? = frames.peekNthOrNull(n)
+    fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNthOrNull(n)
 
     fun peekNthLabelOrNull(n: Int): Entry.Label? = labels.peekNthOrNull(n)
 
@@ -185,13 +185,6 @@ data class Stack(
             val arity: Int,
             val depths: StackDepths,
             val continuation: List<DispatchableInstruction>,
-        ) : Entry
-
-        data class ActivationFrame(
-            val arity: Int,
-            val depths: StackDepths,
-            val instance: ModuleInstance,
-            var locals: MutableList<ExecutionValue>,
         ) : Entry
     }
 

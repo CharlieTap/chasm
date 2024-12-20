@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
@@ -12,7 +13,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.value.executionValue
 
 fun stack(
-    frames: List<Stack.Entry.ActivationFrame> = emptyList(),
+    frames: List<ActivationFrame> = emptyList(),
     handlers: List<ExceptionHandler> = emptyList(),
     instructions: List<DispatchableInstruction> = emptyList(),
     labels: List<Stack.Entry.Label> = emptyList(),
@@ -54,7 +55,7 @@ fun frame(
     depths: StackDepths = stackDepths(),
     instance: ModuleInstance = moduleInstance(),
     locals: MutableList<ExecutionValue> = mutableListOf(),
-) = Stack.Entry.ActivationFrame(
+) = ActivationFrame(
     arity = arity,
     depths = depths,
     locals = locals,

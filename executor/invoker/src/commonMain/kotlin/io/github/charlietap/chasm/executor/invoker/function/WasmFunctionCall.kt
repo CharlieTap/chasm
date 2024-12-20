@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 internal typealias WasmFunctionCall = (ExecutionContext, FunctionInstance.WasmFunction) -> Result<Unit, InvocationError>
@@ -31,7 +32,7 @@ internal inline fun WasmFunctionCall(
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
-    crossinline frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame>,
+    crossinline frameDispatcher: Dispatcher<ActivationFrame>,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack) = context
@@ -49,7 +50,7 @@ internal inline fun WasmFunctionCall(
     }
 
     val depths = stack.depths()
-    val frame = Stack.Entry.ActivationFrame(
+    val frame = ActivationFrame(
         arity = results,
         depths = depths,
         locals = locals,

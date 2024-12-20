@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.benchmark.runtime
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.label
 import io.github.charlietap.chasm.fixture.executor.runtime.value
@@ -25,7 +24,7 @@ import kotlinx.benchmark.Warmup
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 class StackBenchmark {
 
-    private val stack = stackOf<Stack.Entry>()
+    private val stack = stackOf<Any>()
 
     private val frame = frame()
     private val label = label()

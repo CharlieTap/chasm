@@ -6,10 +6,10 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.Stack.Companion.MAX_DEPTH
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
@@ -35,18 +35,20 @@ inline fun Stack.pushf64(f64: Double) {
     push(Stack.Entry.Value(F64(f64)))
 }
 
-inline fun Stack.pushFrame(frame: Stack.Entry.ActivationFrame): Result<Unit, InvocationError> {
-    return if (framesDepth() < MAX_DEPTH) {
+inline fun Stack.pushFrame(frame: ActivationFrame): Result<Unit, InvocationError> {
+    return try {
         push(frame)
         Ok(Unit)
-    } else {
+    } catch (_: IndexOutOfBoundsException) {
+        Err(InvocationError.CallStackExhausted)
+    } catch (_: IllegalArgumentException) {
         Err(InvocationError.CallStackExhausted)
     }
 }
 
 inline fun Stack.pushValue(value: ExecutionValue) = push(Stack.Entry.Value(value))
 
-inline fun Stack.peekFrame(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
+inline fun Stack.peekFrame(): Result<ActivationFrame, InvocationError.MissingStackFrame> {
     return peekFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
 }
 
@@ -58,7 +60,7 @@ inline fun Stack.peekValue(): Result<Stack.Entry.Value, InvocationError.MissingS
     return peekValueOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
 }
 
-inline fun Stack.peekNthFrame(n: Int): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
+inline fun Stack.peekNthFrame(n: Int): Result<ActivationFrame, InvocationError.MissingStackFrame> {
     return peekNthFrameOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
 }
 
@@ -70,7 +72,7 @@ inline fun Stack.peekNthValue(n: Int): Result<Stack.Entry.Value, InvocationError
     return peekNthValueOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
 }
 
-inline fun Stack.popFrame(): Result<Stack.Entry.ActivationFrame, InvocationError.MissingStackFrame> {
+inline fun Stack.popFrame(): Result<ActivationFrame, InvocationError.MissingStackFrame> {
     return popFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
 }
 

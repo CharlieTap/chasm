@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.fixture.ast.module.local
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
@@ -108,7 +109,7 @@ class WasmFunctionCallTest {
             instance = functionInstance.module,
         )
         val frameDispatchable = dispatchableInstruction()
-        val frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame> = { frame ->
+        val frameDispatcher: Dispatcher<ActivationFrame> = { frame ->
             frameDispatchable
         }
         val expectedFrameInstruction = frameDispatchable

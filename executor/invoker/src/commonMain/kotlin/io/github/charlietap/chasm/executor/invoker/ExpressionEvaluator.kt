@@ -5,11 +5,11 @@ import com.github.michaelbull.result.map
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.function.Expression
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -39,7 +39,7 @@ internal inline fun ExpressionEvaluator(
 ): Result<ExecutionValue?, InvocationError> {
 
     val thread = Thread(
-        frame = Stack.Entry.ActivationFrame(
+        frame = ActivationFrame(
             arity = arity.value,
             locals = mutableListOf(),
             instance = instance,

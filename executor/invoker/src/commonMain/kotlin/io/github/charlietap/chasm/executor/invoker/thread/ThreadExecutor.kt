@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
+import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 internal typealias ThreadExecutor = (Configuration) -> Result<List<ExecutionValue>, InvocationError>
@@ -24,7 +25,7 @@ internal fun ThreadExecutor(
 
 internal fun ThreadExecutor(
     configuration: Configuration,
-    frameDispatcher: Dispatcher<Stack.Entry.ActivationFrame>,
+    frameDispatcher: Dispatcher<ActivationFrame>,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
     val thread = configuration.thread
