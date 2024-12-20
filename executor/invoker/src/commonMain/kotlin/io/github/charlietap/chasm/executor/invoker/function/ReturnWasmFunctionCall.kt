@@ -30,12 +30,13 @@ internal inline fun ReturnWasmFunctionCall(
         locals[params++] = local.type.default().bind()
     }
 
-    stack.shrinkHandlers(0, frame.stackHandlersDepth)
+    val depths = frame.depths
+    stack.shrinkHandlers(0, depths.handlers)
     // leave frame and label admin instructions on the stack
-    stack.shrinkInstructions(0, frame.stackInstructionsDepth + 2)
+    stack.shrinkInstructions(0, depths.instructions + 2)
     // leave top label in place
-    stack.shrinkLabels(0, frame.stackLabelsDepth + 1)
-    stack.shrinkValues(0, frame.stackValuesDepth)
+    stack.shrinkLabels(0, depths.labels + 1)
+    stack.shrinkValues(0, depths.values)
 
     stack.push(instance.function.body.instructions)
 }

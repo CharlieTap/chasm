@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.function.Expression
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -42,10 +43,7 @@ internal inline fun ExpressionEvaluator(
             arity = arity.value,
             locals = mutableListOf(),
             instance = instance,
-            stackHandlersDepth = 0,
-            stackInstructionsDepth = 0,
-            stackLabelsDepth = 0,
-            stackValuesDepth = 0,
+            depths = FrameStackDepths(0, 0, 0, 0),
         ),
         instructions = expression.instructions,
     )

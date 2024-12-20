@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -55,10 +56,7 @@ internal inline fun FunctionInvoker(
             arity = arity,
             instance = function.module,
             locals = values.toMutableList(),
-            stackHandlersDepth = 0,
-            stackInstructionsDepth = 0,
-            stackLabelsDepth = 0,
-            stackValuesDepth = 0,
+            depths = FrameStackDepths(0, 0, 0, 0),
         ),
         instructions = arrayOf(instruction),
     )

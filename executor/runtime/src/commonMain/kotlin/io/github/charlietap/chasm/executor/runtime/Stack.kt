@@ -3,6 +3,8 @@ package io.github.charlietap.chasm.executor.runtime
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.stack.Stack as InternalStack
 
@@ -48,6 +50,13 @@ data class Stack(
             }
         }
     }
+
+    fun depths(): StackDepths = FrameStackDepths(
+        handlers = handlersDepth(),
+        instructions = instructionsDepth(),
+        labels = labelsDepth(),
+        values = valuesDepth(),
+    )
 
     fun push(frame: Entry.ActivationFrame) = frames.push(frame)
 
@@ -184,10 +193,7 @@ data class Stack(
             val arity: Int,
             val instance: ModuleInstance,
             var locals: MutableList<ExecutionValue>,
-            val stackHandlersDepth: Int,
-            val stackInstructionsDepth: Int,
-            val stackLabelsDepth: Int,
-            val stackValuesDepth: Int,
+            val depths: StackDepths,
         ) : Entry
     }
 

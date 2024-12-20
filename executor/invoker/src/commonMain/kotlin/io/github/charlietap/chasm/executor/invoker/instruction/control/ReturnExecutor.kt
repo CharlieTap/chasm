@@ -15,8 +15,9 @@ internal inline fun ReturnExecutor(
     val (stack) = context
     val frame = stack.popFrame().bind()
 
-    stack.shrinkHandlers(0, frame.stackHandlersDepth)
-    stack.shrinkLabels(0, frame.stackLabelsDepth)
-    stack.shrinkInstructions(0, frame.stackInstructionsDepth)
-    stack.shrinkValues(frame.arity, frame.stackValuesDepth)
+    val depths = frame.depths
+    stack.shrinkHandlers(0, depths.handlers)
+    stack.shrinkInstructions(0, depths.instructions)
+    stack.shrinkLabels(0, depths.labels)
+    stack.shrinkValues(frame.arity, depths.values)
 }
