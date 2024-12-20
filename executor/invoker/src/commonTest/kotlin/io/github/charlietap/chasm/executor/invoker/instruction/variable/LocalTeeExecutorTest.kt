@@ -2,10 +2,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
-import io.github.charlietap.chasm.fixture.ast.module.localIndex
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.localTeeRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
@@ -29,7 +28,7 @@ class LocalTeeExecutorTest {
 
         stack.push(frame)
 
-        val instruction = VariableInstruction.LocalTee(localIndex())
+        val instruction = localTeeRuntimeInstruction(0)
 
         val expected = i32(117)
         stack.push(value(expected))

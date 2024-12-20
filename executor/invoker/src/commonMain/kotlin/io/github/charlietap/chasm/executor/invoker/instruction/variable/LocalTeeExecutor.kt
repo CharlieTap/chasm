@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -19,5 +18,5 @@ internal inline fun LocalTeeExecutor(
     val value = stack.peekValue().bind()
     val frame = stack.peekFrame().bind()
 
-    frame.locals[instruction.localIdx.index()] = value.value
+    frame.locals[instruction.localIdx] = value.value
 }

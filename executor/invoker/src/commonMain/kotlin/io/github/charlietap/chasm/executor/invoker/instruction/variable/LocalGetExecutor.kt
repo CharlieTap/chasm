@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -16,5 +15,5 @@ internal inline fun LocalGetExecutor(
     val (stack) = context
     val frame = stack.peekFrame().bind()
 
-    stack.push(Stack.Entry.Value(frame.locals[instruction.localIdx.index()]))
+    stack.push(Stack.Entry.Value(frame.locals[instruction.localIdx]))
 }

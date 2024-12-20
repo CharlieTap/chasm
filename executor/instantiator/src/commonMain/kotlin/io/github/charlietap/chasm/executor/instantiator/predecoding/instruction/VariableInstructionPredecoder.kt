@@ -42,9 +42,9 @@ internal inline fun VariableInstructionPredecoder(
     crossinline globalSetDispatcher: Dispatcher<GlobalSet>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
-        is VariableInstruction.LocalGet -> localGetDispatcher(LocalGet(instruction.localIdx))
-        is VariableInstruction.LocalSet -> localSetDispatcher(LocalSet(instruction.localIdx))
-        is VariableInstruction.LocalTee -> localTeeDispatcher(LocalTee(instruction.localIdx))
+        is VariableInstruction.LocalGet -> localGetDispatcher(LocalGet(instruction.localIdx.idx.toInt()))
+        is VariableInstruction.LocalSet -> localSetDispatcher(LocalSet(instruction.localIdx.idx.toInt()))
+        is VariableInstruction.LocalTee -> localTeeDispatcher(LocalTee(instruction.localIdx.idx.toInt()))
         is VariableInstruction.GlobalGet -> globalGetDispatcher(GlobalGet(instruction.globalIdx))
         is VariableInstruction.GlobalSet -> globalSetDispatcher(GlobalSet(instruction.globalIdx))
     }

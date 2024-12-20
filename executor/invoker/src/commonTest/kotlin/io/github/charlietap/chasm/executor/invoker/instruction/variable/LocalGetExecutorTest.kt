@@ -3,10 +3,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
-import io.github.charlietap.chasm.fixture.ast.module.localIndex
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.localGetRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
@@ -29,7 +28,7 @@ class LocalGetExecutorTest {
 
         stack.push(frame)
 
-        val instruction = VariableInstruction.LocalGet(localIndex())
+        val instruction = localGetRuntimeInstruction(0)
 
         val expected = Stack.Entry.Value(local)
 

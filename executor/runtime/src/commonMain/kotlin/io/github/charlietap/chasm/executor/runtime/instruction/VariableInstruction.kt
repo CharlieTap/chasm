@@ -1,18 +1,17 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index.GlobalIndex
-import io.github.charlietap.chasm.ast.module.Index.LocalIndex
 import kotlin.jvm.JvmInline
 
 sealed interface VariableInstruction : ExecutionInstruction {
     @JvmInline
-    value class LocalGet(val localIdx: LocalIndex) : VariableInstruction
+    value class LocalGet(val localIdx: Int) : VariableInstruction
 
     @JvmInline
-    value class LocalSet(val localIdx: LocalIndex) : VariableInstruction
+    value class LocalSet(val localIdx: Int) : VariableInstruction
 
     @JvmInline
-    value class LocalTee(val localIdx: LocalIndex) : VariableInstruction
+    value class LocalTee(val localIdx: Int) : VariableInstruction
 
     @JvmInline
     value class GlobalGet(val globalIdx: GlobalIndex) : VariableInstruction
