@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -48,15 +47,14 @@ internal inline fun BlockExecutor(
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ): Result<Unit, InvocationError> = binding {
 
-    val (paramArity, resultArity) = functionType.let {
-        Arity.Argument(functionType.params.types.size) to Arity.Return(functionType.results.types.size)
-    }
+    val params = functionType.params.types.size
+    val results = functionType.results.types.size
 
     val label = Stack.Entry.Label(
-        arity = resultArity,
+        arity = results,
         stackInstructionsDepth = stack.instructionsDepth(),
         stackLabelsDepth = stack.labelsDepth(),
-        stackValuesDepth = stack.valuesDepth() - paramArity.value,
+        stackValuesDepth = stack.valuesDepth() - params,
         continuation = emptyList(),
     )
 

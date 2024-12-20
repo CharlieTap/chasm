@@ -173,7 +173,7 @@ data class Stack(
         data class Value(val value: ExecutionValue) : Entry
 
         data class Label(
-            val arity: Arity,
+            val arity: Int,
             val stackInstructionsDepth: Int,
             val stackLabelsDepth: Int,
             val stackValuesDepth: Int,

@@ -5,7 +5,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.LoopDispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -31,15 +30,13 @@ internal inline fun LoopExecutor(
 
     val (stack) = context
     val (blockType, instructions) = instruction
-    val paramArity = instruction.functionType.let {
-        Arity.Argument(it.params.types.size)
-    }
+    val params = instruction.functionType.params.types.size
 
     val label = Stack.Entry.Label(
-        arity = paramArity,
+        arity = params,
         stackInstructionsDepth = stack.instructionsDepth(),
         stackLabelsDepth = stack.labelsDepth(),
-        stackValuesDepth = stack.valuesDepth() - paramArity.value,
+        stackValuesDepth = stack.valuesDepth() - params,
         continuation = listOf(
             loopDispatcher(ControlInstruction.Loop(blockType, instructions)),
         ),

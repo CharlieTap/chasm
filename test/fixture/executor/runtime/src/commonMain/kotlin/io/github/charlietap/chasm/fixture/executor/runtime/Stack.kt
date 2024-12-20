@@ -42,7 +42,7 @@ fun frame(
 )
 
 fun label(
-    arity: Arity.Return = Arity.Return.SIDE_EFFECT,
+    arity: Int = 0,
     stackInstructionsDepth: Int = 0,
     stackLabelsDepth: Int = 0,
     stackValuesDepth: Int = 0,

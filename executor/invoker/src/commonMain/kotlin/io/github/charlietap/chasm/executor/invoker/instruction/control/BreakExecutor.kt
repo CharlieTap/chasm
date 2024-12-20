@@ -31,7 +31,7 @@ internal inline fun BreakExecutor(
 
     stack.shrinkInstructions(0, breakLabel.stackInstructionsDepth)
     stack.shrinkLabels(0, breakLabel.stackLabelsDepth)
-    stack.shrinkValues(breakLabel.arity.value, breakLabel.stackValuesDepth)
+    stack.shrinkValues(breakLabel.arity, breakLabel.stackValuesDepth)
 
     breakLabel.continuation.forEachReversed { instruction ->
         stack.push(instruction)

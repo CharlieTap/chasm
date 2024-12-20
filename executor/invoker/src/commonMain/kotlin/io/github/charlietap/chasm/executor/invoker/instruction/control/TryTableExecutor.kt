@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
@@ -27,19 +26,14 @@ internal inline fun TryTableExecutor(
 
     val (stack) = context
 
-    val paramArity = instruction.functionType.let {
-        Arity.Argument(it.params.types.size)
-    }
-
-    val returnArity = instruction.functionType.let {
-        Arity.Return(it.results.types.size)
-    }
+    val params = instruction.functionType.params.types.size
+    val results = instruction.functionType.results.types.size
 
     val label = Stack.Entry.Label(
-        arity = returnArity,
+        arity = results,
         stackInstructionsDepth = stack.instructionsDepth(),
         stackLabelsDepth = stack.labelsDepth(),
-        stackValuesDepth = stack.valuesDepth() - paramArity.value,
+        stackValuesDepth = stack.valuesDepth() - params,
         continuation = emptyList(),
     )
 

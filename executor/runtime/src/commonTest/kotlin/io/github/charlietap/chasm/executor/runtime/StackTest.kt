@@ -40,11 +40,11 @@ class StackTest {
         val stack = stack()
 
         val label1 = label(
-            arity = returnArity(1),
+            arity = 1,
         )
 
         val label2 = label(
-            arity = returnArity(2),
+            arity = 2,
         )
 
         stack.push(label1)
