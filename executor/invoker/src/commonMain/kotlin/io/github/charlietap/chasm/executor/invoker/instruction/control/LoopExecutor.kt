@@ -29,7 +29,6 @@ internal inline fun LoopExecutor(
 ): Result<Unit, InvocationError> = binding {
 
     val (stack) = context
-    val (blockType, instructions) = instruction
     val params = instruction.functionType.params.types.size
 
     val label = Stack.Entry.Label(
@@ -38,9 +37,9 @@ internal inline fun LoopExecutor(
         stackLabelsDepth = stack.labelsDepth(),
         stackValuesDepth = stack.valuesDepth() - params,
         continuation = listOf(
-            loopDispatcher(ControlInstruction.Loop(blockType, instructions)),
+            loopDispatcher(instruction),
         ),
     )
 
-    instructionBlockExecutor(stack, label, instructions, null).bind()
+    instructionBlockExecutor(stack, label, instruction.instructions, null).bind()
 }
