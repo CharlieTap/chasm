@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddr
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.wasmFunctionCallRuntimeInstruction
-import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.thread
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
@@ -55,7 +54,7 @@ class FunctionInvokerTest {
 
         val thread = thread(
             frame(
-                arity = returnArity(functionType.results.types.size),
+                arity = functionType.results.types.size,
                 locals = locals,
                 instance = moduleInstance,
             ),

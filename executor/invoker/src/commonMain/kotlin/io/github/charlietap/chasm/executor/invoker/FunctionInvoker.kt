@@ -5,9 +5,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.WasmFunctionCallDispatcher
-import io.github.charlietap.chasm.executor.invoker.ext.functionType
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.Thread
@@ -47,14 +45,14 @@ internal inline fun FunctionInvoker(
 
     if (index == -1) Err(InvocationError.InvalidAddress).bind<List<ExecutionValue>>()
 
-    val functionType = function.functionType().bind()
+    val arity = function.functionType.results.types.size
     val instruction = callDispatcher(
         ControlInstruction.WasmFunctionCall(function),
     )
 
     val thread = Thread(
         frame = Stack.Entry.ActivationFrame(
-            arity = Arity.Return(functionType.results.types.size),
+            arity = arity,
             instance = function.module,
             locals = values.toMutableList(),
             stackHandlersDepth = 0,

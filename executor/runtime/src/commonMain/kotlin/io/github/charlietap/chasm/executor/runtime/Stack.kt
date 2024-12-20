@@ -181,7 +181,7 @@ data class Stack(
         ) : Entry
 
         data class ActivationFrame(
-            val arity: Arity.Return,
+            val arity: Int,
             val instance: ModuleInstance,
             var locals: MutableList<ExecutionValue>,
             val stackHandlersDepth: Int,

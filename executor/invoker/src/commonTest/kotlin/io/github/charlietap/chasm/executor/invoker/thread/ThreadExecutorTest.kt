@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.configuration
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.thread
 import io.github.charlietap.chasm.fixture.executor.runtime.value
@@ -24,7 +23,7 @@ class ThreadExecutorTest {
         val locals = mutableListOf<ExecutionValue>(i32(2), i32(3))
 
         val frame = frame(
-            arity = returnArity(1),
+            arity = 1,
             locals = locals,
             instance = moduleInstance(),
         )

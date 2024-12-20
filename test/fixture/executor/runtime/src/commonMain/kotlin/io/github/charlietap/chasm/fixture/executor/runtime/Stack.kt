@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.fixture.executor.runtime
 
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
@@ -24,7 +23,7 @@ fun stack(
 )
 
 fun frame(
-    arity: Arity.Return = Arity.Return.SIDE_EFFECT,
+    arity: Int = 0,
     instance: ModuleInstance = moduleInstance(),
     locals: MutableList<ExecutionValue> = mutableListOf(),
     stackHandlersDepth: Int = 0,

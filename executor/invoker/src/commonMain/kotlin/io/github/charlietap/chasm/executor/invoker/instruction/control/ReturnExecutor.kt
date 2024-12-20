@@ -18,5 +18,5 @@ internal inline fun ReturnExecutor(
     stack.shrinkHandlers(0, frame.stackHandlersDepth)
     stack.shrinkLabels(0, frame.stackLabelsDepth)
     stack.shrinkInstructions(0, frame.stackInstructionsDepth)
-    stack.shrinkValues(frame.arity.value, frame.stackValuesDepth)
+    stack.shrinkValues(frame.arity, frame.stackValuesDepth)
 }

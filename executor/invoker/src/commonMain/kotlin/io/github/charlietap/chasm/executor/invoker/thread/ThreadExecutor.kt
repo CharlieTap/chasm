@@ -48,7 +48,7 @@ internal fun ThreadExecutor(
         instruction(context).bind()
     }
 
-    val results = List(thread.frame.arity.value) {
+    val results = List(thread.frame.arity) {
         stack.popValue().bind().value
     }.asReversed()
 

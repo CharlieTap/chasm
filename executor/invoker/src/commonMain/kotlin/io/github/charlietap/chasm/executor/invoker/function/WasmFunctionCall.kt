@@ -5,7 +5,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -50,7 +49,7 @@ internal inline fun WasmFunctionCall(
     }
 
     val frame = Stack.Entry.ActivationFrame(
-        arity = Arity.Return(results),
+        arity = results,
         stackHandlersDepth = stack.handlersDepth(),
         stackInstructionsDepth = stack.instructionsDepth(),
         stackLabelsDepth = stack.labelsDepth(),

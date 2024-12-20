@@ -26,7 +26,7 @@ class ExpressionEvaluatorTest {
 
         val thread = thread(
             frame(
-                arity = returnArity(1),
+                arity = 1,
                 locals = mutableListOf(),
                 instance = instance,
             ),
@@ -60,7 +60,7 @@ class ExpressionEvaluatorTest {
 
         val thread = thread(
             frame(
-                arity = Arity.Return.SIDE_EFFECT,
+                arity = 0,
                 locals = mutableListOf(),
                 instance = instance,
             ),

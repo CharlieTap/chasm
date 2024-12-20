@@ -39,7 +39,7 @@ internal inline fun ExpressionEvaluator(
 
     val thread = Thread(
         frame = Stack.Entry.ActivationFrame(
-            arity = arity,
+            arity = arity.value,
             locals = mutableListOf(),
             instance = instance,
             stackHandlersDepth = 0,

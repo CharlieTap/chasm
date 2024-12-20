@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.runtime
 
 import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.label
-import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
@@ -17,11 +16,11 @@ class StackTest {
         val stack = stack()
 
         val frame1 = frame(
-            arity = returnArity(1),
+            arity = 1,
         )
 
         val frame2 = frame(
-            arity = returnArity(2),
+            arity = 2,
         )
 
         stack.push(frame1)

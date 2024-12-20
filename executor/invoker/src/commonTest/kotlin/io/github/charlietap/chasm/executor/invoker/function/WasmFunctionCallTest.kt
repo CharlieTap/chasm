@@ -25,7 +25,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpre
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.label
-import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
@@ -105,7 +104,7 @@ class WasmFunctionCallTest {
         ).toMutableList()
 
         val frame = frame(
-            arity = returnArity(functionType.results.types.size),
+            arity = functionType.results.types.size,
             locals = locals,
             instance = functionInstance.module,
         )
@@ -199,7 +198,7 @@ class WasmFunctionCallTest {
         ).toMutableList()
 
         val frame = frame(
-            arity = returnArity(functionType.results.types.size),
+            arity = functionType.results.types.size,
             locals = locals,
             instance = functionInstance.module,
         )
