@@ -9,7 +9,13 @@ plugins {
 val libs = the<LibrariesForLibs>()
 
 fun KotlinMultiplatformExtension.unixTargets() = setOf(
-    macosArm64(),
+    macosArm64 {
+        binaries {
+            test(listOf(RELEASE)) {
+
+            }
+        }
+    },
     macosX64(),
     iosArm64(),
     iosSimulatorArm64(),
