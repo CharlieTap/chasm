@@ -14,11 +14,11 @@ import io.github.charlietap.chasm.fixture.ast.type.definedType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.mutableFieldType
 import io.github.charlietap.chasm.fixture.ast.type.valueStorageType
-import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander

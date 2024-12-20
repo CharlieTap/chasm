@@ -13,10 +13,10 @@ import io.github.charlietap.chasm.fixture.ast.type.mutableFieldType
 import io.github.charlietap.chasm.fixture.ast.type.recursiveType
 import io.github.charlietap.chasm.fixture.ast.type.valueStorageType
 import io.github.charlietap.chasm.fixture.ast.type.varMutability
-import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.fieldValue

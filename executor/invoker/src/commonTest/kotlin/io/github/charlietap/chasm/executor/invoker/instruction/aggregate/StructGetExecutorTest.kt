@@ -10,10 +10,10 @@ import io.github.charlietap.chasm.fixture.ast.type.definedType
 import io.github.charlietap.chasm.fixture.ast.type.fieldType
 import io.github.charlietap.chasm.fixture.ast.type.structCompositeType
 import io.github.charlietap.chasm.fixture.ast.type.structType
-import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.structInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.executionValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.fieldValue

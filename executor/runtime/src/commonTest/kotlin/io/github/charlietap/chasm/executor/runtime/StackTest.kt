@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.runtime
 
-import io.github.charlietap.chasm.fixture.executor.runtime.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.label
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
