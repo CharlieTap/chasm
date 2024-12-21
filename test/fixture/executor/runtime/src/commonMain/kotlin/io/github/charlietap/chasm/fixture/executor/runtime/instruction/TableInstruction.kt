@@ -17,9 +17,9 @@ fun tableGetRuntimeInstruction(
 )
 
 fun tableSetRuntimeInstruction(
-    tableIdx: TableIndex = tableIndex(),
+    table: TableInstance = tableInstance(),
 ) = TableInstruction.TableSet(
-    tableIdx = tableIdx,
+    table = table,
 )
 
 fun tableInitRuntimeInstruction(

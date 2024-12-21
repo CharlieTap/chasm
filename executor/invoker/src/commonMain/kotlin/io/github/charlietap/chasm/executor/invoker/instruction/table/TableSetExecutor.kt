@@ -5,11 +5,8 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.table
-import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal inline fun TableSetExecutor(
@@ -17,13 +14,8 @@ internal inline fun TableSetExecutor(
     instruction: TableInstruction.TableSet,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
-
-    val frame = stack.peekFrame().bind()
-    val tableAddress = frame.instance
-        .tableAddress(instruction.tableIdx)
-        .bind()
-    val tableInstance = store.table(tableAddress).bind()
+    val (stack) = context
+    val tableInstance = instruction.table
 
     val value = stack.popReference().bind()
     val elementIndex = stack.popI32().bind()

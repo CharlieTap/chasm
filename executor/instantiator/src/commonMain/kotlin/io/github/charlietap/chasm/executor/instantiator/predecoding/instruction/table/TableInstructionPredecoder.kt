@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableCopyDispa
 import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableFillDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableGrowDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableInitDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableSetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableSizeDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
@@ -20,7 +19,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableFill
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableGrow
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableInit
-import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableSet
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableSize
 
 internal fun TableInstructionPredecoder(
@@ -31,7 +29,7 @@ internal fun TableInstructionPredecoder(
         context = context,
         instruction = instruction,
         tableGetPredecoder = ::TableGetInstructionPredecoder,
-        tableSetDispatcher = ::TableSetDispatcher,
+        tableSetPredecoder = ::TableSetInstructionPredecoder,
         tableInitDispatcher = ::TableInitDispatcher,
         elemDropDispatcher = ::ElemDropDispatcher,
         tableCopyDispatcher = ::TableCopyDispatcher,
@@ -44,7 +42,7 @@ internal inline fun TableInstructionPredecoder(
     context: InstantiationContext,
     instruction: TableInstruction,
     crossinline tableGetPredecoder: Predecoder<TableInstruction.TableGet, DispatchableInstruction>,
-    crossinline tableSetDispatcher: Dispatcher<TableSet>,
+    crossinline tableSetPredecoder: Predecoder<TableInstruction.TableSet, DispatchableInstruction>,
     crossinline tableInitDispatcher: Dispatcher<TableInit>,
     crossinline elemDropDispatcher: Dispatcher<ElemDrop>,
     crossinline tableCopyDispatcher: Dispatcher<TableCopy>,
@@ -54,7 +52,7 @@ internal inline fun TableInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is TableInstruction.TableGet -> tableGetPredecoder(context, instruction).bind()
-        is TableInstruction.TableSet -> tableSetDispatcher(TableSet(instruction.tableIdx))
+        is TableInstruction.TableSet -> tableSetPredecoder(context, instruction).bind()
         is TableInstruction.TableInit -> tableInitDispatcher(TableInit(instruction.elemIdx, instruction.tableIdx))
         is TableInstruction.ElemDrop -> elemDropDispatcher(ElemDrop(instruction.elemIdx))
         is TableInstruction.TableCopy -> tableCopyDispatcher(TableCopy(instruction.srcTableIdx, instruction.destTableIdx))
