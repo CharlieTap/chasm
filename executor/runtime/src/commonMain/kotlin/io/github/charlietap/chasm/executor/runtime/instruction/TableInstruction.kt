@@ -17,7 +17,7 @@ sealed interface TableInstruction : ExecutionInstruction {
     @JvmInline
     value class ElemDrop(val elemIdx: ElementIndex) : TableInstruction
 
-    data class TableCopy(val srcTableIdx: TableIndex, val destTableIdx: TableIndex) : TableInstruction
+    data class TableCopy(val srcTable: TableInstance, val destTable: TableInstance) : TableInstruction
 
     @JvmInline
     value class TableGrow(val tableIdx: TableIndex) : TableInstruction

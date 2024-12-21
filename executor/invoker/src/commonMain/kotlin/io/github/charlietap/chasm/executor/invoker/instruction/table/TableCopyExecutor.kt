@@ -5,10 +5,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.table
-import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal fun TableCopyExecutor(
@@ -16,18 +13,10 @@ internal fun TableCopyExecutor(
     instruction: TableInstruction.TableCopy,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val (stack) = context
 
-    val frame = stack.peekFrame().bind()
-    val srcTableAddress = frame.instance
-        .tableAddress(instruction.srcTableIdx)
-        .bind()
-    val srcTableInstance = store.table(srcTableAddress).bind() // taby
-
-    val dstTableAddress = frame.instance
-        .tableAddress(instruction.destTableIdx)
-        .bind()
-    val dstTableInstance = store.table(dstTableAddress).bind() // tabx
+    val srcTableInstance = instruction.srcTable // taby
+    val dstTableInstance = instruction.destTable // tabx
 
     val elementsToCopy = stack.popI32().bind()
     val srcOffset = stack.popI32().bind()

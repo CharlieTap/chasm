@@ -37,11 +37,11 @@ fun elemDropRuntimeInstruction(
 )
 
 fun tableCopyRuntimeInstruction(
-    srcTableIdx: TableIndex = tableIndex(),
-    destTableIdx: TableIndex = tableIndex(),
+    srcTable: TableInstance = tableInstance(),
+    destTable: TableInstance = tableInstance(),
 ) = TableInstruction.TableCopy(
-    srcTableIdx = srcTableIdx,
-    destTableIdx = destTableIdx,
+    srcTable = srcTable,
+    destTable = destTable,
 )
 
 fun tableGrowRuntimeInstruction(
