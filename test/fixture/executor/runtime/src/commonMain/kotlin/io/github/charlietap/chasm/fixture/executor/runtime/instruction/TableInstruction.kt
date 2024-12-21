@@ -24,10 +24,10 @@ fun tableSetRuntimeInstruction(
 
 fun tableInitRuntimeInstruction(
     elemIdx: ElementIndex = elementIndex(),
-    tableIdx: TableIndex = tableIndex(),
+    table: TableInstance = tableInstance(),
 ) = TableInstruction.TableInit(
     elemIdx = elemIdx,
-    tableIdx = tableIdx,
+    table = table,
 )
 
 fun elemDropRuntimeInstruction(

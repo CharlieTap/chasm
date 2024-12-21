@@ -10,8 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.table
-import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal fun TableInitExecutor(
@@ -22,10 +20,7 @@ internal fun TableInitExecutor(
     val (stack, store) = context
 
     val frame = stack.peekFrame().bind()
-    val tableAddress = frame.instance
-        .tableAddress(instruction.tableIdx)
-        .bind()
-    val tableInstance = store.table(tableAddress).bind()
+    val tableInstance = instruction.table
 
     val elementAddress = frame.instance
         .elementAddress(instruction.elemIdx)

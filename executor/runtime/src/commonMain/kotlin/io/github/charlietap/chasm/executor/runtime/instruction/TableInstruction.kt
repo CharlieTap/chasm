@@ -12,7 +12,7 @@ sealed interface TableInstruction : ExecutionInstruction {
     @JvmInline
     value class TableSet(val table: TableInstance) : TableInstruction
 
-    data class TableInit(val elemIdx: ElementIndex, val tableIdx: TableIndex) : TableInstruction
+    data class TableInit(val elemIdx: ElementIndex, val table: TableInstance) : TableInstruction
 
     @JvmInline
     value class ElemDrop(val elemIdx: ElementIndex) : TableInstruction
