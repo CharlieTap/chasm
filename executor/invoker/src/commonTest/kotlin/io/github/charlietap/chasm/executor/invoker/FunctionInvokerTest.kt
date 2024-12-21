@@ -14,9 +14,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddr
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.wasmFunctionCallRuntimeInstruction
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.thread
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
@@ -51,17 +49,6 @@ class FunctionInvokerTest {
             assertEquals(wasmFunctionCallRuntimeInstruction(functionInstance), instruction)
             callDispatchable
         }
-
-        val thread = thread(
-            frame(
-                arity = functionType.results.types.size,
-                locals = locals,
-                instance = moduleInstance,
-            ),
-            arrayOf(
-                callDispatchable,
-            ),
-        )
 
         val threadExecutor: ThreadExecutor = { config ->
             Ok(listOf(i32(117)))
