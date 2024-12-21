@@ -58,7 +58,7 @@ internal inline fun BlockExecutor(
             labels = stack.labelsDepth(),
             values = stack.valuesDepth() - params,
         ),
-        continuation = emptyList(),
+        continuation = null,
     )
 
     instructionBlockExecutor(stack, label, instructions, null).bind()

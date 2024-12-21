@@ -37,7 +37,7 @@ internal inline fun TryTableExecutor(
             labels = stack.labelsDepth(),
             values = stack.valuesDepth() - params,
         ),
-        continuation = emptyList(),
+        continuation = null,
     )
 
     val handler = ExceptionHandler(

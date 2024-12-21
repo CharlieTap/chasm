@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -34,7 +33,7 @@ internal inline fun BreakExecutor(
     stack.shrinkLabels(0, depths.labels)
     stack.shrinkValues(breakLabel.arity, depths.values)
 
-    breakLabel.continuation.forEachReversed { instruction ->
-        stack.push(instruction)
+    breakLabel.continuation?.let { continuation ->
+        stack.push(continuation)
     }
 }

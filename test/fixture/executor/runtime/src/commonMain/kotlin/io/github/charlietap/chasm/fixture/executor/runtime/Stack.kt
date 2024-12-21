@@ -26,7 +26,7 @@ fun stack(
 fun label(
     arity: Int = 0,
     depths: StackDepths = stackDepths(),
-    continuation: List<DispatchableInstruction> = emptyList(),
+    continuation: DispatchableInstruction? = null,
 ) = Stack.Entry.Label(
     arity = arity,
     depths = depths,

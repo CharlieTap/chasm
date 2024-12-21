@@ -63,7 +63,7 @@ internal inline fun WasmFunctionCall(
     val label = Stack.Entry.Label(
         arity = results,
         depths = depths,
-        continuation = emptyList(),
+        continuation = null,
     )
 
     instructionBlockExecutor(stack, label, instance.function.body.instructions, null).bind()

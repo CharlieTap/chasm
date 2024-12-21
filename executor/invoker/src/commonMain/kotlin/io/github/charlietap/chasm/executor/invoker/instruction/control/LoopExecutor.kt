@@ -39,9 +39,7 @@ internal inline fun LoopExecutor(
             labels = stack.labelsDepth(),
             values = stack.valuesDepth() - params,
         ),
-        continuation = listOf(
-            loopDispatcher(instruction),
-        ),
+        continuation = loopDispatcher(instruction),
     )
 
     instructionBlockExecutor(stack, label, instruction.instructions, null).bind()
