@@ -8,12 +8,10 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.table.ElemDropDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableFillDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableSizeDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.ElemDrop
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableFill
-import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableSize
 
 internal fun TableInstructionPredecoder(
     context: InstantiationContext,
@@ -28,7 +26,7 @@ internal fun TableInstructionPredecoder(
         elemDropDispatcher = ::ElemDropDispatcher,
         tableCopyPredecoder = ::TableCopyInstructionPredecoder,
         tableGrowPredecoder = ::TableGrowInstructionPredecoder,
-        tableSizeDispatcher = ::TableSizeDispatcher,
+        tableSizePredecoder = ::TableSizeInstructionPredecoder,
         tableFillDispatcher = ::TableFillDispatcher,
     )
 
@@ -41,7 +39,7 @@ internal inline fun TableInstructionPredecoder(
     crossinline elemDropDispatcher: Dispatcher<ElemDrop>,
     crossinline tableCopyPredecoder: Predecoder<TableInstruction.TableCopy, DispatchableInstruction>,
     crossinline tableGrowPredecoder: Predecoder<TableInstruction.TableGrow, DispatchableInstruction>,
-    crossinline tableSizeDispatcher: Dispatcher<TableSize>,
+    crossinline tableSizePredecoder: Predecoder<TableInstruction.TableSize, DispatchableInstruction>,
     crossinline tableFillDispatcher: Dispatcher<TableFill>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
@@ -51,7 +49,7 @@ internal inline fun TableInstructionPredecoder(
         is TableInstruction.ElemDrop -> elemDropDispatcher(ElemDrop(instruction.elemIdx))
         is TableInstruction.TableCopy -> tableCopyPredecoder(context, instruction).bind()
         is TableInstruction.TableGrow -> tableGrowPredecoder(context, instruction).bind()
-        is TableInstruction.TableSize -> tableSizeDispatcher(TableSize(instruction.tableIdx))
+        is TableInstruction.TableSize -> tableSizePredecoder(context, instruction).bind()
         is TableInstruction.TableFill -> tableFillDispatcher(TableFill(instruction.tableIdx))
     }
 }

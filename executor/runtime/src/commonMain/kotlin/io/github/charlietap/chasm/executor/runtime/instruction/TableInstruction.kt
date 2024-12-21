@@ -23,7 +23,7 @@ sealed interface TableInstruction : ExecutionInstruction {
     value class TableGrow(val table: TableInstance) : TableInstruction
 
     @JvmInline
-    value class TableSize(val tableIdx: TableIndex) : TableInstruction
+    value class TableSize(val table: TableInstance) : TableInstruction
 
     @JvmInline
     value class TableFill(val tableIdx: TableIndex) : TableInstruction

@@ -51,9 +51,9 @@ fun tableGrowRuntimeInstruction(
 )
 
 fun tableSizeRuntimeInstruction(
-    tableIdx: TableIndex = tableIndex(),
+    table: TableInstance = tableInstance(),
 ) = TableInstruction.TableSize(
-    tableIdx = tableIdx,
+    table = table,
 )
 
 fun tableFillRuntimeInstruction(
