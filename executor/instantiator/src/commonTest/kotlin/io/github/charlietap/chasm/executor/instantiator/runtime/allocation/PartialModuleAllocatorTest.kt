@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
-import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.fixture.ast.module.dataSegment
@@ -27,7 +25,6 @@ import io.github.charlietap.chasm.fixture.ast.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
@@ -41,7 +38,6 @@ import io.github.charlietap.chasm.type.ext.definedType
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
 
 class PartialModuleAllocatorTest {
@@ -100,13 +96,6 @@ class PartialModuleAllocatorTest {
             Ok(imports.map(Import::externalValue))
         }
 
-        val functionPredecoder: Predecoder<Function, RuntimeFunction> = { _context, _function ->
-            assertEquals(context, _context)
-            assertEquals(function, _function)
-
-            Ok(runtimeFunction())
-        }
-
         val expected = ModuleInstance(
             types = listOf(type.recursiveType.definedType()),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
@@ -124,7 +113,6 @@ class PartialModuleAllocatorTest {
             wasmFunctionAllocator = ::WasmFunctionAllocator,
             typeAllocator = ::DefinedTypeFactory,
             importMatcher = importMatcher,
-            functionPredecoder = functionPredecoder,
         )
 
         assertEquals(Ok(expected), actual)

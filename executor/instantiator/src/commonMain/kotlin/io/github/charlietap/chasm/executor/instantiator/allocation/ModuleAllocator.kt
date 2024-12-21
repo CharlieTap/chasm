@@ -8,6 +8,7 @@ import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Export
+import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
@@ -16,6 +17,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAl
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.predecoding.ExpressionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.FunctionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
@@ -28,12 +30,16 @@ import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addMemoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addTableAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
+import io.github.charlietap.chasm.executor.runtime.ext.function
+import io.github.charlietap.chasm.executor.runtime.ext.functionAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import kotlin.jvm.JvmName
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
 
 internal typealias ModuleAllocator = (InstantiationContext, ModuleInstance, List<ReferenceValue>) -> Result<ModuleInstance, ModuleTrapError>
 
@@ -54,6 +60,7 @@ internal fun ModuleAllocator(
         elementAllocator = ::ElementAllocator,
         dataAllocator = ::DataAllocator,
         expressionPredecoder = ::ExpressionPredecoder,
+        functionPredecoder = ::FunctionPredecoder,
     )
 
 internal inline fun ModuleAllocator(
@@ -68,6 +75,7 @@ internal inline fun ModuleAllocator(
     crossinline elementAllocator: ElementAllocator,
     crossinline dataAllocator: DataAllocator,
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
+    crossinline functionPredecoder: Predecoder<Function, RuntimeFunction>,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val (store, module) = context
@@ -134,6 +142,15 @@ internal inline fun ModuleAllocator(
         }
 
         instance.addExport(ExportInstance(export.name, externalValue))
+    }
+
+    module.functions.forEach { function ->
+
+        val predecoded = functionPredecoder(context, function).bind()
+        val address = instance.functionAddress(function.idx).bind()
+        val functionInstance = context.store.function(address).bind() as FunctionInstance.WasmFunction
+
+        functionInstance.function = predecoded
     }
 
     instance

@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.ast.instruction.Expression
+import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
@@ -9,7 +11,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.global.Global
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
-import io.github.charlietap.chasm.executor.instantiator.predecoding.ExpressionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.dataSegment
@@ -36,6 +38,8 @@ import io.github.charlietap.chasm.fixture.ast.type.heapType
 import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.ast.value.nameValue
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.exportInstance
@@ -49,6 +53,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
@@ -56,13 +61,14 @@ import io.github.charlietap.chasm.type.ext.definedType
 import io.github.charlietap.chasm.type.ext.recursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
 
 class ModuleAllocatorTest {
 
     @Test
     fun `can allocate a module instance`() {
 
-        val store = store()
         val functionType = functionType()
         val typeIndex = typeIndex(0u)
         val function =
@@ -130,6 +136,11 @@ class ModuleAllocatorTest {
             elementSegments = listOf(elementSegment),
             dataSegments = listOf(dataSegment),
             exports = exports,
+        )
+        val store = store(
+            functions = mutableListOf(
+                wasmFunctionInstance(),
+            ),
         )
         val context = instantiationContext(store, module)
 
@@ -199,6 +210,19 @@ class ModuleAllocatorTest {
             Ok(expressionValues.next())
         }
 
+        val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _ ->
+            assertEquals(context, _context)
+
+            Ok(runtimeExpression())
+        }
+
+        val functionPredecoder: Predecoder<Function, RuntimeFunction> = { _context, _function ->
+            assertEquals(context, _context)
+            assertEquals(function, _function)
+
+            Ok(runtimeFunction())
+        }
+
         val expected = moduleInstance(
             types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
@@ -226,7 +250,8 @@ class ModuleAllocatorTest {
             globalAllocator = globalAllocator,
             elementAllocator = elementAllocator,
             dataAllocator = dataAllocator,
-            expressionPredecoder = ::ExpressionPredecoder,
+            expressionPredecoder = expressionPredecoder,
+            functionPredecoder = functionPredecoder,
         )
 
         assertEquals(Ok(expected), actual)
