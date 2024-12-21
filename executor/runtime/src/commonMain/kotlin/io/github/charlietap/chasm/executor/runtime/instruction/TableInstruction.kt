@@ -2,11 +2,12 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index.ElementIndex
 import io.github.charlietap.chasm.ast.module.Index.TableIndex
+import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import kotlin.jvm.JvmInline
 
 sealed interface TableInstruction : ExecutionInstruction {
     @JvmInline
-    value class TableGet(val tableIdx: TableIndex) : TableInstruction
+    value class TableGet(val table: TableInstance) : TableInstruction
 
     @JvmInline
     value class TableSet(val tableIdx: TableIndex) : TableInstruction

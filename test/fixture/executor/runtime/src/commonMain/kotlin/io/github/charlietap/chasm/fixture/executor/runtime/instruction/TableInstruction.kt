@@ -2,16 +2,18 @@ package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index.ElementIndex
 import io.github.charlietap.chasm.ast.module.Index.TableIndex
+import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 import io.github.charlietap.chasm.fixture.ast.module.elementIndex
 import io.github.charlietap.chasm.fixture.ast.module.tableIndex
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 
 fun tableRuntimeInstruction(): TableInstruction = tableGetRuntimeInstruction()
 
 fun tableGetRuntimeInstruction(
-    tableIdx: TableIndex = tableIndex(),
+    table: TableInstance = tableInstance(),
 ) = TableInstruction.TableGet(
-    tableIdx = tableIdx,
+    table = table,
 )
 
 fun tableSetRuntimeInstruction(
