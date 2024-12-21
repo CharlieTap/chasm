@@ -4,9 +4,8 @@ import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 data class ElementInstance(
-    val type: ReferenceType,
-    val elements: Array<ReferenceValue>,
-    val dropped: Boolean = false,
+    var type: ReferenceType,
+    var elements: Array<ReferenceValue>,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -16,7 +15,6 @@ data class ElementInstance(
 
         if (type != other.type) return false
         if (!elements.contentEquals(other.elements)) return false
-        if (dropped != other.dropped) return false
 
         return true
     }
@@ -24,7 +22,6 @@ data class ElementInstance(
     override fun hashCode(): Int {
         var result = type.hashCode()
         result = 31 * result + elements.contentHashCode()
-        result = 31 * result + dropped.hashCode()
         return result
     }
 }

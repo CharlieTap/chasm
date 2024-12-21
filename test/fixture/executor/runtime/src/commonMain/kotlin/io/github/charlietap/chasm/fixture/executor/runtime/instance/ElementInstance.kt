@@ -7,10 +7,8 @@ import io.github.charlietap.chasm.fixture.ast.type.referenceType
 
 fun elementInstance(
     type: ReferenceType = referenceType(),
-    elements: Array<ReferenceValue> = arrayOf(),
-    dropped: Boolean = false,
+    elements: Array<ReferenceValue> = emptyArray(),
 ) = ElementInstance(
     type = type,
     elements = elements,
-    dropped = dropped,
 )

@@ -21,9 +21,5 @@ internal inline fun ElementDropExecutor(
         .elementAddress(instruction.elemIdx)
         .bind()
     val elementInstance = store.element(elementAddress).bind()
-
-    store.elements[elementAddress.address] = elementInstance.copy(
-        elements = arrayOf(),
-        dropped = true,
-    )
+    elementInstance.elements = emptyArray()
 }
