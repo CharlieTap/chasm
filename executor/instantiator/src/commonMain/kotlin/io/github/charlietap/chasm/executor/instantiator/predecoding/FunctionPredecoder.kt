@@ -27,7 +27,7 @@ internal inline fun FunctionPredecoder(
     RuntimeFunction(
         idx = function.idx,
         typeIndex = function.typeIndex,
-        locals = function.locals,
+        locals = function.locals.toTypedArray(),
         body = expressionPredecoder(context, function.body).bind(),
     )
 }

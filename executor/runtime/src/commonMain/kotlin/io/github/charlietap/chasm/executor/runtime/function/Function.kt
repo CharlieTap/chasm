@@ -7,14 +7,14 @@ import io.github.charlietap.chasm.ast.module.Local
 data class Function(
     val idx: FunctionIndex,
     val typeIndex: TypeIndex,
-    val locals: List<Local>,
+    val locals: Array<Local>,
     val body: Expression,
 ) {
     companion object {
         val TEMP = Function(
             idx = FunctionIndex(0u),
             typeIndex = TypeIndex(0u),
-            locals = emptyList(),
+            locals = emptyArray(),
             body = Expression.EMPTY,
         )
     }
@@ -27,7 +27,7 @@ data class Function(
 
         if (idx != other.idx) return false
         if (typeIndex != other.typeIndex) return false
-        if (locals != other.locals) return false
+        if (!(locals contentEquals other.locals)) return false
         if (!(body.instructions contentEquals other.body.instructions)) return false
 
         return true

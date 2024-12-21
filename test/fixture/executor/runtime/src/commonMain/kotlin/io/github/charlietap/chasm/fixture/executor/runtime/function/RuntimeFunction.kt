@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.function.Function
 fun runtimeFunction(
     idx: Index.FunctionIndex = Index.FunctionIndex(0u),
     typeIndex: Index.TypeIndex = Index.TypeIndex(0u),
-    locals: List<Local> = emptyList(),
+    locals: Array<Local> = emptyArray(),
     body: Expression = runtimeExpression(),
 ) = Function(
     idx = idx,

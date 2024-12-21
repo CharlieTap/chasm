@@ -62,7 +62,7 @@ class WasmFunctionCallTest {
         val definedType = functionType.definedType()
 
         val function = runtimeFunction(
-            locals = listOf(
+            locals = arrayOf(
                 local(
                     type = referenceValueType(
                         refNullReferenceType(AbstractHeapType.Func),
@@ -164,7 +164,7 @@ class WasmFunctionCallTest {
         val definedType = functionType.definedType()
 
         val function = runtimeFunction(
-            locals = listOf(
+            locals = arrayOf(
                 local(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
             ),
             body = runtimeExpression(
