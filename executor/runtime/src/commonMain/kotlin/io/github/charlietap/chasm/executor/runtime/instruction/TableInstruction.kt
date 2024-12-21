@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index.ElementIndex
-import io.github.charlietap.chasm.ast.module.Index.TableIndex
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import kotlin.jvm.JvmInline
 
@@ -26,5 +25,5 @@ sealed interface TableInstruction : ExecutionInstruction {
     value class TableSize(val table: TableInstance) : TableInstruction
 
     @JvmInline
-    value class TableFill(val tableIdx: TableIndex) : TableInstruction
+    value class TableFill(val table: TableInstance) : TableInstruction
 }
