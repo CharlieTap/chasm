@@ -7,9 +7,6 @@ import io.github.charlietap.chasm.executor.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.contains
-import io.github.charlietap.chasm.executor.runtime.ext.memory
-import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
@@ -29,16 +26,10 @@ internal inline fun MemoryCopyExecutor(
     crossinline copier: LinearMemoryCopier,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
-    val frame = stack.peekFrame().bind()
-    val srcMemoryAddress = frame.instance
-        .memoryAddress(instruction.srcIndex)
-        .bind()
-    val srcMemory = store.memory(srcMemoryAddress).bind()
-    val dstMemoryAddress = frame.instance
-        .memoryAddress(instruction.dstIndex)
-        .bind()
-    val dstMemory = store.memory(dstMemoryAddress).bind()
+    val stack = context.stack
+
+    val srcMemory = instruction.srcMemory
+    val dstMemory = instruction.dstMemory
 
     val bytesToCopy = stack.popI32().bind()
     val sourceOffset = stack.popI32().bind()

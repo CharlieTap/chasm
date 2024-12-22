@@ -65,7 +65,7 @@ sealed interface MemoryInstruction : ExecutionInstruction {
     @JvmInline
     value class DataDrop(val data: DataInstance) : MemoryInstruction
 
-    data class MemoryCopy(val srcIndex: Index.MemoryIndex, val dstIndex: Index.MemoryIndex) : MemoryInstruction
+    data class MemoryCopy(val srcMemory: MemoryInstance, val dstMemory: MemoryInstance) : MemoryInstruction
 
     @JvmInline
     value class MemoryFill(val memoryIndex: Index.MemoryIndex) : MemoryInstruction

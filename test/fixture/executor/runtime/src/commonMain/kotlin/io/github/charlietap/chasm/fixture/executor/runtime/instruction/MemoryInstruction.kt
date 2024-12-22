@@ -220,9 +220,9 @@ fun dataDropRuntimeInstruction(
 )
 
 fun memoryCopyRuntimeInstruction(
-    srcMemoryIndex: Index.MemoryIndex = memoryIndex(),
-    dstMemoryIndex: Index.MemoryIndex = memoryIndex(),
-) = MemoryInstruction.MemoryCopy(srcMemoryIndex, dstMemoryIndex)
+    srcMemory: MemoryInstance = memoryInstance(),
+    dstMemory: MemoryInstance = memoryInstance(),
+) = MemoryInstruction.MemoryCopy(srcMemory, dstMemory)
 
 fun memoryFillRuntimeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),
