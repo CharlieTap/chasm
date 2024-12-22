@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.module.Index.ElementIndex
+import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
-import io.github.charlietap.chasm.fixture.ast.module.elementIndex
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 
 fun tableRuntimeInstruction(): TableInstruction = tableGetRuntimeInstruction()
@@ -21,17 +21,17 @@ fun tableSetRuntimeInstruction(
 )
 
 fun tableInitRuntimeInstruction(
-    elemIdx: ElementIndex = elementIndex(),
+    element: ElementInstance = elementInstance(),
     table: TableInstance = tableInstance(),
 ) = TableInstruction.TableInit(
-    elemIdx = elemIdx,
+    element = element,
     table = table,
 )
 
 fun elemDropRuntimeInstruction(
-    elemIdx: ElementIndex = elementIndex(),
+    element: ElementInstance = elementInstance(),
 ) = TableInstruction.ElemDrop(
-    elemIdx = elemIdx,
+    element = element,
 )
 
 fun tableCopyRuntimeInstruction(

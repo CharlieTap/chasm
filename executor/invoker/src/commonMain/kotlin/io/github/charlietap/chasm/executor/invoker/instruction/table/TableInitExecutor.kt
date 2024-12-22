@@ -6,9 +6,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.contains
-import io.github.charlietap.chasm.executor.runtime.ext.element
-import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
@@ -17,15 +14,10 @@ internal fun TableInitExecutor(
     instruction: TableInstruction.TableInit,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val (stack) = context
 
-    val frame = stack.peekFrame().bind()
     val tableInstance = instruction.table
-
-    val elementAddress = frame.instance
-        .elementAddress(instruction.elemIdx)
-        .bind()
-    val elementInstance = store.element(elementAddress).bind()
+    val elementInstance = instruction.element
 
     val elementsToInitialise = stack.popI32().bind()
     val segmentOffset = stack.popI32().bind()

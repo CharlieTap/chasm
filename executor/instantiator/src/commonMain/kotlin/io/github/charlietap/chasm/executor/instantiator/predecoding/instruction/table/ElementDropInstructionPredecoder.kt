@@ -6,38 +6,32 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.table.TableInitDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.table.ElemDropDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
-import io.github.charlietap.chasm.executor.runtime.ext.table
-import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
-import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableInit
+import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.ElemDrop
 
-internal fun TableInitInstructionPredecoder(
+internal fun ElementDropInstructionPredecoder(
     context: InstantiationContext,
-    instruction: TableInstruction.TableInit,
+    instruction: TableInstruction.ElemDrop,
 ): Result<DispatchableInstruction, ModuleTrapError> =
-    TableInitInstructionPredecoder(
+    ElementDropInstructionPredecoder(
         context = context,
         instruction = instruction,
-        dispatcher = ::TableInitDispatcher,
+        dispatcher = ::ElemDropDispatcher,
     )
 
-internal inline fun TableInitInstructionPredecoder(
+internal inline fun ElementDropInstructionPredecoder(
     context: InstantiationContext,
-    instruction: TableInstruction.TableInit,
-    crossinline dispatcher: Dispatcher<TableInit>,
+    instruction: TableInstruction.ElemDrop,
+    crossinline dispatcher: Dispatcher<ElemDrop>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val tableAddress = context.instance?.tableAddress(instruction.tableIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
-    val table = context.store.table(tableAddress).bind()
-
     val elementAddress = context.instance?.elementAddress(instruction.elemIdx)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
     val element = context.store.element(elementAddress).bind()
 
-    dispatcher(TableInit(element, table))
+    dispatcher(ElemDrop(element))
 }

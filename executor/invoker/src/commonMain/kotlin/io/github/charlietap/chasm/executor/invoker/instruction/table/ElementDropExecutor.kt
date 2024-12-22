@@ -4,22 +4,11 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.element
-import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal inline fun ElementDropExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.ElemDrop,
 ): Result<Unit, InvocationError> = binding {
-
-    val (stack, store) = context
-
-    val frame = stack.peekFrame().bind()
-    val elementAddress = frame.instance
-        .elementAddress(instruction.elemIdx)
-        .bind()
-    val elementInstance = store.element(elementAddress).bind()
-    elementInstance.elements = emptyArray()
+    instruction.element.elements = emptyArray()
 }
