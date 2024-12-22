@@ -11,6 +11,6 @@ internal inline fun GlobalGetExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction.GlobalGet,
 ): Result<Unit, InvocationError> = binding {
-    val (stack) = context
-    stack.push(Stack.Entry.Value(instruction.global.value))
+    val value = Stack.Entry.Value(instruction.global.value)
+    context.stack.push(value)
 }
