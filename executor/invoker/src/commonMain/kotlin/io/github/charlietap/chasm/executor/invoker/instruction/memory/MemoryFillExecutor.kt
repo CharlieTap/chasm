@@ -7,9 +7,6 @@ import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.fill.LinearMemoryFiller
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.memory
-import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
@@ -31,16 +28,12 @@ internal inline fun MemoryFillExecutor(
     crossinline filler: LinearMemoryFiller,
 ): Result<Unit, InvocationError> = binding {
 
-    val (stack, store) = context
+    val stack = context.stack
     val bytesToFill = stack.popI32().bind()
     val fillValue = stack.popI32().bind()
     val offset = stack.popI32().bind()
 
-    val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.instance
-        .memoryAddress(instruction.memoryIndex)
-        .bind()
-    val memory = store.memory(memoryAddress).bind()
+    val memory = instruction.memory
 
     boundsChecker(offset, bytesToFill, memory.size) {
         filler(memory.data, offset, bytesToFill, fillValue.toByte())

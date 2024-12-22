@@ -225,5 +225,5 @@ fun memoryCopyRuntimeInstruction(
 ) = MemoryInstruction.MemoryCopy(srcMemory, dstMemory)
 
 fun memoryFillRuntimeInstruction(
-    memoryIndex: Index.MemoryIndex = memoryIndex(),
-) = MemoryInstruction.MemoryFill(memoryIndex)
+    memory: MemoryInstance = memoryInstance(),
+) = MemoryInstruction.MemoryFill(memory)

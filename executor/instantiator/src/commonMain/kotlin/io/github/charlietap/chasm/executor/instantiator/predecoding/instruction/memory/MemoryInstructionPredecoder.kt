@@ -29,7 +29,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I64Store16Dis
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I64Store32Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I64Store8Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I64StoreDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryFillDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryInitDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemorySizeDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
@@ -57,7 +56,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.I64Store16
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.I64Store32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.I64Store8
-import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemoryFill
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemoryInit
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemorySize
 
@@ -96,7 +94,7 @@ internal fun MemoryInstructionPredecoder(
         memoryInitDispatcher = ::MemoryInitDispatcher,
         dataDropPredecoder = ::DataDropInstructionPredecoder,
         memoryCopyPredecoder = ::MemoryCopyInstructionPredecoder,
-        memoryFillDispatcher = ::MemoryFillDispatcher,
+        memoryFillPredecoder = ::MemoryFillInstructionPredecoder,
     )
 
 internal inline fun MemoryInstructionPredecoder(
@@ -130,7 +128,7 @@ internal inline fun MemoryInstructionPredecoder(
     crossinline memoryInitDispatcher: Dispatcher<MemoryInit>,
     crossinline dataDropPredecoder: Predecoder<MemoryInstruction.DataDrop, DispatchableInstruction>,
     crossinline memoryCopyPredecoder: Predecoder<MemoryInstruction.MemoryCopy, DispatchableInstruction>,
-    crossinline memoryFillDispatcher: Dispatcher<MemoryFill>,
+    crossinline memoryFillPredecoder: Predecoder<MemoryInstruction.MemoryFill, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is MemoryInstruction.I32Load -> i32LoadDispatcher(I32Load(instruction.memoryIndex, instruction.memArg))
@@ -161,6 +159,6 @@ internal inline fun MemoryInstructionPredecoder(
         is MemoryInstruction.MemoryInit -> memoryInitDispatcher(MemoryInit(instruction.memoryIndex, instruction.dataIndex))
         is MemoryInstruction.DataDrop -> dataDropPredecoder(context, instruction).bind()
         is MemoryInstruction.MemoryCopy -> memoryCopyPredecoder(context, instruction).bind()
-        is MemoryInstruction.MemoryFill -> memoryFillDispatcher(MemoryFill(instruction.memoryIndex))
+        is MemoryInstruction.MemoryFill -> memoryFillPredecoder(context, instruction).bind()
     }
 }
