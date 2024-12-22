@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.module.Index.GlobalIndex
 import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
 import kotlin.jvm.JvmInline
 
@@ -18,5 +17,5 @@ sealed interface VariableInstruction : ExecutionInstruction {
     value class GlobalGet(val global: GlobalInstance) : VariableInstruction
 
     @JvmInline
-    value class GlobalSet(val globalIdx: GlobalIndex) : VariableInstruction
+    value class GlobalSet(val global: GlobalInstance) : VariableInstruction
 }
