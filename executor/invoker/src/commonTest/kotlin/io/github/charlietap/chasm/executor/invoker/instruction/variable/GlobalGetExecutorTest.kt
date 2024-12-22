@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
-import io.github.charlietap.chasm.fixture.ast.module.globalIndex
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -21,7 +20,6 @@ class GlobalGetExecutorTest {
     fun `can execute a global get instruction`() {
 
         val executionValue = i32(117)
-        val globalIndex = globalIndex()
         val globalInstance = globalInstance(
             value = executionValue,
         )
@@ -44,7 +42,7 @@ class GlobalGetExecutorTest {
 
         stack.push(frame)
 
-        val instruction = VariableInstruction.GlobalGet(globalIndex)
+        val instruction = VariableInstruction.GlobalGet(globalInstance)
 
         val expected = Stack.Entry.Value(executionValue)
 

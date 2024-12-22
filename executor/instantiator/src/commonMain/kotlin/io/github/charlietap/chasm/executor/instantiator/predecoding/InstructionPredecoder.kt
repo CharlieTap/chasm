@@ -20,10 +20,10 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.NumericInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.ParametricInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.ReferenceInstructionPredecoder
-import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.VariableInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.VectorInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.control.ControlInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.table.TableInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.variable.VariableInstructionPredecoder
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 
