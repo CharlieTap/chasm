@@ -17,7 +17,7 @@ plugins {
 
 sweet {
     wasmToolsVersion = "1.222.0"
-    testSuiteCommit = "eeb6dac81be81151da0958ed955aba91230c1f25"
+    testSuiteCommit = "68c6f83f331081ba8aaafae3f89ce20d1cc456fb"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm.testsuite"
     proposals = listOf(
