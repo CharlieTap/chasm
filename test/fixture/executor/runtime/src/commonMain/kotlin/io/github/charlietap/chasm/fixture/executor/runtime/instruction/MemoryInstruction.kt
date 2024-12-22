@@ -2,10 +2,12 @@ package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.fixture.ast.instruction.memArg
 import io.github.charlietap.chasm.fixture.ast.module.dataIndex
 import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataInstance
 
 fun memoryRuntimeInstruction(): MemoryInstruction = i32LoadRuntimeInstruction()
 
@@ -210,9 +212,9 @@ fun memoryInitRuntimeInstruction(
 )
 
 fun dataDropRuntimeInstruction(
-    dataIdx: Index.DataIndex = dataIndex(),
+    data: DataInstance = dataInstance(),
 ) = MemoryInstruction.DataDrop(
-    dataIdx = dataIdx,
+    data = data,
 )
 
 fun memoryCopyRuntimeInstruction(

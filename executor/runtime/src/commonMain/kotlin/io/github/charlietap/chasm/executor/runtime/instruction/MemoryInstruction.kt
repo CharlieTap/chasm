@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import kotlin.jvm.JvmInline
 
 sealed interface MemoryInstruction : ExecutionInstruction {
@@ -61,7 +62,7 @@ sealed interface MemoryInstruction : ExecutionInstruction {
     data class MemoryInit(val memoryIndex: Index.MemoryIndex, val dataIndex: Index.DataIndex) : MemoryInstruction
 
     @JvmInline
-    value class DataDrop(val dataIdx: Index.DataIndex) : MemoryInstruction
+    value class DataDrop(val data: DataInstance) : MemoryInstruction
 
     data class MemoryCopy(val srcIndex: Index.MemoryIndex, val dstIndex: Index.MemoryIndex) : MemoryInstruction
 

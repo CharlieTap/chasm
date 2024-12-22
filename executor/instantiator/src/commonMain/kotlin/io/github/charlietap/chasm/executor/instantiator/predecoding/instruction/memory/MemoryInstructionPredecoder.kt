@@ -1,11 +1,11 @@
-package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
+package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memory
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.memory.DataDropDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.F32LoadDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.F32StoreDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.F64LoadDispatcher
@@ -36,7 +36,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryInitDis
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemorySizeDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.DataDrop
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.F32Load
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.F32Store
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.F64Load
@@ -99,7 +98,7 @@ internal fun MemoryInstructionPredecoder(
         memorySizeDispatcher = ::MemorySizeDispatcher,
         memoryGrowDispatcher = ::MemoryGrowDispatcher,
         memoryInitDispatcher = ::MemoryInitDispatcher,
-        dataDropDispatcher = ::DataDropDispatcher,
+        dataDropPredecoder = ::DataDropInstructionPredecoder,
         memoryCopyDispatcher = ::MemoryCopyDispatcher,
         memoryFillDispatcher = ::MemoryFillDispatcher,
     )
@@ -133,7 +132,7 @@ internal inline fun MemoryInstructionPredecoder(
     crossinline memorySizeDispatcher: Dispatcher<MemorySize>,
     crossinline memoryGrowDispatcher: Dispatcher<MemoryGrow>,
     crossinline memoryInitDispatcher: Dispatcher<MemoryInit>,
-    crossinline dataDropDispatcher: Dispatcher<DataDrop>,
+    crossinline dataDropPredecoder: Predecoder<MemoryInstruction.DataDrop, DispatchableInstruction>,
     crossinline memoryCopyDispatcher: Dispatcher<MemoryCopy>,
     crossinline memoryFillDispatcher: Dispatcher<MemoryFill>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
@@ -164,7 +163,7 @@ internal inline fun MemoryInstructionPredecoder(
         is MemoryInstruction.MemorySize -> memorySizeDispatcher(MemorySize(instruction.memoryIndex))
         is MemoryInstruction.MemoryGrow -> memoryGrowDispatcher(MemoryGrow(instruction.memoryIndex))
         is MemoryInstruction.MemoryInit -> memoryInitDispatcher(MemoryInit(instruction.memoryIndex, instruction.dataIndex))
-        is MemoryInstruction.DataDrop -> dataDropDispatcher(DataDrop(instruction.dataIdx))
+        is MemoryInstruction.DataDrop -> dataDropPredecoder(context, instruction).bind()
         is MemoryInstruction.MemoryCopy -> memoryCopyDispatcher(MemoryCopy(instruction.srcIndex, instruction.dstIndex))
         is MemoryInstruction.MemoryFill -> memoryFillDispatcher(MemoryFill(instruction.memoryIndex))
     }
