@@ -29,7 +29,7 @@ dokka="1.9.20"
 
 gradle-maven-publish-plugin = "0.30.0"
 
-hilt-core = "2.50"
+hilt-core = "2.54"
 hilt-integrations = "1.2.0"
 
 junit = "4.13.2"
