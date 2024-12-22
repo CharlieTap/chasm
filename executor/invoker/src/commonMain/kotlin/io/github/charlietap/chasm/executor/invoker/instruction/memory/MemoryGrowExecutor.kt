@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.executor.memory.grow.LinearMemoryGrower
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -43,10 +42,7 @@ internal inline fun MemoryGrowExecutor(
         stack.push(Stack.Entry.Value(NumberValue.I32(-1)))
     } else {
 
-        val newLimits = memory.type.limits.copy(
-            min = memory.type.limits.min + pagesToAdd.toUInt(),
-        )
-        memory.type = MemoryType(newLimits, memory.type.shared)
+        memory.type.limits.min = memory.type.limits.min + pagesToAdd.toUInt()
         memory.data = grower(memory.data, pagesToAdd).bind()
         memory.refresh()
 
