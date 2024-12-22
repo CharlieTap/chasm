@@ -31,11 +31,10 @@ internal fun TableCopyExecutor(
         Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
     }
 
-    val step = if (dstOffset <= srcOffset) 1 else -1
-    val start = if (dstOffset <= srcOffset) 0 else elementsToCopy - 1
-
-    repeat(elementsToCopy) { i ->
-        val index = start + i * step
-        dstTableInstance.elements[dstOffset + index] = srcTableInstance.elements[srcOffset + index]
-    }
+    srcTableInstance.elements.copyInto(
+        destination = dstTableInstance.elements,
+        destinationOffset = dstOffset,
+        startIndex = srcOffset,
+        endIndex = srcOffset + elementsToCopy,
+    )
 }
