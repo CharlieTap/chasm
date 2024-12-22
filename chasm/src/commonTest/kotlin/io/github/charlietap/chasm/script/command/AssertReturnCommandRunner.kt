@@ -43,6 +43,7 @@ fun AssertReturnCommandRunner(
             }
         }
         is ActionResult.Failure -> {
+            println(result)
             CommandResult.Failure(command, result.reason)
         }
     }

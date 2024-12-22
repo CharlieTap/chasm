@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.invoker.instruction.memory.MemoryGrow
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
-import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
@@ -44,16 +43,16 @@ class MemoryGrowInstructionBenchmark {
         instance = moduleInstance(),
     )
 
-    private val instruction = memoryGrowRuntimeInstruction(
-        memoryIndex = memoryIndex(0u),
-    )
-
     private val memoryInstance = memoryInstance(
         type = memoryType(
             limits = limits(1u),
             shared = unsharedStatus(),
         ),
         data = LinearMemoryFactory(LinearMemory.Pages(1u)),
+    )
+
+    private val instruction = memoryGrowRuntimeInstruction(
+        memory = memoryInstance,
     )
 
     private val frame = frame(

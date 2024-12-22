@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
+import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import kotlin.jvm.JvmInline
 
 sealed interface MemoryInstruction : ExecutionInstruction {
@@ -57,7 +58,7 @@ sealed interface MemoryInstruction : ExecutionInstruction {
     value class MemorySize(val memoryIndex: Index.MemoryIndex) : MemoryInstruction
 
     @JvmInline
-    value class MemoryGrow(val memoryIndex: Index.MemoryIndex) : MemoryInstruction
+    value class MemoryGrow(val memory: MemoryInstance) : MemoryInstruction
 
     data class MemoryInit(val memoryIndex: Index.MemoryIndex, val dataIndex: Index.DataIndex) : MemoryInstruction
 

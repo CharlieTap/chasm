@@ -3,11 +3,13 @@ package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
+import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.fixture.ast.instruction.memArg
 import io.github.charlietap.chasm.fixture.ast.module.dataIndex
 import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
 
 fun memoryRuntimeInstruction(): MemoryInstruction = i32LoadRuntimeInstruction()
 
@@ -200,8 +202,8 @@ fun memorySizeRuntimeInstruction(
 ) = MemoryInstruction.MemorySize(memoryIndex)
 
 fun memoryGrowRuntimeInstruction(
-    memoryIndex: Index.MemoryIndex = memoryIndex(),
-) = MemoryInstruction.MemoryGrow(memoryIndex)
+    memory: MemoryInstance = memoryInstance(),
+) = MemoryInstruction.MemoryGrow(memory)
 
 fun memoryInitRuntimeInstruction(
     memoryIndex: Index.MemoryIndex = memoryIndex(),

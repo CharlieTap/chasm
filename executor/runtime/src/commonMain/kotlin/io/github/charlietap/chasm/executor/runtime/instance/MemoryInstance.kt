@@ -5,13 +5,21 @@ import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 
 data class MemoryInstance(
-    val type: MemoryType,
-    val data: LinearMemory,
+    var type: MemoryType,
+    var data: LinearMemory,
 ) {
-    val bounds by lazy {
-        0..<size
+    var size: Int = size()
+        private set
+
+    var bounds: IntRange = bounds()
+        private set
+
+    fun refresh() {
+        size = size()
+        bounds = bounds()
     }
-    val size by lazy {
-        type.limits.min.toInt() * PAGE_SIZE
-    }
+
+    private fun size() = type.limits.min.toInt() * PAGE_SIZE
+
+    private fun bounds() = 0 until size
 }

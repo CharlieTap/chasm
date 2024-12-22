@@ -31,7 +31,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I64Store8Disp
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I64StoreDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryCopyDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryFillDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryGrowDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemoryInitDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.MemorySizeDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
@@ -61,7 +60,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.I64Store8
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemoryCopy
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemoryFill
-import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemoryGrow
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemoryInit
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemorySize
 
@@ -96,7 +94,7 @@ internal fun MemoryInstructionPredecoder(
         i64Store16Dispatcher = ::I64Store16Dispatcher,
         i64Store32Dispatcher = ::I64Store32Dispatcher,
         memorySizeDispatcher = ::MemorySizeDispatcher,
-        memoryGrowDispatcher = ::MemoryGrowDispatcher,
+        memoryGrowPredecoder = ::MemoryGrowInstructionPredecoder,
         memoryInitDispatcher = ::MemoryInitDispatcher,
         dataDropPredecoder = ::DataDropInstructionPredecoder,
         memoryCopyDispatcher = ::MemoryCopyDispatcher,
@@ -130,7 +128,7 @@ internal inline fun MemoryInstructionPredecoder(
     crossinline i64Store16Dispatcher: Dispatcher<I64Store16>,
     crossinline i64Store32Dispatcher: Dispatcher<I64Store32>,
     crossinline memorySizeDispatcher: Dispatcher<MemorySize>,
-    crossinline memoryGrowDispatcher: Dispatcher<MemoryGrow>,
+    crossinline memoryGrowPredecoder: Predecoder<MemoryInstruction.MemoryGrow, DispatchableInstruction>,
     crossinline memoryInitDispatcher: Dispatcher<MemoryInit>,
     crossinline dataDropPredecoder: Predecoder<MemoryInstruction.DataDrop, DispatchableInstruction>,
     crossinline memoryCopyDispatcher: Dispatcher<MemoryCopy>,
@@ -161,7 +159,7 @@ internal inline fun MemoryInstructionPredecoder(
         is MemoryInstruction.I64Store16 -> i64Store16Dispatcher(I64Store16(instruction.memoryIndex, instruction.memArg))
         is MemoryInstruction.I64Store32 -> i64Store32Dispatcher(I64Store32(instruction.memoryIndex, instruction.memArg))
         is MemoryInstruction.MemorySize -> memorySizeDispatcher(MemorySize(instruction.memoryIndex))
-        is MemoryInstruction.MemoryGrow -> memoryGrowDispatcher(MemoryGrow(instruction.memoryIndex))
+        is MemoryInstruction.MemoryGrow -> memoryGrowPredecoder(context, instruction).bind()
         is MemoryInstruction.MemoryInit -> memoryInitDispatcher(MemoryInit(instruction.memoryIndex, instruction.dataIndex))
         is MemoryInstruction.DataDrop -> dataDropPredecoder(context, instruction).bind()
         is MemoryInstruction.MemoryCopy -> memoryCopyDispatcher(MemoryCopy(instruction.srcIndex, instruction.dstIndex))
