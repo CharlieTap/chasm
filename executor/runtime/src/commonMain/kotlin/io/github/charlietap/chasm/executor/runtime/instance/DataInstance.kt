@@ -1,9 +1,12 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
 data class DataInstance(
-    val bytes: UByteArray,
-    val dropped: Boolean = false,
+    var bytes: UByteArray,
 ) {
+    companion object {
+        val EMPTY = UByteArray(0)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false

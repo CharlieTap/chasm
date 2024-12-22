@@ -18,6 +18,5 @@ internal inline fun DataDropExecutor(
     val dataAddress = frame.instance
         .dataAddress(instruction.dataIdx)
         .bind()
-    val dataInstance = DataInstance(ubyteArrayOf(), true)
-    store.data[dataAddress.address] = dataInstance
+    store.data[dataAddress.address].bytes = DataInstance.EMPTY
 }
