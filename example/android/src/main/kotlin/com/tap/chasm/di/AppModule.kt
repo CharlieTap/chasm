@@ -15,8 +15,9 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun assetManager(@ApplicationContext context: Context): AssetManager {
+    fun assetManager(
+        @ApplicationContext context: Context,
+    ): AssetManager {
         return context.assets
     }
-
 }

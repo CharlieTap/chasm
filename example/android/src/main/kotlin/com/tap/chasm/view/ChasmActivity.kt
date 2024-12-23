@@ -23,10 +23,8 @@ import com.tap.chasm.viewmodel.ChasmViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
-class ChasmActivity : AppCompatActivity()
-{
+class ChasmActivity : AppCompatActivity() {
     private val viewModel by viewModels<ChasmViewModel>()
 
     private fun eventHandler(event: ChasmEvent) {
@@ -41,12 +39,12 @@ class ChasmActivity : AppCompatActivity()
 
             val state = viewModel.state.collectAsState()
 
-            Column (
+            Column(
                 Modifier
                     .background(Color.White)
                     .fillMaxSize()
-                    .padding(8.dp)
-            ){
+                    .padding(8.dp),
+            ) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(text = state.value.sliderTitle)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -56,7 +54,7 @@ class ChasmActivity : AppCompatActivity()
                     value = state.value.nth,
                     onValueChange = { eventHandler(ChasmEvent.ChangeFibonacciIndex(it)) },
                     steps = 15,
-                    valueRange = 1f..15f
+                    valueRange = 1f..15f,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = state.value.result)

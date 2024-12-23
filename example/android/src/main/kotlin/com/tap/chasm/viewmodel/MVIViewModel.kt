@@ -11,12 +11,12 @@ import kotlinx.coroutines.launch
 
 abstract class MVIViewModel<State, Event, Effect> : ViewModel() {
 
-    abstract val state : StateFlow<State>
+    abstract val state: StateFlow<State>
 
-    private val _events : MutableSharedFlow<Event> = MutableSharedFlow()
+    private val _events: MutableSharedFlow<Event> = MutableSharedFlow()
     private val event = _events.asSharedFlow()
 
-    private val _effects : Channel<Effect> = Channel()
+    private val _effects: Channel<Effect> = Channel()
     val effects = _effects.receiveAsFlow()
 
     init {
@@ -28,7 +28,6 @@ abstract class MVIViewModel<State, Event, Effect> : ViewModel() {
     }
 
     protected abstract fun handleEvent(event: Event)
-
 
     fun postEvent(event: Event) {
         viewModelScope.launch {
