@@ -11,7 +11,7 @@ min-sdk = "24"
 java-compiler-version = "21"
 java-bytecode-version = "11"
 
-android-build-tools-plugin = "8.3.2"
+android-build-tools-plugin = "8.7.3"
 versions-plugin = "0.51.0"
 
 androidx-appcompat = "1.6.1"
@@ -29,7 +29,7 @@ dokka="1.9.20"
 
 gradle-maven-publish-plugin = "0.30.0"
 
-hilt-core = "2.50"
+hilt-core = "2.54"
 hilt-integrations = "1.2.0"
 
 junit = "4.13.2"
