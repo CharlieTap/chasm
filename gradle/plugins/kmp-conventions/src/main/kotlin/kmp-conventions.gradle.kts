@@ -26,9 +26,6 @@ fun KotlinMultiplatformExtension.unixTargets() = setOf(
 
 kotlin {
 
-    jvm()
-    unixTargets()
-
     compilerOptions {
         extraWarnings.set(true)
 
@@ -41,6 +38,15 @@ kotlin {
         freeCompilerArgs.add("-Xnon-local-break-continue")
         freeCompilerArgs.add("-Xwhen-guards")
     }
+
+    jvm {
+        compilerOptions {
+            freeCompilerArgs.add("-Xno-call-assertions")
+            freeCompilerArgs.add("-Xno-param-assertions")
+            freeCompilerArgs.add("-Xno-receiver-assertions")
+        }
+    }
+    unixTargets()
 
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))
