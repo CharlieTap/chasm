@@ -44,7 +44,7 @@ internal fun ThreadExecutor(
 
     stack.push(thread.instructions)
 
-    while (true) {
+    while (stack.instructionsDepth() > 0) {
         val instruction = stack.popInstructionOrNull() ?: break
         instruction(context).bind()
     }

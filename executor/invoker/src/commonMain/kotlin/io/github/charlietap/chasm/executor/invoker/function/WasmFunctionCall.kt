@@ -62,7 +62,7 @@ internal inline fun WasmFunctionCall(
 
     val label = Stack.Entry.Label(
         arity = results,
-        depths = depths,
+        depths = stack.depths(),
         continuation = null,
     )
 

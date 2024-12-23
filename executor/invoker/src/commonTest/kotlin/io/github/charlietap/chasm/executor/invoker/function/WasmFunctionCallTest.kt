@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
+import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.fixture.ast.module.local
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
@@ -86,6 +87,11 @@ class WasmFunctionCallTest {
 
         val label = label(
             arity = functionType.params.types.size,
+            depths = LabelStackDepths(
+                instructions = 1,
+                labels = 0,
+                values = 0,
+            ),
         )
 
         val params = listOf(
