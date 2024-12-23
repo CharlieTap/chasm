@@ -37,7 +37,7 @@ class MinBenchmark {
     @Test
     fun benchmark() {
         benchmarkRule.measureRepeated {
-            val res = invoke(store, instance, "min", listOf(op1, op2))
+            invoke(store, instance, "min", listOf(op1, op2))
         }
     }
 }
