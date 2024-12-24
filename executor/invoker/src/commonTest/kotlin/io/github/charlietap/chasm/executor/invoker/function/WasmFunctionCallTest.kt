@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -100,7 +99,7 @@ class WasmFunctionCallTest {
         )
 
         params.forEach { value ->
-            stack.push(Stack.Entry.Value(value))
+            stack.push(value)
         }
 
         val locals = (
@@ -194,7 +193,7 @@ class WasmFunctionCallTest {
         )
 
         params.forEach { value ->
-            stack.push(Stack.Entry.Value(value))
+            stack.push(value)
         }
 
         val locals = (

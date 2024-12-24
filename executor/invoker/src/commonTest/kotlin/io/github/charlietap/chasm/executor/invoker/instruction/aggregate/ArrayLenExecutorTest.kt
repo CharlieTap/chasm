@@ -33,6 +33,6 @@ class ArrayLenExecutorTest {
         val actual = ArrayLenExecutor(context, AggregateInstruction.ArrayLen)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(i32(3), stack.popValueOrNull()?.value)
+        assertEquals(i32(3), stack.popValueOrNull())
     }
 }

@@ -12,5 +12,5 @@ internal inline fun GlobalSetExecutor(
     instruction: VariableInstruction.GlobalSet,
 ): Result<Unit, InvocationError> = binding {
     val value = context.stack.popValue().bind()
-    instruction.global.value = value.value
+    instruction.global.value = value
 }

@@ -16,7 +16,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instruction.i32Store8
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
@@ -61,8 +60,8 @@ class I32Store8InstructionBenchmark {
         instance = context.instance,
     )
 
-    private val baseAddress = value(i32(0))
-    private val value = value(i32())
+    private val baseAddress = i32(0)
+    private val value = i32()
 
     @Setup()
     fun setup() {

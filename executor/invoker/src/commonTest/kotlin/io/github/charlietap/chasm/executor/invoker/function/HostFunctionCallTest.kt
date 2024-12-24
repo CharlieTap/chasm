@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.function
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -75,7 +74,7 @@ class HostFunctionCallTest {
         )
 
         params.forEach { value ->
-            stack.push(Stack.Entry.Value(value))
+            stack.push(value)
         }
 
         val actual = HostFunctionCall(
@@ -86,8 +85,8 @@ class HostFunctionCallTest {
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.framesDepth())
         assertEquals(2, stack.valuesDepth())
-        assertEquals(i64(118), stack.popValueOrNull()?.value)
-        assertEquals(i32(117), stack.popValueOrNull()?.value)
+        assertEquals(i64(118), stack.popValueOrNull())
+        assertEquals(i32(117), stack.popValueOrNull())
     }
 
     @Test
@@ -143,7 +142,7 @@ class HostFunctionCallTest {
         )
 
         params.forEach { value ->
-            stack.push(Stack.Entry.Value(value))
+            stack.push(value)
         }
 
         val expected = Err(

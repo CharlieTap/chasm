@@ -14,7 +14,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.structInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.executionValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.fieldValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
@@ -72,7 +71,7 @@ class StructGetExecutorTest {
             Ok(executionValue)
         }
 
-        val expected = value(executionValue)
+        val expected = executionValue
 
         val actual = StructGetExecutor(context, typeIndex, fieldIndex, signedUnpack, definedTypeExpander, fieldUnpacker)
 

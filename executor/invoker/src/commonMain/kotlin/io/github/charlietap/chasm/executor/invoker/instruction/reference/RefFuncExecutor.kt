@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.functionAddress
@@ -22,5 +21,5 @@ internal inline fun RefFuncExecutor(
         .functionAddress(instruction.funcIdx)
         .bind()
 
-    stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
+    stack.push(ReferenceValue.Function(functionAddress))
 }

@@ -36,7 +36,7 @@ class I31GetExecutorTest {
         val actual = I31GetExecutor(context, signedExtension, i31SignedExtender, i31UnsignedExtender)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(i32(i32), stack.popValueOrNull()?.value)
+        assertEquals(i32(i32), stack.popValueOrNull())
     }
 
     @Test
@@ -62,6 +62,6 @@ class I31GetExecutorTest {
         val actual = I31GetExecutor(context, signedExtension, i31SignedExtender, i31UnsignedExtender)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(i32(i32), stack.popValueOrNull()?.value)
+        assertEquals(i32(i32), stack.popValueOrNull())
     }
 }

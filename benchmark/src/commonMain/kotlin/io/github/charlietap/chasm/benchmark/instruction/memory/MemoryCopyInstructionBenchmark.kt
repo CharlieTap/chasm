@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instruction.memoryCop
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
@@ -60,9 +59,9 @@ class MemoryCopyInstructionBenchmark {
         instance = context.instance,
     )
 
-    private val srcOffset = value(i32(0))
-    private val dstOffset = value(i32(0))
-    private val bytesToCopy = value(i32(200))
+    private val srcOffset = i32(0)
+    private val dstOffset = i32(0)
+    private val bytesToCopy = i32(200)
 
     @Setup
     fun setup() {

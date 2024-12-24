@@ -24,7 +24,7 @@ internal inline fun ReturnWasmFunctionCall(
     val locals = frame.locals
     locals.grow(params + instance.function.locals.size, ExecutionValue.Uninitialised)
     for (i in (params - 1) downTo 0) {
-        locals[i] = stack.popValue().bind().value
+        locals[i] = stack.popValue().bind()
     }
     for (local in instance.function.locals) {
         locals[params++] = local.type.default().bind()

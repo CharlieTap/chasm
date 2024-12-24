@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -32,7 +31,7 @@ internal fun HostFunctionCall(
     val type = function.functionType
 
     val params = List(type.params.types.size) {
-        stack.popValue().bind().value
+        stack.popValue().bind()
     }.asReversed()
 
     val functionContext = HostFunctionContext(
@@ -51,7 +50,7 @@ internal fun HostFunctionCall(
         val typeMatches = classifyValue(valueType, result)
 
         if (typeMatches) {
-            stack.push(Stack.Entry.Value(result!!))
+            stack.push(result!!)
         } else {
             Err(InvocationError.HostFunctionInconsistentWithType(valueType, result)).bind<Unit>()
         }

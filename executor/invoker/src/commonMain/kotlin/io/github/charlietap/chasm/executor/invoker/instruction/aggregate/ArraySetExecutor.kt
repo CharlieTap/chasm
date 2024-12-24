@@ -47,7 +47,7 @@ internal inline fun ArraySetExecutor(
     val arrayReference = stack.popArrayReference().bind()
 
     val arrayInstance = arrayReference.instance
-    val fieldValue = fieldPacker(value.value, arrayType.fieldType).bind()
+    val fieldValue = fieldPacker(value, arrayType.fieldType).bind()
 
     if (fieldIndex !in arrayInstance.fields.indices) {
         Err(InvocationError.Trap.TrapEncountered).bind()

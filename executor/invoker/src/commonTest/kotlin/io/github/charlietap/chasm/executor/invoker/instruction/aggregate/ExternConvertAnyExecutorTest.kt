@@ -30,7 +30,7 @@ class ExternConvertAnyExecutorTest {
         val actual = ExternConvertAnyExecutor(context, AggregateInstruction.ExternConvertAny)
 
         assertEquals(Ok(Unit), actual)
-        assertEquals(ReferenceValue.Null(AbstractHeapType.Extern), stack.popValueOrNull()?.value)
+        assertEquals(ReferenceValue.Null(AbstractHeapType.Extern), stack.popValueOrNull())
     }
 
     @Test
@@ -53,7 +53,7 @@ class ExternConvertAnyExecutorTest {
             val actual = ExternConvertAnyExecutor(context, AggregateInstruction.ExternConvertAny)
 
             assertEquals(Ok(Unit), actual)
-            assertEquals(ReferenceValue.Extern(referenceValue), stack.popValueOrNull()?.value)
+            assertEquals(ReferenceValue.Extern(referenceValue), stack.popValueOrNull())
         }
     }
 }

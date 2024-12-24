@@ -18,5 +18,5 @@ internal inline fun LocalSetExecutor(
     val value = stack.popValue().bind()
     val frame = stack.peekFrame().bind()
 
-    frame.locals[instruction.localIdx] = value.value
+    frame.locals[instruction.localIdx] = value
 }

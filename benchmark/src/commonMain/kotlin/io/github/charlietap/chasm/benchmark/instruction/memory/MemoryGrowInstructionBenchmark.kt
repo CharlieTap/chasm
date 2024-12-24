@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instruction.memoryGro
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
@@ -59,7 +58,7 @@ class MemoryGrowInstructionBenchmark {
         instance = context.instance,
     )
 
-    private val pagesToGrow = value(i32(200))
+    private val pagesToGrow = i32(200)
 
     @Setup
     fun setup() {

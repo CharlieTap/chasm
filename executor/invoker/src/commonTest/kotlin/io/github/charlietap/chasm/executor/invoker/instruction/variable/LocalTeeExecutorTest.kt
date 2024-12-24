@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.localTeeRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,7 +30,7 @@ class LocalTeeExecutorTest {
         val instruction = localTeeRuntimeInstruction(0)
 
         val expected = i32(117)
-        stack.push(value(expected))
+        stack.push(expected)
 
         val actual = LocalTeeExecutor(
             context = context,
@@ -41,7 +40,7 @@ class LocalTeeExecutorTest {
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.framesDepth())
         assertEquals(1, stack.valuesDepth())
-        assertEquals(value(expected), stack.popValueOrNull())
+        assertEquals(expected, stack.popValueOrNull())
         assertEquals(expected, frame.locals[0])
     }
 }

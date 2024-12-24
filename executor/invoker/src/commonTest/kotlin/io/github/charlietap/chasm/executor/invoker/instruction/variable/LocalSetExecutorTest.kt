@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.localSetRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,7 +30,7 @@ class LocalSetExecutorTest {
         val instruction = localSetRuntimeInstruction(0)
 
         val expected = i32(117)
-        stack.push(value(expected))
+        stack.push(expected)
 
         val actual = LocalSetExecutor(
             context = context,

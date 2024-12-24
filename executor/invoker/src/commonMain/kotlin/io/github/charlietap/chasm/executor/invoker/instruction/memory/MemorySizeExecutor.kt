@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
@@ -16,5 +15,5 @@ internal inline fun MemorySizeExecutor(
     val currentSizeInPages = instruction.memory.type.limits.min
         .toInt()
 
-    stack.push(Stack.Entry.Value(NumberValue.I32(currentSizeInPages)))
+    stack.push(NumberValue.I32(currentSizeInPages))
 }

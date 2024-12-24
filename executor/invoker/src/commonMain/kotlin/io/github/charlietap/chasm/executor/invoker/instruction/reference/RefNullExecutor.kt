@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
@@ -13,6 +12,6 @@ internal inline fun RefNullExecutor(
     instruction: ReferenceInstruction.RefNull,
 ): Result<Unit, InvocationError> {
     val (stack) = context
-    stack.push(Stack.Entry.Value(ReferenceValue.Null(instruction.type)))
+    stack.push(ReferenceValue.Null(instruction.type))
     return Ok(Unit)
 }

@@ -7,14 +7,13 @@ import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.stackDepths
-import io.github.charlietap.chasm.fixture.executor.runtime.value.executionValue
 
 fun stack(
     frames: List<ActivationFrame> = emptyList(),
     handlers: List<ExceptionHandler> = emptyList(),
     instructions: List<DispatchableInstruction> = emptyList(),
     labels: List<Stack.Entry.Label> = emptyList(),
-    values: List<Stack.Entry.Value> = emptyList(),
+    values: List<ExecutionValue> = emptyList(),
 ) = Stack(
     frames = frames,
     handlers = handlers,
@@ -31,10 +30,4 @@ fun label(
     arity = arity,
     depths = depths,
     continuation = continuation,
-)
-
-fun value(
-    value: ExecutionValue = executionValue(),
-) = Stack.Entry.Value(
-    value = value,
 )

@@ -39,7 +39,7 @@ internal fun ThreadExecutor(
     stack.push(thread.frame)
     stack.push(frameDispatcher(thread.frame))
     thread.frame.locals.forEach { local ->
-        stack.push(Stack.Entry.Value(local))
+        stack.push(local)
     }
 
     stack.push(thread.instructions)
@@ -50,7 +50,7 @@ internal fun ThreadExecutor(
     }
 
     val results = List(thread.frame.arity) {
-        stack.popValue().bind().value
+        stack.popValue().bind()
     }.asReversed()
 
     if (stack.size() > 0) {

@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.hostFunctionInstance
@@ -40,7 +39,7 @@ class CallRefExecutorTest {
             fail("Host function should not be called in this scenario")
         }
 
-        stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
+        stack.push(ReferenceValue.Function(functionAddress))
 
         val actual = CallRefExecutor(context, tailRecursion, hostFunctionCall, wasmFunctionCall)
 
@@ -71,7 +70,7 @@ class CallRefExecutorTest {
             Ok(Unit)
         }
 
-        stack.push(Stack.Entry.Value(ReferenceValue.Function(functionAddress)))
+        stack.push(ReferenceValue.Function(functionAddress))
 
         val actual = CallRefExecutor(context, tailRecursion, hostFunctionCall, wasmFunctionCall)
 

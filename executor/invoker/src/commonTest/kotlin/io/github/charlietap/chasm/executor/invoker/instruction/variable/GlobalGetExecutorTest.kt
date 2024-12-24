@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalInstance
@@ -44,7 +43,7 @@ class GlobalGetExecutorTest {
 
         val instruction = VariableInstruction.GlobalGet(globalInstance)
 
-        val expected = Stack.Entry.Value(executionValue)
+        val expected = executionValue
 
         val actual = GlobalGetExecutor(
             context = context,

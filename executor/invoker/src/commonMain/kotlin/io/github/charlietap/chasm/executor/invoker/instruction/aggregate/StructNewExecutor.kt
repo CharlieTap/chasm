@@ -43,7 +43,7 @@ internal inline fun StructNewExecutor(
     val fields = structType.fields
         .asReversed()
         .map { fieldType ->
-            val value = stack.popValue().bind().value
+            val value = stack.popValue().bind()
             fieldPacker(value, fieldType).bind()
         }.asReversed()
 

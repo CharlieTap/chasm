@@ -62,10 +62,10 @@ class StackExtTest {
 
         assertEquals(4, stack.size())
 
-        val f64 = stack.popValueOrNull()?.value as F64
-        val f32 = stack.popValueOrNull()?.value as F32
-        val i64 = stack.popValueOrNull()?.value as I64
-        val i32 = stack.popValueOrNull()?.value as I32
+        val f64 = stack.popValueOrNull() as F64
+        val f32 = stack.popValueOrNull() as F32
+        val i64 = stack.popValueOrNull() as I64
+        val i32 = stack.popValueOrNull() as I32
 
         assertEquals(117.0, f64.value)
         assertEquals(117f, f32.value)
@@ -80,7 +80,7 @@ class StackExtTest {
         val constructor = ::I32
         val op = Int::countTrailingZeroBits
 
-        stack.push(Stack.Entry.Value(I32(16)))
+        stack.push(I32(16))
 
         val actual = stack.unaryOperation(constructor, op)
 
@@ -88,7 +88,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(4, value.value)
     }
 
@@ -99,7 +99,7 @@ class StackExtTest {
         val constructor = ::I64
         val op = Long::countTrailingZero
 
-        stack.push(Stack.Entry.Value(I64(16)))
+        stack.push(I64(16))
 
         val actual = stack.unaryOperation(constructor, op)
 
@@ -107,7 +107,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I64
+        val value = entry as I64
         assertEquals(4, value.value)
     }
 
@@ -118,7 +118,7 @@ class StackExtTest {
         val constructor = ::F32
         val op = Float::sqrt
 
-        stack.push(Stack.Entry.Value(F32(16f)))
+        stack.push(F32(16f))
 
         val actual = stack.unaryOperation(constructor, op)
 
@@ -126,7 +126,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as F32
+        val value = entry as F32
         assertEquals(4f, value.value)
     }
 
@@ -137,7 +137,7 @@ class StackExtTest {
         val constructor = ::F64
         val op = Double::sqrt
 
-        stack.push(Stack.Entry.Value(F64(16.0)))
+        stack.push(F64(16.0))
 
         val actual = stack.unaryOperation(constructor, op)
 
@@ -145,7 +145,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as F64
+        val value = entry as F64
         assertEquals(4.0, value.value)
     }
 
@@ -155,8 +155,8 @@ class StackExtTest {
         val stack = stack()
         val constructor = ::I32
 
-        stack.push(Stack.Entry.Value(I32(1)))
-        stack.push(Stack.Entry.Value(I32(3)))
+        stack.push(I32(1))
+        stack.push(I32(3))
 
         val actual = stack.binaryOperation(constructor, Int::plus)
 
@@ -164,7 +164,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(4, value.value)
     }
 
@@ -174,8 +174,8 @@ class StackExtTest {
         val stack = stack()
         val constructor = ::I64
 
-        stack.push(Stack.Entry.Value(I64(1)))
-        stack.push(Stack.Entry.Value(I64(3)))
+        stack.push(I64(1))
+        stack.push(I64(3))
 
         val actual = stack.binaryOperation(constructor, Long::plus)
 
@@ -183,7 +183,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I64
+        val value = entry as I64
         assertEquals(4, value.value)
     }
 
@@ -193,8 +193,8 @@ class StackExtTest {
         val stack = stack()
         val constructor = ::F32
 
-        stack.push(Stack.Entry.Value(F32(1f)))
-        stack.push(Stack.Entry.Value(F32(3f)))
+        stack.push(F32(1f))
+        stack.push(F32(3f))
 
         val actual = stack.binaryOperation(constructor, Float::plus)
 
@@ -202,7 +202,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as F32
+        val value = entry as F32
         assertEquals(4f, value.value)
     }
 
@@ -212,8 +212,8 @@ class StackExtTest {
         val stack = stack()
         val constructor = ::F64
 
-        stack.push(Stack.Entry.Value(F64(1.0)))
-        stack.push(Stack.Entry.Value(F64(3.0)))
+        stack.push(F64(1.0))
+        stack.push(F64(3.0))
 
         val actual = stack.binaryOperation(constructor, Double::plus)
 
@@ -221,7 +221,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as F64
+        val value = entry as F64
         assertEquals(4.0, value.value)
     }
 
@@ -230,7 +230,7 @@ class StackExtTest {
 
         val stack = stack()
 
-        stack.push(Stack.Entry.Value(I32(1)))
+        stack.push(I32(1))
 
         val actual = stack.testOperation(Int::eqz)
 
@@ -238,7 +238,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(0, value.value)
     }
 
@@ -247,7 +247,7 @@ class StackExtTest {
 
         val stack = stack()
 
-        stack.push(Stack.Entry.Value(I64(1)))
+        stack.push(I64(1))
 
         val actual = stack.testOperation(Long::eqz)
 
@@ -255,7 +255,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(0, value.value)
     }
 
@@ -264,8 +264,8 @@ class StackExtTest {
 
         val stack = stack()
 
-        stack.push(Stack.Entry.Value(I32(1)))
-        stack.push(Stack.Entry.Value(I32(1)))
+        stack.push(I32(1))
+        stack.push(I32(1))
 
         val actual = stack.relationalOperation(Int::eq)
 
@@ -273,7 +273,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(1, value.value)
     }
 
@@ -282,8 +282,8 @@ class StackExtTest {
 
         val stack = stack()
 
-        stack.push(Stack.Entry.Value(I64(1)))
-        stack.push(Stack.Entry.Value(I64(1)))
+        stack.push(I64(1))
+        stack.push(I64(1))
 
         val actual = stack.relationalOperation(Long::eq)
 
@@ -291,7 +291,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(1, value.value)
     }
 
@@ -300,8 +300,8 @@ class StackExtTest {
 
         val stack = stack()
 
-        stack.push(Stack.Entry.Value(F32(1f)))
-        stack.push(Stack.Entry.Value(F32(1f)))
+        stack.push(F32(1f))
+        stack.push(F32(1f))
 
         val actual = stack.relationalOperation(Float::eq)
 
@@ -309,7 +309,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(1, value.value)
     }
 
@@ -318,8 +318,8 @@ class StackExtTest {
 
         val stack = stack()
 
-        stack.push(Stack.Entry.Value(F64(1.0)))
-        stack.push(Stack.Entry.Value(F64(1.0)))
+        stack.push(F64(1.0))
+        stack.push(F64(1.0))
 
         val actual = stack.relationalOperation(Double::eq)
 
@@ -327,7 +327,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(1, value.value)
     }
 
@@ -336,7 +336,7 @@ class StackExtTest {
 
         val stack = stack()
 
-        stack.push(Stack.Entry.Value(I64(117L)))
+        stack.push(I64(117L))
 
         val actual = stack.convertOperation(::I32, Long::wrap)
 
@@ -344,7 +344,7 @@ class StackExtTest {
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
-        val value = entry?.value as I32
+        val value = entry as I32
         assertEquals(117, value.value)
     }
 }

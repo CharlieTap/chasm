@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
@@ -53,7 +52,7 @@ class CallIndirectExecutorTest {
         )
         val context = executionContext(stack, store)
 
-        stack.push(Stack.Entry.Value(i32(elementIndex)))
+        stack.push(i32(elementIndex))
 
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress),
@@ -122,7 +121,7 @@ class CallIndirectExecutorTest {
         )
         val context = executionContext(stack, store)
 
-        stack.push(Stack.Entry.Value(i32(elementIndex)))
+        stack.push(i32(elementIndex))
 
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress),

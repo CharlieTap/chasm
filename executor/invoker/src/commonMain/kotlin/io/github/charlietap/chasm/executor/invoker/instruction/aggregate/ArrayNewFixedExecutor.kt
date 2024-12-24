@@ -42,7 +42,7 @@ internal inline fun ArrayNewFixedExecutor(
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
     val fields = MutableList(size.toInt()) { _ ->
-        val value = stack.popValue().bind().value
+        val value = stack.popValue().bind()
         fieldPacker(value, arrayType.fieldType).bind()
     }.asReversed()
 

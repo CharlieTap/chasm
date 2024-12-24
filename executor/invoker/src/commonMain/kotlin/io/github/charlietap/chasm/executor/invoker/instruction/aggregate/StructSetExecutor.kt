@@ -41,7 +41,7 @@ internal inline fun StructSetExecutor(
     val structType = definedTypeExpander(definedType).structType().bind()
     val fieldType = structType.field(instruction.fieldIndex).bind()
 
-    val executionValue = stack.popValue().bind().value
+    val executionValue = stack.popValue().bind()
 
     val structRef = stack.popStructReference().bind()
     val structInstance = structRef.instance

@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.fixture.ast.type.referenceType
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 import kotlin.test.Test
@@ -34,7 +33,7 @@ class BrOnCastExecutorTest {
         stack.push(frame)
 
         val referenceValue = ReferenceValue.Null(heapType())
-        stack.push(value(referenceValue))
+        stack.push(referenceValue)
 
         val expectedReferenceTypes = sequenceOf(srcReferenceType, dstReferenceType).iterator()
         val referenceTypeSubstitutor: TypeSubstitutor<ReferenceType> = { _referenceType, _ ->
@@ -83,7 +82,7 @@ class BrOnCastExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(referenceValue, stack.popValueOrNull()?.value)
+        assertEquals(referenceValue, stack.popValueOrNull())
         assertEquals(true, didBreak)
     }
 
@@ -101,7 +100,7 @@ class BrOnCastExecutorTest {
         stack.push(frame)
 
         val referenceValue = ReferenceValue.Null(heapType())
-        stack.push(value(referenceValue))
+        stack.push(referenceValue)
 
         val expectedReferenceTypes = sequenceOf(srcReferenceType, dstReferenceType).iterator()
         val referenceTypeSubstitutor: TypeSubstitutor<ReferenceType> = { _referenceType, _ ->
@@ -150,7 +149,7 @@ class BrOnCastExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(referenceValue, stack.popValueOrNull()?.value)
+        assertEquals(referenceValue, stack.popValueOrNull())
         assertEquals(false, didBreak)
     }
 
@@ -168,7 +167,7 @@ class BrOnCastExecutorTest {
         stack.push(frame)
 
         val referenceValue = ReferenceValue.Null(heapType())
-        stack.push(value(referenceValue))
+        stack.push(referenceValue)
 
         val expectedReferenceTypes = sequenceOf(srcReferenceType, dstReferenceType).iterator()
         val referenceTypeSubstitutor: TypeSubstitutor<ReferenceType> = { _referenceType, _ ->
@@ -217,7 +216,7 @@ class BrOnCastExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(referenceValue, stack.popValueOrNull()?.value)
+        assertEquals(referenceValue, stack.popValueOrNull())
         assertEquals(false, didBreak)
     }
 
@@ -235,7 +234,7 @@ class BrOnCastExecutorTest {
         stack.push(frame)
 
         val referenceValue = ReferenceValue.Null(heapType())
-        stack.push(value(referenceValue))
+        stack.push(referenceValue)
 
         val expectedReferenceTypes = sequenceOf(srcReferenceType, dstReferenceType).iterator()
         val referenceTypeSubstitutor: TypeSubstitutor<ReferenceType> = { _referenceType, _ ->
@@ -284,7 +283,7 @@ class BrOnCastExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(referenceValue, stack.popValueOrNull()?.value)
+        assertEquals(referenceValue, stack.popValueOrNull())
         assertEquals(true, didBreak)
     }
 }

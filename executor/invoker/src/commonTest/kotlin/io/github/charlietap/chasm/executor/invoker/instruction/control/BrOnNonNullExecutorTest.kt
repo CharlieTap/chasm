@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.type.heapType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -23,7 +22,7 @@ class BrOnNonNullExecutorTest {
         val instruction = ControlInstruction.BrOnNonNull(labelIndex())
 
         val referenceValue = ReferenceValue.Function(functionAddress())
-        stack.push(value(referenceValue))
+        stack.push(referenceValue)
 
         val breakExecutor: BreakExecutor = { _stack, _labelIndex ->
             assertEquals(stack, _stack)
@@ -36,7 +35,7 @@ class BrOnNonNullExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(referenceValue, stack.popValueOrNull()?.value)
+        assertEquals(referenceValue, stack.popValueOrNull())
     }
 
     @Test
@@ -47,7 +46,7 @@ class BrOnNonNullExecutorTest {
         val instruction = ControlInstruction.BrOnNonNull(labelIndex())
 
         val referenceValue = ReferenceValue.Null(heapType())
-        stack.push(value(referenceValue))
+        stack.push(referenceValue)
 
         val breakExecutor: BreakExecutor = { _, _ ->
             fail("BreakExecutor should not be called in this scenario")

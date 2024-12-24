@@ -15,8 +15,8 @@ internal inline fun I32DivSExecutor(
     instruction: NumericInstruction.I32DivS,
 ): Result<Unit, InvocationError> = binding {
     val stack = context.stack
-    val operand1 = stack.peekNthValue(1).bind().value as I32
-    val operand2 = stack.peekNthValue(0).bind().value as I32
+    val operand1 = stack.peekNthValue(1).bind() as I32
+    val operand2 = stack.peekNthValue(0).bind() as I32
 
     if (operand2.value == 0) {
         Err(InvocationError.CannotDivideIntegerByZero).bind()

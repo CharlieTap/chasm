@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.selectWithTypeRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,12 +16,12 @@ class SelectWithTypeExecutorTest {
         val stack = stack()
         val context = executionContext(stack)
 
-        val value1 = value(i32(117))
-        val value2 = value(i32(118))
+        val value1 = i32(117)
+        val value2 = i32(118)
 
         stack.push(value1)
         stack.push(value2)
-        stack.push(value(i32(1)))
+        stack.push(i32(1))
 
         val instruction = selectWithTypeRuntimeInstruction(emptyList())
 
@@ -42,12 +41,12 @@ class SelectWithTypeExecutorTest {
         val stack = stack()
         val context = executionContext(stack)
 
-        val value1 = value(i32(117))
-        val value2 = value(i32(118))
+        val value1 = i32(117)
+        val value2 = i32(118)
 
         stack.push(value1)
         stack.push(value2)
-        stack.push(value(i32(0)))
+        stack.push(i32(0))
 
         val instruction = selectWithTypeRuntimeInstruction(emptyList())
 

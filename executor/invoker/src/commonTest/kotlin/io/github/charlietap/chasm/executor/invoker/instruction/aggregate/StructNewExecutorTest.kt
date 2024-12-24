@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.structInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
@@ -75,7 +74,7 @@ class StructNewExecutorTest {
             definedType = definedType,
             fields = mutableListOf(fieldValue1, fieldValue2),
         )
-        val expected = value(ReferenceValue.Struct(expectedInstance))
+        val expected = ReferenceValue.Struct(expectedInstance)
 
         val actual = StructNewExecutor(context, AggregateInstruction.StructNew(typeIndex), definedTypeExpander, fieldPacker)
 

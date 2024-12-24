@@ -71,7 +71,7 @@ class RefCastExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(referenceValue, stack.popValueOrNull()?.value)
+        assertEquals(referenceValue, stack.popValueOrNull())
     }
 
     @Test

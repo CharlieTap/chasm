@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.fixture.ast.type.heapType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refAsNonNullRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.functionReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
 import kotlin.test.Test
@@ -23,7 +22,7 @@ class RefAsNonNullExecutorTest {
         val context = executionContext(stack)
         val value = functionReferenceValue(functionAddress())
 
-        stack.push(value(value))
+        stack.push(value)
 
         val actual = RefAsNonNullExecutor(
             context = context,
@@ -32,7 +31,7 @@ class RefAsNonNullExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(value, stack.popValueOrNull()?.value)
+        assertEquals(value, stack.popValueOrNull())
     }
 
     @Test
@@ -41,7 +40,7 @@ class RefAsNonNullExecutorTest {
         val stack = stack()
         val context = executionContext(stack)
 
-        stack.push(value(nullReferenceValue(heapType())))
+        stack.push(nullReferenceValue(heapType()))
 
         val actual = RefAsNonNullExecutor(
             context = context,

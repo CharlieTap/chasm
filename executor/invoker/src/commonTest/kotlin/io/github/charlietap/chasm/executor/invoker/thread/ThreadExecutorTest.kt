@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.thread
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,7 +31,7 @@ class ThreadExecutorTest {
             assertEquals(2, context.stack.valuesDepth())
             assertEquals(1, context.stack.instructionsDepth())
             context.stack.clearValues()
-            context.stack.push(value(i32(0)))
+            context.stack.push(i32(0))
             Ok(Unit)
         }
         val thread = thread(

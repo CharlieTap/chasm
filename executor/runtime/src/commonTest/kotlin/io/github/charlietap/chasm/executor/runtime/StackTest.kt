@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.runtime
 import io.github.charlietap.chasm.fixture.executor.runtime.label
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -61,13 +60,9 @@ class StackTest {
 
         val stack = stack()
 
-        val value1 = value(
-            i32(1),
-        )
+        val value1 = i32(1)
 
-        val value2 = value(
-            i32(2),
-        )
+        val value2 = i32(2)
 
         stack.push(value1)
         stack.push(value2)
@@ -84,21 +79,11 @@ class StackTest {
 
         val stack = stack()
 
-        val value1 = value(
-            i32(0),
-        )
-        val value2 = value(
-            i32(1),
-        )
-        val value3 = value(
-            i32(2),
-        )
-        val value4 = value(
-            i32(3),
-        )
-        val value5 = value(
-            i32(4),
-        )
+        val value1 = i32(0)
+        val value2 = i32(1)
+        val value3 = i32(2)
+        val value4 = i32(3)
+        val value5 = i32(4)
 
         stack.push(value1)
         stack.push(value2)

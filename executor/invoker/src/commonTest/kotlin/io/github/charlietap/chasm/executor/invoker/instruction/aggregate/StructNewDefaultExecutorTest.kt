@@ -14,7 +14,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -57,7 +56,7 @@ class StructNewDefaultExecutorTest {
             Ok(Unit)
         }
 
-        val expected = value(fieldType.default().value)
+        val expected = fieldType.default().value
 
         val actual =
             StructNewDefaultExecutor(context, AggregateInstruction.StructNewDefault(typeIndex), definedTypeExpander, structNewExecutor)

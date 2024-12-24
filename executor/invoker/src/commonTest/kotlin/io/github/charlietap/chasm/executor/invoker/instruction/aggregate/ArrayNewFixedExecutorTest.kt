@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
@@ -76,7 +75,7 @@ class ArrayNewFixedExecutorTest {
             definedType = definedType,
             fields = mutableListOf(fieldValue1, fieldValue2),
         )
-        val expected = value(ReferenceValue.Array(expectedInstance))
+        val expected = ReferenceValue.Array(expectedInstance)
 
         val actual = ArrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size), definedTypeExpander, fieldPacker)
 

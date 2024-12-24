@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStack
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.stack.Stack as InternalStack
 
@@ -14,14 +15,14 @@ data class Stack(
     private val handlers: InternalStack<ExceptionHandler> = InternalStack(INITIAL_CAPACITY),
     private val instructions: InternalStack<DispatchableInstruction> = InternalStack(INITIAL_CAPACITY),
     private val labels: InternalStack<Entry.Label> = InternalStack(INITIAL_CAPACITY),
-    private val values: InternalStack<Entry.Value> = InternalStack(INITIAL_CAPACITY),
+    private val values: ValueStack = ValueStack(INITIAL_CAPACITY),
 ) {
     constructor(
         frames: List<ActivationFrame>,
         handlers: List<ExceptionHandler>,
         instructions: List<DispatchableInstruction>,
         labels: List<Entry.Label>,
-        values: List<Entry.Value>,
+        values: List<ExecutionValue>,
     ) : this() {
         frames.forEach { frame ->
             this.frames.push(frame)
@@ -46,7 +47,6 @@ data class Stack(
         entries.forEach { entry ->
             when (entry) {
                 is Entry.Label -> push(entry)
-                is Entry.Value -> push(entry)
             }
         }
     }
@@ -66,7 +66,7 @@ data class Stack(
 
     fun push(label: Entry.Label) = labels.push(label)
 
-    fun push(value: Entry.Value) = values.push(value)
+    fun push(value: ExecutionValue) = values.push(value)
 
     fun push(many: Array<DispatchableInstruction>) = instructions.pushAll(many)
 
@@ -78,7 +78,7 @@ data class Stack(
 
     fun popLabelOrNull(): Entry.Label? = labels.popOrNull()
 
-    fun popValueOrNull(): Entry.Value? = values.popOrNull()
+    fun popValueOrNull(): ExecutionValue? = values.popOrNull()
 
     fun peekFrameOrNull(): ActivationFrame? = frames.peekOrNull()
 
@@ -86,13 +86,13 @@ data class Stack(
 
     fun peekLabelOrNull(): Entry.Label? = labels.peekOrNull()
 
-    fun peekValueOrNull(): Entry.Value? = values.peekOrNull()
+    fun peekValueOrNull(): ExecutionValue? = values.peekOrNull()
 
     fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNthOrNull(n)
 
     fun peekNthLabelOrNull(n: Int): Entry.Label? = labels.peekNthOrNull(n)
 
-    fun peekNthValueOrNull(n: Int): Entry.Value? = values.peekNthOrNull(n)
+    fun peekNthValueOrNull(n: Int): ExecutionValue? = values.peekNthOrNull(n)
 
     fun shrinkFrames(
         preserveTopN: Int,
@@ -178,8 +178,6 @@ data class Stack(
     }
 
     sealed interface Entry {
-
-        data class Value(val value: ExecutionValue) : Entry
 
         data class Label(
             val arity: Int,

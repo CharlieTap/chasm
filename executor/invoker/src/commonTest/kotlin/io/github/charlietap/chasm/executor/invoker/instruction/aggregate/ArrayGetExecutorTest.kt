@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayInstanc
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import io.github.charlietap.chasm.fixture.executor.runtime.value.executionValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.fieldValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
@@ -75,7 +74,7 @@ class ArrayGetExecutorTest {
             Ok(executionValue)
         }
 
-        val expected = value(executionValue)
+        val expected = executionValue
 
         val actual = ArrayGetExecutor(context, typeIndex, signedUnpack, definedTypeExpander, fieldUnpacker)
 

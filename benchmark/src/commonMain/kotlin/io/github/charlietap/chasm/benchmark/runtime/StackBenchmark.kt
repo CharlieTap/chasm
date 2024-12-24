@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.benchmark.runtime
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.fixture.executor.runtime.label
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.value
+import io.github.charlietap.chasm.fixture.executor.runtime.value.executionValue
 import io.github.charlietap.chasm.stack.stackOf
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
@@ -28,7 +28,7 @@ class StackBenchmark {
 
     private val frame = frame()
     private val label = label()
-    private val value = value()
+    private val value = executionValue()
 
     @TearDown
     fun cleanup() {

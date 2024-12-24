@@ -72,7 +72,7 @@ class ArrayNewElementExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(2, stack.valuesDepth())
-        assertEquals(arrayElem2, stack.popValueOrNull()?.value)
-        assertEquals(arrayElem1, stack.popValueOrNull()?.value)
+        assertEquals(arrayElem2, stack.popValueOrNull())
+        assertEquals(arrayElem1, stack.popValueOrNull())
     }
 }

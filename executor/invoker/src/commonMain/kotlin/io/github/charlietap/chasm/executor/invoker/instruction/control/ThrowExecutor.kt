@@ -42,7 +42,7 @@ internal inline fun ThrowExecutor(
     val functionType = instance.type.type
 
     val params = List(functionType.params.types.size) {
-        stack.popValue().bind().value
+        stack.popValue().bind()
     }
 
     val exceptionInstance = ExceptionInstance(

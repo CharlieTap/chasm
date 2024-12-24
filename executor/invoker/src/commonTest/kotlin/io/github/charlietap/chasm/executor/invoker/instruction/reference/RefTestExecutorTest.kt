@@ -70,7 +70,7 @@ class RefTestExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(i32(1), stack.popValueOrNull()?.value)
+        assertEquals(i32(1), stack.popValueOrNull())
     }
 
     @Test
@@ -121,6 +121,6 @@ class RefTestExecutorTest {
 
         assertEquals(Ok(Unit), actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(i32(0), stack.popValueOrNull()?.value)
+        assertEquals(i32(0), stack.popValueOrNull())
     }
 }

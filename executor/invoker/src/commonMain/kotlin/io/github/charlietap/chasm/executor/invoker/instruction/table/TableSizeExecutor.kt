@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
@@ -18,5 +17,5 @@ internal inline fun TableSizeExecutor(
     val tableInstance = instruction.table
     val tableSize = tableInstance.elements.size
 
-    stack.push(Stack.Entry.Value(NumberValue.I32(tableSize)))
+    stack.push(NumberValue.I32(tableSize))
 }

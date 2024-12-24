@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refFuncRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.value
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -33,7 +32,7 @@ class RefFuncExecutorTest {
 
         val instruction = refFuncRuntimeInstruction(functionIndex)
 
-        val expected = value(ReferenceValue.Function(functionAddress))
+        val expected = ReferenceValue.Function(functionAddress)
 
         val actual = RefFuncExecutor(
             context = context,

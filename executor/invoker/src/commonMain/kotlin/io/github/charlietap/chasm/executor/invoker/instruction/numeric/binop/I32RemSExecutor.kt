@@ -16,8 +16,7 @@ internal inline fun I32RemSExecutor(
 ): Result<Unit, InvocationError> = binding {
     val operand2 = context.stack
         .peekNthValue(0)
-        .bind()
-        .value as I32
+        .bind() as I32
 
     if (operand2.value == 0) {
         Err(InvocationError.CannotDivideIntegerByZero).bind()

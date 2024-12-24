@@ -17,8 +17,7 @@ internal inline fun I64RemUExecutor(
 ): Result<Unit, InvocationError> = binding {
     val operand2 = context.stack
         .peekNthValue(0)
-        .bind()
-        .value as I64
+        .bind() as I64
 
     if (operand2.value.toULong() == 0uL) {
         Err(InvocationError.CannotDivideIntegerByZero).bind()
