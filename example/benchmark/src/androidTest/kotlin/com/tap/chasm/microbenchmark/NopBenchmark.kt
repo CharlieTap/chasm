@@ -7,7 +7,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
@@ -16,12 +15,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class MinBenchmark {
+class NopBenchmark {
 
     @get:Rule
     val benchmarkRule = BenchmarkRule()
 
-    private val bytes = InstrumentationRegistry.getInstrumentation().context.assets.open("min.wasm").use {
+    private val bytes = InstrumentationRegistry.getInstrumentation().context.assets.open("nop.wasm").use {
         it.readBytes()
     }
     private val store = store()
@@ -30,13 +29,10 @@ class MinBenchmark {
             instance(store, it, emptyList())
         }.expect("failed to create instance")
 
-    private val op1 = Value.Number.F32(116f)
-    private val op2 = Value.Number.F32(117f)
-
     @Test
     fun benchmark() {
         benchmarkRule.measureRepeated {
-            invoke(store, instance, "min", listOf(op1, op2))
+            invoke(store, instance, "nop", emptyList())
         }
     }
 }
