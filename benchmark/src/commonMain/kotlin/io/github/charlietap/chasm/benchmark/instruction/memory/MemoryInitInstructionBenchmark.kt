@@ -5,8 +5,6 @@ import io.github.charlietap.chasm.executor.invoker.instruction.memory.MemoryInit
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
-import io.github.charlietap.chasm.fixture.ast.module.dataIndex
-import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
@@ -47,11 +45,6 @@ class MemoryInitInstructionBenchmark {
         instance = moduleInstance(),
     )
 
-    private val instruction = memoryInitRuntimeInstruction(
-        memoryIndex = memoryIndex(0u),
-        dataIdx = dataIndex(0u),
-    )
-
     private val memoryInstance = memoryInstance(
         type = memoryType(
             limits = limits(1u),
@@ -62,6 +55,11 @@ class MemoryInitInstructionBenchmark {
 
     private val dataInstance = dataInstance(
         UByteArray(1000) { i -> 117u },
+    )
+
+    private val instruction = memoryInitRuntimeInstruction(
+        memory = memoryInstance,
+        data = dataInstance,
     )
 
     private val frame = frame(

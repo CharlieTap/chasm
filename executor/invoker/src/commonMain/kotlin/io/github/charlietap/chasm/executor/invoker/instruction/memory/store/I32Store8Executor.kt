@@ -7,9 +7,6 @@ import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.write.I32ToI8Writer
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.memory
-import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
@@ -30,12 +27,8 @@ internal inline fun I32Store8Executor(
     crossinline boundsChecker: BoundsChecker<Unit>,
     crossinline writer: I32ToI8Writer,
 ): Result<Unit, InvocationError> = binding {
-    val (stack, store) = context
-    val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.instance
-        .memoryAddress(instruction.memoryIndex)
-        .bind()
-    val memory = store.memory(memoryAddress).bind()
+    val stack = context.stack
+    val memory = instruction.memory
 
     val valueToStore = stack.popI32().bind()
     val baseAddress = stack.popI32().bind()

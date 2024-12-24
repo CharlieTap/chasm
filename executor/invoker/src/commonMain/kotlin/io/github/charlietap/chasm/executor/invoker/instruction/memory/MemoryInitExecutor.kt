@@ -6,11 +6,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.memory.init.LinearMemoryInitialiser
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.data
-import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
-import io.github.charlietap.chasm.executor.runtime.ext.memory
-import io.github.charlietap.chasm.executor.runtime.ext.memoryAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
@@ -29,17 +24,10 @@ internal inline fun MemoryInitExecutor(
     instruction: MemoryInstruction.MemoryInit,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ): Result<Unit, InvocationError> = binding {
-    val (stack, store) = context
-    val frame = stack.peekFrame().bind()
-    val memoryAddress = frame.instance
-        .memoryAddress(instruction.memoryIndex)
-        .bind()
-    val memory = store.memory(memoryAddress).bind()
+    val stack = context.stack
 
-    val dataAddress = frame.instance
-        .dataAddress(instruction.dataIndex)
-        .bind()
-    val data = store.data(dataAddress).bind()
+    val memory = instruction.memory
+    val data = instruction.data
 
     val bytesToCopy = stack.popI32().bind()
     val sourceOffset = stack.popI32().bind()
