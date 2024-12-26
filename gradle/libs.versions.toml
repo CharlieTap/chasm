@@ -50,7 +50,7 @@ kotlinx-test-resources = "0.10.0"
 
 ksp = "2.1.0-1.0.29"
 
-result = "2.0.0"
+result = "2.0.1"
 
 [plugins]
 
