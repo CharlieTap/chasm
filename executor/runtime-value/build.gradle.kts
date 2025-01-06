@@ -17,7 +17,6 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
-                api(projects.executor.runtimeValue)
                 api(projects.libs.stack)
                 api(projects.typeSystem)
                 api(libs.result)
@@ -34,8 +33,8 @@ kotlin {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "runtime"
-    description = "A wasm runtime implementation"
+    name = "runtime-value"
+    description = "execution stack values for chasms runtime"
 }
 
 tasks.withType<KotlinCompile>().configureEach {
