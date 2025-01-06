@@ -120,7 +120,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
 
         const val URL_TESTSUITE = "https://github.com/WebAssembly/testsuite.git"
 
-        const val GROUP = "testsuite"
+        const val GROUP = "sweet"
 
         const val TASK_NAME_SYNC_SUITE = "syncWasmTestSuite"
         const val TASK_NAME_DOWNLOAD_WASM_TOOLS = "downloadWasmTools"
