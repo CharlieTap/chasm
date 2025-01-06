@@ -4,8 +4,8 @@ version-name = "0.9.3"
 
 application-id = "com.tap.chasm"
 application-namespace = "com.tap.chasm"
-compile-sdk = "34"
-target-sdk = "34"
+compile-sdk = "35"
+target-sdk = "35"
 min-sdk = "24"
 
 java-compiler-version = "21"

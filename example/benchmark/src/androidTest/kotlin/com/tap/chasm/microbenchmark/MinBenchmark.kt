@@ -7,10 +7,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,8 +30,8 @@ class MinBenchmark {
             instance(store, it, emptyList())
         }.expect("failed to create instance")
 
-    private val op1 = Value.Number.F32(116f)
-    private val op2 = Value.Number.F32(117f)
+    private val op1 = NumberValue.F32(116f)
+    private val op2 = NumberValue.F32(117f)
 
     @Test
     fun benchmark() {

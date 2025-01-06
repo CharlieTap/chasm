@@ -7,11 +7,11 @@ import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -84,9 +84,9 @@ class ChasmViewModel
         }
 
         private fun calculateFibonacci(n: Int): Int {
-            return invoke(store, instance, "fibonacci", listOf(Value.Number.I32(n)))
+            return invoke(store, instance, "fibonacci", listOf(NumberValue.I32(n)))
                 .map {
-                    (it.first() as Value.Number.I32).value
+                    (it.first() as NumberValue.I32).value
                 }.expect("Failed to calculate fibonacci")
         }
 
