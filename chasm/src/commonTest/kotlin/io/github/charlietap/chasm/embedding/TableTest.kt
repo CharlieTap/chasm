@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.embedding.fixture.publicReferenceValue
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.fixture.publicTableType
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.ast.type.tableType
+import io.github.charlietap.chasm.fixture.executor.runtime.value.referenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -17,7 +17,7 @@ class TableTest {
 
         val store = publicStore()
         val type = publicTableType()
-        val initialValue = publicReferenceValue()
+        val initialValue = referenceValue()
 
         val expectedExternalType = ExternalValue.Table(Address.Table(0))
         val expected = publicTable(expectedExternalType)

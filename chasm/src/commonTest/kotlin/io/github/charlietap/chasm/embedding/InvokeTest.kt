@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.embedding
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.fixture.publicI32
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -103,7 +102,7 @@ class InvokeTest {
             Ok(results)
         }
 
-        val expected = ChasmResult.Success(listOf(publicI32(117)))
+        val expected = ChasmResult.Success(listOf(i32(117)))
 
         val actual = invoke(store, instance, function, args, functionInvoker)
 

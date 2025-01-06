@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.embedding.table
 
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.fixture.publicFunctionReferenceValue
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -21,7 +20,7 @@ class ReadTableTest {
     fun `can read a reference value from a table`() {
 
         val functionAddress = functionAddress()
-        val value = publicFunctionReferenceValue(functionAddress.address)
+        val value = functionReferenceValue(functionAddress)
         val instance = tableInstance(elements = arrayOf(functionReferenceValue(functionAddress)))
         val store = publicStore(store(tables = mutableListOf(instance)))
         val address = tableAddress(0)

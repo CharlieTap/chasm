@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicGlobal
 import io.github.charlietap.chasm.embedding.fixture.publicGlobalType
-import io.github.charlietap.chasm.embedding.fixture.publicI32
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.ast.type.globalType
@@ -18,7 +17,7 @@ class GlobalTest {
 
         val store = publicStore()
         val globalType = publicGlobalType()
-        val initialValue = publicI32(117)
+        val initialValue = i32(117)
 
         val expectedExternalValue = globalExternalValue(Address.Global(0))
         val expected = publicGlobal(expectedExternalValue)

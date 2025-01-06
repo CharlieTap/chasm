@@ -10,10 +10,10 @@ import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Mutability
 import io.github.charlietap.chasm.embedding.shapes.ValueType
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.constMutability
+import io.github.charlietap.chasm.fixture.ast.type.functionHeapType
 import io.github.charlietap.chasm.fixture.ast.type.globalType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.limits
@@ -28,6 +28,8 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddres
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.value.functionReferenceValue
+import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -81,7 +83,7 @@ class ImportTest {
                     valueType = ValueType.Number.I32
                     mutability = Mutability.Const
                 }
-                value = NumberValue.I32(0)
+                value = i32(0)
             }
         }
 
@@ -143,12 +145,12 @@ class ImportTest {
                 moduleName = "wasi_preview_1"
                 entityName = "dynamic_dispatch"
                 type {
-                    referenceType = ValueType.Reference.RefNull(AbstractHeapType.Func)
+                    referenceType = ValueType.Reference.RefNull(functionHeapType())
                     limits {
                         min = 1u
                     }
                 }
-                value = ReferenceValue.Function(Address.Function(0))
+                value = functionReferenceValue(functionAddress(0))
             }
         }
 

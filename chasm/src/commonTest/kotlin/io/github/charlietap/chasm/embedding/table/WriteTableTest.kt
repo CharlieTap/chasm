@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding.table
 
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.fixture.publicFunctionReferenceValue
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -22,7 +21,7 @@ class WriteTableTest {
     fun `can write a reference value to a table`() {
 
         val functionAddress = functionAddress()
-        val value = publicFunctionReferenceValue(functionAddress.address)
+        val value = functionReferenceValue(functionAddress)
         val instance = tableInstance(elements = arrayOf(ReferenceValue.Null(AbstractHeapType.Func)))
         val store = publicStore(store(tables = mutableListOf(instance)))
         val address = tableAddress(0)
