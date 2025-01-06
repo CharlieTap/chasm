@@ -7,11 +7,10 @@ import io.github.charlietap.chasm.embedding.fixture.publicImport
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
-import io.github.charlietap.chasm.embedding.shapes.HeapType
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Mutability
-import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.shapes.ValueType
+import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.constMutability
@@ -82,7 +81,7 @@ class ImportTest {
                     valueType = ValueType.Number.I32
                     mutability = Mutability.Const
                 }
-                value = Value.Number.I32(0)
+                value = NumberValue.I32(0)
             }
         }
 
@@ -144,12 +143,12 @@ class ImportTest {
                 moduleName = "wasi_preview_1"
                 entityName = "dynamic_dispatch"
                 type {
-                    referenceType = ValueType.Reference.RefNull(HeapType.Func)
+                    referenceType = ValueType.Reference.RefNull(AbstractHeapType.Func)
                     limits {
                         min = 1u
                     }
                 }
-                value = Value.Reference.Func(0)
+                value = ReferenceValue.Function(Address.Function(0))
             }
         }
 

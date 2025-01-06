@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.ast.type.TableType as InternalTableType
 
 internal class TableTypeMapper(
     private val limitsMapper: BidirectionalMapper<Limits, InternalLimits> = LimitsMapper,
-    private val referenceTypeMapper: BidirectionalMapper<ValueType.Reference, ReferenceType> = ReferenceTypeMapper.instance,
+    private val referenceTypeMapper: BidirectionalMapper<ValueType.Reference, ReferenceType> = ReferenceTypeMapper,
 ) : BidirectionalMapper<TableType, InternalTableType> {
     override fun map(input: TableType): InternalTableType {
         val limits = limitsMapper.map(input.limits)

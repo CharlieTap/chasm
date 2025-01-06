@@ -1,55 +1,57 @@
 package io.github.charlietap.chasm.script.value
 
-import io.github.charlietap.chasm.embedding.shapes.HeapType
-import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
-typealias ValueMatcher = (Value, Value) -> Boolean
+typealias ValueMatcher = (ExecutionValue, ExecutionValue) -> Boolean
 
 fun ValueMatcher(
-    first: Value,
-    second: Value,
+    first: ExecutionValue,
+    second: ExecutionValue,
 ): Boolean = when {
-    first is Value.Number.F32 && second is Value.Number.F32 -> compareFloats(first.value, second.value)
-    first is Value.Number.F64 && second is Value.Number.F64 -> compareDoubles(first.value, second.value)
-    first is Value.Reference.Null -> {
+    first is NumberValue.F32 && second is NumberValue.F32 -> compareFloats(first.value, second.value)
+    first is NumberValue.F64 && second is NumberValue.F64 -> compareDoubles(first.value, second.value)
+    first is ReferenceValue.Null -> {
         when (first.heapType) {
-            is HeapType.Any ->
-                second == Value.Reference.Null(HeapType.Any) ||
-                    second == Value.Reference.Null(HeapType.None)
-            is HeapType.Array ->
-                second == Value.Reference.Null(HeapType.Array) ||
-                    second is Value.Reference.Array
-            is HeapType.Bottom ->
-                second is Value.Reference
-            is HeapType.Eq ->
-                second == Value.Reference.Null(HeapType.Eq) ||
-                    second == Value.Reference.Null(HeapType.Eq) ||
-                    second is Value.Reference.Array ||
-                    second is Value.Reference.I31 ||
-                    second is Value.Reference.Struct
-            is HeapType.Extern ->
-                second == Value.Reference.Null(HeapType.Extern) ||
-                    second == Value.Reference.Null(HeapType.NoExtern) ||
-                    second is Value.Reference.Extern
-            is HeapType.Func ->
-                second == Value.Reference.Null(HeapType.Func) ||
-                    second == Value.Reference.Null(HeapType.NoFunc) ||
-                    second is Value.Reference.Func
-            is HeapType.I31 ->
-                second == Value.Reference.Null(HeapType.I31) ||
-                    second is Value.Reference.I31
-            is HeapType.NoFunc ->
-                second == Value.Reference.Null(HeapType.Func) ||
-                    second == Value.Reference.Null(HeapType.NoFunc)
-            is HeapType.NoExtern ->
-                second == Value.Reference.Null(HeapType.Extern) ||
-                    second == Value.Reference.Null(HeapType.NoExtern)
-            is HeapType.None ->
-                second == Value.Reference.Null(HeapType.Any) ||
-                    second == Value.Reference.Null(HeapType.None)
-            is HeapType.Struct ->
-                second == Value.Reference.Null(HeapType.Struct) ||
-                    second is Value.Reference.Struct
+            is AbstractHeapType.Any ->
+                second == ReferenceValue.Null(AbstractHeapType.Any) ||
+                    second == ReferenceValue.Null(AbstractHeapType.None)
+            is AbstractHeapType.Array ->
+                second == ReferenceValue.Null(AbstractHeapType.Array) ||
+                    second is ReferenceValue.Array
+            is AbstractHeapType.Bottom ->
+                second is ReferenceValue
+            is AbstractHeapType.Eq ->
+                second == ReferenceValue.Null(AbstractHeapType.Eq) ||
+                    second == ReferenceValue.Null(AbstractHeapType.Eq) ||
+                    second is ReferenceValue.Array ||
+                    second is ReferenceValue.I31 ||
+                    second is ReferenceValue.Struct
+            is AbstractHeapType.Extern ->
+                second == ReferenceValue.Null(AbstractHeapType.Extern) ||
+                    second == ReferenceValue.Null(AbstractHeapType.NoExtern) ||
+                    second is ReferenceValue.Extern
+            is AbstractHeapType.Func ->
+                second == ReferenceValue.Null(AbstractHeapType.Func) ||
+                    second == ReferenceValue.Null(AbstractHeapType.NoFunc) ||
+                    second is ReferenceValue.Function
+            is AbstractHeapType.I31 ->
+                second == ReferenceValue.Null(AbstractHeapType.I31) ||
+                    second is ReferenceValue.I31
+            is AbstractHeapType.NoFunc ->
+                second == ReferenceValue.Null(AbstractHeapType.Func) ||
+                    second == ReferenceValue.Null(AbstractHeapType.NoFunc)
+            is AbstractHeapType.NoExtern ->
+                second == ReferenceValue.Null(AbstractHeapType.Extern) ||
+                    second == ReferenceValue.Null(AbstractHeapType.NoExtern)
+            is AbstractHeapType.None ->
+                second == ReferenceValue.Null(AbstractHeapType.Any) ||
+                    second == ReferenceValue.Null(AbstractHeapType.None)
+            is AbstractHeapType.Struct ->
+                second == ReferenceValue.Null(AbstractHeapType.Struct) ||
+                    second is ReferenceValue.Struct
             else -> first == second
         }
     }

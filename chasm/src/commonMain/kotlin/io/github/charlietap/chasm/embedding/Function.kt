@@ -22,7 +22,7 @@ fun function(
     function = function,
     allocator = ::HostFunctionAllocator,
     functionTypeMapper = FunctionTypeMapper.instance,
-    hostFunctionMapper = HostFunctionMapper.instance,
+    hostFunctionMapper = HostFunctionMapper,
 )
 
 internal fun function(

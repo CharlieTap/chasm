@@ -9,19 +9,19 @@ import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.validate
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 fun testRunner(
     fileName: String,
     fileDirectory: String,
-    arguments: List<Value> = emptyList(),
+    arguments: List<ExecutionValue> = emptyList(),
     store: Store = Store(),
     imports: List<Import> = emptyList(),
     functionName: String = fileName.replace(".wasm", ""),
-    setupFunctions: List<Pair<String, List<Value>>> = emptyList(),
-): ChasmResult<List<Value>, ChasmError> {
+    setupFunctions: List<Pair<String, List<ExecutionValue>>> = emptyList(),
+): ChasmResult<List<ExecutionValue>, ChasmError> {
 
     val byteStream = Resource(fileDirectory + fileName).readBytes()
     val reader = FakeSourceReader(byteStream)

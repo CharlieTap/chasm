@@ -1,14 +1,18 @@
 package io.github.charlietap.chasm.script.value
 
-import io.github.charlietap.chasm.embedding.shapes.HeapType
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.ast.type.BottomType
+import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.sweet.lib.value.Value
-import io.github.charlietap.chasm.embedding.shapes.Value as ChasmValue
 
-typealias ValueMapper = (Value) -> ChasmValue?
+typealias ValueMapper = (Value) -> ExecutionValue?
 
 fun ValueMapper(
     value: Value,
-): ChasmValue? = when (value) {
+): ExecutionValue? = when (value) {
     is Value.I32 -> i32ValueMapper(value)
     is Value.I64 -> i64ValueMapper(value)
     is Value.F32 -> f32ValueMapper(value)
@@ -30,115 +34,115 @@ fun ValueMapper(
 
 private fun i32ValueMapper(
     value: Value.I32,
-): ChasmValue.Number.I32? = value.value?.let {
-    ChasmValue.Number.I32(it.toIntOrNull() ?: it.toUInt().toInt())
+): NumberValue.I32? = value.value?.let {
+    NumberValue.I32(it.toIntOrNull() ?: it.toUInt().toInt())
 }
 
 private fun i64ValueMapper(
     value: Value.I64,
-): ChasmValue.Number.I64? = value.value?.let {
-    ChasmValue.Number.I64(it.toLongOrNull() ?: it.toULong().toLong())
+): NumberValue.I64? = value.value?.let {
+    NumberValue.I64(it.toLongOrNull() ?: it.toULong().toLong())
 }
 
 private fun f32ValueMapper(
     value: Value.F32,
-): ChasmValue.Number.F32? = value.value?.let {
+): NumberValue.F32? = value.value?.let {
     if (it.contains("nan")) {
         Float.NaN
     } else {
         val bitPattern = it.toUInt().toInt()
         Float.fromBits(bitPattern)
-    }.let { ChasmValue.Number.F32(it) }
+    }.let { NumberValue.F32(it) }
 }
 
 private fun f64ValueMapper(
     value: Value.F64,
-): ChasmValue.Number.F64? = value.value?.let {
+): NumberValue.F64? = value.value?.let {
     if (it.contains("nan")) {
         Double.NaN
     } else {
         val bitPattern = it.toULong().toLong()
         Double.fromBits(bitPattern)
-    }.let { ChasmValue.Number.F64(it) }
+    }.let { NumberValue.F64(it) }
 }
 
 private fun anyRefValueMapper(
     value: Value.AnyRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Host(it)
-} ?: ChasmValue.Reference.Null(HeapType.Any)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Host(it)
+} ?: ReferenceValue.Null(AbstractHeapType.Any)
 
 private fun arrayRefValueMapper(
     value: Value.ArrayRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.Array)
-} ?: ChasmValue.Reference.Null(HeapType.Array)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.Array)
+} ?: ReferenceValue.Null(AbstractHeapType.Array)
 
 private fun bottomRefValueMapper(
     value: Value.BottomRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.Bottom)
-} ?: ChasmValue.Reference.Null(HeapType.Bottom)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.Bottom(BottomType))
+} ?: ReferenceValue.Null(AbstractHeapType.Bottom(BottomType))
 
 private fun funcRefValueMapper(
     value: Value.FuncRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Func(it)
-} ?: ChasmValue.Reference.Null(HeapType.Func)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Function(Address.Function(it))
+} ?: ReferenceValue.Null(AbstractHeapType.Func)
 
 private fun eqRefValueMapper(
     value: Value.EqRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.Eq)
-} ?: ChasmValue.Reference.Null(HeapType.Eq)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.Eq)
+} ?: ReferenceValue.Null(AbstractHeapType.Eq)
 
 private fun exceptionRefValueMapper(
     value: Value.ExceptionRef,
-): ChasmValue.Reference = value.value?.let {
-    ChasmValue.Reference.Null(HeapType.Exception)
-} ?: ChasmValue.Reference.Null(HeapType.Exception)
+): ReferenceValue = value.value?.let {
+    ReferenceValue.Null(AbstractHeapType.Exception)
+} ?: ReferenceValue.Null(AbstractHeapType.Exception)
 
 private fun externRefValueMapper(
     value: Value.ExternRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Extern(ChasmValue.Reference.Host(it))
-} ?: ChasmValue.Reference.Null(HeapType.Extern)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Extern(ReferenceValue.Host(it))
+} ?: ReferenceValue.Null(AbstractHeapType.Extern)
 
 private fun i31RefValueMapper(
     value: Value.I31Ref,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.I31)
-} ?: ChasmValue.Reference.Null(HeapType.I31)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.I31)
+} ?: ReferenceValue.Null(AbstractHeapType.I31)
 
 private fun nullFuncRefValueMapper(
     value: Value.NullFuncRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.NoFunc)
-} ?: ChasmValue.Reference.Null(HeapType.NoFunc)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.NoFunc)
+} ?: ReferenceValue.Null(AbstractHeapType.NoFunc)
 
 private fun nullExceptionRefValueMapper(
     value: Value.NullExceptionRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.NoException)
-} ?: ChasmValue.Reference.Null(HeapType.NoException)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.NoException)
+} ?: ReferenceValue.Null(AbstractHeapType.NoException)
 
 private fun nullExternRefValueMapper(
     value: Value.NullExternRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.NoExtern)
-} ?: ChasmValue.Reference.Null(HeapType.NoExtern)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.NoExtern)
+} ?: ReferenceValue.Null(AbstractHeapType.NoExtern)
 
 private fun nullRefValueMapper(
     value: Value.NullRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.None)
-} ?: ChasmValue.Reference.Null(HeapType.None)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.None)
+} ?: ReferenceValue.Null(AbstractHeapType.None)
 
 private fun structRefValueMapper(
     value: Value.StructRef,
-): ChasmValue.Reference = value.value?.let(::coalesceNullableInt)?.let {
-    ChasmValue.Reference.Null(HeapType.Struct)
-} ?: ChasmValue.Reference.Null(HeapType.Struct)
+): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
+    ReferenceValue.Null(AbstractHeapType.Struct)
+} ?: ReferenceValue.Null(AbstractHeapType.Struct)
 
 private fun coalesceNullableInt(value: String) = if (value == "null") {
     null

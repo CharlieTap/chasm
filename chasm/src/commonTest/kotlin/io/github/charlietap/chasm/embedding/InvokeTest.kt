@@ -7,10 +7,9 @@ import io.github.charlietap.chasm.embedding.fixture.publicI32
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.Value
-import io.github.charlietap.chasm.embedding.transform.ValueMapper
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.ast.value.nameValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.exportInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
@@ -43,7 +42,7 @@ class InvokeTest {
         val function = "fail"
 
         val store = publicStore()
-        val args = emptyList<Value>()
+        val args = emptyList<ExecutionValue>()
         val address = functionAddress(0)
         val externalValue = functionExternalValue(address)
         val exportInstance = exportInstance(
@@ -69,7 +68,7 @@ class InvokeTest {
 
         val expected = ChasmError.ExecutionError(error.toString())
 
-        val actual = invoke(store, instance, function, args, functionInvoker, ValueMapper.instance)
+        val actual = invoke(store, instance, function, args, functionInvoker)
 
         assertEquals(ChasmResult.Error(expected), actual)
     }
@@ -80,7 +79,7 @@ class InvokeTest {
         val function = "succeed"
 
         val store = publicStore()
-        val args = emptyList<Value>()
+        val args = emptyList<ExecutionValue>()
         val address = functionAddress(0)
         val externalValue = functionExternalValue(address)
         val exportInstance = exportInstance(
@@ -106,7 +105,7 @@ class InvokeTest {
 
         val expected = ChasmResult.Success(listOf(publicI32(117)))
 
-        val actual = invoke(store, instance, function, args, functionInvoker, ValueMapper.instance)
+        val actual = invoke(store, instance, function, args, functionInvoker)
 
         assertEquals(expected, actual)
     }

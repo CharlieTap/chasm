@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.embedding.shapes.ValueType
 import io.github.charlietap.chasm.ast.type.ValueType as InternalValueType
 
 internal class ValueTypeMapper(
-    private val referenceTypeMapper: BidirectionalMapper<ValueType.Reference, ReferenceType> = ReferenceTypeMapper.instance,
+    private val referenceTypeMapper: BidirectionalMapper<ValueType.Reference, ReferenceType> = ReferenceTypeMapper,
 ) : BidirectionalMapper<ValueType, InternalValueType> {
 
     override fun map(input: ValueType): InternalValueType {

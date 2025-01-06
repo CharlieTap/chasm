@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.fixture.publicMemoryType
 import io.github.charlietap.chasm.embedding.module
@@ -9,7 +10,6 @@ import io.github.charlietap.chasm.embedding.shapes.ExportDefinition
 import io.github.charlietap.chasm.embedding.shapes.ExternalType
 import io.github.charlietap.chasm.embedding.shapes.FunctionType
 import io.github.charlietap.chasm.embedding.shapes.GlobalType
-import io.github.charlietap.chasm.embedding.shapes.HeapType
 import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.embedding.shapes.Limits
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
@@ -42,8 +42,8 @@ class ModuleInfoTest {
         val importedMemoryType = publicMemoryType(Limits(1u))
         val exportedMemoryType = publicMemoryType(Limits(2u))
 
-        val importedTableType = TableType(Limits(1u), ValueType.Reference.RefNull(HeapType.Func))
-        val exportedTableType = TableType(Limits(2u), ValueType.Reference.RefNull(HeapType.Func))
+        val importedTableType = TableType(Limits(1u), ValueType.Reference.RefNull(AbstractHeapType.Func))
+        val exportedTableType = TableType(Limits(2u), ValueType.Reference.RefNull(AbstractHeapType.Func))
 
         val importedTagFunctionType = FunctionType(listOf(ValueType.Number.I32), emptyList())
         val importedTagType = TagType(TagType.Attribute.Exception, importedTagFunctionType)

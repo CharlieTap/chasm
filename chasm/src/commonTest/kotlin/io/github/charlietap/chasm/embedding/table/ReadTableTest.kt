@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicFunctionReferenceValue
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
@@ -27,7 +27,7 @@ class ReadTableTest {
         val address = tableAddress(0)
         val table = publicTable(tableExternalValue(address))
 
-        val expected: ChasmResult<Value.Reference, ChasmError.ExecutionError> = ChasmResult.Success(value)
+        val expected: ChasmResult<ReferenceValue, ChasmError.ExecutionError> = ChasmResult.Success(value)
 
         val actual = readTable(
             store = store,

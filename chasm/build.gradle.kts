@@ -40,6 +40,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
+                api(projects.executor.runtimeValue)
                 api(projects.host)
                 api(projects.stream)
 

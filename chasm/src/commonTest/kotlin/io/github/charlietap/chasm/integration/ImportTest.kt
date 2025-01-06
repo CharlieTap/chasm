@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.integration
 
+import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.embedding.fixture.publicMemoryType
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
@@ -7,7 +8,6 @@ import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.FunctionType
 import io.github.charlietap.chasm.embedding.shapes.GlobalType
-import io.github.charlietap.chasm.embedding.shapes.HeapType
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Limits
@@ -15,10 +15,12 @@ import io.github.charlietap.chasm.embedding.shapes.Mutability
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.TableType
 import io.github.charlietap.chasm.embedding.shapes.TagType
-import io.github.charlietap.chasm.embedding.shapes.Value
 import io.github.charlietap.chasm.embedding.shapes.ValueType
 import io.github.charlietap.chasm.embedding.table
 import io.github.charlietap.chasm.embedding.tag
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,7 +47,7 @@ class ImportTest {
         )
 
         val globalType = GlobalType(ValueType.Number.I32, Mutability.Const)
-        val globalExternal = global(store, globalType, Value.Number.I32(117))
+        val globalExternal = global(store, globalType, NumberValue.I32(117))
         val globalImport = Import(
             "env",
             "global",
@@ -61,8 +63,8 @@ class ImportTest {
             memoryExternal,
         )
 
-        val tableType = TableType(Limits(1u), ValueType.Reference.RefNull(HeapType.Func))
-        val tableExternal = table(store, tableType, Value.Reference.Null(HeapType.Func))
+        val tableType = TableType(Limits(1u), ValueType.Reference.RefNull(AbstractHeapType.Func))
+        val tableExternal = table(store, tableType, ReferenceValue.Null(AbstractHeapType.Func))
         val tableImport = Import(
             "env",
             "table",
@@ -91,7 +93,7 @@ class ImportTest {
             ),
         )
 
-        val expected = emptyList<Value>()
+        val expected = emptyList<ExecutionValue>()
 
         assertEquals(ChasmResult.Success(expected), result)
     }

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.embedding.shapes.Value
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.action.ActionResult
 import io.github.charlietap.chasm.script.action.ActionRunner
@@ -50,8 +50,8 @@ fun AssertReturnCommandRunner(
 }
 
 private fun compareResults(
-    expected: List<Value>,
-    actual: List<Value>,
+    expected: List<ExecutionValue>,
+    actual: List<ExecutionValue>,
     valueMatcher: ValueMatcher,
 ): Boolean = if (expected.size == actual.size) {
     expected.zip(actual).all { (first, second) ->
