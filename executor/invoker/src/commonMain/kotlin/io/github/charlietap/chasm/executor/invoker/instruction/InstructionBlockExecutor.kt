@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.admin.LabelDispatcher
+import io.github.charlietap.chasm.executor.invoker.instruction.admin.LabelInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -24,7 +24,7 @@ internal inline fun InstructionBlockExecutor(
         instructions = instructions,
         handler = handler,
         handlerDispatcher = ::HandlerDispatcher,
-        labelDispatcher = ::LabelDispatcher,
+        labelCleaner = ::LabelInstructionExecutor,
     )
 
 internal inline fun InstructionBlockExecutor(
@@ -33,7 +33,7 @@ internal inline fun InstructionBlockExecutor(
     instructions: Array<DispatchableInstruction>,
     handler: ExceptionHandler?,
     crossinline handlerDispatcher: Dispatcher<ExceptionHandler>,
-    crossinline labelDispatcher: Dispatcher<Stack.Entry.Label>,
+    noinline labelCleaner: DispatchableInstruction,
 ): Result<Unit, InvocationError> = binding {
 
     handler?.let {
@@ -42,7 +42,7 @@ internal inline fun InstructionBlockExecutor(
         stack.push(instruction)
     }
     stack.push(label)
-    stack.push(labelDispatcher(label))
+    stack.push(labelCleaner)
 
     stack.push(instructions)
 }

@@ -3,13 +3,12 @@ package io.github.charlietap.chasm.executor.invoker.thread
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatcher
+import io.github.charlietap.chasm.executor.invoker.instruction.admin.FrameInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 internal typealias ThreadExecutor = (Configuration) -> Result<List<ExecutionValue>, InvocationError>
@@ -19,12 +18,12 @@ internal fun ThreadExecutor(
 ): Result<List<ExecutionValue>, InvocationError> =
     ThreadExecutor(
         configuration = configuration,
-        frameDispatcher = ::FrameDispatcher,
+        frameCleaner = ::FrameInstructionExecutor,
     )
 
 internal fun ThreadExecutor(
     configuration: Configuration,
-    frameDispatcher: Dispatcher<ActivationFrame>,
+    frameCleaner: DispatchableInstruction,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
     val thread = configuration.thread
@@ -36,7 +35,7 @@ internal fun ThreadExecutor(
     )
 
     stack.push(thread.frame)
-    stack.push(frameDispatcher(thread.frame))
+    stack.push(frameCleaner)
     thread.frame.locals.forEach { local ->
         stack.push(local)
     }

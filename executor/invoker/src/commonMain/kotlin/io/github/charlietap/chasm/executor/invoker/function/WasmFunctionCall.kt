@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.admin.FrameDispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.admin.FrameInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
@@ -25,14 +25,14 @@ internal inline fun WasmFunctionCall(
         context = context,
         instance = instance,
         instructionBlockExecutor = ::InstructionBlockExecutor,
-        frameDispatcher = ::FrameDispatcher,
+        frameCleaner = ::FrameInstructionExecutor,
     )
 
 internal inline fun WasmFunctionCall(
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
-    crossinline frameDispatcher: Dispatcher<ActivationFrame>,
+    noinline frameCleaner: DispatchableInstruction,
 ): Result<Unit, InvocationError> = binding {
 
     val (stack) = context
@@ -58,7 +58,7 @@ internal inline fun WasmFunctionCall(
     )
 
     stack.pushFrame(frame).bind()
-    stack.push(frameDispatcher(frame))
+    stack.push(frameCleaner)
 
     val label = Stack.Entry.Label(
         arity = results,

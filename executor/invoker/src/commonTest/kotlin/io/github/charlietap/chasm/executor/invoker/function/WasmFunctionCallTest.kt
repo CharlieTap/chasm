@@ -5,13 +5,11 @@ import com.github.michaelbull.result.expect
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
-import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.fixture.ast.module.local
 import io.github.charlietap.chasm.fixture.ast.type.functionType
@@ -114,9 +112,6 @@ class WasmFunctionCallTest {
             instance = functionInstance.module,
         )
         val frameDispatchable = dispatchableInstruction()
-        val frameDispatcher: Dispatcher<ActivationFrame> = { frame ->
-            frameDispatchable
-        }
         val expectedFrameInstruction = frameDispatchable
 
         val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _handler ->
@@ -135,7 +130,7 @@ class WasmFunctionCallTest {
             context = context,
             instance = functionInstance,
             instructionBlockExecutor = instructionBlockExecutor,
-            frameDispatcher = frameDispatcher,
+            frameCleaner = frameDispatchable,
         )
 
         assertEquals(Ok(Unit), actual)

@@ -5,12 +5,9 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popFrame
-import io.github.charlietap.chasm.executor.runtime.instruction.AdminInstruction
 
-@Suppress("UNUSED_PARAMETER")
 internal inline fun FrameInstructionExecutor(
     context: ExecutionContext,
-    instruction: AdminInstruction.Frame,
 ): Result<Unit, InvocationError> = binding {
     context.stack.popFrame().bind()
 }
