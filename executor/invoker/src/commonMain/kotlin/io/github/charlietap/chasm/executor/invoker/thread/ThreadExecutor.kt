@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -49,13 +48,9 @@ internal fun ThreadExecutor(
         instruction(context).bind()
     }
 
-    val results = List(thread.frame.arity) {
-        stack.popValue().bind()
-    }.asReversed()
-
-    if (stack.size() > 0) {
+    if (stack.size() != thread.frame.arity) {
         Err(InvocationError.ProgramFinishedInconsistentState).bind<List<ExecutionValue>>()
     }
 
-    results
+    stack.values()
 }

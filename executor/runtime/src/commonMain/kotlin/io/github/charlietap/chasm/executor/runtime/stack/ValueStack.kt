@@ -5,7 +5,7 @@ import kotlin.jvm.JvmOverloads
 
 class ValueStack
     @JvmOverloads
-    constructor(minCapacity: Int = MIN_CAPACITY) {
+    constructor(minCapacity: Int = MIN_CAPACITY) : List<ExecutionValue> {
 
         private var elements: Array<ExecutionValue?>
         private var top = 0
@@ -94,6 +94,52 @@ class ValueStack
         private fun doubleCapacity() {
             val newCapacity = elements.size * 2
             elements = elements.copyOf(newCapacity)
+        }
+
+        override val size: Int
+            get() = top
+
+        override fun isEmpty(): Boolean = top == 0
+
+        override fun get(index: Int): ExecutionValue = elements[index]
+            ?: throw IndexOutOfBoundsException("Index: $index, Size: $top")
+
+        override fun contains(element: ExecutionValue): Boolean = elements.take(top).contains(element)
+
+        override fun containsAll(elements: Collection<ExecutionValue>): Boolean = elements.all { contains(it) }
+
+        override fun iterator(): Iterator<ExecutionValue> = elements.take(top).map { it!! }.iterator()
+
+        override fun indexOf(element: ExecutionValue): Int = elements.indexOfFirst { it == element }.takeIf { it < top } ?: -1
+
+        override fun lastIndexOf(element: ExecutionValue): Int = elements.indexOfLast { it == element }.takeIf { it < top } ?: -1
+
+        override fun listIterator(): ListIterator<ExecutionValue> = elements.take(top).map { it!! }.listIterator()
+
+        override fun listIterator(index: Int): ListIterator<ExecutionValue> =
+            elements.take(top).map { it!! }.listIterator(index)
+
+        override fun subList(fromIndex: Int, toIndex: Int): List<ExecutionValue> {
+            if (fromIndex < 0 || toIndex > top || fromIndex > toIndex) {
+                throw IndexOutOfBoundsException("fromIndex: $fromIndex, toIndex: $toIndex, Size: $top")
+            }
+            return elements.slice(fromIndex until toIndex).map { it!! }
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is List<*>) return false
+            if (size != other.size) return false
+
+            for (i in 0 until size) {
+                if (this[i] != other[i]) return false
+            }
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return elements.take(top).map { it.hashCode() }.fold(1) { acc, hash -> 31 * acc + hash }
         }
     }
 

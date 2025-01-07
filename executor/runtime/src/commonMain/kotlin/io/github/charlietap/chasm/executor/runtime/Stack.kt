@@ -149,15 +149,15 @@ data class Stack(
 
     fun clearValues() = values.clear()
 
-    fun frames() = frames.entries()
+    fun frames(): List<ActivationFrame> = frames.entries()
 
-    fun handlers() = handlers.entries()
+    fun handlers(): List<ExceptionHandler> = handlers.entries()
 
-    fun instructions() = instructions.entries()
+    fun instructions(): List<DispatchableInstruction> = instructions.entries()
 
-    fun labels() = labels.entries()
+    fun labels(): List<Entry.Label> = labels.entries()
 
-    fun values() = values.entries()
+    fun values(): List<ExecutionValue> = values
 
     fun fill(stack: Stack) {
         stack.frames.entries().forEach { entry ->
