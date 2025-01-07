@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStack
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.InstructionStack
 import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -13,7 +14,7 @@ import io.github.charlietap.chasm.stack.Stack as InternalStack
 data class Stack(
     private val frames: FrameStack = FrameStack(),
     private val handlers: InternalStack<ExceptionHandler> = InternalStack(INITIAL_CAPACITY),
-    private val instructions: InternalStack<DispatchableInstruction> = InternalStack(INITIAL_CAPACITY),
+    private val instructions: InstructionStack = InstructionStack(INITIAL_CAPACITY),
     private val labels: InternalStack<Entry.Label> = InternalStack(INITIAL_CAPACITY),
     private val values: ValueStack = ValueStack(INITIAL_CAPACITY),
 ) {
