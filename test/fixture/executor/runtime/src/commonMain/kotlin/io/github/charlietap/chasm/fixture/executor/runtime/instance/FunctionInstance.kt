@@ -10,6 +10,8 @@ import io.github.charlietap.chasm.fixture.ast.type.definedType
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 
+fun functionInstance(): FunctionInstance = hostFunctionInstance()
+
 fun hostFunctionInstance(
     type: DefinedType = definedType(),
     functionType: FunctionType = functionType(),

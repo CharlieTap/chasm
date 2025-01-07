@@ -61,7 +61,9 @@ class ImportTest {
                 moduleName = "wasi_preview_1",
                 entityName = "fd_write",
                 value = publicFunction(
-                    reference = functionExternalValue(functionAddress(0)),
+                    reference = functionExternalValue(
+                        address = functionAddress(0),
+                    ),
                 ),
             ),
         )

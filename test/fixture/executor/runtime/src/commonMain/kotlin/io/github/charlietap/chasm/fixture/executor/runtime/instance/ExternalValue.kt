@@ -7,20 +7,30 @@ fun externalValue(): ExternalValue = functionExternalValue()
 
 fun functionExternalValue(
     address: Address.Function = functionAddress(),
-) = ExternalValue.Function(address)
+) = ExternalValue.Function(
+    address = address,
+)
 
 fun tableExternalValue(
     address: Address.Table = tableAddress(),
-) = ExternalValue.Table(address)
+) = ExternalValue.Table(
+    address = address,
+)
 
 fun memoryExternalValue(
     address: Address.Memory = memoryAddress(),
-) = ExternalValue.Memory(address)
+) = ExternalValue.Memory(
+    address = address,
+)
 
 fun globalExternalValue(
     address: Address.Global = globalAddress(),
-) = ExternalValue.Global(address)
+) = ExternalValue.Global(
+    address = address,
+)
 
 fun tagExternalValue(
     address: Address.Tag = tagAddress(),
-) = ExternalValue.Tag(address)
+) = ExternalValue.Tag(
+    address = address,
+)

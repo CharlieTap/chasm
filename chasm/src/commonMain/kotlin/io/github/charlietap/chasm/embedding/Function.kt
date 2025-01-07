@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.embedding.transform.FunctionTypeMapper
 import io.github.charlietap.chasm.embedding.transform.HostFunctionMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocator
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.ast.type.FunctionType as InternalFunctionType
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction as InternalHostFunction
 
@@ -35,5 +34,7 @@ internal fun function(
 ): Function {
     val functionType = functionTypeMapper.map(type)
     val hostFunction = hostFunctionMapper.map(function)
-    return Function(ExternalValue.Function(allocator(store.store, functionType, hostFunction)))
+    return Function(
+        reference = allocator(store.store, functionType, hostFunction),
+    )
 }

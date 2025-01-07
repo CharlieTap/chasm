@@ -7,10 +7,10 @@ import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.export.ExportAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
@@ -33,7 +33,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.ext.functionAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -61,6 +60,7 @@ internal fun ModuleAllocator(
         dataAllocator = ::DataAllocator,
         expressionPredecoder = ::ExpressionPredecoder,
         functionPredecoder = ::FunctionPredecoder,
+        exportAllocator = ::ExportAllocator,
     )
 
 internal inline fun ModuleAllocator(
@@ -76,6 +76,7 @@ internal inline fun ModuleAllocator(
     crossinline dataAllocator: DataAllocator,
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
     crossinline functionPredecoder: Predecoder<Function, RuntimeFunction>,
+    crossinline exportAllocator: ExportAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val (store, module) = context
@@ -121,29 +122,6 @@ internal inline fun ModuleAllocator(
         instance.addDataAddress(address)
     }
 
-    module.exports.forEach { export ->
-
-        val externalValue = when (val descriptor = export.descriptor) {
-            is Export.Descriptor.Function -> {
-                ExternalValue.Function(instance.functionAddresses[descriptor.functionIndex.idx.toInt()])
-            }
-            is Export.Descriptor.Table -> {
-                ExternalValue.Table(instance.tableAddresses[descriptor.tableIndex.idx.toInt()])
-            }
-            is Export.Descriptor.Global -> {
-                ExternalValue.Global(instance.globalAddresses[descriptor.globalIndex.idx.toInt()])
-            }
-            is Export.Descriptor.Memory -> {
-                ExternalValue.Memory(instance.memAddresses[descriptor.memoryIndex.idx.toInt()])
-            }
-            is Export.Descriptor.Tag -> {
-                ExternalValue.Tag(instance.tagAddresses[descriptor.tagIndex.idx.toInt()])
-            }
-        }
-
-        instance.addExport(ExportInstance(export.name, externalValue))
-    }
-
     module.functions.forEach { function ->
 
         val predecoded = functionPredecoder(context, function).bind()
@@ -151,6 +129,11 @@ internal inline fun ModuleAllocator(
         val functionInstance = context.store.function(address).bind() as FunctionInstance.WasmFunction
 
         functionInstance.function = predecoded
+    }
+
+    module.exports.forEach { export ->
+        val externalValue = exportAllocator(context, export.descriptor).bind()
+        instance.addExport(ExportInstance(export.name, externalValue))
     }
 
     instance

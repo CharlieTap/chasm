@@ -28,6 +28,12 @@ fun globalExportDescriptor(
     globalIndex = globalIndex,
 )
 
+fun tagExportDescriptor(
+    tagIndex: Index.TagIndex = Index.TagIndex(0u),
+) = Export.Descriptor.Tag(
+    tagIndex = tagIndex,
+)
+
 fun export(
     name: NameValue = NameValue(""),
     descriptor: Export.Descriptor = functionExportDescriptor(),

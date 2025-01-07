@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.export.ExportAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
@@ -31,6 +32,8 @@ import io.github.charlietap.chasm.fixture.ast.module.table
 import io.github.charlietap.chasm.fixture.ast.module.tableExportDescriptor
 import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.tag
+import io.github.charlietap.chasm.fixture.ast.module.tagExportDescriptor
+import io.github.charlietap.chasm.fixture.ast.module.tagIndex
 import io.github.charlietap.chasm.fixture.ast.module.type
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.functionType
@@ -53,6 +56,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
@@ -95,36 +99,49 @@ class ModuleAllocatorTest {
         val importTableAddress = tableAddress(0)
         val importMemoryAddress = memoryAddress(0)
         val importGlobalAddress = globalAddress(0)
+        val importTagAddress = tagAddress(0)
 
+        val functionExportDescriptor = functionExportDescriptor(
+            functionIndex = functionIndex(1u),
+        )
         val functionExport = export(
             name = nameValue("function_export"),
-            descriptor = functionExportDescriptor(
-                functionIndex = functionIndex(1u),
-            ),
+            descriptor = functionExportDescriptor,
+        )
+        val tableExportDescriptor = tableExportDescriptor(
+            tableIndex = tableIndex(1u),
         )
         val tableExport = export(
             name = nameValue("table_export"),
-            descriptor = tableExportDescriptor(
-                tableIndex = tableIndex(1u),
-            ),
+            descriptor = tableExportDescriptor,
+        )
+        val memoryExportDescriptor = memoryExportDescriptor(
+            memoryIndex = memoryIndex(1u),
         )
         val memoryExport = export(
             name = nameValue("memory_export"),
-            descriptor = memoryExportDescriptor(
-                memoryIndex = memoryIndex(1u),
-            ),
+            descriptor = memoryExportDescriptor,
+        )
+        val globalExportDescriptor = globalExportDescriptor(
+            globalIndex = globalIndex(1u),
         )
         val globalExport = export(
             name = nameValue("global_export"),
-            descriptor = globalExportDescriptor(
-                globalIndex = globalIndex(1u),
-            ),
+            descriptor = globalExportDescriptor,
+        )
+        val tagExportDescriptor = tagExportDescriptor(
+            tagIndex = tagIndex(1u),
+        )
+        val tagExport = export(
+            name = nameValue("tag_export"),
+            descriptor = tagExportDescriptor,
         )
         val exports = listOf(
             functionExport,
             tableExport,
             memoryExport,
             globalExport,
+            tagExport,
         )
 
         val module = module(
@@ -133,6 +150,7 @@ class ModuleAllocatorTest {
             tables = listOf(table),
             memories = listOf(memory),
             globals = listOf(global),
+            tags = listOf(tag),
             elementSegments = listOf(elementSegment),
             dataSegments = listOf(dataSegment),
             exports = exports,
@@ -145,8 +163,10 @@ class ModuleAllocatorTest {
         val context = instantiationContext(store, module)
 
         val functionAddress = functionAddress(1)
+        val functionExternalValue = functionExternalValue(functionAddress)
 
         val tableAddress = tableAddress(1)
+        val tableExternalValue = tableExternalValue(tableAddress)
         val tableAllocator: TableAllocator = { _store, _tableType, _refVal ->
             assertEquals(store, _store)
             assertEquals(table.type, _tableType)
@@ -156,6 +176,7 @@ class ModuleAllocatorTest {
         }
 
         val memoryAddress = memoryAddress(1)
+        val memoryExternalValue = memoryExternalValue(memoryAddress)
         val memoryAllocator: MemoryAllocator = { _store, _memoryType ->
             assertEquals(store, _store)
             assertEquals(memory.type, _memoryType)
@@ -164,6 +185,7 @@ class ModuleAllocatorTest {
         }
 
         val tagAddress = tagAddress(1)
+        val tagExternalValue = tagExternalValue(tagAddress)
         val tagAllocator: TagAllocator = { _store, _tagType ->
             assertEquals(store, _store)
             assertEquals(tag.type, _tagType)
@@ -172,6 +194,7 @@ class ModuleAllocatorTest {
         }
 
         val globalAddress = globalAddress(1)
+        val globalExternalValue = globalExternalValue(globalAddress)
         val globalAllocator: GlobalAllocator = { _store, _globalType, _executionValue ->
             assertEquals(store, _store)
             assertEquals(global.type, _globalType)
@@ -203,6 +226,7 @@ class ModuleAllocatorTest {
             globalAddresses = mutableListOf(importGlobalAddress),
             memAddresses = mutableListOf(importMemoryAddress),
             tableAddresses = mutableListOf(importTableAddress),
+            tagAddresses = mutableListOf(importTagAddress),
         )
 
         val expressionValues = sequenceOf(globalInitValue, elementSegmentRef).iterator()
@@ -223,19 +247,37 @@ class ModuleAllocatorTest {
             Ok(runtimeFunction())
         }
 
+        val expectedExports = sequenceOf(
+            functionExportDescriptor to functionExternalValue,
+            tableExportDescriptor to tableExternalValue,
+            memoryExportDescriptor to memoryExternalValue,
+            globalExportDescriptor to globalExternalValue,
+            tagExportDescriptor to tagExternalValue,
+        ).iterator()
+        val exportAllocator: ExportAllocator = { _context, _descriptor ->
+            val (expectedDescriptor, expectedExtern) = expectedExports.next()
+
+            assertEquals(context, _context)
+            assertEquals(expectedDescriptor, _descriptor)
+
+            Ok(expectedExtern)
+        }
+
         val expected = moduleInstance(
             types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
             tableAddresses = mutableListOf(importTableAddress, tableAddress),
             memAddresses = mutableListOf(importMemoryAddress, memoryAddress),
             globalAddresses = mutableListOf(importGlobalAddress, globalAddress),
+            tagAddresses = mutableListOf(importTagAddress, tagAddress),
             elemAddresses = mutableListOf(elementAddress),
             dataAddresses = mutableListOf(dataAddress),
             exports = mutableListOf(
-                exportInstance(nameValue("function_export"), functionExternalValue(functionAddress)),
-                exportInstance(nameValue("table_export"), tableExternalValue(tableAddress)),
-                exportInstance(nameValue("memory_export"), memoryExternalValue(memoryAddress)),
-                exportInstance(nameValue("global_export"), globalExternalValue(globalAddress)),
+                exportInstance(nameValue("function_export"), functionExternalValue),
+                exportInstance(nameValue("table_export"), tableExternalValue),
+                exportInstance(nameValue("memory_export"), memoryExternalValue),
+                exportInstance(nameValue("global_export"), globalExternalValue),
+                exportInstance(nameValue("tag_export"), tagExternalValue),
             ),
         )
 
@@ -252,6 +294,7 @@ class ModuleAllocatorTest {
             dataAllocator = dataAllocator,
             expressionPredecoder = expressionPredecoder,
             functionPredecoder = functionPredecoder,
+            exportAllocator = exportAllocator,
         )
 
         assertEquals(Ok(expected), actual)

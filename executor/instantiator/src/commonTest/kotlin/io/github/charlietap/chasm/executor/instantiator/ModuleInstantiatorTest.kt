@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.executor.instantiator.initialization.TableInit
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.elementSegment
@@ -66,6 +65,7 @@ class ModuleInstantiatorTest {
         val partialInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress(0)),
         )
+
         val pallocator: PartialModuleAllocator = { _context, _imports ->
             assertEquals(context, _context)
             assertEquals(imports, _imports)
@@ -91,7 +91,7 @@ class ModuleInstantiatorTest {
 
         val invoker: FunctionInvoker = { _store, _address, _locals ->
             assertEquals(store, _store)
-            assertEquals(Address.Function(0), _address)
+            assertEquals(functionAddress(0), _address)
             assertEquals(emptyList(), _locals)
 
             Ok(emptyList())
