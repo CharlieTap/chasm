@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.memory
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 
 data class ByteArrayLinearMemory(
-    val memory: ByteArray,
+    var memory: ByteArray,
 ) : LinearMemory {
 
     constructor(
