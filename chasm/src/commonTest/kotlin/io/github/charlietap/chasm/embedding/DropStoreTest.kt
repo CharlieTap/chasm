@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.executor.memory.destruct.LinearMemoryDestructor
+import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.sharedStatus
@@ -61,17 +61,17 @@ class DropStoreTest {
             ),
         )
 
-        var memoryDeallocated = false
-        val destructor: LinearMemoryDestructor = { _memoryInstance ->
-            assertEquals(memoryInstance.data, _memoryInstance)
-            memoryDeallocated = true
+        var memoryDropped = false
+        val memoryDropper: MemoryInstanceDropper = { _memoryInstance ->
+            assertEquals(memoryInstance, _memoryInstance)
+            memoryDropped = true
         }
 
         val expected = ChasmResult.Success(Unit)
-        val actual = dropStore(store, destructor)
+        val actual = dropStore(store, memoryDropper)
 
         assertEquals(expected, actual)
-        assertEquals(true, memoryDeallocated)
+        assertEquals(true, memoryDropped)
         assertContentEquals(ubyteArrayOf(), dataInstance.bytes)
         assertEquals(emptyList<ExecutionValue>(), exceptionInstance.fields)
         assertContentEquals(arrayOf(), elementInstance.elements)

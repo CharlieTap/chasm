@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.embedding
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.executor.memory.destruct.LinearMemoryDestructor
+import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.sharedStatus
@@ -81,13 +81,13 @@ class DropInstanceTest {
         )
 
         var memoryDeallocated = false
-        val destructor: LinearMemoryDestructor = { _memoryInstance ->
-            assertEquals(memoryInstance.data, _memoryInstance)
+        val memoryDropper: MemoryInstanceDropper = { _memoryInstance ->
+            assertEquals(memoryInstance, _memoryInstance)
             memoryDeallocated = true
         }
 
         val expected = ChasmResult.Success(Unit)
-        val actual = dropInstance(store, instance, destructor)
+        val actual = dropInstance(store, instance, memoryDropper)
 
         assertEquals(expected, actual)
         assertEquals(true, moduleInstance.deallocated)
@@ -127,17 +127,17 @@ class DropInstanceTest {
             ),
         )
 
-        var memoryDeallocated = false
-        val destructor: LinearMemoryDestructor = { _memoryInstance ->
-            assertEquals(memoryInstance.data, _memoryInstance)
-            memoryDeallocated = true
+        var memoryDropped = false
+        val memoryDropper: MemoryInstanceDropper = { _memoryInstance ->
+            assertEquals(memoryInstance, _memoryInstance)
+            memoryDropped = true
         }
 
         val expected = ChasmResult.Success(Unit)
-        val actual = dropInstance(store, instance, destructor)
+        val actual = dropInstance(store, instance, memoryDropper)
 
         assertEquals(expected, actual)
         assertEquals(true, instance.instance.deallocated)
-        assertEquals(false, memoryDeallocated)
+        assertEquals(false, memoryDropped)
     }
 }

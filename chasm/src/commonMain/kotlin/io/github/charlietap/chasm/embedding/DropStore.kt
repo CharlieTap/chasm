@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.memory.destruct.LinearMemoryDestructor
+import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 fun dropStore(
@@ -12,13 +12,13 @@ fun dropStore(
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
     return dropStore(
         store = store,
-        destructor = ::LinearMemoryDestructor,
+        memoryDropper = ::MemoryInstanceDropper,
     )
 }
 
 internal fun dropStore(
     store: Store,
-    destructor: LinearMemoryDestructor,
+    memoryDropper: MemoryInstanceDropper,
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
 
     val store = store.store
@@ -47,7 +47,7 @@ internal fun dropStore(
     store.globals.clear()
 
     store.memories.forEach { memory ->
-        destructor(memory.data)
+        memoryDropper(memory)
     }
     store.memories.clear()
 

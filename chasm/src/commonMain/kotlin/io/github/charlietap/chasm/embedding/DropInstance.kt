@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.memory.destruct.LinearMemoryDestructor
+import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.global
@@ -22,14 +22,14 @@ fun dropInstance(
     return dropInstance(
         store = store,
         instance = instance,
-        destructor = ::LinearMemoryDestructor,
+        memoryDropper = ::MemoryInstanceDropper,
     )
 }
 
 internal fun dropInstance(
     store: Store,
     instance: Instance,
-    destructor: LinearMemoryDestructor,
+    memoryDropper: MemoryInstanceDropper,
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
 
     val instance = instance.instance
@@ -64,7 +64,7 @@ internal fun dropInstance(
     instance.memAddresses.forEach { address ->
         store.memory(address).map { memory ->
             if (memory.type.shared == SharedStatus.Unshared) {
-                destructor(memory.data)
+                memoryDropper(memory)
             }
         }
     }
