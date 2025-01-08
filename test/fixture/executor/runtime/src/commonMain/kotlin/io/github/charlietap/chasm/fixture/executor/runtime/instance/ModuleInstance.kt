@@ -15,6 +15,7 @@ fun moduleInstance(
     elemAddresses: MutableList<Address.Element> = mutableListOf(),
     dataAddresses: MutableList<Address.Data> = mutableListOf(),
     exports: MutableList<ExportInstance> = mutableListOf(),
+    deallocated: Boolean = false,
 ) = ModuleInstance(
     types = types,
     functionAddresses = functionAddresses,
@@ -25,4 +26,5 @@ fun moduleInstance(
     elemAddresses = elemAddresses,
     dataAddresses = dataAddresses,
     exports = exports,
+    deallocated = deallocated,
 )

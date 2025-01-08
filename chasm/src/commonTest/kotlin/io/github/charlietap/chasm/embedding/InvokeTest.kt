@@ -21,6 +21,23 @@ import kotlin.test.assertEquals
 class InvokeTest {
 
     @Test
+    fun `calling invoke on an a deallocated instance returns InvocationOfADeinstantiatedInstance`() {
+
+        val store = publicStore()
+        val instance = publicInstance(
+            moduleInstance = moduleInstance(
+                deallocated = true,
+            ),
+        )
+
+        val expected = ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString())
+
+        val actual = invoke(store, instance, "")
+
+        assertEquals(ChasmResult.Error(expected), actual)
+    }
+
+    @Test
     fun `calling invoke on an instance with a function that is not exported returns FunctionNotFound`() {
 
         val function = "missing"

@@ -13,4 +13,5 @@ data class ModuleInstance(
     val elemAddresses: MutableList<Address.Element> = mutableListOf(),
     val dataAddresses: MutableList<Address.Data> = mutableListOf(),
     val exports: MutableList<ExportInstance> = mutableListOf(),
+    var deallocated: Boolean = false,
 )
