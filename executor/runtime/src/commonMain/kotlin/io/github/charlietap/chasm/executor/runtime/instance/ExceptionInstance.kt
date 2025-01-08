@@ -5,5 +5,5 @@ import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 data class ExceptionInstance(
     val tagAddress: Address.Tag,
-    val fields: List<ExecutionValue>,
+    var fields: List<ExecutionValue>,
 )
