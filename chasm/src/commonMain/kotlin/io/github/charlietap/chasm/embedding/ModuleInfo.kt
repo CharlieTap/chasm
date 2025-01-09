@@ -3,13 +3,13 @@ package io.github.charlietap.chasm.embedding
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.embedding.shapes.ExportDefinition
-import io.github.charlietap.chasm.embedding.shapes.ExternalType
 import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.embedding.transform.ExportDescriptorMapper
 import io.github.charlietap.chasm.embedding.transform.ImportDescriptorMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
+import io.github.charlietap.chasm.executor.runtime.type.ExternalType
 
 fun moduleInfo(
     module: Module,

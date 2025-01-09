@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
-import io.github.charlietap.chasm.embedding.fixture.publicTableType
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.ast.type.tableType
@@ -16,7 +15,7 @@ class TableTest {
     fun `can allocate a table in the store and return an external value`() {
 
         val store = publicStore()
-        val type = publicTableType()
+        val type = tableType()
         val initialValue = referenceValue()
 
         val expectedExternalType = ExternalValue.Table(Address.Table(0))

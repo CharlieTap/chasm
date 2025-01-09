@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
-import io.github.charlietap.chasm.embedding.fixture.publicMemoryType
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
@@ -15,7 +14,7 @@ class MemoryTest {
     fun `can allocate a memory in the store and return an external value`() {
 
         val store = publicStore()
-        val memoryType = publicMemoryType()
+        val memoryType = memoryType()
 
         val expectedExternalValue = ExternalValue.Memory(Address.Memory(0))
         val expected = publicMemory(expectedExternalValue)

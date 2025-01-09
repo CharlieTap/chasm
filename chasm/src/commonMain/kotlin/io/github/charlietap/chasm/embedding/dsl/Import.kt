@@ -30,5 +30,10 @@ class ImportsBuilder(private val store: Store) {
         imports.add(import)
     }
 
+    fun tag(builder: TagImportBuilder.() -> Unit) {
+        val import = TagImportBuilder(store).apply(builder).build()
+        imports.add(import)
+    }
+
     fun build(): List<Import> = imports
 }

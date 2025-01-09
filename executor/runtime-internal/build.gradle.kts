@@ -17,19 +17,15 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
-                api(projects.executor.runtimeInternal)
-                api(projects.executor.invoker)
+                api(projects.executor.runtimeExternal)
+                api(projects.libs.stack)
+                api(projects.typeSystem)
                 api(libs.result)
-
-                implementation(projects.typeSystem)
-                implementation(projects.executor.memory)
             }
         }
 
         commonTest {
             dependencies {
-                implementation(projects.test.fixture.ast)
-                implementation(projects.test.fixture.executor.instantiator)
                 implementation(projects.test.fixture.executor.runtime)
                 implementation(libs.kotlin.test)
             }
@@ -38,8 +34,8 @@ kotlin {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "instantiator"
-    description = "A wasm module instantiator"
+    name = "runtime-internal"
+    description = "A wasm runtime implementation"
 }
 
 tasks.withType<KotlinCompile>().configureEach {

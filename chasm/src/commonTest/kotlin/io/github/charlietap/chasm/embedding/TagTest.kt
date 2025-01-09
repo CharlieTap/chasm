@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTag
-import io.github.charlietap.chasm.embedding.fixture.publicTagType
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.ast.type.tagType
@@ -15,7 +14,7 @@ class TagTest {
     fun `can allocate a tag in the store and return an external value`() {
 
         val store = publicStore()
-        val tagType = publicTagType()
+        val tagType = tagType()
 
         val expectedExternalValue = ExternalValue.Tag(Address.Tag(0))
         val expected = publicTag(expectedExternalValue)

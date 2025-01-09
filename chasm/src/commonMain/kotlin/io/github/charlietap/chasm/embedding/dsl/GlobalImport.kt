@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.embedding.dsl
 
+import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.embedding.global
-import io.github.charlietap.chasm.embedding.shapes.GlobalType
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.embedding.dsl
 
+import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.embedding.function
-import io.github.charlietap.chasm.embedding.shapes.FunctionType
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store

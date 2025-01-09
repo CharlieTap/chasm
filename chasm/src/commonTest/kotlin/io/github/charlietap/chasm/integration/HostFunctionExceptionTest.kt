@@ -1,14 +1,15 @@
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.embedding.fixture.publicFunctionType
 import io.github.charlietap.chasm.embedding.fixture.publicImport
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
-import io.github.charlietap.chasm.embedding.shapes.ValueType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.host.HostFunctionException
 import kotlin.test.Test
@@ -21,9 +22,12 @@ class HostFunctionExceptionTest {
 
         val store = publicStore(store())
 
-        val functionType = publicFunctionType(
-            emptyList(),
-            listOf(ValueType.Number.I32),
+        val functionType = functionType(
+            results = resultType(
+                listOf(
+                    i32ValueType(),
+                ),
+            ),
         )
         val reason = "Fail gracefully"
         val exception = HostFunctionException(reason)

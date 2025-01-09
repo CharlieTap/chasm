@@ -1,17 +1,20 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.embedding.shapes.Limits
-import io.github.charlietap.chasm.embedding.shapes.TableType
-import io.github.charlietap.chasm.embedding.shapes.ValueType
+import io.github.charlietap.chasm.ast.type.Limits
+import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.ast.type.TableType
 
 class TableTypeBuilder {
 
-    var referenceType: ValueType.Reference? = null
+    var referenceType: ReferenceType? = null
     private var limits: Limits? = null
 
     fun limits(builder: LimitsBuilder.() -> Unit) {
         limits = LimitsBuilder().apply(builder).build()
     }
 
-    fun build() = TableType(requireNotNull(limits), requireNotNull(referenceType))
+    fun build() = TableType(
+        referenceType = requireNotNull(referenceType),
+        limits = requireNotNull(limits),
+    )
 }

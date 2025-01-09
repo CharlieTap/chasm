@@ -13,7 +13,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
-                api(projects.executor.runtime)
+                api(projects.executor.runtimeInternal)
                 api(projects.test.fixture.ast)
             }
         }

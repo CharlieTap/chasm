@@ -1,25 +1,29 @@
 package io.github.charlietap.chasm.embedding.dsl
 
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.embedding.fixture.publicFunction
 import io.github.charlietap.chasm.embedding.fixture.publicGlobal
 import io.github.charlietap.chasm.embedding.fixture.publicImport
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
+import io.github.charlietap.chasm.embedding.fixture.publicTag
 import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.Mutability
-import io.github.charlietap.chasm.embedding.shapes.ValueType
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.constMutability
+import io.github.charlietap.chasm.fixture.ast.type.exceptionAttribute
 import io.github.charlietap.chasm.fixture.ast.type.functionHeapType
+import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.globalType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.ast.type.tableType
+import io.github.charlietap.chasm.fixture.ast.type.tagType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
@@ -28,6 +32,8 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddres
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagAddress
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.functionReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
@@ -82,7 +88,7 @@ class ImportTest {
                 moduleName = "wasi_preview_1"
                 entityName = "stack_pointer"
                 type {
-                    valueType = ValueType.Number.I32
+                    valueType = i32ValueType()
                     mutability = Mutability.Const
                 }
                 value = i32(0)
@@ -147,7 +153,7 @@ class ImportTest {
                 moduleName = "wasi_preview_1"
                 entityName = "dynamic_dispatch"
                 type {
-                    referenceType = ValueType.Reference.RefNull(functionHeapType())
+                    referenceType = refNullReferenceType(functionHeapType())
                     limits {
                         min = 1u
                     }
@@ -170,5 +176,47 @@ class ImportTest {
         assertEquals(1, store.store.tables.size)
         assertEquals(tableType(refNullReferenceType(AbstractHeapType.Func), limits(1u)), store.store.tables[0].type)
         assertEquals(functionAddress(0), (store.store.tables[0].elements[0] as ReferenceValue.Function).address)
+    }
+
+    @Test
+    fun `can create a tag import using the import dsl builder`() {
+
+        val store = publicStore()
+
+        val actual = imports(store) {
+            tag {
+                moduleName = "err"
+                entityName = "exception"
+                type {
+                    attribute = exceptionAttribute()
+                    functionType {
+                        params { i32() }
+                        results { i32() }
+                    }
+                }
+            }
+        }
+
+        val expectedTagType = tagType(
+            attribute = exceptionAttribute(),
+            type = functionType(
+                params = resultType(listOf(i32ValueType())),
+                results = resultType(listOf(i32ValueType())),
+            ),
+        )
+
+        val expected = listOf<Import>(
+            publicImport(
+                moduleName = "err",
+                entityName = "exception",
+                value = publicTag(
+                    reference = tagExternalValue(tagAddress(0)),
+                ),
+            ),
+        )
+
+        assertEquals(expected, actual)
+        assertEquals(1, store.store.tags.size)
+        assertEquals(expectedTagType, store.store.tags[0].type)
     }
 }

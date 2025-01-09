@@ -16,7 +16,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
-                api(projects.executor.runtime)
+                api(projects.executor.runtimeInternal)
                 api(libs.result)
             }
         }

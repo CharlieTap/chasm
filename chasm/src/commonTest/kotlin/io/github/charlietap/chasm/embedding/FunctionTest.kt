@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicFunction
-import io.github.charlietap.chasm.embedding.fixture.publicFunctionType
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
 import io.github.charlietap.chasm.fixture.ast.type.functionType
@@ -18,7 +17,7 @@ class FunctionTest {
     fun `can allocate a function in the store and return an external value`() {
 
         val store = publicStore()
-        val funcType = publicFunctionType()
+        val funcType = functionType()
         val hostFunction: HostFunction = {
             emptyList()
         }

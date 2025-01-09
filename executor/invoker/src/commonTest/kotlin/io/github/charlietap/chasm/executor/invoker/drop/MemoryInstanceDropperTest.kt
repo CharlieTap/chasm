@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.drop
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.executor.memory.destruct.LinearMemoryDestructor
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory.Companion.PAGE_SIZE
+import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
@@ -17,7 +18,7 @@ class MemoryInstanceDropperTest {
     fun `calling MemoryInstanceDropper sets bounds to zero and invokes linear memory destructor`() {
         val linearMemory = linearMemory()
         val memoryType = memoryType(
-            limits = Limits(4u, 8u),
+            limits = limits(4u, 8u),
             shared = unsharedStatus(),
         )
         val memoryInstance = memoryInstance(

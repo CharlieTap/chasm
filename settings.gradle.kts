@@ -44,8 +44,8 @@ include(":decoder")
 include(":executor:instantiator")
 include(":executor:invoker")
 include(":executor:memory")
-include(":executor:runtime")
-include(":executor:runtime-value")
+include(":executor:runtime-internal")
+include(":executor:runtime-external")
 
 include(":host")
 

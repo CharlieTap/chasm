@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.embedding.shapes.FunctionType
-import io.github.charlietap.chasm.embedding.shapes.ValueType
+import io.github.charlietap.chasm.ast.type.FunctionType
+import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.ast.type.ValueType
 
 class FunctionTypeBuilder {
 
@@ -17,7 +18,7 @@ class FunctionTypeBuilder {
     }
 
     fun build() = FunctionType(
-        params,
-        results,
+        ResultType(params),
+        ResultType(results),
     )
 }

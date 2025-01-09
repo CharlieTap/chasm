@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.embedding.dsl
 
+import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.embedding.shapes.MemoryType
 import io.github.charlietap.chasm.embedding.shapes.Store
 
 fun memoryImport(store: Store, builder: MemoryImportBuilder.() -> Unit): Import {

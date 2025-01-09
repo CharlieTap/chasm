@@ -40,7 +40,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
-                api(projects.executor.runtimeValue)
+                api(projects.executor.runtimeExternal)
                 api(projects.host)
                 api(projects.stream)
 
@@ -50,7 +50,7 @@ kotlin {
 
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
-                implementation(projects.executor.runtime)
+                implementation(projects.executor.runtimeInternal)
                 implementation(projects.executor.memory)
 
                 implementation(projects.typeSystem)

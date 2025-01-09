@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.embedding.shapes.Limits
-import io.github.charlietap.chasm.embedding.shapes.MemoryType
+import io.github.charlietap.chasm.ast.type.Limits
+import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.ast.type.SharedStatus
 
 class MemoryTypeBuilder {
 
@@ -12,5 +13,8 @@ class MemoryTypeBuilder {
         limits = LimitsBuilder().apply(builder).build()
     }
 
-    fun build() = MemoryType(requireNotNull(limits), shared)
+    fun build() = MemoryType(
+        limits = requireNotNull(limits),
+        shared = if (shared) SharedStatus.Shared else SharedStatus.Unshared,
+    )
 }
