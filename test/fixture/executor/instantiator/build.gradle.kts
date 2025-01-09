@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
 
@@ -9,7 +6,6 @@ plugins {
 }
 
 kotlin {
-
     sourceSets {
        commonMain {
             dependencies {
@@ -18,11 +14,5 @@ kotlin {
                 api(projects.test.fixture.executor.runtime)
             }
         }
-    }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
     }
 }

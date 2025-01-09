@@ -1,7 +1,5 @@
 
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -80,12 +78,6 @@ kotlin {
 configure<PublishingConventionsExtension> {
     name = "chasm"
     description = "A wasm runtime for Kotlin Multiplatform"
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
-    }
 }
 
 tasks.named {

@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
 
@@ -29,10 +26,4 @@ kotlin {
 configure<PublishingConventionsExtension> {
     name = "stack"
     description = "ring buffer backed stack with result based operations"
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
-    }
 }
