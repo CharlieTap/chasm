@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.embedding
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
@@ -23,11 +24,13 @@ fun instance(
     store: Store,
     module: Module,
     imports: List<Import>,
+    config: RuntimeConfig = RuntimeConfig.default(),
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
     return instance(
         store = store,
         module = module,
         imports = imports,
+        config = config,
         instantiator = ::ModuleInstantiator,
         importableMapper = ImportableMapper,
     )
@@ -37,6 +40,7 @@ internal fun instance(
     store: Store,
     module: Module,
     imports: List<Import>,
+    config: RuntimeConfig,
     instantiator: ModuleInstantiator,
     importableMapper: Mapper<Importable, ExternalValue>,
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
@@ -49,9 +53,13 @@ internal fun instance(
         )
     }
 
-    return instantiator(store.store, module.module, mappedImports)
+    return instantiator(config, store.store, module.module, mappedImports)
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
-        .map(::Instance)
-        .fold(::Success, ::Error)
+        .map { internal ->
+            Instance(
+                config = config,
+                instance = internal,
+            )
+        }.fold(::Success, ::Error)
 }

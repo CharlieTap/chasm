@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
@@ -21,14 +22,16 @@ import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
-typealias ModuleInstantiator = (Store, Module, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
+typealias ModuleInstantiator = (RuntimeConfig, Store, Module, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
 
 fun ModuleInstantiator(
+    config: RuntimeConfig,
     store: Store,
     module: Module,
     imports: List<Import>,
 ): Result<ModuleInstance, ModuleTrapError> =
     ModuleInstantiator(
+        config = config,
         store = store,
         module = module,
         imports = imports,
@@ -42,6 +45,7 @@ fun ModuleInstantiator(
     )
 
 internal inline fun ModuleInstantiator(
+    config: RuntimeConfig,
     store: Store,
     module: Module,
     imports: List<Import>,
@@ -54,12 +58,12 @@ internal inline fun ModuleInstantiator(
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
-    val context = InstantiationContext(store, module)
+    val context = InstantiationContext(config, store, module)
     val partialInstance = partialAllocator(context, imports).bind()
 
     val tableInitValues = module.tables.map { table ->
         val initExpression = expressionPredecoder(context, table.initExpression).bind()
-        evaluator(store, partialInstance, initExpression, Arity.Return(1)).bind() as ReferenceValue
+        evaluator(config, store, partialInstance, initExpression, Arity.Return(1)).bind() as ReferenceValue
     }
 
     val instance = allocator(context, partialInstance, tableInitValues).bind()
@@ -69,7 +73,7 @@ internal inline fun ModuleInstantiator(
 
     module.startFunction?.let { function ->
         val address = instance.functionAddresses[function.idx.idx.toInt()]
-        invoker(store, address, emptyList()).bind()
+        invoker(config, store, address, emptyList()).bind()
     }
 
     instance

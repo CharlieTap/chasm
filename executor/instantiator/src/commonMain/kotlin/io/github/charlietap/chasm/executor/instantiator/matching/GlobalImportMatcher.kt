@@ -33,7 +33,7 @@ internal inline fun GlobalImportMatcher(
     crossinline globalTypeMatcher: TypeMatcher<GlobalType>,
 ): Result<Boolean, ModuleTrapError> = binding {
 
-    val (store) = context
+    val store = context.store
     val actualGlobal = store.global(import.address).bind()
     val actualGlobalType = actualGlobal.type
     val requiredGlobalType = descriptor.type

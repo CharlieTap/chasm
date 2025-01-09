@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.Configuration
@@ -14,15 +15,17 @@ import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-typealias ExpressionEvaluator = (Store, ModuleInstance, Expression, Arity.Return) -> Result<ExecutionValue?, InvocationError>
+typealias ExpressionEvaluator = (RuntimeConfig, Store, ModuleInstance, Expression, Arity.Return) -> Result<ExecutionValue?, InvocationError>
 
 fun ExpressionEvaluator(
+    config: RuntimeConfig,
     store: Store,
     instance: ModuleInstance,
     expression: Expression,
     arity: Arity.Return = Arity.Return(1),
 ): Result<ExecutionValue?, InvocationError> =
     ExpressionEvaluator(
+        config = config,
         store = store,
         instance = instance,
         expression = expression,
@@ -31,6 +34,7 @@ fun ExpressionEvaluator(
     )
 
 internal inline fun ExpressionEvaluator(
+    config: RuntimeConfig,
     store: Store,
     instance: ModuleInstance,
     expression: Expression,
@@ -49,6 +53,7 @@ internal inline fun ExpressionEvaluator(
     )
 
     val configuration = Configuration(
+        config = config,
         store = store,
         thread = thread,
     )

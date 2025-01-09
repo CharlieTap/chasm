@@ -43,9 +43,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val customSectionDecoder: Decoder<CustomSection> = { _context ->
@@ -87,9 +87,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val typeSectionDecoder: Decoder<TypeSection> = { _context ->
@@ -131,9 +131,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val functionSectionDecoder: Decoder<FunctionSection> = { _context ->
@@ -175,9 +175,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val globalSectionDecoder: Decoder<GlobalSection> = { _context ->
@@ -219,9 +219,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val memorySectionDecoder: Decoder<MemorySection> = { _context ->
@@ -263,9 +263,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val importSectionDecoder: Decoder<ImportSection> = { _context ->
@@ -307,9 +307,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val tableSectionDecoder: Decoder<TableSection> = { _context ->
@@ -351,9 +351,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val exportSectionDecoder: Decoder<ExportSection> = { _context ->
@@ -395,9 +395,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val startSectionDecoder: Decoder<StartSection> = { _context ->
@@ -439,9 +439,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val codeSectionDecoder: Decoder<CodeSection> = { _context ->
@@ -483,9 +483,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val dataSectionDecoder: Decoder<DataSection> = { _context ->
@@ -527,9 +527,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val dataCountSectionDecoder: Decoder<DataCountSection> = { _context ->
@@ -571,9 +571,9 @@ class SectionDecoderTest {
             positions.next()
         }
         val context = decoderContext(
-            reader,
-            sectionSize,
-            sectionType,
+            reader = reader,
+            sectionSize = sectionSize,
+            sectionType = sectionType,
         )
 
         val elementSectionDecoder: Decoder<ElementSection> = { _context ->

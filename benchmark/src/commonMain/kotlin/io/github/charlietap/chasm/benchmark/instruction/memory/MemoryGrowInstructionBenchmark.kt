@@ -3,11 +3,11 @@ package io.github.charlietap.chasm.benchmark.instruction.memory
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.MemoryGrowExecutor
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
+import io.github.charlietap.chasm.fixture.executor.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -36,7 +36,7 @@ import kotlinx.benchmark.Warmup
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 class MemoryGrowInstructionBenchmark {
 
-    private val context = ExecutionContext(
+    private val context = executionContext(
         stack = stack(),
         store = store(),
         instance = moduleInstance(),

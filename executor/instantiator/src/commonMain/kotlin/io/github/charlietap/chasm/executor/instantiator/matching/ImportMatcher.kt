@@ -26,7 +26,7 @@ internal inline fun ImportMatcher(
     imports: List<Import>,
     crossinline descriptorMatcher: ImportDescriptorMatcher,
 ): Result<List<ExternalValue>, ModuleTrapError> = binding {
-    val (_, module) = context
+    val module = context.module
     module.imports.map { moduleImport ->
         imports
             .firstOrNull { (moduleName, entityName, externalValue) ->

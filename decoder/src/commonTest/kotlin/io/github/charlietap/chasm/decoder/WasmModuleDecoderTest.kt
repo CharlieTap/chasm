@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.decoder
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.context.scope.Scope
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.factory.BinaryReaderFactory
@@ -25,6 +26,7 @@ class WasmModuleDecoderTest {
     @Test
     fun `can decode a wasm module with no sections`() {
 
+        val config = moduleConfig()
         val sourceReader = FakeSourceReader()
         val reader = FakeExhaustedReader { Ok(true) }
         val version = Version.One
@@ -61,6 +63,7 @@ class WasmModuleDecoderTest {
         )
 
         val actual = WasmModuleDecoder(
+            config = config,
             source = sourceReader,
             readerFactory = readerFactory,
             magicNumberValidator = magicNumberValidator,
@@ -76,6 +79,7 @@ class WasmModuleDecoderTest {
     @Test
     fun `malformed error is returned if section order is unexpected`() {
 
+        val config = moduleConfig()
         val sourceReader = FakeSourceReader()
         val reader = FakeWasmBinaryReader(
             fakeUIntReader = { Ok(0u) },
@@ -114,6 +118,7 @@ class WasmModuleDecoderTest {
         val expected = Err(ModuleDecodeError.ModuleMalformed)
 
         val actual = WasmModuleDecoder(
+            config = config,
             source = sourceReader,
             readerFactory = readerFactory,
             magicNumberValidator = magicNumberValidator,

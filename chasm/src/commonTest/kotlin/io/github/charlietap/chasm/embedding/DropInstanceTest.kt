@@ -120,7 +120,7 @@ class DropInstanceTest {
             ),
         )
         val instance = publicInstance(
-            moduleInstance(
+            moduleInstance = moduleInstance(
                 memAddresses = mutableListOf(
                     memoryAddress(0),
                 ),

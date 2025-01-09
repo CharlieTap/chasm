@@ -11,6 +11,7 @@ kotlin {
             dependencies {
                 api(projects.executor.runtimeInternal)
                 api(projects.test.fixture.ast)
+                api(projects.test.fixture.config)
             }
         }
     }

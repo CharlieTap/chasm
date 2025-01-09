@@ -2,6 +2,8 @@ package io.github.charlietap.chasm.decoder.fixture
 
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Type
+import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.context.BlockContextImpl
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.context.ModuleContextImpl
@@ -15,6 +17,7 @@ import io.github.charlietap.chasm.decoder.section.SectionType
 
 internal fun decoderContext(
     reader: WasmBinaryReader = FakeWasmBinaryReader(),
+    config: ModuleConfig = moduleConfig(),
     sectionSize: SectionSize = sectionSize(),
     sectionType: SectionType = sectionType(),
     types: MutableList<Type> = mutableListOf(),
@@ -22,6 +25,7 @@ internal fun decoderContext(
     imports: List<Import> = emptyList(),
     index: Int = 0,
 ) = DecoderContext(
+    config = config,
     reader = reader,
     blockContext = BlockContextImpl(
         blockEndOpcode = blockEndOpcode,

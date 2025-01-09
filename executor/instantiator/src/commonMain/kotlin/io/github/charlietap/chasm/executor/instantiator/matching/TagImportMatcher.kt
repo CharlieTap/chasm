@@ -31,7 +31,7 @@ internal inline fun TagImportMatcher(
     import: ExternalValue.Tag,
     crossinline tagTypeMatcher: TypeMatcher<TagType>,
 ): Result<Boolean, ModuleTrapError> = binding {
-    val (store) = context
+    val store = context.store
     val tag = store.tag(import.address).bind()
 
     tagTypeMatcher(tag.type, descriptor.type, context)

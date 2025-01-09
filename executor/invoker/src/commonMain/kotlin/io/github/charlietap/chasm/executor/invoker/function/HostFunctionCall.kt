@@ -35,6 +35,7 @@ internal fun HostFunctionCall(
     }.asReversed()
 
     val functionContext = HostFunctionContext(
+        context.config,
         store,
         frame.instance,
     )

@@ -20,11 +20,11 @@ fun ModuleCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + moduleFilename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    return module(bytes)
+    return module(bytes, context.config.moduleConfig)
         .flatMap { module ->
             validate(module)
         }.flatMap { module ->
-            instance(context.store, module, context.imports)
+            instance(context.store, module, context.imports, context.config.runtimeConfig)
         }.fold({ instance ->
             context.instances[null] = instance
             command.name?.let {

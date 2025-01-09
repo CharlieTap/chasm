@@ -52,6 +52,6 @@ internal inline fun MemoryInitializer(
             )
             val runtimeExpression = expressionPredecoder(context, expression).bind()
 
-            evaluator(context.store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
+            evaluator(context.config, context.store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
         }
 }

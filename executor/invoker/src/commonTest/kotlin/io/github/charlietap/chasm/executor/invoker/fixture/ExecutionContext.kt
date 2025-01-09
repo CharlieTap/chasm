@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.fixture
 
+import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
@@ -12,8 +14,10 @@ fun executionContext(
     stack: Stack = stack(),
     store: Store = store(),
     instance: ModuleInstance = moduleInstance(),
+    config: RuntimeConfig = runtimeConfig(),
 ) = ExecutionContext(
     stack = stack,
     store = store,
     instance = instance,
+    config = config,
 )

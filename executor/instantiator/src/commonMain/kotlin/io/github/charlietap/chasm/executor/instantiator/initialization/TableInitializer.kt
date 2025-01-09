@@ -35,7 +35,7 @@ internal inline fun TableInitializer(
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<Unit, ModuleTrapError> = binding {
 
-    val (store, module) = context
+    val (config, store, module) = context
     module.elementSegments
         .filter { segment ->
             segment.mode is ElementSegment.Mode.Active
@@ -51,7 +51,7 @@ internal inline fun TableInitializer(
                 ),
             )
             val runtimeExpression = expressionPredecoder(context, expression).bind()
-            evaluator(store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
+            evaluator(config, store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
         }
 
     module.elementSegments
@@ -64,6 +64,6 @@ internal inline fun TableInitializer(
                 ),
             )
             val runtimeExpression = expressionPredecoder(context, expression).bind()
-            evaluator(store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
+            evaluator(config, store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
         }
 }

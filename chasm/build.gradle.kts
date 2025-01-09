@@ -38,6 +38,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
+                api(projects.config)
                 api(projects.executor.runtimeExternal)
                 api(projects.host)
                 api(projects.stream)
@@ -63,6 +64,7 @@ kotlin {
             dependencies {
                 implementation(projects.test.fake.decoder)
                 implementation(projects.test.fixture.ast)
+                implementation(projects.test.fixture.config)
                 implementation(projects.test.fixture.executor.runtime)
 
                 implementation(libs.kotlin.test)

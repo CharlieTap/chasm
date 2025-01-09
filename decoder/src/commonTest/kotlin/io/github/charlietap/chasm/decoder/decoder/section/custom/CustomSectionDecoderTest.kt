@@ -31,7 +31,10 @@ class CustomSectionDecoderTest {
             },
             fakePositionReader = sequenceOf(0u, 7u).iterator()::next,
         )
-        val context = decoderContext(reader, sectionSize)
+        val context = decoderContext(
+            reader = reader,
+            sectionSize = sectionSize,
+        )
 
         val nameValueDecoder: Decoder<NameValue> = {
             Ok(nameValue)

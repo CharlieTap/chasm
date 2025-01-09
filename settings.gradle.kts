@@ -38,6 +38,7 @@ dependencyResolutionManagement {
 include(":ast")
 include(":benchmark")
 include(":chasm")
+include(":config")
 
 include(":decoder")
 
@@ -57,6 +58,7 @@ include(":stream")
 include(":test:fake:decoder")
 
 include(":test:fixture:ast")
+include(":test:fixture:config")
 include(":test:fixture:executor:instantiator")
 include(":test:fixture:executor:runtime")
 

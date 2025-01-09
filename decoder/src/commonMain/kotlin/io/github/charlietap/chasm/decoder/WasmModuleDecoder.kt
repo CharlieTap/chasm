@@ -5,6 +5,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.decoder.builder.ModuleBuilder
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.context.scope.Scope
@@ -26,10 +27,12 @@ import io.github.charlietap.chasm.decoder.section.SectionType
 import io.github.charlietap.chasm.stream.SourceReader
 
 fun WasmModuleDecoder(
+    config: ModuleConfig,
     source: SourceReader,
 ): Result<Module, ModuleDecoderError> =
     WasmModuleDecoder(
         source = source,
+        config = config,
         readerFactory = ::SourceWasmBinaryReader,
         magicNumberValidator = ::BinaryMagicNumberValidator,
         versionDecoder = ::VersionDecoder,
@@ -39,6 +42,7 @@ fun WasmModuleDecoder(
     )
 
 internal fun WasmModuleDecoder(
+    config: ModuleConfig,
     source: SourceReader,
     readerFactory: BinaryReaderFactory,
     magicNumberValidator: MagicNumberValidator,
@@ -51,7 +55,7 @@ internal fun WasmModuleDecoder(
     val reader = readerFactory(source).apply {
         magicNumberValidator(this).bind()
     }
-    val context = DecoderContext(reader)
+    val context = DecoderContext(config, reader)
 
     val version = versionDecoder(context).bind()
     val builder = ModuleBuilder(version)

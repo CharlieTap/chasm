@@ -48,7 +48,7 @@ internal fun invoke(
         ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
     )
 
-    return invoker(store.store, address, args)
+    return invoker(instance.config, store.store, address, args)
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
@@ -23,6 +24,7 @@ class FunctionInvokerTest {
     @Test
     fun `can invoke a function and return a result`() {
 
+        val config = runtimeConfig()
         val locals = mutableListOf<ExecutionValue>(i32(117))
         val address = functionAddress(0)
         val moduleInstance = moduleInstance(
@@ -52,6 +54,7 @@ class FunctionInvokerTest {
         }
 
         val actual = FunctionInvoker(
+            config = config,
             store = store,
             address = address,
             values = locals,

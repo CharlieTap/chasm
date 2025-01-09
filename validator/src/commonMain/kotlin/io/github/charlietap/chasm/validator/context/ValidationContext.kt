@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
+import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
@@ -22,6 +23,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubs
 import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
 
 internal data class ValidationContext(
+    val config: ModuleConfig,
     val module: Module,
     val elementSegmentContext: ElementSegmentContext = ElementSegmentContextImpl(),
     val exportContext: ExportContext = ExportContextImpl(),

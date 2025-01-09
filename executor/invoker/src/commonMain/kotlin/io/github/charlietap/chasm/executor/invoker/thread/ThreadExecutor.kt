@@ -32,6 +32,7 @@ internal fun ThreadExecutor(
         stack = stack,
         store = configuration.store,
         instance = thread.frame.instance,
+        config = configuration.config,
     )
 
     stack.push(thread.frame)

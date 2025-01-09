@@ -32,7 +32,7 @@ internal inline fun TableImportMatcher(
     import: ExternalValue.Table,
     crossinline tableTypeMatcher: TypeMatcher<TableType>,
 ): Result<Boolean, ModuleTrapError> = binding {
-    val (store) = context
+    val store = context.store
     val actualTable = store.table(import.address).bind()
     val actualTableType = actualTable.type
 

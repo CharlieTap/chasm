@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
+import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
@@ -31,6 +32,7 @@ class TypeModuleTest {
 
         val byteStream = Resource("src/commonTest/resources/type.wasm").readBytes()
 
+        val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)
 
         val expectedNumberTypeFunctionType = FunctionType(
@@ -112,7 +114,10 @@ class TypeModuleTest {
             ),
         )
 
-        val actual = WasmModuleDecoder(reader)
+        val actual = WasmModuleDecoder(
+            config = config,
+            source = reader,
+        )
 
         assertEquals(expected, actual)
     }

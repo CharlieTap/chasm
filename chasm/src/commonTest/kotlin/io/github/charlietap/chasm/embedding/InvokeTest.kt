@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
@@ -65,8 +66,10 @@ class InvokeTest {
             name = nameValue(function),
             value = externalValue,
         )
+        val config = runtimeConfig()
         val instance = publicInstance(
-            moduleInstance(
+            config = config,
+            moduleInstance = moduleInstance(
                 exports = mutableListOf(
                     exportInstance,
                 ),
@@ -74,7 +77,8 @@ class InvokeTest {
         )
 
         val error = InvocationError.Trap.TrapEncountered
-        val functionInvoker: FunctionInvoker = { _store, _address, _args ->
+        val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
+            assertEquals(config, _config)
             assertEquals(store.store, _store)
             assertEquals(address, _address)
             assertEquals(emptyList(), _args)
@@ -102,8 +106,10 @@ class InvokeTest {
             name = nameValue(function),
             value = externalValue,
         )
+        val config = runtimeConfig()
         val instance = publicInstance(
-            moduleInstance(
+            config = config,
+            moduleInstance = moduleInstance(
                 exports = mutableListOf(
                     exportInstance,
                 ),
@@ -111,7 +117,8 @@ class InvokeTest {
         )
 
         val results = listOf(i32(117))
-        val functionInvoker: FunctionInvoker = { _store, _address, _args ->
+        val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
+            assertEquals(config, _config)
             assertEquals(store.store, _store)
             assertEquals(address, _address)
             assertEquals(emptyList(), _args)

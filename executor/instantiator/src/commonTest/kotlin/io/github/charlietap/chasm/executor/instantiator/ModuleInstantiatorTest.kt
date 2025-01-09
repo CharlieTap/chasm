@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
@@ -37,6 +38,7 @@ class ModuleInstantiatorTest {
     @Test
     fun `can instantiate a module instance`() {
 
+        val config = runtimeConfig()
         val store = store()
         val import = import()
         val global = global()
@@ -81,7 +83,8 @@ class ModuleInstantiatorTest {
             Ok(partialInstance)
         }
 
-        val evaluator: ExpressionEvaluator = { _store, _instance, _expression, _arity ->
+        val evaluator: ExpressionEvaluator = { _config, _store, _instance, _expression, _arity ->
+            assertEquals(config, _config)
             assertEquals(store, _store)
             assertEquals(partialInstance, _instance)
             assertEquals(returnArity(1), _arity)
@@ -89,7 +92,8 @@ class ModuleInstantiatorTest {
             Ok(ReferenceValue.Null(heapType()))
         }
 
-        val invoker: FunctionInvoker = { _store, _address, _locals ->
+        val invoker: FunctionInvoker = { _config, _store, _address, _locals ->
+            assertEquals(config, _config)
             assertEquals(store, _store)
             assertEquals(functionAddress(0), _address)
             assertEquals(emptyList(), _locals)
@@ -120,6 +124,7 @@ class ModuleInstantiatorTest {
         }
 
         val actual = ModuleInstantiator(
+            config = config,
             store = store,
             module = module,
             imports = imports,

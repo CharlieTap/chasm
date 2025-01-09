@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.ElementSegment
+import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
@@ -48,6 +49,7 @@ class TableInitializerTest {
             mode = declarativeElementSegmentMode(),
         )
 
+        val config = runtimeConfig()
         val store = store()
         val module = module(
             elementSegments = listOf(activeSegment, declarativeSegment),
@@ -55,6 +57,7 @@ class TableInitializerTest {
         val context = instantiationContext(
             store = store,
             module = module,
+            config = config,
         )
         val instance = moduleInstance()
 
@@ -87,7 +90,8 @@ class TableInitializerTest {
             Ok(runtimeExpressions.next())
         }
 
-        val evaluator: ExpressionEvaluator = { _store, _instance, _expression, _arity ->
+        val evaluator: ExpressionEvaluator = { _config, _store, _instance, _expression, _arity ->
+            assertEquals(config, _config)
             assertEquals(store, _store)
             assertEquals(instance, _instance)
             assertEquals(runtimeExpressions.next(), _expression)

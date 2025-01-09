@@ -12,7 +12,7 @@ internal object HostFunctionMapper : Mapper<HostFunction, InternalHostFunction> 
     override fun map(input: HostFunction): InternalHostFunction {
         return { params: List<ExecutionValue> ->
             val store = Store(this.store)
-            val instance = Instance(this.instance)
+            val instance = Instance(this.config, this.instance)
             val results = with(HostFunctionContext(store, instance)) {
                 input(params)
             }

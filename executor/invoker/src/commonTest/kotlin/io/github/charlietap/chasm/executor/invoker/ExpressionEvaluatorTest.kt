@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.fixture.executor.runtime.configuration
@@ -19,6 +20,7 @@ class ExpressionEvaluatorTest {
     @Test
     fun `can evaluate an expression and return a result`() {
 
+        val config = runtimeConfig()
         val store = store()
         val instance = moduleInstance()
 
@@ -40,6 +42,7 @@ class ExpressionEvaluatorTest {
         }
 
         val actual = ExpressionEvaluator(
+            config = config,
             store = store,
             instance = instance,
             expression = expression,
@@ -53,6 +56,7 @@ class ExpressionEvaluatorTest {
     @Test
     fun `can evaluate an expression for a side effect`() {
 
+        val config = runtimeConfig()
         val store = store()
         val instance = moduleInstance()
 
@@ -74,6 +78,7 @@ class ExpressionEvaluatorTest {
         }
 
         val actual = ExpressionEvaluator(
+            config = config,
             store = store,
             instance = instance,
             expression = expression,

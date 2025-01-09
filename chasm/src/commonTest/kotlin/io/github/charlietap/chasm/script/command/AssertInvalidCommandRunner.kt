@@ -17,7 +17,7 @@ fun AssertInvalidCommandRunner(
     val moduleFilePath = context.binaryDirectory + "/" + command.filename
     val bytes = moduleFilePath.readBytesFromPath()
 
-    return module(bytes)
+    return module(bytes, context.config.moduleConfig)
         .flatMap { module ->
             validate(module)
         }.fold({ _ ->

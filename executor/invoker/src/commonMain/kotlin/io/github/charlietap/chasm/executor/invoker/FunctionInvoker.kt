@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.WasmFunctionCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
@@ -18,14 +19,16 @@ import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-typealias FunctionInvoker = (Store, Address.Function, List<ExecutionValue>) -> Result<List<ExecutionValue>, InvocationError>
+typealias FunctionInvoker = (RuntimeConfig, Store, Address.Function, List<ExecutionValue>) -> Result<List<ExecutionValue>, InvocationError>
 
 fun FunctionInvoker(
+    config: RuntimeConfig,
     store: Store,
     address: Address.Function,
     values: List<ExecutionValue>,
 ): Result<List<ExecutionValue>, InvocationError> =
     FunctionInvoker(
+        config = config,
         store = store,
         address = address,
         values = values,
@@ -34,6 +37,7 @@ fun FunctionInvoker(
     )
 
 internal inline fun FunctionInvoker(
+    config: RuntimeConfig,
     store: Store,
     address: Address.Function,
     values: List<ExecutionValue>,
@@ -64,6 +68,7 @@ internal inline fun FunctionInvoker(
     val configuration = Configuration(
         store = store,
         thread = thread,
+        config = config,
     )
 
     threadExecutor(configuration).bind()

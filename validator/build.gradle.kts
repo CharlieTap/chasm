@@ -15,6 +15,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
+                api(projects.config)
                 api(libs.result)
 
                 implementation(projects.typeSystem)

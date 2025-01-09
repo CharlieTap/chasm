@@ -230,7 +230,7 @@ class ModuleAllocatorTest {
         )
 
         val expressionValues = sequenceOf(globalInitValue, elementSegmentRef).iterator()
-        val expressionEvaluator: ExpressionEvaluator = { _, _, _, _ ->
+        val expressionEvaluator: ExpressionEvaluator = { _, _, _, _, _ ->
             Ok(expressionValues.next())
         }
 

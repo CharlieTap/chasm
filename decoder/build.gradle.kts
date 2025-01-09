@@ -20,6 +20,7 @@ kotlin {
             dependencies {
 
                 api(projects.ast)
+                api(projects.config)
                 api(projects.stream)
 
                 api(libs.result)
@@ -31,6 +32,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.test.fixture.ast)
+                implementation(projects.test.fixture.config)
                 implementation(projects.test.fake.decoder)
 
                 implementation(libs.kotlin.test)

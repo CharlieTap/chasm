@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.script
 
+import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.script.command.CommandResult
@@ -23,7 +24,9 @@ class ChasmScriptRunner(
 
     override fun execute(directory: String, script: Script): ScriptResult {
 
+        val config = Config.default()
         val context = ScriptContext(
+            config = config,
             binaryDirectory = directory,
             store = store,
             instances = instances,

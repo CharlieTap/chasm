@@ -33,7 +33,7 @@ internal inline fun FunctionImportMatcher(
     crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
 ): Result<Boolean, ModuleTrapError> = binding {
 
-    val (store) = context
+    val store = context.store
     val actualFunction = store.function(import.address).bind()
     val actualFunctionType = actualFunction.type
     val requiredFunctionType = descriptor.type

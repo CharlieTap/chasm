@@ -79,7 +79,7 @@ internal inline fun ModuleAllocator(
     crossinline exportAllocator: ExportAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
-    val (store, module) = context
+    val (config, store, module) = context
 
     module.tables.forEachIndexed { idx, table ->
         val address = tableAllocator(store, table.type, tableInitValues[idx])
@@ -98,7 +98,7 @@ internal inline fun ModuleAllocator(
 
     module.globals.forEachIndexed { idx, global ->
         val initExpression = expressionPredecoder(context, global.initExpression).bind()
-        val value = evaluator(store, instance, initExpression, Arity.Return(1))
+        val value = evaluator(config, store, instance, initExpression, Arity.Return(1))
             .flatMap { initialValue ->
                 initialValue.toResultOr { InvocationError.MissingStackValue }
             }.bind()
@@ -110,7 +110,7 @@ internal inline fun ModuleAllocator(
         val elementSegmentReferences = module.elementSegments.map { segment ->
             segment.initExpressions.map { initExpression ->
                 val initExpression = expressionPredecoder(context, initExpression).bind()
-                evaluator(store, instance, initExpression, Arity.Return(1)).bind() as ReferenceValue
+                evaluator(config, store, instance, initExpression, Arity.Return(1)).bind() as ReferenceValue
             }
         }
         val address = elementAllocator(store, elementSegment.type, elementSegmentReferences[idx])

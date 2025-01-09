@@ -19,9 +19,13 @@ internal fun validate(
     module: Module,
     validator: WasmModuleValidator,
 ): ChasmResult<Module, ValidationError> {
-    return validator(module.module)
+    return validator(module.config, module.module)
         .mapError(ModuleValidatorError::toString)
         .mapError(::ValidationError)
-        .map(::Module)
-        .fold(::Success, ::Error)
+        .map { internal ->
+            Module(
+                config = module.config,
+                module = internal,
+            )
+        }.fold(::Success, ::Error)
 }

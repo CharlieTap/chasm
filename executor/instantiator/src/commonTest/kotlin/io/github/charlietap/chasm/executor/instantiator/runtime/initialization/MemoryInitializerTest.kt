@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
+import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
@@ -44,6 +45,7 @@ class MemoryInitializerTest {
             ),
         )
 
+        val config = runtimeConfig()
         val store = store()
         val module = module(
             dataSegments = listOf(activeSegment),
@@ -51,6 +53,7 @@ class MemoryInitializerTest {
         val context = instantiationContext(
             store = store,
             module = module,
+            config = config,
         )
         val instance = moduleInstance()
 
@@ -69,7 +72,8 @@ class MemoryInitializerTest {
             Ok(runtimeExpression)
         }
 
-        val evaluator: ExpressionEvaluator = { _store, _instance, _expression, _arity ->
+        val evaluator: ExpressionEvaluator = { _config, _store, _instance, _expression, _arity ->
+            assertEquals(config, _config)
             assertEquals(store, _store)
             assertEquals(instance, _instance)
             assertEquals(runtimeExpression, _expression)
