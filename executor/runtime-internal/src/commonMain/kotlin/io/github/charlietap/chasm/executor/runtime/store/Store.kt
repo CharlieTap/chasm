@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.store
 
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExceptionInstance
@@ -18,4 +19,5 @@ data class Store(
     val elements: MutableList<ElementInstance> = mutableListOf(),
     val data: MutableList<DataInstance> = mutableListOf(),
     val exceptions: MutableList<ExceptionInstance> = mutableListOf(),
+    val instructions: MutableList<DispatchableInstruction> = mutableListOf(),
 )

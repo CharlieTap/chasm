@@ -2,9 +2,7 @@ package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.config.runtimeConfig
-import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
-import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
@@ -12,7 +10,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunct
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.instruction.wasmFunctionCallRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.type.ext.definedType
@@ -39,15 +36,11 @@ class FunctionInvokerTest {
             moduleInstance,
             function,
         )
+        val functionInstruction = dispatchableInstruction()
         val store = store(
             functions = mutableListOf(functionInstance),
+            instructions = mutableListOf(functionInstruction),
         )
-
-        val callDispatchable = dispatchableInstruction()
-        val callDispatcher: Dispatcher<ControlInstruction.WasmFunctionCall> = { instruction ->
-            assertEquals(wasmFunctionCallRuntimeInstruction(functionInstance), instruction)
-            callDispatchable
-        }
 
         val threadExecutor: ThreadExecutor = { config ->
             Ok(listOf(i32(117)))
@@ -58,7 +51,6 @@ class FunctionInvokerTest {
             store = store,
             address = address,
             values = locals,
-            callDispatcher = callDispatcher,
             threadExecutor = threadExecutor,
         )
 

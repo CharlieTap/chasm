@@ -63,7 +63,7 @@ internal inline fun InstructionPredecoder(
 
     var dispatchable = context.instructionCache[instruction]
 
-    if(dispatchable == null) {
+    if (dispatchable == null) {
         dispatchable = when (instruction) {
             is AggregateInstruction -> aggregateInstructionPredecoder(context, instruction).bind()
             is AtomicMemoryInstruction -> atomicMemoryInstructionPredecoder(context, instruction).bind()

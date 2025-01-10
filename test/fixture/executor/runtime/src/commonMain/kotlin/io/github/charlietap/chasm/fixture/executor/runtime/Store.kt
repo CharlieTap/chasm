@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.fixture.executor.runtime
 
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExceptionInstance
@@ -19,6 +20,7 @@ fun store(
     memories: MutableList<MemoryInstance> = mutableListOf(),
     tables: MutableList<TableInstance> = mutableListOf(),
     tags: MutableList<TagInstance> = mutableListOf(),
+    instructions: MutableList<DispatchableInstruction> = mutableListOf(),
 ) = Store(
     data = data,
     elements = elements,
@@ -28,4 +30,5 @@ fun store(
     memories = memories,
     tables = tables,
     tags = tags,
+    instructions = instructions,
 )

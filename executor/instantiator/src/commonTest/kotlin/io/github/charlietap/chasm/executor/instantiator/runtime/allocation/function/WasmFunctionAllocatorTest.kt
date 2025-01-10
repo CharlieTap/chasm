@@ -3,12 +3,15 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.func
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
+import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
+import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
@@ -44,6 +47,11 @@ class WasmFunctionAllocatorTest {
             types = mutableListOf(type),
         )
 
+        val functionInstruction = dispatchableInstruction()
+        val callDispatcher: Dispatcher<ControlInstruction.WasmFunctionCall> = {
+            functionInstruction
+        }
+
         val expectedInstance = FunctionInstance.WasmFunction(
             type = type,
             functionType = functionType,
@@ -55,10 +63,12 @@ class WasmFunctionAllocatorTest {
             context = context,
             moduleInstance = moduleInstance,
             function = wasmFunction,
+            callDispatcher = callDispatcher,
         )
 
         assertEquals(Ok(Unit), actual)
         assertEquals(expectedInstance, functions[0])
+        assertEquals(functionInstruction, store.instructions[0])
     }
 
     @Test

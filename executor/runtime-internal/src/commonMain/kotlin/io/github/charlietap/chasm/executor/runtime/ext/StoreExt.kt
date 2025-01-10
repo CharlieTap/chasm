@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.runtime.ext
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
@@ -45,4 +46,8 @@ inline fun Store.data(address: Address.Data): Result<DataInstance, InvocationErr
 
 inline fun Store.exception(address: Address.Exception): Result<ExceptionInstance, InvocationError.StoreLookupFailed> {
     return exceptions.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
+}
+
+inline fun Store.instruction(address: Address.Function): Result<DispatchableInstruction, InvocationError.StoreLookupFailed> {
+    return instructions.getOrNull(address.address)?.let(::Ok) ?: Err(InvocationError.StoreLookupFailed(address))
 }
