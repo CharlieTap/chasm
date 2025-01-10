@@ -141,6 +141,8 @@ import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.fixture.ast.instruction.f32ConstInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.f64ConstInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -205,7 +207,7 @@ class NumericInstructionDecoderTest {
             fakeUByteReader = opcodeReader,
         )
         val context = decoderContext(reader)
-        val expected = Ok(NumericInstruction.F32Const(117f))
+        val expected = Ok(f32ConstInstruction(117f, 117f.toRawBits()))
 
         val actual = NumericInstructionDecoder(context)
 
@@ -227,7 +229,7 @@ class NumericInstructionDecoderTest {
             fakeUByteReader = opcodeReader,
         )
         val context = decoderContext(reader)
-        val expected = Ok(NumericInstruction.F64Const(117.0))
+        val expected = Ok(f64ConstInstruction(117.0, 117.0.toRawBits()))
 
         val actual = NumericInstructionDecoder(context)
 

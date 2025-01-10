@@ -154,11 +154,11 @@ internal fun NumericInstructionDecoder(
         }
         F32_CONST -> {
             val const = context.reader.float().bind()
-            NumericInstruction.F32Const(const)
+            NumericInstruction.F32Const(const, const.toRawBits())
         }
         F64_CONST -> {
             val const = context.reader.double().bind()
-            NumericInstruction.F64Const(const)
+            NumericInstruction.F64Const(const, const.toRawBits())
         }
         I32_EQZ -> NumericInstruction.I32Eqz
         I32_EQ -> NumericInstruction.I32Eq

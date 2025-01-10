@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.executor.instantiator.context
 
+import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
@@ -18,6 +20,7 @@ data class InstantiationContext(
     val store: Store,
     val module: Module,
     var instance: ModuleInstance? = null,
+    val instructionCache: HashMap<Instruction, DispatchableInstruction> = hashMapOf(),
 ) : TypeMatcherContext {
 
     val types by lazy {

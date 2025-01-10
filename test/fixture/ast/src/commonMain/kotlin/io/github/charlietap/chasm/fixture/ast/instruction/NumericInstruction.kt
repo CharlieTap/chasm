@@ -14,11 +14,13 @@ fun i64ConstInstruction(
 
 fun f32ConstInstruction(
     value: Float = 0f,
-) = NumericInstruction.F32Const(value)
+    bits: Int = 0,
+) = NumericInstruction.F32Const(value, bits)
 
 fun f64ConstInstruction(
     value: Double = 0.0,
-) = NumericInstruction.F64Const(value)
+    bits: Long = 0,
+) = NumericInstruction.F64Const(value, bits)
 
 fun i32EqzInstruction() = NumericInstruction.I32Eqz
 

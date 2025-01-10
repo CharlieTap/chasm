@@ -60,16 +60,24 @@ internal inline fun InstructionPredecoder(
     crossinline variableInstructionPredecoder: Predecoder<VariableInstruction, DispatchableInstruction>,
     crossinline vectorInstructionPredecoder: Predecoder<VectorInstruction, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    when (instruction) {
-        is AggregateInstruction -> aggregateInstructionPredecoder(context, instruction).bind()
-        is AtomicMemoryInstruction -> atomicMemoryInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction -> controlInstructionPredecoder(context, instruction).bind()
-        is MemoryInstruction -> memoryInstructionPredecoder(context, instruction).bind()
-        is NumericInstruction -> numericInstructionPredecoder(context, instruction).bind()
-        is ParametricInstruction -> parametricInstructionPredecoder(context, instruction).bind()
-        is ReferenceInstruction -> referenceInstructionPredecoder(context, instruction).bind()
-        is TableInstruction -> tableInstructionPredecoder(context, instruction).bind()
-        is VariableInstruction -> variableInstructionPredecoder(context, instruction).bind()
-        is VectorInstruction -> vectorInstructionPredecoder(context, instruction).bind()
+
+    var dispatchable = context.instructionCache[instruction]
+
+    if(dispatchable == null) {
+        dispatchable = when (instruction) {
+            is AggregateInstruction -> aggregateInstructionPredecoder(context, instruction).bind()
+            is AtomicMemoryInstruction -> atomicMemoryInstructionPredecoder(context, instruction).bind()
+            is ControlInstruction -> controlInstructionPredecoder(context, instruction).bind()
+            is MemoryInstruction -> memoryInstructionPredecoder(context, instruction).bind()
+            is NumericInstruction -> numericInstructionPredecoder(context, instruction).bind()
+            is ParametricInstruction -> parametricInstructionPredecoder(context, instruction).bind()
+            is ReferenceInstruction -> referenceInstructionPredecoder(context, instruction).bind()
+            is TableInstruction -> tableInstructionPredecoder(context, instruction).bind()
+            is VariableInstruction -> variableInstructionPredecoder(context, instruction).bind()
+            is VectorInstruction -> vectorInstructionPredecoder(context, instruction).bind()
+        }
+        context.instructionCache[instruction] = dispatchable
     }
+
+    dispatchable
 }

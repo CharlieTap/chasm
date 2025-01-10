@@ -10,11 +10,9 @@ sealed interface NumericInstruction : Instruction {
     @JvmInline
     value class I64Const(val value: Long) : NumericInstruction
 
-    @JvmInline
-    value class F32Const(val value: Float) : NumericInstruction
+    data class F32Const(val value: Float, val bits: Int) : NumericInstruction
 
-    @JvmInline
-    value class F64Const(val value: Double) : NumericInstruction
+    data class F64Const(val value: Double, val bits: Long) : NumericInstruction
 
     data object I32Eqz : NumericInstruction
 
