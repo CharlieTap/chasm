@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import kotlin.jvm.JvmInline
 
 sealed interface ControlInstruction : ExecutionInstruction {
@@ -151,11 +152,11 @@ sealed interface ControlInstruction : ExecutionInstruction {
 
     data class CallIndirect(
         val typeIndex: Index.TypeIndex,
-        val tableIndex: Index.TableIndex,
+        val table: TableInstance,
     ) : ControlInstruction
 
     data class ReturnCallIndirect(
         val typeIndex: Index.TypeIndex,
-        val tableIndex: Index.TableIndex,
+        val table: TableInstance,
     ) : ControlInstruction
 }

@@ -5,12 +5,13 @@ import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
-import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.referenceType
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 
 fun controlRuntimeInstruction(): ControlInstruction = unreachableRuntimeInstruction()
@@ -125,16 +126,16 @@ fun callRefRuntimeInstruction(
 
 fun callIndirectRuntimeInstruction(
     typeIndex: Index.TypeIndex = typeIndex(),
-    tableIndex: Index.TableIndex = tableIndex(),
+    table: TableInstance = tableInstance(),
 ) = ControlInstruction.CallIndirect(
     typeIndex = typeIndex,
-    tableIndex = tableIndex,
+    table = table,
 )
 
 fun returnCallIndirectRuntimeInstruction(
     typeIndex: Index.TypeIndex = typeIndex(),
-    tableIndex: Index.TableIndex = tableIndex(),
+    table: TableInstance = tableInstance(),
 ) = ControlInstruction.ReturnCallIndirect(
     typeIndex = typeIndex,
-    tableIndex = tableIndex,
+    table = table,
 )

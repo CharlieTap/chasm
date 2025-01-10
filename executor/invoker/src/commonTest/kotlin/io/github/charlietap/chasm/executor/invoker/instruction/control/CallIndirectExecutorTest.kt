@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
@@ -38,7 +37,6 @@ class CallIndirectExecutorTest {
             type = definedType,
         )
 
-        val tableIndex = tableIndex(0u)
         val tableAddress = tableAddress()
         val tableInstance = tableInstance(
             elements = arrayOf(ReferenceValue.Function(functionAddress)),
@@ -66,8 +64,6 @@ class CallIndirectExecutorTest {
 
         stack.push(frame)
 
-        val tailRecursion = true
-
         val wasmFunctionCall: WasmFunctionCall = { _context, _function ->
             assertEquals(context, _context)
             assertEquals(_function, functionInstance)
@@ -85,9 +81,8 @@ class CallIndirectExecutorTest {
 
         val actual = CallIndirectExecutor(
             context = context,
-            tableIndex = tableIndex,
+            table = tableInstance,
             typeIndex = typeIndex,
-            tailRecursion = tailRecursion,
             hostFunctionCall = hostFunctionCall,
             wasmFunctionCall = wasmFunctionCall,
             definedTypeMatcher = definedTypeMatcher,
@@ -107,7 +102,6 @@ class CallIndirectExecutorTest {
         )
         val functionAddress = functionAddress()
 
-        val tableIndex = tableIndex(0u)
         val tableAddress = tableAddress()
         val tableInstance = tableInstance(
             elements = arrayOf(ReferenceValue.Function(functionAddress)),
@@ -135,8 +129,6 @@ class CallIndirectExecutorTest {
 
         stack.push(frame)
 
-        val tailRecursion = false
-
         val wasmFunctionCall: WasmFunctionCall = { _, _ ->
             fail("Host function should not be called in this scenario")
         }
@@ -154,9 +146,8 @@ class CallIndirectExecutorTest {
 
         val actual = CallIndirectExecutor(
             context = context,
-            tableIndex = tableIndex,
+            table = tableInstance,
             typeIndex = typeIndex,
-            tailRecursion = tailRecursion,
             hostFunctionCall = hostFunctionCall,
             wasmFunctionCall = wasmFunctionCall,
             definedTypeMatcher = definedTypeMatcher,

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.control
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
@@ -23,7 +24,10 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowDispatc
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.UnreachableDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.executor.runtime.ext.table
+import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Br
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.BrIf
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.BrOnCast
@@ -125,24 +129,38 @@ internal inline fun ControlInstructionPredecoder(
             ),
         )
         is ControlInstruction.Call -> callInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.CallIndirect -> callIndirectDispatcher(
-            CallIndirect(
-                typeIndex = instruction.typeIndex,
-                tableIndex = instruction.tableIndex,
-            ),
-        )
+        is ControlInstruction.CallIndirect -> {
+
+            val address = context.instance?.tableAddress(instruction.tableIndex)?.bind()
+                ?: Err(InstantiationError.PredecodingError).bind()
+            val table = context.store.table(address).bind()
+
+            callIndirectDispatcher(
+                CallIndirect(
+                    typeIndex = instruction.typeIndex,
+                    table = table,
+                ),
+            )
+        }
         is ControlInstruction.CallRef -> callRefDispatcher(CallRef(instruction.typeIndex))
         is ControlInstruction.If -> ifInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Loop -> loopInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Nop -> nopDispatcher(Nop)
         is ControlInstruction.Return -> returnDispatcher(Return)
         is ControlInstruction.ReturnCall -> returnCallInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.ReturnCallIndirect -> returnCallIndirectDispatcher(
-            ReturnCallIndirect(
-                typeIndex = instruction.typeIndex,
-                tableIndex = instruction.tableIndex,
-            ),
-        )
+        is ControlInstruction.ReturnCallIndirect -> {
+
+            val address = context.instance?.tableAddress(instruction.tableIndex)?.bind()
+                ?: Err(InstantiationError.PredecodingError).bind()
+            val table = context.store.table(address).bind()
+
+            returnCallIndirectDispatcher(
+                ReturnCallIndirect(
+                    typeIndex = instruction.typeIndex,
+                    table = table,
+                ),
+            )
+        }
         is ControlInstruction.ReturnCallRef -> returnCallRefDispatcher(ReturnCallRef(instruction.typeIndex))
         is ControlInstruction.Throw -> throwDispatcher(Throw(instruction.tagIndex))
         is ControlInstruction.ThrowRef -> throwRefDispatcher(ThrowRef)

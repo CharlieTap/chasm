@@ -14,9 +14,8 @@ internal inline fun ReturnCallIndirectExecutor(
 ): Result<Unit, InvocationError> =
     CallIndirectExecutor(
         context = context,
-        tableIndex = instruction.tableIndex,
+        table = instruction.table,
         typeIndex = instruction.typeIndex,
-        tailRecursion = true,
         hostFunctionCall = ::HostFunctionCall,
         wasmFunctionCall = ::ReturnWasmFunctionCall,
         definedTypeMatcher = ::DefinedTypeMatcher,

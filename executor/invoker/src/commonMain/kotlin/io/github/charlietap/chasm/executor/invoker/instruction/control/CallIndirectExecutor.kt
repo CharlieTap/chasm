@@ -15,9 +15,8 @@ import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.table
-import io.github.charlietap.chasm.executor.runtime.ext.tableAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
@@ -29,9 +28,8 @@ internal fun CallIndirectExecutor(
 ): Result<Unit, InvocationError> =
     CallIndirectExecutor(
         context = context,
-        tableIndex = instruction.tableIndex,
         typeIndex = instruction.typeIndex,
-        tailRecursion = false,
+        table = instruction.table,
         hostFunctionCall = ::HostFunctionCall,
         wasmFunctionCall = ::WasmFunctionCall,
         definedTypeMatcher = ::DefinedTypeMatcher,
@@ -39,9 +37,8 @@ internal fun CallIndirectExecutor(
 
 internal inline fun CallIndirectExecutor(
     context: ExecutionContext,
-    tableIndex: Index.TableIndex,
+    table: TableInstance,
     typeIndex: Index.TypeIndex,
-    tailRecursion: Boolean,
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
     crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
@@ -50,17 +47,12 @@ internal inline fun CallIndirectExecutor(
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
 
-    val tableAddress = frame.instance
-        .tableAddress(tableIndex)
-        .bind()
-    val tableInstance = store.table(tableAddress).bind()
-
     val functionType = frame.instance
         .definedType(typeIndex)
         .bind()
 
     val elementIndex = stack.popI32().bind()
-    val reference = tableInstance.element(elementIndex).bind()
+    val reference = table.element(elementIndex).bind()
 
     val address = when (reference) {
         is ReferenceValue.Function -> Ok(reference.address)
