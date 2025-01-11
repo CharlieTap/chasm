@@ -10,17 +10,15 @@ import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
 
 internal data class ValidationContext(
     val config: ModuleConfig,
@@ -43,26 +41,7 @@ internal data class ValidationContext(
 
     val types by lazy {
         try {
-            module.types.map(Type::recursiveType).fold(mutableListOf<DefinedType>()) { acc, recursiveType ->
-                val size = acc.size
-
-                val substitutor: ConcreteHeapTypeSubstitutor = { heapType ->
-                    when (heapType) {
-                        is ConcreteHeapType.TypeIndex -> {
-                            ConcreteHeapType.Defined(acc[heapType.index.idx.toInt()])
-                        }
-                        else -> heapType
-                    }
-                }
-
-                acc.apply {
-                    addAll(
-                        DefinedTypeRoller(size, recursiveType).map { definedType ->
-                            DefinedTypeSubstitutor(definedType, substitutor)
-                        },
-                    )
-                }
-            }
+            DefinedTypeFactory(module.types.map(Type::recursiveType))
         } catch (_: IndexOutOfBoundsException) {
             emptyList()
         }

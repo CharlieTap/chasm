@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
+import io.github.charlietap.chasm.type.rolling.substitution.RecursiveTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 typealias DefinedTypeFactory = (List<RecursiveType>) -> List<DefinedType>
@@ -16,13 +16,13 @@ fun DefinedTypeFactory(
     DefinedTypeFactory(
         recursiveTypes = recursiveTypes,
         definedTypeRoller = ::DefinedTypeRoller,
-        definedTypeSubstitutor = ::DefinedTypeSubstitutor,
+        recursiveTypeSubstitutor = ::RecursiveTypeSubstitutor,
     )
 
 internal fun DefinedTypeFactory(
     recursiveTypes: List<RecursiveType>,
     definedTypeRoller: DefinedTypeRoller,
-    definedTypeSubstitutor: TypeSubstitutor<DefinedType>,
+    recursiveTypeSubstitutor: TypeSubstitutor<RecursiveType>,
 ): List<DefinedType> = recursiveTypes.fold(emptyList()) { acc, recursiveType ->
     val size = acc.size
 
@@ -35,7 +35,14 @@ internal fun DefinedTypeFactory(
         }
     }
 
-    acc + definedTypeRoller(size, recursiveType).map { definedType ->
-        definedTypeSubstitutor(definedType, substitutor)
+    val rolledDefinedTypes = definedTypeRoller(size, recursiveType)
+    val unrolledRecursiveType = rolledDefinedTypes.firstOrNull()?.recursiveType?.let { type ->
+        recursiveTypeSubstitutor(type, substitutor)
     }
+
+    rolledDefinedTypes.forEach { definedType ->
+        definedType.recursiveType = unrolledRecursiveType!!
+    }
+
+    acc + rolledDefinedTypes
 }
