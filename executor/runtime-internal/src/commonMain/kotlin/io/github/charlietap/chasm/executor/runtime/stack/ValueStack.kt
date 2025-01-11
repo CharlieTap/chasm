@@ -141,6 +141,10 @@ class ValueStack
         override fun hashCode(): Int {
             return elements.take(top).map { it.hashCode() }.fold(1) { acc, hash -> 31 * acc + hash }
         }
+
+        override fun toString(): String {
+            return "[${elements.take(top).joinToString(", ") { it.toString() }}]"
+        }
     }
 
 private const val MIN_CAPACITY = 256
