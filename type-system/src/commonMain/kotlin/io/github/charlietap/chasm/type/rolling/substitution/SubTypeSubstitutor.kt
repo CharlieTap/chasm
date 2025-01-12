@@ -4,18 +4,18 @@ import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.SubType
 
-internal fun SubTypeSubstitutorImpl(
+internal fun SubTypeSubstitutor(
     subType: SubType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
 ): SubType =
-    SubTypeSubstitutorImpl(
+    SubTypeSubstitutor(
         subType = subType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
         heapTypeSubstitutor = ::HeapTypeSubstitutor,
         compositeTypeSubstitutor = ::CompositeTypeSubstitutor,
     )
 
-internal fun SubTypeSubstitutorImpl(
+internal fun SubTypeSubstitutor(
     subType: SubType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     heapTypeSubstitutor: TypeSubstitutor<HeapType>,

@@ -10,7 +10,7 @@ fun RecursiveTypeSubstitutor(
     RecursiveTypeSubstitutor(
         recursiveType = recursiveType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        subTypeSubstitutor = ::SubTypeSubstitutorImpl,
+        subTypeSubstitutor = ::SubTypeSubstitutor,
     )
 
 internal fun RecursiveTypeSubstitutor(

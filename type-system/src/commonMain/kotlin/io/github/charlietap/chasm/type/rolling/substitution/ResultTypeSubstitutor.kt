@@ -10,7 +10,7 @@ internal fun ResultTypeSubstitutor(
     ResultTypeSubstitutor(
         resultType = resultType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        valueTypeSubstitutor = ::ValueTypeSubstitutorImpl,
+        valueTypeSubstitutor = ::ValueTypeSubstitutor,
     )
 
 internal fun ResultTypeSubstitutor(

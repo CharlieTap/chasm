@@ -12,7 +12,7 @@ internal fun CompositeTypeSubstitutor(
     CompositeTypeSubstitutor(
         compositeType = compositeType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        structTypeSubstitutor = ::StructTypeSubstitutorImpl,
+        structTypeSubstitutor = ::StructTypeSubstitutor,
         arrayTypeSubstitutor = ::ArrayTypeSubstitutor,
         functionTypeSubstitutor = ::FunctionTypeSubstitutor,
     )

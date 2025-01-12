@@ -10,7 +10,7 @@ internal fun StorageTypeSubstitutor(
     StorageTypeSubstitutor(
         storageType = storageType,
         concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
-        valueTypeSubstitutor = ::ValueTypeSubstitutorImpl,
+        valueTypeSubstitutor = ::ValueTypeSubstitutor,
     )
 
 internal fun StorageTypeSubstitutor(
