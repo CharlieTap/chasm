@@ -5,6 +5,7 @@ import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
@@ -17,7 +18,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 
 internal typealias PartialModuleAllocator = (InstantiationContext, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
 
@@ -29,7 +29,7 @@ internal fun PartialModuleAllocator(
         context = context,
         imports = imports,
         wasmFunctionAllocator = ::WasmFunctionAllocator,
-        typeAllocator = ::DefinedTypeFactory,
+        typeAllocator = ::TypeAllocator,
         importMatcher = ::ImportMatcher,
     )
 
@@ -37,13 +37,14 @@ internal inline fun PartialModuleAllocator(
     context: InstantiationContext,
     imports: List<Import>,
     crossinline wasmFunctionAllocator: WasmFunctionAllocator,
-    crossinline typeAllocator: DefinedTypeFactory,
+    crossinline typeAllocator: TypeAllocator,
     crossinline importMatcher: ImportMatcher,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val module = context.module
+    val types = typeAllocator(context, module.types.map(Type::recursiveType))
 
-    val instance = ModuleInstance(typeAllocator(module.types.map(Type::recursiveType)))
+    val instance = ModuleInstance(types)
     context.instance = instance
 
     val matchedImports = importMatcher(context, imports)

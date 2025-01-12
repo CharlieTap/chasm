@@ -47,7 +47,7 @@ internal inline fun CallIndirectExecutor(
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
 
-    val functionType = frame.instance
+    val expectedFunctionType = frame.instance
         .definedType(typeIndex)
         .bind()
 
@@ -60,8 +60,9 @@ internal inline fun CallIndirectExecutor(
     }.bind()
 
     val functionInstance = store.function(address).bind()
+    val actualFunctionType = functionInstance.type
 
-    if (!definedTypeMatcher(functionInstance.type, functionType, context)) {
+    if (!definedTypeMatcher(actualFunctionType, expectedFunctionType, context)) {
         Err(InvocationError.IndirectCallHasIncorrectFunctionType).bind<Unit>()
     }
 

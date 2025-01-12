@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
@@ -23,6 +24,10 @@ internal inline fun RecursiveTypeValidator(
     type: RecursiveType,
     crossinline subTypeValidator: Validator<SubType>,
 ): Result<Unit, ModuleValidatorError> = binding {
+
+    val definedType = DefinedTypeRoller(context.types.size, type)
+    context.types += definedType
+
     type.subTypes.forEach { subType ->
         subTypeValidator(context, subType).bind()
     }

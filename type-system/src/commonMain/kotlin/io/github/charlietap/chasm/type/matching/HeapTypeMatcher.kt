@@ -35,7 +35,7 @@ internal fun HeapTypeMatcher(
     type1 is AbstractHeapType.NoExtern -> HeapTypeMatcher(type2, AbstractHeapType.Extern, context)
     type1 is AbstractHeapType.Bottom -> true
     type1 is AbstractHeapType && type2 is AbstractHeapType -> abstractHeapTypeMatcher(type1, type2, context)
-    type1 is ConcreteHeapType.TypeIndex && type2 !is ConcreteHeapType.TypeIndex -> {
+    type1 is ConcreteHeapType.TypeIndex -> {
         val definedType1 = context.lookup()(type1.index)
         if (definedType1 != null) {
             HeapTypeMatcher(ConcreteHeapType.Defined(definedType1), type2, context)
@@ -43,7 +43,7 @@ internal fun HeapTypeMatcher(
             false
         }
     }
-    type2 is ConcreteHeapType.TypeIndex && type1 !is ConcreteHeapType.TypeIndex -> {
+    type2 is ConcreteHeapType.TypeIndex -> {
         val definedType2 = context.lookup()(type2.index)
         if (definedType2 != null) {
             HeapTypeMatcher(type1, ConcreteHeapType.Defined(definedType2), context)

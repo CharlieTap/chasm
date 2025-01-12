@@ -41,7 +41,7 @@ internal inline fun FunctionValidator(
     val scopedContext = scope(context, function).bind()
 
     function.locals.forEach { local ->
-        valueTypeValidator(context, local.type).bind()
+        valueTypeValidator(scopedContext, local.type).bind()
     }
 
     instructionBlockValidator(scopedContext, function.body.instructions).bind()

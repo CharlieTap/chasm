@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
@@ -35,7 +36,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.type.ext.definedType
-import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
@@ -111,7 +111,7 @@ class PartialModuleAllocatorTest {
             context = context,
             imports = imports,
             wasmFunctionAllocator = ::WasmFunctionAllocator,
-            typeAllocator = ::DefinedTypeFactory,
+            typeAllocator = ::TypeAllocator,
             importMatcher = importMatcher,
         )
 

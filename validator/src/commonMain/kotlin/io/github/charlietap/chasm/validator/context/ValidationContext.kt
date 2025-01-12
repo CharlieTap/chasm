@@ -8,14 +8,13 @@ import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Tag
-import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.type.ConcreteHeapType
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
@@ -23,6 +22,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubs
 internal data class ValidationContext(
     val config: ModuleConfig,
     val module: Module,
+    val types: MutableList<DefinedType> = mutableListOf<DefinedType>(),
     val elementSegmentContext: ElementSegmentContext = ElementSegmentContextImpl(),
     val exportContext: ExportContext = ExportContextImpl(),
     val expressionContext: ExpressionContext = ExpressionContextImpl(),
@@ -38,14 +38,6 @@ internal data class ValidationContext(
     RefsContext by refsContext,
     TypeContext by typeContext,
     TypeMatcherContext {
-
-    val types by lazy {
-        try {
-            DefinedTypeFactory(module.types.map(Type::recursiveType))
-        } catch (_: IndexOutOfBoundsException) {
-            emptyList()
-        }
-    }
 
     val functions by lazy {
         val importedFunctions = module.imports
