@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
+import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
@@ -22,8 +23,10 @@ import io.github.charlietap.chasm.fixture.ast.module.table
 import io.github.charlietap.chasm.fixture.ast.module.tableImportDescriptor
 import io.github.charlietap.chasm.fixture.ast.module.type
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
-import io.github.charlietap.chasm.fixture.ast.type.functionRecursiveType
+import io.github.charlietap.chasm.fixture.ast.type.finalSubType
+import io.github.charlietap.chasm.fixture.ast.type.functionCompositeType
 import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.ast.type.recursiveType
 import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
@@ -50,7 +53,12 @@ class PartialModuleAllocatorTest {
         val functionAddress = functionAddress(0)
         val function = function(typeIndex = typeIndex)
         val functionType = functionType()
-        val recursiveType = functionRecursiveType(functionType)
+        val recursiveType = recursiveType(
+            subTypes = listOf(
+                finalSubType(emptyList(), functionCompositeType(functionType)),
+            ),
+            state = RecursiveType.STATE_CLOSED,
+        )
         val type = type(
             idx = typeIndex,
             recursiveType = recursiveType,

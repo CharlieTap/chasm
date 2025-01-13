@@ -3,29 +3,30 @@ package io.github.charlietap.chasm.decoder.integration
 import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.ast.module.Import
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.CompositeType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.ast.type.Mutability
+import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.module.type
+import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.fixture.ast.type.definedType
+import io.github.charlietap.chasm.fixture.ast.type.finalSubType
+import io.github.charlietap.chasm.fixture.ast.type.functionCompositeType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.recursiveType
 import io.github.charlietap.chasm.fixture.ast.type.resultType
-import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -45,18 +46,28 @@ class ImportModuleTest {
         )
         val expectedRecursiveType = recursiveType(
             subTypes = listOf(
-                SubType.Final(
-                    superTypes = emptyList(),
-                    compositeType = CompositeType.Function(expectedFunctionType),
+                finalSubType(
+                    heapTypes = emptyList(),
+                    compositeType = functionCompositeType(expectedFunctionType),
                 ),
             ),
+            state = RecursiveType.STATE_SYNTAX,
         )
-        val expectedFunctionImportType = Type(Index.TypeIndex(0u), expectedRecursiveType)
+
+        val expectedType = type(
+            idx = typeIndex(0u),
+            recursiveType = expectedRecursiveType,
+        )
+        val expectedDefinedType = definedType(
+            expectedRecursiveType.copy(
+                state = RecursiveType.STATE_SUBSTITUTED,
+            ),
+        )
 
         val expectedFunctionImport = Import(
             moduleName = NameValue("env"),
             entityName = NameValue("externalFunction"),
-            descriptor = Import.Descriptor.Function(expectedFunctionType.definedType()),
+            descriptor = Import.Descriptor.Function(expectedDefinedType),
         )
 
         val expectedTableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u, 2u))
@@ -89,7 +100,7 @@ class ImportModuleTest {
         val expected = Ok(
             module(
                 version = Version.One,
-                types = listOf(expectedFunctionImportType),
+                types = listOf(expectedType),
                 imports = listOf(
                     expectedFunctionImport,
                     expectedTableImport,

@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.fixture.ast.type.recursiveType
 import io.github.charlietap.chasm.fixture.ast.type.subType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -41,7 +42,10 @@ class RecursiveTypeDecoderTest {
             Ok(Vector(subTypes))
         }
 
-        val expected = RecursiveType(subTypes)
+        val expected = recursiveType(
+            subTypes = subTypes,
+            state = RecursiveType.STATE_SYNTAX,
+        )
 
         val actual = RecursiveTypeDecoder(
             context = context,
@@ -73,7 +77,10 @@ class RecursiveTypeDecoderTest {
             fail("VectorDecoder should not be called in this scenario")
         }
 
-        val expected = RecursiveType(listOf(subType))
+        val expected = recursiveType(
+            subTypes = listOf(subType),
+            state = RecursiveType.STATE_SYNTAX,
+        )
 
         val actual = RecursiveTypeDecoder(
             context = context,

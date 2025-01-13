@@ -8,9 +8,10 @@ import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 
 inline fun FunctionType.recursiveType() = RecursiveType(
-    listOf(
+    subTypes = listOf(
         SubType.Final(emptyList(), CompositeType.Function(this)),
     ),
+    state = RecursiveType.STATE_CLOSED,
 )
 
 inline fun FunctionType.definedType(

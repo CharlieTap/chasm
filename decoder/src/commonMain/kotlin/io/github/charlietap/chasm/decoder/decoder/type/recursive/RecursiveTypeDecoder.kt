@@ -32,11 +32,11 @@ internal inline fun RecursiveTypeDecoder(
         MULTIPLE_SUBTYPES_RECURSIVE_TYPE -> {
             context.reader.ubyte().bind() // consume byte
             val subTypes = vectorDecoder(context, subTypeDecoder).bind()
-            RecursiveType(subTypes.vector)
+            RecursiveType(subTypes.vector, RecursiveType.STATE_SYNTAX)
         }
         else -> {
             val subType = subTypeDecoder(context).bind()
-            RecursiveType(listOf(subType))
+            RecursiveType(listOf(subType), RecursiveType.STATE_SYNTAX)
         }
     }
 }

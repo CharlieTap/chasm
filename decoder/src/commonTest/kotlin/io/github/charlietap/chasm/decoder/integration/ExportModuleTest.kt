@@ -31,6 +31,7 @@ import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
+import io.github.charlietap.chasm.fixture.ast.type.recursiveType
 import io.github.charlietap.chasm.fixture.ast.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,10 +50,11 @@ class ExportModuleTest {
             params = resultType(emptyList()),
             results = resultType(emptyList()),
         )
-        val expectedRecursiveType = RecursiveType(
-            listOf(
+        val expectedRecursiveType = recursiveType(
+            subTypes = listOf(
                 SubType.Final(emptyList(), CompositeType.Function(expectedFunctionType)),
             ),
+            state = RecursiveType.STATE_SYNTAX,
         )
 
         val expectedFunctionExportType = Type(Index.TypeIndex(0u), expectedRecursiveType)
