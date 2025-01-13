@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Tag
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
@@ -18,6 +17,7 @@ import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
+import io.github.charlietap.chasm.type.rolling.substitution.TypeIndexToDefinedTypeSubstitutor
 
 internal data class ValidationContext(
     val config: ModuleConfig,
@@ -108,23 +108,9 @@ internal data class ValidationContext(
         module.elementSegments.map(ElementSegment::type)
     }
 
-    override fun lookup(): DefinedTypeLookup {
-        return { index ->
-            types.getOrNull(index.idx.toInt())
-        }
+    override val lookup: DefinedTypeLookup = { index ->
+        types.getOrNull(index.idx.toInt())
     }
 
-    override fun substitution(): ConcreteHeapTypeSubstitutor {
-        val substitution: ConcreteHeapTypeSubstitutor = { concreteHeapType ->
-            when (concreteHeapType) {
-                is ConcreteHeapType.TypeIndex -> if (concreteHeapType.index.idx.toInt() < types.size) {
-                    ConcreteHeapType.Defined(types[concreteHeapType.index.idx.toInt()])
-                } else {
-                    concreteHeapType
-                }
-                else -> concreteHeapType
-            }
-        }
-        return substitution
-    }
+    override val substitutor: ConcreteHeapTypeSubstitutor = TypeIndexToDefinedTypeSubstitutor(types)
 }

@@ -73,7 +73,7 @@ internal inline fun BrOnCastExecutor(
     val closedReferenceType1 = typeOfReferenceValue(referenceValue, store, moduleInstance)
         .toResultOr { InvocationError.Trap.TrapEncountered }
         .bind()
-    val closedReferenceType2 = referenceTypeSubstitutor(referenceType2, context.substitution())
+    val closedReferenceType2 = referenceTypeSubstitutor(referenceType2, context.substitutor)
 
     val referenceTypeMatches = referenceTypeMatcher(closedReferenceType1, closedReferenceType2, context)
 

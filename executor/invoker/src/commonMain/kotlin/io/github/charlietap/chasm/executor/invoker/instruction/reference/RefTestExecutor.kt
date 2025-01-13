@@ -43,7 +43,7 @@ internal inline fun RefTestExecutor(
     val frame = stack.peekFrame().bind()
     val moduleInstance = frame.instance
 
-    val substitutedReferenceType = referenceTypeSubstitutor(referenceType, context.substitution())
+    val substitutedReferenceType = referenceTypeSubstitutor(referenceType, context.substitutor)
 
     val otherReferenceValue = stack.popReference().bind()
     val otherReferenceType = typeOfReferenceValue(otherReferenceValue, store, moduleInstance)

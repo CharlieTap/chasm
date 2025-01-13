@@ -29,7 +29,7 @@ internal inline fun TypeAllocator(
         // This closes the recursive type in the sense it replaces its TypeIndex's with defined types
         // preventing the defined type roller replacing them with RecursiveTypeIndex's which cannot be
         // used across module boundaries
-        val substituted = recursiveTypeSubstitutor(type, context.substitution())
+        val substituted = recursiveTypeSubstitutor(type, context.substitutor)
         val definedTypes = definedTypeRoller(context.types.size, substituted)
         context.types += definedTypes
         definedTypes

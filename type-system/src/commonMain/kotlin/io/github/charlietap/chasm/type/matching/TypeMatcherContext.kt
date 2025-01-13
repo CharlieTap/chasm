@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubs
 
 interface TypeMatcherContext {
 
-    fun lookup(): DefinedTypeLookup
+    val lookup: DefinedTypeLookup
 
-    fun substitution(): ConcreteHeapTypeSubstitutor
+    val substitutor: ConcreteHeapTypeSubstitutor
 }

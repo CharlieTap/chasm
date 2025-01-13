@@ -30,7 +30,7 @@ internal inline fun DefinedTypeMatcher(
 ): Boolean = when {
     type1 === type2 -> true
     else -> {
-        val substitution = context.substitution()
+        val substitution = context.substitutor
         if (definedTypeSubstitutor(type1, substitution) == definedTypeSubstitutor(type2, substitution)) {
             true
         } else {

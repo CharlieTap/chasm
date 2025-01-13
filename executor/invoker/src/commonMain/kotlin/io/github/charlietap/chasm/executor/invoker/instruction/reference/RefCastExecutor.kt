@@ -44,7 +44,7 @@ internal inline fun RefCastExecutor(
     val frame = stack.peekFrame().bind()
     val moduleInstance = frame.instance
 
-    val substitutedReferenceType = referenceTypeSubstitutor(referenceType, context.substitution()) // rt1
+    val substitutedReferenceType = referenceTypeSubstitutor(referenceType, context.substitutor) // rt1
 
     val otherReferenceValue = stack.popReference().bind() // rt2
     val otherReferenceType = typeOfReferenceValue(otherReferenceValue, store, moduleInstance)
