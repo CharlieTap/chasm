@@ -34,7 +34,7 @@ internal inline fun ExpressionValidator(
 
     val scopedContext = scope(context, expression).bind()
 
-    expression.instructions.map { instruction ->
+    expression.instructions.forEach { instruction ->
         constInstructionValidator(scopedContext, instruction).bind()
     }
 
