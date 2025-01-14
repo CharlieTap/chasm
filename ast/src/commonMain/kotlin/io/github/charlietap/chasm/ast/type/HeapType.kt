@@ -43,5 +43,6 @@ sealed interface ConcreteHeapType : HeapType {
     @JvmInline
     value class RecursiveTypeIndex(val index: Int) : ConcreteHeapType
 
-    data class Defined(val definedType: DefinedType) : ConcreteHeapType
+    @JvmInline
+    value class Defined(val definedType: DefinedType) : ConcreteHeapType
 }

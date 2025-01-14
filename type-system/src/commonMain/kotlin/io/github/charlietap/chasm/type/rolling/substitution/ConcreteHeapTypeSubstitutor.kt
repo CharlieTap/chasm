@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ast.type.DefinedType
 
 typealias ConcreteHeapTypeSubstitutor = (ConcreteHeapType) -> ConcreteHeapType
 
-inline fun TypeIndexToRecursiveTypeIndexSubsitutor(
+fun TypeIndexToRecursiveTypeIndexSubsitutor(
     lowerBound: Int,
     upperBound: Int,
 ): ConcreteHeapTypeSubstitutor = { concreteHeapType ->
@@ -22,7 +22,7 @@ inline fun TypeIndexToRecursiveTypeIndexSubsitutor(
     }
 }
 
-inline fun TypeIndexToDefinedTypeSubstitutor(
+fun TypeIndexToDefinedTypeSubstitutor(
     types: List<DefinedType>,
 ): ConcreteHeapTypeSubstitutor = { concreteHeapType ->
     when (concreteHeapType) {
