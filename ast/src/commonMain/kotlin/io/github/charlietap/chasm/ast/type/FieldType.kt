@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.ast.type
 
 data class FieldType(
-    val storageType: StorageType,
-    val mutability: Mutability,
+    var storageType: StorageType,
+    var mutability: Mutability,
 ) : Type
