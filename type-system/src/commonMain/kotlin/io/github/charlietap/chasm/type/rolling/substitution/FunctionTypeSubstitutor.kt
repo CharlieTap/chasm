@@ -17,8 +17,7 @@ internal fun FunctionTypeSubstitutor(
     functionType: FunctionType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     resultTypeSubstitutor: TypeSubstitutor<ResultType>,
-): FunctionType {
-    val params = resultTypeSubstitutor(functionType.params, concreteHeapTypeSubstitutor)
-    val results = resultTypeSubstitutor(functionType.results, concreteHeapTypeSubstitutor)
-    return FunctionType(params, results)
+): FunctionType = functionType.apply {
+    params = resultTypeSubstitutor(functionType.params, concreteHeapTypeSubstitutor)
+    results = resultTypeSubstitutor(functionType.results, concreteHeapTypeSubstitutor)
 }

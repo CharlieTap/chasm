@@ -21,20 +21,20 @@ internal fun SubTypeSubstitutor(
     heapTypeSubstitutor: TypeSubstitutor<HeapType>,
     compositeTypeSubstitutor: TypeSubstitutor<CompositeType>,
 ): SubType = when (subType) {
-    is SubType.Open -> subType.copy(
+    is SubType.Open -> subType.apply {
         superTypes = subType.superTypes.map { heapType ->
             heapTypeSubstitutor(heapType, concreteHeapTypeSubstitutor)
-        },
+        }
         compositeType = subType.compositeType.let { compositeType ->
             compositeTypeSubstitutor(compositeType, concreteHeapTypeSubstitutor)
-        },
-    )
-    is SubType.Final -> subType.copy(
+        }
+    }
+    is SubType.Final -> subType.apply {
         superTypes = subType.superTypes.map { heapType ->
             heapTypeSubstitutor(heapType, concreteHeapTypeSubstitutor)
-        },
+        }
         compositeType = subType.compositeType.let { compositeType ->
             compositeTypeSubstitutor(compositeType, concreteHeapTypeSubstitutor)
-        },
-    )
+        }
+    }
 }

@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.RecursiveType
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
@@ -17,7 +16,6 @@ fun DefinedTypeMatcher(
     type2 = type2,
     context = context,
     definedTypeSubstitutor = ::DefinedTypeSubstitutor,
-    definedTypeUnroller = ::DefinedTypeUnroller,
     heapTypeMatcher = ::HeapTypeMatcher,
 )
 
@@ -26,7 +24,6 @@ internal inline fun DefinedTypeMatcher(
     type2: DefinedType,
     context: TypeMatcherContext,
     crossinline definedTypeSubstitutor: TypeSubstitutor<DefinedType>,
-    crossinline definedTypeUnroller: DefinedTypeUnroller,
     crossinline heapTypeMatcher: TypeMatcher<HeapType>,
 ): Boolean = when {
     type1 === type2 -> true
@@ -48,9 +45,9 @@ internal inline fun DefinedTypeMatcher(
         if (closedType1 == closedType2) {
             true
         } else {
-            val subType = definedTypeUnroller(type1)
+            val subType = context.unroller(closedType1)
             subType.superTypes.any { ht1 ->
-                heapTypeMatcher(ht1, ConcreteHeapType.Defined(type2), context)
+                heapTypeMatcher(ht1, ConcreteHeapType.Defined(closedType2), context)
             }
         }
     }

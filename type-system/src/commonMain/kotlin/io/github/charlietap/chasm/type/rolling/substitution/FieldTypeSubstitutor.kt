@@ -17,6 +17,6 @@ internal fun FieldTypeSubstitutor(
     fieldType: FieldType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     storageTypeSubstitutor: TypeSubstitutor<StorageType>,
-): FieldType = fieldType.copy(
-    storageTypeSubstitutor(fieldType.storageType, concreteHeapTypeSubstitutor),
-)
+): FieldType = fieldType.apply {
+    storageType = storageTypeSubstitutor(fieldType.storageType, concreteHeapTypeSubstitutor)
+}

@@ -11,11 +11,14 @@ import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.type.factory.DefinedTypeUnrollerFactory
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
+import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeIndexToDefinedTypeSubstitutor
 
@@ -30,6 +33,7 @@ internal data class ValidationContext(
     val instructionContext: InstructionContext = InstructionContextImpl(),
     val refsContext: RefsContext = RefsContextImpl(module),
     val typeContext: TypeContext = TypeContextImpl(),
+    val unrollCache: HashMap<DefinedType, SubType> = hashMapOf(),
 ) : ElementSegmentContext by elementSegmentContext,
     ExportContext by exportContext,
     ExpressionContext by expressionContext,
@@ -113,4 +117,5 @@ internal data class ValidationContext(
     }
 
     override val substitutor: ConcreteHeapTypeSubstitutor = TypeIndexToDefinedTypeSubstitutor(types)
+    override val unroller: DefinedTypeUnroller = DefinedTypeUnrollerFactory(unrollCache)
 }

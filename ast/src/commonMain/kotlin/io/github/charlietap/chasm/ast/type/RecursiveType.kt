@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.ast.type
 
 data class RecursiveType(
-    val subTypes: List<SubType>,
+    var subTypes: List<SubType>,
     var state: Byte,
 ) : Type {
     companion object {

@@ -4,6 +4,8 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.copy.DeepCopier
+import io.github.charlietap.chasm.type.copy.RecursiveTypeDeepCopier
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
@@ -17,15 +19,22 @@ internal fun RecursiveTypeValidator(
         context = context,
         type = type,
         subTypeValidator = ::SubTypeValidator,
+        recursiveTypeCopier = ::RecursiveTypeDeepCopier,
     )
 
 internal inline fun RecursiveTypeValidator(
     context: ValidationContext,
     type: RecursiveType,
     crossinline subTypeValidator: Validator<SubType>,
+    crossinline recursiveTypeCopier: DeepCopier<RecursiveType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
-    val definedType = DefinedTypeRoller(context.types.size, type)
+    // the act of rolling mutates the recursive type with the
+    // recursive type indices but this validator expects the type
+    // to be in syntax state
+
+    val copy = recursiveTypeCopier(type)
+    val definedType = DefinedTypeRoller(context.types.size, copy)
     context.types += definedType
 
     type.subTypes.forEach { subType ->

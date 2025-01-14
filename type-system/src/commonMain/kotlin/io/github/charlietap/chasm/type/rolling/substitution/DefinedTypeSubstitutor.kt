@@ -17,6 +17,6 @@ internal fun DefinedTypeSubstitutor(
     definedType: DefinedType,
     concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
     recursiveTypeSubstitutor: TypeSubstitutor<RecursiveType>,
-): DefinedType = definedType.copy(
-    recursiveTypeSubstitutor(definedType.recursiveType, concreteHeapTypeSubstitutor),
-)
+): DefinedType = definedType.apply {
+    recursiveType = recursiveTypeSubstitutor(definedType.recursiveType, concreteHeapTypeSubstitutor)
+}
