@@ -10,5 +10,5 @@ internal inline fun F64FloorExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Floor,
 ) {
-    context.stack.unaryOperation(Double::floor).bind()
+    context.stack.unaryOperation(Double::floor)
 }

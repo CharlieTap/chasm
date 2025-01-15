@@ -11,5 +11,5 @@ internal inline fun I64ExtendI32UExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64ExtendI32U,
 ) {
-    context.stack.convertOperation(::I64, Int::extendI64u).bind()
+    context.stack.convertOperation(::I64, Int::extendI64u)
 }

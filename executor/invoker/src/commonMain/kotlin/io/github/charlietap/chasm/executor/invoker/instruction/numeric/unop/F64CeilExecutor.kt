@@ -10,5 +10,5 @@ internal inline fun F64CeilExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Ceil,
 ) {
-    context.stack.unaryOperation(Double::ceil).bind()
+    context.stack.unaryOperation(Double::ceil)
 }

@@ -10,5 +10,5 @@ internal inline fun F64SqrtExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Sqrt,
 ) {
-    context.stack.unaryOperation(Double::sqrt).bind()
+    context.stack.unaryOperation(Double::sqrt)
 }

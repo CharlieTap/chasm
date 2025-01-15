@@ -10,5 +10,5 @@ internal inline fun I32Extend8SExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Extend8S,
 ) {
-    context.stack.unaryOperation(Int::extend8s).bind()
+    context.stack.unaryOperation(Int::extend8s)
 }

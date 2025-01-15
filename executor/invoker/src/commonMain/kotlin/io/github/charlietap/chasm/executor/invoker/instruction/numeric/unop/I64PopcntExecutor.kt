@@ -10,5 +10,5 @@ internal inline fun I64PopcntExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Popcnt,
 ) {
-    context.stack.unaryOperation(Long::countOnePopulation).bind()
+    context.stack.unaryOperation(Long::countOnePopulation)
 }

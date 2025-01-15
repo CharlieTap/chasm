@@ -9,5 +9,5 @@ internal inline fun F64NegExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Neg,
 ) {
-    context.stack.unaryOperation(Double::unaryMinus).bind()
+    context.stack.unaryOperation(Double::unaryMinus)
 }

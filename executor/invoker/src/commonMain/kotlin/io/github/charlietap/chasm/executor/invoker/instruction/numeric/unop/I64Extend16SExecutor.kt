@@ -10,5 +10,5 @@ internal inline fun I64Extend16SExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Extend16S,
 ) {
-    context.stack.unaryOperation(Long::extend16s).bind()
+    context.stack.unaryOperation(Long::extend16s)
 }

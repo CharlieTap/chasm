@@ -10,5 +10,5 @@ internal inline fun F32SqrtExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Sqrt,
 ) {
-    context.stack.unaryOperation(Float::sqrt).bind()
+    context.stack.unaryOperation(Float::sqrt)
 }

@@ -9,5 +9,5 @@ internal inline fun I32CtzExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Ctz,
 ) {
-    context.stack.unaryOperation(Int::countTrailingZeroBits).bind()
+    context.stack.unaryOperation(Int::countTrailingZeroBits)
 }

@@ -181,33 +181,32 @@ inline fun Stack.constOperation(
 inline fun <S, T : NumberValue<S>> Stack.unaryOperation(
     crossinline constructor: (S) -> T,
     crossinline operation: (S) -> S,
-): Result<Unit, InvocationError> {
+) {
     val operand = popValueOrNull() as T
 
     val result = operation(operand.value)
     push(constructor(result))
-    return Ok(Unit)
 }
 
 @JvmName("i32UnaryOperation")
 inline fun Stack.unaryOperation(
     crossinline operation: (Int) -> Int,
-): Result<Unit, InvocationError> = unaryOperation(::I32, operation)
+) = unaryOperation(::I32, operation)
 
 @JvmName("i64UnaryOperation")
 inline fun Stack.unaryOperation(
     crossinline operation: (Long) -> Long,
-): Result<Unit, InvocationError> = unaryOperation(::I64, operation)
+) = unaryOperation(::I64, operation)
 
 @JvmName("f32UnaryOperation")
 inline fun Stack.unaryOperation(
     crossinline operation: (Float) -> Float,
-): Result<Unit, InvocationError> = unaryOperation(::F32, operation)
+) = unaryOperation(::F32, operation)
 
 @JvmName("f64UnaryOperation")
 inline fun Stack.unaryOperation(
     crossinline operation: (Double) -> Double,
-): Result<Unit, InvocationError> = unaryOperation(::F64, operation)
+) = unaryOperation(::F64, operation)
 
 inline fun <S, T : NumberValue<S>> Stack.binaryOperation(
     crossinline constructor: (S) -> T,
