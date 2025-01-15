@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
 
 internal inline fun LocalSetExecutor(
@@ -11,7 +9,7 @@ internal inline fun LocalSetExecutor(
 ) {
     val (stack) = context
 
-    val value = stack.popValue().bind()
+    val value = stack.popValue()
     val frame = stack.peekFrame()
 
     frame.locals[instruction.localIdx] = value

@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.tag
 import io.github.charlietap.chasm.executor.runtime.ext.tagAddress
@@ -38,7 +37,7 @@ internal inline fun ThrowExecutor(
     val functionType = instance.type.type
 
     val params = List(functionType.params.types.size) {
-        stack.popValue().bind()
+        stack.popValue()
     }
 
     val exceptionInstance = ExceptionInstance(

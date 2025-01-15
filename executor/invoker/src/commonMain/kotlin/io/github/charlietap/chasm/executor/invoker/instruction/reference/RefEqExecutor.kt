@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
@@ -15,8 +13,8 @@ internal inline fun RefEqExecutor(
 
     val (stack) = context
 
-    val referenceValue1 = stack.popValue().bind()
-    val referenceValue2 = stack.popValue().bind()
+    val referenceValue1 = stack.popValue()
+    val referenceValue2 = stack.popValue()
 
     val equal = when {
         referenceValue1 is ReferenceValue.Array && referenceValue2 is ReferenceValue.Array -> referenceValue1.instance === referenceValue2.instance

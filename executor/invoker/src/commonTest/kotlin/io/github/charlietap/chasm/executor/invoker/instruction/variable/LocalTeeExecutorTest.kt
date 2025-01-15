@@ -39,7 +39,7 @@ class LocalTeeExecutorTest {
         assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
         assertEquals(1, stack.valuesDepth())
-        assertEquals(expected, stack.popValueOrNull())
+        assertEquals(expected, stack.popValue())
         assertEquals(expected, frame.locals[0])
     }
 }

@@ -31,7 +31,7 @@ class RefAsNonNullExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(value, stack.popValueOrNull())
+        assertEquals(value, stack.popValue())
     }
 
     @Test

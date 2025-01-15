@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
@@ -40,7 +39,7 @@ internal inline fun StructNewExecutor(
     val fields = structType.fields
         .asReversed()
         .map { fieldType ->
-            val value = stack.popValue().bind()
+            val value = stack.popValue()
             fieldPacker(value, fieldType).bind()
         }.asReversed()
 

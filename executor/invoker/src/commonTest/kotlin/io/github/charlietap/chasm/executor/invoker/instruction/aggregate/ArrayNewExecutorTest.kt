@@ -39,7 +39,7 @@ class ArrayNewExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(2, stack.valuesDepth())
-        assertEquals(executionValue, stack.popValueOrNull())
-        assertEquals(executionValue, stack.popValueOrNull())
+        assertEquals(executionValue, stack.popValue())
+        assertEquals(executionValue, stack.popValue())
     }
 }

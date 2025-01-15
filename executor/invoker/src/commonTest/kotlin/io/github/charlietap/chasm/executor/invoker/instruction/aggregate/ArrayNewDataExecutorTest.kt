@@ -100,7 +100,7 @@ class ArrayNewDataExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(2, stack.valuesDepth())
-        assertEquals(i32(arrayElem2), stack.popValueOrNull())
-        assertEquals(i32(arrayElem1), stack.popValueOrNull())
+        assertEquals(i32(arrayElem2), stack.popValue())
+        assertEquals(i32(arrayElem1), stack.popValue())
     }
 }

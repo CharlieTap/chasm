@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -39,7 +38,7 @@ internal inline fun ArrayNewFixedExecutor(
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
     val fields = MutableList(size.toInt()) { _ ->
-        val value = stack.popValue().bind()
+        val value = stack.popValue()
         fieldPacker(value, arrayType.fieldType).bind()
     }.asReversed()
 

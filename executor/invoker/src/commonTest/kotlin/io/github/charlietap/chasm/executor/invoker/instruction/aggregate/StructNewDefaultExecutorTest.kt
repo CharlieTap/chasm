@@ -63,6 +63,6 @@ class StructNewDefaultExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(expected, stack.popValueOrNull())
+        assertEquals(expected, stack.popValue())
     }
 }

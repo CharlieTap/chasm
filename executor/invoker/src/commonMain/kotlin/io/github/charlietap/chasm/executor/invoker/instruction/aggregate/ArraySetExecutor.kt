@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -39,7 +38,7 @@ internal inline fun ArraySetExecutor(
 
     val arrayType = definedTypeExpander(definedType).arrayType().bind()
 
-    val value = stack.popValue().bind()
+    val value = stack.popValue()
 
     val fieldIndex = stack.popI32().bind()
     val arrayReference = stack.popArrayReference().bind()

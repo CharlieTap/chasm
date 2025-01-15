@@ -30,6 +30,6 @@ class RefI31ExecutorTest {
         val actual = RefI31Executor(context, AggregateInstruction.RefI31, i31Wrapper)
 
         assertEquals(Unit, actual)
-        assertEquals(i31, stack.popValueOrNull())
+        assertEquals(i31, stack.popValue())
     }
 }

@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunctionContext
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -29,7 +28,7 @@ internal fun HostFunctionCall(
     val type = function.functionType
 
     val params = List(type.params.types.size) {
-        stack.popValue().bind()
+        stack.popValue()
     }.asReversed()
 
     val functionContext = HostFunctionContext(

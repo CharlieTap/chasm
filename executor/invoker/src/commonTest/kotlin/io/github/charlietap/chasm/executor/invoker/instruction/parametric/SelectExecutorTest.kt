@@ -31,7 +31,7 @@ class SelectExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(value1, stack.popValueOrNull())
+        assertEquals(value1, stack.popValue())
     }
 
     @Test
@@ -56,6 +56,6 @@ class SelectExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
-        assertEquals(value2, stack.popValueOrNull())
+        assertEquals(value2, stack.popValue())
     }
 }

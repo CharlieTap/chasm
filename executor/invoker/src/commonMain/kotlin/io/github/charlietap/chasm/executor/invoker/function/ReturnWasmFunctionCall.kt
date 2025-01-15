@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.grow
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -21,7 +20,7 @@ internal inline fun ReturnWasmFunctionCall(
     val locals = frame.locals
     locals.grow(params + instance.function.locals.size, ExecutionValue.Uninitialised)
     for (i in (params - 1) downTo 0) {
-        locals[i] = stack.popValue().bind()
+        locals[i] = stack.popValue()
     }
     for (local in instance.function.locals) {
         locals[params++] = local.type.default().bind()

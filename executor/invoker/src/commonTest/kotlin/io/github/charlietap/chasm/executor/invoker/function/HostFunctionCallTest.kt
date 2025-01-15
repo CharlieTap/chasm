@@ -84,8 +84,8 @@ class HostFunctionCallTest {
         assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
         assertEquals(2, stack.valuesDepth())
-        assertEquals(i64(118), stack.popValueOrNull())
-        assertEquals(i32(117), stack.popValueOrNull())
+        assertEquals(i64(118), stack.popValue())
+        assertEquals(i32(117), stack.popValue())
     }
 
     @Test

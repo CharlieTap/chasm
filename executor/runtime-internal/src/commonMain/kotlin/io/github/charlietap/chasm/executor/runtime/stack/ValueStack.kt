@@ -37,6 +37,13 @@ class ValueStack
             top += values.size
         }
 
+        fun pop(): ExecutionValue {
+            top--
+            val value = elements[top]
+            elements[top] = null
+            return value!!
+        }
+
         fun popOrNull(): ExecutionValue? = try {
             top--
             val value = elements[top]

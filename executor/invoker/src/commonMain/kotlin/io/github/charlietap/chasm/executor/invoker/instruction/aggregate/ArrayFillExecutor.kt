@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -32,7 +31,7 @@ internal inline fun ArrayFillExecutor(
 
     val (stack) = context
     val elementsToFill = stack.popI32().bind()
-    val fillValue = stack.popValue().bind()
+    val fillValue = stack.popValue()
     val arrayElementOffset = stack.popI32().bind()
     val arrayReference = stack.popArrayReference().bind()
     val arrayInstance = arrayReference.instance

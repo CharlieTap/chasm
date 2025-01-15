@@ -95,7 +95,13 @@ data class Stack(
 
     fun popLabelOrNull(): Entry.Label? = labels.popOrNull()
 
-    fun popValueOrNull(): ExecutionValue? = values.popOrNull()
+    fun popValue(): ExecutionValue = try {
+        values.pop()
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.MissingStackValue)
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.MissingStackValue)
+    }
 
     fun peekFrame(): ActivationFrame {
         return try {
