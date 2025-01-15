@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.Configuration
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -43,9 +44,13 @@ internal fun ThreadExecutor(
 
     stack.push(thread.instructions)
 
-    while (stack.instructionsDepth() > 0) {
-        val instruction = stack.popInstructionOrNull() ?: break
-        instruction(context).bind()
+    try {
+        while (stack.instructionsDepth() > 0) {
+            val instruction = stack.popInstructionOrNull() ?: break
+            instruction(context)
+        }
+    } catch (exception: InvocationException) {
+        Err(exception.error).bind()
     }
 
     if (stack.size() != thread.frame.arity) {

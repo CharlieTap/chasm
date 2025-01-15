@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop
 
-import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction
@@ -9,6 +7,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun F64SubExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Sub,
-): Result<Unit, InvocationError> {
-    return context.stack.binaryOperation(Double::minus)
+) {
+    context.stack.binaryOperation(Double::minus)
 }

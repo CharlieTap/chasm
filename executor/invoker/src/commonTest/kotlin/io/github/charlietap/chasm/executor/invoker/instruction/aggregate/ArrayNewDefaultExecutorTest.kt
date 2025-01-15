@@ -65,7 +65,7 @@ class ArrayNewDefaultExecutorTest {
         val actual =
             ArrayNewDefaultExecutor(context, AggregateInstruction.ArrayNewDefault(typeIndex), definedTypeExpander, arrayNewFixedExecutor)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(2, stack.valuesDepth())
         assertEquals(default, stack.popValueOrNull())
         assertEquals(default, stack.popValueOrNull())

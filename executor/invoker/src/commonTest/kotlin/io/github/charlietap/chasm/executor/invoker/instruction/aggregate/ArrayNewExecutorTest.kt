@@ -37,7 +37,7 @@ class ArrayNewExecutorTest {
 
         val actual = ArrayNewExecutor(context, AggregateInstruction.ArrayNew(typeIndex), arrayNewFixedExecutor)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(2, stack.valuesDepth())
         assertEquals(executionValue, stack.popValueOrNull())
         assertEquals(executionValue, stack.popValueOrNull())

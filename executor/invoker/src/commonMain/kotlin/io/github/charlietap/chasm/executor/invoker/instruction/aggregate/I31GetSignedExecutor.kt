@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.extendSigned
 import io.github.charlietap.chasm.executor.runtime.ext.extendUnsigned
@@ -15,7 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 internal fun I31GetSignedExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.I31GetSigned,
-): Result<Unit, InvocationError> =
+) =
     I31GetExecutor(
         context = context,
         signedExtension = true,
@@ -28,7 +26,7 @@ internal inline fun I31GetExecutor(
     signedExtension: Boolean,
     crossinline i31SignedExtender: (ReferenceValue.I31) -> Int,
     crossinline i31UnsignedExtender: (ReferenceValue.I31) -> Int,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val value = stack.popI31Reference().bind()

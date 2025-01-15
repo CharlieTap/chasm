@@ -79,7 +79,7 @@ class ArrayNewFixedExecutorTest {
 
         val actual = ArrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size), definedTypeExpander, fieldPacker)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(expected, stack.popValueOrNull())
     }

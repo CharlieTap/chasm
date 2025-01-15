@@ -1,11 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.store
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.write.I32ToI16Writer
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
@@ -13,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 internal inline fun I32Store16Executor(
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Store16,
-): Result<Unit, InvocationError> =
+) =
     I32Store16Executor(
         context = context,
         instruction = instruction,
@@ -26,7 +24,7 @@ internal inline fun I32Store16Executor(
     instruction: MemoryInstruction.I32Store16,
     crossinline boundsChecker: BoundsChecker<Unit>,
     crossinline writer: I32ToI16Writer,
-): Result<Unit, InvocationError> = binding {
+) {
     val stack = context.stack
     val memory = instruction.memory
 

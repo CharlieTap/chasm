@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.fixture.ast.type.heapType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refAsNonNullRuntimeInstruction
@@ -12,6 +11,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.value.functionReferen
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class RefAsNonNullExecutorTest {
 
@@ -29,7 +29,7 @@ class RefAsNonNullExecutorTest {
             instruction = refAsNonNullRuntimeInstruction(),
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(value, stack.popValueOrNull())
     }
@@ -42,11 +42,13 @@ class RefAsNonNullExecutorTest {
 
         stack.push(nullReferenceValue(heapType()))
 
-        val actual = RefAsNonNullExecutor(
-            context = context,
-            instruction = refAsNonNullRuntimeInstruction(),
-        )
+        val exception = assertFailsWith<InvocationException>{
+            RefAsNonNullExecutor(
+                context = context,
+                instruction = refAsNonNullRuntimeInstruction(),
+            )
+        }
 
-        assertEquals(Err(InvocationError.Trap.TrapEncountered), actual)
+        assertEquals(InvocationError.Trap.TrapEncountered, exception.error)
     }
 }

@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.admin.FrameInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
@@ -15,12 +13,12 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-internal typealias WasmFunctionCall = (ExecutionContext, FunctionInstance.WasmFunction) -> Result<Unit, InvocationError>
+internal typealias WasmFunctionCall = (ExecutionContext, FunctionInstance.WasmFunction) -> Unit
 
 internal inline fun WasmFunctionCall(
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
-): Result<Unit, InvocationError> =
+) =
     WasmFunctionCall(
         context = context,
         instance = instance,
@@ -33,7 +31,7 @@ internal inline fun WasmFunctionCall(
     instance: FunctionInstance.WasmFunction,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
     noinline frameCleaner: DispatchableInstruction,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val type = instance.functionType
@@ -66,5 +64,5 @@ internal inline fun WasmFunctionCall(
         continuation = null,
     )
 
-    instructionBlockExecutor(stack, label, instance.function.body.instructions, null).bind()
+    instructionBlockExecutor(stack, label, instance.function.body.instructions, null)
 }

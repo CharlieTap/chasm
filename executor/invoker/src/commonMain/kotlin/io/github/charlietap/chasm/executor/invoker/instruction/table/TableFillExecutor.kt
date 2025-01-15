@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.contains
@@ -13,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 internal fun TableFillExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.TableFill,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val tableInstance = instruction.table
@@ -25,10 +24,10 @@ internal fun TableFillExecutor(
     val fillRange = tableOffset..<(tableOffset + elementsToFill)
 
     if (!tableInstance.elements.indices.contains(fillRange)) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
-    if (elementsToFill == 0) return@binding
+    if (elementsToFill == 0) return
 
     tableInstance.elements.fill(fillValue, fillRange.first, fillRange.last + 1)
 }

@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -17,7 +16,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun ArraySetExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArraySet,
-): Result<Unit, InvocationError> =
+) =
     ArraySetExecutor(
         context = context,
         instruction = instruction,
@@ -30,7 +29,7 @@ internal inline fun ArraySetExecutor(
     instruction: AggregateInstruction.ArraySet,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val typeIndex = instruction.typeIndex

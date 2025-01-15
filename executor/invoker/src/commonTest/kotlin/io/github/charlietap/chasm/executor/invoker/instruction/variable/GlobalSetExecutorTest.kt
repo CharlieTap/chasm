@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
@@ -51,7 +50,7 @@ class GlobalSetExecutorTest {
             instruction = instruction,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
         assertEquals(0, stack.valuesDepth())
         assertEquals(expected, store.globals[globalAddress.address].value)

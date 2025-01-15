@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -87,7 +86,7 @@ class ArrayCopyExecutorTest {
 
         val actual = ArrayCopyExecutor(context, AggregateInstruction.ArrayCopy(srcTypeIndex, dstTypeIndex))
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(expectedInstance, dstArrayInstance)
         assertEquals(0, stack.valuesDepth())
     }

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -101,7 +100,7 @@ class ArrayInitElementExecutorTest {
 
         val actual = ArrayInitElementExecutor(context, AggregateInstruction.ArrayInitElement(typeIndex, elementIndex))
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(expectedInstance, arrayInstance)
         assertEquals(0, stack.valuesDepth())
     }

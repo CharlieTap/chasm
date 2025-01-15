@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun F64EqExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Eq,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Double::eq)
+) {
+    context.stack.relationalOperation(Double::eq)
 }

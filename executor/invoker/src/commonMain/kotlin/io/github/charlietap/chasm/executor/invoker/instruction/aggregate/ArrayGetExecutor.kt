@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
@@ -18,7 +16,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun ArrayGetExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayGet,
-): Result<Unit, InvocationError> =
+) =
     ArrayGetExecutor(
         context = context,
         typeIndex = instruction.typeIndex,
@@ -33,7 +31,7 @@ internal inline fun ArrayGetExecutor(
     signedUnpack: Boolean,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldUnpacker: FieldUnpacker,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val frame = stack.peekFrame().bind()

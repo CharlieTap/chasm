@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.type.Mutability
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -17,7 +16,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayCopy,
-): Result<Unit, InvocationError> =
+) =
     ArrayCopyExecutor(
         context = context,
         instruction = instruction,
@@ -28,7 +27,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayCopy,
     crossinline definedTypeExpander: DefinedTypeExpander,
-): Result<Unit, InvocationError> = binding {
+) {
 
     // x = dest
     // y = src
@@ -40,7 +39,7 @@ internal inline fun ArrayCopyExecutor(
 
     val destArrayType = definedTypeExpander(destDefinedType).arrayType().bind()
     if (destArrayType.fieldType.mutability != Mutability.Var) {
-        Err(InvocationError.ArrayCopyOnAConstArray).bind<Unit>()
+        Err(InvocationError.ArrayCopyOnAConstArray).bind()
     }
 
     val elementsToCopy = stack.popI32().bind()
@@ -53,14 +52,14 @@ internal inline fun ArrayCopyExecutor(
     val destination = destReference.instance
 
     if (destinationOffset + elementsToCopy > destination.fields.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
     if (sourceOffset + elementsToCopy > source.fields.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
-    if (elementsToCopy == 0) return@binding
+    if (elementsToCopy == 0) return
 
     if (destinationOffset <= sourceOffset) {
         // forward copy

@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 internal inline fun I32ReinterpretF32Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32ReinterpretF32,
-): Result<Unit, InvocationError> {
-    return context.stack.convertOperation(::I32, Float::toRawBits)
+) {
+    context.stack.convertOperation(::I32, Float::toRawBits)
 }

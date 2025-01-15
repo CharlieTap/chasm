@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun I64ShrSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64ShrS,
-): Result<Unit, InvocationError> {
-    return context.stack.binaryOperation(Long::shr)
+) {
+    context.stack.binaryOperation(Long::shr)
 }

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
@@ -68,7 +67,7 @@ class RefTestExecutorTest {
             typeOfReferenceValue = typeOfReferenceValue,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(i32(1), stack.popValueOrNull())
     }
@@ -119,7 +118,7 @@ class RefTestExecutorTest {
             typeOfReferenceValue = typeOfReferenceValue,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(i32(0), stack.popValueOrNull())
     }

@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.grow
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -14,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 internal inline fun ReturnWasmFunctionCall(
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val frame = stack.peekFrame().bind()

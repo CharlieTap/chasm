@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
@@ -28,6 +27,6 @@ class CallRefExecutorTest {
 
         val actual = CallRefExecutor(context, callRefRuntimeInstruction())
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
     }
 }

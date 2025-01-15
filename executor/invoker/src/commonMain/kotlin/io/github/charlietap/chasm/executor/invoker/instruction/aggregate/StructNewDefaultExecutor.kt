@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.default
@@ -16,7 +14,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun StructNewDefaultExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.StructNewDefault,
-): Result<Unit, InvocationError> =
+) =
     StructNewDefaultExecutor(
         context = context,
         instruction = instruction,
@@ -29,7 +27,7 @@ internal inline fun StructNewDefaultExecutor(
     instruction: AggregateInstruction.StructNewDefault,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline structNewExecutor: Executor<AggregateInstruction.StructNew>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val typeIndex = instruction.typeIndex
@@ -44,5 +42,5 @@ internal inline fun StructNewDefaultExecutor(
         stack.pushValue(value)
     }
 
-    structNewExecutor(context, AggregateInstruction.StructNew(typeIndex)).bind()
+    structNewExecutor(context, AggregateInstruction.StructNew(typeIndex))
 }

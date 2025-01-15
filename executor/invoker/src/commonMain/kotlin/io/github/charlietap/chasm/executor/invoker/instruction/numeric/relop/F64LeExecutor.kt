@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun F64LeExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Le,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Double::le)
+) {
+    context.stack.relationalOperation(Double::le)
 }

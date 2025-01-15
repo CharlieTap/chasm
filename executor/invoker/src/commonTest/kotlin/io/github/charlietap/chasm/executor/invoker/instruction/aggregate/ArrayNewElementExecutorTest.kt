@@ -70,7 +70,7 @@ class ArrayNewElementExecutorTest {
 
         val actual = ArrayNewElementExecutor(context, AggregateInstruction.ArrayNewElement(typeIndex, elementIndex), arrayNewFixedExecutor)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(2, stack.valuesDepth())
         assertEquals(arrayElem2, stack.popValueOrNull())
         assertEquals(arrayElem1, stack.popValueOrNull())

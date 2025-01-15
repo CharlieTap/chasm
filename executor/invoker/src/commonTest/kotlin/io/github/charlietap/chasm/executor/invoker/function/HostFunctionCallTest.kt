@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
@@ -21,6 +20,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.value.i64
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class HostFunctionCallTest {
 
@@ -82,7 +82,7 @@ class HostFunctionCallTest {
             function = functionInstance,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
         assertEquals(2, stack.valuesDepth())
         assertEquals(i64(118), stack.popValueOrNull())
@@ -145,18 +145,18 @@ class HostFunctionCallTest {
             stack.push(value)
         }
 
-        val expected = Err(
-            InvocationError.HostFunctionInconsistentWithType(
-                i64ValueType(),
-                i32(118),
-            ),
+        val expected = InvocationError.HostFunctionInconsistentWithType(
+            i64ValueType(),
+            i32(118),
         )
 
-        val actual = HostFunctionCall(
-            context = context,
-            function = functionInstance,
-        )
+        val exception = assertFailsWith<InvocationException> {
+            HostFunctionCall(
+                context = context,
+                function = functionInstance,
+            )
+        }
 
-        assertEquals(expected, actual)
+        assertEquals(expected, exception.error)
     }
 }

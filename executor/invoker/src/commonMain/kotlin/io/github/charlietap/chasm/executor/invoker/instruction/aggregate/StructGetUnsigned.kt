@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun StructGetUnsignedExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.StructGetUnsigned,
-): Result<Unit, InvocationError> =
+) =
     StructGetExecutor(
         context = context,
         typeIndex = instruction.typeIndex,

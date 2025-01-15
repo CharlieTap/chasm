@@ -84,7 +84,7 @@ class StructSetExecutorTest {
 
         val actual = StructSetExecutor(context, instruction, definedTypeExpander, fieldPacker)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(expectedInstance, structInstance)
     }
 }

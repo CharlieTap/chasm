@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -23,8 +23,7 @@ internal typealias BrOnCastExecutor = (ExecutionContext, Index.LabelIndex, Refer
 internal fun BrOnCastExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.BrOnCast,
-): Result<Unit, InvocationError> =
-    BrOnCastExecutor(
+) = BrOnCastExecutor(
         context = context,
         labelIndex = instruction.labelIndex,
         referenceType1 = instruction.srcReferenceType,
@@ -39,7 +38,7 @@ internal fun BrOnCastExecutor(
 internal fun BrOnCastFailExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.BrOnCastFail,
-): Result<Unit, InvocationError> =
+) =
     BrOnCastExecutor(
         context = context,
         labelIndex = instruction.labelIndex,
@@ -63,7 +62,7 @@ internal inline fun BrOnCastExecutor(
     crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
     crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
     crossinline breakExecutor: BreakExecutor,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
@@ -78,6 +77,6 @@ internal inline fun BrOnCastExecutor(
     val referenceTypeMatches = referenceTypeMatcher(closedReferenceType1, closedReferenceType2, context)
 
     if (referenceTypeMatches == breakIfMatches) {
-        breakExecutor(stack, labelIndex).bind()
+        breakExecutor(stack, labelIndex)
     }
 }

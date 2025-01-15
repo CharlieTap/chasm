@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
@@ -19,8 +17,7 @@ import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 internal fun ThrowExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Throw,
-): Result<Unit, InvocationError> =
-    ThrowExecutor(
+) = ThrowExecutor(
         context = context,
         instruction = instruction,
         throwRefDispatcher = ::ThrowRefDispatcher,
@@ -30,7 +27,7 @@ internal inline fun ThrowExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Throw,
     crossinline throwRefDispatcher: Dispatcher<ControlInstruction.ThrowRef>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val frame = stack.peekFrame().bind()

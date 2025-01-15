@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.localGetRuntimeInstruction
@@ -36,7 +35,7 @@ class LocalGetExecutorTest {
             instruction = instruction,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
         assertEquals(1, stack.valuesDepth())
         assertEquals(expected, stack.popValueOrNull())

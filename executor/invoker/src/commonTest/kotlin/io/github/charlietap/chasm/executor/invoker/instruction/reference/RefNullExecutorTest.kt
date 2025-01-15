@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -27,7 +26,7 @@ class RefNullExecutorTest {
             instruction = instruction,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(expected, stack.popValueOrNull())
     }

@@ -212,34 +212,33 @@ inline fun Stack.unaryOperation(
 inline fun <S, T : NumberValue<S>> Stack.binaryOperation(
     crossinline constructor: (S) -> T,
     crossinline operation: (S, S) -> S,
-): Result<Unit, InvocationError> {
+) {
     val operand2 = popValueOrNull() as T
     val operand1 = popValueOrNull() as T
 
     val result = operation(operand1.value, operand2.value)
     push(constructor(result))
-    return Ok(Unit)
 }
 
 @JvmName("i32BinaryOperation")
 inline fun Stack.binaryOperation(
     crossinline operation: (Int, Int) -> Int,
-): Result<Unit, InvocationError> = binaryOperation(::I32, operation)
+) = binaryOperation(::I32, operation)
 
 @JvmName("i64BinaryOperation")
 inline fun Stack.binaryOperation(
     crossinline operation: (Long, Long) -> Long,
-): Result<Unit, InvocationError> = binaryOperation(::I64, operation)
+) = binaryOperation(::I64, operation)
 
 @JvmName("f32BinaryOperation")
 inline fun Stack.binaryOperation(
     crossinline operation: (Float, Float) -> Float,
-): Result<Unit, InvocationError> = binaryOperation(::F32, operation)
+) = binaryOperation(::F32, operation)
 
 @JvmName("f64BinaryOperation")
 inline fun Stack.binaryOperation(
     crossinline operation: (Double, Double) -> Double,
-): Result<Unit, InvocationError> = binaryOperation(::F64, operation)
+) = binaryOperation(::F64, operation)
 
 inline fun <S, T : NumberValue<S>> Stack.testOperation(
     crossinline operation: (S) -> Boolean,

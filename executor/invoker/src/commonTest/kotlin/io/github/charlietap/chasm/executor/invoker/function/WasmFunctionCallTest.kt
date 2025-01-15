@@ -133,7 +133,7 @@ class WasmFunctionCallTest {
             frameCleaner = frameDispatchable,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
     }
 
@@ -213,7 +213,7 @@ class WasmFunctionCallTest {
             instance = functionInstance,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
     }
 }

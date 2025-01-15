@@ -80,7 +80,7 @@ class BrOnCastExecutorTest {
                 breakExecutor,
             )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(referenceValue, stack.popValueOrNull())
         assertEquals(true, didBreak)
@@ -147,7 +147,7 @@ class BrOnCastExecutorTest {
                 breakExecutor,
             )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(referenceValue, stack.popValueOrNull())
         assertEquals(false, didBreak)
@@ -214,7 +214,7 @@ class BrOnCastExecutorTest {
                 breakExecutor,
             )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(referenceValue, stack.popValueOrNull())
         assertEquals(false, didBreak)
@@ -281,7 +281,7 @@ class BrOnCastExecutorTest {
                 breakExecutor,
             )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(referenceValue, stack.popValueOrNull())
         assertEquals(true, didBreak)

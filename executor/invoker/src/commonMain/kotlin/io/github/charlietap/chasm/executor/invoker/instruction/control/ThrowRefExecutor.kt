@@ -1,13 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -25,13 +24,11 @@ import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 internal fun ThrowRefExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.ThrowRef,
-): Result<Unit, InvocationError> =
-    ThrowRefExecutor(
+) = ThrowRefExecutor(
         context = context,
         instruction = instruction,
         breakDispatcher = ::BrDispatcher,
         handlerDispatcher = ::HandlerDispatcher,
-        throwRefDispatcher = ::ThrowRefDispatcher,
     )
 
 internal inline fun ThrowRefExecutor(
@@ -39,8 +36,7 @@ internal inline fun ThrowRefExecutor(
     instruction: ControlInstruction.ThrowRef,
     crossinline breakDispatcher: Dispatcher<ControlInstruction.Br>,
     crossinline handlerDispatcher: Dispatcher<ExceptionHandler>,
-    crossinline throwRefDispatcher: Dispatcher<ControlInstruction.ThrowRef>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val ref = stack.popReference().bind()
@@ -54,11 +50,11 @@ internal inline fun ThrowRefExecutor(
     val instance = store.exception(exceptionRef.address).bind()
     val address = instance.tagAddress
 
-    val handler = jumpToHandlerInstruction(stack).bind()
+    val handler = jumpToHandlerInstruction(stack)
 
     if (handler.instructions.isEmpty()) {
         stack.pushValue(ReferenceValue.Exception(exceptionRef.address))
-        stack.push(throwRefDispatcher(ControlInstruction.ThrowRef))
+        stack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
     } else {
 
         val frame = stack.peekFrame().bind()
@@ -116,13 +112,13 @@ internal inline fun ThrowRefExecutor(
                 val instruction = handlerDispatcher(handler)
                 stack.push(instruction)
                 stack.pushValue(exceptionRef)
-                stack.push(throwRefDispatcher(ControlInstruction.ThrowRef))
+                stack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
             }
         }
     }
 }
 
-private fun jumpToHandlerInstruction(stack: Stack): Result<ExceptionHandler, InvocationError> = binding {
+private inline fun jumpToHandlerInstruction(stack: Stack): ExceptionHandler {
 
     val handler = stack.popHandler().bind()
 
@@ -130,5 +126,5 @@ private fun jumpToHandlerInstruction(stack: Stack): Result<ExceptionHandler, Inv
     stack.shrinkFrames(0, handler.framesDepth)
     stack.shrinkInstructions(0, handler.instructionsDepth)
 
-    handler
+    return handler
 }

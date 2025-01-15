@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -18,7 +17,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayInitElement,
-): Result<Unit, InvocationError> =
+) =
     ArrayInitElementExecutor(
         context = context,
         instruction = instruction,
@@ -31,7 +30,7 @@ internal inline fun ArrayInitElementExecutor(
     instruction: AggregateInstruction.ArrayInitElement,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val (typeIndex, elementIndex) = instruction
@@ -57,7 +56,7 @@ internal inline fun ArrayInitElementExecutor(
         (destinationOffsetInArray + elementsToCopy > arrayInstance.fields.size) ||
         (sourceOffsetInElementSegment + elementsToCopy > elementInstance.elements.size)
     ) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
     repeat(elementsToCopy) { offset ->

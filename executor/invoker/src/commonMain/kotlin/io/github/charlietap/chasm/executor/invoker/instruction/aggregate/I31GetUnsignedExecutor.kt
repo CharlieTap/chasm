@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 internal fun I31GetUnsignedExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.I31GetUnsigned,
-): Result<Unit, InvocationError> =
+) =
     I31GetExecutor(
         context = context,
         signedExtension = false,

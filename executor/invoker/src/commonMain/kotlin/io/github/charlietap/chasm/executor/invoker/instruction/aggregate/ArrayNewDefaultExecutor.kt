@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -17,7 +15,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun ArrayNewDefaultExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewDefault,
-): Result<Unit, InvocationError> =
+) =
     ArrayNewDefaultExecutor(
         context = context,
         instruction = instruction,
@@ -30,7 +28,7 @@ internal inline fun ArrayNewDefaultExecutor(
     instruction: AggregateInstruction.ArrayNewDefault,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val typeIndex = instruction.typeIndex
@@ -47,5 +45,5 @@ internal inline fun ArrayNewDefaultExecutor(
         stack.pushValue(value)
     }
 
-    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size.toUInt())).bind()
+    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size.toUInt()))
 }

@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -22,7 +21,7 @@ import io.github.charlietap.chasm.type.ext.bitWidth
 internal fun ArrayNewDataExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewData,
-): Result<Unit, InvocationError> =
+) =
     ArrayNewDataExecutor(
         context = context,
         instruction = instruction,
@@ -35,7 +34,7 @@ internal inline fun ArrayNewDataExecutor(
     instruction: AggregateInstruction.ArrayNewData,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val (typeIndex, dataIndex) = instruction
@@ -61,7 +60,7 @@ internal inline fun ArrayNewDataExecutor(
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * arrayElementSizeInBytes)
 
     if (arrayEndOffsetInSegment > dataInstance.bytes.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
     val byteArray = dataInstance.bytes.sliceArray(arrayStartOffsetInSegment until arrayEndOffsetInSegment)
@@ -73,5 +72,5 @@ internal inline fun ArrayNewDataExecutor(
         stack.pushValue(value)
     }
 
-    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt())).bind()
+    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt()))
 }

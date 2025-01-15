@@ -11,6 +11,6 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 internal inline fun I32WrapI64Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32WrapI64,
-): Result<Unit, InvocationError> {
-    return context.stack.convertOperation(::I32, Long::wrap)
+) {
+    context.stack.convertOperation(::I32, Long::wrap)
 }

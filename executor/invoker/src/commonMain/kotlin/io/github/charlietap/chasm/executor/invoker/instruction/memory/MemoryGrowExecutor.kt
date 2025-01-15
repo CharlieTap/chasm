@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.grow.LinearMemoryGrower
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
@@ -13,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 fun MemoryGrowExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryGrow,
-): Result<Unit, InvocationError> =
+) =
     MemoryGrowExecutor(
         context = context,
         instruction = instruction,
@@ -24,7 +22,7 @@ internal inline fun MemoryGrowExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemoryGrow,
     crossinline grower: LinearMemoryGrower,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val stack = context.stack
     val memory = instruction.memory

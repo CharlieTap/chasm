@@ -11,6 +11,6 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 internal inline fun F64ConvertI64UExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64ConvertI64U,
-): Result<Unit, InvocationError> {
-    return context.stack.convertOperation(::F64, Long::convertF64u)
+) {
+    context.stack.convertOperation(::F64, Long::convertF64u)
 }

@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun F32LeExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Le,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Float::le)
+) {
+    context.stack.relationalOperation(Float::le)
 }

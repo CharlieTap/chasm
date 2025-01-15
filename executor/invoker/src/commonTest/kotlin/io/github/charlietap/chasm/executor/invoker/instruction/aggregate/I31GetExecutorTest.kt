@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -35,7 +34,7 @@ class I31GetExecutorTest {
 
         val actual = I31GetExecutor(context, signedExtension, i31SignedExtender, i31UnsignedExtender)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(i32(i32), stack.popValueOrNull())
     }
 
@@ -61,7 +60,7 @@ class I31GetExecutorTest {
 
         val actual = I31GetExecutor(context, signedExtension, i31SignedExtender, i31UnsignedExtender)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(i32(i32), stack.popValueOrNull())
     }
 }

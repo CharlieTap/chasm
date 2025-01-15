@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun I64GeUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64GeU,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Long::geu)
+) {
+    context.stack.relationalOperation(Long::geu)
 }

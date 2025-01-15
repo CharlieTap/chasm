@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -22,7 +21,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 internal fun RefTestExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefTest,
-): Result<Unit, InvocationError> = RefTestExecutor(
+) = RefTestExecutor(
     context = context,
     instruction = instruction,
     referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
@@ -36,7 +35,7 @@ internal inline fun RefTestExecutor(
     crossinline referenceTypeSubstitutor: TypeSubstitutor<ReferenceType>,
     crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
     crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val referenceType = instruction.referenceType

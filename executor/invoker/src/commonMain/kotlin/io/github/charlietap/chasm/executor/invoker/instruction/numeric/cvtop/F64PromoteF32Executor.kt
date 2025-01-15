@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 internal inline fun F64PromoteF32Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64PromoteF32,
-): Result<Unit, InvocationError> {
-    return context.stack.convertOperation(::F64, Float::toDouble)
+) {
+    context.stack.convertOperation(::F64, Float::toDouble)
 }

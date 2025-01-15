@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -11,7 +10,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 internal fun TableCopyExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.TableCopy,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
 
@@ -28,7 +27,7 @@ internal fun TableCopyExecutor(
         srcOffset + elementsToCopy > srcTableInstance.elements.size ||
         dstOffset + elementsToCopy > dstTableInstance.elements.size
     ) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
     srcTableInstance.elements.copyInto(

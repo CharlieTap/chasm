@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.dropRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
@@ -22,7 +21,7 @@ class DropExecutorTest {
 
         val actual = DropExecutor(context, instruction)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(0, stack.valuesDepth())
     }
 }

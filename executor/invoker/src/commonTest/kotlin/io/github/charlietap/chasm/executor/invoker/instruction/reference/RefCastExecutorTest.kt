@@ -1,12 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
@@ -20,6 +19,7 @@ import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class RefCastExecutorTest {
 
@@ -69,7 +69,7 @@ class RefCastExecutorTest {
             typeOfReferenceValue = typeOfReferenceValue,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(referenceValue, stack.popValueOrNull())
     }
@@ -112,14 +112,16 @@ class RefCastExecutorTest {
             typeOfReferenceType
         }
 
-        val actual = RefCastExecutor(
-            context = context,
-            instruction = refCastRuntimeInstruction(referenceType),
-            referenceTypeSubstitutor = referenceTypeSubstitutor,
-            referenceTypeMatcher = referenceTypeMatcher,
-            typeOfReferenceValue = typeOfReferenceValue,
-        )
+        val exception = assertFailsWith<InvocationException> {
+            RefCastExecutor(
+                context = context,
+                instruction = refCastRuntimeInstruction(referenceType),
+                referenceTypeSubstitutor = referenceTypeSubstitutor,
+                referenceTypeMatcher = referenceTypeMatcher,
+                typeOfReferenceValue = typeOfReferenceValue,
+            )
+        }
 
-        assertEquals(Err(InvocationError.Trap.TrapEncountered), actual)
+        assertEquals(InvocationError.Trap.TrapEncountered, exception.error)
     }
 }

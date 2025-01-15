@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
@@ -41,7 +40,7 @@ class InstructionBlockExecutorTest {
             labelInstruction,
         ) + instructions
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.labelsDepth())
         assertEquals(label, stack.popLabelOrNull())
         assertEquals(expectedInstructions.toList(), stack.instructions())

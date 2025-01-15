@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.selectWithTypeRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
@@ -30,7 +29,7 @@ class SelectWithTypeExecutorTest {
             instruction = instruction,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(value1, stack.popValueOrNull())
     }
@@ -55,7 +54,7 @@ class SelectWithTypeExecutorTest {
             instruction = instruction,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(value2, stack.popValueOrNull())
     }

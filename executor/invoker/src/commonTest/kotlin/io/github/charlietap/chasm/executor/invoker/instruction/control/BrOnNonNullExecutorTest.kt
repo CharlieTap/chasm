@@ -33,7 +33,7 @@ class BrOnNonNullExecutorTest {
 
         val actual = BrOnNonNullExecutor(context, instruction, breakExecutor)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(referenceValue, stack.popValueOrNull())
     }
@@ -54,7 +54,7 @@ class BrOnNonNullExecutorTest {
 
         val actual = BrOnNonNullExecutor(context, instruction, breakExecutor)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(0, stack.valuesDepth())
     }
 }

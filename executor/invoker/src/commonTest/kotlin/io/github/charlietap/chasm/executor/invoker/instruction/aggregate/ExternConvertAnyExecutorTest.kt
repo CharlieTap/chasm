@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
@@ -29,7 +28,7 @@ class ExternConvertAnyExecutorTest {
 
         val actual = ExternConvertAnyExecutor(context, AggregateInstruction.ExternConvertAny)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(ReferenceValue.Null(AbstractHeapType.Extern), stack.popValueOrNull())
     }
 
@@ -52,7 +51,7 @@ class ExternConvertAnyExecutorTest {
 
             val actual = ExternConvertAnyExecutor(context, AggregateInstruction.ExternConvertAny)
 
-            assertEquals(Ok(Unit), actual)
+            assertEquals(Unit, actual)
             assertEquals(ReferenceValue.Extern(referenceValue), stack.popValueOrNull())
         }
     }

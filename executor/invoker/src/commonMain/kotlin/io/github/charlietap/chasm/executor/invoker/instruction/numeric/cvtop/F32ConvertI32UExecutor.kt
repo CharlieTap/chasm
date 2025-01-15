@@ -11,6 +11,6 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 internal inline fun F32ConvertI32UExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32ConvertI32U,
-): Result<Unit, InvocationError> {
-    return context.stack.convertOperation(::F32, Int::convertF32u)
+) {
+    context.stack.convertOperation(::F32, Int::convertF32u)
 }

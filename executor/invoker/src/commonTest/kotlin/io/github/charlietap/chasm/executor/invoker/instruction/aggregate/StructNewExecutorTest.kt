@@ -78,7 +78,7 @@ class StructNewExecutorTest {
 
         val actual = StructNewExecutor(context, AggregateInstruction.StructNew(typeIndex), definedTypeExpander, fieldPacker)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(expected, stack.popValueOrNull())
     }

@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.asRange
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -13,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 internal inline fun TableGrowExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.TableGrow,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
 
@@ -27,7 +25,7 @@ internal inline fun TableGrowExecutor(
     val proposedLength = (tableSize + elementsToAdd).toUInt()
     if (proposedLength !in tableType.limits.asRange()) {
         stack.push(NumberValue.I32(-1))
-        return@binding
+        return
     }
 
     tableInstance.apply {

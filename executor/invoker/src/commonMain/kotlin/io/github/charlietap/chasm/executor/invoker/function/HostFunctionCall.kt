@@ -1,13 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
@@ -20,12 +19,12 @@ import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.VectorValue
 import io.github.charlietap.chasm.host.HostFunctionException
 
-internal typealias HostFunctionCall = (ExecutionContext, FunctionInstance.HostFunction) -> Result<Unit, InvocationError>
+internal typealias HostFunctionCall = (ExecutionContext, FunctionInstance.HostFunction) -> Unit
 
 internal fun HostFunctionCall(
     context: ExecutionContext,
     function: FunctionInstance.HostFunction,
-): Result<Unit, InvocationError> = binding {
+) {
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
     val type = function.functionType
@@ -53,7 +52,7 @@ internal fun HostFunctionCall(
         if (typeMatches) {
             stack.push(result!!)
         } else {
-            Err(InvocationError.HostFunctionInconsistentWithType(valueType, result)).bind<Unit>()
+            Err(InvocationError.HostFunctionInconsistentWithType(valueType, result)).bind()
         }
     }
 }

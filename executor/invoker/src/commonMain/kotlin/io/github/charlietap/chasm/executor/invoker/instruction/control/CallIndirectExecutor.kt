@@ -2,10 +2,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.DefinedType
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -25,8 +24,7 @@ import io.github.charlietap.chasm.type.matching.TypeMatcher
 internal fun CallIndirectExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.CallIndirect,
-): Result<Unit, InvocationError> =
-    CallIndirectExecutor(
+) = CallIndirectExecutor(
         context = context,
         typeIndex = instruction.typeIndex,
         table = instruction.table,
@@ -42,7 +40,7 @@ internal inline fun CallIndirectExecutor(
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
     crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val frame = stack.peekFrame().bind()
@@ -63,11 +61,11 @@ internal inline fun CallIndirectExecutor(
     val actualFunctionType = functionInstance.type
 
     if (!definedTypeMatcher(actualFunctionType, expectedFunctionType, context)) {
-        Err(InvocationError.IndirectCallHasIncorrectFunctionType).bind<Unit>()
+        Err(InvocationError.IndirectCallHasIncorrectFunctionType).bind()
     }
 
     when (functionInstance) {
-        is FunctionInstance.HostFunction -> hostFunctionCall(context, functionInstance).bind()
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(context, functionInstance).bind()
+        is FunctionInstance.HostFunction -> hostFunctionCall(context, functionInstance)
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(context, functionInstance)
     }
 }

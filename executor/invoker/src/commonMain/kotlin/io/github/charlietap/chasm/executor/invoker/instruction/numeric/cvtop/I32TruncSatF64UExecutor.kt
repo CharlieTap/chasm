@@ -11,6 +11,6 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 internal inline fun I32TruncSatF64UExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32TruncSatF64U,
-): Result<Unit, InvocationError> {
-    return context.stack.convertOperation(::I32, Double::truncI32u)
+) {
+    context.stack.convertOperation(::I32, Double::truncI32u)
 }

@@ -9,4 +9,4 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstructio
 internal inline fun NopExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Nop,
-): Result<Unit, InvocationError> = Ok(Unit)
+) = Ok(Unit)

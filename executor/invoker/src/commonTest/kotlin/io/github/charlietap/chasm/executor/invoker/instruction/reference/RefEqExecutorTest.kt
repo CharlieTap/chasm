@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refEqRuntimeInstruction
@@ -26,7 +25,7 @@ class RefEqExecutorTest {
             instruction = refEqRuntimeInstruction(),
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(i32(1), stack.popValueOrNull())
     }
@@ -44,7 +43,7 @@ class RefEqExecutorTest {
             instruction = refEqRuntimeInstruction(),
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(i32(0), stack.popValueOrNull())
     }

@@ -9,6 +9,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun I64SubExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Sub,
-): Result<Unit, InvocationError> {
-    return context.stack.binaryOperation(Long::minus)
+) {
+    context.stack.binaryOperation(Long::minus)
 }

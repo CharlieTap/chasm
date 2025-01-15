@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -17,7 +16,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayFill,
-): Result<Unit, InvocationError> =
+) =
     ArrayFillExecutor(
         context = context,
         instruction = instruction,
@@ -30,7 +29,7 @@ internal inline fun ArrayFillExecutor(
     instruction: AggregateInstruction.ArrayFill,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val elementsToFill = stack.popI32().bind()
@@ -40,10 +39,10 @@ internal inline fun ArrayFillExecutor(
     val arrayInstance = arrayReference.instance
 
     if (arrayElementOffset + elementsToFill > arrayInstance.fields.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
-    if (elementsToFill == 0) return@binding
+    if (elementsToFill == 0) return
 
     val frame = stack.peekFrame().bind()
     val definedType = frame.instance

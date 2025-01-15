@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun F32NeExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Ne,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Float::ne)
+) {
+    context.stack.relationalOperation(Float::ne)
 }

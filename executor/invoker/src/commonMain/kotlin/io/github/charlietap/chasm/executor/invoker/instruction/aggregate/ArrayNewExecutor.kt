@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.peekValue
@@ -12,7 +10,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruct
 internal fun ArrayNewExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNew,
-): Result<Unit, InvocationError> =
+) =
     ArrayNewExecutor(
         context = context,
         instruction = instruction,
@@ -23,7 +21,7 @@ internal inline fun ArrayNewExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNew,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val typeIndex = instruction.typeIndex
@@ -33,5 +31,5 @@ internal inline fun ArrayNewExecutor(
         stack.push(value)
     }
 
-    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size.toUInt())).bind()
+    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size.toUInt()))
 }

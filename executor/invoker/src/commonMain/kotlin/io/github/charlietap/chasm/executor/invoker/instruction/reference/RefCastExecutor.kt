@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -22,7 +21,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 internal fun RefCastExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefCast,
-): Result<Unit, InvocationError> = RefCastExecutor(
+) = RefCastExecutor(
     context = context,
     instruction = instruction,
     referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
@@ -36,7 +35,7 @@ internal inline fun RefCastExecutor(
     crossinline referenceTypeSubstitutor: TypeSubstitutor<ReferenceType>,
     crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
     crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val referenceType = instruction.referenceType
@@ -54,6 +53,6 @@ internal inline fun RefCastExecutor(
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
         stack.pushValue(otherReferenceValue)
     } else {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 }

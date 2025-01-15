@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.contains
@@ -12,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 internal fun TableInitExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.TableInit,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
 
@@ -33,10 +32,10 @@ internal fun TableInitExecutor(
         !elementInstance.elements.indices.contains(srcRange) ||
         !tableInstance.elements.indices.contains(dstRange)
     ) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
-    if (elementsToInitialise == 0) return@binding
+    if (elementsToInitialise == 0) return
 
     elementInstance.elements.copyInto(tableInstance.elements, dstRange.first, srcRange.first, srcRange.last + 1)
 }

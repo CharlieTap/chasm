@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun F64GtExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Gt,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Double::gt)
+) {
+    context.stack.relationalOperation(Double::gt)
 }

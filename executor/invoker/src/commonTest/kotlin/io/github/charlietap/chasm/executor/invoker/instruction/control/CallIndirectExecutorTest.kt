@@ -88,7 +88,7 @@ class CallIndirectExecutorTest {
             definedTypeMatcher = definedTypeMatcher,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
     }
 
     @Test
@@ -153,6 +153,6 @@ class CallIndirectExecutorTest {
             definedTypeMatcher = definedTypeMatcher,
         )
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
     }
 }

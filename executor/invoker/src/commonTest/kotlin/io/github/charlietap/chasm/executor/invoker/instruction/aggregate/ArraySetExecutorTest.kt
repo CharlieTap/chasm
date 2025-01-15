@@ -85,7 +85,7 @@ class ArraySetExecutorTest {
 
         val actual = ArraySetExecutor(context, AggregateInstruction.ArraySet(typeIndex), definedTypeExpander, fieldPacker)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(expectedInstance, arrayInstance)
     }
 }

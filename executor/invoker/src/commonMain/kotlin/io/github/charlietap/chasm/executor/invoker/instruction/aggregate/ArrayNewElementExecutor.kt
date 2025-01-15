@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
@@ -16,7 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruct
 internal fun ArrayNewElementExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElement,
-): Result<Unit, InvocationError> =
+) =
     ArrayNewElementExecutor(
         context = context,
         instruction = instruction,
@@ -27,7 +26,7 @@ internal inline fun ArrayNewElementExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElement,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack, store) = context
     val (typeIndex, elementIndex) = instruction
@@ -43,7 +42,7 @@ internal inline fun ArrayNewElementExecutor(
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + arrayLength
 
     if (arrayEndOffsetInSegment > elementInstance.elements.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind<Unit>()
+        Err(InvocationError.Trap.TrapEncountered).bind()
     }
 
     elementInstance.elements
@@ -52,5 +51,5 @@ internal inline fun ArrayNewElementExecutor(
             stack.pushValue(referenceValue)
         }
 
-    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt())).bind()
+    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt()))
 }

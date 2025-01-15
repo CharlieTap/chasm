@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop
 
-import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.extendI64s
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction
@@ -11,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 internal inline fun I64ExtendI32SExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64ExtendI32S,
-): Result<Unit, InvocationError> {
-    return context.stack.convertOperation(::I64, Int::extendI64s)
+) {
+    context.stack.convertOperation(::I64, Int::extendI64s).bind()
 }

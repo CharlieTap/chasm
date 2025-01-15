@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 internal inline fun F64ReinterpretI64Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64ReinterpretI64,
-): Result<Unit, InvocationError> {
-    return context.stack.convertOperation(::F64, Double::fromBits)
+) {
+    context.stack.convertOperation(::F64, Double::fromBits)
 }

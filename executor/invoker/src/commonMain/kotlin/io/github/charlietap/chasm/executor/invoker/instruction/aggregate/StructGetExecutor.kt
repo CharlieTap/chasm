@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.field
@@ -17,7 +15,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun StructGetExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.StructGet,
-): Result<Unit, InvocationError> =
+) =
     StructGetExecutor(
         context = context,
         typeIndex = instruction.typeIndex,
@@ -34,7 +32,7 @@ internal inline fun StructGetExecutor(
     signedUnpack: Boolean,
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldUnpacker: FieldUnpacker,
-): Result<Unit, InvocationError> = binding {
+) {
 
     val (stack) = context
     val frame = stack.peekFrame().bind()

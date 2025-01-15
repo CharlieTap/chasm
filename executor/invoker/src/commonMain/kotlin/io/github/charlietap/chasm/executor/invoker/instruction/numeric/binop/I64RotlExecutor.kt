@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun I64RotlExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Rotl,
-): Result<Unit, InvocationError> {
-    return context.stack.binaryOperation(Long::rotateLeft)
+) {
+    context.stack.binaryOperation(Long::rotateLeft)
 }

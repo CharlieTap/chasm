@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.variable
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
@@ -10,7 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstructi
 internal inline fun LocalGetExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction.LocalGet,
-): Result<Unit, InvocationError> = binding {
+) {
     val (stack) = context
     val frame = stack.peekFrame().bind()
 

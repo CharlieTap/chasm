@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun I32GtSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32GtS,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Int::gt)
+) {
+    context.stack.relationalOperation(Int::gt)
 }

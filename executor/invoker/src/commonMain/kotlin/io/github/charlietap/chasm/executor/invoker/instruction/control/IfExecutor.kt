@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
@@ -10,8 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstructio
 internal fun IfExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.If,
-): Result<Unit, InvocationError> =
-    IfExecutor(
+) = IfExecutor(
         context = context,
         instruction = instruction,
         blockExecutor = ::BlockExecutor,
@@ -21,13 +18,13 @@ internal inline fun IfExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.If,
     crossinline blockExecutor: BlockExecutor,
-): Result<Unit, InvocationError> = binding {
+) {
     val (stack, store) = context
     val firstBlock = stack.popI32().bind() != 0
 
     if (firstBlock) {
-        blockExecutor(store, stack, instruction.functionType, instruction.thenInstructions).bind()
+        blockExecutor(store, stack, instruction.functionType, instruction.thenInstructions)
     } else {
-        blockExecutor(store, stack, instruction.functionType, instruction.elseInstructions ?: emptyArray()).bind()
+        blockExecutor(store, stack, instruction.functionType, instruction.elseInstructions ?: emptyArray())
     }
 }

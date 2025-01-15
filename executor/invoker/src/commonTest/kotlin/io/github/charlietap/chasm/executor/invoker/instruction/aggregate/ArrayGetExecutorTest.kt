@@ -78,7 +78,7 @@ class ArrayGetExecutorTest {
 
         val actual = ArrayGetExecutor(context, typeIndex, signedUnpack, definedTypeExpander, fieldUnpacker)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(expected, stack.popValueOrNull())
     }

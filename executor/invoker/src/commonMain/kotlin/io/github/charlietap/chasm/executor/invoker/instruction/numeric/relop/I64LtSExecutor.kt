@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun I64LtSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64LtS,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Long::lt)
+) {
+    context.stack.relationalOperation(Long::lt)
 }

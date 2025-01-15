@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun I32LtUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32LtU,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Int::ltu)
+) {
+    context.stack.relationalOperation(Int::ltu)
 }

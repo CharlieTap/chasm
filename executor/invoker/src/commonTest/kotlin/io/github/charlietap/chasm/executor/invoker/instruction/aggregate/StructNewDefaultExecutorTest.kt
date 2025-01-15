@@ -61,7 +61,7 @@ class StructNewDefaultExecutorTest {
         val actual =
             StructNewDefaultExecutor(context, AggregateInstruction.StructNewDefault(typeIndex), definedTypeExpander, structNewExecutor)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.valuesDepth())
         assertEquals(expected, stack.popValueOrNull())
     }

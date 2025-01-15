@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.read.I64Reader
@@ -15,7 +14,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 fun I64LoadExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load,
-): Result<Unit, InvocationError> =
+) =
     I64LoadExecutor(
         context = context,
         instruction = instruction,
@@ -28,7 +27,7 @@ internal inline fun I64LoadExecutor(
     instruction: MemoryInstruction.I64Load,
     crossinline boundsChecker: BoundsChecker<Long>,
     crossinline reader: I64Reader,
-): Result<Unit, InvocationError> = binding {
+) {
     val stack = context.stack
     val memory = instruction.memory
 
@@ -37,7 +36,7 @@ internal inline fun I64LoadExecutor(
     val effectiveAddress = baseAddress + offset
 
     if (baseAddress < 0 || offset < 0) {
-        Err(InvocationError.MemoryOperationOutOfBounds).bind<Unit>()
+        Err(InvocationError.MemoryOperationOutOfBounds).bind()
     }
 
     val result = boundsChecker(effectiveAddress, Long.SIZE_BYTES, memory.size) {

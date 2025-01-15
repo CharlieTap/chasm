@@ -10,6 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 internal inline fun F64NeExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Ne,
-): Result<Unit, InvocationError> {
-    return context.stack.relationalOperation(Double::ne)
+) {
+    context.stack.relationalOperation(Double::ne)
 }
