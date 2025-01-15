@@ -18,6 +18,7 @@ internal fun RecursiveTypeValidator(
     RecursiveTypeValidator(
         context = context,
         type = type,
+        definedTypeRoller = ::DefinedTypeRoller,
         subTypeValidator = ::SubTypeValidator,
         recursiveTypeCopier = ::RecursiveTypeDeepCopier,
     )
@@ -25,6 +26,7 @@ internal fun RecursiveTypeValidator(
 internal inline fun RecursiveTypeValidator(
     context: ValidationContext,
     type: RecursiveType,
+    crossinline definedTypeRoller: DefinedTypeRoller,
     crossinline subTypeValidator: Validator<SubType>,
     crossinline recursiveTypeCopier: DeepCopier<RecursiveType>,
 ): Result<Unit, ModuleValidatorError> = binding {
@@ -34,7 +36,7 @@ internal inline fun RecursiveTypeValidator(
     // to be in syntax state
 
     val copy = recursiveTypeCopier(type)
-    val definedType = DefinedTypeRoller(context.types.size, copy)
+    val definedType = definedTypeRoller(context.types.size, copy)
     context.types += definedType
 
     type.subTypes.forEach { subType ->
