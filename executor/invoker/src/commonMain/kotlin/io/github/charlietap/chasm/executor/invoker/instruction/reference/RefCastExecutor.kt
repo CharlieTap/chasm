@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
@@ -40,7 +39,7 @@ internal inline fun RefCastExecutor(
     val (stack, store) = context
     val referenceType = instruction.referenceType
 
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
     val moduleInstance = frame.instance
 
     val substitutedReferenceType = referenceTypeSubstitutor(referenceType, context.substitutor) // rt1

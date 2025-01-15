@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
@@ -32,7 +31,7 @@ internal inline fun ArrayNewFixedExecutor(
 
     val (stack) = context
     val (typeIndex, size) = instruction
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
     val definedType = frame.instance
         .definedType(typeIndex)
         .bind()

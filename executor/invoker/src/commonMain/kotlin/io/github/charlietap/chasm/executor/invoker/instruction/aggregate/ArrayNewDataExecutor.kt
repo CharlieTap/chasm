@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.dataAddress
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -38,7 +37,7 @@ internal inline fun ArrayNewDataExecutor(
 
     val (stack, store) = context
     val (typeIndex, dataIndex) = instruction
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
     val definedType = frame.instance
         .definedType(typeIndex)
         .bind()

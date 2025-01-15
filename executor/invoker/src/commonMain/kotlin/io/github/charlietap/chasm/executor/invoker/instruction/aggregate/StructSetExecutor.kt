@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.field
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popStructReference
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
@@ -31,7 +30,7 @@ internal inline fun StructSetExecutor(
 ) {
 
     val (stack) = context
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
     val definedType = frame.instance
         .definedType(instruction.typeIndex)
         .bind()

@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunctionContext
@@ -26,7 +25,7 @@ internal fun HostFunctionCall(
     function: FunctionInstance.HostFunction,
 ) {
     val (stack, store) = context
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
     val type = function.functionType
 
     val params = List(type.params.types.size) {

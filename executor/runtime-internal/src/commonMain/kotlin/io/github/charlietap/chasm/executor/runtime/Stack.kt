@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.executor.runtime
 
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStack
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
@@ -80,6 +82,16 @@ data class Stack(
     fun popLabelOrNull(): Entry.Label? = labels.popOrNull()
 
     fun popValueOrNull(): ExecutionValue? = values.popOrNull()
+
+    fun peekFrame(): ActivationFrame {
+        return try {
+            frames.peek()
+        } catch (_: IndexOutOfBoundsException) {
+            throw InvocationException(InvocationError.MissingStackFrame)
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.MissingStackFrame)
+        }
+    }
 
     fun peekFrameOrNull(): ActivationFrame? = frames.peekOrNull()
 

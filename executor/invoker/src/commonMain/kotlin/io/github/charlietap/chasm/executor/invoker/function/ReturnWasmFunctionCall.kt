@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.grow
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -15,7 +14,7 @@ internal inline fun ReturnWasmFunctionCall(
 ) {
 
     val (stack) = context
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
     val type = instance.functionType
     var params = type.params.types.size
 

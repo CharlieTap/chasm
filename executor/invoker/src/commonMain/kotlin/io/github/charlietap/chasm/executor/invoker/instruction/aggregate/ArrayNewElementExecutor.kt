@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -30,7 +29,7 @@ internal inline fun ArrayNewElementExecutor(
 
     val (stack, store) = context
     val (typeIndex, elementIndex) = instruction
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
 
     val elementAddress = frame.instance
         .elementAddress(elementIndex)

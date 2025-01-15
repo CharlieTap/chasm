@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.peekReference
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -65,7 +64,7 @@ internal inline fun BrOnCastExecutor(
 ) {
 
     val (stack, store) = context
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
     val moduleInstance = frame.instance
 
     val referenceValue = stack.peekReference().bind()

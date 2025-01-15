@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.tag
@@ -30,7 +29,7 @@ internal inline fun ThrowExecutor(
 ) {
 
     val (stack, store) = context
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
     val address = frame.instance
         .tagAddress(instruction.tagIndex)
         .bind()

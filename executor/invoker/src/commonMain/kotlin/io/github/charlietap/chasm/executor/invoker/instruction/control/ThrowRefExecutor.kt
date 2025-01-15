@@ -13,7 +13,6 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popHandler
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.ext.pushValue
@@ -57,7 +56,7 @@ internal inline fun ThrowRefExecutor(
         stack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
     } else {
 
-        val frame = stack.peekFrame().bind()
+        val frame = stack.peekFrame()
 
         val catchHandler = handler.instructions.first()
         val otherHandlers = handler.instructions.drop(1)

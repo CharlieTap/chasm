@@ -48,10 +48,6 @@ inline fun Stack.pushFrame(frame: ActivationFrame) {
 
 inline fun Stack.pushValue(value: ExecutionValue) = push(value)
 
-inline fun Stack.peekFrame(): Result<ActivationFrame, InvocationError.MissingStackFrame> {
-    return peekFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
-}
-
 inline fun Stack.peekLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
     return peekLabelOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
 }

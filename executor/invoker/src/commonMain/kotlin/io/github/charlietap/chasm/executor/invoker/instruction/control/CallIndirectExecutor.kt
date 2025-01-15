@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.function
-import io.github.charlietap.chasm.executor.runtime.ext.peekFrame
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
@@ -43,7 +42,7 @@ internal inline fun CallIndirectExecutor(
 ) {
 
     val (stack, store) = context
-    val frame = stack.peekFrame().bind()
+    val frame = stack.peekFrame()
 
     val expectedFunctionType = frame.instance
         .definedType(typeIndex)

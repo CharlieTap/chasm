@@ -19,6 +19,8 @@ class FrameStack {
         null
     }
 
+    fun peek(): ActivationFrame = elements[top - 1]!!
+
     fun peekOrNull(): ActivationFrame? = try {
         elements[top - 1]
     } catch (_: Exception) {
