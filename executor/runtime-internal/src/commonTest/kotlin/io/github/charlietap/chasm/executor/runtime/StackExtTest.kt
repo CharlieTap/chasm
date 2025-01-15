@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.executor.runtime.ext.constOperation
 import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
-import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.ext.relationalOperation
 import io.github.charlietap.chasm.executor.runtime.ext.testOperation
 import io.github.charlietap.chasm.executor.runtime.ext.unaryOperation
@@ -27,7 +26,7 @@ class StackExtTest {
         val stack = stack()
         val frame = frame()
 
-        val actual = stack.pushFrame(frame)
+        val actual = stack.push(frame)
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.size())
@@ -45,7 +44,7 @@ class StackExtTest {
         )
 
         val actual = assertFailsWith<InvocationException> {
-            stack.pushFrame(frame)
+            stack.push(frame)
         }
 
         assertEquals(InvocationError.CallStackExhausted, actual.error)

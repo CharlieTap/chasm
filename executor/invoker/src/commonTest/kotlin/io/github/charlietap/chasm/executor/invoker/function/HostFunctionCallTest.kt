@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.function
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
-import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.fixture.ast.type.functionType
@@ -37,7 +36,7 @@ class HostFunctionCallTest {
             instance = moduleInstance(),
         )
 
-        stack.pushFrame(frame)
+        stack.push(frame)
 
         val functionType = functionType(
             params = resultType(
@@ -102,7 +101,7 @@ class HostFunctionCallTest {
             instance = moduleInstance(),
         )
 
-        stack.pushFrame(frame)
+        stack.push(frame)
         stack.push(
             dispatchableInstruction(),
         )

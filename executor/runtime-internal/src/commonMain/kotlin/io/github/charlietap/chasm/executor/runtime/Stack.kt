@@ -61,7 +61,15 @@ data class Stack(
         values = valuesDepth(),
     )
 
-    fun push(frame: ActivationFrame) = frames.push(frame)
+    fun push(frame: ActivationFrame) {
+        return try {
+            frames.push(frame)
+        } catch (_: IndexOutOfBoundsException) {
+            throw InvocationException(InvocationError.CallStackExhausted)
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.CallStackExhausted)
+        }
+    }
 
     fun push(handler: ExceptionHandler) = handlers.push(handler)
 

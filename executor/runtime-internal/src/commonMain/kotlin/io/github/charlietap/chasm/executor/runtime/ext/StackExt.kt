@@ -36,16 +36,6 @@ inline fun Stack.pushf64(f64: Double) {
     push(F64(f64))
 }
 
-inline fun Stack.pushFrame(frame: ActivationFrame) {
-    return try {
-        push(frame)
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.CallStackExhausted)
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.CallStackExhausted)
-    }
-}
-
 inline fun Stack.pushValue(value: ExecutionValue) = push(value)
 
 inline fun Stack.peekLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {

@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.ext.default
-import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.fixture.ast.module.local
@@ -203,7 +202,7 @@ class WasmFunctionCallTest {
             instance = functionInstance.module,
         )
 
-        stack.pushFrame(frame)
+        stack.push(frame)
         stack.push(
             dispatchableInstruction(),
         )

@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.popValue
-import io.github.charlietap.chasm.executor.runtime.ext.pushFrame
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -55,7 +54,7 @@ internal inline fun WasmFunctionCall(
         instance = instance.module,
     )
 
-    stack.pushFrame(frame)
+    stack.push(frame)
     stack.push(frameCleaner)
 
     val label = Stack.Entry.Label(
