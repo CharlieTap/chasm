@@ -84,7 +84,7 @@ class StackExtTest {
 
         val actual = stack.unaryOperation(constructor, op)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -103,7 +103,7 @@ class StackExtTest {
 
         val actual = stack.unaryOperation(constructor, op)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -122,7 +122,7 @@ class StackExtTest {
 
         val actual = stack.unaryOperation(constructor, op)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -141,7 +141,7 @@ class StackExtTest {
 
         val actual = stack.unaryOperation(constructor, op)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -160,7 +160,7 @@ class StackExtTest {
 
         val actual = stack.binaryOperation(constructor, Int::plus)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -179,7 +179,7 @@ class StackExtTest {
 
         val actual = stack.binaryOperation(constructor, Long::plus)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -198,7 +198,7 @@ class StackExtTest {
 
         val actual = stack.binaryOperation(constructor, Float::plus)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -217,7 +217,7 @@ class StackExtTest {
 
         val actual = stack.binaryOperation(constructor, Double::plus)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -234,7 +234,7 @@ class StackExtTest {
 
         val actual = stack.testOperation(Int::eqz)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -251,7 +251,7 @@ class StackExtTest {
 
         val actual = stack.testOperation(Long::eqz)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -269,7 +269,7 @@ class StackExtTest {
 
         val actual = stack.relationalOperation(Int::eq)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -287,7 +287,7 @@ class StackExtTest {
 
         val actual = stack.relationalOperation(Long::eq)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -305,7 +305,7 @@ class StackExtTest {
 
         val actual = stack.relationalOperation(Float::eq)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -323,7 +323,7 @@ class StackExtTest {
 
         val actual = stack.relationalOperation(Double::eq)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
@@ -340,7 +340,7 @@ class StackExtTest {
 
         val actual = stack.convertOperation(::I32, Long::wrap)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val entry = stack.popValueOrNull()
