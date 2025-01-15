@@ -241,7 +241,7 @@ inline fun Stack.binaryOperation(
 
 inline fun <S, T : NumberValue<S>> Stack.testOperation(
     crossinline operation: (S) -> Boolean,
-): Result<Unit, InvocationError> {
+) {
     val operand = popValueOrNull() as T
     val result = if (operation(operand.value)) {
         I32(1)
@@ -249,7 +249,6 @@ inline fun <S, T : NumberValue<S>> Stack.testOperation(
         I32(0)
     }
     push(result)
-    return Ok(Unit)
 }
 
 inline fun <S, T : NumberValue<S>> Stack.relationalOperation(
