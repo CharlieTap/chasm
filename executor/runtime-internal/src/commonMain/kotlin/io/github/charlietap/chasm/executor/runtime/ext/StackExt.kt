@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
@@ -267,13 +268,12 @@ inline fun <S, T : NumberValue<S>> Stack.relationalOperation(
 inline fun <S, A : NumberValue<S>, T, B : NumberValue<T>> Stack.convertOperation(
     crossinline constructor: (T) -> B,
     crossinline operation: (S) -> T,
-): Result<Unit, InvocationError> {
+) {
     val operand = popValueOrNull() as A
     val result = try {
         operation(operand.value)
     } catch (_: Throwable) {
-        return Err(InvocationError.Trap.TrapEncountered)
+        throw InvocationException(InvocationError.Trap.TrapEncountered)
     }
     push(constructor(result))
-    return Ok(Unit)
 }

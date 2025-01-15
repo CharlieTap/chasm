@@ -11,5 +11,5 @@ internal inline fun I32TruncF32UExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32TruncF32U,
 ) {
-    context.stack.convertOperation(::I32, Float::truncI32uTrapping).bind()
+    context.stack.convertOperation(::I32, Float::truncI32uTrapping)
 }
