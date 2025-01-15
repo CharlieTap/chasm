@@ -101,8 +101,6 @@ data class Stack(
         }
     }
 
-    fun peekFrameOrNull(): ActivationFrame? = frames.peekOrNull()
-
     fun peekInstructionOrNull(): DispatchableInstruction? = instructions.peekOrNull()
 
     fun peekLabelOrNull(): Entry.Label? = labels.peekOrNull()

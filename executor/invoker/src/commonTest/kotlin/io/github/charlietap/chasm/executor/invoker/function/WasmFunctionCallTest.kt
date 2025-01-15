@@ -118,7 +118,7 @@ class WasmFunctionCallTest {
             assertEquals(label, _label)
             assertEquals(function.body.instructions, _instructions)
 
-            assertEquals(frame, stack.peekFrameOrNull())
+            assertEquals(frame, stack.peekFrame())
             assertEquals(expectedFrameInstruction, stack.peekInstructionOrNull())
             assertEquals(1, stack.framesDepth())
 
