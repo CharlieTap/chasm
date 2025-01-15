@@ -14,10 +14,10 @@ internal fun ReturnCallRefExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.ReturnCallRef,
 ) = ReturnCallRefExecutor(
-        context = context,
-        hostFunctionCall = ::HostFunctionCall,
-        wasmFunctionCall = ::ReturnWasmFunctionCall,
-    )
+    context = context,
+    hostFunctionCall = ::HostFunctionCall,
+    wasmFunctionCall = ::ReturnWasmFunctionCall,
+)
 
 internal inline fun ReturnCallRefExecutor(
     context: ExecutionContext,

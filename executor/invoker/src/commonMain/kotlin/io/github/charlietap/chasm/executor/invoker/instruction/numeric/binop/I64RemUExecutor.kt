@@ -15,8 +15,9 @@ internal inline fun I64RemUExecutor(
     instruction: NumericInstruction.I64RemU,
 ) {
     val operand2 = context.stack
-        .peekNthValue(0).bind()
-         as I64
+        .peekNthValue(0)
+        .bind()
+        as I64
 
     if (operand2.value.toULong() == 0uL) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)

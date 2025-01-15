@@ -15,8 +15,9 @@ internal inline fun I32RemUExecutor(
     instruction: NumericInstruction.I32RemU,
 ) {
     val operand2 = context.stack
-        .peekNthValue(0).bind()
-         as I32
+        .peekNthValue(0)
+        .bind()
+        as I32
 
     if (operand2.value.toUInt() == 0u) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)

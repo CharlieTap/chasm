@@ -10,10 +10,10 @@ internal fun BrOnNonNullExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.BrOnNonNull,
 ) = BrOnNonNullExecutor(
-        context = context,
-        instruction = instruction,
-        breakExecutor = ::BreakExecutor,
-    )
+    context = context,
+    instruction = instruction,
+    breakExecutor = ::BreakExecutor,
+)
 
 internal inline fun BrOnNonNullExecutor(
     context: ExecutionContext,

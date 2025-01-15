@@ -15,13 +15,13 @@ internal inline fun InstructionBlockExecutor(
     instructions: Array<DispatchableInstruction>,
     handler: ExceptionHandler?,
 ) = InstructionBlockExecutor(
-        stack = stack,
-        label = label,
-        instructions = instructions,
-        handler = handler,
-        handlerDispatcher = ::HandlerDispatcher,
-        labelCleaner = ::LabelInstructionExecutor,
-    )
+    stack = stack,
+    label = label,
+    instructions = instructions,
+    handler = handler,
+    handlerDispatcher = ::HandlerDispatcher,
+    labelCleaner = ::LabelInstructionExecutor,
+)
 
 internal inline fun InstructionBlockExecutor(
     stack: Stack,

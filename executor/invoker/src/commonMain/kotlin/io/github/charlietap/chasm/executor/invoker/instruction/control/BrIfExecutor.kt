@@ -9,10 +9,10 @@ internal fun BrIfExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.BrIf,
 ) = BrIfExecutor(
-        context = context,
-        instruction = instruction,
-        breakExecutor = ::BreakExecutor,
-    )
+    context = context,
+    instruction = instruction,
+    breakExecutor = ::BreakExecutor,
+)
 
 internal inline fun BrIfExecutor(
     context: ExecutionContext,

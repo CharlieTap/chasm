@@ -25,13 +25,13 @@ internal fun CallIndirectExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.CallIndirect,
 ) = CallIndirectExecutor(
-        context = context,
-        typeIndex = instruction.typeIndex,
-        table = instruction.table,
-        hostFunctionCall = ::HostFunctionCall,
-        wasmFunctionCall = ::WasmFunctionCall,
-        definedTypeMatcher = ::DefinedTypeMatcher,
-    )
+    context = context,
+    typeIndex = instruction.typeIndex,
+    table = instruction.table,
+    hostFunctionCall = ::HostFunctionCall,
+    wasmFunctionCall = ::WasmFunctionCall,
+    definedTypeMatcher = ::DefinedTypeMatcher,
+)
 
 internal inline fun CallIndirectExecutor(
     context: ExecutionContext,

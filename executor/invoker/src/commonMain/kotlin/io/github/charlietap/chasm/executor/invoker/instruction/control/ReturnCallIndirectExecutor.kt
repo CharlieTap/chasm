@@ -10,10 +10,10 @@ internal inline fun ReturnCallIndirectExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.ReturnCallIndirect,
 ) = CallIndirectExecutor(
-        context = context,
-        table = instruction.table,
-        typeIndex = instruction.typeIndex,
-        hostFunctionCall = ::HostFunctionCall,
-        wasmFunctionCall = ::ReturnWasmFunctionCall,
-        definedTypeMatcher = ::DefinedTypeMatcher,
-    )
+    context = context,
+    table = instruction.table,
+    typeIndex = instruction.typeIndex,
+    hostFunctionCall = ::HostFunctionCall,
+    wasmFunctionCall = ::ReturnWasmFunctionCall,
+    definedTypeMatcher = ::DefinedTypeMatcher,
+)

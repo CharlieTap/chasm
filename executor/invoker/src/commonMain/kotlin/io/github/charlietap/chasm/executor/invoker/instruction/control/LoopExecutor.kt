@@ -11,10 +11,10 @@ internal fun LoopExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Loop,
 ) = LoopExecutor(
-        context = context,
-        instruction = instruction,
-        instructionBlockExecutor = ::InstructionBlockExecutor,
-    )
+    context = context,
+    instruction = instruction,
+    instructionBlockExecutor = ::InstructionBlockExecutor,
+)
 
 internal inline fun LoopExecutor(
     context: ExecutionContext,

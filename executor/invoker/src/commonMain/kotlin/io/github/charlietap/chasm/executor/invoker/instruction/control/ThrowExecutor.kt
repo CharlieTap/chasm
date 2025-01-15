@@ -18,10 +18,10 @@ internal fun ThrowExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Throw,
 ) = ThrowExecutor(
-        context = context,
-        instruction = instruction,
-        throwRefDispatcher = ::ThrowRefDispatcher,
-    )
+    context = context,
+    instruction = instruction,
+    throwRefDispatcher = ::ThrowRefDispatcher,
+)
 
 internal inline fun ThrowExecutor(
     context: ExecutionContext,

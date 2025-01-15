@@ -14,9 +14,9 @@ internal inline fun BreakExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Br,
 ) = BreakExecutor(
-        stack = context.stack,
-        labelIndex = instruction.labelIndex,
-    )
+    stack = context.stack,
+    labelIndex = instruction.labelIndex,
+)
 
 internal inline fun BreakExecutor(
     stack: Stack,

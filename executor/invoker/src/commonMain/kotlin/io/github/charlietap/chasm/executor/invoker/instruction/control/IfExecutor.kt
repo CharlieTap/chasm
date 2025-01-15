@@ -9,10 +9,10 @@ internal fun IfExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.If,
 ) = IfExecutor(
-        context = context,
-        instruction = instruction,
-        blockExecutor = ::BlockExecutor,
-    )
+    context = context,
+    instruction = instruction,
+    blockExecutor = ::BlockExecutor,
+)
 
 internal inline fun IfExecutor(
     context: ExecutionContext,

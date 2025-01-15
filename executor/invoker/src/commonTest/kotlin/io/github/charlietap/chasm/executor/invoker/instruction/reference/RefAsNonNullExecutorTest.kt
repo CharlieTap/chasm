@@ -42,7 +42,7 @@ class RefAsNonNullExecutorTest {
 
         stack.push(nullReferenceValue(heapType()))
 
-        val exception = assertFailsWith<InvocationException>{
+        val exception = assertFailsWith<InvocationException> {
             RefAsNonNullExecutor(
                 context = context,
                 instruction = refAsNonNullRuntimeInstruction(),

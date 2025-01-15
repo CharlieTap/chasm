@@ -9,10 +9,10 @@ internal fun BrTableExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.BrTable,
 ) = BrTableExecutor(
-        context = context,
-        instruction = instruction,
-        breakExecutor = ::BreakExecutor,
-    )
+    context = context,
+    instruction = instruction,
+    breakExecutor = ::BreakExecutor,
+)
 
 internal inline fun BrTableExecutor(
     context: ExecutionContext,

@@ -28,12 +28,12 @@ internal inline fun BlockExecutor(
     functionType: FunctionType,
     instructions: Array<DispatchableInstruction>,
 ) = BlockExecutor(
-        store = store,
-        stack = stack,
-        functionType = functionType,
-        instructions = instructions,
-        instructionBlockExecutor = ::InstructionBlockExecutor,
-    )
+    store = store,
+    stack = stack,
+    functionType = functionType,
+    instructions = instructions,
+    instructionBlockExecutor = ::InstructionBlockExecutor,
+)
 
 @Suppress("UNUSED_PARAMETER")
 internal inline fun BlockExecutor(

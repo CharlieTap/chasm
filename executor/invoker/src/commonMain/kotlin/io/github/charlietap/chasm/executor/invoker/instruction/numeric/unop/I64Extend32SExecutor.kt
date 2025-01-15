@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.extend32s
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.unaryOperation

@@ -14,8 +14,9 @@ internal inline fun I64RemSExecutor(
     instruction: NumericInstruction.I64RemS,
 ) {
     val operand2 = context.stack
-        .peekNthValue(0).bind()
-         as I64
+        .peekNthValue(0)
+        .bind()
+        as I64
 
     if (operand2.value == 0L) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)

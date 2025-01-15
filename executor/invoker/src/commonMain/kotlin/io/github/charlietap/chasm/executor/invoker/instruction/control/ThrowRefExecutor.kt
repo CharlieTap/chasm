@@ -25,11 +25,11 @@ internal fun ThrowRefExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.ThrowRef,
 ) = ThrowRefExecutor(
-        context = context,
-        instruction = instruction,
-        breakDispatcher = ::BrDispatcher,
-        handlerDispatcher = ::HandlerDispatcher,
-    )
+    context = context,
+    instruction = instruction,
+    breakDispatcher = ::BrDispatcher,
+    handlerDispatcher = ::HandlerDispatcher,
+)
 
 internal inline fun ThrowRefExecutor(
     context: ExecutionContext,

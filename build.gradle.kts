@@ -13,8 +13,8 @@ plugins {
     alias(libs.plugins.wasm.testsuite) apply false
 
     alias(libs.plugins.conventions.kmp) apply false
-    alias(libs.plugins.conventions.linting) apply false
     alias(libs.plugins.conventions.publishing) apply false
+    alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.versions)
 }
 

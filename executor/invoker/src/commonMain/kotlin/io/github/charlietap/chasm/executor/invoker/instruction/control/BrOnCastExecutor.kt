@@ -24,16 +24,16 @@ internal fun BrOnCastExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.BrOnCast,
 ) = BrOnCastExecutor(
-        context = context,
-        labelIndex = instruction.labelIndex,
-        referenceType1 = instruction.srcReferenceType,
-        referenceType2 = instruction.dstReferenceType,
-        breakIfMatches = true,
-        referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
-        referenceTypeMatcher = ::ReferenceTypeMatcher,
-        typeOfReferenceValue = ::TypeOfReferenceValue,
-        breakExecutor = ::BreakExecutor,
-    )
+    context = context,
+    labelIndex = instruction.labelIndex,
+    referenceType1 = instruction.srcReferenceType,
+    referenceType2 = instruction.dstReferenceType,
+    breakIfMatches = true,
+    referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
+    referenceTypeMatcher = ::ReferenceTypeMatcher,
+    typeOfReferenceValue = ::TypeOfReferenceValue,
+    breakExecutor = ::BreakExecutor,
+)
 
 internal fun BrOnCastFailExecutor(
     context: ExecutionContext,

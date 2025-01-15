@@ -6,4 +6,4 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 
 @Throws(InvocationException::class)
-fun <T, E: InvocationError> Result<T, E>.bind(): T = this.getOrThrow { e -> InvocationException(e) }
+fun <T, E : InvocationError> Result<T, E>.bind(): T = this.getOrThrow { e -> InvocationException(e) }

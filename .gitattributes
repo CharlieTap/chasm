@@ -1,4 +1,5 @@
 * text eol=lf
+*.xml text eol=lf
 *.bat text eol=crlf
 *.jar binary
 *.wasm binary
