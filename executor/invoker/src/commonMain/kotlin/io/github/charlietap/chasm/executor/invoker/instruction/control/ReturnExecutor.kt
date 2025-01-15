@@ -1,17 +1,14 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popFrame
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal inline fun ReturnExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Return,
 ) {
-
     val (stack) = context
-    val frame = stack.popFrame().bind()
+    val frame = stack.popFrame()
 
     val depths = frame.depths
     stack.shrinkHandlers(0, depths.handlers)

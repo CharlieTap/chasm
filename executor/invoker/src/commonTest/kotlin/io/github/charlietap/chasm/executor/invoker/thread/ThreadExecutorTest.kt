@@ -45,7 +45,7 @@ class ThreadExecutorTest {
         )
 
         val frameDispatchable = dispatchableInstruction { context ->
-            context.stack.popFrameOrNull()
+            context.stack.popFrame()
             assertEquals(0, context.stack.instructionsDepth())
             Ok(Unit)
         }

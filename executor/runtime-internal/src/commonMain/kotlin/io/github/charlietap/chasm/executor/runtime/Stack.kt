@@ -81,7 +81,13 @@ data class Stack(
 
     fun push(many: Array<DispatchableInstruction>) = instructions.pushAll(many)
 
-    fun popFrameOrNull(): ActivationFrame? = frames.popOrNull()
+    fun popFrame(): ActivationFrame = try {
+        frames.pop()
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.MissingStackFrame)
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.MissingStackFrame)
+    }
 
     fun popHandlerOrNull(): ExceptionHandler? = handlers.popOrNull()
 

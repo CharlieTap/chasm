@@ -31,7 +31,7 @@ class StackExtTest {
         assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
-        val frameEntry = stack.popFrameOrNull()
+        val frameEntry = stack.popFrame()
         assertEquals(frame, frameEntry)
     }
 

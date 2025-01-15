@@ -10,6 +10,13 @@ class FrameStack {
         top++
     }
 
+    fun pop(): ActivationFrame {
+        top--
+        val value = elements[top]
+        elements[top] = null
+        return value!!
+    }
+
     fun popOrNull(): ActivationFrame? = try {
         top--
         val value = elements[top]

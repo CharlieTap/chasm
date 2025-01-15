@@ -58,10 +58,6 @@ inline fun Stack.peekNthValue(n: Int): Result<ExecutionValue, InvocationError.Mi
     return peekNthValueOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
 }
 
-inline fun Stack.popFrame(): Result<ActivationFrame, InvocationError.MissingStackFrame> {
-    return popFrameOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
-}
-
 inline fun Stack.popHandler(): Result<ExceptionHandler, InvocationError.UncaughtException> {
     return popHandlerOrNull()?.let(::Ok) ?: Err(InvocationError.UncaughtException)
 }
