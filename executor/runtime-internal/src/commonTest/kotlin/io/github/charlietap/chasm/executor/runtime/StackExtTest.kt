@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.executor.runtime.ext.constOperation
 import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
@@ -18,6 +17,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class StackExtTest {
 
@@ -29,7 +29,7 @@ class StackExtTest {
 
         val actual = stack.pushFrame(frame)
 
-        assertEquals(Ok(Unit), actual)
+        assertEquals(Unit, actual)
         assertEquals(1, stack.size())
 
         val frameEntry = stack.popFrameOrNull()
@@ -44,9 +44,11 @@ class StackExtTest {
             frames = List(Stack.MAX_DEPTH) { frame },
         )
 
-        val actual = stack.pushFrame(frame)
+        val actual = assertFailsWith<InvocationException> {
+            stack.pushFrame(frame)
+        }
 
-        assertEquals(Err(InvocationError.CallStackExhausted), actual)
+        assertEquals(InvocationError.CallStackExhausted, actual.error)
         assertEquals(Stack.MAX_DEPTH, stack.size())
     }
 

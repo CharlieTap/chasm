@@ -55,7 +55,7 @@ internal inline fun WasmFunctionCall(
         instance = instance.module,
     )
 
-    stack.pushFrame(frame).bind()
+    stack.pushFrame(frame)
     stack.push(frameCleaner)
 
     val label = Stack.Entry.Label(

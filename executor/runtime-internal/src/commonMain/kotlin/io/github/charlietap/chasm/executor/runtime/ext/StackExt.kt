@@ -36,14 +36,13 @@ inline fun Stack.pushf64(f64: Double) {
     push(F64(f64))
 }
 
-inline fun Stack.pushFrame(frame: ActivationFrame): Result<Unit, InvocationError> {
+inline fun Stack.pushFrame(frame: ActivationFrame) {
     return try {
         push(frame)
-        Ok(Unit)
     } catch (_: IndexOutOfBoundsException) {
-        Err(InvocationError.CallStackExhausted)
+        throw InvocationException(InvocationError.CallStackExhausted)
     } catch (_: IllegalArgumentException) {
-        Err(InvocationError.CallStackExhausted)
+        throw InvocationException(InvocationError.CallStackExhausted)
     }
 }
 

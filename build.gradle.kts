@@ -1,3 +1,5 @@
+
+
 plugins {
     alias(libs.plugins.kotlin.allopen) apply false
     alias(libs.plugins.kotlin.android) apply false
@@ -14,7 +16,7 @@ plugins {
 
     alias(libs.plugins.conventions.kmp) apply false
     alias(libs.plugins.conventions.publishing) apply false
-    alias(libs.plugins.conventions.linting)
+    alias(libs.plugins.conventions.linting) apply false
     alias(libs.plugins.conventions.versions)
 }
 
