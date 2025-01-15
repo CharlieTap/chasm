@@ -253,7 +253,7 @@ inline fun <S, T : NumberValue<S>> Stack.testOperation(
 
 inline fun <S, T : NumberValue<S>> Stack.relationalOperation(
     crossinline operation: (S, S) -> Boolean,
-): Result<Unit, InvocationError> {
+) {
     val operand2 = popValueOrNull() as T
     val operand1 = popValueOrNull() as T
     val result = if (operation(operand1.value, operand2.value)) {
@@ -262,7 +262,6 @@ inline fun <S, T : NumberValue<S>> Stack.relationalOperation(
         I32(0)
     }
     push(result)
-    return Ok(Unit)
 }
 
 inline fun <S, A : NumberValue<S>, T, B : NumberValue<T>> Stack.convertOperation(
