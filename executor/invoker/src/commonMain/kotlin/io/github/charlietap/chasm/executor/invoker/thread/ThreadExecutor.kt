@@ -54,8 +54,7 @@ internal fun ThreadExecutor(
 
     try {
         while (loop) {
-            val instruction = stack.popInstruction()
-            instruction(context)
+            stack.popInstruction()(context)
         }
     } catch (exception: InvocationException) {
         Err(exception.error).bind()
