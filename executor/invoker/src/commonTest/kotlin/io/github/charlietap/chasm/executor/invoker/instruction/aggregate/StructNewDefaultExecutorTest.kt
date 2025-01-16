@@ -56,7 +56,7 @@ class StructNewDefaultExecutorTest {
             Ok(Unit)
         }
 
-        val expected = fieldType.default().value
+        val expected = fieldType.default()
 
         val actual =
             StructNewDefaultExecutor(context, AggregateInstruction.StructNewDefault(typeIndex), definedTypeExpander, structNewExecutor)

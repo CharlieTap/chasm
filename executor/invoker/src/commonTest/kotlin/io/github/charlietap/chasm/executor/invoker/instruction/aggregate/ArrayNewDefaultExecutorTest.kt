@@ -32,7 +32,7 @@ class ArrayNewDefaultExecutorTest {
         val definedType = definedType()
 
         val fieldType = fieldType()
-        val default = fieldType.default().value
+        val default = fieldType.default()
         val arrayType = arrayCompositeType(
             arrayType = arrayType(
                 fieldType,

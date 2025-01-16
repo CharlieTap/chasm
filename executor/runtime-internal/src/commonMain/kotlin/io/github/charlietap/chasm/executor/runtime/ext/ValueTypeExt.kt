@@ -1,23 +1,21 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.VectorValue
 
-fun ValueType.default(): Result<ExecutionValue, InvocationError> = when (this) {
-    is ValueType.Number -> Ok(default())
-    is ValueType.Reference -> Ok(default())
-    is ValueType.Vector -> Ok(default())
-    is ValueType.Bottom -> Err(InvocationError.UndefinedDefaultBottomType)
+fun ValueType.default(): ExecutionValue = when (this) {
+    is ValueType.Number -> default()
+    is ValueType.Reference -> default()
+    is ValueType.Vector -> default()
+    is ValueType.Bottom -> throw InvocationException(InvocationError.UndefinedDefaultBottomType)
 }
 
 fun ValueType.Number.default(): ExecutionValue = when (this.numberType) {
