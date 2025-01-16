@@ -101,6 +101,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object ArrayReferenceExpected : InvocationError
 
+    data object I31ReferenceExpected : InvocationError
+
     data object UnexpectedReferenceValue : InvocationError
 
     data object UndefinedDefaultBottomType : InvocationError

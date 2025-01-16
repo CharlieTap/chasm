@@ -101,10 +101,12 @@ inline fun Stack.peekReference(): ReferenceValue {
     }
 }
 
-inline fun Stack.popI31Reference(): Result<ReferenceValue.I31, InvocationError.MissingStackValue> {
-    return (popValue() as? ReferenceValue.I31)?.let {
-        Ok(it)
-    } ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.popI31Reference(): UInt {
+    return try {
+        (popValue() as ReferenceValue.I31).value
+    } catch (_: ClassCastException) {
+        throw InvocationException(InvocationError.I31ReferenceExpected)
+    }
 }
 
 inline fun Stack.popArrayReference(): ArrayInstance {

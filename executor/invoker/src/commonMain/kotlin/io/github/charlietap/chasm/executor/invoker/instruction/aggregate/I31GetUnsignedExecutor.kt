@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.extendSigned
 import io.github.charlietap.chasm.executor.runtime.ext.extendUnsigned
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal fun I31GetUnsignedExecutor(
     context: ExecutionContext,
@@ -13,6 +12,6 @@ internal fun I31GetUnsignedExecutor(
     I31GetExecutor(
         context = context,
         signedExtension = false,
-        i31SignedExtender = ReferenceValue.I31::extendSigned,
-        i31UnsignedExtender = ReferenceValue.I31::extendUnsigned,
+        i31SignedExtender = UInt::extendSigned,
+        i31UnsignedExtender = UInt::extendUnsigned,
     )
