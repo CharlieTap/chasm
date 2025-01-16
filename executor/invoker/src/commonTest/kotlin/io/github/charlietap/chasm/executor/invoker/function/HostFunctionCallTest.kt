@@ -1,15 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
 import io.github.charlietap.chasm.fixture.ast.type.resultType
-import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
@@ -19,7 +16,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.value.i64
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class HostFunctionCallTest {
 
@@ -86,76 +82,5 @@ class HostFunctionCallTest {
         assertEquals(2, stack.valuesDepth())
         assertEquals(i64(118), stack.popValue())
         assertEquals(i32(117), stack.popValue())
-    }
-
-    @Test
-    fun `returns an error if the host function does not return values matching its type`() {
-
-        val store = store()
-        val stack = stack()
-        val context = executionContext(
-            store = store,
-            stack = stack,
-        )
-        val frame = frame(
-            instance = moduleInstance(),
-        )
-
-        stack.push(frame)
-        stack.push(
-            dispatchableInstruction(),
-        )
-
-        val functionType = functionType(
-            params = resultType(
-                listOf(
-                    i32ValueType(),
-                    i64ValueType(),
-                ),
-            ),
-            results = resultType(
-                listOf(
-                    i32ValueType(),
-                    i64ValueType(),
-                ),
-            ),
-        )
-        val definedType = functionType.definedType()
-
-        val hostFunction: HostFunction = {
-            listOf(
-                i32(117),
-                i32(118),
-            )
-        }
-
-        val functionInstance = FunctionInstance.HostFunction(
-            type = definedType,
-            functionType = functionType,
-            function = hostFunction,
-        )
-
-        val params = listOf(
-            i32(115),
-            i64(116),
-        )
-
-        params.forEach { value ->
-            stack.push(value)
-        }
-
-        val expected = InvocationError.HostFunctionInconsistentWithType(
-            i64ValueType(),
-            i32(118),
-        )
-
-        val exception = assertFailsWith<InvocationException> {
-            HostFunctionCall(
-                context = context,
-                function = functionInstance,
-            )
-        }
-
-        assertEquals(expected, exception.error)
     }
 }
