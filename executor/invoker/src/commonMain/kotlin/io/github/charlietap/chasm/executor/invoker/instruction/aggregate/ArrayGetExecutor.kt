@@ -41,9 +41,7 @@ internal inline fun ArrayGetExecutor(
     val fieldType = arrayType.fieldType
 
     val fieldIndex = stack.popI32()
-    val arrayRef = stack.popArrayReference().bind()
-
-    val arrayInstance = arrayRef.instance
+    val arrayInstance = stack.popArrayReference()
 
     val fieldValue = arrayInstance.field(Index.FieldIndex(fieldIndex.toUInt())).bind()
 

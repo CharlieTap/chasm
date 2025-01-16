@@ -28,13 +28,11 @@ internal inline fun ArrayFillExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
 ) {
-
     val (stack) = context
     val elementsToFill = stack.popI32()
     val fillValue = stack.popValue()
     val arrayElementOffset = stack.popI32()
-    val arrayReference = stack.popArrayReference().bind()
-    val arrayInstance = arrayReference.instance
+    val arrayInstance = stack.popArrayReference()
 
     if (arrayElementOffset + elementsToFill > arrayInstance.fields.size) {
         Err(InvocationError.Trap.TrapEncountered).bind()

@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
+import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -106,10 +107,12 @@ inline fun Stack.popI31Reference(): Result<ReferenceValue.I31, InvocationError.M
     } ?: Err(InvocationError.MissingStackValue)
 }
 
-inline fun Stack.popArrayReference(): Result<ReferenceValue.Array, InvocationError.MissingStackValue> {
-    return (popValue() as? ReferenceValue.Array)?.let {
-        Ok(it)
-    } ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.popArrayReference(): ArrayInstance {
+    return try {
+        (popValue() as ReferenceValue.Array).instance
+    } catch (_: ClassCastException) {
+        throw InvocationException(InvocationError.ArrayReferenceExpected)
+    }
 }
 
 inline fun Stack.popStructReference(): StructInstance {

@@ -52,8 +52,7 @@ internal fun ArrayInitDataExecutor(
     val byteArrayOffset = stack.popI32()
     val arrayOffset = stack.popI32()
 
-    val arrayReference = stack.popArrayReference().bind()
-    val arrayInstance = arrayReference.instance
+    val arrayInstance = stack.popArrayReference()
 
     val arrayElementSizeInBytes = arrayType.fieldType
         .bitWidth()

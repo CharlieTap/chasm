@@ -47,9 +47,7 @@ internal inline fun ArrayInitElementExecutor(
     val elementsToCopy = stack.popI32()
     val sourceOffsetInElementSegment = stack.popI32()
     val destinationOffsetInArray = stack.popI32()
-
-    val arrayReference = stack.popArrayReference().bind()
-    val arrayInstance = arrayReference.instance
+    val arrayInstance = stack.popArrayReference()
 
     if (
         (destinationOffsetInArray + elementsToCopy > arrayInstance.fields.size) ||

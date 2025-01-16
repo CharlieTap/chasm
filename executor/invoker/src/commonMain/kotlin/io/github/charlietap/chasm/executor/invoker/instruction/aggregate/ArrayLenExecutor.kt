@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -11,8 +10,7 @@ internal fun ArrayLenExecutor(
     instruction: AggregateInstruction.ArrayLen,
 ) {
     val (stack) = context
-    val arrayReference = stack.popArrayReference().bind()
-    val arrayInstance = arrayReference.instance
+    val arrayInstance = stack.popArrayReference()
 
     stack.push(NumberValue.I32(arrayInstance.fields.size))
 }

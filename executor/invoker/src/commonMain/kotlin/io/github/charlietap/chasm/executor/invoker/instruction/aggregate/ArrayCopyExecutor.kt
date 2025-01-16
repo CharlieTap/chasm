@@ -43,12 +43,9 @@ internal inline fun ArrayCopyExecutor(
 
     val elementsToCopy = stack.popI32()
     val sourceOffset = stack.popI32()
-    val srcReference = stack.popArrayReference().bind()
+    val source = stack.popArrayReference()
     val destinationOffset = stack.popI32()
-    val destReference = stack.popArrayReference().bind()
-
-    val source = srcReference.instance
-    val destination = destReference.instance
+    val destination = stack.popArrayReference()
 
     if (destinationOffset + elementsToCopy > destination.fields.size) {
         Err(InvocationError.Trap.TrapEncountered).bind()
