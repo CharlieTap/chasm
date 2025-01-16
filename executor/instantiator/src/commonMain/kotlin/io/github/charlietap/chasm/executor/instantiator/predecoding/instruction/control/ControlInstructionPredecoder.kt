@@ -133,7 +133,7 @@ internal inline fun ControlInstructionPredecoder(
 
             val address = context.instance?.tableAddress(instruction.tableIndex)?.bind()
                 ?: Err(InstantiationError.PredecodingError).bind()
-            val table = context.store.table(address).bind()
+            val table = context.store.table(address)
 
             callIndirectDispatcher(
                 CallIndirect(
@@ -152,7 +152,7 @@ internal inline fun ControlInstructionPredecoder(
 
             val address = context.instance?.tableAddress(instruction.tableIndex)?.bind()
                 ?: Err(InstantiationError.PredecodingError).bind()
-            val table = context.store.table(address).bind()
+            val table = context.store.table(address)
 
             returnCallIndirectDispatcher(
                 ReturnCallIndirect(

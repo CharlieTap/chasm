@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
@@ -27,7 +26,7 @@ internal inline fun ReturnCallRefExecutor(
     val (stack, store) = context
     val address = stack.popFunctionAddress()
 
-    when (val instance = store.function(address).bind()) {
+    when (val instance = store.function(address)) {
         is FunctionInstance.HostFunction -> hostFunctionCall(context, instance)
         is FunctionInstance.WasmFunction -> wasmFunctionCall(context, instance)
     }

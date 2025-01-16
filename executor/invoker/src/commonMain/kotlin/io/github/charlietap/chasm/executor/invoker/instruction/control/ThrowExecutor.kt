@@ -32,7 +32,7 @@ internal inline fun ThrowExecutor(
         .tagAddress(instruction.tagIndex)
         .bind()
 
-    val instance = store.tag(address).bind()
+    val instance = store.tag(address)
     val functionType = instance.type.type
 
     val params = List(functionType.params.types.size) {

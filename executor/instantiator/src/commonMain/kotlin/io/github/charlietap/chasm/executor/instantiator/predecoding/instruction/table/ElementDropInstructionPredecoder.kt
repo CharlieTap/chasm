@@ -31,7 +31,7 @@ internal inline fun ElementDropInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val elementAddress = context.instance?.elementAddress(instruction.elemIdx)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val element = context.store.element(elementAddress).bind()
+    val element = context.store.element(elementAddress)
 
     dispatcher(ElemDrop(element))
 }

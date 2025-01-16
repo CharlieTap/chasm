@@ -42,7 +42,7 @@ internal inline fun ArrayInitElementExecutor(
     val elementAddress = frame.instance
         .elementAddress(elementIndex)
         .bind()
-    val elementInstance = store.element(elementAddress).bind()
+    val elementInstance = store.element(elementAddress)
 
     val elementsToCopy = stack.popI32()
     val sourceOffsetInElementSegment = stack.popI32()

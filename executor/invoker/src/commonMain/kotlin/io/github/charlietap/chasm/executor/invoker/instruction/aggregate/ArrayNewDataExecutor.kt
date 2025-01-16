@@ -45,7 +45,7 @@ internal inline fun ArrayNewDataExecutor(
     val dataAddress = frame.instance
         .dataAddress(dataIndex)
         .bind()
-    val dataInstance = store.data(dataAddress).bind()
+    val dataInstance = store.data(dataAddress)
 
     val arrayLength = stack.popI32()
     val arrayStartOffsetInSegment = stack.popI32()

@@ -31,7 +31,7 @@ internal inline fun I64Store8InstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val memoryAddress = context.instance?.memoryAddress(instruction.memoryIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val memory = context.store.memory(memoryAddress).bind()
+    val memory = context.store.memory(memoryAddress)
 
     dispatcher(I64Store8(memory, instruction.memArg))
 }

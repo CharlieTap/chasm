@@ -34,6 +34,6 @@ internal fun readByte(
     pointer: Int,
     bytesReader: BytesReader,
 ): Result<Byte, ModuleTrapError> = binding {
-    val instance = store.store.memory(memory.reference.address).bind()
+    val instance = store.store.memory(memory.reference.address)
     bytesReader(instance.data, ByteArray(1), pointer, 1, 0).bind().first()
 }

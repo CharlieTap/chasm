@@ -32,6 +32,6 @@ internal fun internalWriteGlobal(
     global: Global,
     value: ExecutionValue,
 ): Result<Unit, ModuleTrapError> = binding {
-    val global = store.store.global(global.reference.address).bind()
+    val global = store.store.global(global.reference.address)
     global.value = value
 }

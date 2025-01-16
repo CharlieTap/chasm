@@ -33,7 +33,7 @@ internal inline fun TableImportMatcher(
     crossinline tableTypeMatcher: TypeMatcher<TableType>,
 ): Result<Boolean, ModuleTrapError> = binding {
     val store = context.store
-    val actualTable = store.table(import.address).bind()
+    val actualTable = store.table(import.address)
     val actualTableType = actualTable.type
 
     val requiredTableType = descriptor.type

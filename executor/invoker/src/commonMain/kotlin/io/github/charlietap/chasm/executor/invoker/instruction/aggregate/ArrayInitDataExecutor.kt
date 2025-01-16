@@ -46,7 +46,7 @@ internal fun ArrayInitDataExecutor(
     val dataAddress = frame.instance
         .dataAddress(dataIndex)
         .bind()
-    val dataInstance = store.data(dataAddress).bind()
+    val dataInstance = store.data(dataAddress)
 
     val elementsToCopy = stack.popI32()
     val byteArrayOffset = stack.popI32()

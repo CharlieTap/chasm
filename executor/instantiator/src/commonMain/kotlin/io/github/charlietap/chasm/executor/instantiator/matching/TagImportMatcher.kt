@@ -32,7 +32,7 @@ internal inline fun TagImportMatcher(
     crossinline tagTypeMatcher: TypeMatcher<TagType>,
 ): Result<Boolean, ModuleTrapError> = binding {
     val store = context.store
-    val tag = store.tag(import.address).bind()
+    val tag = store.tag(import.address)
 
     tagTypeMatcher(tag.type, descriptor.type, context)
 }

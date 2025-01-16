@@ -31,7 +31,7 @@ internal inline fun TableGetInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val address = context.instance?.tableAddress(instruction.tableIdx)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val table = context.store.table(address).bind()
+    val table = context.store.table(address)
 
     dispatcher(TableGet(table))
 }

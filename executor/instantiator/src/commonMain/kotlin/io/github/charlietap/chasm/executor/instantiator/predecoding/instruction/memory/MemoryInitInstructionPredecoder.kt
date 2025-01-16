@@ -33,11 +33,11 @@ internal inline fun MemoryInitInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val memoryAddress = context.instance?.memoryAddress(instruction.memoryIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val memory = context.store.memory(memoryAddress).bind()
+    val memory = context.store.memory(memoryAddress)
 
     val dataAddress = context.instance?.dataAddress(instruction.dataIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val data = context.store.data(dataAddress).bind()
+    val data = context.store.data(dataAddress)
 
     dispatcher(MemoryInit(memory, data))
 }

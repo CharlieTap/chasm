@@ -33,7 +33,7 @@ internal inline fun ArrayNewElementExecutor(
     val elementAddress = frame.instance
         .elementAddress(elementIndex)
         .bind()
-    val elementInstance = store.element(elementAddress).bind()
+    val elementInstance = store.element(elementAddress)
 
     val arrayLength = stack.popI32()
     val arrayStartOffsetInSegment = stack.popI32()

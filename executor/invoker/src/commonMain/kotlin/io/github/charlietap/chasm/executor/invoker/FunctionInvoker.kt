@@ -40,8 +40,8 @@ internal inline fun FunctionInvoker(
     crossinline threadExecutor: ThreadExecutor,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
-    val function = store.function(address).bind() as FunctionInstance.WasmFunction
-    val instruction = store.instruction(address).bind()
+    val function = store.function(address) as FunctionInstance.WasmFunction
+    val instruction = store.instruction(address)
     val arity = function.functionType.results.types.size
 
     val thread = Thread(

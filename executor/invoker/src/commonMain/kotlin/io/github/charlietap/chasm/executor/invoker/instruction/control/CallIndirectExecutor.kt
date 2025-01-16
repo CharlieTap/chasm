@@ -56,7 +56,7 @@ internal inline fun CallIndirectExecutor(
         else -> Err(InvocationError.IndirectCallOnANonFunctionReference)
     }.bind()
 
-    val functionInstance = store.function(address).bind()
+    val functionInstance = store.function(address)
     val actualFunctionType = functionInstance.type
 
     if (!definedTypeMatcher(actualFunctionType, expectedFunctionType, context)) {

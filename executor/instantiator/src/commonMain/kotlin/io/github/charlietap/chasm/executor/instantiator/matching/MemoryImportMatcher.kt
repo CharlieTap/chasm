@@ -34,7 +34,7 @@ internal inline fun MemoryImportMatcher(
 ): Result<Boolean, ModuleTrapError> = binding {
 
     val store = context.store
-    val actualMemory = store.memory(import.address).bind()
+    val actualMemory = store.memory(import.address)
     val actualMemoryType = actualMemory.type
     val requiredMemoryType = descriptor.type
 

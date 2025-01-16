@@ -31,7 +31,7 @@ internal inline fun GlobalSetInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val address = context.instance?.globalAddress(instruction.globalIdx)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val global = context.store.global(address).bind()
+    val global = context.store.global(address)
 
     dispatcher(GlobalSet(global))
 }

@@ -35,6 +35,6 @@ internal fun internalWriteTable(
     elementIndex: Int,
     value: ReferenceValue,
 ): Result<Unit, ModuleTrapError> = binding {
-    val table = store.store.table(table.reference.address).bind()
+    val table = store.store.table(table.reference.address)
     table.elements[elementIndex] = value
 }

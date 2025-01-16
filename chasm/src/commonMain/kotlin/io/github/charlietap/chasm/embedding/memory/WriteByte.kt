@@ -37,6 +37,6 @@ internal fun writeByte(
     byte: Byte,
     bytesWriter: BytesWriter,
 ): Result<Unit, ModuleTrapError> = binding {
-    val instance = store.store.memory(memory.reference.address).bind()
+    val instance = store.store.memory(memory.reference.address)
     bytesWriter(instance.data, instance.size, byteArrayOf(byte), pointer, 1, 0).bind()
 }

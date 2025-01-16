@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.instruction
 import io.github.charlietap.chasm.executor.runtime.ext.popFunctionAddress
@@ -13,6 +12,6 @@ internal fun CallRefExecutor(
     val (stack, store) = context
     val address = stack.popFunctionAddress()
 
-    val instruction = store.instruction(address).bind()
+    val instruction = store.instruction(address)
     instruction(context)
 }

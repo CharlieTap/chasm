@@ -126,7 +126,7 @@ internal inline fun ModuleAllocator(
 
         val predecoded = functionPredecoder(context, function).bind()
         val address = instance.functionAddress(function.idx).bind()
-        val functionInstance = context.store.function(address).bind() as FunctionInstance.WasmFunction
+        val functionInstance = context.store.function(address) as FunctionInstance.WasmFunction
 
         functionInstance.function = predecoded
     }

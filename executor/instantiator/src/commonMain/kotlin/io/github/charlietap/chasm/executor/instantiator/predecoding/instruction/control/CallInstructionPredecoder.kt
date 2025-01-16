@@ -18,5 +18,5 @@ internal inline fun CallInstructionPredecoder(
     // Functions are predecoded into control instructions on instance allocation
     val address = context.instance?.functionAddress(instruction.functionIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    context.store.instruction(address).bind()
+    context.store.instruction(address)
 }

@@ -44,7 +44,7 @@ internal inline fun ThrowRefExecutor(
         ref as ReferenceValue.Exception
     }
 
-    val instance = store.exception(exceptionRef.address).bind()
+    val instance = store.exception(exceptionRef.address)
     val address = instance.tagAddress
 
     val handler = jumpToHandlerInstruction(stack)

@@ -31,11 +31,11 @@ internal inline fun MemoryCopyInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val srcMemoryAddress = context.instance?.memoryAddress(instruction.srcIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val srcMemory = context.store.memory(srcMemoryAddress).bind()
+    val srcMemory = context.store.memory(srcMemoryAddress)
 
     val destMemoryAddress = context.instance?.memoryAddress(instruction.dstIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val destMemory = context.store.memory(destMemoryAddress).bind()
+    val destMemory = context.store.memory(destMemoryAddress)
 
     dispatcher(MemoryCopy(srcMemory, destMemory))
 }

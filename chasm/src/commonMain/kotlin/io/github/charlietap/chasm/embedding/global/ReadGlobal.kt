@@ -29,6 +29,6 @@ internal fun internalReadGlobal(
     store: Store,
     global: Global,
 ): Result<ExecutionValue, ModuleTrapError> = binding {
-    val global = store.store.global(global.reference.address).bind()
+    val global = store.store.global(global.reference.address)
     global.value
 }

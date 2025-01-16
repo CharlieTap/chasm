@@ -31,7 +31,7 @@ internal inline fun DataDropInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val dataAddress = context.instance?.dataAddress(instruction.dataIdx)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val data = context.store.data(dataAddress).bind()
+    val data = context.store.data(dataAddress)
 
     dispatcher(DataDrop(data))
 }

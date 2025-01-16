@@ -33,6 +33,6 @@ internal fun internalReadTable(
     table: Table,
     elementIndex: Int,
 ): Result<ReferenceValue, ModuleTrapError> = binding {
-    val table = store.store.table(table.reference.address).bind()
+    val table = store.store.table(table.reference.address)
     table.element(elementIndex)
 }

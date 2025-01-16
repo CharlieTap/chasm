@@ -36,7 +36,7 @@ internal inline fun ReturnCallInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val address = context.instance?.functionAddress(instruction.functionIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
-    val instance = context.store.function(address).bind()
+    val instance = context.store.function(address)
     when (instance) {
         is FunctionInstance.HostFunction -> {
             returnHostFunctionCallDispatcher(ReturnHostFunctionCall(instance))

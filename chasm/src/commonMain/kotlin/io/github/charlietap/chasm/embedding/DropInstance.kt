@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.embedding
 
-import com.github.michaelbull.result.map
 import io.github.charlietap.chasm.ast.type.SharedStatus
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
@@ -36,14 +35,14 @@ internal fun dropInstance(
     val store = store.store
 
     instance.dataAddresses.forEach { address ->
-        store.data(address).map { data ->
+        store.data(address).let { data ->
             data.bytes = ubyteArrayOf()
         }
     }
     instance.dataAddresses.clear()
 
     instance.elemAddresses.forEach { address ->
-        store.element(address).map { element ->
+        store.element(address).let { element ->
             element.elements = arrayOf()
         }
     }
@@ -55,14 +54,12 @@ internal fun dropInstance(
 
     val uninit = ExecutionValue.Uninitialised
     instance.globalAddresses.forEach { address ->
-        store.global(address).map { global ->
-            global.value = uninit
-        }
+        store.global(address).value = uninit
     }
     instance.globalAddresses.clear()
 
     instance.memAddresses.forEach { address ->
-        store.memory(address).map { memory ->
+        store.memory(address).let { memory ->
             if (memory.type.shared == SharedStatus.Unshared) {
                 memoryDropper(memory)
             }
@@ -71,7 +68,7 @@ internal fun dropInstance(
     instance.memAddresses.clear()
 
     instance.tableAddresses.forEach { address ->
-        store.table(address).map { table ->
+        store.table(address).let { table ->
             table.elements = arrayOf()
         }
     }
