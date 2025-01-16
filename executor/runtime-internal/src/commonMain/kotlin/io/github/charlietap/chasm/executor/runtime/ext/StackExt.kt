@@ -6,11 +6,9 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.runtime.Stack
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
-import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
@@ -36,16 +34,8 @@ inline fun Stack.pushf64(f64: Double) {
     push(F64(f64))
 }
 
-inline fun Stack.peekLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
-    return peekLabelOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
-}
-
 inline fun Stack.peekValue(): Result<ExecutionValue, InvocationError.MissingStackValue> {
     return peekValueOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
-}
-
-inline fun Stack.peekNthFrame(n: Int): Result<ActivationFrame, InvocationError.MissingStackFrame> {
-    return peekNthFrameOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackFrame)
 }
 
 inline fun Stack.peekNthLabel(n: Int): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
@@ -58,10 +48,6 @@ inline fun Stack.peekNthValue(n: Int): Result<ExecutionValue, InvocationError.Mi
 
 inline fun Stack.popHandler(): Result<ExceptionHandler, InvocationError.UncaughtException> {
     return popHandlerOrNull()?.let(::Ok) ?: Err(InvocationError.UncaughtException)
-}
-
-inline fun Stack.popInstruction(): Result<DispatchableInstruction, InvocationError.MissingInstruction> {
-    return popInstructionOrNull()?.let(::Ok) ?: Err(InvocationError.MissingInstruction)
 }
 
 inline fun Stack.popLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
@@ -100,12 +86,6 @@ inline fun Stack.popReference(): Result<ReferenceValue, InvocationError.MissingS
 
 inline fun Stack.peekReference(): Result<ReferenceValue, InvocationError.MissingStackValue> {
     return (peekValueOrNull() as? ReferenceValue)?.let {
-        Ok(it)
-    } ?: Err(InvocationError.MissingStackValue)
-}
-
-inline fun Stack.popNullReference(): Result<ReferenceValue.Null, InvocationError.MissingStackValue> {
-    return (popValue() as? ReferenceValue.Null)?.let {
         Ok(it)
     } ?: Err(InvocationError.MissingStackValue)
 }
