@@ -49,7 +49,7 @@ internal inline fun CallIndirectExecutor(
         .bind()
 
     val elementIndex = stack.popI32()
-    val reference = table.element(elementIndex).bind()
+    val reference = table.element(elementIndex)
 
     val address = when (reference) {
         is ReferenceValue.Function -> Ok(reference.address)

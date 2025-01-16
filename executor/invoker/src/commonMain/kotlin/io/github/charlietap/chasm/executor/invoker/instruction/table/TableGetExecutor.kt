@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -15,7 +14,7 @@ internal inline fun TableGetExecutor(
     val tableInstance = instruction.table
 
     val elementIndex = stack.popI32()
-    val referenceValue = tableInstance.element(elementIndex).bind()
+    val referenceValue = tableInstance.element(elementIndex)
 
     stack.push(referenceValue)
 }

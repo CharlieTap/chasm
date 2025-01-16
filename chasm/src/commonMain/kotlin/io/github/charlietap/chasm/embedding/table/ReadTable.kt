@@ -34,5 +34,5 @@ internal fun internalReadTable(
     elementIndex: Int,
 ): Result<ReferenceValue, ModuleTrapError> = binding {
     val table = store.store.table(table.reference.address).bind()
-    table.element(elementIndex).bind()
+    table.element(elementIndex)
 }
