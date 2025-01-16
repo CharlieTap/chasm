@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.fixture.ast.module.fieldIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
@@ -57,10 +56,10 @@ class StructSetExecutorTest {
         stack.push(frame)
 
         val referenceValue = structReferenceValue(structInstance)
-        stack.pushValue(referenceValue)
+        stack.push(referenceValue)
 
         val executionValue = executionValue()
-        stack.pushValue(executionValue)
+        stack.push(executionValue)
 
         val definedTypeExpander: DefinedTypeExpander = {
             assertEquals(definedType, it)

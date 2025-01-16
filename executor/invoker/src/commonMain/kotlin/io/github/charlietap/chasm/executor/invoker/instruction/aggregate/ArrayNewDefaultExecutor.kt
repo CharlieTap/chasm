@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -41,7 +40,7 @@ internal inline fun ArrayNewDefaultExecutor(
     val size = stack.popI32().bind()
     val value = arrayType.fieldType.default().bind()
     repeat(size) {
-        stack.pushValue(value)
+        stack.push(value)
     }
 
     arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size.toUInt()))

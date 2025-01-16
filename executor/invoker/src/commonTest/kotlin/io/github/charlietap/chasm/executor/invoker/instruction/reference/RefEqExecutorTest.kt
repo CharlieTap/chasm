@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.refEqRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
@@ -17,8 +16,8 @@ class RefEqExecutorTest {
         val stack = stack()
         val context = executionContext(stack)
         val reference = structReferenceValue()
-        stack.pushValue(reference)
-        stack.pushValue(reference)
+        stack.push(reference)
+        stack.push(reference)
 
         val actual = RefEqExecutor(
             context = context,
@@ -35,8 +34,8 @@ class RefEqExecutorTest {
 
         val stack = stack()
         val context = executionContext(stack)
-        stack.pushValue(structReferenceValue())
-        stack.pushValue(structReferenceValue())
+        stack.push(structReferenceValue())
+        stack.push(structReferenceValue())
 
         val actual = RefEqExecutor(
             context = context,

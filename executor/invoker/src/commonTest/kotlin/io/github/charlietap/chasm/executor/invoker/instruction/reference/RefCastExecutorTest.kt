@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.ast.type.referenceType
@@ -38,7 +37,7 @@ class RefCastExecutorTest {
 
         val referenceValue = referenceValue()
 
-        stack.pushValue(referenceValue)
+        stack.push(referenceValue)
 
         val referenceTypeSubstitutor: TypeSubstitutor<ReferenceType> = { _referenceType, _ ->
             assertEquals(referenceType, _referenceType)
@@ -89,7 +88,7 @@ class RefCastExecutorTest {
 
         val referenceValue = referenceValue()
 
-        stack.pushValue(referenceValue)
+        stack.push(referenceValue)
 
         val referenceTypeSubstitutor: TypeSubstitutor<ReferenceType> = { _referenceType, _ ->
             assertEquals(referenceType, _referenceType)

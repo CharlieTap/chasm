@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
@@ -51,8 +50,8 @@ class ArrayNewFixedExecutorTest {
         val executionValue1 = i32(1)
         val executionValue2 = i32(2)
 
-        stack.pushValue(executionValue1)
-        stack.pushValue(executionValue2)
+        stack.push(executionValue1)
+        stack.push(executionValue2)
 
         val definedTypeExpander: DefinedTypeExpander = {
             assertEquals(definedType, it)

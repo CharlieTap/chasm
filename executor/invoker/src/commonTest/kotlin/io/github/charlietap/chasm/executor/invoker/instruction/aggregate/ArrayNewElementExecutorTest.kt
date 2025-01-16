@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.module.elementIndex
@@ -59,8 +58,8 @@ class ArrayNewElementExecutorTest {
 
         stack.push(frame)
 
-        stack.pushValue(i32(offset))
-        stack.pushValue(i32(size.toInt()))
+        stack.push(i32(offset))
+        stack.push(i32(size.toInt()))
 
         val arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed> = { _context, _instruction ->
             assertEquals(context, _context)

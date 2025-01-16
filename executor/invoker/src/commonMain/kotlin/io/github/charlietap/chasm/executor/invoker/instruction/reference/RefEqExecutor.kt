@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -25,8 +24,8 @@ internal inline fun RefEqExecutor(
     }
 
     if (equal) {
-        stack.pushValue(NumberValue.I32(1))
+        stack.push(NumberValue.I32(1))
     } else {
-        stack.pushValue(NumberValue.I32(0))
+        stack.push(NumberValue.I32(0))
     }
 }

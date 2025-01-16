@@ -36,8 +36,6 @@ inline fun Stack.pushf64(f64: Double) {
     push(F64(f64))
 }
 
-inline fun Stack.pushValue(value: ExecutionValue) = push(value)
-
 inline fun Stack.peekLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
     return peekLabelOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
 }

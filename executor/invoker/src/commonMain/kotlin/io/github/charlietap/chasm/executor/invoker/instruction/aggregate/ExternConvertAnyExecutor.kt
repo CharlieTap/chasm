@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
@@ -15,10 +14,10 @@ internal fun ExternConvertAnyExecutor(
     val (stack) = context
     when (val referenceValue = stack.popReference().bind()) {
         is ReferenceValue.Null -> {
-            stack.pushValue(ReferenceValue.Null(AbstractHeapType.Extern))
+            stack.push(ReferenceValue.Null(AbstractHeapType.Extern))
         }
         else -> {
-            stack.pushValue(ReferenceValue.Extern(referenceValue))
+            stack.push(ReferenceValue.Extern(referenceValue))
         }
     }
 }

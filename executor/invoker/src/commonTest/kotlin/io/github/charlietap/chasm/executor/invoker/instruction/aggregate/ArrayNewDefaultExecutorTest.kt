@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.default
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.arrayCompositeType
@@ -48,7 +47,7 @@ class ArrayNewDefaultExecutorTest {
 
         stack.push(frame)
 
-        stack.pushValue(i32(size.toInt()))
+        stack.push(i32(size.toInt()))
 
         val definedTypeExpander: DefinedTypeExpander = { _definedType ->
             assertEquals(definedType, _definedType)

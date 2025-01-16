@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
@@ -20,7 +19,7 @@ class RefI31ExecutorTest {
         val i32 = 117
         val i31 = i31ReferenceValue()
 
-        stack.pushValue(i32(i32))
+        stack.push(i32(i32))
 
         val i31Wrapper: (Int) -> ReferenceValue.I31 = { input ->
             assertEquals(i32, input)

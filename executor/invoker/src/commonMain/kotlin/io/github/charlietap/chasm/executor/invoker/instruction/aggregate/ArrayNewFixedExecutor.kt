@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -45,5 +44,5 @@ internal inline fun ArrayNewFixedExecutor(
     val instance = ArrayInstance(definedType, fields)
     val reference = ReferenceValue.Array(instance)
 
-    stack.pushValue(reference)
+    stack.push(reference)
 }

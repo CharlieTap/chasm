@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.tag
 import io.github.charlietap.chasm.executor.runtime.ext.tagAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExceptionInstance
@@ -48,6 +47,6 @@ internal inline fun ThrowExecutor(
     store.exceptions.add(exceptionInstance)
     val exceptionAddress = Address.Exception(store.exceptions.size - 1)
 
-    stack.pushValue(ReferenceValue.Exception(exceptionAddress))
+    stack.push(ReferenceValue.Exception(exceptionAddress))
     stack.push(throwRefDispatcher(ControlInstruction.ThrowRef))
 }

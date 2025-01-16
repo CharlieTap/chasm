@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i31ReferenceValue
@@ -21,7 +20,7 @@ class I31GetExecutorTest {
         val i32 = 117
         val i31 = i31ReferenceValue()
 
-        stack.pushValue(i31)
+        stack.push(i31)
 
         val i31SignedExtender: (ReferenceValue.I31) -> Int = { input ->
             assertEquals(i31, input)
@@ -47,7 +46,7 @@ class I31GetExecutorTest {
         val i32 = 117
         val i31 = i31ReferenceValue()
 
-        stack.pushValue(i31)
+        stack.push(i31)
 
         val i31SignedExtender: (ReferenceValue.I31) -> Int = { _ ->
             fail("Unsigned extender should not be called in this scenario")

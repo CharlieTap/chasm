@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.module.fieldIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
@@ -56,9 +55,9 @@ class ArrayGetExecutorTest {
         stack.push(frame)
 
         val arrayReference = ReferenceValue.Array(arrayInstance)
-        stack.pushValue(arrayReference)
+        stack.push(arrayReference)
 
-        stack.pushValue(i32(fieldIndex.index()))
+        stack.push(i32(fieldIndex.index()))
 
         val definedTypeExpander: DefinedTypeExpander = {
             assertEquals(definedType, it)

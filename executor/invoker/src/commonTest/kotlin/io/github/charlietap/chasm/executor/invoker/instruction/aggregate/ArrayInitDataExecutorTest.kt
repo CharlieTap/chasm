@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.memory.ext.copyInto
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.fixture.ast.module.dataIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
@@ -86,10 +85,10 @@ class ArrayInitDataExecutorTest {
 
         stack.push(frame)
 
-        stack.pushValue(arrayReferenceValue(arrayInstance))
-        stack.pushValue(i32(0))
-        stack.pushValue(i32(0))
-        stack.pushValue(i32(1))
+        stack.push(arrayReferenceValue(arrayInstance))
+        stack.push(i32(0))
+        stack.push(i32(0))
+        stack.push(i32(1))
 
         val expectedInstance = arrayInstance(
             definedType = definedType,

@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal fun ArrayNewElementExecutor(
@@ -47,7 +46,7 @@ internal inline fun ArrayNewElementExecutor(
     elementInstance.elements
         .slice(arrayStartOffsetInSegment until arrayEndOffsetInSegment)
         .forEach { referenceValue ->
-            stack.pushValue(referenceValue)
+            stack.push(referenceValue)
         }
 
     arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt()))

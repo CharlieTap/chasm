@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.field
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -50,5 +49,5 @@ internal inline fun ArrayGetExecutor(
 
     val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack).bind()
 
-    stack.pushValue(unpackedValue)
+    stack.push(unpackedValue)
 }

@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
@@ -38,7 +37,7 @@ internal inline fun StructNewDefaultExecutor(
     val structType = definedTypeExpander(definedType).structType().bind()
     structType.fields.forEach { fieldType ->
         val value = fieldType.default().bind()
-        stack.pushValue(value)
+        stack.push(value)
     }
 
     structNewExecutor(context, AggregateInstruction.StructNew(typeIndex))

@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.fixture.ast.type.definedType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayInstance
@@ -27,7 +26,7 @@ class ArrayLenExecutorTest {
         val context = executionContext(stack)
 
         val referenceValue = arrayReferenceValue(arrayInstance)
-        stack.pushValue(referenceValue)
+        stack.push(referenceValue)
 
         val actual = ArrayLenExecutor(context, AggregateInstruction.ArrayLen)
 

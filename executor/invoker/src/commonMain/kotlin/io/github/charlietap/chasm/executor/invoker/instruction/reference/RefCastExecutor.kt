@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
@@ -50,7 +49,7 @@ internal inline fun RefCastExecutor(
         .bind()
 
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
-        stack.pushValue(otherReferenceValue)
+        stack.push(otherReferenceValue)
     } else {
         Err(InvocationError.Trap.TrapEncountered).bind()
     }

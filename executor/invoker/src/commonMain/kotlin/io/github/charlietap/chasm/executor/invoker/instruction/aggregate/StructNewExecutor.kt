@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.definedType
-import io.github.charlietap.chasm.executor.runtime.ext.pushValue
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -46,5 +45,5 @@ internal inline fun StructNewExecutor(
     val instance = StructInstance(definedType, fields.toMutableList())
     val reference = ReferenceValue.Struct(instance)
 
-    stack.pushValue(reference)
+    stack.push(reference)
 }
