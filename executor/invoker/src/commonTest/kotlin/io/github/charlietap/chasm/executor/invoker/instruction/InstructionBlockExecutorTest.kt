@@ -42,7 +42,7 @@ class InstructionBlockExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.labelsDepth())
-        assertEquals(label, stack.popLabelOrNull())
+        assertEquals(label, stack.popLabel())
         assertEquals(expectedInstructions.toList(), stack.instructions())
     }
 }

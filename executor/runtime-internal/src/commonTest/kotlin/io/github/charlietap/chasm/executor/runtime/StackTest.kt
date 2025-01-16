@@ -48,8 +48,8 @@ class StackTest {
         stack.push(label1)
         stack.push(label2)
 
-        val result1 = stack.peekNthLabelOrNull(0)
-        val result2 = stack.peekNthLabelOrNull(1)
+        val result1 = stack.peekNthLabel(0)
+        val result2 = stack.peekNthLabel(1)
 
         assertEquals(label2, result1)
         assertEquals(label1, result2)

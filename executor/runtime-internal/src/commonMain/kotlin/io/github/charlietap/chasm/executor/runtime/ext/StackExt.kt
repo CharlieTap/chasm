@@ -37,20 +37,12 @@ inline fun Stack.pushf64(f64: Double) {
     push(F64(f64))
 }
 
-inline fun Stack.peekNthLabel(n: Int): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
-    return peekNthLabelOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
-}
-
 inline fun Stack.peekNthValue(n: Int): Result<ExecutionValue, InvocationError.MissingStackValue> {
     return peekNthValueOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
 }
 
 inline fun Stack.popHandler(): Result<ExceptionHandler, InvocationError.UncaughtException> {
     return popHandlerOrNull()?.let(::Ok) ?: Err(InvocationError.UncaughtException)
-}
-
-inline fun Stack.popLabel(): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
-    return popLabelOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
 }
 
 inline fun Stack.popI32(): Int {

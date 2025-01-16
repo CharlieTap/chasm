@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStack
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.InstructionStack
+import io.github.charlietap.chasm.executor.runtime.stack.LabelStack
 import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -17,7 +18,7 @@ data class Stack(
     private val frames: FrameStack = FrameStack(),
     private val handlers: InternalStack<ExceptionHandler> = InternalStack(INITIAL_CAPACITY),
     private val instructions: InstructionStack = InstructionStack(INITIAL_CAPACITY),
-    private val labels: InternalStack<Entry.Label> = InternalStack(INITIAL_CAPACITY),
+    private val labels: LabelStack = LabelStack(INITIAL_CAPACITY),
     private val values: ValueStack = ValueStack(INITIAL_CAPACITY),
 ) {
     constructor(
@@ -93,7 +94,7 @@ data class Stack(
 
     fun popInstruction(): DispatchableInstruction = instructions.pop()
 
-    fun popLabelOrNull(): Entry.Label? = labels.popOrNull()
+    fun popLabel(): Entry.Label? = labels.pop()
 
     fun popValue(): ExecutionValue = try {
         values.pop()
@@ -115,8 +116,6 @@ data class Stack(
 
     fun peekInstructionOrNull(): DispatchableInstruction? = instructions.peekOrNull()
 
-    fun peekLabelOrNull(): Entry.Label? = labels.peekOrNull()
-
     fun peekValue(): ExecutionValue = try {
         values.peek()
     } catch (_: IndexOutOfBoundsException) {
@@ -127,7 +126,7 @@ data class Stack(
 
     fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNthOrNull(n)
 
-    fun peekNthLabelOrNull(n: Int): Entry.Label? = labels.peekNthOrNull(n)
+    fun peekNthLabel(n: Int): Entry.Label = labels.peekNth(n)
 
     fun peekNthValueOrNull(n: Int): ExecutionValue? = values.peekNthOrNull(n)
 
