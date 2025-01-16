@@ -1,13 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import com.github.michaelbull.result.Err
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ast.type.VectorType
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunctionContext
@@ -39,7 +38,7 @@ internal fun HostFunctionCall(
     val results = try {
         function.function.invoke(functionContext, params)
     } catch (e: HostFunctionException) {
-        Err(InvocationError.HostFunctionError(e.reason)).bind()
+        throw InvocationException(InvocationError.HostFunctionError(e.reason))
     }
 
     type.results.types.forEachIndexed { index, valueType ->
@@ -50,7 +49,9 @@ internal fun HostFunctionCall(
         if (typeMatches) {
             stack.push(result!!)
         } else {
-            Err(InvocationError.HostFunctionInconsistentWithType(valueType, result)).bind()
+            throw InvocationException(
+                InvocationError.HostFunctionInconsistentWithType(valueType, result),
+            )
         }
     }
 }
