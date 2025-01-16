@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
@@ -21,7 +20,7 @@ internal inline fun BrOnNullExecutor(
     crossinline breakExecutor: BreakExecutor,
 ) {
     val (stack) = context
-    val value = stack.popReference().bind()
+    val value = stack.popReference()
     val shouldBreak = value is ReferenceValue.Null
 
     if (shouldBreak) {

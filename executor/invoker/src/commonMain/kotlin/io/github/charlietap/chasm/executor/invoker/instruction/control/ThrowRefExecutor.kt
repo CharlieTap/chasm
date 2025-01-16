@@ -37,7 +37,7 @@ internal inline fun ThrowRefExecutor(
 ) {
 
     val (stack, store) = context
-    val ref = stack.popReference().bind()
+    val ref = stack.popReference()
 
     val exceptionRef = if (ref is ReferenceValue.Null) {
         Err(InvocationError.UnexpectedReferenceValue).bind()

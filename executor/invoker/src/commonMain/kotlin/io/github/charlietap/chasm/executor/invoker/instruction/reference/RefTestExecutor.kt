@@ -42,7 +42,7 @@ internal inline fun RefTestExecutor(
 
     val substitutedReferenceType = referenceTypeSubstitutor(referenceType, context.substitutor)
 
-    val otherReferenceValue = stack.popReference().bind()
+    val otherReferenceValue = stack.popReference()
     val otherReferenceType = typeOfReferenceValue(otherReferenceValue, store, moduleInstance)
         .toResultOr { InvocationError.Trap.TrapEncountered }
         .bind()

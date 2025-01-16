@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.asRange
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -20,7 +19,7 @@ internal inline fun TableGrowExecutor(
 
     val tableSize = tableInstance.elements.size
     val elementsToAdd = stack.popI32()
-    val referenceValue = stack.popReference().bind()
+    val referenceValue = stack.popReference()
 
     val proposedLength = (tableSize + elementsToAdd).toUInt()
     if (proposedLength !in tableType.limits.asRange()) {

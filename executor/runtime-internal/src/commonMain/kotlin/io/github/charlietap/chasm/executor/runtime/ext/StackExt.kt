@@ -83,10 +83,12 @@ inline fun Stack.popF64(): Double {
     }
 }
 
-inline fun Stack.popReference(): Result<ReferenceValue, InvocationError.MissingStackValue> {
-    return (popValue() as? ReferenceValue)?.let {
-        Ok(it)
-    } ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.popReference(): ReferenceValue {
+    return try {
+        (popValue() as ReferenceValue)
+    } catch (_: ClassCastException) {
+        throw InvocationException(InvocationError.ReferenceValueExpected)
+    }
 }
 
 inline fun Stack.peekReference(): Result<ReferenceValue, InvocationError.MissingStackValue> {

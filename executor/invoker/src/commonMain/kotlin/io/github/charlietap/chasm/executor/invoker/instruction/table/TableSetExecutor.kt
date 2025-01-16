@@ -16,7 +16,7 @@ internal inline fun TableSetExecutor(
     val (stack) = context
     val tableInstance = instruction.table
 
-    val value = stack.popReference().bind()
+    val value = stack.popReference()
     val elementIndex = stack.popI32()
 
     if (elementIndex !in tableInstance.elements.indices) {
