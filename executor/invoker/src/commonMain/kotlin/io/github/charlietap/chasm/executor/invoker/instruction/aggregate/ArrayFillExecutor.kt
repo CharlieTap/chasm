@@ -30,9 +30,9 @@ internal inline fun ArrayFillExecutor(
 ) {
 
     val (stack) = context
-    val elementsToFill = stack.popI32().bind()
+    val elementsToFill = stack.popI32()
     val fillValue = stack.popValue()
-    val arrayElementOffset = stack.popI32().bind()
+    val arrayElementOffset = stack.popI32()
     val arrayReference = stack.popArrayReference().bind()
     val arrayInstance = arrayReference.instance
 

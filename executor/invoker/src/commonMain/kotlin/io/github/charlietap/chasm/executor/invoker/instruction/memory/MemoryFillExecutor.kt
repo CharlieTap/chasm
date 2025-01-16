@@ -27,9 +27,9 @@ internal inline fun MemoryFillExecutor(
 ) {
 
     val stack = context.stack
-    val bytesToFill = stack.popI32().bind()
-    val fillValue = stack.popI32().bind()
-    val offset = stack.popI32().bind()
+    val bytesToFill = stack.popI32()
+    val fillValue = stack.popI32()
+    val offset = stack.popI32()
 
     val memory = instruction.memory
 

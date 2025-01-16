@@ -44,9 +44,9 @@ internal inline fun ArrayInitElementExecutor(
         .bind()
     val elementInstance = store.element(elementAddress).bind()
 
-    val elementsToCopy = stack.popI32().bind()
-    val sourceOffsetInElementSegment = stack.popI32().bind()
-    val destinationOffsetInArray = stack.popI32().bind()
+    val elementsToCopy = stack.popI32()
+    val sourceOffsetInElementSegment = stack.popI32()
+    val destinationOffsetInArray = stack.popI32()
 
     val arrayReference = stack.popArrayReference().bind()
     val arrayInstance = arrayReference.instance

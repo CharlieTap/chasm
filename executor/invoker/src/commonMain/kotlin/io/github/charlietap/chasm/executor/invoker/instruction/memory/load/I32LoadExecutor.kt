@@ -31,7 +31,7 @@ internal inline fun I32LoadExecutor(
     val stack = context.stack
     val memory = instruction.memory
 
-    val baseAddress = stack.popI32().bind()
+    val baseAddress = stack.popI32()
     val offset = instruction.memArg.offset.toInt()
     val effectiveAddress = baseAddress + offset
 

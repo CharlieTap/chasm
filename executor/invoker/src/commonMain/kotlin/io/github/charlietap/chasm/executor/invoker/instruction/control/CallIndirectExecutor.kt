@@ -48,7 +48,7 @@ internal inline fun CallIndirectExecutor(
         .definedType(typeIndex)
         .bind()
 
-    val elementIndex = stack.popI32().bind()
+    val elementIndex = stack.popI32()
     val reference = table.element(elementIndex).bind()
 
     val address = when (reference) {

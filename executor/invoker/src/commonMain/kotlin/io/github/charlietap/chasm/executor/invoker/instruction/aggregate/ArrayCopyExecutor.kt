@@ -41,10 +41,10 @@ internal inline fun ArrayCopyExecutor(
         Err(InvocationError.ArrayCopyOnAConstArray).bind()
     }
 
-    val elementsToCopy = stack.popI32().bind()
-    val sourceOffset = stack.popI32().bind()
+    val elementsToCopy = stack.popI32()
+    val sourceOffset = stack.popI32()
     val srcReference = stack.popArrayReference().bind()
-    val destinationOffset = stack.popI32().bind()
+    val destinationOffset = stack.popI32()
     val destReference = stack.popArrayReference().bind()
 
     val source = srcReference.instance

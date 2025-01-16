@@ -19,7 +19,7 @@ internal inline fun TableGrowExecutor(
     val tableType = tableInstance.type
 
     val tableSize = tableInstance.elements.size
-    val elementsToAdd = stack.popI32().bind()
+    val elementsToAdd = stack.popI32()
     val referenceValue = stack.popReference().bind()
 
     val proposedLength = (tableSize + elementsToAdd).toUInt()

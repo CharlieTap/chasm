@@ -17,9 +17,9 @@ internal fun TableFillExecutor(
     val (stack) = context
     val tableInstance = instruction.table
 
-    val elementsToFill = stack.popI32().bind()
+    val elementsToFill = stack.popI32()
     val fillValue = stack.popReference().bind()
-    val tableOffset = stack.popI32().bind()
+    val tableOffset = stack.popI32()
 
     val fillRange = tableOffset..<(tableOffset + elementsToFill)
 

@@ -18,9 +18,9 @@ internal fun TableInitExecutor(
     val tableInstance = instruction.table
     val elementInstance = instruction.element
 
-    val elementsToInitialise = stack.popI32().bind()
-    val segmentOffset = stack.popI32().bind()
-    val tableOffset = stack.popI32().bind()
+    val elementsToInitialise = stack.popI32()
+    val segmentOffset = stack.popI32()
+    val tableOffset = stack.popI32()
 
     val srcRange = segmentOffset..<(segmentOffset + elementsToInitialise)
     val dstRange = tableOffset..<(tableOffset + elementsToInitialise)

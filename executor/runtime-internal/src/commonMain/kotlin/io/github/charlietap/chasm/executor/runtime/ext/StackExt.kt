@@ -50,28 +50,36 @@ inline fun Stack.popLabel(): Result<Stack.Entry.Label, InvocationError.MissingSt
     return popLabelOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
 }
 
-inline fun Stack.popI32(): Result<Int, InvocationError.MissingStackValue> {
-    return ((popValue() as? I32)?.value)?.let {
-        Ok(it)
-    } ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.popI32(): Int {
+    return try {
+        (popValue() as I32).value
+    } catch (_: ClassCastException) {
+        throw InvocationException(InvocationError.I32ValueExpected)
+    }
 }
 
-inline fun Stack.popI64(): Result<Long, InvocationError.MissingStackValue> {
-    return ((popValue() as? I64)?.value)?.let {
-        Ok(it)
-    } ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.popI64(): Long {
+    return try {
+        (popValue() as I64).value
+    } catch (_: ClassCastException) {
+        throw InvocationException(InvocationError.I64ValueExpected)
+    }
 }
 
-inline fun Stack.popF32(): Result<Float, InvocationError.MissingStackValue> {
-    return ((popValue() as? F32)?.value)?.let {
-        Ok(it)
-    } ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.popF32(): Float {
+    return try {
+        (popValue() as F32).value
+    } catch (_: ClassCastException) {
+        throw InvocationException(InvocationError.F32ValueExpected)
+    }
 }
 
-inline fun Stack.popF64(): Result<Double, InvocationError.MissingStackValue> {
-    return ((popValue() as? F64)?.value)?.let {
-        Ok(it)
-    } ?: Err(InvocationError.MissingStackValue)
+inline fun Stack.popF64(): Double {
+    return try {
+        (popValue() as F64).value
+    } catch (_: ClassCastException) {
+        throw InvocationException(InvocationError.F64ValueExpected)
+    }
 }
 
 inline fun Stack.popReference(): Result<ReferenceValue, InvocationError.MissingStackValue> {

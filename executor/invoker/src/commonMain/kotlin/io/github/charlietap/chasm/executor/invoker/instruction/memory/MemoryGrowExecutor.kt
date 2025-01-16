@@ -29,7 +29,7 @@ internal inline fun MemoryGrowExecutor(
 
     val currentSizeInPages = memory.type.limits.min
         .toInt()
-    val pagesToAdd = stack.popI32().bind()
+    val pagesToAdd = stack.popI32()
 
     val max = memory.type.limits.max
         ?.toInt() ?: LinearMemory.MAX_PAGES

@@ -47,8 +47,8 @@ internal inline fun ArrayNewDataExecutor(
         .bind()
     val dataInstance = store.data(dataAddress).bind()
 
-    val arrayLength = stack.popI32().bind()
-    val arrayStartOffsetInSegment = stack.popI32().bind()
+    val arrayLength = stack.popI32()
+    val arrayStartOffsetInSegment = stack.popI32()
 
     val arrayElementSizeInBytes = arrayType.fieldType
         .bitWidth()

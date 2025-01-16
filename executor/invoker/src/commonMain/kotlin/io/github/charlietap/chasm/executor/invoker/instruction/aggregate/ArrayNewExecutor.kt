@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -24,7 +23,7 @@ internal inline fun ArrayNewExecutor(
 
     val (stack) = context
     val typeIndex = instruction.typeIndex
-    val size = stack.popI32().bind()
+    val size = stack.popI32()
     val value = stack.peekValue()
     repeat(size - 1) {
         stack.push(value)

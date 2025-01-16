@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.ParametricInstruction
@@ -11,7 +10,7 @@ internal inline fun SelectExecutor(
     instruction: ParametricInstruction.Select,
 ) {
     val (stack) = context
-    val select = stack.popI32().bind()
+    val select = stack.popI32()
 
     val value2 = stack.popValue()
 

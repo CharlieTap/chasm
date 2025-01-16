@@ -28,9 +28,9 @@ internal inline fun MemoryInitExecutor(
     val memory = instruction.memory
     val data = instruction.data
 
-    val bytesToCopy = stack.popI32().bind()
-    val sourceOffset = stack.popI32().bind()
-    val destinationOffset = stack.popI32().bind()
+    val bytesToCopy = stack.popI32()
+    val sourceOffset = stack.popI32()
+    val destinationOffset = stack.popI32()
 
     if (
         bytesToCopy < 0 ||

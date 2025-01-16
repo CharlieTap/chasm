@@ -85,6 +85,14 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object NumberValueExpected : InvocationError
 
+    data object I32ValueExpected : InvocationError
+
+    data object I64ValueExpected : InvocationError
+
+    data object F32ValueExpected : InvocationError
+
+    data object F64ValueExpected : InvocationError
+
     data object ReferenceValueExpected : InvocationError
 
     data object FunctionReferenceExpected : InvocationError

@@ -17,9 +17,9 @@ internal fun TableCopyExecutor(
     val srcTableInstance = instruction.srcTable // taby
     val dstTableInstance = instruction.destTable // tabx
 
-    val elementsToCopy = stack.popI32().bind()
-    val srcOffset = stack.popI32().bind()
-    val dstOffset = stack.popI32().bind()
+    val elementsToCopy = stack.popI32()
+    val srcOffset = stack.popI32()
+    val dstOffset = stack.popI32()
 
     if (elementsToCopy < 0 ||
         srcOffset < 0 ||

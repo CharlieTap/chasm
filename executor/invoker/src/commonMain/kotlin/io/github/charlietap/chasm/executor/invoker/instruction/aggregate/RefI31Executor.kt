@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.wrapI31
@@ -24,7 +23,7 @@ internal inline fun RefI31Executor(
 ) {
 
     val (stack) = context
-    val value = stack.popI32().bind()
+    val value = stack.popI32()
 
     val i31 = i31Wrapper(value)
 

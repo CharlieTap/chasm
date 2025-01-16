@@ -35,8 +35,8 @@ internal inline fun ArrayNewElementExecutor(
         .bind()
     val elementInstance = store.element(elementAddress).bind()
 
-    val arrayLength = stack.popI32().bind()
-    val arrayStartOffsetInSegment = stack.popI32().bind()
+    val arrayLength = stack.popI32()
+    val arrayStartOffsetInSegment = stack.popI32()
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + arrayLength
 
     if (arrayEndOffsetInSegment > elementInstance.elements.size) {
