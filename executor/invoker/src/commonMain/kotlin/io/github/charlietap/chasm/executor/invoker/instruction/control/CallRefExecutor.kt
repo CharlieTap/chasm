@@ -11,8 +11,8 @@ internal fun CallRefExecutor(
     instruction: ControlInstruction.CallRef,
 ) {
     val (stack, store) = context
-    val value = stack.popFunctionAddress().bind()
+    val address = stack.popFunctionAddress()
 
-    val instruction = store.instruction(value.address).bind()
+    val instruction = store.instruction(address).bind()
     instruction(context)
 }

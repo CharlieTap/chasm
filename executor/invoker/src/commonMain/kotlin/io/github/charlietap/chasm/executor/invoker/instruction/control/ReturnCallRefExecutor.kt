@@ -24,11 +24,10 @@ internal inline fun ReturnCallRefExecutor(
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
 ) {
-
     val (stack, store) = context
-    val value = stack.popFunctionAddress().bind()
+    val address = stack.popFunctionAddress()
 
-    when (val instance = store.function(value.address).bind()) {
+    when (val instance = store.function(address).bind()) {
         is FunctionInstance.HostFunction -> hostFunctionCall(context, instance)
         is FunctionInstance.WasmFunction -> wasmFunctionCall(context, instance)
     }
