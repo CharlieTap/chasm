@@ -41,8 +41,7 @@ internal inline fun StructGetExecutor(
     val structType = definedTypeExpander(definedType).structType().bind()
     val fieldType = structType.field(fieldIndex).bind()
 
-    val structRef = stack.popStructReference().bind()
-    val structInstance = structRef.instance
+    val structInstance = stack.popStructReference()
 
     val fieldValue = structInstance.field(fieldIndex).bind()
     val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack).bind()

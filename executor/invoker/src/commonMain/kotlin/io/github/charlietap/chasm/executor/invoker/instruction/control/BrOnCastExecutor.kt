@@ -67,7 +67,7 @@ internal inline fun BrOnCastExecutor(
     val frame = stack.peekFrame()
     val moduleInstance = frame.instance
 
-    val referenceValue = stack.peekReference().bind()
+    val referenceValue = stack.peekReference()
     val closedReferenceType1 = typeOfReferenceValue(referenceValue, store, moduleInstance)
         .toResultOr { InvocationError.Trap.TrapEncountered }
         .bind()
