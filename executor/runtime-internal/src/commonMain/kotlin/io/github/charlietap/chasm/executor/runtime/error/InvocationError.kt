@@ -69,8 +69,6 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object MissingStackFrame : InvocationError
 
-    data object MissingStackHandler : InvocationError
-
     data object MissingInstruction : InvocationError
 
     data object MissingStackLabel : InvocationError

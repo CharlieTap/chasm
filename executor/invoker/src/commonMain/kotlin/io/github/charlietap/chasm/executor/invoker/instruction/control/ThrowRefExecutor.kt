@@ -13,7 +13,6 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
-import io.github.charlietap.chasm.executor.runtime.ext.popHandler
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.ext.tagAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
@@ -118,7 +117,7 @@ internal inline fun ThrowRefExecutor(
 
 private inline fun jumpToHandlerInstruction(stack: Stack): ExceptionHandler {
 
-    val handler = stack.popHandler().bind()
+    val handler = stack.popHandler()
 
     stack.shrinkLabels(0, handler.labelsDepth)
     stack.shrinkFrames(0, handler.framesDepth)
