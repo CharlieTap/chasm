@@ -53,6 +53,8 @@ class ValueStack
             null
         }
 
+        fun peek(): ExecutionValue = elements[top - 1]!!
+
         fun peekOrNull(): ExecutionValue? = try {
             elements[top - 1]
         } catch (_: Exception) {

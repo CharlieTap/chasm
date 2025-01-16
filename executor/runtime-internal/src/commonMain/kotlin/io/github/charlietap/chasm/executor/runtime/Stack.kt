@@ -117,7 +117,13 @@ data class Stack(
 
     fun peekLabelOrNull(): Entry.Label? = labels.peekOrNull()
 
-    fun peekValueOrNull(): ExecutionValue? = values.peekOrNull()
+    fun peekValue(): ExecutionValue = try {
+        values.peek()
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.MissingStackValue)
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.MissingStackValue)
+    }
 
     fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNthOrNull(n)
 

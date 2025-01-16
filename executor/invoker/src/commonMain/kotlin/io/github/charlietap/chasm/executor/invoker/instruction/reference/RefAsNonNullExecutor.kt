@@ -14,7 +14,7 @@ internal inline fun RefAsNonNullExecutor(
 
     val (stack) = context
 
-    val value = stack.peekValueOrNull()
+    val value = stack.peekValue()
 
     if (value is ReferenceValue) {
         if (value is ReferenceValue.Null) {

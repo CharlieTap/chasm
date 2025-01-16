@@ -34,10 +34,6 @@ inline fun Stack.pushf64(f64: Double) {
     push(F64(f64))
 }
 
-inline fun Stack.peekValue(): Result<ExecutionValue, InvocationError.MissingStackValue> {
-    return peekValueOrNull()?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
-}
-
 inline fun Stack.peekNthLabel(n: Int): Result<Stack.Entry.Label, InvocationError.MissingStackLabel> {
     return peekNthLabelOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackLabel)
 }
@@ -85,7 +81,7 @@ inline fun Stack.popReference(): Result<ReferenceValue, InvocationError.MissingS
 }
 
 inline fun Stack.peekReference(): Result<ReferenceValue, InvocationError.MissingStackValue> {
-    return (peekValueOrNull() as? ReferenceValue)?.let {
+    return (peekValue() as? ReferenceValue)?.let {
         Ok(it)
     } ?: Err(InvocationError.MissingStackValue)
 }
