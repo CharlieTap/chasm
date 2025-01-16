@@ -37,20 +37,15 @@ class InstructionStack
             top += values.size
         }
 
+        // we intentionally leave the instruction in the stack
+        // and just move the stack pointer, this memory will not be reclaimed
+        // irrespective as the thread object has a reference to it,
+        // and we benefit from the performance not setting it on each loop
         fun pop(): DispatchableInstruction {
             top--
             val value = elements[top]
-            elements[top] = null
+            // elements[top] = null
             return value!!
-        }
-
-        fun popOrNull(): DispatchableInstruction? = try {
-            top--
-            val value = elements[top]
-            elements[top] = null
-            value
-        } catch (_: Exception) {
-            null
         }
 
         fun peekOrNull(): DispatchableInstruction? = try {

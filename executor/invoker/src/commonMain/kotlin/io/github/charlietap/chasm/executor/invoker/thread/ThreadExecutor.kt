@@ -37,15 +37,23 @@ internal fun ThreadExecutor(
     )
 
     stack.push(thread.frame)
-    stack.push(frameCleaner)
     thread.frame.locals.forEach { local ->
         stack.push(local)
     }
 
+    var loop = true
+
+    @Suppress("UNUSED_PARAMETER")
+    fun exitLoop(ctx: ExecutionContext) {
+        loop = false
+    }
+
+    stack.push(::exitLoop)
+    stack.push(frameCleaner)
     stack.push(thread.instructions)
 
     try {
-        while (stack.instructionsDepth() > 0) {
+        while (loop) {
             val instruction = stack.popInstruction()
             instruction(context)
         }

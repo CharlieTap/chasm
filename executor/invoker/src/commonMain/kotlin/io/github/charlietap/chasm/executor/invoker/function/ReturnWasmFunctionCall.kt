@@ -11,7 +11,6 @@ internal inline fun ReturnWasmFunctionCall(
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
 ) {
-
     val (stack) = context
     val frame = stack.peekFrame()
     val type = instance.functionType
