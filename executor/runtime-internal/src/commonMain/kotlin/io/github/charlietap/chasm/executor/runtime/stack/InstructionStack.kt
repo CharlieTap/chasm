@@ -37,6 +37,13 @@ class InstructionStack
             top += values.size
         }
 
+        fun pop(): DispatchableInstruction {
+            top--
+            val value = elements[top]
+            elements[top] = null
+            return value!!
+        }
+
         fun popOrNull(): DispatchableInstruction? = try {
             top--
             val value = elements[top]

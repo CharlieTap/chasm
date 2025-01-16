@@ -46,7 +46,7 @@ internal fun ThreadExecutor(
 
     try {
         while (stack.instructionsDepth() > 0) {
-            val instruction = stack.popInstructionOrNull() ?: break
+            val instruction = stack.popInstruction()
             instruction(context)
         }
     } catch (exception: InvocationException) {

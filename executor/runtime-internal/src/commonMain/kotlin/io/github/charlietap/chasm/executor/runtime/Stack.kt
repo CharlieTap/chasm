@@ -91,7 +91,7 @@ data class Stack(
 
     fun popHandlerOrNull(): ExceptionHandler? = handlers.popOrNull()
 
-    fun popInstructionOrNull(): DispatchableInstruction? = instructions.popOrNull()
+    fun popInstruction(): DispatchableInstruction = instructions.pop()
 
     fun popLabelOrNull(): Entry.Label? = labels.popOrNull()
 
