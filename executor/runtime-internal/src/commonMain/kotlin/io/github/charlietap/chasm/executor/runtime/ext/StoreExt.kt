@@ -1,7 +1,15 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.DataLookupFailed
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.ElementLookupFailed
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.ExceptionLookupFailed
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.FunctionLookupFailed
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.GlobalLookupFailed
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.InstructionLookupFailed
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.MemoryLookupFailed
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.TableLookupFailed
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError.TagLookupFailed
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
@@ -17,71 +25,71 @@ import io.github.charlietap.chasm.executor.runtime.store.Store
 inline fun Store.function(address: Address.Function): FunctionInstance = try {
     functions[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(FunctionLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(FunctionLookupFailed(address))
 }
 
 inline fun Store.table(address: Address.Table): TableInstance = try {
     tables[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(TableLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(TableLookupFailed(address))
 }
 
 inline fun Store.memory(address: Address.Memory): MemoryInstance = try {
     memories[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(MemoryLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(MemoryLookupFailed(address))
 }
 
 inline fun Store.tag(address: Address.Tag): TagInstance = try {
     tags[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(TagLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(TagLookupFailed(address))
 }
 
 inline fun Store.global(address: Address.Global): GlobalInstance = try {
     globals[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(GlobalLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(GlobalLookupFailed(address))
 }
 
 inline fun Store.element(address: Address.Element): ElementInstance = try {
     elements[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(ElementLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(ElementLookupFailed(address))
 }
 
 inline fun Store.data(address: Address.Data): DataInstance = try {
     data[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(DataLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(DataLookupFailed(address))
 }
 
 inline fun Store.exception(address: Address.Exception): ExceptionInstance = try {
     exceptions[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(ExceptionLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(ExceptionLookupFailed(address))
 }
 
 inline fun Store.instruction(address: Address.Function): DispatchableInstruction = try {
     instructions[address.address]
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(InstructionLookupFailed(address))
 } catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StoreLookupFailed(address))
+    throw InvocationException(InstructionLookupFailed(address))
 }

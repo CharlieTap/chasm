@@ -16,7 +16,34 @@ sealed interface InvocationError : ModuleTrapError {
     value class FunctionNotFound(val function: String) : InvocationError
 
     @JvmInline
-    value class StoreLookupFailed(val address: Address) : InvocationError
+    value class InstructionLookupFailed(val address: Address.Function) : InvocationError
+
+    @JvmInline
+    value class FunctionLookupFailed(val address: Address.Function) : InvocationError
+
+    @JvmInline
+    value class TableLookupFailed(val address: Address.Table) : InvocationError
+
+    @JvmInline
+    value class MemoryLookupFailed(val address: Address.Memory) : InvocationError
+
+    @JvmInline
+    value class TagLookupFailed(val address: Address.Tag) : InvocationError
+
+    @JvmInline
+    value class GlobalLookupFailed(val address: Address.Global) : InvocationError
+
+    @JvmInline
+    value class ElementLookupFailed(val address: Address.Element) : InvocationError
+
+    @JvmInline
+    value class DataLookupFailed(val address: Address.Data) : InvocationError
+
+    @JvmInline
+    value class ExceptionLookupFailed(val address: Address.Exception) : InvocationError
+
+    @JvmInline
+    value class HostLookupFailed(val address: Address.Host) : InvocationError
 
     @JvmInline
     value class FunctionTypeLookupFailed(val index: Int) : InvocationError
