@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
@@ -35,10 +34,6 @@ inline fun Stack.pushf32(f32: Float) {
 
 inline fun Stack.pushf64(f64: Double) {
     push(F64(f64))
-}
-
-inline fun Stack.peekNthValue(n: Int): Result<ExecutionValue, InvocationError.MissingStackValue> {
-    return peekNthValueOrNull(n)?.let(::Ok) ?: Err(InvocationError.MissingStackValue)
 }
 
 inline fun Stack.popHandler(): Result<ExceptionHandler, InvocationError.UncaughtException> {

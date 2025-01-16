@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.stack
 
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import kotlin.jvm.JvmOverloads
 
@@ -37,34 +39,31 @@ class ValueStack
             top += values.size
         }
 
-        fun pop(): ExecutionValue {
+        fun pop(): ExecutionValue = try {
             top--
             val value = elements[top]
             elements[top] = null
-            return value!!
+            value!!
+        } catch (_: IndexOutOfBoundsException) {
+            throw InvocationException(InvocationError.MissingStackValue)
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.MissingStackValue)
         }
 
-        fun popOrNull(): ExecutionValue? = try {
-            top--
-            val value = elements[top]
-            elements[top] = null
-            value
-        } catch (_: Exception) {
-            null
+        fun peek(): ExecutionValue = try {
+            elements[top - 1]!!
+        } catch (_: IndexOutOfBoundsException) {
+            throw InvocationException(InvocationError.MissingStackValue)
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.MissingStackValue)
         }
 
-        fun peek(): ExecutionValue = elements[top - 1]!!
-
-        fun peekOrNull(): ExecutionValue? = try {
-            elements[top - 1]
-        } catch (_: Exception) {
-            null
-        }
-
-        fun peekNthOrNull(n: Int): ExecutionValue? = try {
-            elements[top - 1 - n]
-        } catch (_: Exception) {
-            null
+        fun peekNth(n: Int): ExecutionValue = try {
+            elements[top - 1 - n]!!
+        } catch (_: IndexOutOfBoundsException) {
+            throw InvocationException(InvocationError.MissingStackValue)
+        } catch (_: IllegalArgumentException) {
+            throw InvocationException(InvocationError.MissingStackValue)
         }
 
         fun shrink(preserveTopN: Int, depth: Int) {

@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime
 
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStack
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
@@ -62,15 +60,7 @@ data class Stack(
         values = valuesDepth(),
     )
 
-    fun push(frame: ActivationFrame) {
-        return try {
-            frames.push(frame)
-        } catch (_: IndexOutOfBoundsException) {
-            throw InvocationException(InvocationError.CallStackExhausted)
-        } catch (_: IllegalArgumentException) {
-            throw InvocationException(InvocationError.CallStackExhausted)
-        }
-    }
+    fun push(frame: ActivationFrame) = frames.push(frame)
 
     fun push(handler: ExceptionHandler) = handlers.push(handler)
 
@@ -82,13 +72,7 @@ data class Stack(
 
     fun push(many: Array<DispatchableInstruction>) = instructions.pushAll(many)
 
-    fun popFrame(): ActivationFrame = try {
-        frames.pop()
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.MissingStackFrame)
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.MissingStackFrame)
-    }
+    fun popFrame(): ActivationFrame = frames.pop()
 
     fun popHandlerOrNull(): ExceptionHandler? = handlers.popOrNull()
 
@@ -96,39 +80,19 @@ data class Stack(
 
     fun popLabel(): Entry.Label? = labels.pop()
 
-    fun popValue(): ExecutionValue = try {
-        values.pop()
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.MissingStackValue)
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.MissingStackValue)
-    }
+    fun popValue(): ExecutionValue = values.pop()
 
-    fun peekFrame(): ActivationFrame {
-        return try {
-            frames.peek()
-        } catch (_: IndexOutOfBoundsException) {
-            throw InvocationException(InvocationError.MissingStackFrame)
-        } catch (_: IllegalArgumentException) {
-            throw InvocationException(InvocationError.MissingStackFrame)
-        }
-    }
+    fun peekFrame(): ActivationFrame = frames.peek()
 
     fun peekInstructionOrNull(): DispatchableInstruction? = instructions.peekOrNull()
 
-    fun peekValue(): ExecutionValue = try {
-        values.peek()
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.MissingStackValue)
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.MissingStackValue)
-    }
+    fun peekValue(): ExecutionValue = values.peek()
 
-    fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNthOrNull(n)
+    fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNth(n)
 
     fun peekNthLabel(n: Int): Entry.Label = labels.peekNth(n)
 
-    fun peekNthValueOrNull(n: Int): ExecutionValue? = values.peekNthOrNull(n)
+    fun peekNthValue(n: Int): ExecutionValue = values.peekNth(n)
 
     fun shrinkFrames(
         preserveTopN: Int,
