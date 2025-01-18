@@ -78,7 +78,7 @@ class WasmFunctionCallTest {
             depths = LabelStackDepths(
                 instructions = 1,
                 labels = 0,
-                values = 0,
+                values = 3,
             ),
         )
 
@@ -91,11 +91,8 @@ class WasmFunctionCallTest {
             stack.push(value)
         }
 
-        val locals = (params + function.locals).toMutableList()
-
         val frame = frame(
             arity = functionType.results.types.size,
-            locals = locals,
             instance = functionInstance.module,
         )
         val frameDispatchable = dispatchableInstruction()
@@ -151,11 +148,7 @@ class WasmFunctionCallTest {
         val definedType = functionType.definedType()
 
         val function = runtimeFunction(
-            locals = arrayOf(
-                nullReferenceValue(
-                    heapType = functionHeapType(),
-                ),
-            ),
+            locals = arrayOf(),
             body = runtimeExpression(
                 arrayOf(
                     dispatchableInstruction(),
@@ -180,11 +173,8 @@ class WasmFunctionCallTest {
             stack.push(value)
         }
 
-        val locals = (params + function.locals).toMutableList()
-
         val frame = frame(
             arity = functionType.results.types.size,
-            locals = locals,
             instance = functionInstance.module,
         )
 

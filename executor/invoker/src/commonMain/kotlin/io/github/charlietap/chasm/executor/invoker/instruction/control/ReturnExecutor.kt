@@ -15,4 +15,6 @@ internal inline fun ReturnExecutor(
     stack.shrinkInstructions(0, depths.instructions)
     stack.shrinkLabels(0, depths.labels)
     stack.shrinkValues(frame.arity, depths.values)
+
+    stack.setFramePointer(frame.previousFramePointer)
 }

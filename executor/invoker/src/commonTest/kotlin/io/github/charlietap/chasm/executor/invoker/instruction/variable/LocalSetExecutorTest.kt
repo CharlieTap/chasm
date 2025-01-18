@@ -14,13 +14,13 @@ class LocalSetExecutorTest {
     @Test
     fun `can execute a local set instruction`() {
 
-        val stack = stack()
+        val local = i32(0)
+        val stack = stack(
+            values = listOf(local),
+        )
         val context = executionContext(stack)
 
-        val local = i32(0)
-
         val frame = frame(
-            locals = mutableListOf(local),
             instance = moduleInstance(),
         )
 
@@ -38,7 +38,7 @@ class LocalSetExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
-        assertEquals(0, stack.valuesDepth())
-        assertEquals(expected, frame.locals[0])
+        assertEquals(1, stack.valuesDepth())
+        assertEquals(expected, stack.local(0))
     }
 }

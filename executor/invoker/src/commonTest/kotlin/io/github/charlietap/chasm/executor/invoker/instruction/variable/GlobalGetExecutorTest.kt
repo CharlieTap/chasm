@@ -34,7 +34,6 @@ class GlobalGetExecutorTest {
         val context = executionContext(stack, store)
 
         val frame = frame(
-            locals = mutableListOf(),
             instance = moduleInstance,
         )
 

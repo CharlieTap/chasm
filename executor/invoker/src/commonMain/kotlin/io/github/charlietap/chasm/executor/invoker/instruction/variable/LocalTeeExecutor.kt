@@ -7,10 +7,8 @@ internal inline fun LocalTeeExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction.LocalTee,
 ) {
-    val (stack) = context
-
-    val value = stack.peekValue()
-    val frame = stack.peekFrame()
-
-    frame.locals[instruction.localIdx] = value
+    context.stack.setLocal(
+        instruction.localIdx,
+        context.stack.peekValue(),
+    )
 }

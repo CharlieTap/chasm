@@ -7,7 +7,8 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 
 internal typealias WasmFunctionCall = (ExecutionContext, FunctionInstance.WasmFunction) -> Unit
 
@@ -28,37 +29,42 @@ internal inline fun WasmFunctionCall(
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
     noinline frameCleaner: DispatchableInstruction,
 ) {
-
     val (stack) = context
     val type = instance.functionType
     val params = type.params.types.size
     val results = type.results.types.size
 
-    val locals = MutableList<ExecutionValue>(params + instance.function.locals.size) { ExecutionValue.Uninitialised }
-    for (i in (params - 1) downTo 0) {
-        locals[i] = stack.popValue()
-    }
-    var idx = params
-    for (local in instance.function.locals) {
-        locals[idx++] = local
-    }
+    val valuesDepth = stack.valuesDepth() - params
+    stack.push(instance.function.locals)
 
-    val depths = stack.depths()
+    val depths = FrameStackDepths(
+        handlers = stack.handlersDepth(),
+        instructions = stack.instructionsDepth(),
+        labels = stack.labelsDepth(),
+        values = valuesDepth,
+    )
     val frame = ActivationFrame(
         arity = results,
         depths = depths,
-        locals = locals,
         instance = instance.module,
+        previousFramePointer = stack.getFramePointer(),
     )
 
     stack.push(frame)
     stack.push(frameCleaner)
 
+    val labelDepths = LabelStackDepths(
+        instructions = stack.instructionsDepth(),
+        labels = stack.labelsDepth(),
+        values = stack.valuesDepth(),
+    )
+
     val label = Stack.Entry.Label(
         arity = results,
-        depths = stack.depths(),
+        depths = labelDepths,
         continuation = null,
     )
 
+    stack.setFramePointer(valuesDepth)
     instructionBlockExecutor(stack, label, instance.function.body.instructions, null)
 }

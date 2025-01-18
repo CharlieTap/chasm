@@ -12,18 +12,21 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-internal typealias ThreadExecutor = (Configuration) -> Result<List<ExecutionValue>, InvocationError>
+internal typealias ThreadExecutor = (Configuration, List<ExecutionValue>) -> Result<List<ExecutionValue>, InvocationError>
 
 internal fun ThreadExecutor(
     configuration: Configuration,
+    params: List<ExecutionValue>,
 ): Result<List<ExecutionValue>, InvocationError> =
     ThreadExecutor(
         configuration = configuration,
+        params = params,
         frameCleaner = ::FrameInstructionExecutor,
     )
 
 internal fun ThreadExecutor(
     configuration: Configuration,
+    params: List<ExecutionValue>,
     frameCleaner: DispatchableInstruction,
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
@@ -37,7 +40,7 @@ internal fun ThreadExecutor(
     )
 
     stack.push(thread.frame)
-    thread.frame.locals.forEach { local ->
+    params.forEach { local ->
         stack.push(local)
     }
 

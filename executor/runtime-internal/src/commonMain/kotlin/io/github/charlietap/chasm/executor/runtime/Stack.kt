@@ -60,6 +60,16 @@ data class Stack(
         values = valuesDepth(),
     )
 
+    fun getFramePointer() = values.framePointer
+
+    fun setFramePointer(pointer: Int) {
+        values.framePointer = pointer
+    }
+
+    fun local(localIndex: Int): ExecutionValue = values.getLocal(localIndex)
+
+    fun setLocal(localIndex: Int, value: ExecutionValue) = values.setLocal(localIndex, value)
+
     fun push(frame: ActivationFrame) = frames.push(frame)
 
     fun push(handler: ExceptionHandler) = handlers.push(handler)
@@ -69,6 +79,8 @@ data class Stack(
     fun push(label: Entry.Label) = labels.push(label)
 
     fun push(value: ExecutionValue) = values.push(value)
+
+    fun push(many: Array<ExecutionValue>) = values.pushAll(many)
 
     fun push(many: Array<DispatchableInstruction>) = instructions.pushAll(many)
 

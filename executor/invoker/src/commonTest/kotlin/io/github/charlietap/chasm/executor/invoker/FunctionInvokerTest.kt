@@ -22,7 +22,7 @@ class FunctionInvokerTest {
     fun `can invoke a function and return a result`() {
 
         val config = runtimeConfig()
-        val locals = mutableListOf<ExecutionValue>(i32(117))
+        val params = mutableListOf<ExecutionValue>(i32(117))
         val address = functionAddress(0)
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(address),
@@ -42,7 +42,9 @@ class FunctionInvokerTest {
             instructions = mutableListOf(functionInstruction),
         )
 
-        val threadExecutor: ThreadExecutor = { config ->
+        val threadExecutor: ThreadExecutor = { _config, _params ->
+            assertEquals(config, _config.config)
+            assertEquals(params, _params)
             Ok(listOf(i32(117)))
         }
 
@@ -50,7 +52,7 @@ class FunctionInvokerTest {
             config = config,
             store = store,
             address = address,
-            values = locals,
+            values = params,
             threadExecutor = threadExecutor,
         )
 

@@ -29,15 +29,15 @@ class ExpressionEvaluatorTest {
         val thread = thread(
             frame(
                 arity = 1,
-                locals = mutableListOf(),
                 instance = instance,
             ),
             expression.instructions,
         )
         val expectedConfig = configuration(store, thread)
 
-        val threadExecutor: ThreadExecutor = { config ->
+        val threadExecutor: ThreadExecutor = { config, params ->
             assertEquals(expectedConfig, config)
+            assertEquals(emptyList(), params)
             Ok(listOf(i32(117)))
         }
 
@@ -65,15 +65,15 @@ class ExpressionEvaluatorTest {
         val thread = thread(
             frame(
                 arity = 0,
-                locals = mutableListOf(),
                 instance = instance,
             ),
             expression.instructions,
         )
         val expectedConfig = configuration(store, thread)
 
-        val threadExecutor: ThreadExecutor = { config ->
+        val threadExecutor: ThreadExecutor = { config, params ->
             assertEquals(expectedConfig, config)
+            assertEquals(emptyList(), params)
             Ok(emptyList())
         }
 

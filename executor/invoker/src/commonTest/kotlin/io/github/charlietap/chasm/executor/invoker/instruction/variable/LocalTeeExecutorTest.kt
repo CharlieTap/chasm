@@ -14,13 +14,13 @@ class LocalTeeExecutorTest {
     @Test
     fun `can execute a local tee instruction`() {
 
-        val stack = stack()
+        val local = i32(0)
+        val stack = stack(
+            values = listOf(local),
+        )
         val context = executionContext(stack)
 
-        val local = i32(0)
-
         val frame = frame(
-            locals = mutableListOf(local),
             instance = moduleInstance(),
         )
 
@@ -38,8 +38,8 @@ class LocalTeeExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
-        assertEquals(1, stack.valuesDepth())
+        assertEquals(2, stack.valuesDepth())
         assertEquals(expected, stack.popValue())
-        assertEquals(expected, frame.locals[0])
+        assertEquals(expected, stack.local(0))
     }
 }

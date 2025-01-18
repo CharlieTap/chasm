@@ -9,6 +9,8 @@ class ValueStack
     @JvmOverloads
     constructor(minCapacity: Int = MIN_CAPACITY) : List<ExecutionValue> {
 
+        var framePointer = 0
+
         private var elements: Array<ExecutionValue?>
         private var top = 0
 
@@ -102,6 +104,12 @@ class ValueStack
         private fun doubleCapacity() {
             val newCapacity = elements.size * 2
             elements = elements.copyOf(newCapacity)
+        }
+
+        fun getLocal(localIndex: Int): ExecutionValue = elements[framePointer + localIndex]!!
+
+        fun setLocal(localIndex: Int, value: ExecutionValue) {
+            elements[framePointer + localIndex] = value
         }
 
         override val size: Int

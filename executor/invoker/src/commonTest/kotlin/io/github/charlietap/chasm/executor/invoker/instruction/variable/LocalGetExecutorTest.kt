@@ -14,13 +14,13 @@ class LocalGetExecutorTest {
     @Test
     fun `can execute a local get instruction`() {
 
-        val stack = stack()
+        val local = i32(117)
+        val stack = stack(
+            values = listOf(local),
+        )
         val context = executionContext(stack)
 
-        val local = i32(117)
-
         val frame = frame(
-            locals = mutableListOf(local),
             instance = moduleInstance(),
         )
 
@@ -37,7 +37,7 @@ class LocalGetExecutorTest {
 
         assertEquals(Unit, actual)
         assertEquals(1, stack.framesDepth())
-        assertEquals(1, stack.valuesDepth())
+        assertEquals(2, stack.valuesDepth())
         assertEquals(expected, stack.popValue())
     }
 }

@@ -17,11 +17,8 @@ class ThreadExecutorTest {
     @Test
     fun `can execute a thread and return a result`() {
 
-        val locals = mutableListOf<ExecutionValue>(i32(2), i32(3))
-
         val frame = frame(
             arity = 1,
-            locals = locals,
             instance = moduleInstance(),
         )
 
@@ -49,10 +46,12 @@ class ThreadExecutorTest {
             assertEquals(1, context.stack.instructionsDepth()) // exit loop instr
             Ok(Unit)
         }
+        val params = mutableListOf<ExecutionValue>(i32(2), i32(3))
 
         val actual = ThreadExecutor(
             configuration = configuration,
             frameCleaner = frameDispatchable,
+            params = params,
         )
 
         assertEquals(Ok(listOf(i32(0))), actual)

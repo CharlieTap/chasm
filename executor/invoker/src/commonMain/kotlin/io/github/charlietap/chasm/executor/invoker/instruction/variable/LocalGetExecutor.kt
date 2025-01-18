@@ -7,8 +7,7 @@ internal inline fun LocalGetExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction.LocalGet,
 ) {
-    val (stack) = context
-    val frame = stack.peekFrame()
-
-    stack.push(frame.locals[instruction.localIdx])
+    context.stack.push(
+        context.stack.local(instruction.localIdx),
+    )
 }

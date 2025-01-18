@@ -7,10 +7,8 @@ internal inline fun LocalSetExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction.LocalSet,
 ) {
-    val (stack) = context
-
-    val value = stack.popValue()
-    val frame = stack.peekFrame()
-
-    frame.locals[instruction.localIdx] = value
+    context.stack.setLocal(
+        instruction.localIdx,
+        context.stack.popValue(),
+    )
 }

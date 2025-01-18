@@ -45,7 +45,6 @@ internal inline fun ExpressionEvaluator(
     val thread = Thread(
         frame = ActivationFrame(
             arity = arity.value,
-            locals = mutableListOf(),
             instance = instance,
             depths = FrameStackDepths(0, 0, 0, 0),
         ),
@@ -58,5 +57,5 @@ internal inline fun ExpressionEvaluator(
         thread = thread,
     )
 
-    return threadExecutor(configuration).map { it.firstOrNull() }
+    return threadExecutor(configuration, emptyList()).map { it.firstOrNull() }
 }

@@ -48,7 +48,6 @@ internal inline fun FunctionInvoker(
         frame = ActivationFrame(
             arity = arity,
             instance = function.module,
-            locals = values.toMutableList(),
             depths = FrameStackDepths(0, 0, 0, 0),
         ),
         instructions = arrayOf(instruction),
@@ -60,5 +59,5 @@ internal inline fun FunctionInvoker(
         config = config,
     )
 
-    threadExecutor(configuration).bind()
+    threadExecutor(configuration, values).bind()
 }
