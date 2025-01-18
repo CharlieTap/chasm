@@ -40,7 +40,7 @@ internal inline fun WasmFunctionCall(
     }
     var idx = params
     for (local in instance.function.locals) {
-        locals[idx++] = local.default
+        locals[idx++] = local
     }
 
     val depths = stack.depths()

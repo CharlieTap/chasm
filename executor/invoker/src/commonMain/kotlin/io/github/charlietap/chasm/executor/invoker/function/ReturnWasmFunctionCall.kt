@@ -20,7 +20,7 @@ internal inline fun ReturnWasmFunctionCall(
         locals[i] = stack.popValue()
     }
     for (local in instance.function.locals) {
-        locals[params++] = local.default
+        locals[params++] = local
     }
 
     val depths = frame.depths

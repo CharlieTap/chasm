@@ -2,11 +2,12 @@ package io.github.charlietap.chasm.executor.runtime.function
 
 import io.github.charlietap.chasm.ast.module.Index.FunctionIndex
 import io.github.charlietap.chasm.ast.module.Index.TypeIndex
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 data class Function(
     val idx: FunctionIndex,
     val typeIndex: TypeIndex,
-    val locals: Array<Local>,
+    val locals: Array<ExecutionValue>,
     val body: Expression,
 ) {
     companion object {

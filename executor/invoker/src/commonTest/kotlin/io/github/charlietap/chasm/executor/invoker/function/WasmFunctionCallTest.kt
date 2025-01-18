@@ -1,25 +1,18 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.fixture.ast.type.functionHeapType
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
-import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
-import io.github.charlietap.chasm.fixture.ast.type.referenceValueType
 import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
-import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeLocal
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.label
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
@@ -61,13 +54,8 @@ class WasmFunctionCallTest {
 
         val function = runtimeFunction(
             locals = arrayOf(
-                runtimeLocal(
-                    type = referenceValueType(
-                        refNullReferenceType(functionHeapType()),
-                    ),
-                    default = nullReferenceValue(
-                        heapType = functionHeapType(),
-                    ),
+                nullReferenceValue(
+                    heapType = functionHeapType(),
                 ),
             ),
             body = runtimeExpression(
@@ -103,11 +91,7 @@ class WasmFunctionCallTest {
             stack.push(value)
         }
 
-        val locals = (
-            params + function.locals.map { local ->
-                local.type.default()
-            }
-        ).toMutableList()
+        val locals = (params + function.locals).toMutableList()
 
         val frame = frame(
             arity = functionType.results.types.size,
@@ -168,7 +152,9 @@ class WasmFunctionCallTest {
 
         val function = runtimeFunction(
             locals = arrayOf(
-                runtimeLocal(type = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Func))),
+                nullReferenceValue(
+                    heapType = functionHeapType(),
+                ),
             ),
             body = runtimeExpression(
                 arrayOf(
@@ -194,11 +180,7 @@ class WasmFunctionCallTest {
             stack.push(value)
         }
 
-        val locals = (
-            params + function.locals.map { local ->
-                local.type.default()
-            }
-        ).toMutableList()
+        val locals = (params + function.locals).toMutableList()
 
         val frame = frame(
             arity = functionType.results.types.size,
