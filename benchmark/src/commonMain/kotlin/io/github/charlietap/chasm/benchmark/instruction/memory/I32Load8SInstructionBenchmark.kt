@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.I32Load8SExecutor
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
-import io.github.charlietap.chasm.fixture.ast.instruction.memArg
 import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddres
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.i32Load8SRuntimeInstruction
+import io.github.charlietap.chasm.fixture.executor.runtime.instruction.runtimeMemArg
 import io.github.charlietap.chasm.fixture.executor.runtime.stack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
@@ -53,7 +53,7 @@ class I32Load8SInstructionBenchmark {
 
     private val instruction = i32Load8SRuntimeInstruction(
         memory = memoryInstance,
-        memArg = memArg(0u, 0u),
+        memArg = runtimeMemArg(0, 0),
     )
 
     private val frame = frame(

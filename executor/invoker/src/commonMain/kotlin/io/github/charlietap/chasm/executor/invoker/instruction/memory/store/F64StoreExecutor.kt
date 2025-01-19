@@ -31,7 +31,7 @@ internal inline fun F64StoreExecutor(
 
     val valueToStore = stack.popF64()
     val baseAddress = stack.popI32()
-    val effectiveAddress = baseAddress + instruction.memArg.offset.toInt()
+    val effectiveAddress = baseAddress + instruction.memArg.offset
 
     boundsChecker(effectiveAddress, Double.SIZE_BYTES, memory.size) {
         writer(memory.data, effectiveAddress, valueToStore).bind()

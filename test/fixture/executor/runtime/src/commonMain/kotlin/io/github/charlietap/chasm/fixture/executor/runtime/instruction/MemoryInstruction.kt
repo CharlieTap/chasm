@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.MemArg
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
-import io.github.charlietap.chasm.fixture.ast.instruction.memArg
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
 
@@ -12,7 +11,7 @@ fun memoryRuntimeInstruction(): MemoryInstruction = i32LoadRuntimeInstruction()
 
 fun i32LoadRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I32Load(
     memory = memory,
     memArg = memArg,
@@ -20,7 +19,7 @@ fun i32LoadRuntimeInstruction(
 
 fun i64LoadRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Load(
     memory = memory,
     memArg = memArg,
@@ -28,7 +27,7 @@ fun i64LoadRuntimeInstruction(
 
 fun f32LoadRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.F32Load(
     memory = memory,
     memArg = memArg,
@@ -36,7 +35,7 @@ fun f32LoadRuntimeInstruction(
 
 fun f64LoadRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.F64Load(
     memory = memory,
     memArg = memArg,
@@ -44,7 +43,7 @@ fun f64LoadRuntimeInstruction(
 
 fun i32Load8SRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I32Load8S(
     memory = memory,
     memArg = memArg,
@@ -52,7 +51,7 @@ fun i32Load8SRuntimeInstruction(
 
 fun i32Load8URuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I32Load8U(
     memory = memory,
     memArg = memArg,
@@ -60,7 +59,7 @@ fun i32Load8URuntimeInstruction(
 
 fun i32Load16SRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I32Load16S(
     memory = memory,
     memArg = memArg,
@@ -68,7 +67,7 @@ fun i32Load16SRuntimeInstruction(
 
 fun i32Load16URuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I32Load16U(
     memory = memory,
     memArg = memArg,
@@ -76,7 +75,7 @@ fun i32Load16URuntimeInstruction(
 
 fun i64Load8SRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Load8S(
     memory = memory,
     memArg = memArg,
@@ -84,7 +83,7 @@ fun i64Load8SRuntimeInstruction(
 
 fun i64Load8URuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Load8U(
     memory = memory,
     memArg = memArg,
@@ -92,7 +91,7 @@ fun i64Load8URuntimeInstruction(
 
 fun i64Load16SRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Load16S(
     memory = memory,
     memArg = memArg,
@@ -100,7 +99,7 @@ fun i64Load16SRuntimeInstruction(
 
 fun i64Load16URuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Load16U(
     memory = memory,
     memArg = memArg,
@@ -108,7 +107,7 @@ fun i64Load16URuntimeInstruction(
 
 fun i64Load32SRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Load32S(
     memory = memory,
     memArg = memArg,
@@ -116,7 +115,7 @@ fun i64Load32SRuntimeInstruction(
 
 fun i64Load32URuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Load32U(
     memory = memory,
     memArg = memArg,
@@ -124,7 +123,7 @@ fun i64Load32URuntimeInstruction(
 
 fun i32StoreRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I32Store(
     memory = memory,
     memArg = memArg,
@@ -132,7 +131,7 @@ fun i32StoreRuntimeInstruction(
 
 fun i64StoreRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Store(
     memory = memory,
     memArg = memArg,
@@ -140,7 +139,7 @@ fun i64StoreRuntimeInstruction(
 
 fun f32StoreRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.F32Store(
     memory = memory,
     memArg = memArg,
@@ -148,7 +147,7 @@ fun f32StoreRuntimeInstruction(
 
 fun f64StoreRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.F64Store(
     memory = memory,
     memArg = memArg,
@@ -156,7 +155,7 @@ fun f64StoreRuntimeInstruction(
 
 fun i32Store8RuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I32Store8(
     memory = memory,
     memArg = memArg,
@@ -164,7 +163,7 @@ fun i32Store8RuntimeInstruction(
 
 fun i32Store16RuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I32Store16(
     memory = memory,
     memArg = memArg,
@@ -172,7 +171,7 @@ fun i32Store16RuntimeInstruction(
 
 fun i64Store8RuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Store8(
     memory = memory,
     memArg = memArg,
@@ -180,7 +179,7 @@ fun i64Store8RuntimeInstruction(
 
 fun i64Store16RuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Store16(
     memory = memory,
     memArg = memArg,
@@ -188,7 +187,7 @@ fun i64Store16RuntimeInstruction(
 
 fun i64Store32RuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-    memArg: MemArg = memArg(),
+    memArg: MemArg = runtimeMemArg(),
 ) = MemoryInstruction.I64Store32(
     memory = memory,
     memArg = memArg,

@@ -30,7 +30,7 @@ internal inline fun I32Store8Executor(
 
     val valueToStore = stack.popI32()
     val baseAddress = stack.popI32()
-    val effectiveAddress = baseAddress + instruction.memArg.offset.toInt()
+    val effectiveAddress = baseAddress + instruction.memArg.offset
 
     boundsChecker(effectiveAddress, 1, memory.size) {
         writer(memory.data, effectiveAddress, valueToStore).bind()

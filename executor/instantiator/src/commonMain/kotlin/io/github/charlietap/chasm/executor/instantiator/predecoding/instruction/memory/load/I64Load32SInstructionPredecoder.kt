@@ -5,6 +5,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.MemArgPredecoder
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I64Load32SDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
@@ -22,16 +23,19 @@ internal fun I64Load32SInstructionPredecoder(
         context = context,
         instruction = instruction,
         dispatcher = ::I64Load32SDispatcher,
+        memArgPredecoder = ::MemArgPredecoder,
     )
 
 internal inline fun I64Load32SInstructionPredecoder(
     context: InstantiationContext,
     instruction: MemoryInstruction.I64Load32S,
     crossinline dispatcher: Dispatcher<I64Load32S>,
+    crossinline memArgPredecoder: MemArgPredecoder,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val memoryAddress = context.instance?.memoryAddress(instruction.memoryIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
     val memory = context.store.memory(memoryAddress)
+    val memArg = memArgPredecoder(instruction.memArg)
 
-    dispatcher(I64Load32S(memory, instruction.memArg))
+    dispatcher(I64Load32S(memory, memArg))
 }

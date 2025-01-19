@@ -32,7 +32,7 @@ internal inline fun I64Load8UExecutor(
     val memory = instruction.memory
 
     val baseAddress = stack.popI32()
-    val offset = instruction.memArg.offset.toInt()
+    val offset = instruction.memArg.offset
     val effectiveAddress = baseAddress + offset
 
     if (baseAddress < 0 || offset < 0) {

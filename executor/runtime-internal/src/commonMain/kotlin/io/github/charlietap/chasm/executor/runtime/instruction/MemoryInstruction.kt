@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import kotlin.jvm.JvmInline
