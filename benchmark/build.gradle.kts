@@ -27,12 +27,15 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation(projects.chasm)
                 implementation(projects.executor.invoker)
                 implementation(projects.executor.memory)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.executor.runtime)
 
                 implementation(libs.kotlinx.benchmark)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.test.resources)
             }
         }
 
@@ -42,4 +45,11 @@ kotlin {
             }
         }
     }
+}
+
+tasks.register<JavaExec>("coremark") {
+    group = "benchmark"
+    description = "Run the Coremark benchmark"
+    classpath = kotlin.jvm().compilations["main"].run { runtimeDependencyFiles + output.allOutputs }
+    mainClass.set("io.github.charlietap.chasm.benchmark.coremark.CoremarkBenchmarkKt")
 }
