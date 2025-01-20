@@ -25,6 +25,8 @@ jobs:
             task: iosSimulatorArm64Test
           - os: ubuntu-latest
             task: linuxX64Test
+          - os: ubuntu-24.04-arm
+            task: linuxArm64Test
     uses: ./.github/workflows/task-runner.yml
     with:
       runner: ${{ matrix.os }}
