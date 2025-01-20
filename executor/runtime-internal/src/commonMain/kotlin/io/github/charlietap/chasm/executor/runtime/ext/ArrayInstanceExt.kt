@@ -10,7 +10,7 @@ fun ArrayInstance.field(
     index: Index.FieldIndex,
 ): FieldValue = try {
     this.fields[index.idx.toInt()]
-} catch (e: IndexOutOfBoundsException) {
+} catch (_: IndexOutOfBoundsException) {
     throw InvocationException(InvocationError.ArrayFieldLookupFailed(index.idx.toInt()))
 } catch (_: IllegalArgumentException) {
     throw InvocationException(InvocationError.ArrayFieldLookupFailed(index.idx.toInt()))
