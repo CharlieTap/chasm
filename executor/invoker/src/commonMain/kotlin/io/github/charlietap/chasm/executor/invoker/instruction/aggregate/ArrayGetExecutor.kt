@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.bind
+import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
-import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.field
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -33,9 +32,7 @@ internal inline fun ArrayGetExecutor(
 
     val (stack) = context
     val frame = stack.peekFrame()
-    val definedType = frame.instance
-        .definedType(typeIndex)
-        .bind()
+    val definedType = frame.instance.definedType(typeIndex)
 
     val arrayType = definedTypeExpander(definedType).arrayType()
     val fieldType = arrayType.fieldType

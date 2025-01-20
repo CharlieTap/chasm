@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import com.github.michaelbull.result.Err
 import io.github.charlietap.chasm.executor.invoker.ext.bind
+import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
-import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
@@ -34,9 +34,8 @@ internal inline fun ArrayInitElementExecutor(
     val (stack, store) = context
     val (typeIndex, elementIndex) = instruction
     val frame = stack.peekFrame()
-    val definedType = frame.instance
-        .definedType(typeIndex)
-        .bind()
+    val definedType = frame.instance.definedType(typeIndex)
+
     val arrayType = definedTypeExpander(definedType).arrayType()
 
     val elementAddress = frame.instance

@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
+import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.default
-import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
@@ -30,9 +29,7 @@ internal inline fun StructNewDefaultExecutor(
     val (stack) = context
     val typeIndex = instruction.typeIndex
     val frame = stack.peekFrame()
-    val definedType = frame.instance
-        .definedType(typeIndex)
-        .bind()
+    val definedType = frame.instance.definedType(typeIndex)
 
     val structType = definedTypeExpander(definedType).structType()
     structType.fields.forEach { fieldType ->

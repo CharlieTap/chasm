@@ -3,10 +3,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import com.github.michaelbull.result.Err
 import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.executor.invoker.ext.bind
+import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
-import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -32,9 +32,7 @@ internal inline fun ArrayCopyExecutor(
     // y = src
     val (stack) = context
     val frame = stack.peekFrame()
-    val destDefinedType = frame.instance
-        .definedType(instruction.destinationTypeIndex)
-        .bind()
+    val destDefinedType = frame.instance.definedType(instruction.destinationTypeIndex)
 
     val destArrayType = definedTypeExpander(destDefinedType).arrayType()
     if (destArrayType.fieldType.mutability != Mutability.Var) {

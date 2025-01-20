@@ -4,14 +4,10 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-
-inline fun ModuleInstance.definedType(index: Index.TypeIndex): Result<DefinedType, InvocationError.FunctionTypeLookupFailed> =
-    types.getOrNull(index.idx.toInt())?.let(::Ok) ?: Err(InvocationError.FunctionTypeLookupFailed(index.idx.toInt()))
 
 inline fun ModuleInstance.functionAddress(index: Index.FunctionIndex): Result<Address.Function, InvocationError.FunctionAddressLookupFailed> =
     functionAddresses.getOrNull(index.idx.toInt())?.let(::Ok) ?: Err(InvocationError.FunctionAddressLookupFailed(index.idx.toInt()))

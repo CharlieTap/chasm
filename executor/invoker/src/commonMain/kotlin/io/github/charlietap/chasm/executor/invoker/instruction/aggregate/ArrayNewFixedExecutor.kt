@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
+import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
-import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -30,10 +29,7 @@ internal inline fun ArrayNewFixedExecutor(
     val (stack) = context
     val (typeIndex, size) = instruction
     val frame = stack.peekFrame()
-    val definedType = frame.instance
-        .definedType(typeIndex)
-        .bind()
-
+    val definedType = frame.instance.definedType(typeIndex)
     val arrayType = definedTypeExpander(definedType).arrayType()
 
     val fields = MutableList(size.toInt()) { _ ->

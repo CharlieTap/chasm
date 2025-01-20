@@ -5,11 +5,11 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.invoker.ext.bind
+import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -44,9 +44,7 @@ internal inline fun CallIndirectExecutor(
     val (stack, store) = context
     val frame = stack.peekFrame()
 
-    val expectedFunctionType = frame.instance
-        .definedType(typeIndex)
-        .bind()
+    val expectedFunctionType = frame.instance.definedType(typeIndex)
 
     val elementIndex = stack.popI32()
     val reference = table.element(elementIndex)

@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
+import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -29,9 +28,7 @@ internal inline fun StructNewExecutor(
 
     val (stack) = context
     val frame = stack.peekFrame()
-    val definedType = frame.instance
-        .definedType(instruction.typeIndex)
-        .bind()
+    val definedType = frame.instance.definedType(instruction.typeIndex)
 
     val structType = definedTypeExpander(definedType).structType()
 
