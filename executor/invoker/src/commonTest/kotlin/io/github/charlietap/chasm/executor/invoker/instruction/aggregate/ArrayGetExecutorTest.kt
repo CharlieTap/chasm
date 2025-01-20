@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -70,7 +69,7 @@ class ArrayGetExecutorTest {
             assertEquals(fieldType, _fieldType)
             assertEquals(signedUnpack, _signedUnpack)
 
-            Ok(executionValue)
+            executionValue
         }
 
         val expected = executionValue

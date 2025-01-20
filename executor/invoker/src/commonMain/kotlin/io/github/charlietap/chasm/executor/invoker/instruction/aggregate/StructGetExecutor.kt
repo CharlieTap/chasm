@@ -44,7 +44,7 @@ internal inline fun StructGetExecutor(
     val structInstance = stack.popStructReference()
 
     val fieldValue = structInstance.field(fieldIndex).bind()
-    val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack).bind()
+    val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack)
 
     stack.push(unpackedValue)
 }

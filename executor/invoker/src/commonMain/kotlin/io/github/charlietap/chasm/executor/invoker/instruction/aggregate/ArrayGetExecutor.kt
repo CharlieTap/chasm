@@ -44,8 +44,7 @@ internal inline fun ArrayGetExecutor(
     val arrayInstance = stack.popArrayReference()
 
     val fieldValue = arrayInstance.field(Index.FieldIndex(fieldIndex.toUInt()))
-
-    val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack).bind()
+    val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack)
 
     stack.push(unpackedValue)
 }
