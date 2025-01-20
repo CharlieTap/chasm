@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
-import com.github.michaelbull.result.Err
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.contains
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
@@ -39,7 +39,7 @@ internal inline fun MemoryCopyExecutor(
         !srcMemory.bounds.contains(sourceOffset..<sourceOffset + bytesToCopy) ||
         !dstMemory.bounds.contains(destinationOffset..<destinationOffset + bytesToCopy)
     ) {
-        Err(InvocationError.MemoryOperationOutOfBounds).bind()
+        throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
     }
 
     if (bytesToCopy == 0) return
