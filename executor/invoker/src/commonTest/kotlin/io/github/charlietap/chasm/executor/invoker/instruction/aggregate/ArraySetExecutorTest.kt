@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -74,7 +73,7 @@ class ArraySetExecutorTest {
             assertEquals(executionValue, _executionValue)
             assertEquals(fieldType, _fieldType)
 
-            Ok(updatedFieldValue)
+            updatedFieldValue
         }
 
         val expectedInstance = arrayInstance(

@@ -39,7 +39,7 @@ internal inline fun StructNewExecutor(
         .asReversed()
         .map { fieldType ->
             val value = stack.popValue()
-            fieldPacker(value, fieldType).bind()
+            fieldPacker(value, fieldType)
         }.asReversed()
 
     val instance = StructInstance(definedType, fields.toMutableList())

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -66,7 +65,7 @@ class StructNewExecutorTest {
             assertEquals(executionValueIter.next(), _executionValue)
             assertEquals(fieldType, _fieldType)
 
-            Ok(fieldValueIter.next())
+            fieldValueIter.next()
         }
 
         val expectedInstance = structInstance(

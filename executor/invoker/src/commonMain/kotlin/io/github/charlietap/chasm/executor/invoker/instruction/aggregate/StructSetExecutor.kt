@@ -38,7 +38,7 @@ internal inline fun StructSetExecutor(
 
     val executionValue = stack.popValue()
     val structInstance = stack.popStructReference()
-    val fieldValue = fieldPacker(executionValue, fieldType).bind()
+    val fieldValue = fieldPacker(executionValue, fieldType)
 
     structInstance.fields[instruction.fieldIndex.index()] = fieldValue
 }

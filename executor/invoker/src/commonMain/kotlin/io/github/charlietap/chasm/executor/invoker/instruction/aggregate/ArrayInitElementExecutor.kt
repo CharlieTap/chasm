@@ -61,7 +61,7 @@ internal inline fun ArrayInitElementExecutor(
         val elementIndex = sourceOffsetInElementSegment + offset
         val elementValue = elementInstance.elements[elementIndex]
         val fieldIndex = destinationOffsetInArray + offset
-        val fieldValue = fieldPacker(elementValue, arrayType.fieldType).bind()
+        val fieldValue = fieldPacker(elementValue, arrayType.fieldType)
 
         arrayInstance.fields[fieldIndex] = fieldValue
     }

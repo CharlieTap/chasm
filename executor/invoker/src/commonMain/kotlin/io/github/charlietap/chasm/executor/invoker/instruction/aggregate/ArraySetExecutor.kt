@@ -43,7 +43,7 @@ internal inline fun ArraySetExecutor(
     val fieldIndex = stack.popI32()
     val arrayInstance = stack.popArrayReference()
 
-    val fieldValue = fieldPacker(value, arrayType.fieldType).bind()
+    val fieldValue = fieldPacker(value, arrayType.fieldType)
 
     if (fieldIndex !in arrayInstance.fields.indices) {
         Err(InvocationError.Trap.TrapEncountered).bind()

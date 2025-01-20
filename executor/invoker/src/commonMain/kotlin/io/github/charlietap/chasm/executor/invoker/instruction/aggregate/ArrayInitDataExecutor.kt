@@ -76,7 +76,7 @@ internal fun ArrayInitDataExecutor(
         val element = arrayType.fieldType.valueFromBytes(byteArray).bind()
 
         val fieldIndex = arrayOffset + offset
-        val fieldValue = fieldPacker(element, arrayType.fieldType).bind()
+        val fieldValue = fieldPacker(element, arrayType.fieldType)
 
         arrayInstance.fields[fieldIndex] = fieldValue
     }

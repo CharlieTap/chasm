@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.fixture.ast.module.fieldIndex
@@ -71,7 +70,7 @@ class StructSetExecutorTest {
             assertEquals(executionValue, _executionValue)
             assertEquals(fieldType, _fieldType)
 
-            Ok(updatedFieldValue)
+            updatedFieldValue
         }
 
         val instruction = AggregateInstruction.StructSet(typeIndex, fieldIndex)

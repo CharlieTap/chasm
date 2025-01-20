@@ -49,7 +49,7 @@ internal inline fun ArrayFillExecutor(
     repeat(elementsToFill) { fillOffset ->
 
         val fieldIndex = arrayElementOffset + fillOffset
-        val fieldValue = fieldPacker(fillValue, arrayType.fieldType).bind()
+        val fieldValue = fieldPacker(fillValue, arrayType.fieldType)
 
         arrayInstance.fields[fieldIndex] = fieldValue
     }
