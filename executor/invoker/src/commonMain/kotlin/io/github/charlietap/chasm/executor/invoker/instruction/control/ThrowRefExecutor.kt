@@ -8,13 +8,13 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
+import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.tagAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
@@ -63,12 +63,10 @@ internal inline fun ThrowRefExecutor(
             is CatchHandler.Catch -> {
                 address == frame.instance
                     .tagAddress(catchHandler.tagIndex)
-                    .bind()
             }
             is CatchHandler.CatchRef -> {
                 address == frame.instance
                     .tagAddress(catchHandler.tagIndex)
-                    .bind()
             }
             else -> false
         }

@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.memory.Memory
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.instantiator.predecoding.ExpressionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.FunctionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
@@ -31,7 +32,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.addMemoryAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addTableAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
 import io.github.charlietap.chasm.executor.runtime.ext.function
-import io.github.charlietap.chasm.executor.runtime.ext.functionAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
