@@ -41,7 +41,7 @@ internal inline fun I64Load8UExecutor(
 
     val result = boundsChecker(effectiveAddress, 1, memory.size) {
         reader(memory.data, effectiveAddress).bind()
-    }.bind()
+    }
 
     stack.pushI64(result)
 }

@@ -36,5 +36,5 @@ internal inline fun I64Store16Executor(
 
     boundsChecker(effectiveAddress, 2, memory.size) {
         writer(memory.data, effectiveAddress, valueToStore).bind()
-    }.bind()
+    }
 }

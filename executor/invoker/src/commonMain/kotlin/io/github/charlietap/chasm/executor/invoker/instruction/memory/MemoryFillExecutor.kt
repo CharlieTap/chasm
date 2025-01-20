@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.fill.LinearMemoryFiller
@@ -35,5 +34,5 @@ internal inline fun MemoryFillExecutor(
 
     boundsChecker(offset, bytesToFill, memory.size) {
         filler(memory.data, offset, bytesToFill, fillValue.toByte())
-    }.bind()
+    }
 }

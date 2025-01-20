@@ -35,5 +35,5 @@ internal inline fun F64StoreExecutor(
 
     boundsChecker(effectiveAddress, Double.SIZE_BYTES, memory.size) {
         writer(memory.data, effectiveAddress, valueToStore).bind()
-    }.bind()
+    }
 }

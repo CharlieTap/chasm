@@ -41,7 +41,7 @@ internal inline fun I32Load8SExecutor(
 
     val result = boundsChecker(effectiveAddress, 1, memory.size) {
         reader(memory.data, effectiveAddress).bind()
-    }.bind()
+    }
 
     stack.pushI32(result)
 }

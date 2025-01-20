@@ -41,7 +41,7 @@ internal inline fun F32LoadExecutor(
 
     val result = boundsChecker(effectiveAddress, Float.SIZE_BYTES, memory.size) {
         reader(memory.data, effectiveAddress).bind()
-    }.bind()
+    }
 
     stack.pushf32(result)
 }

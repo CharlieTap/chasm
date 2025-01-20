@@ -41,7 +41,7 @@ internal inline fun I64LoadExecutor(
 
     val result = boundsChecker(effectiveAddress, Long.SIZE_BYTES, memory.size) {
         reader(memory.data, effectiveAddress).bind()
-    }.bind()
+    }
 
     stack.pushI64(result)
 }

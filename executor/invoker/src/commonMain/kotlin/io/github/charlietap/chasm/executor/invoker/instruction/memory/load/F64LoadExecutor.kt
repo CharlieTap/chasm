@@ -41,7 +41,7 @@ internal inline fun F64LoadExecutor(
 
     val result = boundsChecker(effectiveAddress, Double.SIZE_BYTES, memory.size) {
         reader(memory.data, effectiveAddress).bind()
-    }.bind()
+    }
 
     stack.pushf64(result)
 }
