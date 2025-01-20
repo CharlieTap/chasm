@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
@@ -44,5 +43,5 @@ internal inline fun MemoryCopyExecutor(
 
     if (bytesToCopy == 0) return
 
-    copier(srcMemory.data, dstMemory.data, sourceOffset, destinationOffset, bytesToCopy).bind()
+    copier(srcMemory.data, dstMemory.data, sourceOffset, destinationOffset, bytesToCopy)
 }
