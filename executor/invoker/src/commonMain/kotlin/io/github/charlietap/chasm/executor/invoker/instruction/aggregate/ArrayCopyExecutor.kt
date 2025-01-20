@@ -36,7 +36,7 @@ internal inline fun ArrayCopyExecutor(
         .definedType(instruction.destinationTypeIndex)
         .bind()
 
-    val destArrayType = definedTypeExpander(destDefinedType).arrayType().bind()
+    val destArrayType = definedTypeExpander(destDefinedType).arrayType()
     if (destArrayType.fieldType.mutability != Mutability.Var) {
         Err(InvocationError.ArrayCopyOnAConstArray).bind()
     }

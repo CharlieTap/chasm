@@ -44,7 +44,7 @@ internal inline fun ArrayFillExecutor(
     val definedType = frame.instance
         .definedType(instruction.typeIndex)
         .bind()
-    val arrayType = definedTypeExpander(definedType).arrayType().bind()
+    val arrayType = definedTypeExpander(definedType).arrayType()
 
     repeat(elementsToFill) { fillOffset ->
 

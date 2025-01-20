@@ -41,7 +41,7 @@ internal inline fun ArrayNewDataExecutor(
         .definedType(typeIndex)
         .bind()
 
-    val arrayType = definedTypeExpander(definedType).arrayType().bind()
+    val arrayType = definedTypeExpander(definedType).arrayType()
     val dataAddress = frame.instance
         .dataAddress(dataIndex)
         .bind()

@@ -36,7 +36,7 @@ internal inline fun ArraySetExecutor(
         .definedType(typeIndex)
         .bind()
 
-    val arrayType = definedTypeExpander(definedType).arrayType().bind()
+    val arrayType = definedTypeExpander(definedType).arrayType()
 
     val value = stack.popValue()
 

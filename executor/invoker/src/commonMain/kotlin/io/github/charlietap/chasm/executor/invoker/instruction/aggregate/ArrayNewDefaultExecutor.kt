@@ -35,7 +35,7 @@ internal inline fun ArrayNewDefaultExecutor(
         .definedType(typeIndex)
         .bind()
 
-    val arrayType = definedTypeExpander(definedType).arrayType().bind()
+    val arrayType = definedTypeExpander(definedType).arrayType()
 
     val size = stack.popI32()
     val value = arrayType.fieldType.default()

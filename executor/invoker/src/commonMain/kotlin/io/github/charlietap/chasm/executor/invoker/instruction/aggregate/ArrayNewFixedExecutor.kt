@@ -34,7 +34,7 @@ internal inline fun ArrayNewFixedExecutor(
         .definedType(typeIndex)
         .bind()
 
-    val arrayType = definedTypeExpander(definedType).arrayType().bind()
+    val arrayType = definedTypeExpander(definedType).arrayType()
 
     val fields = MutableList(size.toInt()) { _ ->
         val value = stack.popValue()

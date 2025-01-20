@@ -33,7 +33,7 @@ internal inline fun StructNewExecutor(
         .definedType(instruction.typeIndex)
         .bind()
 
-    val structType = definedTypeExpander(definedType).structType().bind()
+    val structType = definedTypeExpander(definedType).structType()
 
     val fields = structType.fields
         .asReversed()

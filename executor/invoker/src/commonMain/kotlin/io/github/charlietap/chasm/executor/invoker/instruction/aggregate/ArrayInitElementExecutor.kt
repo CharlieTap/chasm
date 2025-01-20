@@ -37,7 +37,7 @@ internal inline fun ArrayInitElementExecutor(
     val definedType = frame.instance
         .definedType(typeIndex)
         .bind()
-    val arrayType = definedTypeExpander(definedType).arrayType().bind()
+    val arrayType = definedTypeExpander(definedType).arrayType()
 
     val elementAddress = frame.instance
         .elementAddress(elementIndex)

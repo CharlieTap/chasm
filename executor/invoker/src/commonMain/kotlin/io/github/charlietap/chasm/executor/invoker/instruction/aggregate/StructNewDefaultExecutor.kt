@@ -34,7 +34,7 @@ internal inline fun StructNewDefaultExecutor(
         .definedType(typeIndex)
         .bind()
 
-    val structType = definedTypeExpander(definedType).structType().bind()
+    val structType = definedTypeExpander(definedType).structType()
     structType.fields.forEach { fieldType ->
         val value = fieldType.default()
         stack.push(value)
