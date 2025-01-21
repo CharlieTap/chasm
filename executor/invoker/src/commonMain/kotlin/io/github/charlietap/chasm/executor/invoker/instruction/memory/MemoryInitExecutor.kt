@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
-import com.github.michaelbull.result.Err
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.init.LinearMemoryInitialiser
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
@@ -39,12 +38,12 @@ internal inline fun MemoryInitExecutor(
         (sourceOffset + bytesToCopy) > data.bytes.size ||
         (destinationOffset + bytesToCopy) > memory.size
     ) {
-        Err(InvocationError.Trap.TrapEncountered).bind()
+        throw InvocationException(InvocationError.Trap.TrapEncountered)
     }
 
     if (bytesToCopy == 0) {
         return
     }
 
-    linearMemoryInitialiser(data.bytes, memory.data, sourceOffset, destinationOffset, bytesToCopy).bind()
+    linearMemoryInitialiser(data.bytes, memory.data, sourceOffset, destinationOffset, bytesToCopy)
 }
