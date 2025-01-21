@@ -144,6 +144,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object ArrayCopyOnAConstArray : InvocationError
 
+    data object ArrayOperationOutOfBounds : InvocationError
+
     data object CannotDivideIntegerByZero : InvocationError
 
     data object IntegerOverflow : InvocationError

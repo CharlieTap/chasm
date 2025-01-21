@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Err
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -21,6 +20,6 @@ internal fun AnyConvertExternExecutor(
         is ReferenceValue.Extern -> {
             stack.push(referenceValue.referenceValue)
         }
-        else -> Err(InvocationError.UnexpectedReferenceValue).bind()
+        else -> throw InvocationException(InvocationError.UnexpectedReferenceValue)
     }
 }

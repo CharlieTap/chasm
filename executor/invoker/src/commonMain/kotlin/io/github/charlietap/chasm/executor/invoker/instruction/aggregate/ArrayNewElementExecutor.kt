@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Err
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.element
@@ -39,7 +38,7 @@ internal inline fun ArrayNewElementExecutor(
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + arrayLength
 
     if (arrayEndOffsetInSegment > elementInstance.elements.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind()
+        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
     elementInstance.elements

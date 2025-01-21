@@ -1,10 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Err
 import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
@@ -36,7 +35,7 @@ internal inline fun ArrayCopyExecutor(
 
     val destArrayType = definedTypeExpander(destDefinedType).arrayType()
     if (destArrayType.fieldType.mutability != Mutability.Var) {
-        Err(InvocationError.ArrayCopyOnAConstArray).bind()
+        throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
 
     val elementsToCopy = stack.popI32()
@@ -46,11 +45,11 @@ internal inline fun ArrayCopyExecutor(
     val destination = stack.popArrayReference()
 
     if (destinationOffset + elementsToCopy > destination.fields.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind()
+        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
     if (sourceOffset + elementsToCopy > source.fields.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind()
+        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
     if (elementsToCopy == 0) return

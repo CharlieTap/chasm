@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.dataAddress
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
@@ -56,7 +56,7 @@ internal inline fun ArrayNewDataExecutor(
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * arrayElementSizeInBytes)
 
     if (arrayEndOffsetInSegment > dataInstance.bytes.size) {
-        Err(InvocationError.Trap.TrapEncountered).bind()
+        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
     val byteArray = dataInstance.bytes.sliceArray(arrayStartOffsetInSegment until arrayEndOffsetInSegment)
