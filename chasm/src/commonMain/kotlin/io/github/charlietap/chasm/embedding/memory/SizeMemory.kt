@@ -33,5 +33,5 @@ internal fun sizeMemory(
     sizer: MemoryInstanceSizer,
 ): Result<Int, ModuleTrapError> = binding {
     val instance = store.store.memory(memory.reference.address)
-    sizer(instance).bind()
+    sizer(instance)
 }

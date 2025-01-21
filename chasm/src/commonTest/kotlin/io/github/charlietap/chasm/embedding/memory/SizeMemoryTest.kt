@@ -27,7 +27,7 @@ class SizeMemoryTest {
         val sizer: MemoryInstanceSizer = { _instance ->
             assertEquals(instance, _instance)
 
-            Ok(size)
+            size
         }
 
         val expected: Result<Int, ModuleTrapError> = Ok(size)
