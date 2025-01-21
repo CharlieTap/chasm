@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.read.I32Reader
@@ -40,7 +39,7 @@ internal inline fun I32LoadExecutor(
     }
 
     val result = boundsChecker(effectiveAddress, Int.SIZE_BYTES, memory.size) {
-        reader(memory.data, effectiveAddress).bind()
+        reader(memory.data, effectiveAddress)
     }
 
     stack.pushI32(result)

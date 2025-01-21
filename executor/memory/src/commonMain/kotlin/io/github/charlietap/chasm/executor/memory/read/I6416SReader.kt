@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.executor.memory.read
 
-import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 
-typealias I6416SReader = (LinearMemory, Int) -> Result<Long, InvocationError>
+typealias I6416SReader = (LinearMemory, Int) -> Long
 
 expect inline fun I6416SReader(
     memory: LinearMemory,
     address: Int,
-): Result<Long, InvocationError>
+): Long

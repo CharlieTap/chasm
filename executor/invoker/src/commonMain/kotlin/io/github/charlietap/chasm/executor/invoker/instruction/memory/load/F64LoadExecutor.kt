@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.load
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.read.F64Reader
@@ -40,7 +39,7 @@ internal inline fun F64LoadExecutor(
     }
 
     val result = boundsChecker(effectiveAddress, Double.SIZE_BYTES, memory.size) {
-        reader(memory.data, effectiveAddress).bind()
+        reader(memory.data, effectiveAddress)
     }
 
     stack.pushf64(result)
