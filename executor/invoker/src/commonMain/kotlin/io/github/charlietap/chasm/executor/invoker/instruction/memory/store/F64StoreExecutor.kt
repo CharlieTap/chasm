@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.store
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.write.F64Writer
@@ -34,6 +33,6 @@ internal inline fun F64StoreExecutor(
     val effectiveAddress = baseAddress + instruction.memArg.offset
 
     boundsChecker(effectiveAddress, Double.SIZE_BYTES, memory.size) {
-        writer(memory.data, effectiveAddress, valueToStore).bind()
+        writer(memory.data, effectiveAddress, valueToStore)
     }
 }

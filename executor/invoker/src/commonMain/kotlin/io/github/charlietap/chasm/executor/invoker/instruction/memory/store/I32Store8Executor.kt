@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory.store
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.write.I32ToI8Writer
@@ -33,6 +32,6 @@ internal inline fun I32Store8Executor(
     val effectiveAddress = baseAddress + instruction.memArg.offset
 
     boundsChecker(effectiveAddress, 1, memory.size) {
-        writer(memory.data, effectiveAddress, valueToStore).bind()
+        writer(memory.data, effectiveAddress, valueToStore)
     }
 }
