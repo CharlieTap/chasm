@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.field
@@ -41,7 +40,7 @@ internal inline fun StructGetExecutor(
 
     val structInstance = stack.popStructReference()
 
-    val fieldValue = structInstance.field(fieldIndex).bind()
+    val fieldValue = structInstance.field(fieldIndex)
     val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack)
 
     stack.push(unpackedValue)
