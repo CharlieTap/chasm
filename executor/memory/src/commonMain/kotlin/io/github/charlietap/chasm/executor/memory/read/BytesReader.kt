@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.executor.memory.read
 
-import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 
-typealias BytesReader = (LinearMemory, ByteArray, Int, Int, Int) -> Result<ByteArray, InvocationError>
+typealias BytesReader = (LinearMemory, ByteArray, Int, Int, Int) -> ByteArray
 
 expect inline fun BytesReader(
     memory: LinearMemory,
@@ -12,4 +10,4 @@ expect inline fun BytesReader(
     memoryPointer: Int,
     bytesToRead: Int,
     bufferPointer: Int,
-): Result<ByteArray, InvocationError>
+): ByteArray

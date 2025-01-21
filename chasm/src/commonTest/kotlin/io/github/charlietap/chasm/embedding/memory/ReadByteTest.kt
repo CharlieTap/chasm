@@ -33,7 +33,7 @@ class ReadByteTest {
             assertEquals(1, _bytesToRead)
             assertEquals(0, _bufferPointer)
 
-            Ok(byteArrayOf(byte))
+            byteArrayOf(byte)
         }
 
         val expected: Result<Byte, ModuleTrapError> = Ok(byte)
