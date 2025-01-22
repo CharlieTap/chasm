@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.runtime.value.FieldValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -32,14 +33,13 @@ internal inline fun StructNewExecutor(
 
     val structType = definedTypeExpander(definedType).structType()
 
-    val fields = structType.fields
-        .asReversed()
-        .map { fieldType ->
-            val value = stack.popValue()
-            fieldPacker(value, fieldType)
-        }.asReversed()
+    val fieldTypes = structType.fields.asReversed()
+    val fields = ArrayList<FieldValue>(fieldTypes.size)
+    fieldTypes.forEachIndexed { idx, fieldType ->
+        fields.add(fieldPacker(stack.popValue(), fieldType))
+    }
 
-    val instance = StructInstance(definedType, fields.toMutableList())
+    val instance = StructInstance(definedType, fields.asReversed())
     val reference = ReferenceValue.Struct(instance)
 
     stack.push(reference)
