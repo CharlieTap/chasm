@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import com.github.michaelbull.result.Err
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
@@ -23,6 +22,6 @@ internal inline fun RefIsNullExecutor(
             stack.push(NumberValue.I32(0))
         }
     } else {
-        Err(InvocationError.ReferenceValueExpected).bind()
+        throw InvocationException(InvocationError.ReferenceValueExpected)
     }
 }

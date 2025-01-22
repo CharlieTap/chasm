@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
-import com.github.michaelbull.result.Err
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
@@ -20,7 +19,7 @@ internal inline fun TableSetExecutor(
     val elementIndex = stack.popI32()
 
     if (elementIndex !in tableInstance.elements.indices) {
-        Err(InvocationError.Trap.TrapEncountered).bind()
+        throw InvocationException(InvocationError.Trap.TrapEncountered)
     }
 
     tableInstance.elements[elementIndex] = value

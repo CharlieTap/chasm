@@ -1,17 +1,16 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import com.github.michaelbull.result.Err
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
@@ -39,7 +38,7 @@ internal inline fun ThrowRefExecutor(
     val ref = stack.popReference()
 
     val exceptionRef = if (ref is ReferenceValue.Null) {
-        Err(InvocationError.UnexpectedReferenceValue).bind()
+        throw InvocationException(InvocationError.UnexpectedReferenceValue)
     } else {
         ref as ReferenceValue.Exception
     }

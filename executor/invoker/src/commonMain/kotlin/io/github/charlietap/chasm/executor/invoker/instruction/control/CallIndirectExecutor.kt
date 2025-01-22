@@ -1,14 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.function
@@ -50,15 +48,15 @@ internal inline fun CallIndirectExecutor(
     val reference = table.element(elementIndex)
 
     val address = when (reference) {
-        is ReferenceValue.Function -> Ok(reference.address)
-        else -> Err(InvocationError.IndirectCallOnANonFunctionReference)
-    }.bind()
+        is ReferenceValue.Function -> reference.address
+        else -> throw InvocationException(InvocationError.IndirectCallOnANonFunctionReference)
+    }
 
     val functionInstance = store.function(address)
     val actualFunctionType = functionInstance.type
 
     if (!definedTypeMatcher(actualFunctionType, expectedFunctionType, context)) {
-        Err(InvocationError.IndirectCallHasIncorrectFunctionType).bind()
+        throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
 
     when (functionInstance) {

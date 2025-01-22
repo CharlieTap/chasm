@@ -142,6 +142,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object UnobservableBitWidth : InvocationError
 
+    data object FailedToGetTypeOfReferenceValue : InvocationError
+
     data object ArrayCopyOnAConstArray : InvocationError
 
     data object ArrayOperationOutOfBounds : InvocationError

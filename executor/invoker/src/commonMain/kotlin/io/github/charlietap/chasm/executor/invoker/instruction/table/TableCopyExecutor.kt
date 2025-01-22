@@ -1,8 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
-import com.github.michaelbull.result.Err
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
@@ -27,7 +26,7 @@ internal fun TableCopyExecutor(
         srcOffset + elementsToCopy > srcTableInstance.elements.size ||
         dstOffset + elementsToCopy > dstTableInstance.elements.size
     ) {
-        Err(InvocationError.Trap.TrapEncountered).bind()
+        throw InvocationException(InvocationError.Trap.TrapEncountered)
     }
 
     srcTableInstance.elements.copyInto(
