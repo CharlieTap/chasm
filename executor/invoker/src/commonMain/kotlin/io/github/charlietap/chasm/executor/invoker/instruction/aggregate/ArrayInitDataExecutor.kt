@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.dataAddress
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
@@ -51,11 +50,9 @@ internal fun ArrayInitDataExecutor(
 
     val arrayInstance = stack.popArrayReference()
 
-    val arrayElementSizeInBytes = arrayType.fieldType
-        .bitWidth()
-        .toResultOr {
-            InvocationError.UnobservableBitWidth
-        }.bind() / 8
+    val arrayElementSizeInBytes = arrayType.fieldType.bitWidth()?.let {
+        it / 8
+    } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
 
     if (
         (arrayOffset + elementsToCopy > arrayInstance.fields.size) ||
