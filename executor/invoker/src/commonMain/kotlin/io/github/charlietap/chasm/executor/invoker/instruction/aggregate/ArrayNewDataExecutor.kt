@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.bind
 import io.github.charlietap.chasm.executor.invoker.ext.dataAddress
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
@@ -60,7 +59,7 @@ internal inline fun ArrayNewDataExecutor(
 
     for (i in byteArray.indices step arrayElementSizeInBytes) {
         val elementBytes = byteArray.sliceArray(i until i + arrayElementSizeInBytes)
-        val value = arrayType.fieldType.valueFromBytes(elementBytes).bind()
+        val value = arrayType.fieldType.valueFromBytes(elementBytes)
 
         stack.push(value)
     }
