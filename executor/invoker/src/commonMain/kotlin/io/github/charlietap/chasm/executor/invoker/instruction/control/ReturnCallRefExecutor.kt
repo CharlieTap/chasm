@@ -23,7 +23,8 @@ internal inline fun ReturnCallRefExecutor(
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
 ) {
-    val (stack, store) = context
+    val stack = context.vstack
+    val store = context.store
     val address = stack.popFunctionAddress()
 
     when (val instance = store.function(address)) {

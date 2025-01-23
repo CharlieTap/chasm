@@ -62,8 +62,9 @@ internal inline fun BrOnCastExecutor(
     crossinline breakExecutor: BreakExecutor,
 ) {
 
-    val (stack, store) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val store = context.store
+    val frame = context.cstack.peekFrame()
     val moduleInstance = frame.instance
 
     val referenceValue = stack.peekReference()
@@ -74,6 +75,6 @@ internal inline fun BrOnCastExecutor(
     val referenceTypeMatches = referenceTypeMatcher(closedReferenceType1, closedReferenceType2, context)
 
     if (referenceTypeMatches == breakIfMatches) {
-        breakExecutor(stack, labelIndex)
+        breakExecutor(context.cstack, stack, labelIndex)
     }
 }

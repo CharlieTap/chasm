@@ -1,30 +1,19 @@
-package io.github.charlietap.chasm.executor.runtime
+package io.github.charlietap.chasm.executor.runtime.stack
 
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
-import io.github.charlietap.chasm.executor.runtime.stack.FrameStack
-import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
-import io.github.charlietap.chasm.executor.runtime.stack.HandlerStack
-import io.github.charlietap.chasm.executor.runtime.stack.InstructionStack
-import io.github.charlietap.chasm.executor.runtime.stack.LabelStack
-import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
-import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-data class Stack(
+data class ControlStack(
     private val frames: FrameStack = FrameStack(),
     private val handlers: HandlerStack = HandlerStack(INITIAL_CAPACITY),
     private val instructions: InstructionStack = InstructionStack(INITIAL_CAPACITY),
     private val labels: LabelStack = LabelStack(INITIAL_CAPACITY),
-    private val values: ValueStack = ValueStack(INITIAL_CAPACITY),
 ) {
     constructor(
         frames: List<ActivationFrame>,
         handlers: List<ExceptionHandler>,
         instructions: List<DispatchableInstruction>,
         labels: List<Entry.Label>,
-        values: List<ExecutionValue>,
     ) : this() {
         frames.forEach { frame ->
             this.frames.push(frame)
@@ -38,9 +27,6 @@ data class Stack(
         labels.forEach { label ->
             this.labels.push(label)
         }
-        values.forEach { value ->
-            this.values.push(value)
-        }
     }
 
     constructor(
@@ -53,23 +39,6 @@ data class Stack(
         }
     }
 
-    fun depths(): StackDepths = FrameStackDepths(
-        handlers = handlersDepth(),
-        instructions = instructionsDepth(),
-        labels = labelsDepth(),
-        values = valuesDepth(),
-    )
-
-    fun getFramePointer() = values.framePointer
-
-    fun setFramePointer(pointer: Int) {
-        values.framePointer = pointer
-    }
-
-    fun local(localIndex: Int): ExecutionValue = values.getLocal(localIndex)
-
-    fun setLocal(localIndex: Int, value: ExecutionValue) = values.setLocal(localIndex, value)
-
     fun push(frame: ActivationFrame) = frames.push(frame)
 
     fun push(handler: ExceptionHandler) = handlers.push(handler)
@@ -77,10 +46,6 @@ data class Stack(
     fun push(instruction: DispatchableInstruction) = instructions.push(instruction)
 
     fun push(label: Entry.Label) = labels.push(label)
-
-    fun push(value: ExecutionValue) = values.push(value)
-
-    fun push(many: Array<ExecutionValue>) = values.pushAll(many)
 
     fun push(many: Array<DispatchableInstruction>) = instructions.pushAll(many)
 
@@ -92,19 +57,13 @@ data class Stack(
 
     fun popLabel(): Entry.Label? = labels.pop()
 
-    fun popValue(): ExecutionValue = values.pop()
-
     fun peekFrame(): ActivationFrame = frames.peek()
 
     fun peekInstructionOrNull(): DispatchableInstruction? = instructions.peekOrNull()
 
-    fun peekValue(): ExecutionValue = values.peek()
-
     fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNth(n)
 
     fun peekNthLabel(n: Int): Entry.Label = labels.peekNth(n)
-
-    fun peekNthValue(n: Int): ExecutionValue = values.peekNth(n)
 
     fun shrinkFrames(
         preserveTopN: Int,
@@ -126,12 +85,7 @@ data class Stack(
         depth: Int,
     ) = labels.shrink(preserveTopN, depth)
 
-    fun shrinkValues(
-        preserveTopN: Int,
-        depth: Int,
-    ) = values.shrink(preserveTopN, depth)
-
-    fun size() = frames.depth() + instructions.depth() + labels.depth() + values.depth()
+    fun size() = frames.depth() + instructions.depth() + labels.depth()
 
     fun framesDepth() = frames.depth()
 
@@ -141,14 +95,11 @@ data class Stack(
 
     fun labelsDepth() = labels.depth()
 
-    fun valuesDepth() = values.depth()
-
     fun clear() {
         frames.clear()
         handlers.clear()
         instructions.clear()
         labels.clear()
-        values.clear()
     }
 
     fun clearHandlers() = handlers.clear()
@@ -159,8 +110,6 @@ data class Stack(
 
     fun clearFrames() = frames.clear()
 
-    fun clearValues() = values.clear()
-
     fun frames(): List<ActivationFrame> = frames.entries()
 
     fun handlers(): List<ExceptionHandler> = handlers.entries()
@@ -169,22 +118,17 @@ data class Stack(
 
     fun labels(): List<Entry.Label> = labels.entries()
 
-    fun values(): List<ExecutionValue> = values
-
-    fun fill(stack: Stack) {
-        stack.frames.entries().forEach { entry ->
+    fun fill(controlStack: ControlStack) {
+        controlStack.frames.entries().forEach { entry ->
             push(entry)
         }
-        stack.handlers.entries().forEach { entry ->
+        controlStack.handlers.entries().forEach { entry ->
             push(entry)
         }
-        stack.instructions.entries().forEach { entry ->
+        controlStack.instructions.entries().forEach { entry ->
             push(entry)
         }
-        stack.labels.entries().forEach { entry ->
-            push(entry)
-        }
-        stack.values.entries().forEach { entry ->
+        controlStack.labels.entries().forEach { entry ->
             push(entry)
         }
     }

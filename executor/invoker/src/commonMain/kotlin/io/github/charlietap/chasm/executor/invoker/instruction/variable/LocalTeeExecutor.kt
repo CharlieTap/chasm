@@ -7,8 +7,8 @@ internal inline fun LocalTeeExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction.LocalTee,
 ) {
-    context.stack.setLocal(
+    context.vstack.setLocal(
         instruction.localIdx,
-        context.stack.peekValue(),
+        context.vstack.peek(),
     )
 }

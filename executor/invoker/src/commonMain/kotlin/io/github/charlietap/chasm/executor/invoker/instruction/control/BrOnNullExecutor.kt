@@ -19,12 +19,12 @@ internal inline fun BrOnNullExecutor(
     instruction: ControlInstruction.BrOnNull,
     crossinline breakExecutor: BreakExecutor,
 ) {
-    val (stack) = context
+    val stack = context.vstack
     val value = stack.popReference()
     val shouldBreak = value is ReferenceValue.Null
 
     if (shouldBreak) {
-        breakExecutor(stack, instruction.labelIndex)
+        breakExecutor(context.cstack, stack, instruction.labelIndex)
     } else {
         stack.push(value)
     }

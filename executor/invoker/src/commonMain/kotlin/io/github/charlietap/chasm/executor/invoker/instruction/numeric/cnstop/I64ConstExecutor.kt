@@ -8,5 +8,5 @@ internal inline fun I64ConstExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Const,
 ) {
-    context.stack.constOperation(instruction.value)
+    context.vstack.constOperation(instruction.value)
 }

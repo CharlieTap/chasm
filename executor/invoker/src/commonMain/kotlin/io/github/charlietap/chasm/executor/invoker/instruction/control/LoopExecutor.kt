@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.LoopDispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 
 internal fun LoopExecutor(
@@ -21,18 +21,19 @@ internal inline fun LoopExecutor(
     instruction: ControlInstruction.Loop,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ) {
-    val (stack) = context
+    val stack = context.vstack
+    val cstack = context.cstack
     val params = instruction.functionType.params.types.size
 
-    val label = Stack.Entry.Label(
+    val label = ControlStack.Entry.Label(
         arity = params,
         depths = LabelStackDepths(
-            instructions = stack.instructionsDepth(),
-            labels = stack.labelsDepth(),
-            values = stack.valuesDepth() - params,
+            instructions = cstack.instructionsDepth(),
+            labels = cstack.labelsDepth(),
+            values = stack.depth() - params,
         ),
         continuation = LoopDispatcher(instruction),
     )
 
-    instructionBlockExecutor(stack, label, instruction.instructions, null)
+    instructionBlockExecutor(cstack, label, instruction.instructions, null)
 }

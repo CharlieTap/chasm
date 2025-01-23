@@ -9,5 +9,5 @@ internal inline fun F64GeExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Ge,
 ) {
-    context.stack.relationalOperation(Double::ge)
+    context.vstack.relationalOperation(Double::ge)
 }

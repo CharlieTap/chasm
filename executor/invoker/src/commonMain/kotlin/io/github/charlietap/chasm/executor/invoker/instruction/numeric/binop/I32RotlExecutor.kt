@@ -8,5 +8,5 @@ internal inline fun I32RotlExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Rotl,
 ) {
-    context.stack.binaryOperation(Int::rotateLeft)
+    context.vstack.binaryOperation(Int::rotateLeft)
 }

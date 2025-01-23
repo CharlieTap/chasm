@@ -3,19 +3,19 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.admin.LabelInstructionExecutor
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 
-internal typealias InstructionBlockExecutor = (Stack, Stack.Entry.Label, Array<DispatchableInstruction>, ExceptionHandler?) -> Unit
+internal typealias InstructionBlockExecutor = (ControlStack, ControlStack.Entry.Label, Array<DispatchableInstruction>, ExceptionHandler?) -> Unit
 
 internal inline fun InstructionBlockExecutor(
-    stack: Stack,
-    label: Stack.Entry.Label,
+    controlStack: ControlStack,
+    label: ControlStack.Entry.Label,
     instructions: Array<DispatchableInstruction>,
     handler: ExceptionHandler?,
 ) = InstructionBlockExecutor(
-    stack = stack,
+    controlStack = controlStack,
     label = label,
     instructions = instructions,
     handler = handler,
@@ -24,20 +24,20 @@ internal inline fun InstructionBlockExecutor(
 )
 
 internal inline fun InstructionBlockExecutor(
-    stack: Stack,
-    label: Stack.Entry.Label,
+    controlStack: ControlStack,
+    label: ControlStack.Entry.Label,
     instructions: Array<DispatchableInstruction>,
     handler: ExceptionHandler?,
     crossinline handlerDispatcher: Dispatcher<ExceptionHandler>,
     noinline labelCleaner: DispatchableInstruction,
 ) {
     handler?.let {
-        stack.push(handler)
+        controlStack.push(handler)
         val instruction = handlerDispatcher(handler)
-        stack.push(instruction)
+        controlStack.push(instruction)
     }
-    stack.push(label)
-    stack.push(labelCleaner)
+    controlStack.push(label)
+    controlStack.push(labelCleaner)
 
-    stack.push(instructions)
+    controlStack.push(instructions)
 }

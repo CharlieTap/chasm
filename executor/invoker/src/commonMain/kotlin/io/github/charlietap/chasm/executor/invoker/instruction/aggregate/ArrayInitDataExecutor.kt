@@ -31,22 +31,20 @@ internal fun ArrayInitDataExecutor(
     definedTypeExpander: DefinedTypeExpander,
     fieldPacker: FieldPacker,
 ) {
+    val stack = context.vstack
+    val store = context.store
 
-    val(stack, store) = context
     val (typeIndex, dataIndex) = instruction
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
     val arrayType = definedTypeExpander(definedType).arrayType()
 
-    val dataAddress = frame.instance
-        .dataAddress(dataIndex)
-
+    val dataAddress = frame.instance.dataAddress(dataIndex)
     val dataInstance = store.data(dataAddress)
 
     val elementsToCopy = stack.popI32()
     val byteArrayOffset = stack.popI32()
     val arrayOffset = stack.popI32()
-
     val arrayInstance = stack.popArrayReference()
 
     val arrayElementSizeInBytes = arrayType.fieldType.bitWidth()?.let {

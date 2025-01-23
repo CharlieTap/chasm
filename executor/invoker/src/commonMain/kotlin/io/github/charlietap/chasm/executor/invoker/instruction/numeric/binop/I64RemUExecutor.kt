@@ -12,13 +12,13 @@ internal inline fun I64RemUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64RemU,
 ) {
-    val operand2 = context.stack
-        .peekNthValue(0)
+    val operand2 = context.vstack
+        .peekNth(0)
         as I64
 
     if (operand2.value.toULong() == 0uL) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
 
-    context.stack.binaryOperation(Long::remu)
+    context.vstack.binaryOperation(Long::remu)
 }

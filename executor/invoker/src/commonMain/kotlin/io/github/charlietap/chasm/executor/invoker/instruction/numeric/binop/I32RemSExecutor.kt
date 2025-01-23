@@ -11,13 +11,13 @@ internal inline fun I32RemSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32RemS,
 ) {
-    val operand2 = context.stack
-        .peekNthValue(0)
+    val operand2 = context.vstack
+        .peekNth(0)
         as I32
 
     if (operand2.value == 0) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
 
-    context.stack.binaryOperation(Int::rem)
+    context.vstack.binaryOperation(Int::rem)
 }

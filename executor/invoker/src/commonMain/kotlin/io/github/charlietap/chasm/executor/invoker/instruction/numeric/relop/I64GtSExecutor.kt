@@ -9,5 +9,5 @@ internal inline fun I64GtSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64GtS,
 ) {
-    context.stack.relationalOperation(Long::gt)
+    context.vstack.relationalOperation(Long::gt)
 }

@@ -25,7 +25,7 @@ internal inline fun I31GetExecutor(
     crossinline i31UnsignedExtender: (UInt) -> Int,
 ) {
 
-    val (stack) = context
+    val stack = context.vstack
     val value = stack.popI31Reference()
 
     val extended = if (signedExtension) {

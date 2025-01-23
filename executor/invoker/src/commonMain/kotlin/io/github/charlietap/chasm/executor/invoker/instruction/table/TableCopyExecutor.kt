@@ -11,7 +11,7 @@ internal fun TableCopyExecutor(
     instruction: TableInstruction.TableCopy,
 ) {
 
-    val (stack) = context
+    val stack = context.vstack
 
     val srcTableInstance = instruction.srcTable // taby
     val dstTableInstance = instruction.destTable // tabx

@@ -9,5 +9,5 @@ internal inline fun F32DemoteF64Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32DemoteF64,
 ) {
-    context.stack.convertOperation(::F32, Double::toFloat)
+    context.vstack.convertOperation(::F32, Double::toFloat)
 }

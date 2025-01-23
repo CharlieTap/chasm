@@ -8,7 +8,7 @@ internal inline fun MemorySizeExecutor(
     context: ExecutionContext,
     instruction: MemoryInstruction.MemorySize,
 ) {
-    val stack = context.stack
+    val stack = context.vstack
     val currentSizeInPages = instruction.memory.type.limits.min
         .toInt()
 

@@ -9,5 +9,5 @@ internal inline fun F64TruncExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Trunc,
 ) {
-    context.stack.unaryOperation(Double::trunc)
+    context.vstack.unaryOperation(Double::trunc)
 }

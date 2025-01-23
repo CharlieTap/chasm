@@ -31,8 +31,8 @@ internal inline fun StructGetExecutor(
     crossinline fieldUnpacker: FieldUnpacker,
 ) {
 
-    val (stack) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
 
     val structType = definedTypeExpander(definedType).structType()

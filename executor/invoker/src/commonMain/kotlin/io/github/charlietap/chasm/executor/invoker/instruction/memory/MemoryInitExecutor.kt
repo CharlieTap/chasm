@@ -22,7 +22,7 @@ internal inline fun MemoryInitExecutor(
     instruction: MemoryInstruction.MemoryInit,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) {
-    val stack = context.stack
+    val stack = context.vstack
 
     val memory = instruction.memory
     val data = instruction.data

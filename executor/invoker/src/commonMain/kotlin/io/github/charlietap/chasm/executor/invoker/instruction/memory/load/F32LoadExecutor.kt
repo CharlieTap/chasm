@@ -27,7 +27,7 @@ internal inline fun F32LoadExecutor(
     crossinline boundsChecker: BoundsChecker<Float>,
     crossinline reader: F32Reader,
 ) {
-    val stack = context.stack
+    val stack = context.vstack
     val memory = instruction.memory
 
     val baseAddress = stack.popI32()

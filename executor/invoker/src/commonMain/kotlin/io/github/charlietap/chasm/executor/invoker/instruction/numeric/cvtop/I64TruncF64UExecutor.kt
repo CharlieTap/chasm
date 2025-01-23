@@ -10,5 +10,5 @@ internal inline fun I64TruncF64UExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF64U,
 ) {
-    context.stack.convertOperation(::I64, Double::truncI64uTrapping)
+    context.vstack.convertOperation(::I64, Double::truncI64uTrapping)
 }

@@ -8,6 +8,6 @@ internal inline fun RefNullExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefNull,
 ) {
-    val (stack) = context
+    val stack = context.vstack
     stack.push(ReferenceValue.Null(instruction.type))
 }

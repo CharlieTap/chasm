@@ -31,10 +31,11 @@ internal inline fun ArrayNewDataExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
+    val stack = context.vstack
+    val store = context.store
 
-    val (stack, store) = context
     val (typeIndex, dataIndex) = instruction
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
 
     val arrayType = definedTypeExpander(definedType).arrayType()

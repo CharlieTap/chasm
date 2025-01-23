@@ -25,7 +25,7 @@ internal inline fun F64StoreExecutor(
     crossinline boundsChecker: BoundsChecker<Unit>,
     crossinline writer: F64Writer,
 ) {
-    val stack = context.stack
+    val stack = context.vstack
     val memory = instruction.memory
 
     val valueToStore = stack.popF64()

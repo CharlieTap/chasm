@@ -7,20 +7,21 @@ internal inline fun ReturnWasmFunctionCall(
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
 ) {
-    val (stack) = context
-    val frame = stack.peekFrame()
+    val cstack = context.cstack
+    val vstack = context.vstack
+    val frame = cstack.peekFrame()
     val type = instance.functionType
     val params = type.params.types.size
     val depths = frame.depths
 
-    stack.shrinkHandlers(0, depths.handlers)
+    cstack.shrinkHandlers(0, depths.handlers)
     // leave frame and label admin instructions on the stack
-    stack.shrinkInstructions(0, depths.instructions + 2)
+    cstack.shrinkInstructions(0, depths.instructions + 2)
     // leave top label in place
-    stack.shrinkLabels(0, depths.labels + 1)
-    stack.shrinkValues(params, depths.values)
+    cstack.shrinkLabels(0, depths.labels + 1)
+    vstack.shrink(params, depths.values)
 
-    stack.setFramePointer(depths.values)
-    stack.push(instance.function.locals)
-    stack.push(instance.function.body.instructions)
+    vstack.framePointer = depths.values
+    vstack.push(instance.function.locals)
+    cstack.push(instance.function.body.instructions)
 }

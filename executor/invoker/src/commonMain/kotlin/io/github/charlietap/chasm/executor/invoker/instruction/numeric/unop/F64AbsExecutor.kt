@@ -9,5 +9,5 @@ internal inline fun F64AbsExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Abs,
 ) {
-    context.stack.unaryOperation(Double::absoluteValue)
+    context.vstack.unaryOperation(Double::absoluteValue)
 }

@@ -25,7 +25,7 @@ internal inline fun F32StoreExecutor(
     crossinline boundsChecker: BoundsChecker<Unit>,
     crossinline writer: F32Writer,
 ) {
-    val stack = context.stack
+    val stack = context.vstack
     val memory = instruction.memory
 
     val valueToStore = stack.popF32()

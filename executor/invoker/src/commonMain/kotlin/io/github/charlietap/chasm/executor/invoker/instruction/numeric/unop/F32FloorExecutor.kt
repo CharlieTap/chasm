@@ -9,5 +9,5 @@ internal inline fun F32FloorExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Floor,
 ) {
-    context.stack.unaryOperation(Float::floor)
+    context.vstack.unaryOperation(Float::floor)
 }

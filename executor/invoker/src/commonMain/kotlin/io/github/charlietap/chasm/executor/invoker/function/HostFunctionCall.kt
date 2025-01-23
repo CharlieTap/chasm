@@ -13,12 +13,14 @@ internal fun HostFunctionCall(
     context: ExecutionContext,
     function: FunctionInstance.HostFunction,
 ) {
-    val (stack, store) = context
-    val frame = stack.peekFrame()
+    val cstack = context.cstack
+    val vstack = context.vstack
+    val store = context.store
+    val frame = cstack.peekFrame()
     val type = function.functionType
 
     val params = List(type.params.types.size) {
-        stack.popValue()
+        vstack.pop()
     }.asReversed()
 
     val functionContext = HostFunctionContext(
@@ -33,6 +35,6 @@ internal fun HostFunctionCall(
     }
 
     results.forEach { result ->
-        stack.push(result)
+        vstack.push(result)
     }
 }

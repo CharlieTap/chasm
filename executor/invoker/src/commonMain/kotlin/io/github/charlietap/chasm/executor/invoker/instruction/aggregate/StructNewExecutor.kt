@@ -27,8 +27,8 @@ internal inline fun StructNewExecutor(
     crossinline fieldPacker: FieldPacker,
 ) {
 
-    val (stack) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(instruction.typeIndex)
 
     val structType = definedTypeExpander(definedType).structType()
@@ -36,7 +36,7 @@ internal inline fun StructNewExecutor(
     val fieldTypes = structType.fields.asReversed()
     val fields = ArrayList<FieldValue>(fieldTypes.size)
     fieldTypes.forEachIndexed { idx, fieldType ->
-        fields.add(fieldPacker(stack.popValue(), fieldType))
+        fields.add(fieldPacker(stack.pop(), fieldType))
     }
 
     val instance = StructInstance(definedType, fields.asReversed())

@@ -9,5 +9,5 @@ internal inline fun I64RotlExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Rotl,
 ) {
-    context.stack.binaryOperation(Long::rotateLeft)
+    context.vstack.binaryOperation(Long::rotateLeft)
 }

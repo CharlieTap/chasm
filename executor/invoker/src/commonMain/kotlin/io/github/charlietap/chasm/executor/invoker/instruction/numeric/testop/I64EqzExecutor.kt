@@ -9,5 +9,5 @@ internal inline fun I64EqzExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Eqz,
 ) {
-    context.stack.testOperation(Long::eqz)
+    context.vstack.testOperation(Long::eqz)
 }

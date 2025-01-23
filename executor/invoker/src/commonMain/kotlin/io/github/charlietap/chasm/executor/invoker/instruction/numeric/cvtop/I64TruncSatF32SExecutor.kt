@@ -10,5 +10,5 @@ internal inline fun I64TruncSatF32SExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF32S,
 ) {
-    context.stack.convertOperation(::I64, Float::truncI64s)
+    context.vstack.convertOperation(::I64, Float::truncI64s)
 }

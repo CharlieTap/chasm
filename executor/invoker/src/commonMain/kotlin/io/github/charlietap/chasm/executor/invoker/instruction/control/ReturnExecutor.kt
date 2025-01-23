@@ -7,14 +7,16 @@ internal inline fun ReturnExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Return,
 ) {
-    val (stack) = context
-    val frame = stack.popFrame()
+    val cstack = context.cstack
+    val vstack = context.vstack
+
+    val frame = cstack.popFrame()
 
     val depths = frame.depths
-    stack.shrinkHandlers(0, depths.handlers)
-    stack.shrinkInstructions(0, depths.instructions)
-    stack.shrinkLabels(0, depths.labels)
-    stack.shrinkValues(frame.arity, depths.values)
+    cstack.shrinkHandlers(0, depths.handlers)
+    cstack.shrinkInstructions(0, depths.instructions)
+    cstack.shrinkLabels(0, depths.labels)
+    vstack.shrink(frame.arity, depths.values)
 
-    stack.setFramePointer(frame.previousFramePointer)
+    vstack.framePointer = frame.previousFramePointer
 }

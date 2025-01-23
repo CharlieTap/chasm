@@ -9,5 +9,5 @@ internal inline fun I64ReinterpretF64Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64ReinterpretF64,
 ) {
-    context.stack.convertOperation(::I64, Double::toRawBits)
+    context.vstack.convertOperation(::I64, Double::toRawBits)
 }

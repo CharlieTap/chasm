@@ -11,9 +11,8 @@ internal inline fun RefIsNullExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefIsNull,
 ) {
-
-    val (stack) = context
-    val value = stack.popValue()
+    val stack = context.vstack
+    val value = stack.pop()
 
     if (value is ReferenceValue) {
         if (value is ReferenceValue.Null) {

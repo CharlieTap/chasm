@@ -24,10 +24,11 @@ internal inline fun ArrayNewElementExecutor(
     instruction: AggregateInstruction.ArrayNewElement,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
+    val stack = context.vstack
+    val store = context.store
 
-    val (stack, store) = context
     val (typeIndex, elementIndex) = instruction
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
 
     val elementAddress = frame.instance
         .elementAddress(elementIndex)

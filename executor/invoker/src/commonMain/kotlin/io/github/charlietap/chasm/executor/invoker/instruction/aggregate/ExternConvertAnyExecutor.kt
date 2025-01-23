@@ -10,7 +10,7 @@ internal fun ExternConvertAnyExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ExternConvertAny,
 ) {
-    val (stack) = context
+    val stack = context.vstack
     when (val referenceValue = stack.popReference()) {
         is ReferenceValue.Null -> {
             stack.push(ReferenceValue.Null(AbstractHeapType.Extern))

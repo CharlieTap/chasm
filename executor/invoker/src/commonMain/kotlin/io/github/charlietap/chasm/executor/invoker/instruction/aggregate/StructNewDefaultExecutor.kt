@@ -26,9 +26,9 @@ internal inline fun StructNewDefaultExecutor(
     crossinline structNewExecutor: Executor<AggregateInstruction.StructNew>,
 ) {
 
-    val (stack) = context
+    val stack = context.vstack
     val typeIndex = instruction.typeIndex
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
 
     val structType = definedTypeExpander(definedType).structType()

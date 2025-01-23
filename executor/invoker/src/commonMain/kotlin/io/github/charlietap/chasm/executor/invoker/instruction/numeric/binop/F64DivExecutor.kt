@@ -8,5 +8,5 @@ internal inline fun F64DivExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Div,
 ) {
-    context.stack.binaryOperation(Double::div)
+    context.vstack.binaryOperation(Double::div)
 }

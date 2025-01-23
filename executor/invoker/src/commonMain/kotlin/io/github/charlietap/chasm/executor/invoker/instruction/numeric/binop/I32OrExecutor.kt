@@ -8,5 +8,5 @@ internal inline fun I32OrExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Or,
 ) {
-    context.stack.binaryOperation(Int::or)
+    context.vstack.binaryOperation(Int::or)
 }

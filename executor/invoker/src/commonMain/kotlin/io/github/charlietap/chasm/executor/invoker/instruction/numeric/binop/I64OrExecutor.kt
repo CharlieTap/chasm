@@ -8,5 +8,5 @@ internal inline fun I64OrExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Or,
 ) {
-    context.stack.binaryOperation(Long::or)
+    context.vstack.binaryOperation(Long::or)
 }

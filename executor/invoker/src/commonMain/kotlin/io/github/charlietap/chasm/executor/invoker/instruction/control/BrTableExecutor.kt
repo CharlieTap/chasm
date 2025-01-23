@@ -18,7 +18,7 @@ internal inline fun BrTableExecutor(
     instruction: ControlInstruction.BrTable,
     crossinline breakExecutor: BreakExecutor,
 ) {
-    val (stack) = context
+    val stack = context.vstack
     val index = stack.popI32()
 
     val label = if (index >= 0 && index < instruction.labelIndices.size) {
@@ -27,5 +27,5 @@ internal inline fun BrTableExecutor(
         instruction.defaultLabelIndex
     }
 
-    breakExecutor(stack, label)
+    breakExecutor(context.cstack, stack, label)
 }

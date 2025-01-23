@@ -8,5 +8,5 @@ internal inline fun I64XorExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Xor,
 ) {
-    context.stack.binaryOperation(Long::xor)
+    context.vstack.binaryOperation(Long::xor)
 }

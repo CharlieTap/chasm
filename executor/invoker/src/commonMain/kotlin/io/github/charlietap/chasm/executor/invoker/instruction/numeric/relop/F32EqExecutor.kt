@@ -9,5 +9,5 @@ internal inline fun F32EqExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Eq,
 ) {
-    context.stack.relationalOperation(Float::eq)
+    context.vstack.relationalOperation(Float::eq)
 }

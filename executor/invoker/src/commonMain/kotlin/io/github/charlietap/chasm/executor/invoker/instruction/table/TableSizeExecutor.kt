@@ -8,7 +8,7 @@ internal inline fun TableSizeExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.TableSize,
 ) {
-    val (stack) = context
+    val stack = context.vstack
 
     val tableInstance = instruction.table
     val tableSize = tableInstance.elements.size

@@ -9,5 +9,5 @@ internal inline fun F32LeExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Le,
 ) {
-    context.stack.relationalOperation(Float::le)
+    context.vstack.relationalOperation(Float::le)
 }

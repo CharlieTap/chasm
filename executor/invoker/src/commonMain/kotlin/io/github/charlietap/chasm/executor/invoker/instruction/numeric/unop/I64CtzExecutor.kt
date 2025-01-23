@@ -9,5 +9,5 @@ internal inline fun I64CtzExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Ctz,
 ) {
-    context.stack.unaryOperation(Long::countTrailingZero)
+    context.vstack.unaryOperation(Long::countTrailingZero)
 }

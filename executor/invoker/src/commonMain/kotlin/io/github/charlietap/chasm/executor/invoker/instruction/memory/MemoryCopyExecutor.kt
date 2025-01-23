@@ -24,7 +24,7 @@ internal inline fun MemoryCopyExecutor(
     crossinline copier: LinearMemoryCopier,
 ) {
 
-    val stack = context.stack
+    val stack = context.vstack
 
     val srcMemory = instruction.srcMemory
     val dstMemory = instruction.dstMemory

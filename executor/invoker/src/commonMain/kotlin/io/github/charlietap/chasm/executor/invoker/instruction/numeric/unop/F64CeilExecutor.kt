@@ -9,5 +9,5 @@ internal inline fun F64CeilExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Ceil,
 ) {
-    context.stack.unaryOperation(Double::ceil)
+    context.vstack.unaryOperation(Double::ceil)
 }

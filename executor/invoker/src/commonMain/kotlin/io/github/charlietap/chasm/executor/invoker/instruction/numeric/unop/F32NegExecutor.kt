@@ -8,5 +8,5 @@ internal inline fun F32NegExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Neg,
 ) {
-    context.stack.unaryOperation(Float::unaryMinus)
+    context.vstack.unaryOperation(Float::unaryMinus)
 }

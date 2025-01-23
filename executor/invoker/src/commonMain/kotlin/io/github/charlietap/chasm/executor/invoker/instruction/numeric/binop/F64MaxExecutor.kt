@@ -9,5 +9,5 @@ internal inline fun F64MaxExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Max,
 ) {
-    context.stack.binaryOperation(Double::max)
+    context.vstack.binaryOperation(Double::max)
 }

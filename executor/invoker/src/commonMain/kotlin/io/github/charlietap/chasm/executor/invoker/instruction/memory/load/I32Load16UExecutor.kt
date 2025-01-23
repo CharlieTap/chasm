@@ -27,7 +27,7 @@ internal inline fun I32Load16UExecutor(
     crossinline boundsChecker: BoundsChecker<Int>,
     crossinline reader: I3216UReader,
 ) {
-    val stack = context.stack
+    val stack = context.vstack
     val memory = instruction.memory
 
     val baseAddress = stack.popI32()

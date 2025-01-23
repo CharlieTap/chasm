@@ -8,5 +8,5 @@ internal inline fun I32MulExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Mul,
 ) {
-    context.stack.binaryOperation(Int::times)
+    context.vstack.binaryOperation(Int::times)
 }

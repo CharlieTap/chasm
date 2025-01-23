@@ -26,14 +26,14 @@ internal inline fun ArrayNewFixedExecutor(
     crossinline fieldPacker: FieldPacker,
 ) {
 
-    val (stack) = context
+    val stack = context.vstack
     val (typeIndex, size) = instruction
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
     val arrayType = definedTypeExpander(definedType).arrayType()
 
     val fields = MutableList(size.toInt()) { _ ->
-        val value = stack.popValue()
+        val value = stack.pop()
         fieldPacker(value, arrayType.fieldType)
     }.asReversed()
 

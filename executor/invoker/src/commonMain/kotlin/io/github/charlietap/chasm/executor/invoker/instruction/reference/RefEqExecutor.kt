@@ -10,10 +10,10 @@ internal inline fun RefEqExecutor(
     instruction: ReferenceInstruction.RefEq,
 ) {
 
-    val (stack) = context
+    val stack = context.vstack
 
-    val referenceValue1 = stack.popValue()
-    val referenceValue2 = stack.popValue()
+    val referenceValue1 = stack.pop()
+    val referenceValue2 = stack.pop()
 
     val equal = when {
         referenceValue1 is ReferenceValue.Array && referenceValue2 is ReferenceValue.Array -> referenceValue1.instance === referenceValue2.instance

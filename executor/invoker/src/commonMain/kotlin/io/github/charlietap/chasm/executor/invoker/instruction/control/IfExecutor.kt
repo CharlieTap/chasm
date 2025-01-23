@@ -18,12 +18,13 @@ internal inline fun IfExecutor(
     instruction: ControlInstruction.If,
     crossinline blockExecutor: BlockExecutor,
 ) {
-    val (stack, store) = context
+    val stack = context.vstack
+    val store = context.store
     val firstBlock = stack.popI32() != 0
 
     if (firstBlock) {
-        blockExecutor(store, stack, instruction.functionType, instruction.thenInstructions)
+        blockExecutor(store, context.cstack, stack, instruction.functionType, instruction.thenInstructions)
     } else {
-        blockExecutor(store, stack, instruction.functionType, instruction.elseInstructions ?: emptyArray())
+        blockExecutor(store, context.cstack, stack, instruction.functionType, instruction.elseInstructions ?: emptyArray())
     }
 }

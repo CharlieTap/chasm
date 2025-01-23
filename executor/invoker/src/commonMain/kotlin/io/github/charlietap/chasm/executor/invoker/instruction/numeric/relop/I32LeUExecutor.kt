@@ -9,5 +9,5 @@ internal inline fun I32LeUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32LeU,
 ) {
-    context.stack.relationalOperation(Int::leu)
+    context.vstack.relationalOperation(Int::leu)
 }

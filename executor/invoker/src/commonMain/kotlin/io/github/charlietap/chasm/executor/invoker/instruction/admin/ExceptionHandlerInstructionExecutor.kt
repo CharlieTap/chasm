@@ -8,5 +8,5 @@ internal inline fun ExceptionHandlerInstructionExecutor(
     context: ExecutionContext,
     instruction: AdminInstruction.Handler,
 ) {
-    context.stack.popHandler()
+    context.cstack.popHandler()
 }

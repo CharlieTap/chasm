@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddres
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.memoryGrowRuntimeInstruction
-import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
@@ -37,7 +37,7 @@ import kotlinx.benchmark.Warmup
 class MemoryGrowInstructionBenchmark {
 
     private val context = executionContext(
-        stack = stack(),
+        cstack = cstack(),
         store = store(),
         instance = moduleInstance(),
     )
@@ -64,22 +64,22 @@ class MemoryGrowInstructionBenchmark {
     fun setup() {
         context.apply {
             instance.memAddresses.add(0, memoryAddress(0))
-            stack.push(frame)
+            cstack.push(frame)
             store.memories.add(0, memoryInstance)
         }
     }
 
     @TearDown
     fun cleanup() {
-        context.stack.clear()
+        context.cstack.clear()
         context.store.memories.clear()
     }
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.stack.push(pagesToGrow)
+        context.vstack.push(pagesToGrow)
         val result = MemoryGrowExecutor(context, instruction)
-        context.stack.clearValues()
+        context.vstack.clear()
         blackhole.consume(result)
     }
 }

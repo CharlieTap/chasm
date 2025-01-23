@@ -7,6 +7,6 @@ internal inline fun GlobalSetExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction.GlobalSet,
 ) {
-    val value = context.stack.popValue()
+    val value = context.vstack.pop()
     instruction.global.value = value
 }

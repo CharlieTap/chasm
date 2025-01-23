@@ -8,5 +8,5 @@ internal inline fun I32XorExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Xor,
 ) {
-    context.stack.binaryOperation(Int::xor)
+    context.vstack.binaryOperation(Int::xor)
 }

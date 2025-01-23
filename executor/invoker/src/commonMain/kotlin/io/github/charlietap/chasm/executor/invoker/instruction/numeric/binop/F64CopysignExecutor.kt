@@ -9,5 +9,5 @@ internal inline fun F64CopysignExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Copysign,
 ) {
-    context.stack.binaryOperation(Double::copySign)
+    context.vstack.binaryOperation(Double::copySign)
 }

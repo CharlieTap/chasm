@@ -9,5 +9,5 @@ internal inline fun F64MinExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Min,
 ) {
-    context.stack.binaryOperation(Double::min)
+    context.vstack.binaryOperation(Double::min)
 }

@@ -29,10 +29,11 @@ internal inline fun ArrayInitElementExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
 ) {
+    val stack = context.vstack
+    val store = context.store
 
-    val (stack, store) = context
     val (typeIndex, elementIndex) = instruction
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
 
     val arrayType = definedTypeExpander(definedType).arrayType()

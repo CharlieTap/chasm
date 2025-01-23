@@ -9,5 +9,5 @@ internal inline fun I64ShlExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Shl,
 ) {
-    context.stack.binaryOperation(Long::shl)
+    context.vstack.binaryOperation(Long::shl)
 }

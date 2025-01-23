@@ -10,5 +10,5 @@ internal inline fun I64ExtendI32SExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64ExtendI32S,
 ) {
-    context.stack.convertOperation(::I64, Int::extendI64s)
+    context.vstack.convertOperation(::I64, Int::extendI64s)
 }

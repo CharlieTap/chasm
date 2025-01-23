@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
@@ -15,6 +14,7 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal fun ThrowRefExecutor(
@@ -33,8 +33,10 @@ internal inline fun ThrowRefExecutor(
     crossinline breakDispatcher: Dispatcher<ControlInstruction.Br>,
     crossinline handlerDispatcher: Dispatcher<ExceptionHandler>,
 ) {
+    val stack = context.vstack
+    val cstack = context.cstack
+    val store = context.store
 
-    val (stack, store) = context
     val ref = stack.popReference()
 
     val exceptionRef = if (ref is ReferenceValue.Null) {
@@ -46,14 +48,14 @@ internal inline fun ThrowRefExecutor(
     val instance = store.exception(exceptionRef.address)
     val address = instance.tagAddress
 
-    val handler = jumpToHandlerInstruction(stack)
+    val handler = jumpToHandlerInstruction(cstack)
 
     if (handler.instructions.isEmpty()) {
         stack.push(ReferenceValue.Exception(exceptionRef.address))
-        stack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
+        cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
     } else {
 
-        val frame = stack.peekFrame()
+        val frame = context.cstack.peekFrame()
 
         val catchHandler = handler.instructions.first()
         val otherHandlers = handler.instructions.drop(1)
@@ -75,7 +77,7 @@ internal inline fun ThrowRefExecutor(
                 instance.fields.forEachReversed { field ->
                     stack.push(field)
                 }
-                stack.push(
+                cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
             }
@@ -84,41 +86,41 @@ internal inline fun ThrowRefExecutor(
                     stack.push(field)
                 }
                 stack.push(exceptionRef)
-                stack.push(
+                cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
             }
             catchHandler is CatchHandler.CatchAll -> {
-                stack.push(
+                cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
             }
             catchHandler is CatchHandler.CatchAllRef -> {
                 stack.push(exceptionRef)
-                stack.push(
+                cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
             }
             else -> {
 
                 handler.instructions = otherHandlers
-                stack.push(handler)
+                cstack.push(handler)
                 val instruction = handlerDispatcher(handler)
-                stack.push(instruction)
+                cstack.push(instruction)
                 stack.push(exceptionRef)
-                stack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
+                cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
             }
         }
     }
 }
 
-private inline fun jumpToHandlerInstruction(stack: Stack): ExceptionHandler {
+private inline fun jumpToHandlerInstruction(controlStack: ControlStack): ExceptionHandler {
 
-    val handler = stack.popHandler()
+    val handler = controlStack.popHandler()
 
-    stack.shrinkLabels(0, handler.labelsDepth)
-    stack.shrinkFrames(0, handler.framesDepth)
-    stack.shrinkInstructions(0, handler.instructionsDepth)
+    controlStack.shrinkLabels(0, handler.labelsDepth)
+    controlStack.shrinkFrames(0, handler.framesDepth)
+    controlStack.shrinkInstructions(0, handler.instructionsDepth)
 
     return handler
 }

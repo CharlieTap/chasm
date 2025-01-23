@@ -25,8 +25,10 @@ internal inline fun ThrowExecutor(
     crossinline throwRefDispatcher: Dispatcher<ControlInstruction.ThrowRef>,
 ) {
 
-    val (stack, store) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val cstack = context.cstack
+    val store = context.store
+    val frame = cstack.peekFrame()
     val address = frame.instance
         .tagAddress(instruction.tagIndex)
 
@@ -34,7 +36,7 @@ internal inline fun ThrowExecutor(
     val functionType = instance.type.type
 
     val params = List(functionType.params.types.size) {
-        stack.popValue()
+        stack.pop()
     }
 
     val exceptionInstance = ExceptionInstance(
@@ -46,5 +48,5 @@ internal inline fun ThrowExecutor(
     val exceptionAddress = Address.Exception(store.exceptions.size - 1)
 
     stack.push(ReferenceValue.Exception(exceptionAddress))
-    stack.push(throwRefDispatcher(ControlInstruction.ThrowRef))
+    cstack.push(throwRefDispatcher(ControlInstruction.ThrowRef))
 }

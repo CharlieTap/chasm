@@ -8,5 +8,5 @@ internal inline fun I32ShrSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrS,
 ) {
-    context.stack.binaryOperation(Int::shr)
+    context.vstack.binaryOperation(Int::shr)
 }

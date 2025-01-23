@@ -9,5 +9,5 @@ internal inline fun F32MinExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Min,
 ) {
-    context.stack.binaryOperation(Float::min)
+    context.vstack.binaryOperation(Float::min)
 }

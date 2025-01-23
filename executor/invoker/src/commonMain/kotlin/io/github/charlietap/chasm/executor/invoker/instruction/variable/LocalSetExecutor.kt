@@ -7,8 +7,8 @@ internal inline fun LocalSetExecutor(
     context: ExecutionContext,
     instruction: VariableInstruction.LocalSet,
 ) {
-    context.stack.setLocal(
+    context.vstack.setLocal(
         instruction.localIdx,
-        context.stack.popValue(),
+        context.vstack.pop(),
     )
 }

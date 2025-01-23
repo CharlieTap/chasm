@@ -10,5 +10,5 @@ internal inline fun F32ConvertI64SExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32ConvertI64S,
 ) {
-    context.stack.convertOperation(::F32, Long::convertF32s)
+    context.vstack.convertOperation(::F32, Long::convertF32s)
 }

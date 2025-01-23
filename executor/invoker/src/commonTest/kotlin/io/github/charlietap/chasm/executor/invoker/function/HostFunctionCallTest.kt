@@ -8,8 +8,9 @@ import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
 import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
 import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i64
@@ -23,16 +24,18 @@ class HostFunctionCallTest {
     fun `can execute a host function call and return a result`() {
 
         val store = store()
-        val stack = stack()
+        val cstack = cstack()
+        val vstack = vstack()
         val context = executionContext(
             store = store,
-            stack = stack,
+            cstack = cstack,
+            vstack = vstack,
         )
         val frame = frame(
             instance = moduleInstance(),
         )
 
-        stack.push(frame)
+        cstack.push(frame)
 
         val functionType = functionType(
             params = resultType(
@@ -69,7 +72,7 @@ class HostFunctionCallTest {
         )
 
         params.forEach { value ->
-            stack.push(value)
+            vstack.push(value)
         }
 
         val actual = HostFunctionCall(
@@ -78,9 +81,9 @@ class HostFunctionCallTest {
         )
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.framesDepth())
-        assertEquals(2, stack.valuesDepth())
-        assertEquals(i64(118), stack.popValue())
-        assertEquals(i32(117), stack.popValue())
+        assertEquals(1, cstack.framesDepth())
+        assertEquals(2, vstack.depth())
+        assertEquals(i64(118), vstack.pop())
+        assertEquals(i32(117), vstack.pop())
     }
 }

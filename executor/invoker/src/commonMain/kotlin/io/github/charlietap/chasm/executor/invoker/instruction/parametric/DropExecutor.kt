@@ -8,5 +8,5 @@ internal inline fun DropExecutor(
     context: ExecutionContext,
     instruction: ParametricInstruction.Drop,
 ) {
-    context.stack.popValue()
+    context.vstack.pop()
 }

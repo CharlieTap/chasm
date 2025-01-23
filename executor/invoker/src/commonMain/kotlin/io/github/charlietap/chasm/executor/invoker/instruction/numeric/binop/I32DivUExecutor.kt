@@ -12,13 +12,13 @@ internal inline fun I32DivUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32DivU,
 ) {
-    val operand2 = context.stack
-        .peekNthValue(0)
+    val operand2 = context.vstack
+        .peekNth(0)
         as I32
 
     if (operand2.value.toUInt() == 0u) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
 
-    context.stack.binaryOperation(Int::divu)
+    context.vstack.binaryOperation(Int::divu)
 }

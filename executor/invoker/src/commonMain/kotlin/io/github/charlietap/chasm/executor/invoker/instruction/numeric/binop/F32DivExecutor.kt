@@ -8,5 +8,5 @@ internal inline fun F32DivExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Div,
 ) {
-    context.stack.binaryOperation(Float::div)
+    context.vstack.binaryOperation(Float::div)
 }

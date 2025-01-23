@@ -8,5 +8,5 @@ internal inline fun I32AddExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Add,
 ) {
-    context.stack.binaryOperation(Int::plus)
+    context.vstack.binaryOperation(Int::plus)
 }

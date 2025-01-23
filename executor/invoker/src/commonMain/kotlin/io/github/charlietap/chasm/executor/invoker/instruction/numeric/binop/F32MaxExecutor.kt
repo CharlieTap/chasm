@@ -9,5 +9,5 @@ internal inline fun F32MaxExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Max,
 ) {
-    context.stack.binaryOperation(Float::max)
+    context.vstack.binaryOperation(Float::max)
 }

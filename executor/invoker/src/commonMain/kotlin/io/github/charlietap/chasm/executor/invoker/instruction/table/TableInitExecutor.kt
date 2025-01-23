@@ -11,8 +11,7 @@ internal fun TableInitExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.TableInit,
 ) {
-
-    val (stack) = context
+    val stack = context.vstack
 
     val tableInstance = instruction.table
     val elementInstance = instruction.element

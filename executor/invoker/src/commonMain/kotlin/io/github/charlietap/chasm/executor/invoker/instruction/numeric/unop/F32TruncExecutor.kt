@@ -9,5 +9,5 @@ internal inline fun F32TruncExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Trunc,
 ) {
-    context.stack.unaryOperation(Float::trunc)
+    context.vstack.unaryOperation(Float::trunc)
 }

@@ -8,5 +8,5 @@ internal inline fun I32ClzExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Clz,
 ) {
-    context.stack.unaryOperation(Int::countLeadingZeroBits)
+    context.vstack.unaryOperation(Int::countLeadingZeroBits)
 }

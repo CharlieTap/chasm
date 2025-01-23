@@ -9,5 +9,5 @@ internal inline fun I32EqzExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Eqz,
 ) {
-    context.stack.testOperation(Int::eqz)
+    context.vstack.testOperation(Int::eqz)
 }

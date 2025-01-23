@@ -9,7 +9,8 @@ internal fun CallRefExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.CallRef,
 ) {
-    val (stack, store) = context
+    val stack = context.vstack
+    val store = context.store
     val address = stack.popFunctionAddress()
 
     val instruction = store.instruction(address)

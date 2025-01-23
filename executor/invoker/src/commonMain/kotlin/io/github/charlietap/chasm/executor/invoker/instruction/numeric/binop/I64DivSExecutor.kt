@@ -11,9 +11,9 @@ internal inline fun I64DivSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64DivS,
 ) {
-    val stack = context.stack
-    val operand1 = stack.peekNthValue(1) as I64
-    val operand2 = stack.peekNthValue(0) as I64
+    val stack = context.vstack
+    val operand1 = stack.peekNth(1) as I64
+    val operand2 = stack.peekNth(0) as I64
 
     if (operand2.value == 0L) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)

@@ -9,5 +9,5 @@ internal inline fun F64NearestExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Nearest,
 ) {
-    context.stack.unaryOperation(Double::nearest)
+    context.vstack.unaryOperation(Double::nearest)
 }

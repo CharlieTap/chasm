@@ -10,5 +10,5 @@ internal inline fun I32TruncF64UExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32TruncF64U,
 ) {
-    context.stack.convertOperation(::I32, Double::truncI32uTrapping)
+    context.vstack.convertOperation(::I32, Double::truncI32uTrapping)
 }

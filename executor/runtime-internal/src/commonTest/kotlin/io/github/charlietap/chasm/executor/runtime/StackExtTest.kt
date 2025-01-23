@@ -8,12 +8,14 @@ import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
 import io.github.charlietap.chasm.executor.runtime.ext.relationalOperation
 import io.github.charlietap.chasm.executor.runtime.ext.testOperation
 import io.github.charlietap.chasm.executor.runtime.ext.unaryOperation
+import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
-import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -23,7 +25,7 @@ class StackExtTest {
     @Test
     fun `can push a stack frame to the stack`() {
 
-        val stack = stack()
+        val stack = cstack()
         val frame = frame()
 
         stack.push(frame)
@@ -38,34 +40,34 @@ class StackExtTest {
     fun `pushing too many frames to the stack returns an error`() {
 
         val frame = frame()
-        val stack = stack(
-            frames = List(Stack.MAX_DEPTH) { frame },
+        val controlStack = cstack(
+            frames = List(ControlStack.MAX_DEPTH) { frame },
         )
 
         val actual = assertFailsWith<InvocationException> {
-            stack.push(frame)
+            controlStack.push(frame)
         }
 
         assertEquals(InvocationError.CallStackExhausted, actual.error)
-        assertEquals(Stack.MAX_DEPTH, stack.size())
+        assertEquals(ControlStack.MAX_DEPTH, controlStack.size())
     }
 
     @Test
     fun `can run an const operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         stack.constOperation(117)
         stack.constOperation(117L)
         stack.constOperation(117f)
         stack.constOperation(117.0)
 
-        assertEquals(4, stack.size())
+        assertEquals(4, stack.depth())
 
-        val f64 = stack.popValue() as F64
-        val f32 = stack.popValue() as F32
-        val i64 = stack.popValue() as I64
-        val i32 = stack.popValue() as I32
+        val f64 = stack.pop() as F64
+        val f32 = stack.pop() as F32
+        val i64 = stack.pop() as I64
+        val i32 = stack.pop() as I32
 
         assertEquals(117.0, f64.value)
         assertEquals(117f, f32.value)
@@ -76,7 +78,7 @@ class StackExtTest {
     @Test
     fun `can run an i32 unary operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
         val constructor = ::I32
         val op = Int::countTrailingZeroBits
 
@@ -85,9 +87,9 @@ class StackExtTest {
         val actual = stack.unaryOperation(constructor, op)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(4, value.value)
     }
@@ -95,7 +97,7 @@ class StackExtTest {
     @Test
     fun `can run an i64 unary operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
         val constructor = ::I64
         val op = Long::countTrailingZero
 
@@ -104,9 +106,9 @@ class StackExtTest {
         val actual = stack.unaryOperation(constructor, op)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I64
         assertEquals(4, value.value)
     }
@@ -114,7 +116,7 @@ class StackExtTest {
     @Test
     fun `can run an f32 unary operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
         val constructor = ::F32
         val op = Float::sqrt
 
@@ -123,9 +125,9 @@ class StackExtTest {
         val actual = stack.unaryOperation(constructor, op)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as F32
         assertEquals(4f, value.value)
     }
@@ -133,7 +135,7 @@ class StackExtTest {
     @Test
     fun `can run an f64 unary operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
         val constructor = ::F64
         val op = Double::sqrt
 
@@ -142,9 +144,9 @@ class StackExtTest {
         val actual = stack.unaryOperation(constructor, op)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as F64
         assertEquals(4.0, value.value)
     }
@@ -152,7 +154,7 @@ class StackExtTest {
     @Test
     fun `can run an i32 binary operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
         val constructor = ::I32
 
         stack.push(I32(1))
@@ -161,9 +163,9 @@ class StackExtTest {
         val actual = stack.binaryOperation(constructor, Int::plus)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(4, value.value)
     }
@@ -171,7 +173,7 @@ class StackExtTest {
     @Test
     fun `can run an i64 binary operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
         val constructor = ::I64
 
         stack.push(I64(1))
@@ -180,9 +182,9 @@ class StackExtTest {
         val actual = stack.binaryOperation(constructor, Long::plus)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I64
         assertEquals(4, value.value)
     }
@@ -190,7 +192,7 @@ class StackExtTest {
     @Test
     fun `can run an f32 binary operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
         val constructor = ::F32
 
         stack.push(F32(1f))
@@ -199,9 +201,9 @@ class StackExtTest {
         val actual = stack.binaryOperation(constructor, Float::plus)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as F32
         assertEquals(4f, value.value)
     }
@@ -209,7 +211,7 @@ class StackExtTest {
     @Test
     fun `can run an f64 binary operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
         val constructor = ::F64
 
         stack.push(F64(1.0))
@@ -218,9 +220,9 @@ class StackExtTest {
         val actual = stack.binaryOperation(constructor, Double::plus)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as F64
         assertEquals(4.0, value.value)
     }
@@ -228,16 +230,16 @@ class StackExtTest {
     @Test
     fun `can run an i32 test operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         stack.push(I32(1))
 
         val actual = stack.testOperation(Int::eqz)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(0, value.value)
     }
@@ -245,16 +247,16 @@ class StackExtTest {
     @Test
     fun `can run a i64 test operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         stack.push(I64(1))
 
         val actual = stack.testOperation(Long::eqz)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(0, value.value)
     }
@@ -262,7 +264,7 @@ class StackExtTest {
     @Test
     fun `can run an i32 relational operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         stack.push(I32(1))
         stack.push(I32(1))
@@ -270,9 +272,9 @@ class StackExtTest {
         val actual = stack.relationalOperation(Int::eq)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(1, value.value)
     }
@@ -280,7 +282,7 @@ class StackExtTest {
     @Test
     fun `can run an i64 relational operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         stack.push(I64(1))
         stack.push(I64(1))
@@ -288,9 +290,9 @@ class StackExtTest {
         val actual = stack.relationalOperation(Long::eq)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(1, value.value)
     }
@@ -298,7 +300,7 @@ class StackExtTest {
     @Test
     fun `can run an f32 relational operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         stack.push(F32(1f))
         stack.push(F32(1f))
@@ -306,9 +308,9 @@ class StackExtTest {
         val actual = stack.relationalOperation(Float::eq)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(1, value.value)
     }
@@ -316,7 +318,7 @@ class StackExtTest {
     @Test
     fun `can run an f64 relational operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         stack.push(F64(1.0))
         stack.push(F64(1.0))
@@ -324,9 +326,9 @@ class StackExtTest {
         val actual = stack.relationalOperation(Double::eq)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(1, value.value)
     }
@@ -334,16 +336,16 @@ class StackExtTest {
     @Test
     fun `can run a conversion operation on the stack`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         stack.push(I64(117L))
 
         val actual = stack.convertOperation(::I32, Long::wrap)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.depth())
 
-        val entry = stack.popValue()
+        val entry = stack.pop()
         val value = entry as I32
         assertEquals(117, value.value)
     }

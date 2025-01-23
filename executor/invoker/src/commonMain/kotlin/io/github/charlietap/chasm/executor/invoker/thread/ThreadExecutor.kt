@@ -5,11 +5,13 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.instruction.admin.FrameInstructionExecutor
 import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.ext.depth
+import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
+import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 internal typealias ThreadExecutor = (Configuration, List<ExecutionValue>) -> Result<List<ExecutionValue>, InvocationError>
@@ -31,17 +33,19 @@ internal fun ThreadExecutor(
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
     val thread = configuration.thread
-    val stack = Stack()
+    val controlStack = ControlStack()
+    val valueStack = ValueStack()
     val context = ExecutionContext(
-        stack = stack,
+        cstack = controlStack,
+        vstack = valueStack,
         store = configuration.store,
         instance = thread.frame.instance,
         config = configuration.config,
     )
 
-    stack.push(thread.frame)
+    controlStack.push(thread.frame)
     params.forEach { local ->
-        stack.push(local)
+        valueStack.push(local)
     }
 
     var loop = true
@@ -51,21 +55,21 @@ internal fun ThreadExecutor(
         loop = false
     }
 
-    stack.push(::exitLoop)
-    stack.push(frameCleaner)
-    stack.push(thread.instructions)
+    controlStack.push(::exitLoop)
+    controlStack.push(frameCleaner)
+    controlStack.push(thread.instructions)
 
     try {
         while (loop) {
-            stack.popInstruction()(context)
+            controlStack.popInstruction()(context)
         }
     } catch (exception: InvocationException) {
         Err(exception.error).bind()
     }
 
-    if (stack.size() != thread.frame.arity) {
+    if (context.depth() != thread.frame.arity) {
         Err(InvocationError.ProgramFinishedInconsistentState).bind<List<ExecutionValue>>()
     }
 
-    stack.values()
+    valueStack
 }

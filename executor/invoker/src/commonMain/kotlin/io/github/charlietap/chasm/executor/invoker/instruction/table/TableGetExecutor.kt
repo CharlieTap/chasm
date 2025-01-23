@@ -9,8 +9,7 @@ internal inline fun TableGetExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.TableGet,
 ) {
-
-    val (stack) = context
+    val stack = context.vstack
     val tableInstance = instruction.table
 
     val elementIndex = stack.popI32()

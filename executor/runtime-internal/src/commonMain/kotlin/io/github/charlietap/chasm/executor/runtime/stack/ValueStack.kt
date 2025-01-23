@@ -32,7 +32,7 @@ class ValueStack
             }
         }
 
-        fun pushAll(values: Array<ExecutionValue>) {
+        fun push(values: Array<ExecutionValue>) {
             val requiredSize = top + values.size
             while (requiredSize > elements.size) {
                 doubleCapacity()

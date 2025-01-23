@@ -18,10 +18,10 @@ internal inline fun BrIfExecutor(
     instruction: ControlInstruction.BrIf,
     crossinline breakExecutor: BreakExecutor,
 ) {
-    val (stack) = context
+    val stack = context.vstack
     val shouldBreak = stack.popI32() != 0
 
     if (shouldBreak) {
-        breakExecutor(stack, instruction.labelIndex)
+        breakExecutor(context.cstack, stack, instruction.labelIndex)
     }
 }

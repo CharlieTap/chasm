@@ -5,5 +5,5 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 internal inline fun LabelInstructionExecutor(
     context: ExecutionContext,
 ) {
-    context.stack.popLabel()
+    context.cstack.popLabel()
 }

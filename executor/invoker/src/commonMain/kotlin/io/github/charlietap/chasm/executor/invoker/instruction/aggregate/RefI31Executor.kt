@@ -21,8 +21,7 @@ internal inline fun RefI31Executor(
     instruction: AggregateInstruction.RefI31,
     crossinline i31Wrapper: (Int) -> ReferenceValue.I31,
 ) {
-
-    val (stack) = context
+    val stack = context.vstack
     val value = stack.popI32()
 
     val i31 = i31Wrapper(value)

@@ -8,5 +8,5 @@ internal inline fun GlobalGetExecutor(
     instruction: VariableInstruction.GlobalGet,
 ) {
     val value = instruction.global.value
-    context.stack.push(value)
+    context.vstack.push(value)
 }

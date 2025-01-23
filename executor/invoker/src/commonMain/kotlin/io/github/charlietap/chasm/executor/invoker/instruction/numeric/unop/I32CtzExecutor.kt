@@ -8,5 +8,5 @@ internal inline fun I32CtzExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Ctz,
 ) {
-    context.stack.unaryOperation(Int::countTrailingZeroBits)
+    context.vstack.unaryOperation(Int::countTrailingZeroBits)
 }

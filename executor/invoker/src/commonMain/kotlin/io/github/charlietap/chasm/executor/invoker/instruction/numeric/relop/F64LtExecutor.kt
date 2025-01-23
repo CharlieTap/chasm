@@ -9,5 +9,5 @@ internal inline fun F64LtExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Lt,
 ) {
-    context.stack.relationalOperation(Double::lt)
+    context.vstack.relationalOperation(Double::lt)
 }

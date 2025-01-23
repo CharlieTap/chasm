@@ -9,5 +9,5 @@ internal inline fun F64PromoteF32Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64PromoteF32,
 ) {
-    context.stack.convertOperation(::F64, Float::toDouble)
+    context.vstack.convertOperation(::F64, Float::toDouble)
 }

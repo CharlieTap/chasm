@@ -9,5 +9,5 @@ internal inline fun I64PopcntExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Popcnt,
 ) {
-    context.stack.unaryOperation(Long::countOnePopulation)
+    context.vstack.unaryOperation(Long::countOnePopulation)
 }

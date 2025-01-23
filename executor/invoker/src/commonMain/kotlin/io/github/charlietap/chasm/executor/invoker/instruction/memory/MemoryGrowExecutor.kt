@@ -23,7 +23,7 @@ internal inline fun MemoryGrowExecutor(
     crossinline grower: LinearMemoryGrower,
 ) {
 
-    val stack = context.stack
+    val stack = context.vstack
     val memory = instruction.memory
 
     val currentSizeInPages = memory.type.limits.min

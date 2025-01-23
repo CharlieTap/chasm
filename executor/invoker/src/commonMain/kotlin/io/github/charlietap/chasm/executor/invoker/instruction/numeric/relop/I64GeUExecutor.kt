@@ -9,5 +9,5 @@ internal inline fun I64GeUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64GeU,
 ) {
-    context.stack.relationalOperation(Long::geu)
+    context.vstack.relationalOperation(Long::geu)
 }

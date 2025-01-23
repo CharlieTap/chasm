@@ -9,9 +9,8 @@ internal inline fun RefFuncExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefFunc,
 ) {
-
-    val (stack) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val frame = context.cstack.peekFrame()
 
     val functionAddress = frame.instance
         .functionAddress(instruction.funcIdx)

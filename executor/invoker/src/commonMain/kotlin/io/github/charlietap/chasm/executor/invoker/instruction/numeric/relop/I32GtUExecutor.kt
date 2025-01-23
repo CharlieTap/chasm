@@ -9,5 +9,5 @@ internal inline fun I32GtUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32GtU,
 ) {
-    context.stack.relationalOperation(Int::gtu)
+    context.vstack.relationalOperation(Int::gtu)
 }

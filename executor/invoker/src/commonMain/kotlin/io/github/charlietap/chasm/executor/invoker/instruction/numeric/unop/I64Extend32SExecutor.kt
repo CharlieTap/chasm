@@ -9,5 +9,5 @@ internal inline fun I64Extend32SExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Extend32S,
 ) {
-    context.stack.unaryOperation(Long::extend32s)
+    context.vstack.unaryOperation(Long::extend32s)
 }

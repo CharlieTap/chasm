@@ -9,5 +9,5 @@ internal inline fun F64EqExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F64Eq,
 ) {
-    context.stack.relationalOperation(Double::eq)
+    context.vstack.relationalOperation(Double::eq)
 }

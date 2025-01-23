@@ -9,5 +9,5 @@ internal inline fun F32AbsExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Abs,
 ) {
-    context.stack.unaryOperation(Float::absoluteValue)
+    context.vstack.unaryOperation(Float::absoluteValue)
 }

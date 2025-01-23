@@ -11,13 +11,13 @@ internal inline fun I64RemSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64RemS,
 ) {
-    val operand2 = context.stack
-        .peekNthValue(0)
+    val operand2 = context.vstack
+        .peekNth(0)
         as I64
 
     if (operand2.value == 0L) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
 
-    context.stack.binaryOperation(Long::rem)
+    context.vstack.binaryOperation(Long::rem)
 }

@@ -9,5 +9,5 @@ internal inline fun F32GeExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Ge,
 ) {
-    context.stack.relationalOperation(Float::ge)
+    context.vstack.relationalOperation(Float::ge)
 }

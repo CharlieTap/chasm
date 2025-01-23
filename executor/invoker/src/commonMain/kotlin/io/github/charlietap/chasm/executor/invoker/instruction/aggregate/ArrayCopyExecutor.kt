@@ -29,8 +29,8 @@ internal inline fun ArrayCopyExecutor(
 
     // x = dest
     // y = src
-    val (stack) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val frame = context.cstack.peekFrame()
     val destDefinedType = frame.instance.definedType(instruction.destinationTypeIndex)
 
     val destArrayType = definedTypeExpander(destDefinedType).arrayType()

@@ -8,5 +8,5 @@ internal inline fun I64AddExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Add,
 ) {
-    context.stack.binaryOperation(Long::plus)
+    context.vstack.binaryOperation(Long::plus)
 }

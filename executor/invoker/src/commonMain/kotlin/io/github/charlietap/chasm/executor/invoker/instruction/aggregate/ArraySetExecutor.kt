@@ -28,13 +28,13 @@ internal inline fun ArraySetExecutor(
     crossinline fieldPacker: FieldPacker,
 ) {
 
-    val (stack) = context
+    val stack = context.vstack
     val typeIndex = instruction.typeIndex
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
     val arrayType = definedTypeExpander(definedType).arrayType()
 
-    val value = stack.popValue()
+    val value = stack.pop()
 
     val fieldIndex = stack.popI32()
     val arrayInstance = stack.popArrayReference()

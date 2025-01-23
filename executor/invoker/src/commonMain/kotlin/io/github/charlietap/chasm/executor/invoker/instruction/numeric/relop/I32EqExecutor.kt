@@ -9,5 +9,5 @@ internal inline fun I32EqExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Eq,
 ) {
-    context.stack.relationalOperation(Int::eq)
+    context.vstack.relationalOperation(Int::eq)
 }

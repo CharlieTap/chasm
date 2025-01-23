@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.executor.runtime
 
-import io.github.charlietap.chasm.fixture.executor.runtime.label
-import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.label
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -12,7 +14,7 @@ class StackTest {
     @Test
     fun `peek nth frame returns the correct value`() {
 
-        val stack = stack()
+        val stack = cstack()
 
         val frame1 = frame(
             arity = 1,
@@ -35,7 +37,7 @@ class StackTest {
     @Test
     fun `peek nth label returns the correct value`() {
 
-        val stack = stack()
+        val stack = cstack()
 
         val label1 = label(
             arity = 1,
@@ -58,7 +60,7 @@ class StackTest {
     @Test
     fun `peek nth value returns the correct value`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         val value1 = i32(1)
 
@@ -67,8 +69,8 @@ class StackTest {
         stack.push(value1)
         stack.push(value2)
 
-        val result1 = stack.peekNthValue(0)
-        val result2 = stack.peekNthValue(1)
+        val result1 = stack.peekNth(0)
+        val result2 = stack.peekNth(1)
 
         assertEquals(value2, result1)
         assertEquals(value1, result2)
@@ -77,7 +79,7 @@ class StackTest {
     @Test
     fun `squash n returns the correct value`() {
 
-        val stack = stack()
+        val stack = vstack()
 
         val value1 = i32(0)
         val value2 = i32(1)
@@ -91,10 +93,10 @@ class StackTest {
         stack.push(value4)
         stack.push(value5)
 
-        stack.shrinkValues(2, 1)
+        stack.shrink(2, 1)
 
         val expected = listOf(value1, value4, value5)
 
-        assertEquals(expected, stack.values())
+        assertEquals(expected, stack as List<ExecutionValue>)
     }
 }

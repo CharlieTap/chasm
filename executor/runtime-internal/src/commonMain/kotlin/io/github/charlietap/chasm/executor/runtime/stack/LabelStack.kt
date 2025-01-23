@@ -1,15 +1,15 @@
 package io.github.charlietap.chasm.executor.runtime.stack
 
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
+import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import kotlin.jvm.JvmOverloads
 
 class LabelStack
     @JvmOverloads
     constructor(minCapacity: Int = MIN_CAPACITY) {
 
-        private var elements: Array<Stack.Entry.Label?>
+        private var elements: Array<ControlStack.Entry.Label?>
         private var top = 0
 
         init {
@@ -19,10 +19,10 @@ class LabelStack
                 } else {
                     minCapacity
                 }
-            elements = arrayOfNulls<Stack.Entry.Label?>(arrayCapacity)
+            elements = arrayOfNulls<ControlStack.Entry.Label?>(arrayCapacity)
         }
 
-        fun push(value: Stack.Entry.Label) {
+        fun push(value: ControlStack.Entry.Label) {
             elements[top] = value
             top++
             if (top == elements.size) {
@@ -30,7 +30,7 @@ class LabelStack
             }
         }
 
-        fun pushAll(values: Array<Stack.Entry.Label>) {
+        fun pushAll(values: Array<ControlStack.Entry.Label>) {
             val requiredSize = top + values.size
             while (requiredSize > elements.size) {
                 doubleCapacity()
@@ -39,7 +39,7 @@ class LabelStack
             top += values.size
         }
 
-        fun pop(): Stack.Entry.Label = try {
+        fun pop(): ControlStack.Entry.Label = try {
             top--
             val value = elements[top]
             elements[top] = null
@@ -50,7 +50,7 @@ class LabelStack
             throw InvocationException(InvocationError.MissingStackLabel)
         }
 
-        fun peek(): Stack.Entry.Label = try {
+        fun peek(): ControlStack.Entry.Label = try {
             elements[top - 1]!!
         } catch (_: IndexOutOfBoundsException) {
             throw InvocationException(InvocationError.MissingStackLabel)
@@ -58,7 +58,7 @@ class LabelStack
             throw InvocationException(InvocationError.MissingStackLabel)
         }
 
-        fun peekNth(n: Int): Stack.Entry.Label = try {
+        fun peekNth(n: Int): ControlStack.Entry.Label = try {
             elements[top - 1 - n]!!
         } catch (_: IndexOutOfBoundsException) {
             throw InvocationException(InvocationError.MissingStackLabel)
@@ -95,7 +95,7 @@ class LabelStack
         fun entries() = buildList {
             for (i in 0 until top) {
                 @Suppress("UNCHECKED_CAST")
-                add(elements[i] as Stack.Entry.Label)
+                add(elements[i] as ControlStack.Entry.Label)
             }
         }
 

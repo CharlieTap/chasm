@@ -14,9 +14,10 @@ import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchable
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.label
-import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.label
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
@@ -30,10 +31,12 @@ class WasmFunctionCallTest {
     fun `can execute a function call and return a result`() {
 
         val store = store()
-        val stack = stack()
+        val cstack = cstack()
+        val vstack = vstack()
         val context = executionContext(
             store = store,
-            stack = stack,
+            cstack = cstack,
+            vstack = vstack,
         )
 
         val functionType = functionType(
@@ -88,7 +91,7 @@ class WasmFunctionCallTest {
         )
 
         params.forEach { value ->
-            stack.push(value)
+            vstack.push(value)
         }
 
         val frame = frame(
@@ -99,13 +102,13 @@ class WasmFunctionCallTest {
         val expectedFrameInstruction = frameDispatchable
 
         val instructionBlockExecutor: InstructionBlockExecutor = { _stack, _label, _instructions, _handler ->
-            assertEquals(stack, _stack)
+            assertEquals(cstack, _stack)
             assertEquals(label, _label)
             assertEquals(function.body.instructions, _instructions)
 
-            assertEquals(frame, stack.peekFrame())
-            assertEquals(expectedFrameInstruction, stack.peekInstructionOrNull())
-            assertEquals(1, stack.framesDepth())
+            assertEquals(frame, cstack.peekFrame())
+            assertEquals(expectedFrameInstruction, cstack.peekInstructionOrNull())
+            assertEquals(1, cstack.framesDepth())
 
             Ok(Unit)
         }
@@ -118,17 +121,19 @@ class WasmFunctionCallTest {
         )
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.framesDepth())
+        assertEquals(1, cstack.framesDepth())
     }
 
     @Test
     fun `can execute a tail recursive function call and return a result`() {
 
         val store = store()
-        val stack = stack()
+        val cstack = cstack()
+        val vstack = vstack()
         val context = executionContext(
             store = store,
-            stack = stack,
+            cstack = cstack,
+            vstack = vstack,
         )
 
         val functionType = functionType(
@@ -170,7 +175,7 @@ class WasmFunctionCallTest {
         )
 
         params.forEach { value ->
-            stack.push(value)
+            vstack.push(value)
         }
 
         val frame = frame(
@@ -178,8 +183,8 @@ class WasmFunctionCallTest {
             instance = functionInstance.module,
         )
 
-        stack.push(frame)
-        stack.push(
+        cstack.push(frame)
+        cstack.push(
             dispatchableInstruction(),
         )
 
@@ -189,6 +194,6 @@ class WasmFunctionCallTest {
         )
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.framesDepth())
+        assertEquals(1, cstack.framesDepth())
     }
 }

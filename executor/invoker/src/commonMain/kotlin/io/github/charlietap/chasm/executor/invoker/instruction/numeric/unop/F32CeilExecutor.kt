@@ -9,5 +9,5 @@ internal inline fun F32CeilExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Ceil,
 ) {
-    context.stack.unaryOperation(Float::ceil)
+    context.vstack.unaryOperation(Float::ceil)
 }

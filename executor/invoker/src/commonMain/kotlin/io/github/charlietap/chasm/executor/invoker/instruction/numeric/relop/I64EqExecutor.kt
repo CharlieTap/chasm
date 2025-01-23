@@ -9,5 +9,5 @@ internal inline fun I64EqExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64Eq,
 ) {
-    context.stack.relationalOperation(Long::eq)
+    context.vstack.relationalOperation(Long::eq)
 }

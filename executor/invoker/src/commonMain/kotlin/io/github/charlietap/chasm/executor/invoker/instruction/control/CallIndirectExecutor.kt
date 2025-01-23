@@ -39,8 +39,9 @@ internal inline fun CallIndirectExecutor(
     crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
 ) {
 
-    val (stack, store) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val store = context.store
+    val frame = context.cstack.peekFrame()
 
     val expectedFunctionType = frame.instance.definedType(typeIndex)
 

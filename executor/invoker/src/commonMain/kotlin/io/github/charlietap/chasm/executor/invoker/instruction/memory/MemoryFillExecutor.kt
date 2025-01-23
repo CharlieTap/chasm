@@ -25,7 +25,7 @@ internal inline fun MemoryFillExecutor(
     crossinline filler: LinearMemoryFiller,
 ) {
 
-    val stack = context.stack
+    val stack = context.vstack
     val bytesToFill = stack.popI32()
     val fillValue = stack.popI32()
     val offset = stack.popI32()

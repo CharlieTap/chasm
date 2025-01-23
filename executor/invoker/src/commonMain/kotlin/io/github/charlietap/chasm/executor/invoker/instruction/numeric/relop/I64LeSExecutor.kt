@@ -9,5 +9,5 @@ internal inline fun I64LeSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64LeS,
 ) {
-    context.stack.relationalOperation(Long::le)
+    context.vstack.relationalOperation(Long::le)
 }

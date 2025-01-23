@@ -12,7 +12,7 @@ internal inline fun TableGrowExecutor(
     instruction: TableInstruction.TableGrow,
 ) {
 
-    val (stack) = context
+    val stack = context.vstack
 
     val tableInstance = instruction.table
     val tableType = tableInstance.type

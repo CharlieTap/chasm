@@ -8,5 +8,5 @@ internal inline fun F32MulExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Mul,
 ) {
-    context.stack.binaryOperation(Float::times)
+    context.vstack.binaryOperation(Float::times)
 }

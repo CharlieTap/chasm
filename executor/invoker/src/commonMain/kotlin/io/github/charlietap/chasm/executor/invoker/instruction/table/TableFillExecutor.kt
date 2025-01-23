@@ -13,7 +13,7 @@ internal fun TableFillExecutor(
     instruction: TableInstruction.TableFill,
 ) {
 
-    val (stack) = context
+    val stack = context.vstack
     val tableInstance = instruction.table
 
     val elementsToFill = stack.popI32()

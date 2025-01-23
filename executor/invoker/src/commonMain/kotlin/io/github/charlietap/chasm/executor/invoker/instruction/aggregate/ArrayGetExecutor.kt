@@ -30,8 +30,8 @@ internal inline fun ArrayGetExecutor(
     crossinline fieldUnpacker: FieldUnpacker,
 ) {
 
-    val (stack) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
 
     val arrayType = definedTypeExpander(definedType).arrayType()

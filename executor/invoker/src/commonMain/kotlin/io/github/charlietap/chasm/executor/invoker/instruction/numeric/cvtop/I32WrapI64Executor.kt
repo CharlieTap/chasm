@@ -10,5 +10,5 @@ internal inline fun I32WrapI64Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32WrapI64,
 ) {
-    context.stack.convertOperation(::I32, Long::wrap)
+    context.vstack.convertOperation(::I32, Long::wrap)
 }

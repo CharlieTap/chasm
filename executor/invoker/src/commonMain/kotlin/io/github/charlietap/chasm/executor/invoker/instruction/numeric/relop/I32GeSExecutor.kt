@@ -9,5 +9,5 @@ internal inline fun I32GeSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32GeS,
 ) {
-    context.stack.relationalOperation(Int::ge)
+    context.vstack.relationalOperation(Int::ge)
 }

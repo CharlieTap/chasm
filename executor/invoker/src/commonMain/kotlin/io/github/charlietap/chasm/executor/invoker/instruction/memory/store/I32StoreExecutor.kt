@@ -24,7 +24,7 @@ internal inline fun I32StoreExecutor(
     crossinline boundsChecker: BoundsChecker<Unit>,
     crossinline writer: I32Writer,
 ) {
-    val stack = context.stack
+    val stack = context.vstack
     val memory = instruction.memory
 
     val valueToStore = stack.popI32()

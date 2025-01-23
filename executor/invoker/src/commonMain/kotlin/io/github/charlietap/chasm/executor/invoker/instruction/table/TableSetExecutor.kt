@@ -11,8 +11,7 @@ internal inline fun TableSetExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.TableSet,
 ) {
-
-    val (stack) = context
+    val stack = context.vstack
     val tableInstance = instruction.table
 
     val value = stack.popReference()

@@ -8,5 +8,5 @@ internal inline fun I32ShlExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Shl,
 ) {
-    context.stack.binaryOperation(Int::shl)
+    context.vstack.binaryOperation(Int::shl)
 }

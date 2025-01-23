@@ -9,5 +9,5 @@ internal inline fun F32CopysignExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Copysign,
 ) {
-    context.stack.binaryOperation(Float::copySign)
+    context.vstack.binaryOperation(Float::copySign)
 }

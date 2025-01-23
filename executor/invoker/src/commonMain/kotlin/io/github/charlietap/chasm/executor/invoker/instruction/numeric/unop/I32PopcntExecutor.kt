@@ -8,5 +8,5 @@ internal inline fun I32PopcntExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Popcnt,
 ) {
-    context.stack.unaryOperation(Int::countOneBits)
+    context.vstack.unaryOperation(Int::countOneBits)
 }

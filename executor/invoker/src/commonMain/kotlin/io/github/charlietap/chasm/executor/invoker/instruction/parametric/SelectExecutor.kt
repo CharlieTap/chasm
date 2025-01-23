@@ -9,13 +9,13 @@ internal inline fun SelectExecutor(
     context: ExecutionContext,
     instruction: ParametricInstruction.Select,
 ) {
-    val (stack) = context
+    val stack = context.vstack
     val select = stack.popI32()
 
-    val value2 = stack.popValue()
+    val value2 = stack.pop()
 
     if (select == 0) {
-        stack.popValue()
+        stack.pop()
         stack.push(value2)
     }
 }

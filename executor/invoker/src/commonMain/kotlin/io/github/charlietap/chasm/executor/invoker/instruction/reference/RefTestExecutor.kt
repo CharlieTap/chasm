@@ -34,9 +34,10 @@ internal inline fun RefTestExecutor(
     crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
 ) {
 
-    val (stack, store) = context
+    val stack = context.vstack
+    val store = context.store
     val referenceType = instruction.referenceType
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
     val moduleInstance = frame.instance
 
     val substitutedReferenceType = referenceTypeSubstitutor(referenceType, context.substitutor)

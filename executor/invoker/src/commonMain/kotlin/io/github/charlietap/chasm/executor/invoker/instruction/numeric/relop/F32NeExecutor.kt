@@ -9,5 +9,5 @@ internal inline fun F32NeExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Ne,
 ) {
-    context.stack.relationalOperation(Float::ne)
+    context.vstack.relationalOperation(Float::ne)
 }

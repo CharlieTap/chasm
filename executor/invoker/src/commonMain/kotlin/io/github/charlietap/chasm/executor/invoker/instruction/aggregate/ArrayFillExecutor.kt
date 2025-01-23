@@ -27,9 +27,9 @@ internal inline fun ArrayFillExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
 ) {
-    val (stack) = context
+    val stack = context.vstack
     val elementsToFill = stack.popI32()
-    val fillValue = stack.popValue()
+    val fillValue = stack.pop()
     val arrayElementOffset = stack.popI32()
     val arrayInstance = stack.popArrayReference()
 
@@ -39,7 +39,7 @@ internal inline fun ArrayFillExecutor(
 
     if (elementsToFill == 0) return
 
-    val frame = stack.peekFrame()
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(instruction.typeIndex)
     val arrayType = definedTypeExpander(definedType).arrayType()
 

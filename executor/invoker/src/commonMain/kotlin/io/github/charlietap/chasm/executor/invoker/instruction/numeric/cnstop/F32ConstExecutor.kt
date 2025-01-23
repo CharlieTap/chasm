@@ -8,5 +8,5 @@ internal inline fun F32ConstExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Const,
 ) {
-    context.stack.constOperation(instruction.value)
+    context.vstack.constOperation(instruction.value)
 }

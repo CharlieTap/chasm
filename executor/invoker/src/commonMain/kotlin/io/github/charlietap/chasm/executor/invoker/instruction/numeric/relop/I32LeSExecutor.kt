@@ -9,5 +9,5 @@ internal inline fun I32LeSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32LeS,
 ) {
-    context.stack.relationalOperation(Int::le)
+    context.vstack.relationalOperation(Int::le)
 }

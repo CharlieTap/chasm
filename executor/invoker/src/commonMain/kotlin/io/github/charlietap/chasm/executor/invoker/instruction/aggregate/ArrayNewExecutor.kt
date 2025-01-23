@@ -20,11 +20,12 @@ internal inline fun ArrayNewExecutor(
     instruction: AggregateInstruction.ArrayNew,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
-
-    val (stack) = context
+    val stack = context.vstack
     val typeIndex = instruction.typeIndex
+
     val size = stack.popI32()
-    val value = stack.peekValue()
+    val value = stack.peek()
+
     repeat(size - 1) {
         stack.push(value)
     }

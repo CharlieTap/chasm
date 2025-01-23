@@ -9,5 +9,5 @@ internal inline fun I32ReinterpretF32Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32ReinterpretF32,
 ) {
-    context.stack.convertOperation(::I32, Float::toRawBits)
+    context.vstack.convertOperation(::I32, Float::toRawBits)
 }

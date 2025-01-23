@@ -8,5 +8,5 @@ internal inline fun I32SubExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32Sub,
 ) {
-    context.stack.binaryOperation(Int::minus)
+    context.vstack.binaryOperation(Int::minus)
 }

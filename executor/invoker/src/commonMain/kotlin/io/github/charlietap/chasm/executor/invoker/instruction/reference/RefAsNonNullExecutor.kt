@@ -10,8 +10,8 @@ internal inline fun RefAsNonNullExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefAsNonNull,
 ) {
-    val (stack) = context
-    val value = stack.peekValue()
+    val stack = context.vstack
+    val value = stack.peek()
 
     if (value is ReferenceValue) {
         if (value is ReferenceValue.Null) {

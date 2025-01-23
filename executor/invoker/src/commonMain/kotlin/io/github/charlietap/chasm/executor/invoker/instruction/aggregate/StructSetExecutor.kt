@@ -26,14 +26,14 @@ internal inline fun StructSetExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
 ) {
-    val (stack) = context
-    val frame = stack.peekFrame()
+    val stack = context.vstack
+    val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(instruction.typeIndex)
 
     val structType = definedTypeExpander(definedType).structType()
     val fieldType = structType.field(instruction.fieldIndex)
 
-    val executionValue = stack.popValue()
+    val executionValue = stack.pop()
     val structInstance = stack.popStructReference()
     val fieldValue = fieldPacker(executionValue, fieldType)
 

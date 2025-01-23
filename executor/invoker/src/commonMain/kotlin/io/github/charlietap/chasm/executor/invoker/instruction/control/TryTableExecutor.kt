@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.Stack
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 
 internal inline fun TryTableExecutor(
@@ -21,28 +21,28 @@ internal inline fun TryTableExecutor(
     instruction: ControlInstruction.TryTable,
     crossinline blockExecutor: InstructionBlockExecutor,
 ) {
-
-    val (stack) = context
+    val cstack = context.cstack
+    val vstack = context.vstack
 
     val params = instruction.functionType.params.types.size
     val results = instruction.functionType.results.types.size
 
-    val label = Stack.Entry.Label(
+    val label = ControlStack.Entry.Label(
         arity = results,
         depths = LabelStackDepths(
-            instructions = stack.instructionsDepth(),
-            labels = stack.labelsDepth(),
-            values = stack.valuesDepth() - params,
+            instructions = cstack.instructionsDepth(),
+            labels = cstack.labelsDepth(),
+            values = vstack.depth() - params,
         ),
         continuation = null,
     )
 
     val handler = ExceptionHandler(
         instructions = instruction.handlers,
-        framesDepth = stack.framesDepth(),
-        labelsDepth = stack.labelsDepth(),
-        instructionsDepth = stack.instructionsDepth(),
+        framesDepth = cstack.framesDepth(),
+        labelsDepth = cstack.labelsDepth(),
+        instructionsDepth = cstack.instructionsDepth(),
     )
 
-    blockExecutor(stack, label, instruction.instructions, handler)
+    blockExecutor(cstack, label, instruction.instructions, handler)
 }

@@ -9,5 +9,5 @@ internal inline fun F32NearestExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.F32Nearest,
 ) {
-    context.stack.unaryOperation(Float::nearest)
+    context.vstack.unaryOperation(Float::nearest)
 }

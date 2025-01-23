@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.f32StoreRuntimeInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instruction.runtimeMemArg
-import io.github.charlietap.chasm.fixture.executor.runtime.stack
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.f32
@@ -39,7 +39,7 @@ import kotlinx.benchmark.Warmup
 class F32StoreInstructionBenchmark {
 
     private val context = executionContext(
-        stack = stack(),
+        cstack = cstack(),
         store = store(),
         instance = moduleInstance(),
     )
@@ -68,23 +68,23 @@ class F32StoreInstructionBenchmark {
     fun setup() {
         context.apply {
             instance.memAddresses.add(0, memoryAddress(0))
-            stack.push(frame)
+            cstack.push(frame)
             store.memories.add(0, memoryInstance)
         }
     }
 
     @TearDown
     fun cleanup() {
-        context.stack.clear()
+        context.cstack.clear()
         context.store.memories.clear()
     }
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.stack.push(baseAddress)
-        context.stack.push(value)
+        context.vstack.push(baseAddress)
+        context.vstack.push(value)
         val result = F32StoreExecutor(context, instruction)
-        context.stack.clearValues()
+        context.vstack.clear()
         blackhole.consume(result)
     }
 }
