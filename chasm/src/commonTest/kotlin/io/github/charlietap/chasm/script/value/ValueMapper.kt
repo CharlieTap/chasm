@@ -69,7 +69,7 @@ private fun f64ValueMapper(
 private fun anyRefValueMapper(
     value: Value.AnyRef,
 ): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
-    ReferenceValue.Host(it)
+    ReferenceValue.Host(Address.Host(it))
 } ?: ReferenceValue.Null(AbstractHeapType.Any)
 
 private fun arrayRefValueMapper(
@@ -105,7 +105,7 @@ private fun exceptionRefValueMapper(
 private fun externRefValueMapper(
     value: Value.ExternRef,
 ): ReferenceValue = value.value?.let(::coalesceNullableInt)?.let {
-    ReferenceValue.Extern(ReferenceValue.Host(it))
+    ReferenceValue.Extern(ReferenceValue.Host(Address.Host(it)))
 } ?: ReferenceValue.Null(AbstractHeapType.Extern)
 
 private fun i31RefValueMapper(

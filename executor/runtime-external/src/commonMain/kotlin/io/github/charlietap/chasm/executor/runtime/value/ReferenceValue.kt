@@ -27,7 +27,7 @@ sealed interface ReferenceValue : ExecutionValue {
     value class Function(val address: Address.Function) : ReferenceValue
 
     @JvmInline
-    value class Host(val address: Any?) : ReferenceValue
+    value class Host(val address: Address.Host) : ReferenceValue
 
     @JvmInline
     value class Exception(val address: Address.Exception) : ReferenceValue
