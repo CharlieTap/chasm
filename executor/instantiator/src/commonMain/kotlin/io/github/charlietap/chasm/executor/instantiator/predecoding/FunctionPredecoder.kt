@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.default
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
 
@@ -28,8 +29,11 @@ internal inline fun FunctionPredecoder(
     RuntimeFunction(
         idx = function.idx,
         typeIndex = function.typeIndex,
-        locals = Array(function.locals.size) { index ->
-            function.locals[index].type.default()
+        locals = LongArray(function.locals.size) { index ->
+            function.locals[index]
+                .type
+                .default()
+                .toLong()
         },
         body = expressionPredecoder(context, function.body).bind(),
     )

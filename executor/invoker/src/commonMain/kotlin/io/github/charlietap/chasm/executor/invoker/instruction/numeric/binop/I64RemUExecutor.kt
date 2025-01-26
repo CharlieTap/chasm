@@ -6,17 +6,14 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 
 internal inline fun I64RemUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64RemU,
 ) {
-    val operand2 = context.vstack
-        .peekNth(0)
-        as I64
+    val operand = context.vstack.peekNthI64(0)
 
-    if (operand2.value.toULong() == 0uL) {
+    if (operand.toULong() == 0uL) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
 

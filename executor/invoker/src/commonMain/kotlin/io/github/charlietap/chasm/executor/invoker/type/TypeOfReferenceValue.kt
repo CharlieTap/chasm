@@ -6,6 +6,8 @@ import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ReferenceType.Ref
 import io.github.charlietap.chasm.ast.type.ReferenceType.RefNull
+import io.github.charlietap.chasm.executor.runtime.ext.array
+import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -31,14 +33,12 @@ internal inline fun TypeOfReferenceValue(
 ): ReferenceType? = when (value) {
     is ReferenceValue.Null -> bottomOfHeapType(value.heapType, moduleInstance.types)?.let(::RefNull)
     is ReferenceValue.Struct -> {
-        value.instance.definedType.let { definedType ->
-            Ref(ConcreteHeapType.Defined(definedType))
-        }
+        val struct = store.struct(value.address)
+        Ref(ConcreteHeapType.Defined(struct.definedType))
     }
     is ReferenceValue.Array -> {
-        value.instance.definedType.let { definedType ->
-            Ref(ConcreteHeapType.Defined(definedType))
-        }
+        val array = store.array(value.address)
+        Ref(ConcreteHeapType.Defined(array.definedType))
     }
     is ReferenceValue.Function -> {
         store.functions.getOrNull(value.address.address)?.type?.let { definedType ->

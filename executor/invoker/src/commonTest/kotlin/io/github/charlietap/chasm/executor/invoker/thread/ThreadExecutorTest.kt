@@ -26,7 +26,7 @@ class ThreadExecutorTest {
             assertEquals(2, context.vstack.depth())
             assertEquals(2, context.cstack.instructionsDepth())
             context.vstack.clear()
-            context.vstack.push(i32(0))
+            context.vstack.pushI32(0)
             Ok(Unit)
         }
         val thread = thread(
@@ -54,6 +54,6 @@ class ThreadExecutorTest {
             params = params,
         )
 
-        assertEquals(Ok(listOf(i32(0))), actual)
+        assertEquals(Ok(listOf(0L)), actual)
     }
 }

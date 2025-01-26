@@ -3,8 +3,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -25,7 +27,7 @@ internal inline fun ArrayNewFixedExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
 ) {
-
+    val store = context.store
     val stack = context.vstack
     val (typeIndex, size) = instruction
     val frame = context.cstack.peekFrame()
@@ -38,7 +40,8 @@ internal inline fun ArrayNewFixedExecutor(
     }.asReversed()
 
     val instance = ArrayInstance(definedType, fields)
-    val reference = ReferenceValue.Array(instance)
+    store.arrays.add(instance)
+    val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 
-    stack.push(reference)
+    stack.push(reference.toLong())
 }

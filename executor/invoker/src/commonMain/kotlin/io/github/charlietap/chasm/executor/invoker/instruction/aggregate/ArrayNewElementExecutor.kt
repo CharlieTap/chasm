@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.element
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal fun ArrayNewElementExecutor(

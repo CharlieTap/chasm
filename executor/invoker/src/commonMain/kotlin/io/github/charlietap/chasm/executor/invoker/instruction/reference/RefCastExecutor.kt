@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
+import io.github.charlietap.chasm.executor.runtime.encoder.toLong
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -46,7 +47,7 @@ internal inline fun RefCastExecutor(
         ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
 
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
-        stack.push(otherReferenceValue)
+        stack.push(otherReferenceValue.toLong())
     } else {
         throw InvocationException(InvocationError.Trap.TrapEncountered)
     }

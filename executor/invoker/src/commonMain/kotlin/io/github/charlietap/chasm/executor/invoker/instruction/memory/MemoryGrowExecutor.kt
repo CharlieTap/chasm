@@ -2,10 +2,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import io.github.charlietap.chasm.executor.memory.grow.LinearMemoryGrower
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
 fun MemoryGrowExecutor(
     context: ExecutionContext,
@@ -35,13 +33,13 @@ internal inline fun MemoryGrowExecutor(
     if (memory.type.limits.min
             .toInt() + pagesToAdd > max
     ) {
-        stack.push(NumberValue.I32(-1))
+        stack.push(-1L)
     } else {
 
         memory.type.limits.min = memory.type.limits.min + pagesToAdd.toUInt()
         memory.data = grower(memory.data, pagesToAdd)
         memory.refresh()
 
-        stack.push(NumberValue.I32(currentSizeInPages))
+        stack.pushI32(currentSizeInPages)
     }
 }

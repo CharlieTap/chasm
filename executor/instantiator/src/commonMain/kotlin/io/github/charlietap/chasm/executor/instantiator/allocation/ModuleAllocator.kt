@@ -35,17 +35,16 @@ import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import kotlin.jvm.JvmName
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
 
-internal typealias ModuleAllocator = (InstantiationContext, ModuleInstance, List<ReferenceValue>) -> Result<ModuleInstance, ModuleTrapError>
+internal typealias ModuleAllocator = (InstantiationContext, ModuleInstance, LongArray) -> Result<ModuleInstance, ModuleTrapError>
 
 internal fun ModuleAllocator(
     context: InstantiationContext,
     instance: ModuleInstance,
-    tableInitValues: List<ReferenceValue>,
+    tableInitValues: LongArray,
 ): Result<ModuleInstance, ModuleTrapError> =
     ModuleAllocator(
         context = context,
@@ -66,7 +65,7 @@ internal fun ModuleAllocator(
 internal inline fun ModuleAllocator(
     context: InstantiationContext,
     instance: ModuleInstance,
-    tableInitValues: List<ReferenceValue>,
+    tableInitValues: LongArray,
     crossinline evaluator: ExpressionEvaluator,
     crossinline tableAllocator: TableAllocator,
     crossinline memoryAllocator: MemoryAllocator,
@@ -108,9 +107,9 @@ internal inline fun ModuleAllocator(
 
     module.elementSegments.forEachIndexed { idx, elementSegment ->
         val elementSegmentReferences = module.elementSegments.map { segment ->
-            segment.initExpressions.map { initExpression ->
-                val initExpression = expressionPredecoder(context, initExpression).bind()
-                evaluator(config, store, instance, initExpression, Arity.Return(1)).bind() as ReferenceValue
+            LongArray(segment.initExpressions.size) { initExpressionIndex ->
+                val initExpression = expressionPredecoder(context, segment.initExpressions[initExpressionIndex]).bind()
+                evaluator(config, store, instance, initExpression, Arity.Return(1)).bind() ?: 0L
             }
         }
         val address = elementAllocator(store, elementSegment.type, elementSegmentReferences[idx])

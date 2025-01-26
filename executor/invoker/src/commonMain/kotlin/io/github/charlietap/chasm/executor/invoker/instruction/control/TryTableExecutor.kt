@@ -23,7 +23,6 @@ internal inline fun TryTableExecutor(
 ) {
     val cstack = context.cstack
     val vstack = context.vstack
-
     val params = instruction.functionType.params.types.size
     val results = instruction.functionType.results.types.size
 

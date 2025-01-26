@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.global
 
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.ast.type.globalType
@@ -21,7 +22,7 @@ class GlobalAllocatorTest {
         )
 
         val type = globalType()
-        val value = executionValue()
+        val value = executionValue().toLong()
 
         val expected = globalInstance(
             type = type,

@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
@@ -33,7 +32,6 @@ internal inline fun RefTestExecutor(
     crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
     crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
 ) {
-
     val stack = context.vstack
     val store = context.store
     val referenceType = instruction.referenceType
@@ -47,8 +45,8 @@ internal inline fun RefTestExecutor(
         ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
 
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
-        stack.push(NumberValue.I32(1))
+        stack.push(1L)
     } else {
-        stack.push(NumberValue.I32(0))
+        stack.push(0L)
     }
 }

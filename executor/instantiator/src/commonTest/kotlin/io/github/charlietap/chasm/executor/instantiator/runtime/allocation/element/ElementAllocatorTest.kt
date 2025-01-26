@@ -24,10 +24,10 @@ class ElementAllocatorTest {
 
         val expected = elementInstance(
             type = refType,
-            elements = arrayOf(),
+            elements = longArrayOf(),
         )
 
-        val address = ElementAllocator(store, refType, emptyList())
+        val address = ElementAllocator(store, refType, longArrayOf())
 
         assertEquals(Address.Element(0), address)
         assertEquals(expected, elements[0])

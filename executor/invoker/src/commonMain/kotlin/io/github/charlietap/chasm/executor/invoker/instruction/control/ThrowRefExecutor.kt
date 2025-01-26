@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
-import io.github.charlietap.chasm.executor.invoker.ext.forEachReversed
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
+import io.github.charlietap.chasm.executor.runtime.ext.pushReference
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -51,7 +51,7 @@ internal inline fun ThrowRefExecutor(
     val handler = jumpToHandlerInstruction(cstack)
 
     if (handler.instructions.isEmpty()) {
-        stack.push(ReferenceValue.Exception(exceptionRef.address))
+        stack.pushReference(ReferenceValue.Exception(exceptionRef.address))
         cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
     } else {
 
@@ -74,18 +74,16 @@ internal inline fun ThrowRefExecutor(
 
         when {
             catchHandler is CatchHandler.Catch && tagMatches -> {
-                instance.fields.forEachReversed { field ->
-                    stack.push(field)
-                }
+                instance.fields.reverse()
+                stack.push(instance.fields)
                 cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
             }
             catchHandler is CatchHandler.CatchRef && tagMatches -> {
-                instance.fields.forEachReversed { field ->
-                    stack.push(field)
-                }
-                stack.push(exceptionRef)
+                instance.fields.reverse()
+                stack.push(instance.fields)
+                stack.pushReference(exceptionRef)
                 cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
@@ -96,7 +94,7 @@ internal inline fun ThrowRefExecutor(
                 )
             }
             catchHandler is CatchHandler.CatchAllRef -> {
-                stack.push(exceptionRef)
+                stack.pushReference(exceptionRef)
                 cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
@@ -107,7 +105,7 @@ internal inline fun ThrowRefExecutor(
                 cstack.push(handler)
                 val instruction = handlerDispatcher(handler)
                 cstack.push(instruction)
-                stack.push(exceptionRef)
+                stack.pushReference(exceptionRef)
                 cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
             }
         }

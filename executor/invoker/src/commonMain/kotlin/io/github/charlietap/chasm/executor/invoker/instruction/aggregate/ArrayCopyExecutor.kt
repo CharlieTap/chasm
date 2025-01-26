@@ -5,9 +5,9 @@ import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -26,9 +26,9 @@ internal inline fun ArrayCopyExecutor(
     instruction: AggregateInstruction.ArrayCopy,
     crossinline definedTypeExpander: DefinedTypeExpander,
 ) {
-
     // x = dest
     // y = src
+    val store = context.store
     val stack = context.vstack
     val frame = context.cstack.peekFrame()
     val destDefinedType = frame.instance.definedType(instruction.destinationTypeIndex)
@@ -40,9 +40,11 @@ internal inline fun ArrayCopyExecutor(
 
     val elementsToCopy = stack.popI32()
     val sourceOffset = stack.popI32()
-    val source = stack.popArrayReference()
+    val sourceRef = stack.popArrayReference()
+    val source = store.array(sourceRef.address)
     val destinationOffset = stack.popI32()
-    val destination = stack.popArrayReference()
+    val destinationRef = stack.popArrayReference()
+    val destination = store.array(destinationRef.address)
 
     if (destinationOffset + elementsToCopy > destination.fields.size) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)

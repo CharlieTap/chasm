@@ -6,8 +6,6 @@ import io.github.charlietap.chasm.executor.memory.read.I3216UReader
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.pushI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
 internal inline fun I32Load16UExecutor(

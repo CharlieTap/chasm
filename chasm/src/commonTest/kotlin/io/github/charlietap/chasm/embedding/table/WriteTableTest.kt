@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
@@ -22,7 +23,7 @@ class WriteTableTest {
 
         val functionAddress = functionAddress()
         val value = functionReferenceValue(functionAddress)
-        val instance = tableInstance(elements = arrayOf(ReferenceValue.Null(AbstractHeapType.Func)))
+        val instance = tableInstance(elements = longArrayOf(ReferenceValue.Null(AbstractHeapType.Func).toLong()))
         val store = publicStore(store(tables = mutableListOf(instance)))
         val address = tableAddress(0)
         val table = publicTable(tableExternalValue(address))
@@ -37,6 +38,6 @@ class WriteTableTest {
         )
 
         assertEquals(expected, actual)
-        assertEquals(functionReferenceValue(functionAddress), store.store.tables[0].elements[0])
+        assertEquals(functionReferenceValue(functionAddress).toLong(), store.store.tables[0].elements[0])
     }
 }

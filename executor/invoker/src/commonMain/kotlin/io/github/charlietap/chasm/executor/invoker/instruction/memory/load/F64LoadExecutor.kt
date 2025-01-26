@@ -6,8 +6,6 @@ import io.github.charlietap.chasm.executor.memory.read.F64Reader
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.pushf64
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
 fun F64LoadExecutor(
@@ -42,5 +40,5 @@ internal inline fun F64LoadExecutor(
         reader(memory.data, effectiveAddress)
     }
 
-    stack.pushf64(result)
+    stack.pushF64(result)
 }

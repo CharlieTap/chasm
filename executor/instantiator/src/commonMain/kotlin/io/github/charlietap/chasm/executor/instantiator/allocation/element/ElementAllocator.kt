@@ -4,17 +4,16 @@ import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
-internal typealias ElementAllocator = (Store, ReferenceType, List<ReferenceValue>) -> Address.Element
+internal typealias ElementAllocator = (Store, ReferenceType, LongArray) -> Address.Element
 
 internal fun ElementAllocator(
     store: Store,
     type: ReferenceType,
-    values: List<ReferenceValue>,
+    values: LongArray,
 ): Address.Element {
 
-    val instance = ElementInstance(type, values.toTypedArray())
+    val instance = ElementInstance(type, values)
 
     store.elements.add(instance)
 

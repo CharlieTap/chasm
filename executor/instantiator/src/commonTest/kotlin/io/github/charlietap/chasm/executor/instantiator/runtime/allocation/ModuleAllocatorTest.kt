@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAl
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
+import io.github.charlietap.chasm.executor.runtime.encoder.toLong
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.dataSegment
 import io.github.charlietap.chasm.fixture.ast.module.elementSegment
@@ -59,11 +60,11 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
 import io.github.charlietap.chasm.type.ext.definedType
 import io.github.charlietap.chasm.type.ext.recursiveType
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
@@ -86,12 +87,12 @@ class ModuleAllocatorTest {
         val memory = memory()
         val tag = tag()
         val global = global()
-        val globalInitValue = i32(117)
-        val tableInitValue = nullReferenceValue(heapType())
-        val tableInitValues = listOf(tableInitValue)
+        val globalInitValue = 117L
+        val tableInitValue = nullReferenceValue(heapType()).toLong()
+        val tableInitValues = longArrayOf(tableInitValue)
         val refType = refNullReferenceType(AbstractHeapType.Extern)
         val elementSegment = elementSegment(type = refType, initExpressions = listOf(expression()))
-        val elementSegmentRef = nullReferenceValue(AbstractHeapType.Extern)
+        val elementSegmentRef = nullReferenceValue(AbstractHeapType.Extern).toLong()
         val bytes = ubyteArrayOf()
         val dataSegment = dataSegment(initData = bytes)
 
@@ -207,7 +208,7 @@ class ModuleAllocatorTest {
         val elementAllocator: ElementAllocator = { _store, _refType, _refValues ->
             assertEquals(store, _store)
             assertEquals(refType, _refType)
-            assertEquals(listOf(elementSegmentRef), _refValues)
+            assertContentEquals(longArrayOf(elementSegmentRef), _refValues)
 
             elementAddress
         }

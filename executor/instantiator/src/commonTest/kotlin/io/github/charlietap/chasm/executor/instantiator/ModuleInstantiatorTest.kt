@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.executor.instantiator.initialization.TableInit
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
+import io.github.charlietap.chasm.executor.runtime.encoder.toLong
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.elementSegment
@@ -29,6 +30,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
@@ -78,7 +80,7 @@ class ModuleInstantiatorTest {
         val allocator: ModuleAllocator = { _context, _instance, _tableInitExpressions ->
             assertEquals(context, _context)
             assertEquals(partialInstance, _instance)
-            assertEquals(listOf(ReferenceValue.Null(heapType())), _tableInitExpressions)
+            assertContentEquals(longArrayOf(ReferenceValue.Null(heapType()).toLong()), _tableInitExpressions)
 
             Ok(partialInstance)
         }
@@ -89,7 +91,7 @@ class ModuleInstantiatorTest {
             assertEquals(partialInstance, _instance)
             assertEquals(returnArity(1), _arity)
 
-            Ok(ReferenceValue.Null(heapType()))
+            Ok(ReferenceValue.Null(heapType()).toLong())
         }
 
         val invoker: FunctionInvoker = { _config, _store, _address, _locals ->

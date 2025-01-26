@@ -4,11 +4,10 @@ import io.github.charlietap.chasm.executor.invoker.ext.truncI64sTrapping
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 
 internal inline fun I64TruncF32SExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF32S,
 ) {
-    context.vstack.convertOperation(::I64, Float::truncI64sTrapping)
+    context.vstack.convertOperation(Float::truncI64sTrapping)
 }

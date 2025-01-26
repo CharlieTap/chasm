@@ -1,11 +1,10 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
 import io.github.charlietap.chasm.ast.type.TableType
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 data class TableInstance(
     var type: TableType,
-    var elements: Array<ReferenceValue>,
+    var elements: LongArray,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

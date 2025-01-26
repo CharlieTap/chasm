@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 fun dropStore(
     store: Store,
@@ -29,20 +28,19 @@ internal fun dropStore(
     store.data.clear()
 
     store.exceptions.forEach { exception ->
-        exception.fields = emptyList()
+        exception.fields = longArrayOf()
     }
     store.exceptions.clear()
 
     store.elements.forEach { element ->
-        element.elements = arrayOf()
+        element.elements = longArrayOf()
     }
     store.elements.clear()
 
     store.functions.clear()
 
-    val uninit = ExecutionValue.Uninitialised
     store.globals.forEach { global ->
-        global.value = uninit
+        global.value = 0L
     }
     store.globals.clear()
 
@@ -52,7 +50,7 @@ internal fun dropStore(
     store.memories.clear()
 
     store.tables.forEach { table ->
-        table.elements = arrayOf()
+        table.elements = longArrayOf()
     }
     store.tables.clear()
 

@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.data
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
+import io.github.charlietap.chasm.executor.runtime.ext.pushExecution
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.bitWidth
@@ -62,7 +62,7 @@ internal inline fun ArrayNewDataExecutor(
         val elementBytes = byteArray.sliceArray(i until i + arrayElementSizeInBytes)
         val value = arrayType.fieldType.valueFromBytes(elementBytes)
 
-        stack.push(value)
+        stack.pushExecution(value)
     }
 
     arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt()))

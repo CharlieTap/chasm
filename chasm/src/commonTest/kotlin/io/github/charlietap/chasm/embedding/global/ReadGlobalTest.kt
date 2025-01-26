@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddres
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,7 +18,7 @@ class ReadGlobalTest {
     @Test
     fun `can read a value from a global`() {
 
-        val value = i32(117)
+        val value = 117L
         val instance = globalInstance(value = value)
         val store = publicStore(store(globals = mutableListOf(instance)))
         val address = globalAddress(0)

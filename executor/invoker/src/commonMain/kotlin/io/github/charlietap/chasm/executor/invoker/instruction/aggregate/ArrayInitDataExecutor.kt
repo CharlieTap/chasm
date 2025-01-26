@@ -6,10 +6,11 @@ import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.bitWidth
@@ -45,7 +46,8 @@ internal fun ArrayInitDataExecutor(
     val elementsToCopy = stack.popI32()
     val byteArrayOffset = stack.popI32()
     val arrayOffset = stack.popI32()
-    val arrayInstance = stack.popArrayReference()
+    val arrayRef = stack.popArrayReference()
+    val arrayInstance = store.array(arrayRef.address)
 
     val arrayElementSizeInBytes = arrayType.fieldType.bitWidth()?.let {
         it / 8
@@ -67,7 +69,7 @@ internal fun ArrayInitDataExecutor(
         val element = arrayType.fieldType.valueFromBytes(byteArray)
 
         val fieldIndex = arrayOffset + offset
-        val fieldValue = fieldPacker(element, arrayType.fieldType)
+        val fieldValue = fieldPacker(element.toLong(), arrayType.fieldType)
 
         arrayInstance.fields[fieldIndex] = fieldValue
     }

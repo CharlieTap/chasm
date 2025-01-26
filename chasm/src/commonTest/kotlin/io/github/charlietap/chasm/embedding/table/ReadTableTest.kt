@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.executor.runtime.encoder.toLong
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
@@ -21,7 +22,7 @@ class ReadTableTest {
 
         val functionAddress = functionAddress()
         val value = functionReferenceValue(functionAddress)
-        val instance = tableInstance(elements = arrayOf(functionReferenceValue(functionAddress)))
+        val instance = tableInstance(elements = longArrayOf(functionReferenceValue(functionAddress).toLong()))
         val store = publicStore(store(tables = mutableListOf(instance)))
         val address = tableAddress(0)
         val table = publicTable(tableExternalValue(address))

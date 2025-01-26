@@ -3,11 +3,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.numeric.cvtop
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.convertOperation
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 
 internal inline fun I64ReinterpretF64Executor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64ReinterpretF64,
 ) {
-    context.vstack.convertOperation(::I64, Double::toRawBits)
+    context.vstack.convertOperation(Double::toRawBits)
 }

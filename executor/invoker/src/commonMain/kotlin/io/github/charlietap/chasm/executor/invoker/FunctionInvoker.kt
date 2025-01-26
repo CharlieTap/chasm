@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.Thread
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.ext.instruction
+import io.github.charlietap.chasm.executor.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
@@ -59,5 +60,8 @@ internal inline fun FunctionInvoker(
         config = config,
     )
 
-    threadExecutor(configuration, values).bind()
+    threadExecutor(configuration, values).bind().mapIndexed { idx, result ->
+        val expected = function.functionType.results.types[idx]
+        result.toExecutionValue(expected)
+    }
 }

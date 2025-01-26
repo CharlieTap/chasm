@@ -9,5 +9,5 @@ internal inline fun UnreachableExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Unreachable,
 ) {
-    throw InvocationException(InvocationError.Trap.TrapEncountered)
+    throw InvocationException(InvocationError.Unreachable)
 }

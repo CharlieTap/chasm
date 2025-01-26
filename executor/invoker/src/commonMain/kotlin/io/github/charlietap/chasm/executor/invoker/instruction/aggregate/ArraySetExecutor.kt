@@ -4,9 +4,9 @@ import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -27,7 +27,7 @@ internal inline fun ArraySetExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
 ) {
-
+    val store = context.store
     val stack = context.vstack
     val typeIndex = instruction.typeIndex
     val frame = context.cstack.peekFrame()
@@ -35,9 +35,9 @@ internal inline fun ArraySetExecutor(
     val arrayType = definedTypeExpander(definedType).arrayType()
 
     val value = stack.pop()
-
     val fieldIndex = stack.popI32()
-    val arrayInstance = stack.popArrayReference()
+    val arrayRef = stack.popArrayReference()
+    val arrayInstance = store.array(arrayRef.address)
 
     val fieldValue = fieldPacker(value, arrayType.fieldType)
 

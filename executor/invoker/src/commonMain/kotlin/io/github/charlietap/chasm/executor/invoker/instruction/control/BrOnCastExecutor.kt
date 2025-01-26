@@ -61,7 +61,6 @@ internal inline fun BrOnCastExecutor(
     crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
     crossinline breakExecutor: BreakExecutor,
 ) {
-
     val stack = context.vstack
     val store = context.store
     val frame = context.cstack.peekFrame()

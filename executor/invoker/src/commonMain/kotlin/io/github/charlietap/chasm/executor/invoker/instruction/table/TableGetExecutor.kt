@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.element
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal inline fun TableGetExecutor(

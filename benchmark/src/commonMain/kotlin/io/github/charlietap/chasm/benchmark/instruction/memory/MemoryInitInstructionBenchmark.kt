@@ -17,7 +17,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instruction.memoryIni
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -65,9 +64,9 @@ class MemoryInitInstructionBenchmark {
         instance = context.instance,
     )
 
-    private val srcOffset = i32(0)
-    private val destOffset = i32(0)
-    private val bytesToCopy = i32(200)
+    private val srcOffset = 0
+    private val destOffset = 0
+    private val bytesToCopy = 200
 
     @Setup
     fun setup() {
@@ -88,9 +87,9 @@ class MemoryInitInstructionBenchmark {
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.vstack.push(destOffset)
-        context.vstack.push(srcOffset)
-        context.vstack.push(bytesToCopy)
+        context.vstack.pushI32(destOffset)
+        context.vstack.pushI32(srcOffset)
+        context.vstack.pushI32(bytesToCopy)
         val result = MemoryInitExecutor(context, instruction)
         context.vstack.clear()
         blackhole.consume(result)

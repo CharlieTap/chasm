@@ -4,8 +4,6 @@ import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.write.F32Writer
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popF32
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
 fun F32StoreExecutor(

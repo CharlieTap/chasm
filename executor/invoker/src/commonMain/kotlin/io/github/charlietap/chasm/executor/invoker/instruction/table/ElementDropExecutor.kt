@@ -7,5 +7,5 @@ internal inline fun ElementDropExecutor(
     context: ExecutionContext,
     instruction: TableInstruction.ElemDrop,
 ) {
-    instruction.element.elements = emptyArray()
+    instruction.element.elements = longArrayOf()
 }

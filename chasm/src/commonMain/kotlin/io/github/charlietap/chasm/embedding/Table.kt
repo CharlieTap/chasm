@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.Table
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
+import io.github.charlietap.chasm.executor.runtime.encoder.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
@@ -24,5 +25,5 @@ internal fun table(
     value: ReferenceValue,
     allocator: TableAllocator,
 ): Table {
-    return Table(ExternalValue.Table(allocator(store.store, type, value)))
+    return Table(ExternalValue.Table(allocator(store.store, type, value.toLong())))
 }

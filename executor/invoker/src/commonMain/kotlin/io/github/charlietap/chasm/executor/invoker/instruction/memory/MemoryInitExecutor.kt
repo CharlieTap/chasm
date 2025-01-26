@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.memory.init.LinearMemoryInitialiser
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 
 fun MemoryInitExecutor(

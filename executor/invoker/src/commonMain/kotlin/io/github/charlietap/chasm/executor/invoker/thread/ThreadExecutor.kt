@@ -10,16 +10,17 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.depth
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-internal typealias ThreadExecutor = (Configuration, List<ExecutionValue>) -> Result<List<ExecutionValue>, InvocationError>
+internal typealias ThreadExecutor = (Configuration, List<ExecutionValue>) -> Result<List<Long>, InvocationError>
 
 internal fun ThreadExecutor(
     configuration: Configuration,
     params: List<ExecutionValue>,
-): Result<List<ExecutionValue>, InvocationError> =
+): Result<List<Long>, InvocationError> =
     ThreadExecutor(
         configuration = configuration,
         params = params,
@@ -30,7 +31,7 @@ internal fun ThreadExecutor(
     configuration: Configuration,
     params: List<ExecutionValue>,
     frameCleaner: DispatchableInstruction,
-): Result<List<ExecutionValue>, InvocationError> = binding {
+): Result<List<Long>, InvocationError> = binding {
 
     val thread = configuration.thread
     val controlStack = ControlStack()
@@ -44,8 +45,8 @@ internal fun ThreadExecutor(
     )
 
     controlStack.push(thread.frame)
-    params.forEach { local ->
-        valueStack.push(local)
+    params.forEach { param ->
+        valueStack.push(param.toLong())
     }
 
     var loop = true
@@ -71,5 +72,7 @@ internal fun ThreadExecutor(
         Err(InvocationError.ProgramFinishedInconsistentState).bind<List<ExecutionValue>>()
     }
 
-    valueStack
+    List(thread.frame.arity) {
+        valueStack.pop()
+    }.asReversed()
 }

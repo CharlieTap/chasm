@@ -30,5 +30,11 @@ sealed interface Address {
     value class Exception(override val address: Int) : Address
 
     @JvmInline
+    value class Struct(override val address: Int) : Address
+
+    @JvmInline
+    value class Array(override val address: Int) : Address
+
+    @JvmInline
     value class Host(override val address: Int) : Address
 }

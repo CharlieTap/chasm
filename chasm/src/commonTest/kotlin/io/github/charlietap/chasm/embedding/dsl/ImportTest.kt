@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.fixture.publicTag
 import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.executor.runtime.encoder.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.constMutability
 import io.github.charlietap.chasm.fixture.ast.type.exceptionAttribute
@@ -108,7 +108,7 @@ class ImportTest {
         assertEquals(expected, actual)
         assertEquals(1, store.store.globals.size)
         assertEquals(globalType(i32ValueType(), constMutability()), store.store.globals[0].type)
-        assertEquals(0, (store.store.globals[0].value as NumberValue.I32).value)
+        assertEquals(0, store.store.globals[0].value)
     }
 
     @Test
@@ -175,7 +175,14 @@ class ImportTest {
         assertEquals(expected, actual)
         assertEquals(1, store.store.tables.size)
         assertEquals(tableType(refNullReferenceType(AbstractHeapType.Func), limits(1u)), store.store.tables[0].type)
-        assertEquals(functionAddress(0), (store.store.tables[0].elements[0] as ReferenceValue.Function).address)
+        assertEquals(
+            functionAddress(0),
+            (
+                store.store.tables[0]
+                    .elements[0]
+                    .toReferenceValue() as ReferenceValue.Function
+            ).address,
+        )
     }
 
     @Test

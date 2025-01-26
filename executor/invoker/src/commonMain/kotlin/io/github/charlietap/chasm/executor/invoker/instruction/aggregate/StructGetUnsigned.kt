@@ -7,12 +7,11 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 internal fun StructGetUnsignedExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.StructGetUnsigned,
-) =
-    StructGetExecutor(
-        context = context,
-        typeIndex = instruction.typeIndex,
-        fieldIndex = instruction.fieldIndex,
-        signedUnpack = false,
-        definedTypeExpander = ::DefinedTypeExpander,
-        fieldUnpacker = ::FieldUnpacker,
-    )
+) = StructGetExecutor(
+    context = context,
+    typeIndex = instruction.typeIndex,
+    fieldIndex = instruction.fieldIndex,
+    signedUnpack = false,
+    definedTypeExpander = ::DefinedTypeExpander,
+    fieldUnpacker = ::FieldUnpacker,
+)

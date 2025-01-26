@@ -1,11 +1,9 @@
 package io.github.charlietap.chasm.executor.runtime
 
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.label
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -62,15 +60,14 @@ class StackTest {
 
         val stack = vstack()
 
-        val value1 = i32(1)
+        val value1 = 1
+        val value2 = 2
 
-        val value2 = i32(2)
+        stack.pushI32(value1)
+        stack.pushI32(value2)
 
-        stack.push(value1)
-        stack.push(value2)
-
-        val result1 = stack.peekNth(0)
-        val result2 = stack.peekNth(1)
+        val result1 = stack.peekNthI32(0)
+        val result2 = stack.peekNthI32(1)
 
         assertEquals(value2, result1)
         assertEquals(value1, result2)
@@ -81,22 +78,25 @@ class StackTest {
 
         val stack = vstack()
 
-        val value1 = i32(0)
-        val value2 = i32(1)
-        val value3 = i32(2)
-        val value4 = i32(3)
-        val value5 = i32(4)
+        val value1 = 0
+        val value2 = 1
+        val value3 = 2
+        val value4 = 3
+        val value5 = 4
 
-        stack.push(value1)
-        stack.push(value2)
-        stack.push(value3)
-        stack.push(value4)
-        stack.push(value5)
+        stack.pushI32(value1)
+        stack.pushI32(value2)
+        stack.pushI32(value3)
+        stack.pushI32(value4)
+        stack.pushI32(value5)
 
         stack.shrink(2, 1)
 
         val expected = listOf(value1, value4, value5)
+        val actual = List(stack.depth()) {
+            stack.popI32()
+        }.asReversed()
 
-        assertEquals(expected, stack as List<ExecutionValue>)
+        assertEquals(expected, actual)
     }
 }

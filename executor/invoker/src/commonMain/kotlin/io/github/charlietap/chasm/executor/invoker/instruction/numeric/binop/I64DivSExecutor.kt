@@ -5,19 +5,18 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
 
 internal inline fun I64DivSExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64DivS,
 ) {
     val stack = context.vstack
-    val operand1 = stack.peekNth(1) as I64
-    val operand2 = stack.peekNth(0) as I64
+    val operand1 = stack.peekNthI64(1)
+    val operand2 = stack.peekNthI64(0)
 
-    if (operand2.value == 0L) {
+    if (operand2 == 0L) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
-    } else if (operand1.value == Long.MIN_VALUE && operand2.value == -1L) {
+    } else if (operand1 == Long.MIN_VALUE && operand2 == -1L) {
         throw InvocationException(InvocationError.IntegerOverflow)
     }
 

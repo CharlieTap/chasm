@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddres
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -33,6 +32,6 @@ class WriteGlobalTest {
         )
 
         assertEquals(expected, actual)
-        assertEquals(i32(117), store.store.globals[0].value)
+        assertEquals(117, store.store.globals[0].value)
     }
 }

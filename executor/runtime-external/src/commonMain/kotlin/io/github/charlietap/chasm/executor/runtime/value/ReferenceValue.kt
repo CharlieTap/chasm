@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.value
 
 import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
-import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import kotlin.jvm.JvmInline
 
@@ -18,10 +16,10 @@ sealed interface ReferenceValue : ExecutionValue {
     value class I31(val value: UInt) : ReferenceValue
 
     @JvmInline
-    value class Struct(val instance: StructInstance) : ReferenceValue
+    value class Struct(val address: Address.Struct) : ReferenceValue
 
     @JvmInline
-    value class Array(val instance: ArrayInstance) : ReferenceValue
+    value class Array(val address: Address.Array) : ReferenceValue
 
     @JvmInline
     value class Function(val address: Address.Function) : ReferenceValue

@@ -2,71 +2,36 @@
 
 package io.github.charlietap.chasm.executor.runtime.ext
 
+import io.github.charlietap.chasm.executor.runtime.encoder.RV_SHIFT_BITS
+import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_ARRAY
+import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_FUNCTION
+import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_I31
+import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_MASK
+import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_STRUCT
+import io.github.charlietap.chasm.executor.runtime.encoder.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
-import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
-import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F32
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.F64
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I32
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue.I64
+import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import kotlin.jvm.JvmName
 
-inline fun ValueStack.pushI32(i32: Int) {
-    push(I32(i32))
+inline fun ValueStack.pushExecution(
+    value: ExecutionValue,
+) {
+    push(value.toLong())
 }
 
-inline fun ValueStack.pushI64(i64: Long) {
-    push(I64(i64))
-}
-
-inline fun ValueStack.pushf32(f32: Float) {
-    push(F32(f32))
-}
-
-inline fun ValueStack.pushf64(f64: Double) {
-    push(F64(f64))
-}
-
-inline fun ValueStack.popI32(): Int {
-    return try {
-        (pop() as I32).value
-    } catch (_: ClassCastException) {
-        throw InvocationException(InvocationError.I32ValueExpected)
-    }
-}
-
-inline fun ValueStack.popI64(): Long {
-    return try {
-        (pop() as I64).value
-    } catch (_: ClassCastException) {
-        throw InvocationException(InvocationError.I64ValueExpected)
-    }
-}
-
-inline fun ValueStack.popF32(): Float {
-    return try {
-        (pop() as F32).value
-    } catch (_: ClassCastException) {
-        throw InvocationException(InvocationError.F32ValueExpected)
-    }
-}
-
-inline fun ValueStack.popF64(): Double {
-    return try {
-        (pop() as F64).value
-    } catch (_: ClassCastException) {
-        throw InvocationException(InvocationError.F64ValueExpected)
-    }
+inline fun ValueStack.pushReference(
+    value: ReferenceValue,
+) {
+    push(value.toLong())
 }
 
 inline fun ValueStack.popReference(): ReferenceValue {
     return try {
-        (pop() as ReferenceValue)
+        (pop().toReferenceValue())
     } catch (_: ClassCastException) {
         throw InvocationException(InvocationError.ReferenceValueExpected)
     }
@@ -74,155 +39,411 @@ inline fun ValueStack.popReference(): ReferenceValue {
 
 inline fun ValueStack.peekReference(): ReferenceValue {
     return try {
-        (peek() as ReferenceValue)
+        (peek().toReferenceValue())
     } catch (_: ClassCastException) {
         throw InvocationException(InvocationError.ReferenceValueExpected)
     }
 }
 
 inline fun ValueStack.popI31Reference(): UInt {
-    return try {
-        (pop() as ReferenceValue.I31).value
-    } catch (_: ClassCastException) {
+    val encoded = pop()
+    val typeId = encoded and RV_TYPE_MASK
+    if (typeId != RV_TYPE_I31) {
         throw InvocationException(InvocationError.I31ReferenceExpected)
     }
+    return (encoded shr RV_SHIFT_BITS).toUInt()
 }
 
-inline fun ValueStack.popArrayReference(): ArrayInstance {
-    return try {
-        (pop() as ReferenceValue.Array).instance
-    } catch (_: ClassCastException) {
+inline fun ValueStack.popArrayReference(): ReferenceValue.Array {
+    val encoded = pop()
+    val typeId = encoded and RV_TYPE_MASK
+    if (typeId != RV_TYPE_ARRAY) {
         throw InvocationException(InvocationError.ArrayReferenceExpected)
     }
+    val address = (encoded shr RV_SHIFT_BITS).toInt()
+    return ReferenceValue.Array(Address.Array(address))
 }
 
-inline fun ValueStack.popStructReference(): StructInstance {
-    return try {
-        (pop() as ReferenceValue.Struct).instance
-    } catch (_: ClassCastException) {
+inline fun ValueStack.popStructReference(): ReferenceValue.Struct {
+    val encoded = pop()
+    val typeId = encoded and RV_TYPE_MASK
+    if (typeId != RV_TYPE_STRUCT) {
         throw InvocationException(InvocationError.StructReferenceExpected)
     }
+    val address = (encoded shr RV_SHIFT_BITS).toInt()
+    return ReferenceValue.Struct(Address.Struct(address))
 }
 
 inline fun ValueStack.popFunctionAddress(): Address.Function {
-    return try {
-        (pop() as ReferenceValue.Function).address
-    } catch (_: ClassCastException) {
+    val encoded = pop()
+    val typeId = encoded and RV_TYPE_MASK
+    if (typeId != RV_TYPE_FUNCTION) {
         throw InvocationException(InvocationError.FunctionReferenceExpected)
     }
+    val address = (encoded shr RV_SHIFT_BITS).toInt()
+    return Address.Function(address)
 }
 
 inline fun ValueStack.constOperation(
     const: Int,
-) = push(I32(const))
+) = pushI32(const)
 
 inline fun ValueStack.constOperation(
     const: Long,
-) = push(I64(const))
+) = pushI64(const)
 
 inline fun ValueStack.constOperation(
     const: Float,
-) = push(F32(const))
+) = pushF32(const)
 
 inline fun ValueStack.constOperation(
     const: Double,
-) = push(F64(const))
-
-inline fun <S, T : NumberValue<S>> ValueStack.unaryOperation(
-    crossinline constructor: (S) -> T,
-    crossinline operation: (S) -> S,
-) {
-    val operand = pop() as T
-
-    val result = operation(operand.value)
-    push(constructor(result))
-}
+) = pushF64(const)
 
 @JvmName("i32UnaryOperation")
 inline fun ValueStack.unaryOperation(
     crossinline operation: (Int) -> Int,
-) = unaryOperation(::I32, operation)
+) {
+    val operand = popI32()
+
+    val result = operation(operand)
+    pushI32(result)
+}
 
 @JvmName("i64UnaryOperation")
 inline fun ValueStack.unaryOperation(
     crossinline operation: (Long) -> Long,
-) = unaryOperation(::I64, operation)
+) {
+    val operand = popI64()
+
+    val result = operation(operand)
+    pushI64(result)
+}
 
 @JvmName("f32UnaryOperation")
 inline fun ValueStack.unaryOperation(
     crossinline operation: (Float) -> Float,
-) = unaryOperation(::F32, operation)
+) {
+    val operand = popF32()
+
+    val result = operation(operand)
+    pushF32(result)
+}
 
 @JvmName("f64UnaryOperation")
 inline fun ValueStack.unaryOperation(
     crossinline operation: (Double) -> Double,
-) = unaryOperation(::F64, operation)
-
-inline fun <S, T : NumberValue<S>> ValueStack.binaryOperation(
-    crossinline constructor: (S) -> T,
-    crossinline operation: (S, S) -> S,
 ) {
-    val operand2 = pop() as T
-    val operand1 = pop() as T
+    val operand = popF64()
 
-    val result = operation(operand1.value, operand2.value)
-    push(constructor(result))
+    val result = operation(operand)
+    pushF64(result)
 }
 
 @JvmName("i32BinaryOperation")
 inline fun ValueStack.binaryOperation(
     crossinline operation: (Int, Int) -> Int,
-) = binaryOperation(::I32, operation)
+) {
+    val operand2 = popI32()
+    val operand1 = popI32()
+
+    val result = operation(operand1, operand2)
+    pushI32(result)
+}
 
 @JvmName("i64BinaryOperation")
 inline fun ValueStack.binaryOperation(
     crossinline operation: (Long, Long) -> Long,
-) = binaryOperation(::I64, operation)
+) {
+    val operand2 = popI64()
+    val operand1 = popI64()
+
+    val result = operation(operand1, operand2)
+    pushI64(result)
+}
 
 @JvmName("f32BinaryOperation")
 inline fun ValueStack.binaryOperation(
     crossinline operation: (Float, Float) -> Float,
-) = binaryOperation(::F32, operation)
+) {
+    val operand2 = popF32()
+    val operand1 = popF32()
+
+    val result = operation(operand1, operand2)
+    pushF32(result)
+}
 
 @JvmName("f64BinaryOperation")
 inline fun ValueStack.binaryOperation(
     crossinline operation: (Double, Double) -> Double,
-) = binaryOperation(::F64, operation)
-
-inline fun <S, T : NumberValue<S>> ValueStack.testOperation(
-    crossinline operation: (S) -> Boolean,
 ) {
-    val operand = pop() as T
-    val result = if (operation(operand.value)) {
-        I32(1)
+    val operand2 = popF64()
+    val operand1 = popF64()
+
+    val result = operation(operand1, operand2)
+    pushF64(result)
+}
+
+@JvmName("i32TestOperation")
+inline fun ValueStack.testOperation(
+    crossinline operation: (Int) -> Boolean,
+) {
+    val operand = popI32()
+    val result = if (operation(operand)) {
+        1L
     } else {
-        I32(0)
+        0L
     }
     push(result)
 }
 
-inline fun <S, T : NumberValue<S>> ValueStack.relationalOperation(
-    crossinline operation: (S, S) -> Boolean,
+@JvmName("i64TestOperation")
+inline fun ValueStack.testOperation(
+    crossinline operation: (Long) -> Boolean,
 ) {
-    val operand2 = pop() as T
-    val operand1 = pop() as T
-    val result = if (operation(operand1.value, operand2.value)) {
-        I32(1)
+    val operand = popI64()
+    val result = if (operation(operand)) {
+        1L
     } else {
-        I32(0)
+        0L
     }
     push(result)
 }
 
-inline fun <S, A : NumberValue<S>, T, B : NumberValue<T>> ValueStack.convertOperation(
-    crossinline constructor: (T) -> B,
-    crossinline operation: (S) -> T,
+@JvmName("f32TestOperation")
+inline fun ValueStack.testOperation(
+    crossinline operation: (Float) -> Boolean,
 ) {
-    val operand = pop() as A
+    val operand = popF32()
+    val result = if (operation(operand)) {
+        1L
+    } else {
+        0L
+    }
+    push(result)
+}
+
+@JvmName("f64TestOperation")
+inline fun ValueStack.testOperation(
+    crossinline operation: (Double) -> Boolean,
+) {
+    val operand = popF64()
+    val result = if (operation(operand)) {
+        1L
+    } else {
+        0L
+    }
+    push(result)
+}
+
+@JvmName("i32RelationalOperation")
+inline fun ValueStack.relationalOperation(
+    crossinline operation: (Int, Int) -> Boolean,
+) {
+    val operand2 = popI32()
+    val operand1 = popI32()
+    val result = if (operation(operand1, operand2)) {
+        1L
+    } else {
+        0L
+    }
+    push(result)
+}
+
+@JvmName("i64RelationalOperation")
+inline fun ValueStack.relationalOperation(
+    crossinline operation: (Long, Long) -> Boolean,
+) {
+    val operand2 = popI64()
+    val operand1 = popI64()
+    val result = if (operation(operand1, operand2)) {
+        1L
+    } else {
+        0L
+    }
+    push(result)
+}
+
+@JvmName("f32RelationalOperation")
+inline fun ValueStack.relationalOperation(
+    crossinline operation: (Float, Float) -> Boolean,
+) {
+    val operand2 = popF32()
+    val operand1 = popF32()
+    val result = if (operation(operand1, operand2)) {
+        1L
+    } else {
+        0L
+    }
+    push(result)
+}
+
+@JvmName("f64RelationalOperation")
+inline fun ValueStack.relationalOperation(
+    crossinline operation: (Double, Double) -> Boolean,
+) {
+    val operand2 = popF64()
+    val operand1 = popF64()
+    val result = if (operation(operand1, operand2)) {
+        1L
+    } else {
+        0L
+    }
+    push(result)
+}
+
+@JvmName("i32i64ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Int) -> Long,
+) {
+    val operand = popI32()
     val result = try {
-        operation(operand.value)
+        operation(operand)
     } catch (_: Throwable) {
-        throw InvocationException(InvocationError.Trap.TrapEncountered)
+        throw InvocationException(InvocationError.ConvertOperationFailed)
     }
-    push(constructor(result))
+    pushI64(result)
+}
+
+@JvmName("i32f32ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Int) -> Float,
+) {
+    val operand = popI32()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushF32(result)
+}
+
+@JvmName("i32f64ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Int) -> Double,
+) {
+    val operand = popI32()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushF64(result)
+}
+
+@JvmName("i64i32ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Long) -> Int,
+) {
+    val operand = popI64()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushI32(result)
+}
+
+@JvmName("i64f32ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Long) -> Float,
+) {
+    val operand = popI64()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushF32(result)
+}
+
+@JvmName("i64f64ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Long) -> Double,
+) {
+    val operand = popI64()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushF64(result)
+}
+
+@JvmName("f32i32ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Float) -> Int,
+) {
+    val operand = popF32()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushI32(result)
+}
+
+@JvmName("f32i64ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Float) -> Long,
+) {
+    val operand = popF32()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushI64(result)
+}
+
+@JvmName("f32f64ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Float) -> Double,
+) {
+    val operand = popF32()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushF64(result)
+}
+
+@JvmName("f64i32ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Double) -> Int,
+) {
+    val operand = popF64()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushI32(result)
+}
+
+@JvmName("f64i64ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Double) -> Long,
+) {
+    val operand = popF64()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushI64(result)
+}
+
+@JvmName("f64f32ConvertOperation")
+inline fun ValueStack.convertOperation(
+    crossinline operation: (Double) -> Float,
+) {
+    val operand = popF64()
+    val result = try {
+        operation(operand)
+    } catch (_: Throwable) {
+        throw InvocationException(InvocationError.ConvertOperationFailed)
+    }
+    pushF32(result)
 }

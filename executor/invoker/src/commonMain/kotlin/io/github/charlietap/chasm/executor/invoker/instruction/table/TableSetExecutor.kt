@@ -3,8 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
-import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal inline fun TableSetExecutor(
@@ -14,7 +12,7 @@ internal inline fun TableSetExecutor(
     val stack = context.vstack
     val tableInstance = instruction.table
 
-    val value = stack.popReference()
+    val value = stack.pop()
     val elementIndex = stack.popI32()
 
     if (elementIndex !in tableInstance.elements.indices) {

@@ -2,9 +2,11 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.ext.pushReference
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.FieldValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
@@ -26,7 +28,7 @@ internal inline fun StructNewExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldPacker: FieldPacker,
 ) {
-
+    val store = context.store
     val stack = context.vstack
     val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(instruction.typeIndex)
@@ -40,7 +42,8 @@ internal inline fun StructNewExecutor(
     }
 
     val instance = StructInstance(definedType, fields.asReversed())
-    val reference = ReferenceValue.Struct(instance)
+    store.structs.add(instance)
+    val reference = ReferenceValue.Struct(Address.Struct(store.structs.size - 1))
 
-    stack.push(reference)
+    stack.pushReference(reference)
 }

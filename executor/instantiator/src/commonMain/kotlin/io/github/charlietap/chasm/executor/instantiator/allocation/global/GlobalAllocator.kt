@@ -4,18 +4,16 @@ import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-typealias GlobalAllocator = (Store, GlobalType, ExecutionValue) -> Address.Global
+typealias GlobalAllocator = (Store, GlobalType, Long) -> Address.Global
 
 fun GlobalAllocator(
     store: Store,
     type: GlobalType,
-    value: ExecutionValue,
+    value: Long,
 ): Address.Global {
 
     val instance = GlobalInstance(type, value)
-
     store.globals.add(instance)
 
     return Address.Global(store.globals.size - 1)

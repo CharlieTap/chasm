@@ -5,10 +5,10 @@ import io.github.charlietap.chasm.executor.invoker.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
@@ -45,7 +45,8 @@ internal inline fun ArrayInitElementExecutor(
     val elementsToCopy = stack.popI32()
     val sourceOffsetInElementSegment = stack.popI32()
     val destinationOffsetInArray = stack.popI32()
-    val arrayInstance = stack.popArrayReference()
+    val arrayRef = stack.popArrayReference()
+    val arrayInstance = store.array(arrayRef.address)
 
     if (
         (destinationOffsetInArray + elementsToCopy > arrayInstance.fields.size) ||

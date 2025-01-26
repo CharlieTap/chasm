@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.tabl
 
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
+import io.github.charlietap.chasm.executor.runtime.encoder.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.limits
 import io.github.charlietap.chasm.fixture.ast.type.tableType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
@@ -27,8 +27,8 @@ class TableAllocatorTest {
         val limits = limits(min.toUInt())
         val type = tableType(limits = limits)
 
-        val refValue = nullReferenceValue(AbstractHeapType.Func)
-        val elements = Array<ReferenceValue>(min) {
+        val refValue = nullReferenceValue(AbstractHeapType.Func).toLong()
+        val elements = LongArray(min) {
             refValue
         }
 

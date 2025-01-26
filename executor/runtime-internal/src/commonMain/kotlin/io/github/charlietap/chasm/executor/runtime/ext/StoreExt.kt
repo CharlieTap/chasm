@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError.DataLookupFailed
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError.ElementLookupFailed
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError.ExceptionLookupFailed
@@ -11,12 +12,14 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError.MemoryL
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError.TableLookupFailed
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError.TagLookupFailed
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
+import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ExceptionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TagInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
@@ -92,4 +95,20 @@ inline fun Store.instruction(address: Address.Function): DispatchableInstruction
     throw InvocationException(InstructionLookupFailed(address))
 } catch (_: IllegalArgumentException) {
     throw InvocationException(InstructionLookupFailed(address))
+}
+
+inline fun Store.struct(address: Address.Struct): StructInstance = try {
+    structs[address.address]
+} catch (_: IndexOutOfBoundsException) {
+    throw InvocationException(InvocationError.StructLookupFailed(address))
+} catch (_: IllegalArgumentException) {
+    throw InvocationException(InvocationError.StructLookupFailed(address))
+}
+
+inline fun Store.array(address: Address.Array): ArrayInstance = try {
+    arrays[address.address]
+} catch (_: IndexOutOfBoundsException) {
+    throw InvocationException(InvocationError.ArrayLookupFailed(address))
+} catch (_: IllegalArgumentException) {
+    throw InvocationException(InvocationError.ArrayLookupFailed(address))
 }

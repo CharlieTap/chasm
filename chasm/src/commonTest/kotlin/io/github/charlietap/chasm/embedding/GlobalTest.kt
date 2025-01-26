@@ -25,6 +25,6 @@ class GlobalTest {
 
         assertEquals(expected, actual)
         assertEquals(globalType(), store.store.globals[0].type)
-        assertEquals(i32(117), store.store.globals[0].value)
+        assertEquals(117, store.store.globals[0].value)
     }
 }

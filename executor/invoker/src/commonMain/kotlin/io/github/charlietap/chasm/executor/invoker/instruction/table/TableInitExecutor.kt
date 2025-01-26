@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.contains
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal fun TableInitExecutor(
@@ -12,7 +11,6 @@ internal fun TableInitExecutor(
     instruction: TableInstruction.TableInit,
 ) {
     val stack = context.vstack
-
     val tableInstance = instruction.table
     val elementInstance = instruction.element
 

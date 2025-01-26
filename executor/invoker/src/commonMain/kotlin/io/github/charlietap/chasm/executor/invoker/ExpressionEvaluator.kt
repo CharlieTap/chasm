@@ -13,9 +13,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
-typealias ExpressionEvaluator = (RuntimeConfig, Store, ModuleInstance, Expression, Arity.Return) -> Result<ExecutionValue?, InvocationError>
+typealias ExpressionEvaluator = (RuntimeConfig, Store, ModuleInstance, Expression, Arity.Return) -> Result<Long?, InvocationError>
 
 fun ExpressionEvaluator(
     config: RuntimeConfig,
@@ -23,7 +22,7 @@ fun ExpressionEvaluator(
     instance: ModuleInstance,
     expression: Expression,
     arity: Arity.Return = Arity.Return(1),
-): Result<ExecutionValue?, InvocationError> =
+): Result<Long?, InvocationError> =
     ExpressionEvaluator(
         config = config,
         store = store,
@@ -40,7 +39,7 @@ internal inline fun ExpressionEvaluator(
     expression: Expression,
     arity: Arity.Return,
     crossinline threadExecutor: ThreadExecutor,
-): Result<ExecutionValue?, InvocationError> {
+): Result<Long?, InvocationError> {
 
     val thread = Thread(
         frame = ActivationFrame(

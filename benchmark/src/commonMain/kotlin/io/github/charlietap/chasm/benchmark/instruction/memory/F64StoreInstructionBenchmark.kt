@@ -16,8 +16,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instruction.runtimeMe
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value.f64
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -61,8 +59,8 @@ class F64StoreInstructionBenchmark {
         instance = context.instance,
     )
 
-    private val baseAddress = i32(0)
-    private val value = f64()
+    private val baseAddress = 0
+    private val value = 117.0
 
     @Setup()
     fun setup() {
@@ -81,8 +79,8 @@ class F64StoreInstructionBenchmark {
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.vstack.push(baseAddress)
-        context.vstack.push(value)
+        context.vstack.pushI32(baseAddress)
+        context.vstack.pushF64(value)
         val result = F64StoreExecutor(context, instruction)
         context.vstack.clear()
         blackhole.consume(result)

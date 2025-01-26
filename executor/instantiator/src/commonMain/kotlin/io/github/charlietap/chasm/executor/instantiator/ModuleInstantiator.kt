@@ -19,7 +19,6 @@ import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
 typealias ModuleInstantiator = (RuntimeConfig, Store, Module, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
@@ -61,9 +60,10 @@ internal inline fun ModuleInstantiator(
     val context = InstantiationContext(config, store, module)
     val partialInstance = partialAllocator(context, imports).bind()
 
-    val tableInitValues = module.tables.map { table ->
+    val tableInitValues = LongArray(module.tables.size) { tableIndex ->
+        val table = module.tables[tableIndex]
         val initExpression = expressionPredecoder(context, table.initExpression).bind()
-        evaluator(config, store, partialInstance, initExpression, Arity.Return(1)).bind() as ReferenceValue
+        evaluator(config, store, partialInstance, initExpression, Arity.Return(1)).bind() ?: 0L
     }
 
     val instance = allocator(context, partialInstance, tableInitValues).bind()

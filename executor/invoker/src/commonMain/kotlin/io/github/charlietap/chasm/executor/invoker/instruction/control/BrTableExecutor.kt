@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal fun BrTableExecutor(

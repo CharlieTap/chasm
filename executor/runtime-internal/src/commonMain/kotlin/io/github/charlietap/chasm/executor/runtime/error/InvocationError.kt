@@ -43,6 +43,12 @@ sealed interface InvocationError : ModuleTrapError {
     value class ExceptionLookupFailed(val address: Address.Exception) : InvocationError
 
     @JvmInline
+    value class StructLookupFailed(val address: Address.Struct) : InvocationError
+
+    @JvmInline
+    value class ArrayLookupFailed(val address: Address.Array) : InvocationError
+
+    @JvmInline
     value class HostLookupFailed(val address: Address.Host) : InvocationError
 
     @JvmInline
@@ -85,6 +91,8 @@ sealed interface InvocationError : ModuleTrapError {
         val pagesRequested: Int,
         val maxPages: Int,
     ) : InvocationError
+
+    data object SegmentInitExpressionFailed : InvocationError
 
     data object MemoryGrowFailed : InvocationError
 
@@ -150,12 +158,18 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object CannotDivideIntegerByZero : InvocationError
 
+    data object ConvertOperationFailed : InvocationError
+
     data object IntegerOverflow : InvocationError
 
     data object CallStackExhausted : InvocationError
 
     @JvmInline
     value class UnimplementedInstruction(val instruction: ExecutionInstruction) : InvocationError
+
+    data object Unreachable : InvocationError
+
+    data object FunctionInconsistentWithType : InvocationError
 
     data class HostFunctionInconsistentWithType(
         val expectedType: ValueType,

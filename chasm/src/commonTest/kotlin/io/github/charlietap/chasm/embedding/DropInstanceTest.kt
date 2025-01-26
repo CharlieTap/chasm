@@ -4,6 +4,8 @@ import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
+import io.github.charlietap.chasm.executor.runtime.encoder.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.sharedStatus
@@ -30,13 +32,13 @@ class DropInstanceTest {
     @Test
     fun `calling dropInstance on an instance wipes all the associated state`() {
 
-        val referenceValue = hostReferenceValue()
+        val referenceValue = hostReferenceValue().toLong()
 
         val dataInstance = dataInstance(
             bytes = ubyteArrayOf(1u, 2u),
         )
         val elementInstance = elementInstance(
-            elements = arrayOf(referenceValue, referenceValue),
+            elements = longArrayOf(referenceValue, referenceValue),
         )
         val globalInstance = globalInstance(
             value = referenceValue,
@@ -47,7 +49,7 @@ class DropInstanceTest {
             ),
         )
         val tableInstance = tableInstance(
-            elements = arrayOf(referenceValue, referenceValue),
+            elements = longArrayOf(referenceValue, referenceValue),
         )
 
         val store = publicStore(
@@ -93,9 +95,9 @@ class DropInstanceTest {
         assertEquals(true, moduleInstance.deallocated)
         assertEquals(true, memoryDeallocated)
         assertContentEquals(ubyteArrayOf(), dataInstance.bytes)
-        assertContentEquals(arrayOf(), elementInstance.elements)
-        assertEquals(ExecutionValue.Uninitialised, globalInstance.value)
-        assertContentEquals(arrayOf(), tableInstance.elements)
+        assertContentEquals(longArrayOf(), elementInstance.elements)
+        assertEquals(ExecutionValue.Uninitialised.toLong(), globalInstance.value)
+        assertContentEquals(longArrayOf(), tableInstance.elements)
         assertEquals(0, moduleInstance.dataAddresses.size)
         assertEquals(0, moduleInstance.elemAddresses.size)
         assertEquals(0, moduleInstance.exports.size)

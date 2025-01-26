@@ -5,12 +5,12 @@ import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
+import io.github.charlietap.chasm.executor.runtime.encoder.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.function
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
@@ -38,7 +38,6 @@ internal inline fun CallIndirectExecutor(
     crossinline wasmFunctionCall: WasmFunctionCall,
     crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
 ) {
-
     val stack = context.vstack
     val store = context.store
     val frame = context.cstack.peekFrame()
@@ -46,7 +45,7 @@ internal inline fun CallIndirectExecutor(
     val expectedFunctionType = frame.instance.definedType(typeIndex)
 
     val elementIndex = stack.popI32()
-    val reference = table.element(elementIndex)
+    val reference = table.element(elementIndex).toReferenceValue() // TODO just shift the type off here and optimistically take the address
 
     val address = when (reference) {
         is ReferenceValue.Function -> reference.address

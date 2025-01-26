@@ -16,7 +16,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instruction.runtimeMe
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -60,7 +59,7 @@ class I32Load8SInstructionBenchmark {
         instance = context.instance,
     )
 
-    private val baseAddress = i32(0)
+    private val baseAddress = 0
 
     @Setup
     fun setup() {
@@ -79,7 +78,7 @@ class I32Load8SInstructionBenchmark {
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.vstack.push(baseAddress)
+        context.vstack.pushI32(baseAddress)
         val result = I32Load8SExecutor(context, instruction)
         context.vstack.clear()
         blackhole.consume(result)

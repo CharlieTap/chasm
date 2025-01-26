@@ -5,6 +5,8 @@ import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.field
 import io.github.charlietap.chasm.executor.runtime.ext.popStructReference
+import io.github.charlietap.chasm.executor.runtime.ext.pushExecution
+import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.ext.structType
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
@@ -30,7 +32,7 @@ internal inline fun StructGetExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline fieldUnpacker: FieldUnpacker,
 ) {
-
+    val store = context.store
     val stack = context.vstack
     val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
@@ -38,10 +40,11 @@ internal inline fun StructGetExecutor(
     val structType = definedTypeExpander(definedType).structType()
     val fieldType = structType.field(fieldIndex)
 
-    val structInstance = stack.popStructReference()
+    val structRef = stack.popStructReference()
+    val structInstance = store.struct(structRef.address)
 
     val fieldValue = structInstance.field(fieldIndex)
     val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack)
 
-    stack.push(unpackedValue)
+    stack.pushExecution(unpackedValue)
 }

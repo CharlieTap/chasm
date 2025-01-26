@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.ext.popReference
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal inline fun RefIsNullExecutor(
@@ -12,15 +10,11 @@ internal inline fun RefIsNullExecutor(
     instruction: ReferenceInstruction.RefIsNull,
 ) {
     val stack = context.vstack
-    val value = stack.pop()
+    val value = stack.popReference()
 
-    if (value is ReferenceValue) {
-        if (value is ReferenceValue.Null) {
-            stack.push(NumberValue.I32(1))
-        } else {
-            stack.push(NumberValue.I32(0))
-        }
+    if (value is ReferenceValue.Null) {
+        stack.push(1L)
     } else {
-        throw InvocationException(InvocationError.ReferenceValueExpected)
+        stack.push(0L)
     }
 }

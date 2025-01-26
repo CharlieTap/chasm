@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popI32
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 
 internal fun BrIfExecutor(
@@ -19,7 +18,7 @@ internal inline fun BrIfExecutor(
     crossinline breakExecutor: BreakExecutor,
 ) {
     val stack = context.vstack
-    val shouldBreak = stack.popI32() != 0
+    val shouldBreak = stack.pop() != 0L
 
     if (shouldBreak) {
         breakExecutor(context.cstack, stack, instruction.labelIndex)

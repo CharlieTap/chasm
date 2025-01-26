@@ -5,6 +5,8 @@ import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.ast.type.functionType
+import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
@@ -27,7 +29,11 @@ class FunctionInvokerTest {
         val moduleInstance = moduleInstance(
             functionAddresses = mutableListOf(address),
         )
-        val functionType = functionType()
+        val functionType = functionType(
+            results = resultType(
+                listOf(i32ValueType()),
+            ),
+        )
         val definedType = functionType.definedType()
         val function = runtimeFunction()
         val functionInstance = wasmFunctionInstance(
@@ -45,7 +51,7 @@ class FunctionInvokerTest {
         val threadExecutor: ThreadExecutor = { _config, _params ->
             assertEquals(config, _config.config)
             assertEquals(params, _params)
-            Ok(listOf(i32(117)))
+            Ok(listOf(117L))
         }
 
         val actual = FunctionInvoker(

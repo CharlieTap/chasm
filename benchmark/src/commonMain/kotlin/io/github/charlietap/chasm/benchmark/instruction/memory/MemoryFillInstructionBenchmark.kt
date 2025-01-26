@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instruction.memoryFil
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -58,9 +57,9 @@ class MemoryFillInstructionBenchmark {
         instance = context.instance,
     )
 
-    private val offset = i32(0)
-    private val fillValue = i32(117)
-    private val bytesToFill = i32(200)
+    private val offset = 0
+    private val fillValue = 117
+    private val bytesToFill = 200
 
     @Setup
     fun setup() {
@@ -79,9 +78,9 @@ class MemoryFillInstructionBenchmark {
 
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
-        context.vstack.push(offset)
-        context.vstack.push(fillValue)
-        context.vstack.push(bytesToFill)
+        context.vstack.pushI32(offset)
+        context.vstack.pushI32(fillValue)
+        context.vstack.pushI32(bytesToFill)
         val result = MemoryFillExecutor(context, instruction)
         context.vstack.clear()
         blackhole.consume(result)

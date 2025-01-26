@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.thread
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -38,7 +37,7 @@ class ExpressionEvaluatorTest {
         val threadExecutor: ThreadExecutor = { config, params ->
             assertEquals(expectedConfig, config)
             assertEquals(emptyList(), params)
-            Ok(listOf(i32(117)))
+            Ok(listOf(117))
         }
 
         val actual = ExpressionEvaluator(
@@ -50,7 +49,7 @@ class ExpressionEvaluatorTest {
             threadExecutor = threadExecutor,
         )
 
-        assertEquals(Ok(i32(117)), actual)
+        assertEquals(Ok(117L), actual)
     }
 
     @Test

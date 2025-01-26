@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.global
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.table
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 fun dropInstance(
     store: Store,
@@ -43,7 +42,7 @@ internal fun dropInstance(
 
     instance.elemAddresses.forEach { address ->
         store.element(address).let { element ->
-            element.elements = arrayOf()
+            element.elements = longArrayOf()
         }
     }
     instance.elemAddresses.clear()
@@ -52,9 +51,8 @@ internal fun dropInstance(
 
     instance.functionAddresses.clear()
 
-    val uninit = ExecutionValue.Uninitialised
     instance.globalAddresses.forEach { address ->
-        store.global(address).value = uninit
+        store.global(address).value = 0L
     }
     instance.globalAddresses.clear()
 
@@ -69,7 +67,7 @@ internal fun dropInstance(
 
     instance.tableAddresses.forEach { address ->
         store.table(address).let { table ->
-            table.elements = arrayOf()
+            table.elements = longArrayOf()
         }
     }
     instance.tableAddresses.clear()

@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.global
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
 fun writeGlobal(
@@ -33,5 +34,5 @@ internal fun internalWriteGlobal(
     value: ExecutionValue,
 ): Result<Unit, ModuleTrapError> = binding {
     val global = store.store.global(global.reference.address)
-    global.value = value
+    global.value = value.toLong()
 }

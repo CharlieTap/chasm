@@ -1,15 +1,13 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.value
 
 import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
-import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.heapType
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.hostAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.structInstance
+import io.github.charlietap.chasm.fixture.executor.runtime.instance.structAddress
 
 fun referenceValue(): ReferenceValue = nullReferenceValue()
 
@@ -26,15 +24,15 @@ fun i31ReferenceValue(
 )
 
 fun structReferenceValue(
-    instance: StructInstance = structInstance(),
+    address: Address.Struct = structAddress(),
 ) = ReferenceValue.Struct(
-    instance = instance,
+    address = address,
 )
 
 fun arrayReferenceValue(
-    instance: ArrayInstance = arrayInstance(),
+    address: Address.Array = arrayAddress(),
 ) = ReferenceValue.Array(
-    instance = instance,
+    address = address,
 )
 
 fun functionReferenceValue(

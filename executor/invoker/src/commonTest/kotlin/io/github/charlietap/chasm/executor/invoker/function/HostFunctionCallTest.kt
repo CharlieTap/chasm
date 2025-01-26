@@ -66,14 +66,8 @@ class HostFunctionCallTest {
             function = hostFunction,
         )
 
-        val params = listOf(
-            i32(115),
-            i64(116),
-        )
-
-        params.forEach { value ->
-            vstack.push(value)
-        }
+        vstack.pushI32(115)
+        vstack.pushI64(116)
 
         val actual = HostFunctionCall(
             context = context,
@@ -83,7 +77,7 @@ class HostFunctionCallTest {
         assertEquals(Unit, actual)
         assertEquals(1, cstack.framesDepth())
         assertEquals(2, vstack.depth())
-        assertEquals(i64(118), vstack.pop())
-        assertEquals(i32(117), vstack.pop())
+        assertEquals(118, vstack.pop())
+        assertEquals(117, vstack.pop())
     }
 }
