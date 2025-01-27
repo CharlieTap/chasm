@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.field
+import io.github.charlietap.chasm.executor.runtime.ext.packedField
 import io.github.charlietap.chasm.executor.runtime.ext.popStructReference
 import io.github.charlietap.chasm.executor.runtime.ext.pushExecution
 import io.github.charlietap.chasm.executor.runtime.ext.struct
@@ -27,10 +27,9 @@ internal inline fun StructGetSignedExecutor(
 
     val structRef = stack.popStructReference()
     val structInstance = store.struct(structRef.address)
-    val fieldType = structInstance.structType.field(fieldIndex)
 
-    val fieldValue = structInstance.field(fieldIndex)
-    val unpackedValue = fieldUnpacker(fieldValue, fieldType, true)
+    val fieldValue = structInstance.packedField(fieldIndex)
+    val unpackedValue = fieldUnpacker(fieldValue, true)
 
     stack.pushExecution(unpackedValue)
 }

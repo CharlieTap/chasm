@@ -8,8 +8,18 @@ import io.github.charlietap.chasm.executor.runtime.value.FieldValue
 
 fun StructInstance.field(
     index: Index.FieldIndex,
-): FieldValue = try {
-    this.fields[index.idx.toInt()]
+): FieldValue.Execution = try {
+    this.fields[index.idx.toInt()] as FieldValue.Execution
+} catch (_: IndexOutOfBoundsException) {
+    throw InvocationException(InvocationError.StructFieldLookupFailed(index.idx.toInt()))
+} catch (_: IllegalArgumentException) {
+    throw InvocationException(InvocationError.StructFieldLookupFailed(index.idx.toInt()))
+}
+
+fun StructInstance.packedField(
+    index: Index.FieldIndex,
+): FieldValue.Packed = try {
+    this.fields[index.idx.toInt()] as FieldValue.Packed
 } catch (_: IndexOutOfBoundsException) {
     throw InvocationException(InvocationError.StructFieldLookupFailed(index.idx.toInt()))
 } catch (_: IllegalArgumentException) {
