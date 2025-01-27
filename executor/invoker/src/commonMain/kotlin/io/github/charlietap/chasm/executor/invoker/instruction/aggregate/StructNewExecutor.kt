@@ -41,7 +41,7 @@ internal inline fun StructNewExecutor(
         fields.add(fieldPacker(stack.pop(), fieldType))
     }
 
-    val instance = StructInstance(definedType, fields.asReversed())
+    val instance = StructInstance(definedType, structType, fields.asReversed())
     store.structs.add(instance)
     val reference = ReferenceValue.Struct(Address.Struct(store.structs.size - 1))
 
