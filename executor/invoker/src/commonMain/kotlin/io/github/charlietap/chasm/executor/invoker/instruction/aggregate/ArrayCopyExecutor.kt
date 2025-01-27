@@ -1,50 +1,35 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
-import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-
-internal fun ArrayCopyExecutor(
-    context: ExecutionContext,
-    instruction: AggregateInstruction.ArrayCopy,
-) =
-    ArrayCopyExecutor(
-        context = context,
-        instruction = instruction,
-        definedTypeExpander = ::DefinedTypeExpander,
-    )
 
 internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayCopy,
-    crossinline definedTypeExpander: DefinedTypeExpander,
 ) {
     // x = dest
     // y = src
     val store = context.store
     val stack = context.vstack
-    val frame = context.cstack.peekFrame()
-    val destDefinedType = frame.instance.definedType(instruction.destinationTypeIndex)
-
-    val destArrayType = definedTypeExpander(destDefinedType).arrayType()
-    if (destArrayType.fieldType.mutability != Mutability.Var) {
-        throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
-    }
 
     val elementsToCopy = stack.popI32()
+
     val sourceOffset = stack.popI32()
     val sourceRef = stack.popArrayReference()
     val source = store.array(sourceRef.address)
+
     val destinationOffset = stack.popI32()
     val destinationRef = stack.popArrayReference()
     val destination = store.array(destinationRef.address)
+
+    if (destination.arrayType.fieldType.mutability != Mutability.Var) {
+        throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
+    }
 
     if (destinationOffset + elementsToCopy > destination.fields.size) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
