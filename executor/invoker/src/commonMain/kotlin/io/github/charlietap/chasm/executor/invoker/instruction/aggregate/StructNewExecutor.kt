@@ -32,7 +32,6 @@ internal inline fun StructNewExecutor(
     val stack = context.vstack
     val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(instruction.typeIndex)
-
     val structType = definedTypeExpander(definedType).structType()
 
     val fieldTypes = structType.fields.asReversed()
