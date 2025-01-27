@@ -8,24 +8,10 @@ import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-
-internal fun ArrayInitElementExecutor(
-    context: ExecutionContext,
-    instruction: AggregateInstruction.ArrayInitElement,
-) =
-    ArrayInitElementExecutor(
-        context = context,
-        instruction = instruction,
-        definedTypeExpander = ::DefinedTypeExpander,
-        fieldPacker = ::FieldPacker,
-    )
 
 internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayInitElement,
-    crossinline definedTypeExpander: DefinedTypeExpander,
-    crossinline fieldPacker: FieldPacker,
 ) {
     val stack = context.vstack
     val store = context.store
@@ -55,8 +41,7 @@ internal inline fun ArrayInitElementExecutor(
         val elementIndex = sourceOffsetInElementSegment + offset
         val elementValue = elementInstance.elements[elementIndex]
         val fieldIndex = destinationOffsetInArray + offset
-        val fieldValue = fieldPacker(elementValue, arrayInstance.arrayType.fieldType)
 
-        arrayInstance.fields[fieldIndex] = fieldValue
+        arrayInstance.fields[fieldIndex] = elementValue
     }
 }

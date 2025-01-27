@@ -7,18 +7,9 @@ import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
-internal fun ArraySetExecutor(
-    context: ExecutionContext,
-    instruction: AggregateInstruction.ArraySet,
-) =
-    ArraySetExecutor(
-        context = context,
-        fieldPacker = ::FieldPacker,
-    )
-
 internal inline fun ArraySetExecutor(
     context: ExecutionContext,
-    crossinline fieldPacker: FieldPacker,
+    instruction: AggregateInstruction.ArraySet,
 ) {
     val store = context.store
     val stack = context.vstack
@@ -28,10 +19,9 @@ internal inline fun ArraySetExecutor(
     val arrayRef = stack.popArrayReference()
 
     val arrayInstance = store.array(arrayRef.address)
-    val fieldValue = fieldPacker(value, arrayInstance.arrayType.fieldType)
 
     try {
-        arrayInstance.fields[fieldIndex] = fieldValue
+        arrayInstance.fields[fieldIndex] = value
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }

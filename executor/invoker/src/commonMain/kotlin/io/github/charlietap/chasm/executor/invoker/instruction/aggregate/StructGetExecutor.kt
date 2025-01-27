@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.field
 import io.github.charlietap.chasm.executor.runtime.ext.popStructReference
-import io.github.charlietap.chasm.executor.runtime.ext.pushExecution
 import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
@@ -27,5 +26,5 @@ internal inline fun StructGetExecutor(
     val structInstance = store.struct(structRef.address)
     val fieldValue = structInstance.field(fieldIndex)
 
-    stack.pushExecution(fieldValue.executionValue)
+    stack.push(fieldValue)
 }

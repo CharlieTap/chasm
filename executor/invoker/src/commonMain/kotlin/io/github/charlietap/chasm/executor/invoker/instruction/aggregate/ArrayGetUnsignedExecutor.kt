@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.packedField
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
-import io.github.charlietap.chasm.executor.runtime.ext.pushExecution
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal fun ArrayGetUnsignedExecutor(
@@ -26,8 +25,8 @@ internal inline fun ArrayGetUnsignedExecutor(
     val arrayRef = stack.popArrayReference()
     val arrayInstance = store.array(arrayRef.address)
 
-    val fieldValue = arrayInstance.packedField(fieldIndex)
-    val unpackedValue = fieldUnpacker(fieldValue, false)
+    val (packed, type) = arrayInstance.packedField(fieldIndex)
+    val unpackedValue = fieldUnpacker(packed, type, false)
 
-    stack.pushExecution(unpackedValue)
+    stack.push(unpackedValue)
 }

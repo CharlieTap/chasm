@@ -26,12 +26,10 @@ internal inline fun ArrayNewDefaultExecutor(
     crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
-
     val stack = context.vstack
     val typeIndex = instruction.typeIndex
     val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
-
     val arrayType = definedTypeExpander(definedType).arrayType()
 
     val size = stack.popI32()

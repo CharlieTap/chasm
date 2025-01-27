@@ -18,14 +18,12 @@ internal fun ArrayNewFixedExecutor(
         context = context,
         instruction = instruction,
         definedTypeExpander = ::DefinedTypeExpander,
-        fieldPacker = ::FieldPacker,
     )
 
 internal inline fun ArrayNewFixedExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewFixed,
     crossinline definedTypeExpander: DefinedTypeExpander,
-    crossinline fieldPacker: FieldPacker,
 ) {
     val store = context.store
     val stack = context.vstack
@@ -34,10 +32,10 @@ internal inline fun ArrayNewFixedExecutor(
     val definedType = frame.instance.definedType(typeIndex)
     val arrayType = definedTypeExpander(definedType).arrayType()
 
-    val fields = MutableList(size.toInt()) { _ ->
-        val value = stack.pop()
-        fieldPacker(value, arrayType.fieldType)
-    }.asReversed()
+    val fields = LongArray(size.toInt()) { _ ->
+        stack.pop()
+    }
+    fields.reverse()
 
     val instance = ArrayInstance(definedType, arrayType, fields)
     store.arrays.add(instance)

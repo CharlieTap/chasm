@@ -12,20 +12,9 @@ import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.ext.bitWidth
 
-internal fun ArrayInitDataExecutor(
+internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayInitData,
-) =
-    ArrayInitDataExecutor(
-        context = context,
-        instruction = instruction,
-        fieldPacker = ::FieldPacker,
-    )
-
-internal fun ArrayInitDataExecutor(
-    context: ExecutionContext,
-    instruction: AggregateInstruction.ArrayInitData,
-    fieldPacker: FieldPacker,
 ) {
     val stack = context.vstack
     val store = context.store
@@ -63,7 +52,7 @@ internal fun ArrayInitDataExecutor(
         val element = arrayType.fieldType.valueFromBytes(byteArray)
 
         val fieldIndex = arrayOffset + offset
-        val fieldValue = fieldPacker(element.toLong(), arrayType.fieldType)
+        val fieldValue = element.toLong()
 
         arrayInstance.fields[fieldIndex] = fieldValue
     }

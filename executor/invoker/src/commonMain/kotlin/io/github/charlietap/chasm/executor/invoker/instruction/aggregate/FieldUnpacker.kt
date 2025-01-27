@@ -1,28 +1,26 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.FieldValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
-import io.github.charlietap.chasm.executor.runtime.value.PackedValue
+import io.github.charlietap.chasm.ast.type.PackedType
 
-internal typealias FieldUnpacker = (FieldValue.Packed, Boolean) -> ExecutionValue
+internal typealias FieldUnpacker = (Long, PackedType, Boolean) -> Long
 
 internal fun FieldUnpacker(
-    value: FieldValue.Packed,
+    value: Long,
+    type: PackedType,
     signedUnpack: Boolean,
-): ExecutionValue {
-    val unpacked = when (val packed = value.packedValue) {
-        is PackedValue.I8 -> if (signedUnpack) {
-            packed.value.toByte().toInt()
+): Long {
+    val unpacked = when (type) {
+        is PackedType.I8 -> if (signedUnpack) {
+            value.toByte().toInt()
         } else {
-            packed.value.toInt() and 0xFF
+            value.toInt() and 0xFF
         }
-        is PackedValue.I16 -> if (signedUnpack) {
-            packed.value.toShort().toInt()
+        is PackedType.I16 -> if (signedUnpack) {
+            value.toShort().toInt()
         } else {
-            packed.value.toInt() and 0xFFFF
+            value.toInt() and 0xFFFF
         }
     }
 
-    return NumberValue.I32(unpacked)
+    return unpacked.toLong()
 }
