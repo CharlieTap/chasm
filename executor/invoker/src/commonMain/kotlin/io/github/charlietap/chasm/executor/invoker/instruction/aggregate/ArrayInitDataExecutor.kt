@@ -1,18 +1,15 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.ext.dataAddress
-import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
-import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.bitWidth
 
 internal fun ArrayInitDataExecutor(
@@ -22,23 +19,19 @@ internal fun ArrayInitDataExecutor(
     ArrayInitDataExecutor(
         context = context,
         instruction = instruction,
-        definedTypeExpander = ::DefinedTypeExpander,
         fieldPacker = ::FieldPacker,
     )
 
 internal fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayInitData,
-    definedTypeExpander: DefinedTypeExpander,
     fieldPacker: FieldPacker,
 ) {
     val stack = context.vstack
     val store = context.store
 
-    val (typeIndex, dataIndex) = instruction
+    val dataIndex = instruction.dataIndex
     val frame = context.cstack.peekFrame()
-    val definedType = frame.instance.definedType(typeIndex)
-    val arrayType = definedTypeExpander(definedType).arrayType()
 
     val dataAddress = frame.instance.dataAddress(dataIndex)
     val dataInstance = store.data(dataAddress)
@@ -48,6 +41,7 @@ internal fun ArrayInitDataExecutor(
     val arrayOffset = stack.popI32()
     val arrayRef = stack.popArrayReference()
     val arrayInstance = store.array(arrayRef.address)
+    val arrayType = arrayInstance.arrayType
 
     val arrayElementSizeInBytes = arrayType.fieldType.bitWidth()?.let {
         it / 8
