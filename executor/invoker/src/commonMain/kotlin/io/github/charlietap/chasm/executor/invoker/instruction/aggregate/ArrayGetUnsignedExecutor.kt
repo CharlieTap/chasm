@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
 internal fun ArrayGetUnsignedExecutor(
     context: ExecutionContext,
@@ -12,6 +11,5 @@ internal fun ArrayGetUnsignedExecutor(
         context = context,
         typeIndex = instruction.typeIndex,
         signedUnpack = false,
-        definedTypeExpander = ::DefinedTypeExpander,
         fieldUnpacker = ::FieldUnpacker,
     )

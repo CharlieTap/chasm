@@ -39,7 +39,7 @@ internal inline fun ArrayNewFixedExecutor(
         fieldPacker(value, arrayType.fieldType)
     }.asReversed()
 
-    val instance = ArrayInstance(definedType, fields)
+    val instance = ArrayInstance(definedType, arrayType, fields)
     store.arrays.add(instance)
     val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 
