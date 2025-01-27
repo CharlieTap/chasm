@@ -33,7 +33,7 @@ internal inline fun ArrayGetExecutor(
     val arrayInstance = store.array(arrayRef.address)
     val fieldType = arrayInstance.arrayType.fieldType
 
-    val fieldValue = arrayInstance.field(Index.FieldIndex(fieldIndex.toUInt()))
+    val fieldValue = arrayInstance.field(fieldIndex)
     val unpackedValue = fieldUnpacker(fieldValue, fieldType, signedUnpack)
 
     stack.pushExecution(unpackedValue)
