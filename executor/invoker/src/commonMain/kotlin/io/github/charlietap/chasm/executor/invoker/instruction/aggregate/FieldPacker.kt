@@ -17,10 +17,10 @@ internal fun FieldPacker(
         is StorageType.Packed -> {
             val packedValue = when (storageType.type) {
                 PackedType.I8 -> {
-                    PackedValue.I8(value.toUByte())
+                    PackedValue.I8(value)
                 }
                 PackedType.I16 -> {
-                    PackedValue.I16(value.toUShort())
+                    PackedValue.I16(value)
                 }
             }
             FieldValue.Packed(packedValue)

@@ -5,13 +5,13 @@ import io.github.charlietap.chasm.executor.runtime.value.PackedValue
 fun packedValue(): PackedValue = bytePackedValue()
 
 fun bytePackedValue(
-    value: UByte = 0u,
+    value: Long = 0L,
 ) = PackedValue.I8(
     value = value,
 )
 
 fun shortPackedValue(
-    value: UShort = 0u,
+    value: Long = 0L,
 ) = PackedValue.I16(
     value = value,
 )

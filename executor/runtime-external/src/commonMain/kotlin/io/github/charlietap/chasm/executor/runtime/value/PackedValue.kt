@@ -4,8 +4,8 @@ import kotlin.jvm.JvmInline
 
 sealed interface PackedValue {
     @JvmInline
-    value class I8(val value: UByte) : PackedValue
+    value class I8(val value: Long) : PackedValue
 
     @JvmInline
-    value class I16(val value: UShort) : PackedValue
+    value class I16(val value: Long) : PackedValue
 }

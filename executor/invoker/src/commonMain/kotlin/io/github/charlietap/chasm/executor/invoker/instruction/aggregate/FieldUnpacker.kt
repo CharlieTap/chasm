@@ -12,19 +12,15 @@ internal fun FieldUnpacker(
     signedUnpack: Boolean,
 ): ExecutionValue {
     val unpacked = when (val packed = value.packedValue) {
-        is PackedValue.I8 -> {
-            if (signedUnpack) {
-                packed.value.toByte().toInt()
-            } else {
-                packed.value.toInt() and 0xFF
-            }
+        is PackedValue.I8 -> if (signedUnpack) {
+            packed.value.toByte().toInt()
+        } else {
+            packed.value.toInt() and 0xFF
         }
-        is PackedValue.I16 -> {
-            if (signedUnpack) {
-                packed.value.toShort().toInt()
-            } else {
-                packed.value.toInt() and 0xFFFF
-            }
+        is PackedValue.I16 -> if (signedUnpack) {
+            packed.value.toShort().toInt()
+        } else {
+            packed.value.toInt() and 0xFFFF
         }
     }
 
