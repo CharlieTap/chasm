@@ -34,8 +34,6 @@ internal inline fun ArrayFillExecutor(
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
-    if (elementsToFill == 0) return
-
     repeat(elementsToFill) { fillOffset ->
 
         val fieldIndex = arrayElementOffset + fillOffset
