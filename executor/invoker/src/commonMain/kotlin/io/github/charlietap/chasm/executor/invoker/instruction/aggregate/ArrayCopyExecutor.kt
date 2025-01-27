@@ -39,8 +39,6 @@ internal inline fun ArrayCopyExecutor(
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
-    if (elementsToCopy == 0) return
-
     if (destinationOffset <= sourceOffset) {
         // forward copy
         repeat(elementsToCopy) { copyOffset ->
