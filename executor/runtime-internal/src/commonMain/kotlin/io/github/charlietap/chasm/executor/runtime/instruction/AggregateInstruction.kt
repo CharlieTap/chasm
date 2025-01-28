@@ -3,17 +3,22 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ArrayType
 import io.github.charlietap.chasm.ast.type.DefinedType
+import io.github.charlietap.chasm.ast.type.StructType
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import kotlin.jvm.JvmInline
 
 sealed interface AggregateInstruction : ExecutionInstruction {
 
-    @JvmInline
-    value class StructNew(val typeIndex: Index.TypeIndex) : AggregateInstruction
+    data class StructNew(
+        val definedType: DefinedType,
+        val structType: StructType,
+    ) : AggregateInstruction
 
-    @JvmInline
-    value class StructNewDefault(val typeIndex: Index.TypeIndex) : AggregateInstruction
+    data class StructNewDefault(
+        val definedType: DefinedType,
+        val structType: StructType,
+    ) : AggregateInstruction
 
     data class StructGet(val typeIndex: Index.TypeIndex, val fieldIndex: Index.FieldIndex) : AggregateInstruction
 

@@ -64,6 +64,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruct
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructNewDefault
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructSet
 import io.github.charlietap.chasm.type.ext.arrayType
+import io.github.charlietap.chasm.type.ext.structType
 
 internal fun AggregateInstructionPredecoder(
     context: InstantiationContext,
@@ -210,8 +211,22 @@ internal inline fun AggregateInstructionPredecoder(
         is AggregateInstruction.StructGetUnsigned -> structGetUnsignedDispatcher(
             StructGetUnsigned(instruction.typeIndex, instruction.fieldIndex),
         )
-        is AggregateInstruction.StructNew -> structNewDispatcher(StructNew(instruction.typeIndex))
-        is AggregateInstruction.StructNewDefault -> structNewDefaultDispatcher(StructNewDefault(instruction.typeIndex))
+        is AggregateInstruction.StructNew -> {
+            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val structType = context.unroller(definedType).compositeType.structType() ?: Err(
+                InvocationError.StructCompositeTypeExpected,
+            ).bind()
+
+            structNewDispatcher(StructNew(definedType, structType))
+        }
+        is AggregateInstruction.StructNewDefault -> {
+            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val structType = context.unroller(definedType).compositeType.structType() ?: Err(
+                InvocationError.StructCompositeTypeExpected,
+            ).bind()
+
+            structNewDefaultDispatcher(StructNewDefault(definedType, structType))
+        }
         is AggregateInstruction.StructSet -> structSetDispatcher(StructSet(instruction.typeIndex, instruction.fieldIndex))
     }
 }
