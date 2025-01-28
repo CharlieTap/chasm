@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-import io.github.charlietap.chasm.type.ext.bitWidth
 
 internal fun ArrayNewDataExecutor(
     context: ExecutionContext,
@@ -27,21 +26,18 @@ internal inline fun ArrayNewDataExecutor(
     val arrayType = instruction.arrayType
     val dataInstance = instruction.dataInstance
     val byteArray = dataInstance.bytes
+    val fieldWidthInBytes = instruction.fieldWidthInBytes
 
     val arrayLength = stack.popI32()
     val arrayStartOffsetInSegment = stack.popI32()
 
-    val arrayElementSizeInBytes = arrayType.fieldType.bitWidth()?.let {
-        it / 8
-    } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
-
-    val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * arrayElementSizeInBytes)
+    val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * fieldWidthInBytes)
     if (arrayEndOffsetInSegment > byteArray.size) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
     repeat(arrayLength) { offset ->
-        val elementOffset = arrayStartOffsetInSegment + (offset * arrayElementSizeInBytes)
+        val elementOffset = arrayStartOffsetInSegment + (offset * fieldWidthInBytes)
         val value = arrayType.fieldType.valueFromBytes(byteArray, elementOffset)
 
         stack.push(value)

@@ -22,11 +22,11 @@ internal inline fun ArrayInitDataExecutor(
     val arrayRef = stack.popArrayReference()
     val arrayInstance = store.array(arrayRef.address)
     val arrayType = arrayInstance.arrayType
-    val elementSizeInBytes = instruction.elementSizeInBytes
+    val fieldWidthInBytes = instruction.fieldWidthInBytes
 
     if (
         (arrayOffset + elementsToCopy > arrayInstance.fields.size) ||
-        (byteArrayOffset + (elementsToCopy * elementSizeInBytes) > dataInstance.bytes.size)
+        (byteArrayOffset + (elementsToCopy * fieldWidthInBytes) > dataInstance.bytes.size)
     ) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
@@ -34,7 +34,7 @@ internal inline fun ArrayInitDataExecutor(
     val byteArray = dataInstance.bytes
     repeat(elementsToCopy) { offset ->
 
-        val srcOffsetInByteArray = byteArrayOffset + (elementSizeInBytes * offset)
+        val srcOffsetInByteArray = byteArrayOffset + (fieldWidthInBytes * offset)
         val element = arrayType.fieldType.valueFromBytes(byteArray, srcOffsetInByteArray)
 
         val fieldIndex = arrayOffset + offset

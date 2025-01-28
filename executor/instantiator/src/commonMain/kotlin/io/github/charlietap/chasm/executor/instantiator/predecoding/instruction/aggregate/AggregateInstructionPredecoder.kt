@@ -145,11 +145,11 @@ internal inline fun AggregateInstructionPredecoder(
             ).bind()
             val dataAddress = context.instance!!.dataAddress(instruction.dataIndex).bind()
             val dataInstance = context.store.data(dataAddress)
-            val elementSizeInBytes = arrayType.fieldType.bitWidth()?.let { sizeInBits ->
+            val fieldWidthInBytes = arrayType.fieldType.bitWidth()?.let { sizeInBits ->
                 sizeInBits / 8
             } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
 
-            arrayInitDataDispatcher(ArrayInitData(instruction.typeIndex, dataInstance, elementSizeInBytes))
+            arrayInitDataDispatcher(ArrayInitData(instruction.typeIndex, dataInstance, fieldWidthInBytes))
         }
         is AggregateInstruction.ArrayInitElement -> {
             val elementAddress = context.instance!!.elementAddress(instruction.elementIndex).bind()
@@ -176,9 +176,12 @@ internal inline fun AggregateInstructionPredecoder(
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
+            val fieldWidthInBytes = arrayType.fieldType.bitWidth()?.let { sizeInBits ->
+                sizeInBits / 8
+            } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
 
             arrayNewDataDispatcher(
-                ArrayNewData(definedType, arrayType, dataInstance),
+                ArrayNewData(definedType, arrayType, dataInstance, fieldWidthInBytes),
             )
         }
         is AggregateInstruction.ArrayNewDefault -> {

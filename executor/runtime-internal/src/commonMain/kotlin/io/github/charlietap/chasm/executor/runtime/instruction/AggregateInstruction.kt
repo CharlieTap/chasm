@@ -48,6 +48,7 @@ sealed interface AggregateInstruction : ExecutionInstruction {
         val definedType: DefinedType,
         val arrayType: ArrayType,
         val dataInstance: DataInstance,
+        val fieldWidthInBytes: Int,
     ) : AggregateInstruction
 
     data class ArrayNewElement(
@@ -78,7 +79,7 @@ sealed interface AggregateInstruction : ExecutionInstruction {
     data class ArrayInitData(
         val typeIndex: Index.TypeIndex,
         val dataInstance: DataInstance,
-        val elementSizeInBytes: Int,
+        val fieldWidthInBytes: Int,
     ) : AggregateInstruction
 
     data class ArrayInitElement(
