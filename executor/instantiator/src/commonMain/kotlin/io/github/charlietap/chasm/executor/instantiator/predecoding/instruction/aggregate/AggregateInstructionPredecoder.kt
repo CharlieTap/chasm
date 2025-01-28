@@ -63,7 +63,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruct
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructNew
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructNewDefault
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructSet
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.arrayType
 
 internal fun AggregateInstructionPredecoder(
@@ -151,7 +150,7 @@ internal inline fun AggregateInstructionPredecoder(
         is AggregateInstruction.ArrayLen -> arrayLenDispatcher(ArrayLen)
         is AggregateInstruction.ArrayNew -> {
             val definedType = context.types[instruction.typeIndex.idx.toInt()]
-            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
 
@@ -163,7 +162,7 @@ internal inline fun AggregateInstructionPredecoder(
             val dataAddress = context.instance!!.dataAddress(instruction.dataIndex).bind()
             val dataInstance = context.store.data(dataAddress)
             val definedType = context.types[instruction.typeIndex.idx.toInt()]
-            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
 
@@ -173,7 +172,7 @@ internal inline fun AggregateInstructionPredecoder(
         }
         is AggregateInstruction.ArrayNewDefault -> {
             val definedType = context.types[instruction.typeIndex.idx.toInt()]
-            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
 
@@ -185,7 +184,7 @@ internal inline fun AggregateInstructionPredecoder(
             val elementAddress = context.instance!!.elementAddress(instruction.elementIndex).bind()
             val elementInstance = context.store.element(elementAddress)
             val definedType = context.types[instruction.typeIndex.idx.toInt()]
-            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
 
@@ -195,7 +194,7 @@ internal inline fun AggregateInstructionPredecoder(
         }
         is AggregateInstruction.ArrayNewFixed -> {
             val definedType = context.types[instruction.typeIndex.idx.toInt()]
-            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
 
