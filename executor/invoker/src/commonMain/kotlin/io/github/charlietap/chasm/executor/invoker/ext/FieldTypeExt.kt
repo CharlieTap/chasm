@@ -12,24 +12,22 @@ import io.github.charlietap.chasm.executor.memory.ext.toLongLittleEndian
 import io.github.charlietap.chasm.executor.memory.ext.toShortLittleEndian
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 
 fun FieldType.valueFromBytes(
     bytes: UByteArray,
     offset: Int,
-): ExecutionValue {
+): Long {
     return when (val storageType = this.storageType) {
         is StorageType.Packed -> when (storageType.type) {
-            is PackedType.I8 -> NumberValue.I32(bytes[offset].toInt())
-            is PackedType.I16 -> NumberValue.I32(bytes.asByteArray().toShortLittleEndian(offset).toInt())
+            is PackedType.I8 -> bytes[offset].toLong()
+            is PackedType.I16 -> bytes.asByteArray().toShortLittleEndian(offset).toLong()
         }
         is StorageType.Value -> when (val valueType = storageType.type) {
             is ValueType.Number -> when (valueType.numberType) {
-                NumberType.I32 -> NumberValue.I32(bytes.asByteArray().toIntLittleEndian(offset))
-                NumberType.I64 -> NumberValue.I64(bytes.asByteArray().toLongLittleEndian(offset))
-                NumberType.F32 -> NumberValue.F32(bytes.asByteArray().toFloatLittleEndian(offset))
-                NumberType.F64 -> NumberValue.F64(bytes.asByteArray().toDoubleLittleEndian(offset))
+                NumberType.I32 -> bytes.asByteArray().toIntLittleEndian(offset).toLong()
+                NumberType.I64 -> bytes.asByteArray().toLongLittleEndian(offset)
+                NumberType.F32 -> bytes.asByteArray().toFloatLittleEndian(offset).toLong()
+                NumberType.F64 -> bytes.asByteArray().toDoubleLittleEndian(offset).toLong()
             }
             is ValueType.Bottom,
             is ValueType.Reference,

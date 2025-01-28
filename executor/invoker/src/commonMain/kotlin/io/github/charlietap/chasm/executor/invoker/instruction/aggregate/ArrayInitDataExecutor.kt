@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.ext.bitWidth
 
@@ -43,8 +42,7 @@ internal inline fun ArrayInitDataExecutor(
         val element = arrayType.fieldType.valueFromBytes(byteArray, srcOffsetInByteArray)
 
         val fieldIndex = arrayOffset + offset
-        val fieldValue = element.toLong()
 
-        arrayInstance.fields[fieldIndex] = fieldValue
+        arrayInstance.fields[fieldIndex] = element
     }
 }
