@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.dataAddress
 import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
-import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
@@ -18,12 +16,7 @@ internal inline fun ArrayInitDataExecutor(
 ) {
     val stack = context.vstack
     val store = context.store
-
-    val dataIndex = instruction.dataIndex
-    val frame = context.cstack.peekFrame()
-
-    val dataAddress = frame.instance.dataAddress(dataIndex)
-    val dataInstance = store.data(dataAddress)
+    val dataInstance = instruction.dataInstance
 
     val elementsToCopy = stack.popI32()
     val byteArrayOffset = stack.popI32()

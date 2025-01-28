@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.ext.dataAddress
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.AnyConvertExternDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayCopyDispatcher
@@ -32,6 +33,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructNewD
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructSetDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.AnyConvertExtern
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.ArrayCopy
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.ArrayFill
@@ -128,7 +130,11 @@ internal inline fun AggregateInstructionPredecoder(
         is AggregateInstruction.ArrayGet -> arrayGetDispatcher(ArrayGet(instruction.typeIndex))
         is AggregateInstruction.ArrayGetSigned -> arrayGetSignedDispatcher(ArrayGetSigned(instruction.typeIndex))
         is AggregateInstruction.ArrayGetUnsigned -> arrayGetUnsignedDispatcher(ArrayGetUnsigned(instruction.typeIndex))
-        is AggregateInstruction.ArrayInitData -> arrayInitDataDispatcher(ArrayInitData(instruction.typeIndex, instruction.dataIndex))
+        is AggregateInstruction.ArrayInitData -> {
+            val dataAddress = context.instance!!.dataAddress(instruction.dataIndex).bind()
+            val dataInstance = context.store.data(dataAddress)
+            arrayInitDataDispatcher(ArrayInitData(instruction.typeIndex, dataInstance))
+        }
         is AggregateInstruction.ArrayInitElement -> arrayInitElementDispatcher(
             ArrayInitElement(instruction.typeIndex, instruction.elementIndex),
         )

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import kotlin.jvm.JvmInline
 
 sealed interface AggregateInstruction : ExecutionInstruction {
@@ -50,7 +51,7 @@ sealed interface AggregateInstruction : ExecutionInstruction {
 
     data class ArrayCopy(val sourceTypeIndex: Index.TypeIndex, val destinationTypeIndex: Index.TypeIndex) : AggregateInstruction
 
-    data class ArrayInitData(val typeIndex: Index.TypeIndex, val dataIndex: Index.DataIndex) : AggregateInstruction
+    data class ArrayInitData(val typeIndex: Index.TypeIndex, val dataInstance: DataInstance) : AggregateInstruction
 
     data class ArrayInitElement(val typeIndex: Index.TypeIndex, val elementIndex: Index.ElementIndex) : AggregateInstruction
 
