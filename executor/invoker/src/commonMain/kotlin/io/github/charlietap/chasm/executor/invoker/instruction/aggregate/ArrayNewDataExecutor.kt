@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.dataAddress
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -8,7 +7,6 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.ext.arrayType
-import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.pushExecution
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
@@ -31,17 +29,13 @@ internal inline fun ArrayNewDataExecutor(
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
     val stack = context.vstack
-    val store = context.store
 
-    val (typeIndex, dataIndex) = instruction
+    val typeIndex = instruction.typeIndex
     val frame = context.cstack.peekFrame()
     val definedType = frame.instance.definedType(typeIndex)
 
     val arrayType = definedTypeExpander(definedType).arrayType()
-    val dataAddress = frame.instance
-        .dataAddress(dataIndex)
-
-    val dataInstance = store.data(dataAddress)
+    val dataInstance = instruction.dataInstance
     val byteArray = dataInstance.bytes
 
     val arrayLength = stack.popI32()

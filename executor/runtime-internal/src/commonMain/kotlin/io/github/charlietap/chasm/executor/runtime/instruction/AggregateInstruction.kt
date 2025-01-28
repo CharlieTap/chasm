@@ -28,7 +28,7 @@ sealed interface AggregateInstruction : ExecutionInstruction {
     @JvmInline
     value class ArrayNewDefault(val typeIndex: Index.TypeIndex) : AggregateInstruction
 
-    data class ArrayNewData(val typeIndex: Index.TypeIndex, val dataIndex: Index.DataIndex) : AggregateInstruction
+    data class ArrayNewData(val typeIndex: Index.TypeIndex, val dataInstance: DataInstance) : AggregateInstruction
 
     data class ArrayNewElement(val typeIndex: Index.TypeIndex, val elementIndex: Index.ElementIndex) : AggregateInstruction
 
