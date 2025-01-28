@@ -5,6 +5,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.dataAddress
+import io.github.charlietap.chasm.executor.instantiator.ext.elementAddress
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.AnyConvertExternDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayCopyDispatcher
@@ -34,6 +35,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructSetD
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.data
+import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.AnyConvertExtern
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.ArrayCopy
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.ArrayFill
@@ -146,9 +148,13 @@ internal inline fun AggregateInstructionPredecoder(
             arrayNewDataDispatcher(ArrayNewData(instruction.typeIndex, dataInstance))
         }
         is AggregateInstruction.ArrayNewDefault -> arrayNewDefaultDispatcher(ArrayNewDefault(instruction.typeIndex))
-        is AggregateInstruction.ArrayNewElement -> arrayNewElementDispatcher(
-            ArrayNewElement(instruction.typeIndex, instruction.elementIndex),
-        )
+        is AggregateInstruction.ArrayNewElement -> {
+            val elementAddress = context.instance!!.elementAddress(instruction.elementIndex).bind()
+            val elementInstance = context.store.element(elementAddress)
+            arrayNewElementDispatcher(
+                ArrayNewElement(instruction.typeIndex, elementInstance),
+            )
+        }
         is AggregateInstruction.ArrayNewFixed -> arrayNewFixedDispatcher(ArrayNewFixed(instruction.typeIndex, instruction.size))
         is AggregateInstruction.ArraySet -> arraySetDispatcher(ArraySet(instruction.typeIndex))
         is AggregateInstruction.ExternConvertAny -> externConvertAnyDispatcher(ExternConvertAny)

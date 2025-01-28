@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
+import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import kotlin.jvm.JvmInline
 
 sealed interface AggregateInstruction : ExecutionInstruction {
@@ -30,7 +31,10 @@ sealed interface AggregateInstruction : ExecutionInstruction {
 
     data class ArrayNewData(val typeIndex: Index.TypeIndex, val dataInstance: DataInstance) : AggregateInstruction
 
-    data class ArrayNewElement(val typeIndex: Index.TypeIndex, val elementIndex: Index.ElementIndex) : AggregateInstruction
+    data class ArrayNewElement(
+        val typeIndex: Index.TypeIndex,
+        val elementInstance: ElementInstance,
+    ) : AggregateInstruction
 
     @JvmInline
     value class ArrayGet(val typeIndex: Index.TypeIndex) : AggregateInstruction
