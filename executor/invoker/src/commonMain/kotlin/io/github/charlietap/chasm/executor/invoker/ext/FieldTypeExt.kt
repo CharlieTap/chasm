@@ -38,3 +38,27 @@ fun FieldType.valueFromBytes(bytes: UByteArray): ExecutionValue {
         }
     }
 }
+
+fun FieldType.valueFromBytes(
+    bytes: UByteArray,
+    offset: Int,
+): ExecutionValue {
+    return when (val storageType = this.storageType) {
+        is StorageType.Packed -> when (storageType.type) {
+            is PackedType.I8 -> NumberValue.I32(bytes[offset].toInt())
+            is PackedType.I16 -> NumberValue.I32(bytes.asByteArray().toShortLittleEndian(offset).toInt())
+        }
+        is StorageType.Value -> when (val valueType = storageType.type) {
+            is ValueType.Number -> when (valueType.numberType) {
+                NumberType.I32 -> NumberValue.I32(bytes.asByteArray().toIntLittleEndian(offset))
+                NumberType.I64 -> NumberValue.I64(bytes.asByteArray().toLongLittleEndian(offset))
+                NumberType.F32 -> NumberValue.F32(bytes.asByteArray().toFloatLittleEndian(offset))
+                NumberType.F64 -> NumberValue.F64(bytes.asByteArray().toDoubleLittleEndian(offset))
+            }
+            is ValueType.Bottom,
+            is ValueType.Reference,
+            is ValueType.Vector,
+            -> throw InvocationException(InvocationError.UnobservableBitWidth)
+        }
+    }
+}

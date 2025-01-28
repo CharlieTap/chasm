@@ -6,7 +6,7 @@ inline fun ByteArray.toShortLittleEndian(): Short =
             ((this[1].toInt() and 0xFF) shl 8)
     ).toShort()
 
-internal inline fun ByteArray.toShortLittleEndian(offset: Int = 0): Short =
+inline fun ByteArray.toShortLittleEndian(offset: Int = 0): Short =
     (
         (this[offset].toInt() and 0xFF) or
             ((this[offset + 1].toInt() and 0xFF) shl 8)
