@@ -31,25 +31,9 @@ internal inline fun ArrayCopyExecutor(
         throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
 
-    if (destinationOffset + elementsToCopy > destination.fields.size) {
+    try {
+        source.fields.copyInto(destination.fields, destinationOffset, sourceOffset, sourceOffset + elementsToCopy)
+    } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
-    }
-
-    if (sourceOffset + elementsToCopy > source.fields.size) {
-        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
-    }
-
-    if (destinationOffset <= sourceOffset) {
-        // forward copy
-        repeat(elementsToCopy) { copyOffset ->
-            val field = source.fields[sourceOffset + copyOffset]
-            destination.fields[destinationOffset + copyOffset] = field
-        }
-    } else {
-        // backward copy
-        repeat(elementsToCopy) { copyOffset ->
-            val field = source.fields[sourceOffset + elementsToCopy - 1 - copyOffset]
-            destination.fields[destinationOffset + elementsToCopy - 1 - copyOffset] = field
-        }
     }
 }
