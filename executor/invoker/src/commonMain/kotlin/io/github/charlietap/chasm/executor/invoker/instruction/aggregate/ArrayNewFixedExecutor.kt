@@ -1,38 +1,34 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.definedType
+import io.github.charlietap.chasm.ast.type.ArrayType
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
 internal fun ArrayNewFixedExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewFixed,
-) =
-    ArrayNewFixedExecutor(
-        context = context,
-        instruction = instruction,
-        definedTypeExpander = ::DefinedTypeExpander,
-    )
+) = ArrayNewFixedExecutor(
+    context = context,
+    definedType = instruction.definedType,
+    arrayType = instruction.arrayType,
+    size = instruction.size.toInt(),
+)
 
 internal inline fun ArrayNewFixedExecutor(
     context: ExecutionContext,
-    instruction: AggregateInstruction.ArrayNewFixed,
-    crossinline definedTypeExpander: DefinedTypeExpander,
+    definedType: DefinedType,
+    arrayType: ArrayType,
+    size: Int,
 ) {
     val store = context.store
     val stack = context.vstack
-    val (typeIndex, size) = instruction
-    val frame = context.cstack.peekFrame()
-    val definedType = frame.instance.definedType(typeIndex)
-    val arrayType = definedTypeExpander(definedType).arrayType()
 
-    val fields = LongArray(size.toInt()) { _ ->
+    val fields = LongArray(size) { _ ->
         stack.pop()
     }
     fields.reverse()

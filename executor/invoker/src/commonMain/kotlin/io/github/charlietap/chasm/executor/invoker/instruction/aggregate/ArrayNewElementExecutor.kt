@@ -22,7 +22,6 @@ internal inline fun ArrayNewElementExecutor(
 ) {
     val stack = context.vstack
 
-    val typeIndex = instruction.typeIndex
     val elementInstance = instruction.elementInstance
     val elements = elementInstance.elements
 
@@ -38,5 +37,12 @@ internal inline fun ArrayNewElementExecutor(
         stack.push(elements[arrayStartOffsetInSegment + offset])
     }
 
-    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt()))
+    arrayNewFixedExecutor(
+        context,
+        AggregateInstruction.ArrayNewFixed(
+            definedType = instruction.definedType,
+            arrayType = instruction.arrayType,
+            size = arrayLength.toUInt(),
+        ),
+    )
 }

@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.ArrayType
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import kotlin.jvm.JvmInline
@@ -21,18 +23,31 @@ sealed interface AggregateInstruction : ExecutionInstruction {
 
     data class StructSet(val typeIndex: Index.TypeIndex, val fieldIndex: Index.FieldIndex) : AggregateInstruction
 
-    @JvmInline
-    value class ArrayNew(val typeIndex: Index.TypeIndex) : AggregateInstruction
+    data class ArrayNew(
+        val definedType: DefinedType,
+        val arrayType: ArrayType,
+    ) : AggregateInstruction
 
-    data class ArrayNewFixed(val typeIndex: Index.TypeIndex, val size: UInt) : AggregateInstruction
+    data class ArrayNewFixed(
+        val definedType: DefinedType,
+        val arrayType: ArrayType,
+        val size: UInt,
+    ) : AggregateInstruction
 
-    @JvmInline
-    value class ArrayNewDefault(val typeIndex: Index.TypeIndex) : AggregateInstruction
+    data class ArrayNewDefault(
+        val definedType: DefinedType,
+        val arrayType: ArrayType,
+    ) : AggregateInstruction
 
-    data class ArrayNewData(val typeIndex: Index.TypeIndex, val dataInstance: DataInstance) : AggregateInstruction
+    data class ArrayNewData(
+        val definedType: DefinedType,
+        val arrayType: ArrayType,
+        val dataInstance: DataInstance,
+    ) : AggregateInstruction
 
     data class ArrayNewElement(
-        val typeIndex: Index.TypeIndex,
+        val definedType: DefinedType,
+        val arrayType: ArrayType,
         val elementInstance: ElementInstance,
     ) : AggregateInstruction
 

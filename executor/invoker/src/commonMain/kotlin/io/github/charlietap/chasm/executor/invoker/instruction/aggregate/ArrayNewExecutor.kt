@@ -20,7 +20,6 @@ internal inline fun ArrayNewExecutor(
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
     val stack = context.vstack
-    val typeIndex = instruction.typeIndex
 
     val size = stack.popI32()
     val value = stack.peek()
@@ -29,5 +28,12 @@ internal inline fun ArrayNewExecutor(
         stack.push(value)
     }
 
-    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, size.toUInt()))
+    arrayNewFixedExecutor(
+        context,
+        AggregateInstruction.ArrayNewFixed(
+            definedType = instruction.definedType,
+            arrayType = instruction.arrayType,
+            size = size.toUInt(),
+        ),
+    )
 }

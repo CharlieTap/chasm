@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.aggregate
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
@@ -33,6 +34,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructNewD
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructNewDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructSetDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.element
@@ -61,6 +63,8 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruct
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructNew
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructNewDefault
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructSet
+import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
+import io.github.charlietap.chasm.type.ext.arrayType
 
 internal fun AggregateInstructionPredecoder(
     context: InstantiationContext,
@@ -145,21 +149,58 @@ internal inline fun AggregateInstructionPredecoder(
             )
         }
         is AggregateInstruction.ArrayLen -> arrayLenDispatcher(ArrayLen)
-        is AggregateInstruction.ArrayNew -> arrayNewDispatcher(ArrayNew(instruction.typeIndex))
+        is AggregateInstruction.ArrayNew -> {
+            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+                InvocationError.ArrayCompositeTypeExpected,
+            ).bind()
+
+            arrayNewDispatcher(
+                ArrayNew(definedType, arrayType),
+            )
+        }
         is AggregateInstruction.ArrayNewData -> {
             val dataAddress = context.instance!!.dataAddress(instruction.dataIndex).bind()
             val dataInstance = context.store.data(dataAddress)
-            arrayNewDataDispatcher(ArrayNewData(instruction.typeIndex, dataInstance))
+            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+                InvocationError.ArrayCompositeTypeExpected,
+            ).bind()
+
+            arrayNewDataDispatcher(
+                ArrayNewData(definedType, arrayType, dataInstance),
+            )
         }
-        is AggregateInstruction.ArrayNewDefault -> arrayNewDefaultDispatcher(ArrayNewDefault(instruction.typeIndex))
+        is AggregateInstruction.ArrayNewDefault -> {
+            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+                InvocationError.ArrayCompositeTypeExpected,
+            ).bind()
+
+            arrayNewDefaultDispatcher(
+                ArrayNewDefault(definedType, arrayType),
+            )
+        }
         is AggregateInstruction.ArrayNewElement -> {
             val elementAddress = context.instance!!.elementAddress(instruction.elementIndex).bind()
             val elementInstance = context.store.element(elementAddress)
+            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+                InvocationError.ArrayCompositeTypeExpected,
+            ).bind()
+
             arrayNewElementDispatcher(
-                ArrayNewElement(instruction.typeIndex, elementInstance),
+                ArrayNewElement(definedType, arrayType, elementInstance),
             )
         }
-        is AggregateInstruction.ArrayNewFixed -> arrayNewFixedDispatcher(ArrayNewFixed(instruction.typeIndex, instruction.size))
+        is AggregateInstruction.ArrayNewFixed -> {
+            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val arrayType = DefinedTypeExpander(definedType).arrayType() ?: Err(
+                InvocationError.ArrayCompositeTypeExpected,
+            ).bind()
+
+            arrayNewFixedDispatcher(ArrayNewFixed(definedType, arrayType, instruction.size))
+        }
         is AggregateInstruction.ArraySet -> arraySetDispatcher(ArraySet(instruction.typeIndex))
         is AggregateInstruction.ExternConvertAny -> externConvertAnyDispatcher(ExternConvertAny)
         is AggregateInstruction.I31GetSigned -> i31GetSignedDispatcher(I31GetSigned)

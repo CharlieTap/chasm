@@ -1,14 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.ext.arrayType
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.bitWidth
 
 internal fun ArrayNewDataExecutor(
@@ -17,23 +14,17 @@ internal fun ArrayNewDataExecutor(
 ) = ArrayNewDataExecutor(
     context = context,
     instruction = instruction,
-    definedTypeExpander = ::DefinedTypeExpander,
     arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
 )
 
 internal inline fun ArrayNewDataExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewData,
-    crossinline definedTypeExpander: DefinedTypeExpander,
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
     val stack = context.vstack
 
-    val typeIndex = instruction.typeIndex
-    val frame = context.cstack.peekFrame()
-    val definedType = frame.instance.definedType(typeIndex)
-
-    val arrayType = definedTypeExpander(definedType).arrayType()
+    val arrayType = instruction.arrayType
     val dataInstance = instruction.dataInstance
     val byteArray = dataInstance.bytes
 
@@ -56,5 +47,5 @@ internal inline fun ArrayNewDataExecutor(
         stack.push(value)
     }
 
-    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt()))
+    arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(instruction.definedType, instruction.arrayType, arrayLength.toUInt()))
 }
