@@ -28,10 +28,12 @@ internal inline fun ArrayNewFixedExecutor(
     val store = context.store
     val stack = context.vstack
 
-    val fields = LongArray(size) { _ ->
-        stack.pop()
+    val fields = LongArray(size)
+    var index = size - 1
+    while (index >= 0) {
+        fields[index] = stack.pop()
+        index--
     }
-    fields.reverse()
 
     val instance = ArrayInstance(definedType, arrayType, fields)
     store.arrays.add(instance)
