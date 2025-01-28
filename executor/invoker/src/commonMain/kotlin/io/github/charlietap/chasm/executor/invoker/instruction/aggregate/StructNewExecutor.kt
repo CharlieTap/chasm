@@ -14,11 +14,14 @@ internal inline fun StructNewExecutor(
     val store = context.store
     val stack = context.vstack
     val structType = instruction.structType
+    val size = structType.fields.size
 
-    val fields = LongArray(structType.fields.size) { idx ->
-        stack.pop()
+    val fields = LongArray(size)
+    var index = size - 1
+    while (index >= 0) {
+        fields[index] = stack.pop()
+        index--
     }
-    fields.reverse()
 
     val instance = StructInstance(instruction.definedType, structType, fields)
     store.structs.add(instance)
