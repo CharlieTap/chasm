@@ -75,7 +75,11 @@ sealed interface AggregateInstruction : ExecutionInstruction {
 
     data class ArrayCopy(val sourceTypeIndex: Index.TypeIndex, val destinationTypeIndex: Index.TypeIndex) : AggregateInstruction
 
-    data class ArrayInitData(val typeIndex: Index.TypeIndex, val dataInstance: DataInstance) : AggregateInstruction
+    data class ArrayInitData(
+        val typeIndex: Index.TypeIndex,
+        val dataInstance: DataInstance,
+        val elementSizeInBytes: Int,
+    ) : AggregateInstruction
 
     data class ArrayInitElement(
         val typeIndex: Index.TypeIndex,

@@ -36,6 +36,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructSetD
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.ext.data
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.AnyConvertExtern
@@ -64,6 +65,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruct
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructNewDefault
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructSet
 import io.github.charlietap.chasm.type.ext.arrayType
+import io.github.charlietap.chasm.type.ext.bitWidth
 import io.github.charlietap.chasm.type.ext.structType
 
 internal fun AggregateInstructionPredecoder(
@@ -137,9 +139,17 @@ internal inline fun AggregateInstructionPredecoder(
         is AggregateInstruction.ArrayGetSigned -> arrayGetSignedDispatcher(ArrayGetSigned(instruction.typeIndex))
         is AggregateInstruction.ArrayGetUnsigned -> arrayGetUnsignedDispatcher(ArrayGetUnsigned(instruction.typeIndex))
         is AggregateInstruction.ArrayInitData -> {
+            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
+                InvocationError.ArrayCompositeTypeExpected,
+            ).bind()
             val dataAddress = context.instance!!.dataAddress(instruction.dataIndex).bind()
             val dataInstance = context.store.data(dataAddress)
-            arrayInitDataDispatcher(ArrayInitData(instruction.typeIndex, dataInstance))
+            val elementSizeInBytes = arrayType.fieldType.bitWidth()?.let { sizeInBits ->
+                sizeInBits / 8
+            } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
+
+            arrayInitDataDispatcher(ArrayInitData(instruction.typeIndex, dataInstance, elementSizeInBytes))
         }
         is AggregateInstruction.ArrayInitElement -> {
             val elementAddress = context.instance!!.elementAddress(instruction.elementIndex).bind()

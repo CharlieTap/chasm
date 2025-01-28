@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-import io.github.charlietap.chasm.type.ext.bitWidth
 
 internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
@@ -23,14 +22,11 @@ internal inline fun ArrayInitDataExecutor(
     val arrayRef = stack.popArrayReference()
     val arrayInstance = store.array(arrayRef.address)
     val arrayType = arrayInstance.arrayType
-
-    val arrayElementSizeInBytes = arrayType.fieldType.bitWidth()?.let { sizeInBits ->
-        sizeInBits / 8
-    } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
+    val elementSizeInBytes = instruction.elementSizeInBytes
 
     if (
         (arrayOffset + elementsToCopy > arrayInstance.fields.size) ||
-        (byteArrayOffset + (elementsToCopy * arrayElementSizeInBytes) > dataInstance.bytes.size)
+        (byteArrayOffset + (elementsToCopy * elementSizeInBytes) > dataInstance.bytes.size)
     ) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
@@ -38,7 +34,7 @@ internal inline fun ArrayInitDataExecutor(
     val byteArray = dataInstance.bytes
     repeat(elementsToCopy) { offset ->
 
-        val srcOffsetInByteArray = byteArrayOffset + (arrayElementSizeInBytes * offset)
+        val srcOffsetInByteArray = byteArrayOffset + (elementSizeInBytes * offset)
         val element = arrayType.fieldType.valueFromBytes(byteArray, srcOffsetInByteArray)
 
         val fieldIndex = arrayOffset + offset
