@@ -20,12 +20,9 @@ internal inline fun ArrayFillExecutor(
     val arrayRef = stack.popArrayReference()
     val arrayInstance = store.array(arrayRef.address)
 
-    if (arrayElementOffset + elementsToFill > arrayInstance.fields.size) {
+    try {
+        arrayInstance.fields.fill(fillValue, arrayElementOffset, arrayElementOffset + elementsToFill)
+    } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
-    }
-
-    repeat(elementsToFill) { fillOffset ->
-        val fieldIndex = arrayElementOffset + fillOffset
-        arrayInstance.fields[fieldIndex] = fillValue
     }
 }
