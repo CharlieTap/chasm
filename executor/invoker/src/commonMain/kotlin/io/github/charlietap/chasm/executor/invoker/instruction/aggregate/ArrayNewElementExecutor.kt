@@ -10,10 +10,10 @@ internal fun ArrayNewElementExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElement,
 ) = ArrayNewElementExecutor(
-        context = context,
-        instruction = instruction,
-        arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
-    )
+    context = context,
+    instruction = instruction,
+    arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
+)
 
 internal inline fun ArrayNewElementExecutor(
     context: ExecutionContext,

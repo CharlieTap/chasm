@@ -137,9 +137,13 @@ internal inline fun AggregateInstructionPredecoder(
             val dataInstance = context.store.data(dataAddress)
             arrayInitDataDispatcher(ArrayInitData(instruction.typeIndex, dataInstance))
         }
-        is AggregateInstruction.ArrayInitElement -> arrayInitElementDispatcher(
-            ArrayInitElement(instruction.typeIndex, instruction.elementIndex),
-        )
+        is AggregateInstruction.ArrayInitElement -> {
+            val elementAddress = context.instance!!.elementAddress(instruction.elementIndex).bind()
+            val elementInstance = context.store.element(elementAddress)
+            arrayInitElementDispatcher(
+                ArrayInitElement(instruction.typeIndex, elementInstance),
+            )
+        }
         is AggregateInstruction.ArrayLen -> arrayLenDispatcher(ArrayLen)
         is AggregateInstruction.ArrayNew -> arrayNewDispatcher(ArrayNew(instruction.typeIndex))
         is AggregateInstruction.ArrayNewData -> {

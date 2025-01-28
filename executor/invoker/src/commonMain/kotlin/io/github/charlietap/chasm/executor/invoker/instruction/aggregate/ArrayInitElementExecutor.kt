@@ -1,11 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.elementAddress
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
-import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
@@ -15,13 +13,7 @@ internal inline fun ArrayInitElementExecutor(
 ) {
     val stack = context.vstack
     val store = context.store
-
-    val elementIndex = instruction.elementIndex
-    val frame = context.cstack.peekFrame()
-
-    val elementAddress = frame.instance
-        .elementAddress(elementIndex)
-    val elementInstance = store.element(elementAddress)
+    val elementInstance = instruction.elementInstance
 
     val elementsToCopy = stack.popI32()
     val sourceOffsetInElementSegment = stack.popI32()

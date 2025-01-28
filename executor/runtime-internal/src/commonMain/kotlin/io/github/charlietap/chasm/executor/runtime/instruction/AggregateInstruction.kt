@@ -57,7 +57,10 @@ sealed interface AggregateInstruction : ExecutionInstruction {
 
     data class ArrayInitData(val typeIndex: Index.TypeIndex, val dataInstance: DataInstance) : AggregateInstruction
 
-    data class ArrayInitElement(val typeIndex: Index.TypeIndex, val elementIndex: Index.ElementIndex) : AggregateInstruction
+    data class ArrayInitElement(
+        val typeIndex: Index.TypeIndex,
+        val elementInstance: ElementInstance,
+    ) : AggregateInstruction
 
     data object RefI31 : AggregateInstruction
 
