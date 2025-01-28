@@ -9,8 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruct
 internal fun ArrayNewElementExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElement,
-) =
-    ArrayNewElementExecutor(
+) = ArrayNewElementExecutor(
         context = context,
         instruction = instruction,
         arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
@@ -25,6 +24,7 @@ internal inline fun ArrayNewElementExecutor(
 
     val typeIndex = instruction.typeIndex
     val elementInstance = instruction.elementInstance
+    val elements = elementInstance.elements
 
     val arrayLength = stack.popI32()
     val arrayStartOffsetInSegment = stack.popI32()
@@ -34,11 +34,9 @@ internal inline fun ArrayNewElementExecutor(
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
-    elementInstance.elements
-        .slice(arrayStartOffsetInSegment until arrayEndOffsetInSegment)
-        .forEach { referenceValue ->
-            stack.push(referenceValue)
-        }
+    repeat(arrayLength) { offset ->
+        stack.push(elements[arrayStartOffsetInSegment + offset])
+    }
 
     arrayNewFixedExecutor(context, AggregateInstruction.ArrayNewFixed(typeIndex, arrayLength.toUInt()))
 }
