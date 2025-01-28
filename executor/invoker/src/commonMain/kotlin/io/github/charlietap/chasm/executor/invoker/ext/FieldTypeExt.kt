@@ -14,30 +14,6 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
-import io.github.charlietap.chasm.executor.runtime.value.VectorValue
-
-fun FieldType.valueFromBytes(bytes: UByteArray): ExecutionValue {
-    return when (val storageType = this.storageType) {
-        is StorageType.Packed -> when (storageType.type) {
-            is PackedType.I8 -> NumberValue.I32(bytes.first().toInt())
-            is PackedType.I16 -> NumberValue.I32(bytes.asByteArray().toShortLittleEndian().toInt())
-        }
-
-        is StorageType.Value -> when (val valueType = storageType.type) {
-            is ValueType.Number -> when (valueType.numberType) {
-                NumberType.I32 -> NumberValue.I32(bytes.asByteArray().toIntLittleEndian())
-                NumberType.I64 -> NumberValue.I64(bytes.asByteArray().toLongLittleEndian())
-                NumberType.F32 -> NumberValue.F32(bytes.asByteArray().toFloatLittleEndian())
-                NumberType.F64 -> NumberValue.F64(bytes.asByteArray().toDoubleLittleEndian())
-            }
-
-            is ValueType.Vector -> VectorValue.V128(bytes.asByteArray())
-            is ValueType.Bottom,
-            is ValueType.Reference,
-            -> throw InvocationException(InvocationError.UnobservableBitWidth)
-        }
-    }
-}
 
 fun FieldType.valueFromBytes(
     bytes: UByteArray,

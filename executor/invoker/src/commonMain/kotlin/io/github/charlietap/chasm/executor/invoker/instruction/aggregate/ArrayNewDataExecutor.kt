@@ -17,13 +17,12 @@ import io.github.charlietap.chasm.type.ext.bitWidth
 internal fun ArrayNewDataExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewData,
-) =
-    ArrayNewDataExecutor(
-        context = context,
-        instruction = instruction,
-        definedTypeExpander = ::DefinedTypeExpander,
-        arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
-    )
+) = ArrayNewDataExecutor(
+    context = context,
+    instruction = instruction,
+    definedTypeExpander = ::DefinedTypeExpander,
+    arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
+)
 
 internal inline fun ArrayNewDataExecutor(
     context: ExecutionContext,
@@ -43,6 +42,7 @@ internal inline fun ArrayNewDataExecutor(
         .dataAddress(dataIndex)
 
     val dataInstance = store.data(dataAddress)
+    val byteArray = dataInstance.bytes
 
     val arrayLength = stack.popI32()
     val arrayStartOffsetInSegment = stack.popI32()
@@ -50,17 +50,15 @@ internal inline fun ArrayNewDataExecutor(
     val arrayElementSizeInBytes = arrayType.fieldType.bitWidth()?.let {
         it / 8
     } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
-    val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * arrayElementSizeInBytes)
 
-    if (arrayEndOffsetInSegment > dataInstance.bytes.size) {
+    val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * arrayElementSizeInBytes)
+    if (arrayEndOffsetInSegment > byteArray.size) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
-    val byteArray = dataInstance.bytes.sliceArray(arrayStartOffsetInSegment until arrayEndOffsetInSegment)
-
-    for (i in byteArray.indices step arrayElementSizeInBytes) {
-        val elementBytes = byteArray.sliceArray(i until i + arrayElementSizeInBytes)
-        val value = arrayType.fieldType.valueFromBytes(elementBytes)
+    repeat(arrayLength) { offset ->
+        val elementOffset = arrayStartOffsetInSegment + (offset * arrayElementSizeInBytes)
+        val value = arrayType.fieldType.valueFromBytes(byteArray, elementOffset)
 
         stack.pushExecution(value)
     }
