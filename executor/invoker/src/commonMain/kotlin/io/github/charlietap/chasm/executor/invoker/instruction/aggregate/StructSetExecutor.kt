@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popStructAddress
 import io.github.charlietap.chasm.executor.runtime.ext.struct
@@ -17,5 +16,5 @@ internal inline fun StructSetExecutor(
     val address = stack.popStructAddress()
     val structInstance = store.struct(address)
 
-    structInstance.fields[instruction.fieldIndex.index()] = executionValue
+    structInstance.fields[instruction.fieldIndex] = executionValue
 }

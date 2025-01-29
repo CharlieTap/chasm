@@ -240,6 +240,8 @@ internal inline fun AggregateInstructionPredecoder(
 
             structNewDefaultDispatcher(StructNewDefault(definedType, structType))
         }
-        is AggregateInstruction.StructSet -> structSetDispatcher(StructSet(instruction.typeIndex, instruction.fieldIndex))
+        is AggregateInstruction.StructSet -> {
+            structSetDispatcher(StructSet(instruction.fieldIndex.idx.toInt()))
+        }
     }
 }
