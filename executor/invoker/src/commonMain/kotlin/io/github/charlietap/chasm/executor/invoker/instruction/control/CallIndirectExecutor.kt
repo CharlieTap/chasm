@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
-import io.github.charlietap.chasm.executor.runtime.encoder.toReferenceValue
+import io.github.charlietap.chasm.executor.runtime.encoder.toFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -14,7 +14,6 @@ import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 
@@ -45,12 +44,7 @@ internal inline fun CallIndirectExecutor(
     val expectedFunctionType = frame.instance.definedType(typeIndex)
 
     val elementIndex = stack.popI32()
-    val reference = table.element(elementIndex).toReferenceValue() // TODO just shift the type off here and optimistically take the address
-
-    val address = when (reference) {
-        is ReferenceValue.Function -> reference.address
-        else -> throw InvocationException(InvocationError.IndirectCallOnANonFunctionReference)
-    }
+    val address = table.element(elementIndex).toFunctionAddress()
 
     val functionInstance = store.function(address)
     val actualFunctionType = functionInstance.type

@@ -4,10 +4,10 @@ package io.github.charlietap.chasm.executor.runtime.ext
 
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_ARRAY
-import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_FUNCTION
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_I31
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_MASK
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_STRUCT
+import io.github.charlietap.chasm.executor.runtime.encoder.toFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.encoder.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
@@ -74,15 +74,7 @@ inline fun ValueStack.popStructReference(): ReferenceValue.Struct {
     return ReferenceValue.Struct(Address.Struct(address))
 }
 
-inline fun ValueStack.popFunctionAddress(): Address.Function {
-    val encoded = pop()
-    val typeId = encoded and RV_TYPE_MASK
-    if (typeId != RV_TYPE_FUNCTION) {
-        throw InvocationException(InvocationError.FunctionReferenceExpected)
-    }
-    val address = (encoded shr RV_SHIFT_BITS).toInt()
-    return Address.Function(address)
-}
+inline fun ValueStack.popFunctionAddress(): Address.Function = pop().toFunctionAddress()
 
 inline fun ValueStack.constOperation(
     const: Int,
