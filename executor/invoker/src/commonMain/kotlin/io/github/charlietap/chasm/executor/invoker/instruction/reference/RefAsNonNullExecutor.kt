@@ -15,6 +15,6 @@ internal inline fun RefAsNonNullExecutor(
     val value = stack.peekReference()
 
     if (value is ReferenceValue.Null) {
-        throw InvocationException(InvocationError.Trap.TrapEncountered)
+        throw InvocationException(InvocationError.NonNullReferenceExpected)
     }
 }

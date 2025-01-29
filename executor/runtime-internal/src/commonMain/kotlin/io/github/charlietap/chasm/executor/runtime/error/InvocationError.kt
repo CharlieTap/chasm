@@ -138,6 +138,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object UnexpectedReferenceValue : InvocationError
 
+    data object NonNullReferenceExpected : InvocationError
+
     data object UndefinedDefaultBottomType : InvocationError
 
     data object FunctionCompositeTypeExpected : InvocationError
