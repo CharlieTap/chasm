@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefAsNonNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefCastDispatcher
@@ -58,7 +59,11 @@ internal inline fun ReferenceInstructionPredecoder(
         }
         is ReferenceInstruction.RefIsNull -> refIsNullDispatcher(RefIsNull)
         is ReferenceInstruction.RefAsNonNull -> refAsNonNullDispatcher(RefAsNonNull)
-        is ReferenceInstruction.RefFunc -> refFuncDispatcher(RefFunc(instruction.funcIdx))
+        is ReferenceInstruction.RefFunc -> {
+            val address = context.instance!!.functionAddress(instruction.funcIdx).bind()
+            val reference = ReferenceValue.Function(address).toLong()
+            refFuncDispatcher(RefFunc(reference))
+        }
         is ReferenceInstruction.RefEq -> refEqDispatcher(RefEq)
         is ReferenceInstruction.RefTest -> refTestDispatcher(RefTest(instruction.referenceType))
         is ReferenceInstruction.RefCast -> refCastDispatcher(RefCast(instruction.referenceType))

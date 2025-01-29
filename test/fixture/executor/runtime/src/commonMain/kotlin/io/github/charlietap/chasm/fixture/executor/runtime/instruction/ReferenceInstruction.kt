@@ -1,9 +1,7 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.fixture.ast.module.functionIndex
 import io.github.charlietap.chasm.fixture.ast.type.referenceType
 
 fun referenceRuntimeInstruction() = refEqRuntimeInstruction()
@@ -27,9 +25,9 @@ fun refIsNullRuntimeInstruction() = ReferenceInstruction.RefIsNull
 fun refAsNonNullRuntimeInstruction() = ReferenceInstruction.RefAsNonNull
 
 fun refFuncRuntimeInstruction(
-    funcIdx: Index.FunctionIndex = functionIndex(),
+    reference: Long = 0L,
 ) = ReferenceInstruction.RefFunc(
-    funcIdx = funcIdx,
+    reference = reference,
 )
 
 fun refCastRuntimeInstruction(

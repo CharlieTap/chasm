@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import kotlin.jvm.JvmInline
 
@@ -13,7 +12,7 @@ sealed interface ReferenceInstruction : ExecutionInstruction {
     data object RefAsNonNull : ReferenceInstruction
 
     @JvmInline
-    value class RefFunc(val funcIdx: Index.FunctionIndex) : ReferenceInstruction
+    value class RefFunc(val reference: Long) : ReferenceInstruction
 
     data object RefEq : ReferenceInstruction
 
