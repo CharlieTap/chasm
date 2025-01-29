@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushReference
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
@@ -27,5 +27,5 @@ internal inline fun StructNewExecutor(
     store.structs.add(instance)
     val reference = ReferenceValue.Struct(Address.Struct(store.structs.size - 1))
 
-    stack.pushReference(reference)
+    stack.push(reference.toLong())
 }
