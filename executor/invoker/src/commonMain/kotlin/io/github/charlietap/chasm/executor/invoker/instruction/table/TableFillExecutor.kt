@@ -20,7 +20,7 @@ internal fun TableFillExecutor(
     val fillRange = tableOffset..<(tableOffset + elementsToFill)
 
     if (!tableInstance.elements.indices.contains(fillRange)) {
-        throw InvocationException(InvocationError.Trap.TrapEncountered)
+        throw InvocationException(InvocationError.TableOperationOutOfBounds)
     }
 
     if (elementsToFill == 0) return

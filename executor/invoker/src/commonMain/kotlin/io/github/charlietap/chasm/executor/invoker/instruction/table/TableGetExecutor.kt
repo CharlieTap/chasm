@@ -12,7 +12,6 @@ internal inline fun TableGetExecutor(
     val tableInstance = instruction.table
 
     val elementIndex = stack.popI32()
-    val referenceValue = tableInstance.element(elementIndex)
 
-    stack.push(referenceValue)
+    stack.push(tableInstance.element(elementIndex))
 }

@@ -9,7 +9,6 @@ internal inline fun TableSizeExecutor(
 ) {
     val stack = context.vstack
     val tableInstance = instruction.table
-    val tableSize = tableInstance.elements.size
 
-    stack.pushI32(tableSize)
+    stack.pushI32(tableInstance.elements.size)
 }

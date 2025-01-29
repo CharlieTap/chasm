@@ -156,6 +156,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object ArrayOperationOutOfBounds : InvocationError
 
+    data object TableOperationOutOfBounds : InvocationError
+
     data object CannotDivideIntegerByZero : InvocationError
 
     data object ConvertOperationFailed : InvocationError

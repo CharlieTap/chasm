@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -26,10 +25,6 @@ internal inline fun ArrayCopyExecutor(
     val destinationOffset = stack.popI32()
     val destinationRef = stack.popArrayReference()
     val destination = store.array(destinationRef.address)
-
-    if (destination.arrayType.fieldType.mutability != Mutability.Var) {
-        throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
-    }
 
     try {
         source.fields.copyInto(destination.fields, destinationOffset, sourceOffset, sourceOffset + elementsToCopy)

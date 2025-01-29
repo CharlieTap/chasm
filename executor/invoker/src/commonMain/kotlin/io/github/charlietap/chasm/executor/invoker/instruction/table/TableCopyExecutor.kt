@@ -23,7 +23,7 @@ internal fun TableCopyExecutor(
         srcOffset + elementsToCopy > srcTableInstance.elements.size ||
         dstOffset + elementsToCopy > dstTableInstance.elements.size
     ) {
-        throw InvocationException(InvocationError.Trap.TrapEncountered)
+        throw InvocationException(InvocationError.TableOperationOutOfBounds)
     }
 
     srcTableInstance.elements.copyInto(

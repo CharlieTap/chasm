@@ -15,9 +15,9 @@ internal inline fun TableSetExecutor(
     val value = stack.pop()
     val elementIndex = stack.popI32()
 
-    if (elementIndex !in tableInstance.elements.indices) {
-        throw InvocationException(InvocationError.Trap.TrapEncountered)
+    try {
+        tableInstance.elements[elementIndex] = value
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.TableOperationOutOfBounds)
     }
-
-    tableInstance.elements[elementIndex] = value
 }
