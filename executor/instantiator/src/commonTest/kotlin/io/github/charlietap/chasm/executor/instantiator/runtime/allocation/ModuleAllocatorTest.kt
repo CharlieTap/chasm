@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAl
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
-import io.github.charlietap.chasm.executor.runtime.encoder.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.dataSegment
 import io.github.charlietap.chasm.fixture.ast.module.elementSegment

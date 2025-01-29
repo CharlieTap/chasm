@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.function
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.runtime.encoder.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.fixture.ast.type.functionHeapType

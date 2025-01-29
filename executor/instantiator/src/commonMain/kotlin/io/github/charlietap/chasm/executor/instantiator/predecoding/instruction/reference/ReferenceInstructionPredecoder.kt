@@ -13,8 +13,8 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefIsNullD
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefTestDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.encoder.toLong
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefAsNonNull
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefCast
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefEq

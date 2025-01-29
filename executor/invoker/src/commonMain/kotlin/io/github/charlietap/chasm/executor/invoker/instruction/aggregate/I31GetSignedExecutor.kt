@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.extendSigned
-import io.github.charlietap.chasm.executor.runtime.ext.popI31Reference
+import io.github.charlietap.chasm.executor.runtime.ext.popI31
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal fun I31GetSignedExecutor(
@@ -18,7 +18,7 @@ internal inline fun I31GetExecutor(
     crossinline extender: (UInt) -> Int,
 ) {
     val stack = context.vstack
-    val value = stack.popI31Reference()
+    val value = stack.popI31()
 
     val extended = extender(value)
 

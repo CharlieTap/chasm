@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
-import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
+import io.github.charlietap.chasm.executor.runtime.ext.popArrayAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal inline fun ArrayCopyExecutor(
@@ -19,12 +19,12 @@ internal inline fun ArrayCopyExecutor(
     val elementsToCopy = stack.popI32()
 
     val sourceOffset = stack.popI32()
-    val sourceRef = stack.popArrayReference()
-    val source = store.array(sourceRef.address)
+    val sourceAddress = stack.popArrayAddress()
+    val source = store.array(sourceAddress)
 
     val destinationOffset = stack.popI32()
-    val destinationRef = stack.popArrayReference()
-    val destination = store.array(destinationRef.address)
+    val destinationAddress = stack.popArrayAddress()
+    val destination = store.array(destinationAddress)
 
     try {
         source.fields.copyInto(destination.fields, destinationOffset, sourceOffset, sourceOffset + elementsToCopy)

@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.executor.instantiator.initialization.TableInit
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.executor.runtime.encoder.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.elementSegment

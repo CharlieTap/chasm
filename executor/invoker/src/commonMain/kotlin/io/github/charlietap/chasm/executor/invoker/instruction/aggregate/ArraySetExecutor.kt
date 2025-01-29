@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
-import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
+import io.github.charlietap.chasm.executor.runtime.ext.popArrayAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal inline fun ArraySetExecutor(
@@ -16,9 +16,9 @@ internal inline fun ArraySetExecutor(
 
     val value = stack.pop()
     val fieldIndex = stack.popI32()
-    val arrayRef = stack.popArrayReference()
+    val address = stack.popArrayAddress()
 
-    val arrayInstance = store.array(arrayRef.address)
+    val arrayInstance = store.array(address)
 
     try {
         arrayInstance.fields[fieldIndex] = value

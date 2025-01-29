@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.array
-import io.github.charlietap.chasm.executor.runtime.ext.popArrayReference
+import io.github.charlietap.chasm.executor.runtime.ext.popArrayAddress
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal inline fun ArrayFillExecutor(
@@ -17,8 +17,8 @@ internal inline fun ArrayFillExecutor(
     val elementsToFill = stack.popI32()
     val fillValue = stack.pop()
     val arrayElementOffset = stack.popI32()
-    val arrayRef = stack.popArrayReference()
-    val arrayInstance = store.array(arrayRef.address)
+    val address = stack.popArrayAddress()
+    val arrayInstance = store.array(address)
 
     try {
         arrayInstance.fields.fill(fillValue, arrayElementOffset, arrayElementOffset + elementsToFill)

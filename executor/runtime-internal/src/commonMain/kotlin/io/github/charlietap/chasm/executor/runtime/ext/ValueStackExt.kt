@@ -2,13 +2,6 @@
 
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import io.github.charlietap.chasm.executor.runtime.encoder.RV_SHIFT_BITS
-import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_ARRAY
-import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_I31
-import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_MASK
-import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_STRUCT
-import io.github.charlietap.chasm.executor.runtime.encoder.toFunctionAddress
-import io.github.charlietap.chasm.executor.runtime.encoder.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
@@ -45,34 +38,11 @@ inline fun ValueStack.peekReference(): ReferenceValue {
     }
 }
 
-inline fun ValueStack.popI31Reference(): UInt {
-    val encoded = pop()
-    val typeId = encoded and RV_TYPE_MASK
-    if (typeId != RV_TYPE_I31) {
-        throw InvocationException(InvocationError.I31ReferenceExpected)
-    }
-    return (encoded shr RV_SHIFT_BITS).toUInt()
-}
+inline fun ValueStack.popI31(): UInt = pop().toI31()
 
-inline fun ValueStack.popArrayReference(): ReferenceValue.Array {
-    val encoded = pop()
-    val typeId = encoded and RV_TYPE_MASK
-    if (typeId != RV_TYPE_ARRAY) {
-        throw InvocationException(InvocationError.ArrayReferenceExpected)
-    }
-    val address = (encoded shr RV_SHIFT_BITS).toInt()
-    return ReferenceValue.Array(Address.Array(address))
-}
+inline fun ValueStack.popArrayAddress(): Address.Array = pop().toArrayAddress()
 
-inline fun ValueStack.popStructReference(): ReferenceValue.Struct {
-    val encoded = pop()
-    val typeId = encoded and RV_TYPE_MASK
-    if (typeId != RV_TYPE_STRUCT) {
-        throw InvocationException(InvocationError.StructReferenceExpected)
-    }
-    val address = (encoded shr RV_SHIFT_BITS).toInt()
-    return ReferenceValue.Struct(Address.Struct(address))
-}
+inline fun ValueStack.popStructAddress(): Address.Struct = pop().toStructAddress()
 
 inline fun ValueStack.popFunctionAddress(): Address.Function = pop().toFunctionAddress()
 

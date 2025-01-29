@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.fixture.publicTag
 import io.github.charlietap.chasm.embedding.shapes.Import
-import io.github.charlietap.chasm.executor.runtime.encoder.toReferenceValue
+import io.github.charlietap.chasm.executor.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.type.constMutability
 import io.github.charlietap.chasm.fixture.ast.type.exceptionAttribute

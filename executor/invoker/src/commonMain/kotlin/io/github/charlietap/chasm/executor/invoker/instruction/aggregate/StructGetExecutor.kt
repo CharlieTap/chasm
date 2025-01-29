@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.field
-import io.github.charlietap.chasm.executor.runtime.ext.popStructReference
+import io.github.charlietap.chasm.executor.runtime.ext.popStructAddress
 import io.github.charlietap.chasm.executor.runtime.ext.struct
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
@@ -22,8 +22,8 @@ internal inline fun StructGetExecutor(
     val store = context.store
     val stack = context.vstack
 
-    val structRef = stack.popStructReference()
-    val structInstance = store.struct(structRef.address)
+    val address = stack.popStructAddress()
+    val structInstance = store.struct(address)
     val fieldValue = structInstance.field(fieldIndex)
 
     stack.push(fieldValue)
