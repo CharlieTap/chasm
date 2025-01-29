@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.isExternReference
 import io.github.charlietap.chasm.executor.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.executor.runtime.ext.pushReference
 import io.github.charlietap.chasm.executor.runtime.ext.toExternReference
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
@@ -19,7 +20,7 @@ internal fun AnyConvertExternExecutor(
     val referenceValue = stack.pop()
     when {
         referenceValue.isNullableReference() -> {
-            stack.pushReference(ReferenceValue.Null(AbstractHeapType.Any))
+            stack.push(ReferenceValue.Null(AbstractHeapType.Any).toLong())
         }
         referenceValue.isExternReference() -> {
             val extern = referenceValue.toExternReference()
