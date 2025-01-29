@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.contains
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal fun TableFillExecutor(
@@ -17,13 +16,12 @@ internal fun TableFillExecutor(
     val fillValue = stack.pop()
     val tableOffset = stack.popI32()
 
-    val fillRange = tableOffset..<(tableOffset + elementsToFill)
-
-    if (!tableInstance.elements.indices.contains(fillRange)) {
+    val fillUpperBound = tableOffset + elementsToFill
+    if (tableOffset < 0 || fillUpperBound > tableInstance.elements.size) {
         throw InvocationException(InvocationError.TableOperationOutOfBounds)
     }
 
     if (elementsToFill == 0) return
 
-    tableInstance.elements.fill(fillValue, fillRange.first, fillRange.last + 1)
+    tableInstance.elements.fill(fillValue, tableOffset, fillUpperBound)
 }
