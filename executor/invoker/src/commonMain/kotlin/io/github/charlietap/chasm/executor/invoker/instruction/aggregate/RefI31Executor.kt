@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.pushReference
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.ext.wrapI31
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -23,7 +23,7 @@ internal inline fun RefI31Executor(
 ) {
     val stack = context.vstack
     val value = stack.popI32()
-    val i31 = i31Wrapper(value)
+    val i31 = i31Wrapper(value).toLong()
 
-    stack.pushReference(i31)
+    stack.push(i31)
 }
