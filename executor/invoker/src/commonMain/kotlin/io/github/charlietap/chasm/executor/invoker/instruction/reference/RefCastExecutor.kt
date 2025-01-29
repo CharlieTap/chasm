@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
@@ -47,7 +47,7 @@ internal inline fun RefCastExecutor(
         ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
 
     if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
-        stack.push(otherReferenceValue.toLong())
+        stack.push(otherReferenceValue.toLongFromBoxed())
     } else {
         throw InvocationException(InvocationError.Trap.TrapEncountered)
     }

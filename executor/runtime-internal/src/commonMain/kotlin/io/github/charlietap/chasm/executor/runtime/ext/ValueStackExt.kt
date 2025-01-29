@@ -13,13 +13,13 @@ import kotlin.jvm.JvmName
 inline fun ValueStack.pushExecution(
     value: ExecutionValue,
 ) {
-    push(value.toLong())
+    push(value.toLongFromBoxed())
 }
 
 inline fun ValueStack.pushReference(
     value: ReferenceValue,
 ) {
-    push(value.toLong())
+    push(value.toLongFromBoxed())
 }
 
 inline fun ValueStack.popReference(): ReferenceValue {

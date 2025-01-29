@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.Table
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.table
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 fun writeTable(
@@ -37,5 +37,5 @@ internal fun internalWriteTable(
     value: ReferenceValue,
 ): Result<Unit, ModuleTrapError> = binding {
     val table = store.store.table(table.reference.address)
-    table.elements[elementIndex] = value.toLong()
+    table.elements[elementIndex] = value.toLongFromBoxed()
 }

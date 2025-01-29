@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.toExecutionValue
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunctionContext
 import io.github.charlietap.chasm.host.HostFunctionException
@@ -45,6 +45,6 @@ internal fun HostFunctionCall(
     }
 
     results.forEach { result ->
-        vstack.push(result.toLong())
+        vstack.push(result.toLongFromBoxed())
     }
 }

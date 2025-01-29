@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAlloca
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.dataSegment
 import io.github.charlietap.chasm.fixture.ast.module.elementSegment
@@ -88,7 +89,7 @@ class ModuleAllocatorTest {
         val tag = tag()
         val global = global()
         val globalInitValue = 117L
-        val tableInitValue = nullReferenceValue(heapType()).toLong()
+        val tableInitValue = nullReferenceValue(heapType()).toLongFromBoxed()
         val tableInitValues = longArrayOf(tableInitValue)
         val refType = refNullReferenceType(AbstractHeapType.Extern)
         val elementSegment = elementSegment(type = refType, initExpressions = listOf(expression()))

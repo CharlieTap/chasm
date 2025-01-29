@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.ast.type.memoryType
 import io.github.charlietap.chasm.fixture.ast.type.sharedStatus
@@ -76,7 +77,7 @@ class DropStoreTest {
         assertContentEquals(ubyteArrayOf(), dataInstance.bytes)
         assertContentEquals(longArrayOf(), exceptionInstance.fields)
         assertContentEquals(longArrayOf(), elementInstance.elements)
-        assertEquals(ExecutionValue.Uninitialised.toLong(), globalInstance.value)
+        assertEquals(ExecutionValue.Uninitialised.toLongFromBoxed(), globalInstance.value)
         assertContentEquals(longArrayOf(), tableInstance.elements)
         assertEquals(0, store.store.data.size)
         assertEquals(0, store.store.exceptions.size)

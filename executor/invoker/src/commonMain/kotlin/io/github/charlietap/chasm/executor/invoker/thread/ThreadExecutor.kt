@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.depth
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -46,7 +46,7 @@ internal fun ThreadExecutor(
 
     controlStack.push(thread.frame)
     params.forEach { param ->
-        valueStack.push(param.toLong())
+        valueStack.push(param.toLongFromBoxed())
     }
 
     var loop = true

@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.elementSegment
@@ -80,7 +81,7 @@ class ModuleInstantiatorTest {
         val allocator: ModuleAllocator = { _context, _instance, _tableInitExpressions ->
             assertEquals(context, _context)
             assertEquals(partialInstance, _instance)
-            assertContentEquals(longArrayOf(ReferenceValue.Null(heapType()).toLong()), _tableInitExpressions)
+            assertContentEquals(longArrayOf(ReferenceValue.Null(heapType()).toLongFromBoxed()), _tableInitExpressions)
 
             Ok(partialInstance)
         }

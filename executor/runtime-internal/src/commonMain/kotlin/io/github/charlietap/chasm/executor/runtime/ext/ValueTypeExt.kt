@@ -25,8 +25,8 @@ fun ValueType.Number.default(): Long = when (this.numberType) {
 }
 
 fun ValueType.Reference.default(): Long = when (val refType = this.referenceType) {
-    is ReferenceType.RefNull -> ReferenceValue.Null(refType.heapType).toLong()
-    is ReferenceType.Ref -> ExecutionValue.Uninitialised.toLong()
+    is ReferenceType.RefNull -> ReferenceValue.Null(refType.heapType).toLongFromBoxed()
+    is ReferenceType.Ref -> ExecutionValue.Uninitialised.toLongFromBoxed()
 }
 
 fun ValueType.Vector.default(): Long = when (this.vectorType) {
