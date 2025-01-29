@@ -137,7 +137,7 @@ internal inline fun ControlInstructionPredecoder(
 
             callIndirectDispatcher(
                 CallIndirect(
-                    typeIndex = instruction.typeIndex,
+                    type = context.types[instruction.typeIndex.idx.toInt()],
                     table = table,
                 ),
             )
@@ -156,7 +156,7 @@ internal inline fun ControlInstructionPredecoder(
 
             returnCallIndirectDispatcher(
                 ReturnCallIndirect(
-                    typeIndex = instruction.typeIndex,
+                    type = context.types[instruction.typeIndex.idx.toInt()],
                     table = table,
                 ),
             )

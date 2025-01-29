@@ -12,7 +12,7 @@ internal inline fun ReturnCallIndirectExecutor(
 ) = CallIndirectExecutor(
     context = context,
     table = instruction.table,
-    typeIndex = instruction.typeIndex,
+    type = instruction.type,
     hostFunctionCall = ::HostFunctionCall,
     wasmFunctionCall = ::ReturnWasmFunctionCall,
     definedTypeMatcher = ::DefinedTypeMatcher,

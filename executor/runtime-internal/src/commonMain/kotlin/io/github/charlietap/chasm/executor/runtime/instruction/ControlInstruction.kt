@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
@@ -151,12 +152,12 @@ sealed interface ControlInstruction : ExecutionInstruction {
     value class CallRef(val typeIndex: Index.TypeIndex) : ControlInstruction
 
     data class CallIndirect(
-        val typeIndex: Index.TypeIndex,
+        val type: DefinedType,
         val table: TableInstance,
     ) : ControlInstruction
 
     data class ReturnCallIndirect(
-        val typeIndex: Index.TypeIndex,
+        val type: DefinedType,
         val table: TableInstance,
     ) : ControlInstruction
 }

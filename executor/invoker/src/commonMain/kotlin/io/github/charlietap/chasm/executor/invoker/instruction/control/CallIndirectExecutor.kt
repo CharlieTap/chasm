@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.executor.invoker.ext.definedType
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.encoder.toFunctionAddress
@@ -22,8 +20,8 @@ internal fun CallIndirectExecutor(
     instruction: ControlInstruction.CallIndirect,
 ) = CallIndirectExecutor(
     context = context,
-    typeIndex = instruction.typeIndex,
     table = instruction.table,
+    type = instruction.type,
     hostFunctionCall = ::HostFunctionCall,
     wasmFunctionCall = ::WasmFunctionCall,
     definedTypeMatcher = ::DefinedTypeMatcher,
@@ -32,16 +30,13 @@ internal fun CallIndirectExecutor(
 internal inline fun CallIndirectExecutor(
     context: ExecutionContext,
     table: TableInstance,
-    typeIndex: Index.TypeIndex,
+    type: DefinedType,
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
     crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
 ) {
     val stack = context.vstack
     val store = context.store
-    val frame = context.cstack.peekFrame()
-
-    val expectedFunctionType = frame.instance.definedType(typeIndex)
 
     val elementIndex = stack.popI32()
     val address = table.element(elementIndex).toFunctionAddress()
@@ -49,7 +44,7 @@ internal inline fun CallIndirectExecutor(
     val functionInstance = store.function(address)
     val actualFunctionType = functionInstance.type
 
-    if (!definedTypeMatcher(actualFunctionType, expectedFunctionType, context)) {
+    if (!definedTypeMatcher(actualFunctionType, type, context)) {
         throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
 
