@@ -1,13 +1,12 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ReferenceInstruction : ExecutionInstruction {
     @JvmInline
-    value class RefNull(val type: HeapType) : ReferenceInstruction
+    value class RefNull(val reference: Long) : ReferenceInstruction
 
     data object RefIsNull : ReferenceInstruction
 

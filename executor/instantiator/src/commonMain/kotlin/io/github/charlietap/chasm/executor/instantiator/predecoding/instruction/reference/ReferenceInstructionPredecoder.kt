@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefIsNullD
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefTestDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.encoder.toLong
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefAsNonNull
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefCast
@@ -21,6 +22,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruct
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefIsNull
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefNull
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefTest
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal fun ReferenceInstructionPredecoder(
     context: InstantiationContext,
@@ -50,7 +52,10 @@ internal inline fun ReferenceInstructionPredecoder(
     crossinline refCastDispatcher: Dispatcher<RefCast>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
-        is ReferenceInstruction.RefNull -> refNullDispatcher(RefNull(instruction.type))
+        is ReferenceInstruction.RefNull -> {
+            val reference = ReferenceValue.Null(instruction.type).toLong()
+            refNullDispatcher(RefNull(reference))
+        }
         is ReferenceInstruction.RefIsNull -> refIsNullDispatcher(RefIsNull)
         is ReferenceInstruction.RefAsNonNull -> refAsNonNullDispatcher(RefAsNonNull)
         is ReferenceInstruction.RefFunc -> refFuncDispatcher(RefFunc(instruction.funcIdx))
