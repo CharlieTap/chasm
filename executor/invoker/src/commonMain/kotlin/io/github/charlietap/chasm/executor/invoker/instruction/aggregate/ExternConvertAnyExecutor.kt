@@ -2,8 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popReference
+import io.github.charlietap.chasm.executor.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.executor.runtime.ext.pushReference
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
@@ -12,12 +14,14 @@ internal fun ExternConvertAnyExecutor(
     instruction: AggregateInstruction.ExternConvertAny,
 ) {
     val stack = context.vstack
-    when (val referenceValue = stack.popReference()) {
-        is ReferenceValue.Null -> {
-            stack.pushReference(ReferenceValue.Null(AbstractHeapType.Extern))
+    val referenceValue = stack.pop()
+    when {
+        referenceValue.isNullableReference() -> {
+            stack.push(ReferenceValue.Null(AbstractHeapType.Extern).toLong())
         }
         else -> {
-            stack.pushReference(ReferenceValue.Extern(referenceValue))
+            val extern = referenceValue.toReferenceValue()
+            stack.pushReference(ReferenceValue.Extern(extern))
         }
     }
 }
