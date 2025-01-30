@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
 import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.pushReference
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
@@ -51,7 +51,7 @@ internal inline fun ThrowRefExecutor(
     val handler = jumpToHandlerInstruction(cstack)
 
     if (handler.instructions.isEmpty()) {
-        stack.pushReference(ReferenceValue.Exception(exceptionRef.address))
+        stack.push(ReferenceValue.Exception(exceptionRef.address).toLong())
         cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
     } else {
 
@@ -83,7 +83,7 @@ internal inline fun ThrowRefExecutor(
             catchHandler is CatchHandler.CatchRef && tagMatches -> {
                 instance.fields.reverse()
                 stack.push(instance.fields)
-                stack.pushReference(exceptionRef)
+                stack.push(exceptionRef.toLong())
                 cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
@@ -94,7 +94,7 @@ internal inline fun ThrowRefExecutor(
                 )
             }
             catchHandler is CatchHandler.CatchAllRef -> {
-                stack.pushReference(exceptionRef)
+                stack.push(exceptionRef.toLong())
                 cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
@@ -105,7 +105,7 @@ internal inline fun ThrowRefExecutor(
                 cstack.push(handler)
                 val instruction = handlerDispatcher(handler)
                 cstack.push(instruction)
-                stack.pushReference(exceptionRef)
+                stack.push(exceptionRef.toLong())
                 cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
             }
         }
