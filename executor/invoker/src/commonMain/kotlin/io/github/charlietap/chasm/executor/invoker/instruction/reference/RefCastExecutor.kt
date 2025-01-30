@@ -12,8 +12,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruct
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
-import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 internal fun RefCastExecutor(
     context: ExecutionContext,
@@ -21,7 +19,6 @@ internal fun RefCastExecutor(
 ) = RefCastExecutor(
     context = context,
     instruction = instruction,
-    referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
     referenceTypeMatcher = ::ReferenceTypeMatcher,
     typeOfReferenceValue = ::TypeOfReferenceValue,
 )
@@ -29,24 +26,20 @@ internal fun RefCastExecutor(
 internal inline fun RefCastExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefCast,
-    crossinline referenceTypeSubstitutor: TypeSubstitutor<ReferenceType>,
     crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
     crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
 ) {
     val stack = context.vstack
     val store = context.store
-    val referenceType = instruction.referenceType
 
     val frame = context.cstack.peekFrame()
     val moduleInstance = frame.instance
 
-    val substitutedReferenceType = referenceTypeSubstitutor(referenceType, context.substitutor) // rt1
-
-    val otherReferenceValue = stack.popReference() // rt2
+    val otherReferenceValue = stack.popReference()
     val otherReferenceType = typeOfReferenceValue(otherReferenceValue, store, moduleInstance)
         ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
 
-    if (referenceTypeMatcher(otherReferenceType, substitutedReferenceType, context)) {
+    if (referenceTypeMatcher(otherReferenceType, instruction.referenceType, context)) {
         stack.push(otherReferenceValue.toLongFromBoxed())
     } else {
         throw InvocationException(InvocationError.Trap.TrapEncountered)
