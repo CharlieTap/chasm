@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
@@ -65,7 +64,6 @@ internal inline fun BrOnCastExecutor(
     val moduleInstance = frame.instance
 
     val closedReferenceType1 = typeOfReferenceValue(stack.peek(), store, moduleInstance)
-        ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
     val closedReferenceType2 = referenceTypeSubstitutor(referenceType2, context.substitutor)
 
     val referenceTypeMatches = referenceTypeMatcher(closedReferenceType1, closedReferenceType2, context)
