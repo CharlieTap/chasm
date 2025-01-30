@@ -47,13 +47,13 @@ internal inline fun IfInstructionPredecoder(
         instructionPredecoder(context, predispatch).bind()
     }
 
-    val elseInstructions: Array<DispatchableInstruction>? = instruction.elseInstructions?.let { instructions ->
+    val elseInstructions: Array<DispatchableInstruction> = instruction.elseInstructions?.let { instructions ->
         Array(instructions.size) { idx ->
             val reversedIndex = instructions.size - 1 - idx
             val predispatch = instructions[reversedIndex]
             instructionPredecoder(context, predispatch).bind()
         }
-    }
+    } ?: emptyArray()
 
     ifDispatcher(
         If(

@@ -42,7 +42,7 @@ fun ifRuntimeInstruction(
     params: Int = 0,
     results: Int = 0,
     thenInstructions: Array<DispatchableInstruction> = emptyArray(),
-    elseInstructions: Array<DispatchableInstruction>? = null,
+    elseInstructions: Array<DispatchableInstruction> = emptyArray(),
 ) = ControlInstruction.If(
     params = params,
     results = results,

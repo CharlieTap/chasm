@@ -68,7 +68,7 @@ sealed interface ControlInstruction : ExecutionInstruction {
         val params: Int,
         val results: Int,
         val thenInstructions: Array<DispatchableInstruction>,
-        val elseInstructions: Array<DispatchableInstruction>?,
+        val elseInstructions: Array<DispatchableInstruction>,
     ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

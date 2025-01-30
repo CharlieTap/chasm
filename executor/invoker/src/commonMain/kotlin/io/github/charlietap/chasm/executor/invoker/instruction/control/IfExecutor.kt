@@ -24,6 +24,6 @@ internal inline fun IfExecutor(
     if (firstBlock) {
         blockExecutor(store, context.cstack, stack, instruction.params, instruction.results, instruction.thenInstructions)
     } else {
-        blockExecutor(store, context.cstack, stack, instruction.params, instruction.results, instruction.elseInstructions ?: emptyArray())
+        blockExecutor(store, context.cstack, stack, instruction.params, instruction.results, instruction.elseInstructions)
     }
 }
