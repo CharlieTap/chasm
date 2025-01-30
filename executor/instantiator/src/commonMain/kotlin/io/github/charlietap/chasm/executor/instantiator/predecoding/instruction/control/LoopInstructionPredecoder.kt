@@ -49,7 +49,7 @@ internal inline fun LoopInstructionPredecoder(
 
     loopDispatcher(
         Loop(
-            functionType = functionType,
+            params = functionType.params.types.size,
             instructions = instructions,
         ),
     )

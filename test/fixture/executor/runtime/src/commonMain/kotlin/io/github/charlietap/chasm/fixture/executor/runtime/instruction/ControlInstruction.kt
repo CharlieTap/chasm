@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -11,7 +10,6 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstructio
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.ast.type.definedType
-import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.referenceType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
@@ -23,27 +21,31 @@ fun unreachableRuntimeInstruction() = ControlInstruction.Unreachable
 fun nopRuntimeInstruction() = ControlInstruction.Nop
 
 fun blockRuntimeInstruction(
-    functionType: FunctionType = functionType(),
+    params: Int = 0,
+    results: Int = 0,
     instructions: Array<DispatchableInstruction> = emptyArray(),
 ) = ControlInstruction.Block(
-    functionType = functionType,
+    params = params,
+    results = results,
     instructions = instructions,
 )
 
 fun loopRuntimeInstruction(
-    functionType: FunctionType = functionType(),
+    params: Int = 0,
     instructions: Array<DispatchableInstruction> = emptyArray(),
 ) = ControlInstruction.Loop(
-    functionType = functionType,
+    params = params,
     instructions = instructions,
 )
 
 fun ifRuntimeInstruction(
-    functionType: FunctionType = functionType(),
+    params: Int = 0,
+    results: Int = 0,
     thenInstructions: Array<DispatchableInstruction> = emptyArray(),
     elseInstructions: Array<DispatchableInstruction>? = null,
 ) = ControlInstruction.If(
-    functionType = functionType,
+    params = params,
+    results = results,
     thenInstructions = thenInstructions,
     elseInstructions = elseInstructions,
 )

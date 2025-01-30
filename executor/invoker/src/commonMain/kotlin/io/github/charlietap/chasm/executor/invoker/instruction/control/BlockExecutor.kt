@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
@@ -10,31 +9,33 @@ import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
-internal typealias BlockExecutor = (Store, ControlStack, ValueStack, FunctionType, Array<DispatchableInstruction>) -> Unit
+internal typealias BlockExecutor = (Store, ControlStack, ValueStack, Int, Int, Array<DispatchableInstruction>) -> Unit
 
 internal inline fun BlockExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.Block,
-) =
-    BlockExecutor(
-        store = context.store,
-        controlStack = context.cstack,
-        valueStack = context.vstack,
-        functionType = instruction.functionType,
-        instructions = instruction.instructions,
-    )
+) = BlockExecutor(
+    store = context.store,
+    controlStack = context.cstack,
+    valueStack = context.vstack,
+    params = instruction.params,
+    results = instruction.results,
+    instructions = instruction.instructions,
+)
 
 internal inline fun BlockExecutor(
     store: Store,
     controlStack: ControlStack,
     valueStack: ValueStack,
-    functionType: FunctionType,
+    params: Int,
+    results: Int,
     instructions: Array<DispatchableInstruction>,
 ) = BlockExecutor(
     store = store,
     controlStack = controlStack,
     valueStack = valueStack,
-    functionType = functionType,
+    params = params,
+    results = results,
     instructions = instructions,
     instructionBlockExecutor = ::InstructionBlockExecutor,
 )
@@ -44,13 +45,11 @@ internal inline fun BlockExecutor(
     store: Store,
     controlStack: ControlStack,
     valueStack: ValueStack,
-    functionType: FunctionType,
+    params: Int,
+    results: Int,
     instructions: Array<DispatchableInstruction>,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ) {
-    val params = functionType.params.types.size
-    val results = functionType.results.types.size
-
     val label = ControlStack.Entry.Label(
         arity = results,
         depths = LabelStackDepths(

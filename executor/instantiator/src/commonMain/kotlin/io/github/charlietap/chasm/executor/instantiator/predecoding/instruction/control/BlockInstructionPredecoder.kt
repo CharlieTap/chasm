@@ -49,7 +49,8 @@ internal inline fun BlockInstructionPredecoder(
 
     blockDispatcher(
         Block(
-            functionType = functionType,
+            params = functionType.params.types.size,
+            results = functionType.results.types.size,
             instructions = instructions,
         ),
     )

@@ -23,14 +23,13 @@ internal inline fun LoopExecutor(
 ) {
     val stack = context.vstack
     val cstack = context.cstack
-    val params = instruction.functionType.params.types.size
 
     val label = ControlStack.Entry.Label(
-        arity = params,
+        arity = instruction.params,
         depths = LabelStackDepths(
             instructions = cstack.instructionsDepth(),
             labels = cstack.labelsDepth(),
-            values = stack.depth() - params,
+            values = stack.depth() - instruction.params,
         ),
         continuation = LoopDispatcher(instruction),
     )

@@ -49,7 +49,8 @@ internal inline fun TryTableInstructionPredecoder(
 
     tryTableDispatcher(
         TryTable(
-            functionType = functionType,
+            params = functionType.params.types.size,
+            results = functionType.results.types.size,
             handlers = instruction.handlers,
             instructions = instructions,
         ),

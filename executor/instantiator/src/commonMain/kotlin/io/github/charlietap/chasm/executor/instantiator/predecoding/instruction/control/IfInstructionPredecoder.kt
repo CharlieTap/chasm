@@ -57,7 +57,8 @@ internal inline fun IfInstructionPredecoder(
 
     ifDispatcher(
         If(
-            functionType = functionType,
+            params = functionType.params.types.size,
+            results = functionType.results.types.size,
             thenInstructions = thenInstructions,
             elseInstructions = elseInstructions,
         ),

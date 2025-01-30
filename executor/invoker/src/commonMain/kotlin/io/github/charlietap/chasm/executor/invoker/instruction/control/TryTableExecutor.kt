@@ -23,15 +23,13 @@ internal inline fun TryTableExecutor(
 ) {
     val cstack = context.cstack
     val vstack = context.vstack
-    val params = instruction.functionType.params.types.size
-    val results = instruction.functionType.results.types.size
 
     val label = ControlStack.Entry.Label(
-        arity = results,
+        arity = instruction.results,
         depths = LabelStackDepths(
             instructions = cstack.instructionsDepth(),
             labels = cstack.labelsDepth(),
-            values = vstack.depth() - params,
+            values = vstack.depth() - instruction.params,
         ),
         continuation = null,
     )

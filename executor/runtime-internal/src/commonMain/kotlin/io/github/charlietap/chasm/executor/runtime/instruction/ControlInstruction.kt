@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
@@ -16,54 +15,69 @@ sealed interface ControlInstruction : ExecutionInstruction {
 
     data object Nop : ControlInstruction
 
-    data class Block(val functionType: FunctionType, val instructions: Array<DispatchableInstruction>) : ControlInstruction {
+    data class Block(
+        val params: Int,
+        val results: Int,
+        val instructions: Array<DispatchableInstruction>,
+    ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
 
             other as Block
 
-            if (functionType != other.functionType) return false
+            if (params != other.params) return false
+            if (results != other.results) return false
             if (!instructions.contentEquals(other.instructions)) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = functionType.hashCode()
+            var result = params
+            result = 31 * result + results
             result = 31 * result + instructions.contentHashCode()
             return result
         }
     }
 
-    data class Loop(val functionType: FunctionType, val instructions: Array<DispatchableInstruction>) : ControlInstruction {
+    data class Loop(
+        val params: Int,
+        val instructions: Array<DispatchableInstruction>,
+    ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
 
             other as Loop
 
-            if (functionType != other.functionType) return false
+            if (params != other.params) return false
             if (!instructions.contentEquals(other.instructions)) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = functionType.hashCode()
+            var result = params
             result = 31 * result + instructions.contentHashCode()
             return result
         }
     }
 
-    data class If(val functionType: FunctionType, val thenInstructions: Array<DispatchableInstruction>, val elseInstructions: Array<DispatchableInstruction>?) : ControlInstruction {
+    data class If(
+        val params: Int,
+        val results: Int,
+        val thenInstructions: Array<DispatchableInstruction>,
+        val elseInstructions: Array<DispatchableInstruction>?,
+    ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
 
             other as If
 
-            if (functionType != other.functionType) return false
+            if (params != other.params) return false
+            if (results != other.results) return false
             if (!thenInstructions.contentEquals(other.thenInstructions)) return false
             if (!elseInstructions.contentEquals(other.elseInstructions)) return false
 
@@ -71,21 +85,28 @@ sealed interface ControlInstruction : ExecutionInstruction {
         }
 
         override fun hashCode(): Int {
-            var result = functionType.hashCode()
+            var result = params
+            result = 31 * result + results
             result = 31 * result + thenInstructions.contentHashCode()
             result = 31 * result + (elseInstructions?.contentHashCode() ?: 0)
             return result
         }
     }
 
-    data class TryTable(val functionType: FunctionType, val handlers: List<CatchHandler>, val instructions: Array<DispatchableInstruction>) : ControlInstruction {
+    data class TryTable(
+        val params: Int,
+        val results: Int,
+        val handlers: List<CatchHandler>,
+        val instructions: Array<DispatchableInstruction>,
+    ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
 
             other as TryTable
 
-            if (functionType != other.functionType) return false
+            if (params != other.params) return false
+            if (results != other.results) return false
             if (handlers != other.handlers) return false
             if (!instructions.contentEquals(other.instructions)) return false
 
@@ -93,7 +114,8 @@ sealed interface ControlInstruction : ExecutionInstruction {
         }
 
         override fun hashCode(): Int {
-            var result = functionType.hashCode()
+            var result = params
+            result = 31 * result + results
             result = 31 * result + handlers.hashCode()
             result = 31 * result + instructions.contentHashCode()
             return result
