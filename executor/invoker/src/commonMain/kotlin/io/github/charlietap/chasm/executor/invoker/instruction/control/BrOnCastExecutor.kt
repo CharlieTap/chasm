@@ -8,9 +8,7 @@ import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.peekReference
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutor
@@ -58,7 +56,7 @@ internal inline fun BrOnCastExecutor(
     breakIfMatches: Boolean,
     crossinline referenceTypeSubstitutor: TypeSubstitutor<ReferenceType>,
     crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
-    crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
+    crossinline typeOfReferenceValue: TypeOf<Long, ReferenceType>,
     crossinline breakExecutor: BreakExecutor,
 ) {
     val stack = context.vstack
@@ -66,8 +64,7 @@ internal inline fun BrOnCastExecutor(
     val frame = context.cstack.peekFrame()
     val moduleInstance = frame.instance
 
-    val referenceValue = stack.peekReference()
-    val closedReferenceType1 = typeOfReferenceValue(referenceValue, store, moduleInstance)
+    val closedReferenceType1 = typeOfReferenceValue(stack.peek(), store, moduleInstance)
         ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
     val closedReferenceType2 = referenceTypeSubstitutor(referenceType2, context.substitutor)
 

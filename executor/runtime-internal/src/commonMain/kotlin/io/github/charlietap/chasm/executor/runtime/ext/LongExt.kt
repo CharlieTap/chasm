@@ -28,6 +28,12 @@ fun Long.toExternReference(): ReferenceValue.Extern = try {
     throw InvocationException(InvocationError.ExternReferenceExpected)
 }
 
+fun Long.toNullableReference(): ReferenceValue.Null = try {
+    toReferenceValue() as ReferenceValue.Null
+} catch (_: ClassCastException) {
+    throw InvocationException(InvocationError.NullReferenceExpected)
+}
+
 inline fun Long.toArrayAddress(): Address.Array {
     val typeId = this and RV_TYPE_MASK
     if (typeId != RV_TYPE_ARRAY) {

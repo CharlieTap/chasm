@@ -6,10 +6,7 @@ import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popReference
-import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 
@@ -27,7 +24,7 @@ internal inline fun RefCastExecutor(
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefCast,
     crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
-    crossinline typeOfReferenceValue: TypeOf<ReferenceValue, ReferenceType>,
+    crossinline typeOfReferenceValue: TypeOf<Long, ReferenceType>,
 ) {
     val stack = context.vstack
     val store = context.store
@@ -35,12 +32,12 @@ internal inline fun RefCastExecutor(
     val frame = context.cstack.peekFrame()
     val moduleInstance = frame.instance
 
-    val otherReferenceValue = stack.popReference()
-    val otherReferenceType = typeOfReferenceValue(otherReferenceValue, store, moduleInstance)
+    val referenceValue = stack.pop()
+    val otherReferenceType = typeOfReferenceValue(referenceValue, store, moduleInstance)
         ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
 
     if (referenceTypeMatcher(otherReferenceType, instruction.referenceType, context)) {
-        stack.push(otherReferenceValue.toLongFromBoxed())
+        stack.push(referenceValue)
     } else {
         throw InvocationException(InvocationError.Trap.TrapEncountered)
     }
