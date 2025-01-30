@@ -40,13 +40,11 @@ internal inline fun IfInstructionPredecoder(
         .toResultOr {
             InstantiationError.PredecodingError
         }.bind()
-
     val thenInstructions: Array<DispatchableInstruction> = Array(instruction.thenInstructions.size) { idx ->
         val reversedIndex = instruction.thenInstructions.size - 1 - idx
         val predispatch = instruction.thenInstructions[reversedIndex]
         instructionPredecoder(context, predispatch).bind()
     }
-
     val elseInstructions: Array<DispatchableInstruction> = instruction.elseInstructions?.let { instructions ->
         Array(instructions.size) { idx ->
             val reversedIndex = instructions.size - 1 - idx
@@ -54,13 +52,13 @@ internal inline fun IfInstructionPredecoder(
             instructionPredecoder(context, predispatch).bind()
         }
     } ?: emptyArray()
+    val instructions = arrayOf(elseInstructions, thenInstructions)
 
     ifDispatcher(
         If(
             params = functionType.params.types.size,
             results = functionType.results.types.size,
-            thenInstructions = thenInstructions,
-            elseInstructions = elseInstructions,
+            instructions = instructions,
         ),
     )
 }

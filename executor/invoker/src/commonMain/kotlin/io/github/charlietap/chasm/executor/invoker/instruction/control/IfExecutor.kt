@@ -19,11 +19,8 @@ internal inline fun IfExecutor(
 ) {
     val stack = context.vstack
     val store = context.store
-    val firstBlock = stack.pop() != 0L
+    val value = stack.pop()
+    val branchIndex = ((value or -value) ushr 63).toInt()
 
-    if (firstBlock) {
-        blockExecutor(store, context.cstack, stack, instruction.params, instruction.results, instruction.thenInstructions)
-    } else {
-        blockExecutor(store, context.cstack, stack, instruction.params, instruction.results, instruction.elseInstructions)
-    }
+    blockExecutor(store, context.cstack, stack, instruction.params, instruction.results, instruction.instructions[branchIndex])
 }

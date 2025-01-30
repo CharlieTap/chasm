@@ -67,8 +67,7 @@ sealed interface ControlInstruction : ExecutionInstruction {
     data class If(
         val params: Int,
         val results: Int,
-        val thenInstructions: Array<DispatchableInstruction>,
-        val elseInstructions: Array<DispatchableInstruction>,
+        val instructions: Array<Array<DispatchableInstruction>>,
     ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -78,8 +77,7 @@ sealed interface ControlInstruction : ExecutionInstruction {
 
             if (params != other.params) return false
             if (results != other.results) return false
-            if (!thenInstructions.contentEquals(other.thenInstructions)) return false
-            if (!elseInstructions.contentEquals(other.elseInstructions)) return false
+            if (!instructions.contentEquals(other.instructions)) return false
 
             return true
         }
@@ -87,8 +85,7 @@ sealed interface ControlInstruction : ExecutionInstruction {
         override fun hashCode(): Int {
             var result = params
             result = 31 * result + results
-            result = 31 * result + thenInstructions.contentHashCode()
-            result = 31 * result + (elseInstructions?.contentHashCode() ?: 0)
+            result = 31 * result + instructions.contentHashCode()
             return result
         }
     }

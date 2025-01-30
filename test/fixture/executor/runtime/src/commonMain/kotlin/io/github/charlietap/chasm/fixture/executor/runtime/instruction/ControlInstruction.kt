@@ -41,13 +41,11 @@ fun loopRuntimeInstruction(
 fun ifRuntimeInstruction(
     params: Int = 0,
     results: Int = 0,
-    thenInstructions: Array<DispatchableInstruction> = emptyArray(),
-    elseInstructions: Array<DispatchableInstruction> = emptyArray(),
+    instructions: Array<Array<DispatchableInstruction>> = emptyArray(),
 ) = ControlInstruction.If(
     params = params,
     results = results,
-    thenInstructions = thenInstructions,
-    elseInstructions = elseInstructions,
+    instructions = instructions,
 )
 
 fun brRuntimeInstruction(
