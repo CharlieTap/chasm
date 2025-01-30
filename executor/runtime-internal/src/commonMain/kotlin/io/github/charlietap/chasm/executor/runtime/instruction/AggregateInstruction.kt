@@ -18,6 +18,7 @@ sealed interface AggregateInstruction : ExecutionInstruction {
     data class StructNewDefault(
         val definedType: DefinedType,
         val structType: StructType,
+        val fields: LongArray,
     ) : AggregateInstruction
 
     data class StructGet(val typeIndex: Index.TypeIndex, val fieldIndex: Index.FieldIndex) : AggregateInstruction

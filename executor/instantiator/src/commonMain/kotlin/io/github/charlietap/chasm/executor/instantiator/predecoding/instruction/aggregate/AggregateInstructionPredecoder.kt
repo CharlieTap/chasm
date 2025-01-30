@@ -38,6 +38,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.ext.data
+import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.AnyConvertExtern
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.ArrayCopy
@@ -237,8 +238,11 @@ internal inline fun AggregateInstructionPredecoder(
             val structType = context.unroller(definedType).compositeType.structType() ?: Err(
                 InvocationError.StructCompositeTypeExpected,
             ).bind()
+            val fields = LongArray(structType.fields.size) { idx ->
+                structType.fields[idx].default()
+            }
 
-            structNewDefaultDispatcher(StructNewDefault(definedType, structType))
+            structNewDefaultDispatcher(StructNewDefault(definedType, structType, fields))
         }
         is AggregateInstruction.StructSet -> {
             structSetDispatcher(StructSet(instruction.fieldIndex.idx.toInt()))

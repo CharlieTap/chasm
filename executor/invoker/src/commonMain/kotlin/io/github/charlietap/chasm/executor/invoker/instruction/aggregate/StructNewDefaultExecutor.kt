@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal fun StructNewDefaultExecutor(
@@ -22,10 +21,7 @@ internal inline fun StructNewDefaultExecutor(
 ) {
     val stack = context.vstack
 
-    instruction.structType.fields.forEach { fieldType ->
-        val value = fieldType.default()
-        stack.push(value)
-    }
+    stack.push(instruction.fields)
 
     structNewExecutor(
         context,
