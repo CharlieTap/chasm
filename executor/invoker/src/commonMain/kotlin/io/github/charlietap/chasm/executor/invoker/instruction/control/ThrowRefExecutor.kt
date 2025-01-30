@@ -11,7 +11,8 @@ import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.exception
-import io.github.charlietap.chasm.executor.runtime.ext.popReference
+import io.github.charlietap.chasm.executor.runtime.ext.isNullableReference
+import io.github.charlietap.chasm.executor.runtime.ext.toExceptionAddress
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
@@ -37,21 +38,21 @@ internal inline fun ThrowRefExecutor(
     val cstack = context.cstack
     val store = context.store
 
-    val ref = stack.popReference()
+    val ref = stack.pop()
 
-    val exceptionRef = if (ref is ReferenceValue.Null) {
+    val exceptionAddress = if (ref.isNullableReference()) {
         throw InvocationException(InvocationError.UnexpectedReferenceValue)
     } else {
-        ref as ReferenceValue.Exception
+        ref.toExceptionAddress()
     }
 
-    val instance = store.exception(exceptionRef.address)
+    val instance = store.exception(exceptionAddress)
     val address = instance.tagAddress
 
     val handler = jumpToHandlerInstruction(cstack)
 
     if (handler.instructions.isEmpty()) {
-        stack.push(ReferenceValue.Exception(exceptionRef.address).toLong())
+        stack.push(ReferenceValue.Exception(exceptionAddress).toLong())
         cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
     } else {
 
@@ -83,7 +84,7 @@ internal inline fun ThrowRefExecutor(
             catchHandler is CatchHandler.CatchRef && tagMatches -> {
                 instance.fields.reverse()
                 stack.push(instance.fields)
-                stack.push(exceptionRef.toLong())
+                stack.push(ref)
                 cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
@@ -94,7 +95,7 @@ internal inline fun ThrowRefExecutor(
                 )
             }
             catchHandler is CatchHandler.CatchAllRef -> {
-                stack.push(exceptionRef.toLong())
+                stack.push(ref)
                 cstack.push(
                     breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
                 )
@@ -105,7 +106,7 @@ internal inline fun ThrowRefExecutor(
                 cstack.push(handler)
                 val instruction = handlerDispatcher(handler)
                 cstack.push(instruction)
-                stack.push(exceptionRef.toLong())
+                stack.push(ref)
                 cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
             }
         }

@@ -128,6 +128,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object ReferenceValueExpected : InvocationError
 
+    data object ExceptionReferenceExpected : InvocationError
+
     data object FunctionReferenceExpected : InvocationError
 
     data object StructReferenceExpected : InvocationError

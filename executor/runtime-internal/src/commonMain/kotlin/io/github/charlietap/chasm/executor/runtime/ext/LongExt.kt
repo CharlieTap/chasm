@@ -43,6 +43,15 @@ inline fun Long.toArrayAddress(): Address.Array {
     return Address.Array(address)
 }
 
+inline fun Long.toExceptionAddress(): Address.Exception {
+    val typeId = this and RV_TYPE_MASK
+    if (typeId != RV_TYPE_EXCEPTION) {
+        throw InvocationException(InvocationError.ExceptionReferenceExpected)
+    }
+    val address = (this shr RV_SHIFT_BITS).toInt()
+    return Address.Exception(address)
+}
+
 inline fun Long.toFunctionAddress(): Address.Function {
     val typeId = this and RV_TYPE_MASK
     if (typeId != RV_TYPE_FUNCTION) {
