@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 
 internal fun ArrayNewDefaultExecutor(
@@ -21,12 +20,10 @@ internal inline fun ArrayNewDefaultExecutor(
     crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
     val stack = context.vstack
-
     val size = stack.popI32()
-    val value = instruction.arrayType.fieldType.default()
 
     repeat(size) {
-        stack.push(value)
+        stack.push(instruction.field)
     }
 
     arrayNewFixedExecutor(

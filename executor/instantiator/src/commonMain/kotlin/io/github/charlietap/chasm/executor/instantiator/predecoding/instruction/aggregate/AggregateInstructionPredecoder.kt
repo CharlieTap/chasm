@@ -190,9 +190,10 @@ internal inline fun AggregateInstructionPredecoder(
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
+            val field = arrayType.fieldType.default()
 
             arrayNewDefaultDispatcher(
-                ArrayNewDefault(definedType, arrayType),
+                ArrayNewDefault(definedType, arrayType, field),
             )
         }
         is AggregateInstruction.ArrayNewElement -> {

@@ -46,6 +46,7 @@ sealed interface AggregateInstruction : ExecutionInstruction {
     data class ArrayNewDefault(
         val definedType: DefinedType,
         val arrayType: ArrayType,
+        val field: Long,
     ) : AggregateInstruction
 
     data class ArrayNewData(
