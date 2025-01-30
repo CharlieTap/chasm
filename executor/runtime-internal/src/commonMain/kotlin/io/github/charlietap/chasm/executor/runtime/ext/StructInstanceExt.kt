@@ -13,8 +13,6 @@ fun StructInstance.field(
     this.fields[index.idx.toInt()]
 } catch (_: IndexOutOfBoundsException) {
     throw InvocationException(InvocationError.StructFieldLookupFailed(index.idx.toInt()))
-} catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.StructFieldLookupFailed(index.idx.toInt()))
 }
 
 fun StructInstance.packedField(
@@ -23,7 +21,5 @@ fun StructInstance.packedField(
     val storage = this.structType.fields[index.idx.toInt()].storageType as StorageType.Packed
     this.fields[index.idx.toInt()] to storage.type
 } catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.StructFieldLookupFailed(index.idx.toInt()))
-} catch (_: IllegalArgumentException) {
     throw InvocationException(InvocationError.StructFieldLookupFailed(index.idx.toInt()))
 }
