@@ -6,6 +6,8 @@ import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ReferenceType.Ref
 import io.github.charlietap.chasm.ast.type.ReferenceType.RefNull
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.ext.array
 import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.ext.isArrayReference
@@ -29,7 +31,7 @@ fun TypeOfReferenceValue(
     value: Long,
     store: Store,
     moduleInstance: ModuleInstance,
-): ReferenceType? = TypeOfReferenceValue(
+): ReferenceType = TypeOfReferenceValue(
     value = value,
     store = store,
     moduleInstance = moduleInstance,
@@ -41,8 +43,11 @@ internal inline fun TypeOfReferenceValue(
     store: Store,
     moduleInstance: ModuleInstance,
     crossinline bottomOfHeapType: BottomOf<HeapType>,
-): ReferenceType? = when {
-    value.isNullableReference() -> bottomOfHeapType(value.toNullableReference().heapType, moduleInstance.types)?.let(::RefNull)
+): ReferenceType = when {
+    value.isNullableReference() -> {
+        bottomOfHeapType(value.toNullableReference().heapType, moduleInstance.types)?.let(::RefNull)
+            ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
+    }
     value.isStructReference() -> {
         val struct = store.struct(value.toStructAddress())
         Ref(ConcreteHeapType.Defined(struct.definedType))
@@ -58,5 +63,5 @@ internal inline fun TypeOfReferenceValue(
     value.isI31Reference() -> Ref(AbstractHeapType.I31)
     value.isExternReference() -> Ref(AbstractHeapType.Extern)
     value.isHostReference() -> Ref(AbstractHeapType.Any)
-    else -> null
+    else -> throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
 }

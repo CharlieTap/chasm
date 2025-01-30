@@ -33,10 +33,9 @@ internal inline fun RefCastExecutor(
     val moduleInstance = frame.instance
 
     val referenceValue = stack.pop()
-    val otherReferenceType = typeOfReferenceValue(referenceValue, store, moduleInstance)
-        ?: throw InvocationException(InvocationError.FailedToGetTypeOfReferenceValue)
+    val referenceType = typeOfReferenceValue(referenceValue, store, moduleInstance)
 
-    if (referenceTypeMatcher(otherReferenceType, instruction.referenceType, context)) {
+    if (referenceTypeMatcher(referenceType, instruction.referenceType, context)) {
         stack.push(referenceValue)
     } else {
         throw InvocationException(InvocationError.Trap.TrapEncountered)
