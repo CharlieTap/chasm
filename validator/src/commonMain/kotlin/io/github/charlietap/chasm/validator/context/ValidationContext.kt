@@ -17,6 +17,7 @@ import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.type.factory.DefinedTypeUnrollerFactory
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
+import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
@@ -115,6 +116,9 @@ internal data class ValidationContext(
     override val lookup: DefinedTypeLookup = { index ->
         types.getOrNull(index.idx.toInt())
     }
+
+    override val reverseLookup: DefinedTypeReverseLookup
+        get() = TODO("Not yet implemented")
 
     override val substitutor: ConcreteHeapTypeSubstitutor = TypeIndexToDefinedTypeSubstitutor(types)
     override val unroller: DefinedTypeUnroller = DefinedTypeUnrollerFactory(unrollCache)

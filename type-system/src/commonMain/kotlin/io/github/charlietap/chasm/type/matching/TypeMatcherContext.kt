@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubs
 interface TypeMatcherContext {
 
     val lookup: DefinedTypeLookup
+    val reverseLookup: DefinedTypeReverseLookup
     val substitutor: ConcreteHeapTypeSubstitutor
     val unroller: DefinedTypeUnroller
 }

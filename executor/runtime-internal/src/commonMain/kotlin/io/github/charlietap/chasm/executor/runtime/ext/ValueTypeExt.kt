@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
+import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.ast.type.ValueType
@@ -8,10 +9,13 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 
-fun ValueType.default(): Long = when (this) {
+fun ValueType.default(
+    context: TypeMatcherContext,
+): Long = when (this) {
     is ValueType.Number -> default()
-    is ValueType.Reference -> default()
+    is ValueType.Reference -> default(context)
     is ValueType.Vector -> default()
     is ValueType.Bottom -> throw InvocationException(InvocationError.UndefinedDefaultBottomType)
 }
@@ -24,8 +28,20 @@ fun ValueType.Number.default(): Long = when (this.numberType) {
     -> 0L
 }
 
-fun ValueType.Reference.default(): Long = when (val refType = this.referenceType) {
-    is ReferenceType.RefNull -> ReferenceValue.Null(refType.heapType).toLongFromBoxed()
+fun ValueType.Reference.default(
+    context: TypeMatcherContext,
+): Long = when (val refType = this.referenceType) {
+    is ReferenceType.RefNull -> {
+        val substituted = when (val heapType = refType.heapType) {
+            is ConcreteHeapType.Defined -> {
+                val typeIndex = context.reverseLookup(heapType.definedType)
+                ConcreteHeapType.TypeIndex(typeIndex)
+            }
+            else -> heapType
+        }
+
+        ReferenceValue.Null(substituted).toLongFromBoxed()
+    }
     is ReferenceType.Ref -> ExecutionValue.Uninitialised.toLongFromBoxed()
 }
 

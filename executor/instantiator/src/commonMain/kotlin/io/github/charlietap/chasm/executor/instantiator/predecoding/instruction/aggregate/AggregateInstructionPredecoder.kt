@@ -190,7 +190,7 @@ internal inline fun AggregateInstructionPredecoder(
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
-            val field = arrayType.fieldType.default()
+            val field = arrayType.fieldType.default(context)
 
             arrayNewDefaultDispatcher(
                 ArrayNewDefault(definedType, arrayType, field),
@@ -240,7 +240,7 @@ internal inline fun AggregateInstructionPredecoder(
                 InvocationError.StructCompositeTypeExpected,
             ).bind()
             val fields = LongArray(structType.fields.size) { idx ->
-                structType.fields[idx].default()
+                structType.fields[idx].default(context)
             }
 
             structNewDefaultDispatcher(StructNewDefault(definedType, structType, fields))

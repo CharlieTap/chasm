@@ -31,7 +31,7 @@ internal inline fun FunctionPredecoder(
         locals = LongArray(function.locals.size) { index ->
             function.locals[index]
                 .type
-                .default()
+                .default(context)
         },
         body = expressionPredecoder(context, function.body).bind(),
     )
