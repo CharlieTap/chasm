@@ -10,14 +10,14 @@ jobs:
   lint:
     uses: ./.github/workflows/task-runner.yml
     with:
-      runner: ubuntu-latest
+      runner: ubuntu-24.04-arm
       task: lintKotlin
 
   test:
     strategy:
       matrix:
         include:
-          - os: macos-latest
+          - os: ubuntu-24.04-arm
             task: jvmTest
           - os: macos-latest
             task: macosArm64Test
