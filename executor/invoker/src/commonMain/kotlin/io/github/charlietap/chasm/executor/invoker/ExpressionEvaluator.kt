@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.function.Expression
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
-import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
 typealias ExpressionEvaluator = (RuntimeConfig, Store, ModuleInstance, Expression, Arity.Return) -> Result<Long?, InvocationError>
@@ -45,7 +45,7 @@ internal inline fun ExpressionEvaluator(
         frame = ActivationFrame(
             arity = arity.value,
             instance = instance,
-            depths = FrameStackDepths(0, 0, 0, 0),
+            depths = StackDepths(0, 0, 0, 0),
         ),
         instructions = expression.instructions,
     )

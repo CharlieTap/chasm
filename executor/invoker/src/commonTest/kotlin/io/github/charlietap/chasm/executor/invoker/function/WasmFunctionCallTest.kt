@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
 import io.github.charlietap.chasm.fixture.ast.type.functionHeapType
 import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
@@ -18,6 +17,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.label
+import io.github.charlietap.chasm.fixture.executor.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
@@ -78,7 +78,7 @@ class WasmFunctionCallTest {
 
         val label = label(
             arity = functionType.params.types.size,
-            depths = LabelStackDepths(
+            depths = stackDepths(
                 instructions = 1,
                 labels = 0,
                 values = 3,

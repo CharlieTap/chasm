@@ -7,8 +7,7 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
-import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
-import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 
 internal typealias WasmFunctionCall = (ExecutionContext, FunctionInstance.WasmFunction) -> Unit
 
@@ -38,7 +37,7 @@ internal inline fun WasmFunctionCall(
     val valuesDepth = vstack.depth() - params
     vstack.push(instance.function.locals)
 
-    val depths = FrameStackDepths(
+    val depths = StackDepths(
         handlers = cstack.handlersDepth(),
         instructions = cstack.instructionsDepth(),
         labels = cstack.labelsDepth(),
@@ -54,7 +53,8 @@ internal inline fun WasmFunctionCall(
     cstack.push(frame)
     cstack.push(frameCleaner)
 
-    val labelDepths = LabelStackDepths(
+    val labelDepths = StackDepths(
+        handlers = cstack.handlersDepth(),
         instructions = cstack.instructionsDepth(),
         labels = cstack.labelsDepth(),
         values = vstack.depth(),

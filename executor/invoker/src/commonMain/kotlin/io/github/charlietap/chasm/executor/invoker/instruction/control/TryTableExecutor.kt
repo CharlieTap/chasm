@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
-import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 
 internal inline fun TryTableExecutor(
     context: ExecutionContext,
@@ -26,7 +26,8 @@ internal inline fun TryTableExecutor(
 
     val label = ControlStack.Entry.Label(
         arity = instruction.results,
-        depths = LabelStackDepths(
+        depths = StackDepths(
+            handlers = cstack.handlersDepth(),
             instructions = cstack.instructionsDepth(),
             labels = cstack.labelsDepth(),
             values = vstack.depth() - instruction.params,

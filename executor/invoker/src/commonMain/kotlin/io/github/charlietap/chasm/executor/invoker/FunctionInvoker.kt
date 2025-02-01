@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.instruction
 import io.github.charlietap.chasm.executor.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
-import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
@@ -49,7 +49,7 @@ internal inline fun FunctionInvoker(
         frame = ActivationFrame(
             arity = arity,
             instance = function.module,
-            depths = FrameStackDepths(0, 0, 0, 0),
+            depths = StackDepths(0, 0, 0, 0),
         ),
         instructions = arrayOf(instruction),
     )

@@ -26,6 +26,7 @@ internal inline fun BreakExecutor(
     val breakLabel = controlStack.peekNthLabel(labelIndex.index())
 
     val depths = breakLabel.depths
+    controlStack.shrinkHandlers(0, depths.handlers)
     controlStack.shrinkInstructions(0, depths.instructions)
     controlStack.shrinkLabels(0, depths.labels)
     valueStack.shrink(breakLabel.arity, depths.values)

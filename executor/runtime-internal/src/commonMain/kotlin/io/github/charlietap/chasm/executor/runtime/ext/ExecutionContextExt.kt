@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.stack.FrameStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 
 inline fun ExecutionContext.depth() =
     cstack.handlersDepth() +
@@ -9,7 +9,7 @@ inline fun ExecutionContext.depth() =
         cstack.labelsDepth() +
         vstack.depth()
 
-inline fun ExecutionContext.depths() = FrameStackDepths(
+inline fun ExecutionContext.depths() = StackDepths(
     handlers = cstack.handlersDepth(),
     instructions = cstack.instructionsDepth(),
     labels = cstack.labelsDepth(),

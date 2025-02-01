@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.stack
 
 import kotlin.jvm.JvmInline
 
-inline fun FrameStackDepths(
+inline fun StackDepths(
     handlers: Int,
     instructions: Int,
     labels: Int,
@@ -11,18 +11,6 @@ inline fun FrameStackDepths(
     val depths =
         ((handlers.toLong() and 0xFFFF) shl 48) or
             ((instructions.toLong() and 0xFFFF) shl 32) or
-            ((labels.toLong() and 0xFFFF) shl 16) or
-            (values.toLong() and 0xFFFF)
-    return StackDepths(depths)
-}
-
-inline fun LabelStackDepths(
-    instructions: Int,
-    labels: Int,
-    values: Int,
-): StackDepths {
-    val depths =
-        ((instructions.toLong() and 0xFFFF) shl 32) or
             ((labels.toLong() and 0xFFFF) shl 16) or
             (values.toLong() and 0xFFFF)
     return StackDepths(depths)

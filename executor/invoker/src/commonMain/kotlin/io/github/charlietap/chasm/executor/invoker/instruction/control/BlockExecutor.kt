@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
-import io.github.charlietap.chasm.executor.runtime.stack.LabelStackDepths
+import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.store.Store
 
@@ -52,7 +52,8 @@ internal inline fun BlockExecutor(
 ) {
     val label = ControlStack.Entry.Label(
         arity = results,
-        depths = LabelStackDepths(
+        depths = StackDepths(
+            handlers = controlStack.handlersDepth(),
             instructions = controlStack.instructionsDepth(),
             labels = controlStack.labelsDepth(),
             values = valueStack.depth() - params,
