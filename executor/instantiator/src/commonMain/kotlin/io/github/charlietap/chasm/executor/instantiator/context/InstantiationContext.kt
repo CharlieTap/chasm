@@ -32,7 +32,7 @@ data class InstantiationContext(
     }
 
     override val reverseLookup: DefinedTypeReverseLookup = { type ->
-        val index = types.indexOfFirst { definedType -> type === definedType }
+        val index = types.indexOfFirst { definedType -> type == definedType }
         Index.TypeIndex(index.toUInt())
     }
 
