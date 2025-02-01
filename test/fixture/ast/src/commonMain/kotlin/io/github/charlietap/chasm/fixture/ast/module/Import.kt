@@ -56,10 +56,11 @@ fun import(
 fun functionImport(
     moduleName: NameValue = NameValue(""),
     entityName: NameValue = NameValue(""),
+    descriptor: Import.Descriptor = functionImportDescriptor(),
 ) = Import(
     moduleName = moduleName,
     entityName = entityName,
-    descriptor = functionImportDescriptor(),
+    descriptor = descriptor,
 )
 
 fun globalImport(

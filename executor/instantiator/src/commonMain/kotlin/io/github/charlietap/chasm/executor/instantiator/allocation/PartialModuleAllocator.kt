@@ -2,13 +2,11 @@ package io.github.charlietap.chasm.executor.instantiator.allocation
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
-import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.addFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
@@ -47,10 +45,7 @@ internal inline fun PartialModuleAllocator(
     val instance = ModuleInstance(types)
     context.instance = instance
 
-    val matchedImports = importMatcher(context, imports)
-        .mapError {
-            InstantiationError.MissingImport
-        }.bind()
+    val matchedImports = importMatcher(context, imports).bind()
 
     matchedImports.forEach { import ->
         when (import) {

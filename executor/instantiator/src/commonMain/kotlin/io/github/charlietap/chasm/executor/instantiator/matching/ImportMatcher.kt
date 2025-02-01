@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.Import
+import io.github.charlietap.chasm.ast.module.Import as ModuleImport
 
 typealias ImportMatcher = (InstantiationContext, List<Import>) -> Result<List<ExternalValue>, ModuleTrapError>
 
@@ -26,13 +27,25 @@ internal inline fun ImportMatcher(
     imports: List<Import>,
     crossinline descriptorMatcher: ImportDescriptorMatcher,
 ): Result<List<ExternalValue>, ModuleTrapError> = binding {
-    val module = context.module
-    module.imports.map { moduleImport ->
-        imports
-            .firstOrNull { (moduleName, entityName, externalValue) ->
-                moduleImport.moduleName.name == moduleName &&
-                    moduleImport.entityName.name == entityName &&
-                    descriptorMatcher(context, moduleImport.descriptor, externalValue).bind()
-            }?.externalValue ?: Err(InstantiationError.MissingImport).bind<Nothing>()
+
+    val requiredImports = context.module.imports
+    val missingImports = mutableListOf<ModuleImport>()
+
+    val matched = requiredImports.mapNotNull { requiredImport ->
+        val match = imports.firstOrNull { (moduleName, entityName, externalValue) ->
+            requiredImport.moduleName.name == moduleName &&
+                requiredImport.entityName.name == entityName &&
+                descriptorMatcher(context, requiredImport.descriptor, externalValue).bind()
+        }
+        if (match == null) {
+            missingImports.add(requiredImport)
+        }
+        match?.externalValue
     }
+
+    if (missingImports.isNotEmpty()) {
+        Err(InstantiationError.MissingImports(missingImports)).bind()
+    }
+
+    matched
 }
