@@ -117,9 +117,9 @@ private inline fun jumpToHandlerInstruction(controlStack: ControlStack): Excepti
 
     val handler = controlStack.popHandler()
 
-    controlStack.shrinkLabels(0, handler.labelsDepth)
-    controlStack.shrinkFrames(0, handler.framesDepth)
-    controlStack.shrinkInstructions(0, handler.instructionsDepth)
+    controlStack.shrinkLabels(handler.labelsDepth)
+    controlStack.shrinkFrames(handler.framesDepth)
+    controlStack.shrinkInstructions(handler.instructionsDepth)
 
     return handler
 }

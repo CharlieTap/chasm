@@ -66,24 +66,20 @@ data class ControlStack(
     fun peekNthLabel(n: Int): Entry.Label = labels.peekNth(n)
 
     fun shrinkFrames(
-        preserveTopN: Int,
         depth: Int,
-    ) = frames.shrink(preserveTopN, depth)
+    ) = frames.shrink(depth)
 
     fun shrinkHandlers(
-        preserveTopN: Int,
         depth: Int,
-    ) = handlers.shrink(preserveTopN, depth)
+    ) = handlers.shrink(depth)
 
     fun shrinkInstructions(
-        preserveTopN: Int,
         depth: Int,
-    ) = instructions.shrink(preserveTopN, depth)
+    ) = instructions.shrink(depth)
 
     fun shrinkLabels(
-        preserveTopN: Int,
         depth: Int,
-    ) = labels.shrink(preserveTopN, depth)
+    ) = labels.shrink(depth)
 
     fun size() = frames.depth() + instructions.depth() + labels.depth()
 

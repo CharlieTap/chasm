@@ -13,9 +13,9 @@ internal inline fun ReturnExecutor(
     val frame = cstack.popFrame()
 
     val depths = frame.depths
-    cstack.shrinkHandlers(0, depths.handlers)
-    cstack.shrinkInstructions(0, depths.instructions)
-    cstack.shrinkLabels(0, depths.labels)
+    cstack.shrinkHandlers(depths.handlers)
+    cstack.shrinkInstructions(depths.instructions)
+    cstack.shrinkLabels(depths.labels)
     vstack.shrink(frame.arity, depths.values)
 
     vstack.framePointer = frame.previousFramePointer

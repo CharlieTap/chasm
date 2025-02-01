@@ -66,21 +66,8 @@ class HandlerStack
             throw InvocationException(InvocationError.UncaughtException)
         }
 
-        fun shrink(preserveTopN: Int, depth: Int) {
-            elements.copyInto(
-                destination = elements,
-                destinationOffset = depth,
-                startIndex = top - preserveTopN,
-                endIndex = top,
-            )
-
-            var i = depth + preserveTopN
-            while (i < top) {
-                elements[i] = null
-                i++
-            }
-
-            top = depth + preserveTopN
+        fun shrink(depth: Int) {
+            top = depth
         }
 
         fun depth(): Int = top
