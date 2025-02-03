@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.memory.NativeLinearMemory
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
-import kotlinx.cinterop.get
+import kotlinx.cinterop.readBytes
 import liblinmem.read_bytes
 
 actual inline fun BytesReader(
@@ -21,9 +21,7 @@ actual inline fun BytesReader(
         throw InvocationException(InvocationError.InvalidPointer)
     }
 
-    for (i in 0 until bytesToRead) {
-        buffer[bufferPointer + i] = pointer[i].toByte()
-    }
+    pointer.readBytes(bytesToRead).copyInto(buffer, destinationOffset = bufferPointer)
 
     return buffer
 }
