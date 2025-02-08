@@ -11,7 +11,7 @@ plugins {
 
 bolt {
     library = "liblinmem"
-    url = "https://github.com/CharlieTap/linmem/releases/download/0.1.3/"
+    url = "https://github.com/CharlieTap/linmem/releases/download/0.1.48/"
 }
 
 kotlin {
