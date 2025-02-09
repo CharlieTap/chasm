@@ -17,19 +17,16 @@ internal fun TableCopyExecutor(
     val srcOffset = stack.popI32()
     val dstOffset = stack.popI32()
 
-    if (elementsToCopy < 0 ||
-        srcOffset < 0 ||
-        dstOffset < 0 ||
-        srcOffset + elementsToCopy > srcTableInstance.elements.size ||
-        dstOffset + elementsToCopy > dstTableInstance.elements.size
-    ) {
+    try {
+        srcTableInstance.elements.copyInto(
+            destination = dstTableInstance.elements,
+            destinationOffset = dstOffset,
+            startIndex = srcOffset,
+            endIndex = srcOffset + elementsToCopy,
+        )
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.TableOperationOutOfBounds)
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.TableOperationOutOfBounds)
     }
-
-    srcTableInstance.elements.copyInto(
-        destination = dstTableInstance.elements,
-        destinationOffset = dstOffset,
-        startIndex = srcOffset,
-        endIndex = srcOffset + elementsToCopy,
-    )
 }
