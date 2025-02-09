@@ -24,21 +24,24 @@ internal inline fun ArrayInitDataExecutor(
     val arrayType = arrayInstance.arrayType
     val fieldWidthInBytes = instruction.fieldWidthInBytes
 
-    if (
-        (arrayOffset + elementsToCopy > arrayInstance.fields.size) ||
-        (byteArrayOffset + (elementsToCopy * fieldWidthInBytes) > dataInstance.bytes.size)
-    ) {
-        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
+    if (elementsToCopy == 0) {
+        if (
+            (arrayOffset + elementsToCopy > arrayInstance.fields.size) ||
+            (byteArrayOffset + (elementsToCopy * fieldWidthInBytes) > dataInstance.bytes.size)
+        ) {
+            throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
+        }
+        return
     }
 
     val byteArray = dataInstance.bytes
-    repeat(elementsToCopy) { offset ->
-
-        val srcOffsetInByteArray = byteArrayOffset + (fieldWidthInBytes * offset)
-        val element = arrayType.fieldType.valueFromBytes(byteArray, srcOffsetInByteArray)
-
-        val fieldIndex = arrayOffset + offset
-
-        arrayInstance.fields[fieldIndex] = element
+    try {
+        val elements = LongArray(elementsToCopy) { offset ->
+            val srcOffsetInByteArray = byteArrayOffset + (fieldWidthInBytes * offset)
+            arrayType.fieldType.valueFromBytes(byteArray, srcOffsetInByteArray)
+        }
+        elements.copyInto(arrayInstance.fields, arrayOffset)
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 }
