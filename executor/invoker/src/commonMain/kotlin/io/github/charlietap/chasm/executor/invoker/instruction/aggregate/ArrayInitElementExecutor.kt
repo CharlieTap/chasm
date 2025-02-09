@@ -21,19 +21,11 @@ internal inline fun ArrayInitElementExecutor(
     val address = stack.popArrayAddress()
     val arrayInstance = store.array(address)
 
-    if (
-        (destinationOffsetInArray + elementsToCopy > arrayInstance.fields.size) ||
-        (sourceOffsetInElementSegment + elementsToCopy > elementInstance.elements.size)
-    ) {
+    try {
+        elementInstance.elements.copyInto(arrayInstance.fields, destinationOffsetInArray, sourceOffsetInElementSegment, sourceOffsetInElementSegment + elementsToCopy)
+    } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
-    }
-
-    repeat(elementsToCopy) { offset ->
-
-        val elementIndex = sourceOffsetInElementSegment + offset
-        val elementValue = elementInstance.elements[elementIndex]
-        val fieldIndex = destinationOffsetInArray + offset
-
-        arrayInstance.fields[fieldIndex] = elementValue
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.TableOperationOutOfBounds)
     }
 }
