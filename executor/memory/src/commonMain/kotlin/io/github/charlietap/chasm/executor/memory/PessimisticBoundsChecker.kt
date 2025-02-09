@@ -10,7 +10,7 @@ inline fun <T> PessimisticBoundsChecker(
     crossinline operation: () -> T,
 ): T {
     val lastByte = address + bytes
-    return if (address >= 0 && bytes >= 0 && lastByte > 0 && lastByte <= memoryUpperBound) {
+    return if (address >= 0 && lastByte >= address && lastByte <= memoryUpperBound) {
         operation()
     } else {
         throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
