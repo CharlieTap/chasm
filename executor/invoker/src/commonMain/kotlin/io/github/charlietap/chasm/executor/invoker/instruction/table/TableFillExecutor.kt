@@ -16,12 +16,11 @@ internal fun TableFillExecutor(
     val fillValue = stack.pop()
     val tableOffset = stack.popI32()
 
-    val fillUpperBound = tableOffset + elementsToFill
-    if (tableOffset < 0 || fillUpperBound > tableInstance.elements.size) {
+    try {
+        tableInstance.elements.fill(fillValue, tableOffset, tableOffset + elementsToFill)
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.TableOperationOutOfBounds)
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.TableOperationOutOfBounds)
     }
-
-    if (elementsToFill == 0) return
-
-    tableInstance.elements.fill(fillValue, tableOffset, fillUpperBound)
 }

@@ -25,6 +25,7 @@ internal inline fun ArrayInitDataExecutor(
     val fieldWidthInBytes = instruction.fieldWidthInBytes
 
     if (elementsToCopy == 0) {
+        // Spec requires us to check bounds even if initialising zero elements
         if (
             (arrayOffset + elementsToCopy > arrayInstance.fields.size) ||
             (byteArrayOffset + (elementsToCopy * fieldWidthInBytes) > dataInstance.bytes.size)
