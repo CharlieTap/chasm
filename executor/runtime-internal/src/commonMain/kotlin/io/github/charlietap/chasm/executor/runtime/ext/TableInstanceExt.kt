@@ -10,6 +10,4 @@ inline fun TableInstance.element(
     elements[elementIndex]
 } catch (_: IndexOutOfBoundsException) {
     throw InvocationException(InvocationError.TableElementLookupFailed(elementIndex))
-} catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.TableElementLookupFailed(elementIndex))
 }
