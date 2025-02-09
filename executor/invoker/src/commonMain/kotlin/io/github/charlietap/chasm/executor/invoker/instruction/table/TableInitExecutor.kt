@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.table
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.contains
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 
 internal fun TableInitExecutor(
@@ -17,22 +16,6 @@ internal fun TableInitExecutor(
     val elementsToInitialise = stack.popI32()
     val segmentOffset = stack.popI32()
     val tableOffset = stack.popI32()
-
-    if (elementsToInitialise == 0) {
-        // Spec requires us to check bounds even if initialising zero elements
-        val srcRange = segmentOffset..<(segmentOffset + elementsToInitialise)
-        val dstRange = tableOffset..<(tableOffset + elementsToInitialise)
-        if (
-            elementsToInitialise < 0 ||
-            segmentOffset < 0 ||
-            tableOffset < 0 ||
-            !elementInstance.elements.indices.contains(srcRange) ||
-            !tableInstance.elements.indices.contains(dstRange)
-        ) {
-            throw InvocationException(InvocationError.TableOperationOutOfBounds)
-        }
-        return
-    }
 
     try {
         elementInstance.elements.copyInto(tableInstance.elements, tableOffset, segmentOffset, segmentOffset + elementsToInitialise)
