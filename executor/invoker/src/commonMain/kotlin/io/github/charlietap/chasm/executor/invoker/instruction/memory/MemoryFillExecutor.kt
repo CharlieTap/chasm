@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
-import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
+import io.github.charlietap.chasm.executor.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.fill.LinearMemoryFiller
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
@@ -13,7 +13,7 @@ fun MemoryFillExecutor(
     MemoryFillExecutor(
         context = context,
         instruction = instruction,
-        boundsChecker = ::PessimisticBoundsChecker,
+        boundsChecker = ::OptimisticBoundsChecker,
         filler = ::LinearMemoryFiller,
     )
 
