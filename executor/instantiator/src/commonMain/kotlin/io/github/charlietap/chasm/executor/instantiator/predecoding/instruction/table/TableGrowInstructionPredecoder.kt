@@ -32,6 +32,8 @@ internal inline fun TableGrowInstructionPredecoder(
     val address = context.instance?.tableAddress(instruction.tableIdx)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
     val table = context.store.table(address)
+    val max = table.type.limits.max
+        ?.toInt() ?: Int.MAX_VALUE
 
-    dispatcher(TableGrow(table))
+    dispatcher(TableGrow(table, max))
 }

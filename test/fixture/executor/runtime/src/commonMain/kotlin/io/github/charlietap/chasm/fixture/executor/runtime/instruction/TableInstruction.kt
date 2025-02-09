@@ -44,8 +44,10 @@ fun tableCopyRuntimeInstruction(
 
 fun tableGrowRuntimeInstruction(
     table: TableInstance = tableInstance(),
+    max: Int = 0,
 ) = TableInstruction.TableGrow(
     table = table,
+    max = max,
 )
 
 fun tableSizeRuntimeInstruction(

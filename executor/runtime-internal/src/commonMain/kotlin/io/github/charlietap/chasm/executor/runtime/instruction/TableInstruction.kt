@@ -18,8 +18,10 @@ sealed interface TableInstruction : ExecutionInstruction {
 
     data class TableCopy(val srcTable: TableInstance, val destTable: TableInstance) : TableInstruction
 
-    @JvmInline
-    value class TableGrow(val table: TableInstance) : TableInstruction
+    data class TableGrow(
+        val table: TableInstance,
+        val max: Int,
+    ) : TableInstruction
 
     @JvmInline
     value class TableSize(val table: TableInstance) : TableInstruction
