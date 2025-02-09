@@ -18,20 +18,27 @@ internal fun TableInitExecutor(
     val segmentOffset = stack.popI32()
     val tableOffset = stack.popI32()
 
-    val srcRange = segmentOffset..<(segmentOffset + elementsToInitialise)
-    val dstRange = tableOffset..<(tableOffset + elementsToInitialise)
-
-    if (
-        elementsToInitialise < 0 ||
-        segmentOffset < 0 ||
-        tableOffset < 0 ||
-        !elementInstance.elements.indices.contains(srcRange) ||
-        !tableInstance.elements.indices.contains(dstRange)
-    ) {
-        throw InvocationException(InvocationError.Trap.TrapEncountered)
+    if (elementsToInitialise == 0) {
+        // Spec requires us to check bounds even if initialising zero elements
+        val srcRange = segmentOffset..<(segmentOffset + elementsToInitialise)
+        val dstRange = tableOffset..<(tableOffset + elementsToInitialise)
+        if (
+            elementsToInitialise < 0 ||
+            segmentOffset < 0 ||
+            tableOffset < 0 ||
+            !elementInstance.elements.indices.contains(srcRange) ||
+            !tableInstance.elements.indices.contains(dstRange)
+        ) {
+            throw InvocationException(InvocationError.TableOperationOutOfBounds)
+        }
+        return
     }
 
-    if (elementsToInitialise == 0) return
-
-    elementInstance.elements.copyInto(tableInstance.elements, dstRange.first, srcRange.first, srcRange.last + 1)
+    try {
+        elementInstance.elements.copyInto(tableInstance.elements, tableOffset, segmentOffset, segmentOffset + elementsToInitialise)
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.TableOperationOutOfBounds)
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.TableOperationOutOfBounds)
+    }
 }
