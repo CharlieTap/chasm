@@ -1,39 +1,29 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.execution.Executor
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-
-internal fun ArrayNewExecutor(
-    context: ExecutionContext,
-    instruction: AggregateInstruction.ArrayNew,
-) =
-    ArrayNewExecutor(
-        context = context,
-        instruction = instruction,
-        arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
-    )
+import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal inline fun ArrayNewExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNew,
-    crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
     val stack = context.vstack
+    val store = context.store
 
     val size = stack.popI32()
-    val value = stack.peek()
+    val value = stack.pop()
 
-    repeat(size - 1) {
-        stack.push(value)
+    val fields = LongArray(size) {
+        value
     }
 
-    arrayNewFixedExecutor(
-        context,
-        AggregateInstruction.ArrayNewFixed(
-            definedType = instruction.definedType,
-            arrayType = instruction.arrayType,
-            size = size.toUInt(),
-        ),
-    )
+    val instance = ArrayInstance(instruction.definedType, instruction.arrayType, fields)
+    store.arrays.add(instance)
+    val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
+
+    stack.push(reference.toLong())
 }
