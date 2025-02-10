@@ -172,6 +172,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object IntegerOverflow : InvocationError
 
+    data object FailedToCastReference : InvocationError
+
     data object CallStackExhausted : InvocationError
 
     @JvmInline
@@ -190,8 +192,4 @@ sealed interface InvocationError : ModuleTrapError {
     value class HostFunctionError(val error: String) : InvocationError
 
     data object ProgramFinishedInconsistentState : InvocationError
-
-    sealed interface Trap : InvocationError {
-        data object TrapEncountered : Trap
-    }
 }

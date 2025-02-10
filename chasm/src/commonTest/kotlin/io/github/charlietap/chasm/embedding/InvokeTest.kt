@@ -76,7 +76,7 @@ class InvokeTest {
             ),
         )
 
-        val error = InvocationError.Trap.TrapEncountered
+        val error = InvocationError.FunctionNotFound("function")
         val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
             assertEquals(config, _config)
             assertEquals(store.store, _store)

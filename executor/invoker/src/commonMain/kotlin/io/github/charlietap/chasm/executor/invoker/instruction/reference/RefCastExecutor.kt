@@ -38,6 +38,6 @@ internal inline fun RefCastExecutor(
     if (referenceTypeMatcher(referenceType, instruction.referenceType, context)) {
         stack.push(referenceValue)
     } else {
-        throw InvocationException(InvocationError.Trap.TrapEncountered)
+        throw InvocationException(InvocationError.FailedToCastReference)
     }
 }
