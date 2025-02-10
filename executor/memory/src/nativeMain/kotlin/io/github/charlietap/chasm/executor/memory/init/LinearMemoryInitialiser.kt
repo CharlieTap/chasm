@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.memory.init
 
 import io.github.charlietap.chasm.executor.memory.NativeLinearMemory
+import io.github.charlietap.chasm.executor.runtime.error.InvocationError
+import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import kotlinx.cinterop.CValuesRef
 import kotlinx.cinterop.addressOf
@@ -15,7 +17,21 @@ actual inline fun LinearMemoryInitialiser(
     srcOffset: Int,
     dstOffset: Int,
     bytesToInit: Int,
+    srcUpperBound: Int,
+    dstUpperBound: Int,
 ) {
+    if (
+        bytesToInit < 0 ||
+        srcOffset < 0 ||
+        dstOffset < 0 ||
+        (srcOffset + bytesToInit) > srcUpperBound ||
+        (dstOffset + bytesToInit) > dstUpperBound
+    ) {
+        throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
+    }
+
+    if (bytesToInit == 0) return
+
     val nativeMemory = dst as NativeLinearMemory
     src.usePinned { pinned ->
         val cValuesRef: CValuesRef<uint8_tVar>? = pinned.addressOf(srcOffset).reinterpret()
