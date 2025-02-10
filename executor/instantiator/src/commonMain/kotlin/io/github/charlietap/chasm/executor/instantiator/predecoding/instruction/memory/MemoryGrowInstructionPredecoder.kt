@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.MemoryGrow
+import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 
 internal fun MemoryGrowInstructionPredecoder(
     context: InstantiationContext,
@@ -32,6 +33,8 @@ internal inline fun MemoryGrowInstructionPredecoder(
     val memoryAddress = context.instance?.memoryAddress(instruction.memoryIndex)?.bind()
         ?: Err(InstantiationError.PredecodingError).bind()
     val memory = context.store.memory(memoryAddress)
+    val max = memory.type.limits.max
+        ?.toInt() ?: LinearMemory.MAX_PAGES
 
-    dispatcher(MemoryGrow(memory))
+    dispatcher(MemoryGrow(memory, max))
 }

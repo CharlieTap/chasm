@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memory
 import io.github.charlietap.chasm.executor.memory.grow.LinearMemoryGrower
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 
 fun MemoryGrowExecutor(
     context: ExecutionContext,
@@ -20,26 +19,21 @@ internal inline fun MemoryGrowExecutor(
     instruction: MemoryInstruction.MemoryGrow,
     crossinline grower: LinearMemoryGrower,
 ) {
-
     val stack = context.vstack
     val memory = instruction.memory
+    val originalSizeInPages = memory.type.limits.min.toInt()
 
-    val currentSizeInPages = memory.type.limits.min
-        .toInt()
     val pagesToAdd = stack.popI32()
+    val newSizeInPages = originalSizeInPages + pagesToAdd
 
-    val max = memory.type.limits.max
-        ?.toInt() ?: LinearMemory.MAX_PAGES
-    if (memory.type.limits.min
-            .toInt() + pagesToAdd > max
-    ) {
+    if (newSizeInPages > instruction.max) {
         stack.push(-1L)
     } else {
 
-        memory.type.limits.min = memory.type.limits.min + pagesToAdd.toUInt()
+        memory.type.limits.min = newSizeInPages.toUInt()
         memory.data = grower(memory.data, pagesToAdd)
         memory.refresh()
 
-        stack.pushI32(currentSizeInPages)
+        stack.pushI32(originalSizeInPages)
     }
 }

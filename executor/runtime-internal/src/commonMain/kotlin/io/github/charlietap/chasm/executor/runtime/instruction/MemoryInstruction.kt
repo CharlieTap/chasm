@@ -55,8 +55,10 @@ sealed interface MemoryInstruction : ExecutionInstruction {
     @JvmInline
     value class MemorySize(val memory: MemoryInstance) : MemoryInstruction
 
-    @JvmInline
-    value class MemoryGrow(val memory: MemoryInstance) : MemoryInstruction
+    data class MemoryGrow(
+        val memory: MemoryInstance,
+        val max: Int,
+    ) : MemoryInstruction
 
     data class MemoryInit(
         val memory: MemoryInstance,

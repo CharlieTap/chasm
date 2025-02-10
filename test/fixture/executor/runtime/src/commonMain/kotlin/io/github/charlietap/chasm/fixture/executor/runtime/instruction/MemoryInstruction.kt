@@ -199,7 +199,8 @@ fun memorySizeRuntimeInstruction(
 
 fun memoryGrowRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
-) = MemoryInstruction.MemoryGrow(memory)
+    max: Int = 0,
+) = MemoryInstruction.MemoryGrow(memory, max)
 
 fun memoryInitRuntimeInstruction(
     memory: MemoryInstance = memoryInstance(),
