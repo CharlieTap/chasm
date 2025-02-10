@@ -1,33 +1,22 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.execution.Executor
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-
-internal fun StructNewDefaultExecutor(
-    context: ExecutionContext,
-    instruction: AggregateInstruction.StructNewDefault,
-) =
-    StructNewDefaultExecutor(
-        context = context,
-        instruction = instruction,
-        structNewExecutor = ::StructNewExecutor,
-    )
+import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal inline fun StructNewDefaultExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.StructNewDefault,
-    crossinline structNewExecutor: Executor<AggregateInstruction.StructNew>,
 ) {
     val stack = context.vstack
+    val store = context.store
 
-    stack.push(instruction.fields)
+    val instance = StructInstance(instruction.definedType, instruction.structType, instruction.fields)
+    store.structs.add(instance)
+    val reference = ReferenceValue.Struct(Address.Struct(store.structs.size - 1))
 
-    structNewExecutor(
-        context,
-        AggregateInstruction.StructNew(
-            definedType = instruction.definedType,
-            structType = instruction.structType,
-        ),
-    )
+    stack.push(reference.toLong())
 }
