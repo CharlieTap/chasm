@@ -3,24 +3,18 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.execution.Executor
+import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
-
-internal fun ArrayNewElementExecutor(
-    context: ExecutionContext,
-    instruction: AggregateInstruction.ArrayNewElement,
-) = ArrayNewElementExecutor(
-    context = context,
-    instruction = instruction,
-    arrayNewFixedExecutor = ::ArrayNewFixedExecutor,
-)
+import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 
 internal inline fun ArrayNewElementExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElement,
-    crossinline arrayNewFixedExecutor: Executor<AggregateInstruction.ArrayNewFixed>,
 ) {
     val stack = context.vstack
+    val store = context.store
 
     val elementInstance = instruction.elementInstance
     val elements = elementInstance.elements
@@ -33,16 +27,12 @@ internal inline fun ArrayNewElementExecutor(
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 
-    repeat(arrayLength) { offset ->
-        stack.push(elements[arrayStartOffsetInSegment + offset])
-    }
+    val fields = LongArray(arrayLength)
+    elements.copyInto(fields, 0, arrayStartOffsetInSegment, arrayEndOffsetInSegment)
 
-    arrayNewFixedExecutor(
-        context,
-        AggregateInstruction.ArrayNewFixed(
-            definedType = instruction.definedType,
-            arrayType = instruction.arrayType,
-            size = arrayLength.toUInt(),
-        ),
-    )
+    val instance = ArrayInstance(instruction.definedType, instruction.arrayType, fields)
+    store.arrays.add(instance)
+    val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
+
+    stack.push(reference.toLong())
 }
