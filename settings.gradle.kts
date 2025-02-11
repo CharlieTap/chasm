@@ -49,10 +49,12 @@ include(":executor:runtime-internal")
 include(":executor:runtime-external")
 
 include(":host")
+include(":ir")
 
 include(":libs:sse2")
 include(":libs:stack")
 
+include(":optimiser")
 include(":stream")
 
 include(":test:fake:decoder")
@@ -61,6 +63,7 @@ include(":test:fixture:ast")
 include(":test:fixture:config")
 include(":test:fixture:executor:instantiator")
 include(":test:fixture:executor:runtime")
+include(":test:fixture:ir")
 
 include(":type-system")
 include(":validator")
