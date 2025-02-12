@@ -1,7 +1,8 @@
 package io.github.charlietap.chasm.optimiser
 
 import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.optimiser.passes.InstructionFuser
+import io.github.charlietap.chasm.optimiser.passes.FusionPass
+import io.github.charlietap.chasm.optimiser.passes.Pass
 
 typealias Optimiser = (List<Instruction>) -> List<Instruction>
 
@@ -10,12 +11,12 @@ fun Optimiser(
 ): List<Instruction> =
     Optimiser(
         instructions = instructions,
-        fuser = ::InstructionFuser,
+        fuser = ::FusionPass,
     )
 
 internal fun Optimiser(
     instructions: List<Instruction>,
-    fuser: InstructionFuser,
+    fuser: Pass,
 ): List<Instruction> {
     return fuser(instructions)
 }
