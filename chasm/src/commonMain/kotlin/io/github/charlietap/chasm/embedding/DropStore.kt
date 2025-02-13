@@ -54,6 +54,10 @@ internal fun dropStore(
     }
     store.tables.clear()
 
+    store.arrays.clear()
+
+    store.structs.clear()
+
     store.tags.clear()
 
     return Success(Unit)
