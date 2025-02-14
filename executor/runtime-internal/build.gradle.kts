@@ -15,6 +15,7 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.executor.runtimeExternal)
+                api(projects.ir)
                 api(projects.libs.stack)
                 api(projects.typeSystem)
                 api(libs.result)

@@ -18,6 +18,7 @@ kotlin {
                 api(projects.executor.invoker)
                 api(libs.result)
 
+                implementation(projects.ir)
                 implementation(projects.typeSystem)
                 implementation(projects.executor.memory)
             }

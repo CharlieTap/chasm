@@ -1,0 +1,17 @@
+package io.github.charlietap.chasm.executor.invoker.instruction.numeric_fused.unop
+
+import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction
+import kotlin.math.absoluteValue
+
+internal inline fun F32AbsExecutor(
+    context: ExecutionContext,
+    instruction: FusedNumericInstruction.F32Abs,
+) {
+    val stack = context.vstack
+
+    val float = Float.fromBits(instruction.operand(stack).toInt())
+    val result = float.absoluteValue.toRawBits().toLong()
+
+    instruction.destination(result, stack)
+}

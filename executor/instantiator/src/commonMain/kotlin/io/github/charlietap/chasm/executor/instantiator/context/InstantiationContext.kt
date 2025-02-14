@@ -8,7 +8,11 @@ import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.executor.runtime.instruction.LoadOp
+import io.github.charlietap.chasm.executor.runtime.instruction.StoreOp
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.ir.instruction.FusedDestination
+import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.type.factory.DefinedTypeUnrollerFactory
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
@@ -25,6 +29,8 @@ data class InstantiationContext(
     val instructionCache: HashMap<Instruction, DispatchableInstruction> = hashMapOf(),
     val types: MutableList<DefinedType> = mutableListOf(),
     val unrollCache: HashMap<DefinedType, SubType> = hashMapOf(),
+    val loadCache: HashMap<FusedOperand, LoadOp> = hashMapOf(),
+    val storeCache: HashMap<FusedDestination, StoreOp> = hashMapOf(),
 ) : TypeMatcherContext {
 
     override val lookup: DefinedTypeLookup = { index ->
