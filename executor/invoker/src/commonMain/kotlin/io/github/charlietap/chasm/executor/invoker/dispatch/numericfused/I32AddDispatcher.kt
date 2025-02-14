@@ -1,6 +1,6 @@
-package io.github.charlietap.chasm.executor.invoker.dispatch.numeric_fused
+package io.github.charlietap.chasm.executor.invoker.dispatch.numericfused
 
-import io.github.charlietap.chasm.executor.invoker.instruction.numeric_fused.binop.I32AddExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.I32AddExecutor
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.execution.Executor
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction

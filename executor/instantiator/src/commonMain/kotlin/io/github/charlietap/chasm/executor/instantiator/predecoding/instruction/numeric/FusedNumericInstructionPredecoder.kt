@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.executor.instantiator.context.InstantiationCon
 import io.github.charlietap.chasm.executor.instantiator.predecoding.LoadFactory
 import io.github.charlietap.chasm.executor.instantiator.predecoding.StoreFactory
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numeric_fused.F32AbsDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numeric_fused.I32AddDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numeric_fused.I32SubDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32AbsDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32AddDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32SubDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F32Abs

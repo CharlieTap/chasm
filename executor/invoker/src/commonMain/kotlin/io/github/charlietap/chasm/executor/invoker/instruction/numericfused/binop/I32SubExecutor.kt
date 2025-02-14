@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.numeric_fused.binop
+package io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop
 
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction
