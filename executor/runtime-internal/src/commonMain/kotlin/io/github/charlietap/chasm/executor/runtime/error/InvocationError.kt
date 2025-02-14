@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.error
 
 import io.github.charlietap.chasm.ast.type.ValueType
-import io.github.charlietap.chasm.executor.runtime.instruction.ExecutionInstruction
+import io.github.charlietap.chasm.executor.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import kotlin.jvm.JvmInline
@@ -177,7 +177,7 @@ sealed interface InvocationError : ModuleTrapError {
     data object CallStackExhausted : InvocationError
 
     @JvmInline
-    value class UnimplementedInstruction(val instruction: ExecutionInstruction) : InvocationError
+    value class UnimplementedInstruction(val instruction: LinkedInstruction) : InvocationError
 
     data object Unreachable : InvocationError
 

@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import kotlin.jvm.JvmInline
 
-sealed interface TableInstruction : ExecutionInstruction {
+sealed interface TableInstruction : LinkedInstruction {
     @JvmInline
     value class TableGet(val table: TableInstance) : TableInstruction
 

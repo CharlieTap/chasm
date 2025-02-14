@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import kotlin.jvm.JvmInline
 
-sealed interface AggregateInstruction : ExecutionInstruction {
+sealed interface AggregateInstruction : LinkedInstruction {
 
     data class StructNew(
         val definedType: DefinedType,

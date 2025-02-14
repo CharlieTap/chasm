@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 import io.github.charlietap.chasm.ast.type.ReferenceType
 import kotlin.jvm.JvmInline
 
-sealed interface ReferenceInstruction : ExecutionInstruction {
+sealed interface ReferenceInstruction : LinkedInstruction {
     @JvmInline
     value class RefNull(val reference: Long) : ReferenceInstruction
 

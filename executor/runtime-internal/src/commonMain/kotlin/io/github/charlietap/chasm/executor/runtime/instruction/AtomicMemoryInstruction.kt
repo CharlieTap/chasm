@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
 
-sealed interface AtomicMemoryInstruction : ExecutionInstruction {
+sealed interface AtomicMemoryInstruction : LinkedInstruction {
 
     sealed interface Load : AtomicMemoryInstruction {
 

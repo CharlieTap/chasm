@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 
 import kotlin.jvm.JvmInline
 
-sealed interface NumericInstruction : ExecutionInstruction {
+sealed interface NumericInstruction : LinkedInstruction {
 
     @JvmInline
     value class I32Const(val value: Int) : NumericInstruction

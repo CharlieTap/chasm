@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import kotlin.jvm.JvmInline
 
-sealed interface AdminInstruction : ExecutionInstruction {
+sealed interface AdminInstruction : LinkedInstruction {
 
     @JvmInline
     value class Frame(val frame: ActivationFrame) : AdminInstruction

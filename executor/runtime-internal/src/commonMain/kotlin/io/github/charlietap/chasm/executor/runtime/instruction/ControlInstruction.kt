@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import kotlin.jvm.JvmInline
 
-sealed interface ControlInstruction : ExecutionInstruction {
+sealed interface ControlInstruction : LinkedInstruction {
 
     data object Unreachable : ControlInstruction
 

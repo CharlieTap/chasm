@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
 import kotlin.jvm.JvmInline
 
-sealed interface VariableInstruction : ExecutionInstruction {
+sealed interface VariableInstruction : LinkedInstruction {
     @JvmInline
     value class LocalGet(val localIdx: Int) : VariableInstruction
 

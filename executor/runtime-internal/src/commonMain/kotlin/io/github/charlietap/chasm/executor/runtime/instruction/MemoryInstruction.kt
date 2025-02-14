@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import kotlin.jvm.JvmInline
 
-sealed interface MemoryInstruction : ExecutionInstruction {
+sealed interface MemoryInstruction : LinkedInstruction {
 
     data class I32Load(val memory: MemoryInstance, val memArg: MemArg) : MemoryInstruction
 

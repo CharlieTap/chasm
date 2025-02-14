@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 import io.github.charlietap.chasm.ast.instruction.MemArg
 import kotlin.jvm.JvmInline
 
-sealed interface VectorInstruction : ExecutionInstruction {
+sealed interface VectorInstruction : LinkedInstruction {
     @JvmInline
     value class V128Load(val memArg: MemArg) : VectorInstruction
 
