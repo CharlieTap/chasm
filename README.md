@@ -110,6 +110,87 @@ val hostFunction = HostFunction { params ->
 val result = function(store, funcType, hostFunction)
 ```
 
+### Working with Strings
+
+The WebAssembly type system does not currently support Strings, when you compile functions that give or take strings to WebAssembly
+compilers will replace them with pointers. Using these pointers alongside an exported memory will give you the ability to work with
+Strings and create high level wrappers for your exported wasm functions.
+
+#### Get access to the memory
+
+For most scenarios you can just look for an exported memory in the exports of an instance:
+
+```kotlin
+instance.exports.firstNotNullOf { it.value as? Memory }
+```
+
+If you're compiling to wasm-wasi, the wasi standard specifies the export will also have the name "memory"
+
+```kotlin
+instance.exports.first { it.name == "memory" && it.value is Memory }.value
+```
+Chasm supports the multiple memories proposal so it's possible that there exists more than one memory if the compiler supports it.
+In this case you'll need to follow the guidance of the compiler.
+
+#### Transforming pointers to strings
+
+Say you have a function like the following which you compile to WebAssembly:
+
+```kotlin
+fun concat(input: String): String
+```
+
+The compiler will either output:
+
+2 Integers
+
+```wat
+(func $concat (param i32 i32) (result i32 i32)
+```
+
+This is by far the most common transformation, where the string is replaced with two ints, the first its pointer in memory and the
+second is its length in bytes.
+
+Or
+
+1 Integer
+
+```wat
+(func $concat (param i32) (result i32)
+```
+
+In this case each integer is a pointer, but instead the length is encoded in the bytes where it resides. Either by prefixing the string
+with its length in bytes or by terminating the string with a null byte, please follow the guidance of the source compiler for learning
+the encoding strategy.
+
+Once you know the encoding you can use one of chasm's many functions for working with memories to read or write the string.
+
+```kotlin
+readByte(store, memory, int)
+readBytes(store, memory, buffer, srcPointer, bytesToRead, dstPointer)
+readUtf8String(store, memory, pointer, stringLengthInBytes)
+readNullTerminatedUtf8String(store, memory, pointer)
+writeUtf8String(store, memory, pointer, string)
+```
+
+#### Calling functions which take Strings
+
+ You will need to write the string to memory before invoking the function:
+
+```kotlin
+writeUtf8String(store, memory, pointer, string)
+invoke(store, instance, "concat", listOf(pointer, stringLengthInBytes))
+```
+
+#### Calling functions which return Strings
+
+```kotlin
+val results = invoke(store, instance, "concat", args).expect("")
+val pointer = (results[0] as NumberValue.I32).value
+val stringLengthInBytes = (results[1] as NumberValue.I32).value
+val string = readUtf8String(store, memory, pointer, stringLengthInBytes)
+```
+
 ## License
 
 This project is dual-licensed under both the MIT and Apache 2.0 licenses. You can choose which one you want to use the software under.
