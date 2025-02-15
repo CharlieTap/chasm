@@ -50,6 +50,7 @@ include(":executor:runtime-external")
 
 include(":host")
 include(":ir")
+include(":ir-factory")
 
 include(":libs:sse2")
 include(":libs:stack")

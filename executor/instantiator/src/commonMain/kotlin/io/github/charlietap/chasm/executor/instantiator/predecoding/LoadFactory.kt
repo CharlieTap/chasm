@@ -32,7 +32,7 @@ internal inline fun LoadFactory(
                 { global.value }
             }
             is FusedOperand.LocalGet -> {
-                { stack -> stack.getLocal(operand.index.idx.toInt()) }
+                { stack -> stack.getLocal(operand.index.idx) }
             }
         }
     }

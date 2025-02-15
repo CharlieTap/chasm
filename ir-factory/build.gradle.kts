@@ -7,7 +7,6 @@ plugins {
 }
 
 kotlin {
-
     sourceSets {
        commonMain {
             dependencies {
@@ -24,6 +23,6 @@ kotlin {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "ir"
-    description = "intermediate representation of chasms internal bytecode"
+    name = "ir-factory"
+    description = "factory functions for creating ir from ast encodings"
 }

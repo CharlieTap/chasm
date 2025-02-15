@@ -20,7 +20,7 @@ internal inline fun StoreFactory(
                 { value, _ -> global.value = value }
             }
             is FusedDestination.LocalSet -> {
-                { value, stack -> stack.setLocal(destination.index.idx.toInt(), value) }
+                { value, stack -> stack.setLocal(destination.index.idx, value) }
             }
             FusedDestination.ValueStack -> {
                 { value, stack -> stack.push(value) }
