@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.fixture.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.fixture.ast.module.dataIndex
-import io.github.charlietap.chasm.fixture.ast.module.elementIndex
-import io.github.charlietap.chasm.fixture.ast.module.fieldIndex
-import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.fixture.ir.module.dataIndex
+import io.github.charlietap.chasm.fixture.ir.module.elementIndex
+import io.github.charlietap.chasm.fixture.ir.module.fieldIndex
+import io.github.charlietap.chasm.fixture.ir.module.typeIndex
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
+import io.github.charlietap.chasm.ir.module.Index
 
 fun aggregateInstruction(): AggregateInstruction = structNewInstruction()
 

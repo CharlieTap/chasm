@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.fixture.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.fixture.ast.module.globalIndex
-import io.github.charlietap.chasm.fixture.ast.module.localIndex
+import io.github.charlietap.chasm.fixture.ir.module.globalIndex
+import io.github.charlietap.chasm.fixture.ir.module.localIndex
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
+import io.github.charlietap.chasm.ir.module.Index
 
 fun fusedOperand(): FusedOperand = i32ConstOperand()
 

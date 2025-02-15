@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.fixture.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index.ElementIndex
-import io.github.charlietap.chasm.ast.module.Index.TableIndex
-import io.github.charlietap.chasm.fixture.ast.module.elementIndex
-import io.github.charlietap.chasm.fixture.ast.module.tableIndex
+import io.github.charlietap.chasm.fixture.ir.module.elementIndex
+import io.github.charlietap.chasm.fixture.ir.module.tableIndex
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
+import io.github.charlietap.chasm.ir.module.Index.ElementIndex
+import io.github.charlietap.chasm.ir.module.Index.TableIndex
 
 fun tableInstruction(): TableInstruction = tableGetInstruction()
 

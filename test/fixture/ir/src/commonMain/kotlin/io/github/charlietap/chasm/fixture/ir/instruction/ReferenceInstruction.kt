@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.fixture.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.fixture.ast.module.functionIndex
-import io.github.charlietap.chasm.fixture.ast.type.heapType
-import io.github.charlietap.chasm.fixture.ast.type.referenceType
+import io.github.charlietap.chasm.fixture.ir.module.functionIndex
+import io.github.charlietap.chasm.fixture.ir.type.heapType
+import io.github.charlietap.chasm.fixture.ir.type.referenceType
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ir.type.HeapType
+import io.github.charlietap.chasm.ir.type.ReferenceType
 
 fun referenceInstruction() = refEqInstruction()
 

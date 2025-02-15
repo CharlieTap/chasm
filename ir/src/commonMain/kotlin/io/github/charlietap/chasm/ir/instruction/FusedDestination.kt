@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ir.module.Index
 import kotlin.jvm.JvmInline
 
 sealed interface FusedDestination {

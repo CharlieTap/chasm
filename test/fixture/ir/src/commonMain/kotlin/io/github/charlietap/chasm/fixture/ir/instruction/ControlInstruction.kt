@@ -1,17 +1,17 @@
 package io.github.charlietap.chasm.fixture.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
-import io.github.charlietap.chasm.fixture.ast.module.functionIndex
-import io.github.charlietap.chasm.fixture.ast.module.labelIndex
-import io.github.charlietap.chasm.fixture.ast.module.tableIndex
-import io.github.charlietap.chasm.fixture.ast.module.tagIndex
-import io.github.charlietap.chasm.fixture.ast.module.typeIndex
-import io.github.charlietap.chasm.fixture.ast.type.referenceType
-import io.github.charlietap.chasm.fixture.ast.type.valueType
+import io.github.charlietap.chasm.fixture.ir.module.functionIndex
+import io.github.charlietap.chasm.fixture.ir.module.labelIndex
+import io.github.charlietap.chasm.fixture.ir.module.tableIndex
+import io.github.charlietap.chasm.fixture.ir.module.tagIndex
+import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.ir.type.referenceType
+import io.github.charlietap.chasm.fixture.ir.type.valueType
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
+import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.ir.type.ValueType
 
 fun controlInstruction(): ControlInstruction = unreachableInstruction()
 

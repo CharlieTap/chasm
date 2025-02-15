@@ -18,7 +18,7 @@ kotlin {
 
        commonMain {
             dependencies {
-                api(projects.ast)
+
             }
         }
 

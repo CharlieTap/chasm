@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index.GlobalIndex
-import io.github.charlietap.chasm.ast.module.Index.LocalIndex
+import io.github.charlietap.chasm.ir.module.Index.GlobalIndex
+import io.github.charlietap.chasm.ir.module.Index.LocalIndex
 import kotlin.jvm.JvmInline
 
 sealed interface VariableInstruction : Instruction {

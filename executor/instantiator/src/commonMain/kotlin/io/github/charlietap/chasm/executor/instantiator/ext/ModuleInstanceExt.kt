@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.ir.module.Index.GlobalIndex as IRGlobalIndex
 
 inline fun ModuleInstance.definedType(index: Index.TypeIndex): Result<DefinedType, InvocationError.FunctionTypeLookupFailed> =
     types.getOrNull(index.idx.toInt())?.let(::Ok) ?: Err(InvocationError.FunctionTypeLookupFailed(index.idx.toInt()))
@@ -27,6 +28,9 @@ inline fun ModuleInstance.tagAddress(index: Index.TagIndex): Result<Address.Tag,
 
 inline fun ModuleInstance.globalAddress(index: Index.GlobalIndex): Result<Address.Global, InvocationError.GlobalAddressLookupFailed> =
     globalAddresses.getOrNull(index.idx.toInt())?.let(::Ok) ?: Err(InvocationError.GlobalAddressLookupFailed(index.idx.toInt()))
+
+inline fun ModuleInstance.globalAddress(index: IRGlobalIndex): Result<Address.Global, InvocationError.GlobalAddressLookupFailed> =
+    globalAddresses.getOrNull(index.idx)?.let(::Ok) ?: Err(InvocationError.GlobalAddressLookupFailed(index.idx))
 
 inline fun ModuleInstance.elementAddress(index: Index.ElementIndex): Result<Address.Element, InvocationError.ElementAddressLookupFailed> =
     elemAddresses.getOrNull(index.idx.toInt())?.let(::Ok) ?: Err(InvocationError.ElementAddressLookupFailed(index.idx.toInt()))

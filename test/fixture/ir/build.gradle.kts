@@ -10,7 +10,6 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ir)
-                api(projects.test.fixture.ast)
             }
         }
     }

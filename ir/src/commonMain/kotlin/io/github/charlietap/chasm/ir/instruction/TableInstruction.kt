@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index.ElementIndex
-import io.github.charlietap.chasm.ast.module.Index.TableIndex
+import io.github.charlietap.chasm.ir.module.Index.ElementIndex
+import io.github.charlietap.chasm.ir.module.Index.TableIndex
 import kotlin.jvm.JvmInline
 
 sealed interface TableInstruction : Instruction {

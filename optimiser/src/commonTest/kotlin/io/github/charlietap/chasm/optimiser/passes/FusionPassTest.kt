@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.optimiser.passes
 
-import io.github.charlietap.chasm.fixture.ast.module.localIndex
 import io.github.charlietap.chasm.fixture.ir.instruction.f32AbsInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedF32Abs
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
@@ -10,6 +9,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.localGetOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.valueStackDestination
+import io.github.charlietap.chasm.fixture.ir.module.localIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,14 +19,14 @@ class FusionPassTest {
     fun `can fuse an instructions operands despite no explicit destination`() {
 
         val instructions = listOf(
-            localGetInstruction(localIndex(0u)),
-            localGetInstruction(localIndex(1u)),
+            localGetInstruction(localIndex(0)),
+            localGetInstruction(localIndex(1)),
             i32AddInstruction(),
         )
 
         val expected = fusedI32Add(
-            left = localGetOperand(localIndex(0u)),
-            right = localGetOperand(localIndex(1u)),
+            left = localGetOperand(localIndex(0)),
+            right = localGetOperand(localIndex(1)),
             destination = valueStackDestination(),
         )
         val actual = FusionPass(instructions)
@@ -39,14 +39,14 @@ class FusionPassTest {
     fun `can fuse a unary operand instruction with an explicit destination`() {
 
         val instructions = listOf(
-            localGetInstruction(localIndex(0u)),
+            localGetInstruction(localIndex(0)),
             f32AbsInstruction(),
-            localSetInstruction(localIndex(2u)),
+            localSetInstruction(localIndex(2)),
         )
 
         val expected = fusedF32Abs(
-            operand = localGetOperand(localIndex(0u)),
-            destination = localSetDestination(localIndex(2u)),
+            operand = localGetOperand(localIndex(0)),
+            destination = localSetDestination(localIndex(2)),
         )
         val actual = FusionPass(instructions)
 
@@ -58,16 +58,16 @@ class FusionPassTest {
     fun `can fuse a binary operand instruction with an explicit destination`() {
 
         val instructions = listOf(
-            localGetInstruction(localIndex(0u)),
-            localGetInstruction(localIndex(1u)),
+            localGetInstruction(localIndex(0)),
+            localGetInstruction(localIndex(1)),
             i32AddInstruction(),
-            localSetInstruction(localIndex(2u)),
+            localSetInstruction(localIndex(2)),
         )
 
         val expected = fusedI32Add(
-            left = localGetOperand(localIndex(0u)),
-            right = localGetOperand(localIndex(1u)),
-            destination = localSetDestination(localIndex(2u)),
+            left = localGetOperand(localIndex(0)),
+            right = localGetOperand(localIndex(1)),
+            destination = localSetDestination(localIndex(2)),
         )
         val actual = FusionPass(instructions)
 

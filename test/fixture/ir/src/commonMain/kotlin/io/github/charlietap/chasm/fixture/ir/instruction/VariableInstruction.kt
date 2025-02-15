@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.fixture.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index.GlobalIndex
-import io.github.charlietap.chasm.ast.module.Index.LocalIndex
-import io.github.charlietap.chasm.fixture.ast.module.globalIndex
-import io.github.charlietap.chasm.fixture.ast.module.localIndex
+import io.github.charlietap.chasm.fixture.ir.module.globalIndex
+import io.github.charlietap.chasm.fixture.ir.module.localIndex
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
+import io.github.charlietap.chasm.ir.module.Index.GlobalIndex
+import io.github.charlietap.chasm.ir.module.Index.LocalIndex
 
 fun variableInstruction(): VariableInstruction = localGetInstruction()
 

@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.fixture.ir.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
+import io.github.charlietap.chasm.fixture.ir.module.memoryIndex
 import io.github.charlietap.chasm.ir.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.MemArg
+import io.github.charlietap.chasm.ir.module.Index
 
 fun atomicMemoryInstruction(): AtomicMemoryInstruction = atomicFenceInstruction()
 
