@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.optimiser.passes
 
+import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.f32AbsInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedF32Abs
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
@@ -9,7 +10,9 @@ import io.github.charlietap.chasm.fixture.ir.instruction.localGetOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.valueStackDestination
+import io.github.charlietap.chasm.fixture.ir.module.function
 import io.github.charlietap.chasm.fixture.ir.module.localIndex
+import io.github.charlietap.chasm.fixture.ir.module.module
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -23,13 +26,22 @@ class FusionPassTest {
             localGetInstruction(localIndex(1)),
             i32AddInstruction(),
         )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
 
         val expected = fusedI32Add(
             left = localGetOperand(localIndex(0)),
             right = localGetOperand(localIndex(1)),
             destination = valueStackDestination(),
         )
-        val actual = FusionPass(instructions)
+        val actual = FusionPass(module).functions[0].body.instructions
 
         assertEquals(1, actual.size)
         assertEquals(expected, actual.first())
@@ -43,12 +55,21 @@ class FusionPassTest {
             f32AbsInstruction(),
             localSetInstruction(localIndex(2)),
         )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
 
         val expected = fusedF32Abs(
             operand = localGetOperand(localIndex(0)),
             destination = localSetDestination(localIndex(2)),
         )
-        val actual = FusionPass(instructions)
+        val actual = FusionPass(module).functions[0].body.instructions
 
         assertEquals(1, actual.size)
         assertEquals(expected, actual.first())
@@ -63,13 +84,22 @@ class FusionPassTest {
             i32AddInstruction(),
             localSetInstruction(localIndex(2)),
         )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
 
         val expected = fusedI32Add(
             left = localGetOperand(localIndex(0)),
             right = localGetOperand(localIndex(1)),
             destination = localSetDestination(localIndex(2)),
         )
-        val actual = FusionPass(instructions)
+        val actual = FusionPass(module).functions[0].body.instructions
 
         assertEquals(1, actual.size)
         assertEquals(expected, actual.first())

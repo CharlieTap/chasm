@@ -21,7 +21,7 @@ internal fun InstructionFuser(
     binop = ::BinopFuser,
 )
 
-internal fun InstructionFuser(
+internal inline fun InstructionFuser(
     index: Int,
     instruction: Instruction,
     input: List<Instruction>,

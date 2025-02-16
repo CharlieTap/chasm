@@ -1,31 +1,23 @@
 package io.github.charlietap.chasm.optimiser.passes
 
-import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.optimiser.passes.fusion.InstructionFuser
+import io.github.charlietap.chasm.ir.module.Module
+import io.github.charlietap.chasm.optimiser.passes.fusion.ExpressionFuser
 
 internal fun FusionPass(
-    instructions: List<Instruction>,
-): List<Instruction> =
+    module: Module,
+): Module =
     FusionPass(
-        instructions = instructions,
-        fuser = ::InstructionFuser,
+        module = module,
+        expressionFuser = ::ExpressionFuser,
     )
 
-internal fun FusionPass(
-    instructions: List<Instruction>,
-    fuser: InstructionFuser,
-): List<Instruction> {
-
-    val fused = mutableListOf<Instruction>()
-
-    var idx = 0
-    while (idx < instructions.size) {
-
-        val instruction = instructions[idx]
-        idx = fuser(idx, instruction, instructions, fused)
-
-        idx++
-    }
-
-    return fused
-}
+internal inline fun FusionPass(
+    module: Module,
+    expressionFuser: ExpressionFuser,
+): Module = module.copy(
+    functions = module.functions.map { function ->
+        function.copy(
+            body = expressionFuser(function.body),
+        )
+    },
+)

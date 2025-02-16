@@ -1,5 +1,5 @@
 package io.github.charlietap.chasm.optimiser.passes
 
-import io.github.charlietap.chasm.ir.instruction.Instruction
+import io.github.charlietap.chasm.ir.module.Module
 
-internal typealias Pass = (List<Instruction>) -> List<Instruction>
+internal typealias Pass = (Module) -> Module

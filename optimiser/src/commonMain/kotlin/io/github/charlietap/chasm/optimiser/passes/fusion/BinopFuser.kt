@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.ir.instruction.Instruction
 internal typealias BinopFusedInstructionFactory = (FusedOperand, FusedOperand, FusedDestination) -> Instruction
 internal typealias BinopFuser = (Int, Instruction, List<Instruction>, MutableList<Instruction>, BinopFusedInstructionFactory) -> Int
 
-internal inline fun BinopFuser(
+internal fun BinopFuser(
     index: Int,
     instruction: Instruction,
     input: List<Instruction>,
