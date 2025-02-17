@@ -67,6 +67,7 @@ include(":test:fixture:executor:runtime")
 include(":test:fixture:ir")
 
 include(":type-system")
+include(":type-system-ir")
 include(":validator")
 
 includeBuild("bolt")
