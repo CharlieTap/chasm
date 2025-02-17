@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.table
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.ir.type.TableType
 
 fun tableImport(store: Store, builder: TableImportBuilder.() -> Unit): Import {
     return TableImportBuilder(store).apply(builder).build()

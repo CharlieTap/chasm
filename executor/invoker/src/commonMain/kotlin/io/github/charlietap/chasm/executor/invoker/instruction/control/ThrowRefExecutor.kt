@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
@@ -17,6 +16,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
 
 internal fun ThrowRefExecutor(
     context: ExecutionContext,

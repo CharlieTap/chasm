@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.allocation.function
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.WasmFunctionCallDispatcher
@@ -14,7 +13,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.type.ext.functionType
+import io.github.charlietap.chasm.ir.module.Function
+import io.github.charlietap.chasm.type.ir.ext.functionType
 import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
 
 internal typealias WasmFunctionAllocator = (InstantiationContext, ModuleInstance, Function) -> Result<Unit, ModuleTrapError>
@@ -39,7 +39,7 @@ internal inline fun WasmFunctionAllocator(
 ): Result<Unit, ModuleTrapError> = binding {
 
     val store = context.store
-    val type = moduleInstance.types.getOrNull(function.typeIndex.idx.toInt())
+    val type = moduleInstance.types.getOrNull(function.typeIndex.idx)
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
     val functionType = type.functionType()
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()

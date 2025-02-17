@@ -38,7 +38,7 @@ internal inline fun BinopFuser(
 
     if (left == null || right == null) {
         output.add(instruction)
-        return index + 1
+        return index
     }
 
     output.removeLast()

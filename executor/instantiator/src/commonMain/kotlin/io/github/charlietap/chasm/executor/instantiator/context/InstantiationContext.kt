@@ -1,10 +1,5 @@
 package io.github.charlietap.chasm.executor.instantiator.context
 
-import io.github.charlietap.chasm.ast.instruction.Instruction
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.module.Module
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
@@ -13,13 +8,18 @@ import io.github.charlietap.chasm.executor.runtime.instruction.StoreOp
 import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
-import io.github.charlietap.chasm.type.factory.DefinedTypeUnrollerFactory
-import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
-import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
-import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
-import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.TypeIndexToDefinedTypeSubstitutor
+import io.github.charlietap.chasm.ir.instruction.Instruction
+import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ir.module.Module
+import io.github.charlietap.chasm.ir.type.DefinedType
+import io.github.charlietap.chasm.ir.type.SubType
+import io.github.charlietap.chasm.type.ir.factory.DefinedTypeUnrollerFactory
+import io.github.charlietap.chasm.type.ir.matching.DefinedTypeLookup
+import io.github.charlietap.chasm.type.ir.matching.DefinedTypeReverseLookup
+import io.github.charlietap.chasm.type.ir.matching.TypeMatcherContext
+import io.github.charlietap.chasm.type.ir.rolling.DefinedTypeUnroller
+import io.github.charlietap.chasm.type.ir.rolling.substitution.ConcreteHeapTypeSubstitutor
+import io.github.charlietap.chasm.type.ir.rolling.substitution.TypeIndexToDefinedTypeSubstitutor
 
 data class InstantiationContext(
     val config: RuntimeConfig,
@@ -34,12 +34,12 @@ data class InstantiationContext(
 ) : TypeMatcherContext {
 
     override val lookup: DefinedTypeLookup = { index ->
-        types.getOrNull(index.idx.toInt())
+        types.getOrNull(index.idx)
     }
 
     override val reverseLookup: DefinedTypeReverseLookup = { type ->
         val index = types.indexOfFirst { definedType -> type == definedType }
-        Index.TypeIndex(index.toUInt())
+        Index.TypeIndex(index)
     }
 
     override val substitutor: ConcreteHeapTypeSubstitutor = TypeIndexToDefinedTypeSubstitutor(types)

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.value
 
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.ir.type.HeapType
 import kotlin.jvm.JvmInline
 
 sealed interface ReferenceValue : ExecutionValue {

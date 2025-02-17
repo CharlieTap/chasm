@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import io.github.charlietap.chasm.ast.type.ArrayType
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.StructType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
+import io.github.charlietap.chasm.ir.type.ArrayType
+import io.github.charlietap.chasm.ir.type.CompositeType
+import io.github.charlietap.chasm.ir.type.FunctionType
+import io.github.charlietap.chasm.ir.type.StructType
 
 inline fun CompositeType.functionType(): FunctionType = try {
     (this as CompositeType.Function).functionType

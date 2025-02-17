@@ -29,7 +29,9 @@ import io.github.charlietap.chasm.ir.module.Tag as IRTag
 import io.github.charlietap.chasm.ir.module.Type as IRType
 import io.github.charlietap.chasm.ir.module.Version as IRVersion
 
-internal fun ModuleFactory(
+typealias ModuleFactory = (Module) -> IRModule
+
+fun ModuleFactory(
     module: Module,
 ): IRModule = ModuleFactory(
     module = module,

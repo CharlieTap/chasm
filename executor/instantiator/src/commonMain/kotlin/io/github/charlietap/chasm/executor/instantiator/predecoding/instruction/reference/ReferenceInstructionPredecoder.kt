@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
@@ -24,6 +23,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruct
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefNull
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefTest
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
 
 internal fun ReferenceInstructionPredecoder(
     context: InstantiationContext,

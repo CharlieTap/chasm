@@ -1,15 +1,15 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
-import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.type.matching.TypeMatcherContext
+import io.github.charlietap.chasm.ir.type.ConcreteHeapType
+import io.github.charlietap.chasm.ir.type.NumberType
+import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.ir.type.ValueType
+import io.github.charlietap.chasm.ir.type.VectorType
+import io.github.charlietap.chasm.type.ir.matching.TypeMatcherContext
 
 fun ValueType.default(
     context: TypeMatcherContext,

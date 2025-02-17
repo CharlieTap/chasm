@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ast.type.Limits
+import io.github.charlietap.chasm.ir.type.Limits
 
 fun limits(builder: LimitsBuilder.() -> Unit): Limits {
     return LimitsBuilder().apply(builder).build()

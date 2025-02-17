@@ -2,8 +2,6 @@ package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
@@ -19,14 +17,18 @@ import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.ir.factory.ModuleFactory
+import io.github.charlietap.chasm.ir.instruction.Expression
+import io.github.charlietap.chasm.optimiser.Optimiser
+import io.github.charlietap.chasm.ast.module.Module as ASTModule
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
-typealias ModuleInstantiator = (RuntimeConfig, Store, Module, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
+typealias ModuleInstantiator = (RuntimeConfig, Store, ASTModule, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
 
 fun ModuleInstantiator(
     config: RuntimeConfig,
     store: Store,
-    module: Module,
+    module: ASTModule,
     imports: List<Import>,
 ): Result<ModuleInstance, ModuleTrapError> =
     ModuleInstantiator(
@@ -34,6 +36,8 @@ fun ModuleInstantiator(
         store = store,
         module = module,
         imports = imports,
+        moduleFactory = ::ModuleFactory,
+        optimiser = ::Optimiser,
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
         invoker = ::FunctionInvoker,
@@ -46,8 +50,10 @@ fun ModuleInstantiator(
 internal inline fun ModuleInstantiator(
     config: RuntimeConfig,
     store: Store,
-    module: Module,
+    module: ASTModule,
     imports: List<Import>,
+    crossinline moduleFactory: ModuleFactory,
+    crossinline optimiser: Optimiser,
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline allocator: ModuleAllocator,
     crossinline invoker: FunctionInvoker,
@@ -57,11 +63,13 @@ internal inline fun ModuleInstantiator(
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
-    val context = InstantiationContext(config, store, module)
+    val irModule = optimiser(moduleFactory(module))
+
+    val context = InstantiationContext(config, store, irModule)
     val partialInstance = partialAllocator(context, imports).bind()
 
-    val tableInitValues = LongArray(module.tables.size) { tableIndex ->
-        val table = module.tables[tableIndex]
+    val tableInitValues = LongArray(irModule.tables.size) { tableIndex ->
+        val table = irModule.tables[tableIndex]
         val initExpression = expressionPredecoder(context, table.initExpression).bind()
         evaluator(config, store, partialInstance, initExpression, Arity.Return(1)).bind() ?: 0L
     }
@@ -71,8 +79,8 @@ internal inline fun ModuleInstantiator(
     tableInitializer(context, instance).bind()
     memoryInitializer(context, instance).bind()
 
-    module.startFunction?.let { function ->
-        val address = instance.functionAddresses[function.idx.idx.toInt()]
+    irModule.startFunction?.let { function ->
+        val address = instance.functionAddresses[function.idx.idx]
         invoker(config, store, address, emptyList()).bind()
     }
 

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
-import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory.Companion.PAGE_SIZE
+import io.github.charlietap.chasm.ir.type.MemoryType
 
 data class MemoryInstance(
     var type: MemoryType,

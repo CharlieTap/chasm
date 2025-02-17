@@ -3,8 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.predecoding.InstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
@@ -14,7 +12,9 @@ import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruct
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.If
-import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
+import io.github.charlietap.chasm.ir.instruction.ControlInstruction
+import io.github.charlietap.chasm.ir.instruction.Instruction
+import io.github.charlietap.chasm.type.ir.expansion.BlockTypeExpander
 
 internal fun IfInstructionPredecoder(
     context: InstantiationContext,

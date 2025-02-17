@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.fixture.ast.type.referenceType
+import io.github.charlietap.chasm.fixture.ir.type.referenceType
+import io.github.charlietap.chasm.ir.type.ReferenceType
 
 fun referenceRuntimeInstruction() = refEqRuntimeInstruction()
 

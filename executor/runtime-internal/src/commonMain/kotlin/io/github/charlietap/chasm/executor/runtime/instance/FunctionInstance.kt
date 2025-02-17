@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.executor.runtime.function.Function
+import io.github.charlietap.chasm.ir.type.DefinedType
+import io.github.charlietap.chasm.ir.type.FunctionType
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction as HostFunctionImpl
 
 sealed class FunctionInstance {

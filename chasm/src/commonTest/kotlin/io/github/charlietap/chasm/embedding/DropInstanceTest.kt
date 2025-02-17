@@ -7,9 +7,6 @@ import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.fixture.ast.type.memoryType
-import io.github.charlietap.chasm.fixture.ast.type.sharedStatus
-import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementAddress
@@ -23,6 +20,9 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.hostReferenceValue
+import io.github.charlietap.chasm.fixture.ir.type.memoryType
+import io.github.charlietap.chasm.fixture.ir.type.sharedStatus
+import io.github.charlietap.chasm.fixture.ir.type.unsharedStatus
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

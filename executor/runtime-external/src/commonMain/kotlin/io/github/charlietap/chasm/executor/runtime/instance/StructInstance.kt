@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.StructType
+import io.github.charlietap.chasm.ir.type.DefinedType
+import io.github.charlietap.chasm.ir.type.StructType
 
 data class StructInstance(
     val definedType: DefinedType,

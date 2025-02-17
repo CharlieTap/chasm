@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
-import io.github.charlietap.chasm.type.matching.TypeMatcher
+import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.ir.matching.ReferenceTypeMatcher
+import io.github.charlietap.chasm.type.ir.matching.TypeMatcher
 
 internal fun RefTestExecutor(
     context: ExecutionContext,

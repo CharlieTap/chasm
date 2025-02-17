@@ -1,13 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.ast.type.ArrayType
-import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.ir.type.ArrayType
+import io.github.charlietap.chasm.ir.type.DefinedType
 
 internal fun ArrayNewFixedExecutor(
     context: ExecutionContext,

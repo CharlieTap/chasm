@@ -24,6 +24,6 @@ kotlin {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "type"
-    description = "extension functions for recursive module types"
+    name = "type-system-ir"
+    description = "type system functions for chasms ir"
 }

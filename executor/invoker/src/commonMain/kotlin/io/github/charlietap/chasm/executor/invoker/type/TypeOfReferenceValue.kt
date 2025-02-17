@@ -1,11 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.type
 
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ReferenceType.Ref
-import io.github.charlietap.chasm.ast.type.ReferenceType.RefNull
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.ext.array
@@ -24,8 +18,14 @@ import io.github.charlietap.chasm.executor.runtime.ext.toNullableReference
 import io.github.charlietap.chasm.executor.runtime.ext.toStructAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.type.extremas.BottomOf
-import io.github.charlietap.chasm.type.extremas.BottomOfHeapType
+import io.github.charlietap.chasm.ir.type.AbstractHeapType
+import io.github.charlietap.chasm.ir.type.ConcreteHeapType
+import io.github.charlietap.chasm.ir.type.HeapType
+import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.ir.type.ReferenceType.Ref
+import io.github.charlietap.chasm.ir.type.ReferenceType.RefNull
+import io.github.charlietap.chasm.type.ir.extremas.BottomOf
+import io.github.charlietap.chasm.type.ir.extremas.BottomOfHeapType
 
 fun TypeOfReferenceValue(
     value: Long,

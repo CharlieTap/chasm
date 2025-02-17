@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.runtime.instruction.ParametricInstruction
+import io.github.charlietap.chasm.ir.type.ValueType
 
 fun parametricRuntimeInstruction(): ParametricInstruction = dropRuntimeInstruction()
 

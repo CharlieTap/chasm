@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.dataAddress
 import io.github.charlietap.chasm.executor.instantiator.ext.elementAddress
@@ -65,9 +64,10 @@ import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruct
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructNew
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructNewDefault
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction.StructSet
-import io.github.charlietap.chasm.type.ext.arrayType
-import io.github.charlietap.chasm.type.ext.bitWidth
-import io.github.charlietap.chasm.type.ext.structType
+import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
+import io.github.charlietap.chasm.type.ir.ext.arrayType
+import io.github.charlietap.chasm.type.ir.ext.bitWidth
+import io.github.charlietap.chasm.type.ir.ext.structType
 
 internal fun AggregateInstructionPredecoder(
     context: InstantiationContext,
@@ -140,7 +140,7 @@ internal inline fun AggregateInstructionPredecoder(
         is AggregateInstruction.ArrayGetSigned -> arrayGetSignedDispatcher(ArrayGetSigned(instruction.typeIndex))
         is AggregateInstruction.ArrayGetUnsigned -> arrayGetUnsignedDispatcher(ArrayGetUnsigned(instruction.typeIndex))
         is AggregateInstruction.ArrayInitData -> {
-            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val definedType = context.types[instruction.typeIndex.idx]
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
@@ -161,7 +161,7 @@ internal inline fun AggregateInstructionPredecoder(
         }
         is AggregateInstruction.ArrayLen -> arrayLenDispatcher(ArrayLen)
         is AggregateInstruction.ArrayNew -> {
-            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val definedType = context.types[instruction.typeIndex.idx]
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
@@ -173,7 +173,7 @@ internal inline fun AggregateInstructionPredecoder(
         is AggregateInstruction.ArrayNewData -> {
             val dataAddress = context.instance!!.dataAddress(instruction.dataIndex).bind()
             val dataInstance = context.store.data(dataAddress)
-            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val definedType = context.types[instruction.typeIndex.idx]
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
@@ -186,7 +186,7 @@ internal inline fun AggregateInstructionPredecoder(
             )
         }
         is AggregateInstruction.ArrayNewDefault -> {
-            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val definedType = context.types[instruction.typeIndex.idx]
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
@@ -199,7 +199,7 @@ internal inline fun AggregateInstructionPredecoder(
         is AggregateInstruction.ArrayNewElement -> {
             val elementAddress = context.instance!!.elementAddress(instruction.elementIndex).bind()
             val elementInstance = context.store.element(elementAddress)
-            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val definedType = context.types[instruction.typeIndex.idx]
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
@@ -209,7 +209,7 @@ internal inline fun AggregateInstructionPredecoder(
             )
         }
         is AggregateInstruction.ArrayNewFixed -> {
-            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val definedType = context.types[instruction.typeIndex.idx]
             val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
                 InvocationError.ArrayCompositeTypeExpected,
             ).bind()
@@ -227,7 +227,7 @@ internal inline fun AggregateInstructionPredecoder(
             StructGetUnsigned(instruction.typeIndex, instruction.fieldIndex),
         )
         is AggregateInstruction.StructNew -> {
-            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val definedType = context.types[instruction.typeIndex.idx]
             val structType = context.unroller(definedType).compositeType.structType() ?: Err(
                 InvocationError.StructCompositeTypeExpected,
             ).bind()
@@ -235,7 +235,7 @@ internal inline fun AggregateInstructionPredecoder(
             structNewDispatcher(StructNew(definedType, structType))
         }
         is AggregateInstruction.StructNewDefault -> {
-            val definedType = context.types[instruction.typeIndex.idx.toInt()]
+            val definedType = context.types[instruction.typeIndex.idx]
             val structType = context.unroller(definedType).compositeType.structType() ?: Err(
                 InvocationError.StructCompositeTypeExpected,
             ).bind()
@@ -246,7 +246,7 @@ internal inline fun AggregateInstructionPredecoder(
             structNewDefaultDispatcher(StructNewDefault(definedType, structType, fields))
         }
         is AggregateInstruction.StructSet -> {
-            structSetDispatcher(StructSet(instruction.fieldIndex.idx.toInt()))
+            structSetDispatcher(StructSet(instruction.fieldIndex.idx))
         }
     }
 }

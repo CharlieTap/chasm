@@ -1,13 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.drop
 
-import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.executor.memory.destruct.LinearMemoryDestructor
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory.Companion.PAGE_SIZE
-import io.github.charlietap.chasm.fixture.ast.type.limits
-import io.github.charlietap.chasm.fixture.ast.type.memoryType
-import io.github.charlietap.chasm.fixture.ast.type.unsharedStatus
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.memory.linearMemory
+import io.github.charlietap.chasm.fixture.ir.type.limits
+import io.github.charlietap.chasm.fixture.ir.type.memoryType
+import io.github.charlietap.chasm.fixture.ir.type.unsharedStatus
+import io.github.charlietap.chasm.ir.type.Limits
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

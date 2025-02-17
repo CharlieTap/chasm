@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -12,8 +11,9 @@ import io.github.charlietap.chasm.executor.runtime.ext.toFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
-import io.github.charlietap.chasm.type.matching.TypeMatcher
+import io.github.charlietap.chasm.ir.type.DefinedType
+import io.github.charlietap.chasm.type.ir.matching.DefinedTypeMatcher
+import io.github.charlietap.chasm.type.ir.matching.TypeMatcher
 
 internal fun CallIndirectExecutor(
     context: ExecutionContext,

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.executor.runtime.ext.pushReference
@@ -8,6 +7,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.ir.type.AbstractHeapType
 
 internal fun ExternConvertAnyExecutor(
     context: ExecutionContext,

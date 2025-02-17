@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.instruction.MemArg
 import kotlin.jvm.JvmInline
 
 sealed interface VectorInstruction : LinkedInstruction {

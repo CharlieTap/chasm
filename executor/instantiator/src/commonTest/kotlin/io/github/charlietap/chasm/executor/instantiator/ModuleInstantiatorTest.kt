@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
@@ -14,15 +12,6 @@ import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.ast.instruction.expression
-import io.github.charlietap.chasm.fixture.ast.module.elementSegment
-import io.github.charlietap.chasm.fixture.ast.module.function
-import io.github.charlietap.chasm.fixture.ast.module.global
-import io.github.charlietap.chasm.fixture.ast.module.import
-import io.github.charlietap.chasm.fixture.ast.module.module
-import io.github.charlietap.chasm.fixture.ast.module.startFunction
-import io.github.charlietap.chasm.fixture.ast.module.table
-import io.github.charlietap.chasm.fixture.ast.type.heapType
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
@@ -30,10 +19,24 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExte
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
 import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.ir.instruction.expression
+import io.github.charlietap.chasm.fixture.ir.module.elementSegment
+import io.github.charlietap.chasm.fixture.ir.module.function
+import io.github.charlietap.chasm.fixture.ir.module.global
+import io.github.charlietap.chasm.fixture.ir.module.import
+import io.github.charlietap.chasm.fixture.ir.module.module
+import io.github.charlietap.chasm.fixture.ir.module.startFunction
+import io.github.charlietap.chasm.fixture.ir.module.table
+import io.github.charlietap.chasm.fixture.ir.type.heapType
+import io.github.charlietap.chasm.ir.factory.ModuleFactory
+import io.github.charlietap.chasm.ir.instruction.Expression
+import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.optimiser.Optimiser
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.fixture.ast.module.module as astModule
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
 
 class ModuleInstantiatorTest {
@@ -56,6 +59,7 @@ class ModuleInstantiatorTest {
         val elementSegment = elementSegment()
         val function = function()
         val startFunction = startFunction(function.idx)
+        val astModule = astModule()
         val module = module(
             functions = listOf(function),
             imports = listOf(import),
@@ -70,6 +74,16 @@ class ModuleInstantiatorTest {
         val partialInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress(0)),
         )
+
+        val moduleFactory: ModuleFactory = { _module ->
+            assertEquals(astModule, _module)
+            module
+        }
+
+        val optimiser: Optimiser = { _module ->
+            assertEquals(module, _module)
+            module
+        }
 
         val pallocator: PartialModuleAllocator = { _context, _imports ->
             assertEquals(context, _context)
@@ -129,8 +143,10 @@ class ModuleInstantiatorTest {
         val actual = ModuleInstantiator(
             config = config,
             store = store,
-            module = module,
+            module = astModule,
             imports = imports,
+            moduleFactory = moduleFactory,
+            optimiser = optimiser,
             partialAllocator = pallocator,
             allocator = allocator,
             invoker = invoker,

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import io.github.charlietap.chasm.ast.type.FieldType
-import io.github.charlietap.chasm.ast.type.StorageType
-import io.github.charlietap.chasm.type.matching.TypeMatcherContext
+import io.github.charlietap.chasm.ir.type.FieldType
+import io.github.charlietap.chasm.ir.type.StorageType
+import io.github.charlietap.chasm.type.ir.matching.TypeMatcherContext
 
 fun FieldType.default(
     context: TypeMatcherContext,

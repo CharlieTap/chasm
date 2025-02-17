@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.function
 
-import io.github.charlietap.chasm.ast.type.FunctionType
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostFunctionCallDispatcher
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
@@ -9,7 +8,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.ir.type.FunctionType
+import io.github.charlietap.chasm.type.ir.ext.definedType
 
 typealias HostFunctionAllocator = (Store, FunctionType, HostFunction) -> ExternalValue.Function
 

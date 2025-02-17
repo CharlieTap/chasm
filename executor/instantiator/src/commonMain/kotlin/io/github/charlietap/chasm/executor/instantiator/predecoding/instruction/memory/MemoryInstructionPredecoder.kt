@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memory.load.F32LoadInstructionPredecoder
@@ -30,6 +29,7 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memory.store.I64StoreInstructionPredecoder
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
 
 internal fun MemoryInstructionPredecoder(
     context: InstantiationContext,

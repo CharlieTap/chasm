@@ -1,9 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.module.Function
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
@@ -16,32 +13,6 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
-import io.github.charlietap.chasm.fixture.ast.instruction.expression
-import io.github.charlietap.chasm.fixture.ast.module.dataSegment
-import io.github.charlietap.chasm.fixture.ast.module.elementSegment
-import io.github.charlietap.chasm.fixture.ast.module.export
-import io.github.charlietap.chasm.fixture.ast.module.function
-import io.github.charlietap.chasm.fixture.ast.module.functionExportDescriptor
-import io.github.charlietap.chasm.fixture.ast.module.functionIndex
-import io.github.charlietap.chasm.fixture.ast.module.global
-import io.github.charlietap.chasm.fixture.ast.module.globalExportDescriptor
-import io.github.charlietap.chasm.fixture.ast.module.globalIndex
-import io.github.charlietap.chasm.fixture.ast.module.memory
-import io.github.charlietap.chasm.fixture.ast.module.memoryExportDescriptor
-import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
-import io.github.charlietap.chasm.fixture.ast.module.module
-import io.github.charlietap.chasm.fixture.ast.module.table
-import io.github.charlietap.chasm.fixture.ast.module.tableExportDescriptor
-import io.github.charlietap.chasm.fixture.ast.module.tableIndex
-import io.github.charlietap.chasm.fixture.ast.module.tag
-import io.github.charlietap.chasm.fixture.ast.module.tagExportDescriptor
-import io.github.charlietap.chasm.fixture.ast.module.tagIndex
-import io.github.charlietap.chasm.fixture.ast.module.type
-import io.github.charlietap.chasm.fixture.ast.module.typeIndex
-import io.github.charlietap.chasm.fixture.ast.type.functionType
-import io.github.charlietap.chasm.fixture.ast.type.heapType
-import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
-import io.github.charlietap.chasm.fixture.ast.value.nameValue
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
@@ -62,8 +33,37 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagExternalV
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
-import io.github.charlietap.chasm.type.ext.definedType
-import io.github.charlietap.chasm.type.ext.recursiveType
+import io.github.charlietap.chasm.fixture.ir.instruction.expression
+import io.github.charlietap.chasm.fixture.ir.module.dataSegment
+import io.github.charlietap.chasm.fixture.ir.module.elementSegment
+import io.github.charlietap.chasm.fixture.ir.module.export
+import io.github.charlietap.chasm.fixture.ir.module.function
+import io.github.charlietap.chasm.fixture.ir.module.functionExportDescriptor
+import io.github.charlietap.chasm.fixture.ir.module.functionIndex
+import io.github.charlietap.chasm.fixture.ir.module.global
+import io.github.charlietap.chasm.fixture.ir.module.globalExportDescriptor
+import io.github.charlietap.chasm.fixture.ir.module.globalIndex
+import io.github.charlietap.chasm.fixture.ir.module.memory
+import io.github.charlietap.chasm.fixture.ir.module.memoryExportDescriptor
+import io.github.charlietap.chasm.fixture.ir.module.memoryIndex
+import io.github.charlietap.chasm.fixture.ir.module.module
+import io.github.charlietap.chasm.fixture.ir.module.table
+import io.github.charlietap.chasm.fixture.ir.module.tableExportDescriptor
+import io.github.charlietap.chasm.fixture.ir.module.tableIndex
+import io.github.charlietap.chasm.fixture.ir.module.tag
+import io.github.charlietap.chasm.fixture.ir.module.tagExportDescriptor
+import io.github.charlietap.chasm.fixture.ir.module.tagIndex
+import io.github.charlietap.chasm.fixture.ir.module.type
+import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.fixture.ir.type.heapType
+import io.github.charlietap.chasm.fixture.ir.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ir.value.nameValue
+import io.github.charlietap.chasm.ir.instruction.Expression
+import io.github.charlietap.chasm.ir.module.Function
+import io.github.charlietap.chasm.ir.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ir.ext.definedType
+import io.github.charlietap.chasm.type.ir.ext.recursiveType
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -76,7 +76,7 @@ class ModuleAllocatorTest {
     fun `can allocate a module instance`() {
 
         val functionType = functionType()
-        val typeIndex = typeIndex(0u)
+        val typeIndex = typeIndex(0)
         val function =
             function(typeIndex = typeIndex)
         val type = type(
@@ -104,35 +104,35 @@ class ModuleAllocatorTest {
         val importTagAddress = tagAddress(0)
 
         val functionExportDescriptor = functionExportDescriptor(
-            functionIndex = functionIndex(1u),
+            functionIndex = functionIndex(1),
         )
         val functionExport = export(
             name = nameValue("function_export"),
             descriptor = functionExportDescriptor,
         )
         val tableExportDescriptor = tableExportDescriptor(
-            tableIndex = tableIndex(1u),
+            tableIndex = tableIndex(1),
         )
         val tableExport = export(
             name = nameValue("table_export"),
             descriptor = tableExportDescriptor,
         )
         val memoryExportDescriptor = memoryExportDescriptor(
-            memoryIndex = memoryIndex(1u),
+            memoryIndex = memoryIndex(1),
         )
         val memoryExport = export(
             name = nameValue("memory_export"),
             descriptor = memoryExportDescriptor,
         )
         val globalExportDescriptor = globalExportDescriptor(
-            globalIndex = globalIndex(1u),
+            globalIndex = globalIndex(1),
         )
         val globalExport = export(
             name = nameValue("global_export"),
             descriptor = globalExportDescriptor,
         )
         val tagExportDescriptor = tagExportDescriptor(
-            tagIndex = tagIndex(1u),
+            tagIndex = tagIndex(1),
         )
         val tagExport = export(
             name = nameValue("tag_export"),

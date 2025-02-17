@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
@@ -14,6 +13,7 @@ import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction.LocalGet
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction.LocalSet
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction.LocalTee
+import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 
 internal fun VariableInstructionPredecoder(
     context: InstantiationContext,
@@ -39,9 +39,9 @@ internal inline fun VariableInstructionPredecoder(
     crossinline globalSetPredecoder: Predecoder<VariableInstruction.GlobalSet, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
-        is VariableInstruction.LocalGet -> localGetDispatcher(LocalGet(instruction.localIdx.idx.toInt()))
-        is VariableInstruction.LocalSet -> localSetDispatcher(LocalSet(instruction.localIdx.idx.toInt()))
-        is VariableInstruction.LocalTee -> localTeeDispatcher(LocalTee(instruction.localIdx.idx.toInt()))
+        is VariableInstruction.LocalGet -> localGetDispatcher(LocalGet(instruction.localIdx.idx))
+        is VariableInstruction.LocalSet -> localSetDispatcher(LocalSet(instruction.localIdx.idx))
+        is VariableInstruction.LocalTee -> localTeeDispatcher(LocalTee(instruction.localIdx.idx))
         is VariableInstruction.GlobalGet -> globalGetPredecoder(context, instruction).bind()
         is VariableInstruction.GlobalSet -> globalSetPredecoder(context, instruction).bind()
     }

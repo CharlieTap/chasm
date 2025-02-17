@@ -6,8 +6,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.toResultOr
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.export.ExportAllocator
@@ -35,6 +33,8 @@ import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.ir.instruction.Expression
+import io.github.charlietap.chasm.ir.module.Function
 import kotlin.jvm.JvmName
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction

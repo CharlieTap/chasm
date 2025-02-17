@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.tableAddress
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
@@ -44,6 +43,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstructio
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Throw
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.ThrowRef
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.Unreachable
+import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 
 internal fun ControlInstructionPredecoder(
     context: InstantiationContext,
@@ -137,7 +137,7 @@ internal inline fun ControlInstructionPredecoder(
 
             callIndirectDispatcher(
                 CallIndirect(
-                    type = context.types[instruction.typeIndex.idx.toInt()],
+                    type = context.types[instruction.typeIndex.idx],
                     table = table,
                 ),
             )
@@ -156,7 +156,7 @@ internal inline fun ControlInstructionPredecoder(
 
             returnCallIndirectDispatcher(
                 ReturnCallIndirect(
-                    type = context.types[instruction.typeIndex.idx.toInt()],
+                    type = context.types[instruction.typeIndex.idx],
                     table = table,
                 ),
             )

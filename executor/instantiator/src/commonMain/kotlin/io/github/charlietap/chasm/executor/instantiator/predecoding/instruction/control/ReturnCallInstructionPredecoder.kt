@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
@@ -16,6 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.function
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.ReturnHostFunctionCall
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction.ReturnWasmFunctionCall
+import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 
 internal fun ReturnCallInstructionPredecoder(
     context: InstantiationContext,

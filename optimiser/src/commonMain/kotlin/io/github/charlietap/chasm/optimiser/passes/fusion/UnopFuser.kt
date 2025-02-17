@@ -37,7 +37,7 @@ internal inline fun UnopFuser(
 
     if (operand == null) {
         output.add(instruction)
-        return index + 1
+        return index
     }
 
     output.removeLast()

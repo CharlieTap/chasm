@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.tableAddress
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction.TableCopy
+import io.github.charlietap.chasm.ir.instruction.TableInstruction
 
 internal fun TableCopyInstructionPredecoder(
     context: InstantiationContext,

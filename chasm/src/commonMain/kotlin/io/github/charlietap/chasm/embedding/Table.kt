@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.Table
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.ir.type.TableType
 
 fun table(
     store: Store,

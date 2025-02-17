@@ -5,11 +5,6 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.fixture.ast.type.functionHeapType
-import io.github.charlietap.chasm.fixture.ast.type.functionType
-import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
-import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
-import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
@@ -21,7 +16,12 @@ import io.github.charlietap.chasm.fixture.executor.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
-import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.fixture.ir.type.functionHeapType
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ir.type.i64ValueType
+import io.github.charlietap.chasm.fixture.ir.type.resultType
+import io.github.charlietap.chasm.type.ir.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

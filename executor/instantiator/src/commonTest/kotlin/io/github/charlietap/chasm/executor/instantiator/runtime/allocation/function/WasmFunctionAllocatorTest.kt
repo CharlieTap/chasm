@@ -7,15 +7,15 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.fixture.ast.module.function
-import io.github.charlietap.chasm.fixture.ast.module.typeIndex
-import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.fixture.ir.module.function
+import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.type.ir.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -35,7 +35,7 @@ class WasmFunctionAllocatorTest {
 
         val functionType = functionType()
         val type = functionType.definedType()
-        val typeIndex = typeIndex(0u)
+        val typeIndex = typeIndex(0)
         val wasmFunction = function(
             typeIndex = typeIndex,
         )
@@ -81,7 +81,7 @@ class WasmFunctionAllocatorTest {
             store = store,
         )
 
-        val typeIndex = typeIndex(0u)
+        val typeIndex = typeIndex(0)
         val wasmFunction = function(
             typeIndex = typeIndex,
         )

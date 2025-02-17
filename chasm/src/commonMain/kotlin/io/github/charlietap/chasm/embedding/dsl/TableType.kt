@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.ir.type.Limits
+import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.ir.type.TableType
 
 class TableTypeBuilder {
 

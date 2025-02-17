@@ -9,9 +9,9 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
-                api(projects.ast)
+                api(projects.ir)
                 api(projects.executor.runtimeInternal)
-                api(projects.typeSystem)
+                api(projects.typeSystemIr)
                 api(libs.result)
 
                 implementation(projects.executor.memory)
@@ -22,8 +22,8 @@ kotlin {
 
         commonTest {
             dependencies {
-                implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.executor.runtime)
+                implementation(projects.test.fixture.ir)
                 implementation(libs.kotlin.test)
             }
         }

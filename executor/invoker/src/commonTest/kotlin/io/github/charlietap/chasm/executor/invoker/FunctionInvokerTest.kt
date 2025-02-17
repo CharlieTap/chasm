@@ -4,9 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.fixture.ast.type.functionType
-import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
-import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
@@ -14,7 +11,10 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
-import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ir.type.resultType
+import io.github.charlietap.chasm.type.ir.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

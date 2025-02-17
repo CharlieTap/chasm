@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.invoker.ext.index
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
+import io.github.charlietap.chasm.ir.module.Index
 
 internal typealias BreakExecutor = (ControlStack, ValueStack, Index.LabelIndex) -> Unit
 

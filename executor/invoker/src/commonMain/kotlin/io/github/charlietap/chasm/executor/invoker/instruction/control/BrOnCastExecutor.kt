@@ -1,13 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.invoker.type.TypeOf
 import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
-import io.github.charlietap.chasm.type.matching.TypeMatcher
+import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.ir.matching.ReferenceTypeMatcher
+import io.github.charlietap.chasm.type.ir.matching.TypeMatcher
 
 internal fun BrOnCastExecutor(
     context: ExecutionContext,

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.ir.instruction
 
-sealed interface FusedNumericInstruction : NumericInstruction {
+sealed interface FusedNumericInstruction : Instruction {
 
     data class I32Add(
         val left: FusedOperand,

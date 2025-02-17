@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import io.github.charlietap.chasm.ast.type.PackedType
-import io.github.charlietap.chasm.ast.type.StorageType
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
+import io.github.charlietap.chasm.ir.type.PackedType
+import io.github.charlietap.chasm.ir.type.StorageType
 
 fun ArrayInstance.field(
     index: Int,

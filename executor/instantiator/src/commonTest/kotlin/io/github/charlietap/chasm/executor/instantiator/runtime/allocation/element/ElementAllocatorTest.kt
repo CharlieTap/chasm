@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.element
 
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.ir.type.refNullReferenceType
+import io.github.charlietap.chasm.ir.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

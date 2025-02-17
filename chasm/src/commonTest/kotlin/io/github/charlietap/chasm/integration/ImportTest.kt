@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.integration
 
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.memory
@@ -13,18 +12,19 @@ import io.github.charlietap.chasm.embedding.tag
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.ast.type.constMutability
-import io.github.charlietap.chasm.fixture.ast.type.exceptionAttribute
-import io.github.charlietap.chasm.fixture.ast.type.functionType
-import io.github.charlietap.chasm.fixture.ast.type.globalType
-import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
-import io.github.charlietap.chasm.fixture.ast.type.limits
-import io.github.charlietap.chasm.fixture.ast.type.memoryType
-import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
-import io.github.charlietap.chasm.fixture.ast.type.resultType
-import io.github.charlietap.chasm.fixture.ast.type.tableType
-import io.github.charlietap.chasm.fixture.ast.type.tagType
 import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.ir.type.constMutability
+import io.github.charlietap.chasm.fixture.ir.type.exceptionAttribute
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.fixture.ir.type.globalType
+import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ir.type.limits
+import io.github.charlietap.chasm.fixture.ir.type.memoryType
+import io.github.charlietap.chasm.fixture.ir.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ir.type.resultType
+import io.github.charlietap.chasm.fixture.ir.type.tableType
+import io.github.charlietap.chasm.fixture.ir.type.tagType
+import io.github.charlietap.chasm.ir.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

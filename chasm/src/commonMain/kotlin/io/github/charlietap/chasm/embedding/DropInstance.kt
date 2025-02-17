@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.ast.type.SharedStatus
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
@@ -12,6 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.global
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.table
+import io.github.charlietap.chasm.ir.type.SharedStatus
 
 fun dropInstance(
     store: Store,

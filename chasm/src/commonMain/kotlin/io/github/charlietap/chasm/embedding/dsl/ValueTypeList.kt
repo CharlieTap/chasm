@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.ir.type.NumberType
+import io.github.charlietap.chasm.ir.type.ValueType
 
 fun valueTypeList(builder: ValueTypeListBuilder.() -> Unit): List<ValueType> {
     return ValueTypeListBuilder().apply(builder).build()

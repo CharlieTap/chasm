@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F32AbsDispatcher
@@ -287,6 +286,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstructio
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction.I64TruncSatF64S
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction.I64TruncSatF64U
 import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction.I64Xor
+import io.github.charlietap.chasm.ir.instruction.NumericInstruction
 
 internal fun NumericInstructionPredecoder(
     context: InstantiationContext,

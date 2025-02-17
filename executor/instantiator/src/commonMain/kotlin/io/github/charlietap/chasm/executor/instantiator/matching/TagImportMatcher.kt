@@ -2,14 +2,14 @@ package io.github.charlietap.chasm.executor.instantiator.matching
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.tag
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.type.matching.TagTypeMatcher
-import io.github.charlietap.chasm.type.matching.TypeMatcher
-import io.github.charlietap.chasm.ast.module.Import as ModuleImport
+import io.github.charlietap.chasm.ir.type.TagType
+import io.github.charlietap.chasm.type.ir.matching.TagTypeMatcher
+import io.github.charlietap.chasm.type.ir.matching.TypeMatcher
+import io.github.charlietap.chasm.ir.module.Import as ModuleImport
 
 internal typealias TagImportMatcher = (InstantiationContext, ModuleImport.Descriptor.Tag, ExternalValue.Tag) -> Result<Boolean, ModuleTrapError>
 

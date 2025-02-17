@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instance
 
-import io.github.charlietap.chasm.ast.type.ArrayType
-import io.github.charlietap.chasm.ast.type.DefinedType
 import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
-import io.github.charlietap.chasm.fixture.ast.type.arrayType
-import io.github.charlietap.chasm.fixture.ast.type.definedType
+import io.github.charlietap.chasm.fixture.ir.type.arrayType
+import io.github.charlietap.chasm.fixture.ir.type.definedType
+import io.github.charlietap.chasm.ir.type.ArrayType
+import io.github.charlietap.chasm.ir.type.DefinedType
 
 fun arrayInstance(
     definedType: DefinedType = definedType(),

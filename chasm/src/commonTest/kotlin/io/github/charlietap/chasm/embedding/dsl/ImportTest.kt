@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.Mutability
 import io.github.charlietap.chasm.embedding.fixture.publicFunction
 import io.github.charlietap.chasm.embedding.fixture.publicGlobal
 import io.github.charlietap.chasm.embedding.fixture.publicImport
@@ -12,18 +10,6 @@ import io.github.charlietap.chasm.embedding.fixture.publicTag
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.executor.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.fixture.ast.type.constMutability
-import io.github.charlietap.chasm.fixture.ast.type.exceptionAttribute
-import io.github.charlietap.chasm.fixture.ast.type.functionHeapType
-import io.github.charlietap.chasm.fixture.ast.type.functionType
-import io.github.charlietap.chasm.fixture.ast.type.globalType
-import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
-import io.github.charlietap.chasm.fixture.ast.type.limits
-import io.github.charlietap.chasm.fixture.ast.type.memoryType
-import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
-import io.github.charlietap.chasm.fixture.ast.type.resultType
-import io.github.charlietap.chasm.fixture.ast.type.tableType
-import io.github.charlietap.chasm.fixture.ast.type.tagType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
@@ -36,6 +22,20 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.functionReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
+import io.github.charlietap.chasm.fixture.ir.type.constMutability
+import io.github.charlietap.chasm.fixture.ir.type.exceptionAttribute
+import io.github.charlietap.chasm.fixture.ir.type.functionHeapType
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.fixture.ir.type.globalType
+import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ir.type.limits
+import io.github.charlietap.chasm.fixture.ir.type.memoryType
+import io.github.charlietap.chasm.fixture.ir.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.ir.type.resultType
+import io.github.charlietap.chasm.fixture.ir.type.tableType
+import io.github.charlietap.chasm.fixture.ir.type.tagType
+import io.github.charlietap.chasm.ir.type.AbstractHeapType
+import io.github.charlietap.chasm.ir.type.Mutability
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

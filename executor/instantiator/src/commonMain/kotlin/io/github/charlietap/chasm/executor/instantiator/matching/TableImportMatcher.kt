@@ -2,15 +2,15 @@ package io.github.charlietap.chasm.executor.instantiator.matching
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Import
-import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.type.matching.TableTypeMatcher
-import io.github.charlietap.chasm.type.matching.TypeMatcher
-import io.github.charlietap.chasm.ast.module.Import as ModuleImport
+import io.github.charlietap.chasm.ir.module.Import
+import io.github.charlietap.chasm.ir.type.TableType
+import io.github.charlietap.chasm.type.ir.matching.TableTypeMatcher
+import io.github.charlietap.chasm.type.ir.matching.TypeMatcher
+import io.github.charlietap.chasm.ir.module.Import as ModuleImport
 
 internal typealias TableImportMatcher = (InstantiationContext, Import.Descriptor.Table, ExternalValue.Table) -> Result<Boolean, ModuleTrapError>
 

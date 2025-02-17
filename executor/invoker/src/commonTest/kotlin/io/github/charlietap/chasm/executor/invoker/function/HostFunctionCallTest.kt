@@ -3,10 +3,6 @@ package io.github.charlietap.chasm.executor.invoker.function
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
-import io.github.charlietap.chasm.fixture.ast.type.functionType
-import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
-import io.github.charlietap.chasm.fixture.ast.type.i64ValueType
-import io.github.charlietap.chasm.fixture.ast.type.resultType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
@@ -14,7 +10,11 @@ import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i64
-import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ir.type.i64ValueType
+import io.github.charlietap.chasm.fixture.ir.type.resultType
+import io.github.charlietap.chasm.type.ir.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -5,12 +5,12 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.fixture.ast.type.functionType
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.type.ir.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

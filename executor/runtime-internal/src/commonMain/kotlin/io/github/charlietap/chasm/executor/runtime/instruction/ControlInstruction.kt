@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
+import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
+import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ir.type.DefinedType
+import io.github.charlietap.chasm.ir.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ControlInstruction : LinkedInstruction {

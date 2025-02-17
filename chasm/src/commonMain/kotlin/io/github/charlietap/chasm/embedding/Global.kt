@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.embedding
 
-import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.ir.type.GlobalType
 
 fun global(
     store: Store,

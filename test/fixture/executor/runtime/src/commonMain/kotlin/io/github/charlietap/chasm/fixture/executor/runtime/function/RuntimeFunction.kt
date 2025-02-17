@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.function
 
-import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.executor.runtime.function.Expression
 import io.github.charlietap.chasm.executor.runtime.function.Function
+import io.github.charlietap.chasm.ir.module.Index
 
 fun runtimeFunction(
-    idx: Index.FunctionIndex = Index.FunctionIndex(0u),
-    typeIndex: Index.TypeIndex = Index.TypeIndex(0u),
+    idx: Index.FunctionIndex = Index.FunctionIndex(0),
+    typeIndex: Index.TypeIndex = Index.TypeIndex(0),
     locals: LongArray = longArrayOf(),
     body: Expression = runtimeExpression(),
 ) = Function(

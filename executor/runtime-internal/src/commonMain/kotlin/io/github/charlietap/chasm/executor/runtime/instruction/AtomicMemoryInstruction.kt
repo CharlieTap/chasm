@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ir.module.Index
 
 sealed interface AtomicMemoryInstruction : LinkedInstruction {
 

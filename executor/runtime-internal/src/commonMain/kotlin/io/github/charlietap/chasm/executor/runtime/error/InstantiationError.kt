@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.error
 
-import io.github.charlietap.chasm.ast.module.Import
-import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ir.module.Import
+import io.github.charlietap.chasm.ir.module.Index
 import kotlin.jvm.JvmInline
 
 sealed interface InstantiationError : ModuleTrapError {

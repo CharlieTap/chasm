@@ -1,10 +1,14 @@
 package io.github.charlietap.chasm.optimiser.passes
 
+import io.github.charlietap.chasm.fixture.ir.instruction.blockInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.callInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.f32AbsInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedF32Abs
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
 import io.github.charlietap.chasm.fixture.ir.instruction.i32AddInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.i32MulInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.localGetInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.localGetOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetDestination
@@ -45,6 +49,50 @@ class FusionPassTest {
 
         assertEquals(1, actual.size)
         assertEquals(expected, actual.first())
+    }
+
+    @Test
+    fun `can fuse an instructions operands with no explicit destination`() {
+
+        val instructions = listOf(
+            blockInstruction(
+                instructions = listOf(
+                    callInstruction(),
+                    i32ConstInstruction(3),
+                    callInstruction(),
+                    i32ConstInstruction(4),
+                ),
+            ),
+            i32ConstInstruction(5),
+            i32AddInstruction(),
+            i32MulInstruction(),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            blockInstruction(
+                instructions = listOf(
+                    callInstruction(),
+                    i32ConstInstruction(3),
+                    callInstruction(),
+                    i32ConstInstruction(4),
+                ),
+            ),
+            i32ConstInstruction(5),
+            i32AddInstruction(),
+            i32MulInstruction(),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
     }
 
     @Test

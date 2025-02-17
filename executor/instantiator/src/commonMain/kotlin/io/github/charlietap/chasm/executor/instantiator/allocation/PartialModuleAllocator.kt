@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.instantiator.allocation
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
@@ -16,6 +15,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.Import
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.ir.module.Type
 
 internal typealias PartialModuleAllocator = (InstantiationContext, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
 

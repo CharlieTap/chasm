@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.parametric.DropDispatcher
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.ParametricInstruction.Drop
 import io.github.charlietap.chasm.executor.runtime.instruction.ParametricInstruction.Select
 import io.github.charlietap.chasm.executor.runtime.instruction.ParametricInstruction.SelectWithType
+import io.github.charlietap.chasm.ir.instruction.ParametricInstruction
 
 internal fun ParametricInstructionPredecoder(
     context: InstantiationContext,

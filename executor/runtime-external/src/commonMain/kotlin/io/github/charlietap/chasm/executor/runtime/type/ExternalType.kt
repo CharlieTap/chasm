@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.runtime.type
 
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.MemoryType
-import io.github.charlietap.chasm.ast.type.TableType
-import io.github.charlietap.chasm.ast.type.TagType
+import io.github.charlietap.chasm.ir.type.FunctionType
+import io.github.charlietap.chasm.ir.type.GlobalType
+import io.github.charlietap.chasm.ir.type.MemoryType
+import io.github.charlietap.chasm.ir.type.TableType
+import io.github.charlietap.chasm.ir.type.TagType
 import kotlin.jvm.JvmInline
 
 sealed interface ExternalType {

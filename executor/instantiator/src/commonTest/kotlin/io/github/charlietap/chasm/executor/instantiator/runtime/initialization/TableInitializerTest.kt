@@ -1,27 +1,27 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.fixture.ast.instruction.elemDropInstruction
-import io.github.charlietap.chasm.fixture.ast.instruction.expression
-import io.github.charlietap.chasm.fixture.ast.instruction.i32ConstInstruction
-import io.github.charlietap.chasm.fixture.ast.instruction.tableInitInstruction
-import io.github.charlietap.chasm.fixture.ast.module.activeElementSegmentMode
-import io.github.charlietap.chasm.fixture.ast.module.declarativeElementSegmentMode
-import io.github.charlietap.chasm.fixture.ast.module.elementIndex
-import io.github.charlietap.chasm.fixture.ast.module.elementSegment
-import io.github.charlietap.chasm.fixture.ast.module.module
-import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.ir.instruction.elemDropInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.expression
+import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.tableInitInstruction
+import io.github.charlietap.chasm.fixture.ir.module.activeElementSegmentMode
+import io.github.charlietap.chasm.fixture.ir.module.declarativeElementSegmentMode
+import io.github.charlietap.chasm.fixture.ir.module.elementIndex
+import io.github.charlietap.chasm.fixture.ir.module.elementSegment
+import io.github.charlietap.chasm.fixture.ir.module.module
+import io.github.charlietap.chasm.fixture.ir.module.tableIndex
+import io.github.charlietap.chasm.ir.instruction.Expression
+import io.github.charlietap.chasm.ir.module.ElementSegment
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
@@ -31,21 +31,21 @@ class TableInitializerTest {
     @Test
     fun `can initialize a table on a module instance`() {
 
-        val activeTableIndex = tableIndex(0u)
+        val activeTableIndex = tableIndex(0)
         val activeOffsetExpression = expression(
             listOf(
                 i32ConstInstruction(117),
             ),
         )
         val activeSegment = elementSegment(
-            idx = elementIndex(0u),
+            idx = elementIndex(0),
             mode = activeElementSegmentMode(
                 tableIndex = activeTableIndex,
                 offsetExpr = activeOffsetExpression,
             ),
         )
         val declarativeSegment = elementSegment(
-            idx = elementIndex(1u),
+            idx = elementIndex(1),
             mode = declarativeElementSegmentMode(),
         )
 

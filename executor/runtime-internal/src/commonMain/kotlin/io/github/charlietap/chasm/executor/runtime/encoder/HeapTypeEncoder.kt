@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.runtime.encoder
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.BottomType
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ir.type.AbstractHeapType
+import io.github.charlietap.chasm.ir.type.BottomType
+import io.github.charlietap.chasm.ir.type.ConcreteHeapType
+import io.github.charlietap.chasm.ir.type.HeapType
 
 typealias HeapTypeEncoder = (HeapType) -> Int
 typealias HeapTypeDecoder = (Int) -> HeapType
@@ -26,7 +26,7 @@ inline fun HeapTypeEncoder(
     AbstractHeapType.None -> HEAP_TYPE_NONE
     is AbstractHeapType.Bottom -> HEAP_TYPE_BOTTOM
     is ConcreteHeapType.TypeIndex -> {
-        (type.index.idx.toInt() shl 8) or HEAP_TYPE_HEAP_TYPE_INDEX
+        (type.index.idx shl 8) or HEAP_TYPE_HEAP_TYPE_INDEX
     }
     is ConcreteHeapType.RecursiveTypeIndex -> throw IllegalArgumentException("Cannot encode RecursiveTypeIndex on the stack")
     is ConcreteHeapType.Defined -> throw IllegalArgumentException("Cannot encode Defined type on the stack")
@@ -52,7 +52,7 @@ inline fun HeapTypeDecoder(
         HEAP_TYPE_I31 -> AbstractHeapType.I31
         HEAP_TYPE_NONE -> AbstractHeapType.None
         HEAP_TYPE_BOTTOM -> AbstractHeapType.Bottom(BottomType)
-        HEAP_TYPE_HEAP_TYPE_INDEX -> ConcreteHeapType.TypeIndex(Index.TypeIndex(value.toUInt()))
+        HEAP_TYPE_HEAP_TYPE_INDEX -> ConcreteHeapType.TypeIndex(Index.TypeIndex(value))
         else -> throw IllegalArgumentException("Unknown HeapType encoding: $encoded")
     }
 }

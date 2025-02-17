@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instance
 
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.StructType
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
-import io.github.charlietap.chasm.fixture.ast.type.definedType
-import io.github.charlietap.chasm.fixture.ast.type.structType
+import io.github.charlietap.chasm.fixture.ir.type.definedType
+import io.github.charlietap.chasm.fixture.ir.type.structType
+import io.github.charlietap.chasm.ir.type.DefinedType
+import io.github.charlietap.chasm.ir.type.StructType
 
 fun structInstance(
     definedType: DefinedType = definedType(),

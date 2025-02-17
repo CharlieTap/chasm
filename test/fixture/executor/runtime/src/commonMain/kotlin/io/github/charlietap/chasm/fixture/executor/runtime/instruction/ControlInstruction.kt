@@ -1,18 +1,18 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.fixture.ast.module.labelIndex
-import io.github.charlietap.chasm.fixture.ast.module.typeIndex
-import io.github.charlietap.chasm.fixture.ast.type.definedType
-import io.github.charlietap.chasm.fixture.ast.type.referenceType
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
+import io.github.charlietap.chasm.fixture.ir.module.labelIndex
+import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.ir.type.definedType
+import io.github.charlietap.chasm.fixture.ir.type.referenceType
+import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ir.type.DefinedType
+import io.github.charlietap.chasm.ir.type.ReferenceType
 
 fun controlRuntimeInstruction(): ControlInstruction = unreachableRuntimeInstruction()
 

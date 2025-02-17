@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.Import
-import io.github.charlietap.chasm.ast.module.Import as ModuleImport
+import io.github.charlietap.chasm.ir.module.Import as ModuleImport
 
 typealias ImportMatcher = (InstantiationContext, List<Import>) -> Result<List<ExternalValue>, ModuleTrapError>
 

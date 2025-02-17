@@ -2,11 +2,11 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.Expression
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.ir.instruction.Expression
+import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
 internal fun ExpressionPredecoder(

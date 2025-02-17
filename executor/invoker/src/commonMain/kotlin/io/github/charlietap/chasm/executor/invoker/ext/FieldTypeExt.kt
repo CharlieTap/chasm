@@ -1,10 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.ext
 
-import io.github.charlietap.chasm.ast.type.FieldType
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.PackedType
-import io.github.charlietap.chasm.ast.type.StorageType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.memory.ext.toDoubleLittleEndian
 import io.github.charlietap.chasm.executor.memory.ext.toFloatLittleEndian
 import io.github.charlietap.chasm.executor.memory.ext.toIntLittleEndian
@@ -12,6 +7,11 @@ import io.github.charlietap.chasm.executor.memory.ext.toLongLittleEndian
 import io.github.charlietap.chasm.executor.memory.ext.toShortLittleEndian
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
+import io.github.charlietap.chasm.ir.type.FieldType
+import io.github.charlietap.chasm.ir.type.NumberType
+import io.github.charlietap.chasm.ir.type.PackedType
+import io.github.charlietap.chasm.ir.type.StorageType
+import io.github.charlietap.chasm.ir.type.ValueType
 
 fun FieldType.valueFromBytes(
     bytes: UByteArray,

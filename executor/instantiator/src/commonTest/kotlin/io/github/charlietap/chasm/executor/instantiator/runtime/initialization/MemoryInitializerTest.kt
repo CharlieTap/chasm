@@ -1,25 +1,25 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.fixture.ast.instruction.dataDropInstruction
-import io.github.charlietap.chasm.fixture.ast.instruction.expression
-import io.github.charlietap.chasm.fixture.ast.instruction.i32ConstInstruction
-import io.github.charlietap.chasm.fixture.ast.instruction.memoryInitInstruction
-import io.github.charlietap.chasm.fixture.ast.module.activeDataSegmentMode
-import io.github.charlietap.chasm.fixture.ast.module.dataIndex
-import io.github.charlietap.chasm.fixture.ast.module.dataSegment
-import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
-import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.ir.instruction.dataDropInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.expression
+import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.memoryInitInstruction
+import io.github.charlietap.chasm.fixture.ir.module.activeDataSegmentMode
+import io.github.charlietap.chasm.fixture.ir.module.dataIndex
+import io.github.charlietap.chasm.fixture.ir.module.dataSegment
+import io.github.charlietap.chasm.fixture.ir.module.memoryIndex
+import io.github.charlietap.chasm.fixture.ir.module.module
+import io.github.charlietap.chasm.ir.instruction.Expression
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
@@ -29,14 +29,14 @@ class MemoryInitializerTest {
     @Test
     fun `can initialize a memory on a module instance`() {
 
-        val activeDataIndex = dataIndex(0u)
+        val activeDataIndex = dataIndex(0)
         val offset = 117
         val activeOffsetExpression = expression(
             listOf(
                 i32ConstInstruction(offset),
             ),
         )
-        val memoryIndex = memoryIndex(0u)
+        val memoryIndex = memoryIndex(0)
         val activeSegment = dataSegment(
             idx = activeDataIndex,
             mode = activeDataSegmentMode(

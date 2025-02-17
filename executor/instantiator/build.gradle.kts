@@ -12,19 +12,21 @@ kotlin {
                 api(projects.ast)
                 api(projects.executor.runtimeInternal)
                 api(projects.executor.invoker)
+                api(projects.ir)
                 api(libs.result)
 
-                implementation(projects.ir)
-                implementation(projects.typeSystem)
+                implementation(projects.irFactory)
+                implementation(projects.optimiser)
+                implementation(projects.typeSystemIr)
                 implementation(projects.executor.memory)
             }
         }
 
         commonTest {
             dependencies {
-                implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.executor.instantiator)
                 implementation(projects.test.fixture.executor.runtime)
+                implementation(projects.test.fixture.ir)
                 implementation(libs.kotlin.test)
             }
         }

@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.globalAddress
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.global
 import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction.GlobalGet
+import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 
 internal fun GlobalGetInstructionPredecoder(
     context: InstantiationContext,

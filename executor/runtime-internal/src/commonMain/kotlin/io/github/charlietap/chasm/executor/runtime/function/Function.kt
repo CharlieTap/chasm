@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.function
 
-import io.github.charlietap.chasm.ast.module.Index.FunctionIndex
-import io.github.charlietap.chasm.ast.module.Index.TypeIndex
+import io.github.charlietap.chasm.ir.module.Index.FunctionIndex
+import io.github.charlietap.chasm.ir.module.Index.TypeIndex
 
 data class Function(
     val idx: FunctionIndex,
@@ -11,8 +11,8 @@ data class Function(
 ) {
     companion object {
         val TEMP = Function(
-            idx = FunctionIndex(0u),
-            typeIndex = TypeIndex(0u),
+            idx = FunctionIndex(0),
+            typeIndex = TypeIndex(0),
             locals = longArrayOf(),
             body = Expression.EMPTY,
         )

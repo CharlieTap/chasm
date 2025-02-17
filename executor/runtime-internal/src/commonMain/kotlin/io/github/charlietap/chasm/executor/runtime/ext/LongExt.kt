@@ -1,7 +1,5 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_ARRAY
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_EXCEPTION
@@ -19,6 +17,8 @@ import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.value.NumberValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.ir.type.NumberType
+import io.github.charlietap.chasm.ir.type.ValueType
 
 fun Long.toReferenceValue(): ReferenceValue = ReferenceValueDecoder(this)
 

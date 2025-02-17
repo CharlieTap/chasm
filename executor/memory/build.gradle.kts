@@ -23,7 +23,6 @@ kotlin {
 
        commonMain {
             dependencies {
-                api(projects.ast)
                 api(projects.executor.runtimeInternal)
                 api(libs.result)
             }
@@ -31,8 +30,6 @@ kotlin {
 
         commonTest {
             dependencies {
-                implementation(projects.test.fixture.ast)
-                implementation(projects.test.fixture.executor.runtime)
                 implementation(libs.kotlin.test)
             }
         }
