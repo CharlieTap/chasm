@@ -1,13 +1,16 @@
 package io.github.charlietap.chasm.optimiser.passes
 
+import io.github.charlietap.chasm.fixture.ir.instruction.blockInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.callInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.f32AbsInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedF32Abs
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
+import io.github.charlietap.chasm.fixture.ir.instruction.fusedIf
 import io.github.charlietap.chasm.fixture.ir.instruction.i32AddInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstOperand
+import io.github.charlietap.chasm.fixture.ir.instruction.ifInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.localGetInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.localGetOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetDestination
@@ -133,6 +136,79 @@ class FusionPassTest {
                 left = valueStackOperand(),
                 right = i32ConstOperand(5),
                 destination = valueStackDestination(),
+            ),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can fuse an if instruction`() {
+
+        val instructions = listOf(
+            i32ConstInstruction(5),
+            ifInstruction(),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            fusedIf(
+                operand = i32ConstOperand(5),
+            ),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can fuse instructions nested in control flow`() {
+
+        val instructions = listOf(
+            blockInstruction(
+                instructions = listOf(
+                    blockInstruction(
+                        instructions = listOf(
+                            i32ConstInstruction(5),
+                            i32ConstInstruction(2),
+                            i32AddInstruction(),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            blockInstruction(
+                instructions = listOf(
+                    blockInstruction(
+                        instructions = listOf(
+                            fusedI32Add(
+                                left = i32ConstOperand(5),
+                                right = i32ConstOperand(2),
+                                destination = valueStackDestination(),
+                            ),
+                        ),
+                    ),
+                ),
             ),
         )
         val actual = FusionPass(module).functions[0].body.instructions

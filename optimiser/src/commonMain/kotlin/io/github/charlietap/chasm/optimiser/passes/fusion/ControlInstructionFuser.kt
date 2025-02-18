@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.optimiser.passes.fusion
 
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.Expression
+import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 
 internal typealias ControlInstructionFuser = (Int, ControlInstruction, List<Instruction>, MutableList<Instruction>) -> Int
@@ -17,8 +18,7 @@ internal fun ControlInstructionFuser(
     input = input,
     output = output,
     expressionFuser = ::ExpressionFuser,
-    unop = ::UnopFuser,
-    binop = ::BinopFuser,
+    operandFactory = ::FusedOperandFactory,
 )
 
 internal inline fun ControlInstructionFuser(
@@ -27,8 +27,7 @@ internal inline fun ControlInstructionFuser(
     input: List<Instruction>,
     output: MutableList<Instruction>,
     expressionFuser: ExpressionFuser,
-    unop: UnopFuser,
-    binop: BinopFuser,
+    operandFactory: FusedOperandFactory,
 ): Int = when (instruction) {
     is ControlInstruction.Block -> {
 
@@ -51,12 +50,27 @@ internal inline fun ControlInstructionFuser(
             expressionFuser(Expression(it))
         }
 
-        output.add(
-            instruction.copy(
-                thenInstructions = fusedThenExpression.instructions,
-                elseInstructions = fusedElseExpression?.instructions,
-            ),
-        )
+        val operand = input.getOrNull(index - 1)?.let(operandFactory)
+
+        if (operand == null) {
+            output.add(
+                instruction.copy(
+                    thenInstructions = fusedThenExpression.instructions,
+                    elseInstructions = fusedElseExpression?.instructions,
+                ),
+            )
+        } else {
+            output.removeLast()
+            output.add(
+                FusedControlInstruction.If(
+                    operand = operand,
+                    blockType = instruction.blockType,
+                    thenInstructions = fusedThenExpression.instructions,
+                    elseInstructions = fusedElseExpression?.instructions,
+                ),
+            )
+        }
+
         index
     }
     is ControlInstruction.Loop -> {

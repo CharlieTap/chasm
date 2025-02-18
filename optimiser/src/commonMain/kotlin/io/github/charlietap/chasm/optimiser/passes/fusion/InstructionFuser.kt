@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.optimiser.passes.fusion
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ir.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
+import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
@@ -53,6 +54,7 @@ internal inline fun InstructionFuser(
     is TableInstruction,
     is VariableInstruction,
     is VectorInstruction,
+    is FusedControlInstruction,
     is FusedNumericInstruction,
     -> {
         output.add(instruction)
