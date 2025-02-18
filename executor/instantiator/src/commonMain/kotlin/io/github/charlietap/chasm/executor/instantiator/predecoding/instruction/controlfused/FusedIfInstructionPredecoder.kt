@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.control
+package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.controlfused
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding

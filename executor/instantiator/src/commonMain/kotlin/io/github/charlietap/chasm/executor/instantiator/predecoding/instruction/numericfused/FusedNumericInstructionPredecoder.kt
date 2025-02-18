@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.numeric
+package io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.numericfused
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding

@@ -6,10 +6,10 @@ import io.github.charlietap.chasm.executor.instantiator.context.InstantiationCon
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.aggregate.AggregateInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.atomic.AtomicMemoryInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.control.ControlInstructionPredecoder
-import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.control.FusedControlInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.controlfused.FusedControlInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memory.MemoryInstructionPredecoder
-import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.numeric.FusedNumericInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.numeric.NumericInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.numericfused.FusedNumericInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.parametric.ParametricInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.reference.ReferenceInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.table.TableInstructionPredecoder
