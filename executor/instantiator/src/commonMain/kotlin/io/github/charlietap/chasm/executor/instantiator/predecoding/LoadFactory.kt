@@ -34,6 +34,9 @@ internal inline fun LoadFactory(
             is FusedOperand.LocalGet -> {
                 { stack -> stack.getLocal(operand.index.idx) }
             }
+            is FusedOperand.ValueStack -> {
+                { stack -> stack.pop() }
+            }
         }
     }
 }

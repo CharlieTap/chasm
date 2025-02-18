@@ -42,3 +42,5 @@ fun globalGetOperand(
 ): FusedOperand = FusedOperand.GlobalGet(
     index = index,
 )
+
+fun valueStackOperand() = FusedOperand.ValueStack
