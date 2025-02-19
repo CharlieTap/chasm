@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ir.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
@@ -28,6 +29,7 @@ internal fun InstructionFuser(
     output = output,
     controlInstructionFuser = ::ControlInstructionFuser,
     numericInstructionFuser = ::NumericInstructionFuser,
+    variableInstructionFuser = ::VariableInstructionFuser,
 )
 
 internal inline fun InstructionFuser(
@@ -37,29 +39,29 @@ internal inline fun InstructionFuser(
     output: MutableList<Instruction>,
     controlInstructionFuser: ControlInstructionFuser,
     numericInstructionFuser: NumericInstructionFuser,
+    variableInstructionFuser: VariableInstructionFuser,
 ): Int = when (instruction) {
     is NumericInstruction.I32Const,
     is NumericInstruction.I64Const,
     is NumericInstruction.F32Const,
     is NumericInstruction.F64Const,
     is VariableInstruction.GlobalGet,
-    is VariableInstruction.GlobalSet,
     is VariableInstruction.LocalGet,
-    is VariableInstruction.LocalSet,
     is AggregateInstruction,
     is AtomicMemoryInstruction,
     is MemoryInstruction,
     is ParametricInstruction,
     is ReferenceInstruction,
     is TableInstruction,
-    is VariableInstruction,
     is VectorInstruction,
     is FusedControlInstruction,
     is FusedNumericInstruction,
+    is FusedVariableInstruction,
     -> {
         output.add(instruction)
         index
     }
     is ControlInstruction -> controlInstructionFuser(index, instruction, input, output)
     is NumericInstruction -> numericInstructionFuser(index, instruction, input, output)
+    is VariableInstruction -> variableInstructionFuser(index, instruction, input, output)
 }

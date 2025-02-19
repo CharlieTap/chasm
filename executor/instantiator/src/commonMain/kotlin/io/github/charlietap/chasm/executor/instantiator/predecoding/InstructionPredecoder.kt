@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.reference.ReferenceInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.table.TableInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.variable.VariableInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.variablefused.FusedVariableInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.vector.VectorInstructionPredecoder
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
@@ -22,6 +23,7 @@ import io.github.charlietap.chasm.ir.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
@@ -43,6 +45,7 @@ internal fun InstructionPredecoder(
         controlInstructionPredecoder = ::ControlInstructionPredecoder,
         fusedControlInstructionPredecoder = ::FusedControlInstructionPredecoder,
         fusedNumericInstructionPredecoder = ::FusedNumericInstructionPredecoder,
+        fusedVariableInstructionPredecoder = ::FusedVariableInstructionPredecoder,
         numericInstructionPredecoder = ::NumericInstructionPredecoder,
         memoryInstructionPredecoder = ::MemoryInstructionPredecoder,
         parametricInstructionPredecoder = ::ParametricInstructionPredecoder,
@@ -60,6 +63,7 @@ internal inline fun InstructionPredecoder(
     crossinline controlInstructionPredecoder: Predecoder<ControlInstruction, DispatchableInstruction>,
     crossinline fusedControlInstructionPredecoder: Predecoder<FusedControlInstruction, DispatchableInstruction>,
     crossinline fusedNumericInstructionPredecoder: Predecoder<FusedNumericInstruction, DispatchableInstruction>,
+    crossinline fusedVariableInstructionPredecoder: Predecoder<FusedVariableInstruction, DispatchableInstruction>,
     crossinline memoryInstructionPredecoder: Predecoder<MemoryInstruction, DispatchableInstruction>,
     crossinline numericInstructionPredecoder: Predecoder<NumericInstruction, DispatchableInstruction>,
     crossinline parametricInstructionPredecoder: Predecoder<ParametricInstruction, DispatchableInstruction>,
@@ -80,6 +84,7 @@ internal inline fun InstructionPredecoder(
             is NumericInstruction -> numericInstructionPredecoder(context, instruction).bind()
             is FusedControlInstruction -> fusedControlInstructionPredecoder(context, instruction).bind()
             is FusedNumericInstruction -> fusedNumericInstructionPredecoder(context, instruction).bind()
+            is FusedVariableInstruction -> fusedVariableInstructionPredecoder(context, instruction).bind()
             is ParametricInstruction -> parametricInstructionPredecoder(context, instruction).bind()
             is ReferenceInstruction -> referenceInstructionPredecoder(context, instruction).bind()
             is TableInstruction -> tableInstructionPredecoder(context, instruction).bind()

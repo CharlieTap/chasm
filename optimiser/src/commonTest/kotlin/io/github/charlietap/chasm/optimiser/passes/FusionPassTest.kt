@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.f32AbsInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedF32Abs
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedIf
+import io.github.charlietap.chasm.fixture.ir.instruction.fusedLocalSet
 import io.github.charlietap.chasm.fixture.ir.instruction.i32AddInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstOperand
@@ -209,6 +210,34 @@ class FusionPassTest {
                         ),
                     ),
                 ),
+            ),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can fuse local set`() {
+
+        val instructions = listOf(
+            i32ConstInstruction(5),
+            localSetInstruction(localIndex(0)),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            fusedLocalSet(
+                operand = i32ConstOperand(5),
+                localIdx = localIndex(0),
             ),
         )
         val actual = FusionPass(module).functions[0].body.instructions
