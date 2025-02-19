@@ -16,6 +16,16 @@ fun fusedI32Add(
     destination = destination,
 )
 
+fun fusedI32And(
+    left: FusedOperand = fusedOperand(),
+    right: FusedOperand = fusedOperand(),
+    destination: FusedDestination = fusedDestination(),
+): FusedNumericInstruction = FusedNumericInstruction.I32And(
+    left = left,
+    right = right,
+    destination = destination,
+)
+
 fun fusedF32Abs(
     operand: FusedOperand = fusedOperand(),
     destination: FusedDestination = fusedDestination(),

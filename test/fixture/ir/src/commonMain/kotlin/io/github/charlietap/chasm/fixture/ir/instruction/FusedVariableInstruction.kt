@@ -24,3 +24,11 @@ fun fusedLocalSet(
     operand = operand,
     localIdx = localIdx,
 )
+
+fun fusedLocalTee(
+    operand: FusedOperand = fusedOperand(),
+    localIdx: LocalIndex = localIndex(),
+) = FusedVariableInstruction.LocalTee(
+    operand = operand,
+    localIdx = localIdx,
+)

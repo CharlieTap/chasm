@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.optimiser.passes.fusion
 
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Abs
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Add
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32And
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Mul
@@ -38,6 +39,7 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.I32Mul -> binop(index, instruction, input, output, ::I32Mul)
     is NumericInstruction.I32DivS -> binop(index, instruction, input, output, ::I32DivS)
     is NumericInstruction.I32DivU -> binop(index, instruction, input, output, ::I32DivU)
+    is NumericInstruction.I32And -> binop(index, instruction, input, output, ::I32And)
     is NumericInstruction.F32Abs -> unop(index, instruction, input, output, ::F32Abs)
     else -> {
         output.add(instruction)
