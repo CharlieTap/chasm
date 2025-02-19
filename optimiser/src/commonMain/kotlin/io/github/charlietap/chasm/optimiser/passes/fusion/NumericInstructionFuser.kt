@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Or
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Shl
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Sub
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
@@ -42,6 +43,7 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.I32DivU -> binop(index, instruction, input, output, ::I32DivU)
     is NumericInstruction.I32And -> binop(index, instruction, input, output, ::I32And)
     is NumericInstruction.I32Or -> binop(index, instruction, input, output, ::I32Or)
+    is NumericInstruction.I32Shl -> binop(index, instruction, input, output, ::I32Shl)
     is NumericInstruction.F32Abs -> unop(index, instruction, input, output, ::F32Abs)
     else -> {
         output.add(instruction)

@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32DivS
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32DivUDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32MulDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32OrDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ShlDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32SubDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
@@ -23,6 +24,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstr
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32DivU
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Mul
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Or
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Shl
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Sub
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
 
@@ -42,6 +44,7 @@ internal fun FusedNumericInstructionPredecoder(
         i32MulDispatcher = ::I32MulDispatcher,
         i32DivSDispatcher = ::I32DivSDispatcher,
         i32DivUDispatcher = ::I32DivUDispatcher,
+        i32ShlDispatcher = ::I32ShlDispatcher,
         f32AbsDispatcher = ::F32AbsDispatcher,
     )
 
@@ -57,6 +60,7 @@ internal inline fun FusedNumericInstructionPredecoder(
     crossinline i32MulDispatcher: Dispatcher<I32Mul>,
     crossinline i32DivSDispatcher: Dispatcher<I32DivS>,
     crossinline i32DivUDispatcher: Dispatcher<I32DivU>,
+    crossinline i32ShlDispatcher: Dispatcher<I32Shl>,
     crossinline f32AbsDispatcher: Dispatcher<F32Abs>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
@@ -167,6 +171,19 @@ internal inline fun FusedNumericInstructionPredecoder(
                 ),
             )
         }
+        is FusedNumericInstruction.I32Shl -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+
+            i32ShlDispatcher(
+                I32Shl(
+                    left = left,
+                    right = right,
+                    destination = destination,
+                ),
+            )
+        }
         is FusedNumericInstruction.F32Add -> TODO()
         is FusedNumericInstruction.F32Ceil -> TODO()
         is FusedNumericInstruction.F32ConvertI32S -> TODO()
@@ -239,7 +256,6 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.I32RemU -> TODO()
         is FusedNumericInstruction.I32Rotl -> TODO()
         is FusedNumericInstruction.I32Rotr -> TODO()
-        is FusedNumericInstruction.I32Shl -> TODO()
         is FusedNumericInstruction.I32ShrS -> TODO()
         is FusedNumericInstruction.I32ShrU -> TODO()
         is FusedNumericInstruction.I32TruncF32S -> TODO()
