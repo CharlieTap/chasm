@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.control.ControlInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.controlfused.FusedControlInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memory.MemoryInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.FusedMemoryInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.numeric.NumericInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.numericfused.FusedNumericInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.parametric.ParametricInstructionPredecoder
@@ -22,6 +23,7 @@ import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ir.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
+import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
@@ -45,6 +47,7 @@ internal fun InstructionPredecoder(
         controlInstructionPredecoder = ::ControlInstructionPredecoder,
         fusedControlInstructionPredecoder = ::FusedControlInstructionPredecoder,
         fusedNumericInstructionPredecoder = ::FusedNumericInstructionPredecoder,
+        fusedMemoryInstructionPredecoder = ::FusedMemoryInstructionPredecoder,
         fusedVariableInstructionPredecoder = ::FusedVariableInstructionPredecoder,
         numericInstructionPredecoder = ::NumericInstructionPredecoder,
         memoryInstructionPredecoder = ::MemoryInstructionPredecoder,
@@ -63,6 +66,7 @@ internal inline fun InstructionPredecoder(
     crossinline controlInstructionPredecoder: Predecoder<ControlInstruction, DispatchableInstruction>,
     crossinline fusedControlInstructionPredecoder: Predecoder<FusedControlInstruction, DispatchableInstruction>,
     crossinline fusedNumericInstructionPredecoder: Predecoder<FusedNumericInstruction, DispatchableInstruction>,
+    crossinline fusedMemoryInstructionPredecoder: Predecoder<FusedMemoryInstruction, DispatchableInstruction>,
     crossinline fusedVariableInstructionPredecoder: Predecoder<FusedVariableInstruction, DispatchableInstruction>,
     crossinline memoryInstructionPredecoder: Predecoder<MemoryInstruction, DispatchableInstruction>,
     crossinline numericInstructionPredecoder: Predecoder<NumericInstruction, DispatchableInstruction>,
@@ -84,6 +88,7 @@ internal inline fun InstructionPredecoder(
             is NumericInstruction -> numericInstructionPredecoder(context, instruction).bind()
             is FusedControlInstruction -> fusedControlInstructionPredecoder(context, instruction).bind()
             is FusedNumericInstruction -> fusedNumericInstructionPredecoder(context, instruction).bind()
+            is FusedMemoryInstruction -> fusedMemoryInstructionPredecoder(context, instruction).bind()
             is FusedVariableInstruction -> fusedVariableInstructionPredecoder(context, instruction).bind()
             is ParametricInstruction -> parametricInstructionPredecoder(context, instruction).bind()
             is ReferenceInstruction -> referenceInstructionPredecoder(context, instruction).bind()

@@ -24,117 +24,117 @@ internal inline fun MemoryInstructionFactory(
     memArgFactory: IRFactory<MemArg, IRMemArg>,
 ): IRMemoryInstruction {
     return when (instruction) {
-        is MemoryInstruction.I32Load -> IRMemoryInstruction.I32Load(
+        is MemoryInstruction.I32Load -> IRMemoryInstruction.Load.I32Load(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Load -> IRMemoryInstruction.I64Load(
+        is MemoryInstruction.I64Load -> IRMemoryInstruction.Load.I64Load(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.F32Load -> IRMemoryInstruction.F32Load(
+        is MemoryInstruction.F32Load -> IRMemoryInstruction.Load.F32Load(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.F64Load -> IRMemoryInstruction.F64Load(
+        is MemoryInstruction.F64Load -> IRMemoryInstruction.Load.F64Load(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I32Load8S -> IRMemoryInstruction.I32Load8S(
+        is MemoryInstruction.I32Load8S -> IRMemoryInstruction.Load.I32Load8S(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I32Load8U -> IRMemoryInstruction.I32Load8U(
+        is MemoryInstruction.I32Load8U -> IRMemoryInstruction.Load.I32Load8U(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I32Load16S -> IRMemoryInstruction.I32Load16S(
+        is MemoryInstruction.I32Load16S -> IRMemoryInstruction.Load.I32Load16S(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I32Load16U -> IRMemoryInstruction.I32Load16U(
+        is MemoryInstruction.I32Load16U -> IRMemoryInstruction.Load.I32Load16U(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Load8S -> IRMemoryInstruction.I64Load8S(
+        is MemoryInstruction.I64Load8S -> IRMemoryInstruction.Load.I64Load8S(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Load8U -> IRMemoryInstruction.I64Load8U(
+        is MemoryInstruction.I64Load8U -> IRMemoryInstruction.Load.I64Load8U(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Load16S -> IRMemoryInstruction.I64Load16S(
+        is MemoryInstruction.I64Load16S -> IRMemoryInstruction.Load.I64Load16S(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Load16U -> IRMemoryInstruction.I64Load16U(
+        is MemoryInstruction.I64Load16U -> IRMemoryInstruction.Load.I64Load16U(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Load32S -> IRMemoryInstruction.I64Load32S(
+        is MemoryInstruction.I64Load32S -> IRMemoryInstruction.Load.I64Load32S(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Load32U -> IRMemoryInstruction.I64Load32U(
+        is MemoryInstruction.I64Load32U -> IRMemoryInstruction.Load.I64Load32U(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I32Store -> IRMemoryInstruction.I32Store(
+        is MemoryInstruction.I32Store -> IRMemoryInstruction.Store.I32Store(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Store -> IRMemoryInstruction.I64Store(
+        is MemoryInstruction.I64Store -> IRMemoryInstruction.Store.I64Store(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.F32Store -> IRMemoryInstruction.F32Store(
+        is MemoryInstruction.F32Store -> IRMemoryInstruction.Store.F32Store(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.F64Store -> IRMemoryInstruction.F64Store(
+        is MemoryInstruction.F64Store -> IRMemoryInstruction.Store.F64Store(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I32Store8 -> IRMemoryInstruction.I32Store8(
+        is MemoryInstruction.I32Store8 -> IRMemoryInstruction.Store.I32Store8(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I32Store16 -> IRMemoryInstruction.I32Store16(
+        is MemoryInstruction.I32Store16 -> IRMemoryInstruction.Store.I32Store16(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Store8 -> IRMemoryInstruction.I64Store8(
+        is MemoryInstruction.I64Store8 -> IRMemoryInstruction.Store.I64Store8(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Store16 -> IRMemoryInstruction.I64Store16(
+        is MemoryInstruction.I64Store16 -> IRMemoryInstruction.Store.I64Store16(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )
 
-        is MemoryInstruction.I64Store32 -> IRMemoryInstruction.I64Store32(
+        is MemoryInstruction.I64Store32 -> IRMemoryInstruction.Store.I64Store32(
             memoryIndex = memoryIndexFactory(instruction.memoryIndex),
             memArg = memArgFactory(instruction.memArg),
         )

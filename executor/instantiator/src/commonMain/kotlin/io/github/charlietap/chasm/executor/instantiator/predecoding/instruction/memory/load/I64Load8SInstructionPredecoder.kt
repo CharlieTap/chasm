@@ -17,7 +17,7 @@ import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
 
 internal fun I64Load8SInstructionPredecoder(
     context: InstantiationContext,
-    instruction: MemoryInstruction.I64Load8S,
+    instruction: MemoryInstruction.Load.I64Load8S,
 ): Result<DispatchableInstruction, ModuleTrapError> =
     I64Load8SInstructionPredecoder(
         context = context,
@@ -28,7 +28,7 @@ internal fun I64Load8SInstructionPredecoder(
 
 internal inline fun I64Load8SInstructionPredecoder(
     context: InstantiationContext,
-    instruction: MemoryInstruction.I64Load8S,
+    instruction: MemoryInstruction.Load.I64Load8S,
     crossinline dispatcher: Dispatcher<I64Load8S>,
     crossinline memArgPredecoder: MemArgPredecoder,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
