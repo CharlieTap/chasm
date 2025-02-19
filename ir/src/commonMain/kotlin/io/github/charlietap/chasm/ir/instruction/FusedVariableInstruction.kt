@@ -10,6 +10,11 @@ sealed interface FusedVariableInstruction : Instruction {
         val localIdx: LocalIndex,
     ) : FusedVariableInstruction
 
+    data class LocalTee(
+        val operand: FusedOperand,
+        val localIdx: LocalIndex,
+    ) : FusedVariableInstruction
+
     data class GlobalSet(
         val operand: FusedOperand,
         val globalIdx: GlobalIndex,

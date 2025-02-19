@@ -58,6 +58,22 @@ internal inline fun VariableInstructionFuser(
 
         index
     }
+    is VariableInstruction.LocalTee -> {
+        val operand = input.getOrNull(index - 1)?.let(operandFactory)
+        if (operand == null) {
+            output.add(instruction)
+        } else {
+            output.removeLast()
+            output.add(
+                FusedVariableInstruction.LocalTee(
+                    operand = operand,
+                    localIdx = instruction.localIdx,
+                ),
+            )
+        }
+
+        index
+    }
     else -> {
         output.add(instruction)
         index

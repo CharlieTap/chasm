@@ -13,4 +13,9 @@ sealed interface FusedVariableInstruction : LinkedInstruction {
         val operand: LoadOp,
         val localIdx: Int,
     ) : VariableInstruction
+
+    data class LocalTee(
+        val operand: LoadOp,
+        val localIdx: Int,
+    ) : VariableInstruction
 }
