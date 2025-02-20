@@ -1,0 +1,20 @@
+package io.github.charlietap.chasm.executor.invoker.dispatch.memoryfused
+
+import io.github.charlietap.chasm.executor.invoker.instruction.memoryfused.store.F64StoreExecutor
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.execution.Executor
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedMemoryInstruction
+
+fun F64StoreDispatcher(
+    instruction: FusedMemoryInstruction.F64Store,
+) = F64StoreDispatcher(
+    instruction = instruction,
+    executor = ::F64StoreExecutor,
+)
+
+internal inline fun F64StoreDispatcher(
+    instruction: FusedMemoryInstruction.F64Store,
+    crossinline executor: Executor<FusedMemoryInstruction.F64Store>,
+): DispatchableInstruction = { context ->
+    executor(context, instruction)
+}

@@ -18,6 +18,15 @@ import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.load.I64Load8SInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.load.I64Load8UInstructionPredecoder
 import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.load.I64LoadInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.F32StoreInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.F64StoreInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.I32Store16InstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.I32Store8InstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.I32StoreInstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.I64Store16InstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.I64Store32InstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.I64Store8InstructionPredecoder
+import io.github.charlietap.chasm.executor.instantiator.predecoding.instruction.memoryfused.store.I64StoreInstructionPredecoder
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
@@ -43,6 +52,15 @@ internal fun FusedMemoryInstructionPredecoder(
         i64Load32UInstructionPredecoder = ::I64Load32UInstructionPredecoder,
         f32LoadInstructionPredecoder = ::F32LoadInstructionPredecoder,
         f64LoadInstructionPredecoder = ::F64LoadInstructionPredecoder,
+        i32StoreInstructionPredecoder = ::I32StoreInstructionPredecoder,
+        i32Store8InstructionPredecoder = ::I32Store8InstructionPredecoder,
+        i32Store16InstructionPredecoder = ::I32Store16InstructionPredecoder,
+        i64StoreInstructionPredecoder = ::I64StoreInstructionPredecoder,
+        i64Store8InstructionPredecoder = ::I64Store8InstructionPredecoder,
+        i64Store16InstructionPredecoder = ::I64Store16InstructionPredecoder,
+        i64Store32InstructionPredecoder = ::I64Store32InstructionPredecoder,
+        f32StoreInstructionPredecoder = ::F32StoreInstructionPredecoder,
+        f64StoreInstructionPredecoder = ::F64StoreInstructionPredecoder,
     )
 
 internal inline fun FusedMemoryInstructionPredecoder(
@@ -62,6 +80,15 @@ internal inline fun FusedMemoryInstructionPredecoder(
     crossinline i64Load32UInstructionPredecoder: Predecoder<FusedMemoryInstruction.I64Load32U, DispatchableInstruction>,
     crossinline f32LoadInstructionPredecoder: Predecoder<FusedMemoryInstruction.F32Load, DispatchableInstruction>,
     crossinline f64LoadInstructionPredecoder: Predecoder<FusedMemoryInstruction.F64Load, DispatchableInstruction>,
+    crossinline i32StoreInstructionPredecoder: Predecoder<FusedMemoryInstruction.I32Store, DispatchableInstruction>,
+    crossinline i32Store8InstructionPredecoder: Predecoder<FusedMemoryInstruction.I32Store8, DispatchableInstruction>,
+    crossinline i32Store16InstructionPredecoder: Predecoder<FusedMemoryInstruction.I32Store16, DispatchableInstruction>,
+    crossinline i64StoreInstructionPredecoder: Predecoder<FusedMemoryInstruction.I64Store, DispatchableInstruction>,
+    crossinline i64Store8InstructionPredecoder: Predecoder<FusedMemoryInstruction.I64Store8, DispatchableInstruction>,
+    crossinline i64Store16InstructionPredecoder: Predecoder<FusedMemoryInstruction.I64Store16, DispatchableInstruction>,
+    crossinline i64Store32InstructionPredecoder: Predecoder<FusedMemoryInstruction.I64Store32, DispatchableInstruction>,
+    crossinline f32StoreInstructionPredecoder: Predecoder<FusedMemoryInstruction.F32Store, DispatchableInstruction>,
+    crossinline f64StoreInstructionPredecoder: Predecoder<FusedMemoryInstruction.F64Store, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedMemoryInstruction.I32Load -> i32LoadInstructionPredecoder(context, instruction).bind()
@@ -78,15 +105,14 @@ internal inline fun FusedMemoryInstructionPredecoder(
         is FusedMemoryInstruction.I64Load32U -> i64Load32UInstructionPredecoder(context, instruction).bind()
         is FusedMemoryInstruction.F32Load -> f32LoadInstructionPredecoder(context, instruction).bind()
         is FusedMemoryInstruction.F64Load -> f64LoadInstructionPredecoder(context, instruction).bind()
-
-        is FusedMemoryInstruction.I32Store -> TODO()
-        is FusedMemoryInstruction.I32Store8 -> TODO()
-        is FusedMemoryInstruction.I32Store16 -> TODO()
-        is FusedMemoryInstruction.I64Store -> TODO()
-        is FusedMemoryInstruction.I64Store8 -> TODO()
-        is FusedMemoryInstruction.I64Store16 -> TODO()
-        is FusedMemoryInstruction.I64Store32 -> TODO()
-        is FusedMemoryInstruction.F32Store -> TODO()
-        is FusedMemoryInstruction.F64Store -> TODO()
+        is FusedMemoryInstruction.I32Store -> i32StoreInstructionPredecoder(context, instruction).bind()
+        is FusedMemoryInstruction.I32Store8 -> i32Store8InstructionPredecoder(context, instruction).bind()
+        is FusedMemoryInstruction.I32Store16 -> i32Store16InstructionPredecoder(context, instruction).bind()
+        is FusedMemoryInstruction.I64Store -> i64StoreInstructionPredecoder(context, instruction).bind()
+        is FusedMemoryInstruction.I64Store8 -> i64Store8InstructionPredecoder(context, instruction).bind()
+        is FusedMemoryInstruction.I64Store16 -> i64Store16InstructionPredecoder(context, instruction).bind()
+        is FusedMemoryInstruction.I64Store32 -> i64Store32InstructionPredecoder(context, instruction).bind()
+        is FusedMemoryInstruction.F32Store -> f32StoreInstructionPredecoder(context, instruction).bind()
+        is FusedMemoryInstruction.F64Store -> f64StoreInstructionPredecoder(context, instruction).bind()
     }
 }
