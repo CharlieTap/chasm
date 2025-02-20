@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32MulD
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32OrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ShlDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32SubDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32XorDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F32Abs
@@ -26,6 +27,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstr
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Or
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Shl
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Sub
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Xor
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
 
 internal fun FusedNumericInstructionPredecoder(
@@ -40,6 +42,7 @@ internal fun FusedNumericInstructionPredecoder(
         i32AddDispatcher = ::I32AddDispatcher,
         i32AndDispatcher = ::I32AndDispatcher,
         i32OrDispatcher = ::I32OrDispatcher,
+        i32XorDispatcher = ::I32XorDispatcher,
         i32SubDispatcher = ::I32SubDispatcher,
         i32MulDispatcher = ::I32MulDispatcher,
         i32DivSDispatcher = ::I32DivSDispatcher,
@@ -56,6 +59,7 @@ internal inline fun FusedNumericInstructionPredecoder(
     crossinline i32AddDispatcher: Dispatcher<I32Add>,
     crossinline i32AndDispatcher: Dispatcher<I32And>,
     crossinline i32OrDispatcher: Dispatcher<I32Or>,
+    crossinline i32XorDispatcher: Dispatcher<I32Xor>,
     crossinline i32SubDispatcher: Dispatcher<I32Sub>,
     crossinline i32MulDispatcher: Dispatcher<I32Mul>,
     crossinline i32DivSDispatcher: Dispatcher<I32DivS>,
@@ -100,6 +104,20 @@ internal inline fun FusedNumericInstructionPredecoder(
 
             i32OrDispatcher(
                 I32Or(
+                    left = left,
+                    right = right,
+                    destination = destination,
+                ),
+            )
+        }
+        is FusedNumericInstruction.I32Xor -> {
+
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+
+            i32XorDispatcher(
+                I32Xor(
                     left = left,
                     right = right,
                     destination = destination,
@@ -267,7 +285,6 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.I32TruncSatF64S -> TODO()
         is FusedNumericInstruction.I32TruncSatF64U -> TODO()
         is FusedNumericInstruction.I32WrapI64 -> TODO()
-        is FusedNumericInstruction.I32Xor -> TODO()
         is FusedNumericInstruction.I64Add -> TODO()
         is FusedNumericInstruction.I64And -> TODO()
         is FusedNumericInstruction.I64Clz -> TODO()
