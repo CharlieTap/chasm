@@ -14,11 +14,13 @@ internal inline fun I32DivSExecutor(
     val operand1 = stack.peekNthI32(1)
     val operand2 = stack.peekNthI32(0)
 
-    if (operand2 == 0) {
-        throw InvocationException(InvocationError.CannotDivideIntegerByZero)
-    } else if (operand1 == Int.MIN_VALUE && operand2 == -1) {
+    if (operand1 == Int.MIN_VALUE && operand2 == -1) {
         throw InvocationException(InvocationError.IntegerOverflow)
     }
 
-    stack.binaryOperation(Int::div)
+    try {
+        stack.binaryOperation(Int::div)
+    } catch (_: ArithmeticException) {
+        throw InvocationException(InvocationError.CannotDivideIntegerByZero)
+    }
 }

@@ -14,11 +14,13 @@ internal inline fun I64DivSExecutor(
     val left = instruction.left(stack)
     val right = instruction.right(stack)
 
-    if (right == 0L) {
-        throw InvocationException(InvocationError.CannotDivideIntegerByZero)
-    } else if (left == Long.MIN_VALUE && right == -1L) {
+    if (left == Long.MIN_VALUE && right == -1L) {
         throw InvocationException(InvocationError.IntegerOverflow)
     }
 
-    instruction.destination(left / right, stack)
+    try {
+        instruction.destination(left / right, stack)
+    } catch (_: ArithmeticException) {
+        throw InvocationException(InvocationError.CannotDivideIntegerByZero)
+    }
 }

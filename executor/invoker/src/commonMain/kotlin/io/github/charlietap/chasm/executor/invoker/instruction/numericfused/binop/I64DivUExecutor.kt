@@ -14,9 +14,9 @@ internal inline fun I64DivUExecutor(
     val left = instruction.left(stack).toULong()
     val right = instruction.right(stack).toULong()
 
-    if (right == 0UL) {
+    try {
+        instruction.destination((left / right).toLong(), stack)
+    } catch (_: ArithmeticException) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
-
-    instruction.destination((left / right).toLong(), stack)
 }

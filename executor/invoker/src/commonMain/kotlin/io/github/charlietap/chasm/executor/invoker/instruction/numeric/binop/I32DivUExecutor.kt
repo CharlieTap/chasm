@@ -11,11 +11,9 @@ internal inline fun I32DivUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32DivU,
 ) {
-    val operand = context.vstack.peekI32()
-
-    if (operand.toUInt() == 0u) {
+    try {
+        context.vstack.binaryOperation(Int::divu)
+    } catch (_: ArithmeticException) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
-
-    context.vstack.binaryOperation(Int::divu)
 }

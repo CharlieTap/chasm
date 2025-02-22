@@ -11,11 +11,9 @@ internal inline fun I64DivUExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I64DivU,
 ) {
-    val operand = context.vstack.peekNthI64(0)
-
-    if (operand.toULong() == 0uL) {
+    try {
+        context.vstack.binaryOperation(Long::divu)
+    } catch (_: ArithmeticException) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
-
-    context.vstack.binaryOperation(Long::divu)
 }
