@@ -17,14 +17,14 @@ import io.github.charlietap.chasm.stream.SourceReader
 
 fun module(
     sourceReader: SourceReader,
-    config: ModuleConfig = ModuleConfig.default(),
+    config: ModuleConfig = ModuleConfig(),
 ): ChasmResult<Module, DecodeError> {
     return module(sourceReader, config, ::WasmModuleDecoder)
 }
 
 fun module(
     bytes: ByteArray,
-    config: ModuleConfig = ModuleConfig.default(),
+    config: ModuleConfig = ModuleConfig(),
 ): ChasmResult<Module, DecodeError> {
     return module(ByteArraySourceReader(bytes), config, ::WasmModuleDecoder)
 }

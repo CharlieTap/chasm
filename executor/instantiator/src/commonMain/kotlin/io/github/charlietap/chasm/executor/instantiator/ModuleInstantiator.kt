@@ -64,7 +64,9 @@ internal inline fun ModuleInstantiator(
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
-    val irModule = optimiser(moduleFactory(module))
+    val irModule = moduleFactory(module).let { module ->
+        if (config.bytecodeFusion) optimiser(module) else module
+    }
 
     val context = InstantiationContext(config, store, irModule)
     val partialInstance = partialAllocator(context, imports).bind()

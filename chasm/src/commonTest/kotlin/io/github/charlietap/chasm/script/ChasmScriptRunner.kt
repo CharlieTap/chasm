@@ -24,7 +24,7 @@ class ChasmScriptRunner(
 
     override fun execute(directory: String, script: Script): ScriptResult {
 
-        val config = Config.default()
+        val config = Config()
         val context = ScriptContext(
             config = config,
             binaryDirectory = directory,

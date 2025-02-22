@@ -24,7 +24,7 @@ fun instance(
     store: Store,
     module: Module,
     imports: List<Import>,
-    config: RuntimeConfig = RuntimeConfig.default(),
+    config: RuntimeConfig = RuntimeConfig(),
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
     return instance(
         store = store,
