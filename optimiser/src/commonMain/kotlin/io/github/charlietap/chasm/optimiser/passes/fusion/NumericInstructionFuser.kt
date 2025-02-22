@@ -5,6 +5,10 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Add
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Div
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Sub
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Add
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Div
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Mul
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Sub
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Add
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32And
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivS
@@ -72,6 +76,10 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.F32Sub -> binop(index, instruction, input, output, ::F32Sub)
     is NumericInstruction.F32Mul -> binop(index, instruction, input, output, ::F32Mul)
     is NumericInstruction.F32Div -> binop(index, instruction, input, output, ::F32Div)
+    is NumericInstruction.F64Add -> binop(index, instruction, input, output, ::F64Add)
+    is NumericInstruction.F64Sub -> binop(index, instruction, input, output, ::F64Sub)
+    is NumericInstruction.F64Mul -> binop(index, instruction, input, output, ::F64Mul)
+    is NumericInstruction.F64Div -> binop(index, instruction, input, output, ::F64Div)
     else -> {
         output.add(instruction)
         index

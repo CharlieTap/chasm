@@ -8,6 +8,10 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32AddD
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32DivDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32MulDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32SubDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64AddDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64DivDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64MulDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64SubDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32AddDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32AndDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32DivSDispatcher
@@ -31,6 +35,10 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstr
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F32Div
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F32Mul
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F32Sub
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Add
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Div
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Mul
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Sub
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Add
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32And
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32DivS
@@ -82,6 +90,10 @@ internal fun FusedNumericInstructionPredecoder(
         f32SubDispatcher = ::F32SubDispatcher,
         f32MulDispatcher = ::F32MulDispatcher,
         f32DivDispatcher = ::F32DivDispatcher,
+        f64AddDispatcher = ::F64AddDispatcher,
+        f64SubDispatcher = ::F64SubDispatcher,
+        f64MulDispatcher = ::F64MulDispatcher,
+        f64DivDispatcher = ::F64DivDispatcher,
     )
 
 internal inline fun FusedNumericInstructionPredecoder(
@@ -110,6 +122,10 @@ internal inline fun FusedNumericInstructionPredecoder(
     crossinline f32SubDispatcher: Dispatcher<F32Sub>,
     crossinline f32MulDispatcher: Dispatcher<F32Mul>,
     crossinline f32DivDispatcher: Dispatcher<F32Div>,
+    crossinline f64AddDispatcher: Dispatcher<F64Add>,
+    crossinline f64SubDispatcher: Dispatcher<F64Sub>,
+    crossinline f64MulDispatcher: Dispatcher<F64Mul>,
+    crossinline f64DivDispatcher: Dispatcher<F64Div>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedNumericInstruction.I32Add -> {
@@ -322,6 +338,30 @@ internal inline fun FusedNumericInstructionPredecoder(
             val destination = storeFactory(context, instruction.destination)
             f32DivDispatcher(F32Div(left, right, destination))
         }
+        is FusedNumericInstruction.F64Add -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            f64AddDispatcher(F64Add(left, right, destination))
+        }
+        is FusedNumericInstruction.F64Sub -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            f64SubDispatcher(F64Sub(left, right, destination))
+        }
+        is FusedNumericInstruction.F64Mul -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            f64MulDispatcher(F64Mul(left, right, destination))
+        }
+        is FusedNumericInstruction.F64Div -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            f64DivDispatcher(F64Div(left, right, destination))
+        }
         is FusedNumericInstruction.F32Ceil -> TODO()
         is FusedNumericInstruction.F32ConvertI32S -> TODO()
         is FusedNumericInstruction.F32ConvertI32U -> TODO()
@@ -344,14 +384,12 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.F32Sqrt -> TODO()
         is FusedNumericInstruction.F32Trunc -> TODO()
         is FusedNumericInstruction.F64Abs -> TODO()
-        is FusedNumericInstruction.F64Add -> TODO()
         is FusedNumericInstruction.F64Ceil -> TODO()
         is FusedNumericInstruction.F64ConvertI32S -> TODO()
         is FusedNumericInstruction.F64ConvertI32U -> TODO()
         is FusedNumericInstruction.F64ConvertI64S -> TODO()
         is FusedNumericInstruction.F64ConvertI64U -> TODO()
         is FusedNumericInstruction.F64Copysign -> TODO()
-        is FusedNumericInstruction.F64Div -> TODO()
         is FusedNumericInstruction.F64Eq -> TODO()
         is FusedNumericInstruction.F64Floor -> TODO()
         is FusedNumericInstruction.F64Ge -> TODO()
@@ -360,14 +398,12 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.F64Lt -> TODO()
         is FusedNumericInstruction.F64Max -> TODO()
         is FusedNumericInstruction.F64Min -> TODO()
-        is FusedNumericInstruction.F64Mul -> TODO()
         is FusedNumericInstruction.F64Ne -> TODO()
         is FusedNumericInstruction.F64Nearest -> TODO()
         is FusedNumericInstruction.F64Neg -> TODO()
         is FusedNumericInstruction.F64PromoteF32 -> TODO()
         is FusedNumericInstruction.F64ReinterpretI64 -> TODO()
         is FusedNumericInstruction.F64Sqrt -> TODO()
-        is FusedNumericInstruction.F64Sub -> TODO()
         is FusedNumericInstruction.F64Trunc -> TODO()
         is FusedNumericInstruction.I32Clz -> TODO()
         is FusedNumericInstruction.I32Ctz -> TODO()
