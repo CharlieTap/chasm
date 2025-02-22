@@ -6,10 +6,9 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.ext.asPredecodingContext
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
-import io.github.charlietap.chasm.executor.instantiator.predecoding.ExpressionPredecoder
-import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.runtime.Arity
@@ -20,6 +19,8 @@ import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.ir.factory.ModuleFactory
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.optimiser.Optimiser
+import io.github.charlietap.chasm.predecoder.ExpressionPredecoder
+import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.ast.module.Module as ASTModule
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
@@ -70,7 +71,7 @@ internal inline fun ModuleInstantiator(
 
     val tableInitValues = LongArray(irModule.tables.size) { tableIndex ->
         val table = irModule.tables[tableIndex]
-        val initExpression = expressionPredecoder(context, table.initExpression).bind()
+        val initExpression = expressionPredecoder(context.asPredecodingContext(), table.initExpression).bind()
         evaluator(config, store, partialInstance, initExpression, Arity.Return(1)).bind() ?: 0L
     }
 

@@ -14,10 +14,8 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.memory.Memory
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
+import io.github.charlietap.chasm.executor.instantiator.ext.asPredecodingContext
 import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
-import io.github.charlietap.chasm.executor.instantiator.predecoding.ExpressionPredecoder
-import io.github.charlietap.chasm.executor.instantiator.predecoding.FunctionPredecoder
-import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
@@ -35,6 +33,9 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.Function
+import io.github.charlietap.chasm.predecoder.ExpressionPredecoder
+import io.github.charlietap.chasm.predecoder.FunctionPredecoder
+import io.github.charlietap.chasm.predecoder.Predecoder
 import kotlin.jvm.JvmName
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
@@ -96,7 +97,7 @@ internal inline fun ModuleAllocator(
     }
 
     module.globals.forEachIndexed { idx, global ->
-        val initExpression = expressionPredecoder(context, global.initExpression).bind()
+        val initExpression = expressionPredecoder(context.asPredecodingContext(), global.initExpression).bind()
         val value = evaluator(config, store, instance, initExpression, Arity.Return(1))
             .flatMap { initialValue ->
                 initialValue.toResultOr { InvocationError.MissingStackValue }
@@ -108,7 +109,7 @@ internal inline fun ModuleAllocator(
     module.elementSegments.forEachIndexed { idx, elementSegment ->
         val elementSegmentReferences = module.elementSegments.map { segment ->
             LongArray(segment.initExpressions.size) { initExpressionIndex ->
-                val initExpression = expressionPredecoder(context, segment.initExpressions[initExpressionIndex]).bind()
+                val initExpression = expressionPredecoder(context.asPredecodingContext(), segment.initExpressions[initExpressionIndex]).bind()
                 evaluator(config, store, instance, initExpression, Arity.Return(1)).bind() ?: 0L
             }
         }
@@ -123,7 +124,7 @@ internal inline fun ModuleAllocator(
 
     module.functions.forEach { function ->
 
-        val predecoded = functionPredecoder(context, function).bind()
+        val predecoded = functionPredecoder(context.asPredecodingContext(), function).bind()
         val address = instance.functionAddress(function.idx).bind()
         val functionInstance = context.store.function(address) as FunctionInstance.WasmFunction
 

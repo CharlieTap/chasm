@@ -17,6 +17,7 @@ kotlin {
 
                 implementation(projects.irFactory)
                 implementation(projects.optimiser)
+                implementation(projects.predecoder)
                 implementation(projects.typeSystemIr)
                 implementation(projects.executor.memory)
             }

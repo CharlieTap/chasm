@@ -55,6 +55,8 @@ include(":ir-factory")
 include(":libs:sse2")
 include(":libs:stack")
 
+include(":predecoder")
+
 include(":optimiser")
 include(":stream")
 

@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocat
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
-import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
@@ -32,6 +31,7 @@ import io.github.charlietap.chasm.ir.factory.ModuleFactory
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.optimiser.Optimiser
+import io.github.charlietap.chasm.predecoder.Predecoder
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -89,6 +89,9 @@ class ModuleInstantiatorTest {
             assertEquals(context, _context)
             assertEquals(imports, _imports)
 
+            context.instance = partialInstance
+            _context.instance = partialInstance
+
             Ok(partialInstance)
         }
 
@@ -134,7 +137,6 @@ class ModuleInstantiatorTest {
 
         val runtimeTableInitExpression = runtimeExpression()
         val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _expression ->
-            assertEquals(context, _context)
             assertEquals(tableInitExpression, _expression)
 
             Ok(runtimeTableInitExpression)

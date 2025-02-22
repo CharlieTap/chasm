@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
-import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
@@ -22,6 +21,7 @@ import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.module.tableIndex
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.ElementSegment
+import io.github.charlietap.chasm.predecoder.Predecoder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
@@ -54,12 +54,13 @@ class TableInitializerTest {
         val module = module(
             elementSegments = listOf(activeSegment, declarativeSegment),
         )
+        val instance = moduleInstance()
         val context = instantiationContext(
             store = store,
             module = module,
             config = config,
+            instance = instance,
         )
-        val instance = moduleInstance()
 
         val expression1 = expression(
             activeOffsetExpression.instructions + listOf(
@@ -84,7 +85,6 @@ class TableInitializerTest {
         ).iterator()
 
         val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _expression ->
-            assertEquals(context, _context)
             assertEquals(expressions.next(), _expression)
 
             Ok(runtimeExpressions.next())

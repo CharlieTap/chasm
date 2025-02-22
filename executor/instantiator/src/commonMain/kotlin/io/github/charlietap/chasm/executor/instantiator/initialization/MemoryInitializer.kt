@@ -3,8 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.initialization
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.executor.instantiator.predecoding.ExpressionPredecoder
-import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
+import io.github.charlietap.chasm.executor.instantiator.ext.asPredecodingContext
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
@@ -13,6 +12,8 @@ import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
 import io.github.charlietap.chasm.ir.module.DataSegment
+import io.github.charlietap.chasm.predecoder.ExpressionPredecoder
+import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
 
 internal typealias MemoryInitializer = (InstantiationContext, ModuleInstance) -> Result<Unit, ModuleTrapError>
@@ -50,7 +51,7 @@ internal inline fun MemoryInitializer(
                     MemoryInstruction.DataDrop(segment.idx),
                 ),
             )
-            val runtimeExpression = expressionPredecoder(context, expression).bind()
+            val runtimeExpression = expressionPredecoder(context.asPredecodingContext(), expression).bind()
 
             evaluator(context.config, context.store, instance, runtimeExpression, Arity.Return.SIDE_EFFECT).bind()
         }

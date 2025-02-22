@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.global.Global
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
-import io.github.charlietap.chasm.executor.instantiator.predecoding.Predecoder
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
@@ -62,6 +61,7 @@ import io.github.charlietap.chasm.fixture.ir.value.nameValue
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.ir.type.AbstractHeapType
+import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.type.ir.ext.definedType
 import io.github.charlietap.chasm.type.ir.ext.recursiveType
 import kotlin.test.Test
@@ -162,7 +162,6 @@ class ModuleAllocatorTest {
                 wasmFunctionInstance(),
             ),
         )
-        val context = instantiationContext(store, module)
 
         val functionAddress = functionAddress(1)
         val functionExternalValue = functionExternalValue(functionAddress)
@@ -230,6 +229,11 @@ class ModuleAllocatorTest {
             tableAddresses = mutableListOf(importTableAddress),
             tagAddresses = mutableListOf(importTagAddress),
         )
+        val context = instantiationContext(
+            store = store,
+            module = module,
+            instance = partial,
+        )
 
         val expressionValues = sequenceOf(globalInitValue, elementSegmentRef).iterator()
         val expressionEvaluator: ExpressionEvaluator = { _, _, _, _, _ ->
@@ -237,13 +241,11 @@ class ModuleAllocatorTest {
         }
 
         val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _ ->
-            assertEquals(context, _context)
 
             Ok(runtimeExpression())
         }
 
         val functionPredecoder: Predecoder<Function, RuntimeFunction> = { _context, _function ->
-            assertEquals(context, _context)
             assertEquals(function, _function)
 
             Ok(runtimeFunction())
