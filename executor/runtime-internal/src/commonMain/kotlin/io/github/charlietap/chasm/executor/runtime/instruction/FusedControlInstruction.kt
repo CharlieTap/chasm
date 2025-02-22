@@ -1,8 +1,14 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.ir.module.Index
 
 sealed interface FusedControlInstruction : LinkedInstruction {
+
+    data class BrIf(
+        val operand: LoadOp,
+        val labelIndex: Index.LabelIndex,
+    ) : FusedControlInstruction
 
     data class If(
         val operand: LoadOp,
@@ -30,4 +36,9 @@ sealed interface FusedControlInstruction : LinkedInstruction {
             return result
         }
     }
+
+    data class WasmFunctionCall(
+        val operands: List<LoadOp>,
+        val instruction: DispatchableInstruction,
+    ) : FusedControlInstruction
 }

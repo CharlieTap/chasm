@@ -16,14 +16,16 @@ import io.github.charlietap.chasm.ir.instruction.TableInstruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 import io.github.charlietap.chasm.ir.instruction.VectorInstruction
 
-internal typealias InstructionFuser = (Int, Instruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias InstructionFuser = (PassContext, Int, Instruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun InstructionFuser(
+    context: PassContext,
     index: Int,
     instruction: Instruction,
     input: List<Instruction>,
     output: MutableList<Instruction>,
 ): Int = InstructionFuser(
+    context = context,
     index = index,
     instruction = instruction,
     input = input,
@@ -35,6 +37,7 @@ internal fun InstructionFuser(
 )
 
 internal inline fun InstructionFuser(
+    context: PassContext,
     index: Int,
     instruction: Instruction,
     input: List<Instruction>,
@@ -64,8 +67,8 @@ internal inline fun InstructionFuser(
         output.add(instruction)
         index
     }
-    is ControlInstruction -> controlInstructionFuser(index, instruction, input, output)
-    is NumericInstruction -> numericInstructionFuser(index, instruction, input, output)
-    is MemoryInstruction -> memoryInstructionFuser(index, instruction, input, output)
-    is VariableInstruction -> variableInstructionFuser(index, instruction, input, output)
+    is ControlInstruction -> controlInstructionFuser(context, index, instruction, input, output)
+    is NumericInstruction -> numericInstructionFuser(context, index, instruction, input, output)
+    is MemoryInstruction -> memoryInstructionFuser(context, index, instruction, input, output)
+    is VariableInstruction -> variableInstructionFuser(context, index, instruction, input, output)
 }

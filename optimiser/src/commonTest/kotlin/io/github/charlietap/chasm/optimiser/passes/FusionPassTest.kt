@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.blockInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.callInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.f32AbsInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.fusedCall
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedF32Abs
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedIf
@@ -16,11 +17,19 @@ import io.github.charlietap.chasm.fixture.ir.instruction.localGetInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.localGetOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.nopInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.valueStackDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.valueStackOperand
 import io.github.charlietap.chasm.fixture.ir.module.function
+import io.github.charlietap.chasm.fixture.ir.module.functionIndex
 import io.github.charlietap.chasm.fixture.ir.module.localIndex
 import io.github.charlietap.chasm.fixture.ir.module.module
+import io.github.charlietap.chasm.fixture.ir.module.type
+import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.ir.type.functionRecursiveType
+import io.github.charlietap.chasm.fixture.ir.type.functionType
+import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
+import io.github.charlietap.chasm.fixture.ir.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -117,7 +126,7 @@ class FusionPassTest {
     fun `can fuse a binary operand instruction where only the right is fusable`() {
 
         val instructions = listOf(
-            callInstruction(),
+            nopInstruction(),
             i32ConstInstruction(5),
             i32AddInstruction(),
         )
@@ -132,7 +141,7 @@ class FusionPassTest {
         )
 
         val expected = listOf(
-            callInstruction(),
+            nopInstruction(),
             fusedI32Add(
                 left = valueStackOperand(),
                 right = i32ConstOperand(5),
@@ -238,6 +247,56 @@ class FusionPassTest {
             fusedLocalSet(
                 operand = i32ConstOperand(5),
                 localIdx = localIndex(0),
+            ),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can fuse a call instruction`() {
+
+        val instructions = listOf(
+            i32ConstInstruction(5),
+            localGetInstruction(localIndex(2)),
+            localGetInstruction(localIndex(1)),
+            callInstruction(functionIndex(0)),
+        )
+        val module = module(
+            types = listOf(
+                type(
+                    recursiveType = functionRecursiveType(
+                        functionType(
+                            params = resultType(
+                                types = listOf(
+                                    i32ValueType(),
+                                    i32ValueType(),
+                                    i32ValueType(),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            functions = listOf(
+                function(
+                    typeIndex = typeIndex(0),
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            fusedCall(
+                operands = listOf(
+                    i32ConstOperand(5),
+                    localGetOperand(localIndex(2)),
+                    localGetOperand(localIndex(1)),
+                ),
+                functionIndex = functionIndex(0),
             ),
         )
         val actual = FusionPass(module).functions[0].body.instructions

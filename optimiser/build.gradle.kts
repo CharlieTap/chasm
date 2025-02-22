@@ -17,6 +17,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ir)
+                implementation(projects.typeSystemIr)
             }
         }
 

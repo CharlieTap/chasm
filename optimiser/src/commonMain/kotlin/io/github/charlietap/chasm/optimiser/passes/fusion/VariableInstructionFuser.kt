@@ -4,14 +4,16 @@ import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 
-internal typealias VariableInstructionFuser = (Int, VariableInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias VariableInstructionFuser = (PassContext, Int, VariableInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun VariableInstructionFuser(
+    context: PassContext,
     index: Int,
     instruction: VariableInstruction,
     input: List<Instruction>,
     output: MutableList<Instruction>,
 ): Int = VariableInstructionFuser(
+    context = context,
     index = index,
     instruction = instruction,
     input = input,
@@ -20,6 +22,7 @@ internal fun VariableInstructionFuser(
 )
 
 internal inline fun VariableInstructionFuser(
+    context: PassContext,
     index: Int,
     instruction: VariableInstruction,
     input: List<Instruction>,

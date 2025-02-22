@@ -3,17 +3,20 @@ package io.github.charlietap.chasm.optimiser.passes.fusion
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.Instruction
 
-internal typealias ExpressionFuser = (Expression) -> Expression
+internal typealias ExpressionFuser = (PassContext, Expression) -> Expression
 
 internal fun ExpressionFuser(
+    context: PassContext,
     expression: Expression,
 ): Expression =
     ExpressionFuser(
+        context = context,
         expression = expression,
         fuser = ::InstructionFuser,
     )
 
 internal inline fun ExpressionFuser(
+    context: PassContext,
     expression: Expression,
     fuser: InstructionFuser,
 ): Expression {
@@ -24,7 +27,7 @@ internal inline fun ExpressionFuser(
     while (idx < instructions.size) {
 
         val instruction = instructions[idx]
-        idx = fuser(idx, instruction, instructions, fused)
+        idx = fuser(context, idx, instruction, instructions, fused)
 
         idx++
     }

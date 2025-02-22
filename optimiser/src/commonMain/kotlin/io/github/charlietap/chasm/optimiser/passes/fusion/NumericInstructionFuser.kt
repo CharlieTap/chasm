@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Add
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32And
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivU
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Eqz
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Or
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Shl
@@ -13,14 +14,16 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Xor
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
 
-internal typealias NumericInstructionFuser = (Int, NumericInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias NumericInstructionFuser = (PassContext, Int, NumericInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun NumericInstructionFuser(
+    context: PassContext,
     index: Int,
     instruction: NumericInstruction,
     input: List<Instruction>,
     output: MutableList<Instruction>,
 ): Int = NumericInstructionFuser(
+    context = context,
     index = index,
     instruction = instruction,
     input = input,
@@ -30,6 +33,7 @@ internal fun NumericInstructionFuser(
 )
 
 internal inline fun NumericInstructionFuser(
+    context: PassContext,
     index: Int,
     instruction: NumericInstruction,
     input: List<Instruction>,
@@ -46,6 +50,7 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.I32Or -> binop(index, instruction, input, output, ::I32Or)
     is NumericInstruction.I32Xor -> binop(index, instruction, input, output, ::I32Xor)
     is NumericInstruction.I32Shl -> binop(index, instruction, input, output, ::I32Shl)
+    is NumericInstruction.I32Eqz -> unop(index, instruction, input, output, ::I32Eqz)
     is NumericInstruction.F32Abs -> unop(index, instruction, input, output, ::F32Abs)
     else -> {
         output.add(instruction)
