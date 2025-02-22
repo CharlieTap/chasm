@@ -14,7 +14,12 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32OrDi
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ShlDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32SubDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32XorDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64AddDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64DivSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64DivUDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64EqzDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64MulDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64SubDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F32Abs
@@ -28,7 +33,12 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstr
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Shl
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Sub
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Xor
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I64Add
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I64DivS
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I64DivU
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I64Eqz
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I64Mul
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I64Sub
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
 import io.github.charlietap.chasm.predecoder.LoadFactory
 import io.github.charlietap.chasm.predecoder.PredecodingContext
@@ -55,6 +65,11 @@ internal fun FusedNumericInstructionPredecoder(
         i32EqzDispatcher = ::I32EqzDispatcher,
         i64EqzDispatcher = ::I64EqzDispatcher,
         f32AbsDispatcher = ::F32AbsDispatcher,
+        i64AddDispatcher = ::I64AddDispatcher,
+        i64SubDispatcher = ::I64SubDispatcher,
+        i64MulDispatcher = ::I64MulDispatcher,
+        i64DivSDispatcher = ::I64DivSDispatcher,
+        i64DivUDispatcher = ::I64DivUDispatcher,
     )
 
 internal inline fun FusedNumericInstructionPredecoder(
@@ -74,6 +89,11 @@ internal inline fun FusedNumericInstructionPredecoder(
     crossinline i32EqzDispatcher: Dispatcher<I32Eqz>,
     crossinline i64EqzDispatcher: Dispatcher<I64Eqz>,
     crossinline f32AbsDispatcher: Dispatcher<F32Abs>,
+    crossinline i64AddDispatcher: Dispatcher<I64Add>,
+    crossinline i64SubDispatcher: Dispatcher<I64Sub>,
+    crossinline i64MulDispatcher: Dispatcher<I64Mul>,
+    crossinline i64DivSDispatcher: Dispatcher<I64DivS>,
+    crossinline i64DivUDispatcher: Dispatcher<I64DivU>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedNumericInstruction.I32Add -> {
@@ -232,6 +252,36 @@ internal inline fun FusedNumericInstructionPredecoder(
                 ),
             )
         }
+        is FusedNumericInstruction.I64Add -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i64AddDispatcher(I64Add(left, right, destination))
+        }
+        is FusedNumericInstruction.I64Sub -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i64SubDispatcher(I64Sub(left, right, destination))
+        }
+        is FusedNumericInstruction.I64Mul -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i64MulDispatcher(I64Mul(left, right, destination))
+        }
+        is FusedNumericInstruction.I64DivS -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i64DivSDispatcher(I64DivS(left, right, destination))
+        }
+        is FusedNumericInstruction.I64DivU -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i64DivUDispatcher(I64DivU(left, right, destination))
+        }
         is FusedNumericInstruction.F32Add -> TODO()
         is FusedNumericInstruction.F32Ceil -> TODO()
         is FusedNumericInstruction.F32ConvertI32S -> TODO()
@@ -314,12 +364,9 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.I32TruncSatF64S -> TODO()
         is FusedNumericInstruction.I32TruncSatF64U -> TODO()
         is FusedNumericInstruction.I32WrapI64 -> TODO()
-        is FusedNumericInstruction.I64Add -> TODO()
         is FusedNumericInstruction.I64And -> TODO()
         is FusedNumericInstruction.I64Clz -> TODO()
         is FusedNumericInstruction.I64Ctz -> TODO()
-        is FusedNumericInstruction.I64DivS -> TODO()
-        is FusedNumericInstruction.I64DivU -> TODO()
         is FusedNumericInstruction.I64Eq -> TODO()
         is FusedNumericInstruction.I64Extend16S -> TODO()
         is FusedNumericInstruction.I64Extend32S -> TODO()
@@ -334,7 +381,6 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.I64LeU -> TODO()
         is FusedNumericInstruction.I64LtS -> TODO()
         is FusedNumericInstruction.I64LtU -> TODO()
-        is FusedNumericInstruction.I64Mul -> TODO()
         is FusedNumericInstruction.I64Ne -> TODO()
         is FusedNumericInstruction.I64Or -> TODO()
         is FusedNumericInstruction.I64Popcnt -> TODO()
@@ -346,7 +392,6 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.I64Shl -> TODO()
         is FusedNumericInstruction.I64ShrS -> TODO()
         is FusedNumericInstruction.I64ShrU -> TODO()
-        is FusedNumericInstruction.I64Sub -> TODO()
         is FusedNumericInstruction.I64TruncF32S -> TODO()
         is FusedNumericInstruction.I64TruncF32U -> TODO()
         is FusedNumericInstruction.I64TruncF64S -> TODO()
