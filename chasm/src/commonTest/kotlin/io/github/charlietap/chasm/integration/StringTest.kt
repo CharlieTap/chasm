@@ -72,7 +72,6 @@ class StringTest {
             stringLengthInBytes = expected.encodeToByteArray().size,
         )
 
-        println(actual.getOrNull())
         assertEquals(ChasmResult.Success(expected), actual)
     }
 
