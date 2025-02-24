@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.ast.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ReferenceInstruction : Instruction {

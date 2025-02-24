@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.validator.context
 
-import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.type.ResultType
 
 internal interface ExpressionContext {
     val expressionResultType: ResultType?

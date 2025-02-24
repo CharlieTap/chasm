@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ir.type.Limits
-import io.github.charlietap.chasm.ir.type.MemoryType
-import io.github.charlietap.chasm.ir.type.SharedStatus
+import io.github.charlietap.chasm.type.Limits
+import io.github.charlietap.chasm.type.MemoryType
+import io.github.charlietap.chasm.type.SharedStatus
 
 class MemoryTypeBuilder {
 

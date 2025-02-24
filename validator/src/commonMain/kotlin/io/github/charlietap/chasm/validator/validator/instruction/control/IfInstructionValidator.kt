@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
+import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.Label
 import io.github.charlietap.chasm.validator.context.ValidationContext
@@ -30,7 +31,7 @@ internal fun IfInstructionValidator(
 internal inline fun IfInstructionValidator(
     context: ValidationContext,
     instruction: ControlInstruction.If,
-    crossinline blockTypeValidator: Validator<ControlInstruction.BlockType>,
+    crossinline blockTypeValidator: Validator<BlockType>,
     crossinline instructionBlockValidator: Validator<List<Instruction>>,
 ): Result<Unit, ModuleValidatorError> = binding {
 

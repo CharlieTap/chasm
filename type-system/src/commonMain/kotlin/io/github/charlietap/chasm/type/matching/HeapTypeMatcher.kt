@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
 fun HeapTypeMatcher(

@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.ir.type.MemoryType
+import io.github.charlietap.chasm.type.MemoryType
 
 fun memory(
     store: Store,

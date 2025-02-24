@@ -3,10 +3,10 @@ package io.github.charlietap.chasm.validator.validator.type
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.matching.CompositeTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller

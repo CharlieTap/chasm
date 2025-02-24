@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
-import io.github.charlietap.chasm.ast.type.VectorType
+import io.github.charlietap.chasm.type.NumberType
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.chasm.type.VectorType
 
 fun ValueTypeMatcher(
     type1: ValueType,

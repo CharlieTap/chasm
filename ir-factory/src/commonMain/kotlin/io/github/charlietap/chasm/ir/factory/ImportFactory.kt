@@ -30,23 +30,23 @@ internal fun ImportDescriptorFactory(
 ): IRImport.Descriptor {
     return when (descriptor) {
         is Import.Descriptor.Function -> IRImport.Descriptor.Function(
-            type = DefinedTypeFactory(descriptor.type),
+            type = descriptor.type,
         )
 
         is Import.Descriptor.Table -> IRImport.Descriptor.Table(
-            type = TableTypeFactory(descriptor.type),
+            type = descriptor.type,
         )
 
         is Import.Descriptor.Memory -> IRImport.Descriptor.Memory(
-            type = MemoryTypeFactory(descriptor.type),
+            type = descriptor.type,
         )
 
         is Import.Descriptor.Global -> IRImport.Descriptor.Global(
-            type = GlobalTypeFactory(descriptor.type),
+            type = descriptor.type,
         )
 
         is Import.Descriptor.Tag -> IRImport.Descriptor.Tag(
-            type = TagTypeFactory(descriptor.type),
+            type = descriptor.type,
         )
     }
 }

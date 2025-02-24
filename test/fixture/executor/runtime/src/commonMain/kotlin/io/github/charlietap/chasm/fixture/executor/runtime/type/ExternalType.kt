@@ -1,16 +1,16 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.type
 
 import io.github.charlietap.chasm.executor.runtime.type.ExternalType
-import io.github.charlietap.chasm.fixture.ir.type.functionType
-import io.github.charlietap.chasm.fixture.ir.type.globalType
-import io.github.charlietap.chasm.fixture.ir.type.memoryType
-import io.github.charlietap.chasm.fixture.ir.type.tableType
-import io.github.charlietap.chasm.fixture.ir.type.tagType
-import io.github.charlietap.chasm.ir.type.FunctionType
-import io.github.charlietap.chasm.ir.type.GlobalType
-import io.github.charlietap.chasm.ir.type.MemoryType
-import io.github.charlietap.chasm.ir.type.TableType
-import io.github.charlietap.chasm.ir.type.TagType
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.type.memoryType
+import io.github.charlietap.chasm.fixture.type.tableType
+import io.github.charlietap.chasm.fixture.type.tagType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.MemoryType
+import io.github.charlietap.chasm.type.TableType
+import io.github.charlietap.chasm.type.TagType
 
 fun externalType(): ExternalType = functionExternalType()
 

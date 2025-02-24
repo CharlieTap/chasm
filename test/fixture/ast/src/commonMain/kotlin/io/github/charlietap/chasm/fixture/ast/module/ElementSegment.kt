@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.fixture.ast.module
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ReferenceType
 
 fun elementSegment(
     idx: Index.ElementIndex = Index.ElementIndex(0u),

@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.ir.type.ArrayType
-import io.github.charlietap.chasm.ir.type.DefinedType
+import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.DefinedType
 
 internal fun ArrayNewFixedExecutor(
     context: ExecutionContext,

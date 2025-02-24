@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.type.extremas
 
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.HeapType
 
 internal fun BottomOfCompositeType(
     type: CompositeType,

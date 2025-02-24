@@ -2,16 +2,16 @@ package io.github.charlietap.chasm.decoder.decoder.type.recursive
 
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.ast.type.compositeType
+import io.github.charlietap.chasm.fixture.type.compositeType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.SubType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -47,7 +47,9 @@ class SubTypeDecoderTest {
             Ok(compositeType)
         }
 
-        val expectedHeapTypes = typeIndices.map(ConcreteHeapType::TypeIndex)
+        val expectedHeapTypes = typeIndices.map {
+            ConcreteHeapType.TypeIndex(it.idx.toInt())
+        }
         val expected = SubType.Open(expectedHeapTypes, compositeType)
 
         val actual = SubTypeDecoder(
@@ -89,7 +91,9 @@ class SubTypeDecoderTest {
             Ok(compositeType)
         }
 
-        val expectedHeapTypes = typeIndices.map(ConcreteHeapType::TypeIndex)
+        val expectedHeapTypes = typeIndices.map {
+            ConcreteHeapType.TypeIndex(it.idx.toInt())
+        }
         val expected = SubType.Final(expectedHeapTypes, compositeType)
 
         val actual = SubTypeDecoder(

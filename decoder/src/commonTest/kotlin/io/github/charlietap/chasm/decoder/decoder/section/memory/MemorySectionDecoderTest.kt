@@ -3,13 +3,13 @@ package io.github.charlietap.chasm.decoder.decoder.section.memory
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
-import io.github.charlietap.chasm.ast.type.Limits
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.section.MemorySection
-import io.github.charlietap.chasm.fixture.ast.type.memoryType
+import io.github.charlietap.chasm.fixture.type.memoryType
+import io.github.charlietap.chasm.type.Limits
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

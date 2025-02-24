@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.copy
 
-import io.github.charlietap.chasm.ast.type.FieldType
-import io.github.charlietap.chasm.ast.type.StorageType
+import io.github.charlietap.chasm.type.FieldType
+import io.github.charlietap.chasm.type.StorageType
 
 fun FieldTypeDeepCopier(
     input: FieldType,

@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.ast.module
 
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.MemoryType
-import io.github.charlietap.chasm.ast.type.TableType
-import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.ast.value.NameValue
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.MemoryType
+import io.github.charlietap.chasm.type.TableType
+import io.github.charlietap.chasm.type.TagType
 import kotlin.jvm.JvmInline
 
 data class Import(

@@ -8,6 +8,8 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ir)
+                api(projects.typeSystem)
+                api(projects.test.fixture.typeSystem)
             }
         }
     }

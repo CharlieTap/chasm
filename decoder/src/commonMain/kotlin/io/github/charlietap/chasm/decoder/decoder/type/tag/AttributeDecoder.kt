@@ -3,10 +3,10 @@ package io.github.charlietap.chasm.decoder.decoder.type.tag
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.error.SectionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.TagType
 
 internal fun AttributeDecoder(
     context: DecoderContext,

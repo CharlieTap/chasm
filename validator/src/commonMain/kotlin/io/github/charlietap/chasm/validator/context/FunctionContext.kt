@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.validator.context
 
-import io.github.charlietap.chasm.ast.type.LocalType
-import io.github.charlietap.chasm.ast.type.ResultType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.stack.Stack
 import io.github.charlietap.chasm.stack.stackOf
+import io.github.charlietap.chasm.type.LocalType
+import io.github.charlietap.chasm.type.ResultType
+import io.github.charlietap.chasm.type.ValueType
 
 internal interface FunctionContext {
     val locals: MutableList<LocalType>

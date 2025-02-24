@@ -11,9 +11,9 @@ import io.github.charlietap.chasm.executor.runtime.ext.toFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.ir.type.DefinedType
-import io.github.charlietap.chasm.type.ir.matching.DefinedTypeMatcher
-import io.github.charlietap.chasm.type.ir.matching.TypeMatcher
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
+import io.github.charlietap.chasm.type.matching.TypeMatcher
 
 internal fun CallIndirectExecutor(
     context: ExecutionContext,

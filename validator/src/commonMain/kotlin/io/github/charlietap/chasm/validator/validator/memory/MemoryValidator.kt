@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.validator.validator.memory
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Memory
-import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.context.scope.MemoryScope

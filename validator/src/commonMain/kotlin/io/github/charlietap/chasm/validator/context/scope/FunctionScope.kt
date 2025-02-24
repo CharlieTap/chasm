@@ -3,11 +3,11 @@ package io.github.charlietap.chasm.validator.context.scope
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Function
-import io.github.charlietap.chasm.ast.type.InitializationStatus
-import io.github.charlietap.chasm.ast.type.LocalType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.stack.stackOf
+import io.github.charlietap.chasm.type.InitializationStatus
+import io.github.charlietap.chasm.type.LocalType
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.validator.context.FunctionContextImpl
 import io.github.charlietap.chasm.validator.context.Label
 import io.github.charlietap.chasm.validator.context.ValidationContext

@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.validator.context.scope
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.module.Global
-import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.validator.context.ExpressionContextImpl
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError

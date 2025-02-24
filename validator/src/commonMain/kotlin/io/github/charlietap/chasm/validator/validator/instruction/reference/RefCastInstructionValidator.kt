@@ -4,9 +4,9 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.extremas.TopOf
 import io.github.charlietap.chasm.type.extremas.TopOfHeapType
 import io.github.charlietap.chasm.validator.context.ValidationContext

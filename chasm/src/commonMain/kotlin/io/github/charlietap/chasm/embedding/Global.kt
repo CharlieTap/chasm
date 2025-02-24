@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.global.Global
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.ir.type.GlobalType
+import io.github.charlietap.chasm.type.GlobalType
 
 fun global(
     store: Store,

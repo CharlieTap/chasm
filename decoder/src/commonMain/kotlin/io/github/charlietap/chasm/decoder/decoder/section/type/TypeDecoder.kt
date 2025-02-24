@@ -4,11 +4,11 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Type
-import io.github.charlietap.chasm.ast.type.RecursiveType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.recursive.RecursiveTypeDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.RecursiveType
 
 internal fun TypeDecoder(
     context: DecoderContext,

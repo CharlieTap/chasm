@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.type.differ
 
-import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.type.ReferenceType
 
 fun ReferenceTypeDiffer(
     type1: ReferenceType,

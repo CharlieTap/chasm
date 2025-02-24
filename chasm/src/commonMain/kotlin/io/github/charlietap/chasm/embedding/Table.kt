@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAl
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.ir.type.TableType
+import io.github.charlietap.chasm.type.TableType
 
 fun table(
     store: Store,

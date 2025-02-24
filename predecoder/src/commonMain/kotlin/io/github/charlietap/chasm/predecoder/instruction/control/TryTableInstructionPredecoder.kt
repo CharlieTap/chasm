@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.predecoder.InstructionPredecoder
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.predecoder.PredecodingContext
-import io.github.charlietap.chasm.type.ir.expansion.BlockTypeExpander
+import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 
 internal fun TryTableInstructionPredecoder(
     context: PredecodingContext,

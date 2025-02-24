@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.decoder.context
 
 import io.github.charlietap.chasm.ast.module.Type
-import io.github.charlietap.chasm.ast.type.DefinedType
+import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 
 internal interface TypeContext {

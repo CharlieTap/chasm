@@ -8,9 +8,9 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
 import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.ir.type.functionType
-import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
-import io.github.charlietap.chasm.fixture.ir.type.resultType
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.host.HostFunctionException
 import kotlin.test.Test
 import kotlin.test.assertEquals

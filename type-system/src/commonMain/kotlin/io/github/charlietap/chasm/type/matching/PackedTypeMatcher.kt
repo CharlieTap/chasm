@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.PackedType
+import io.github.charlietap.chasm.type.PackedType
 
 @Suppress("UNUSED_PARAMETER")
 internal fun PackedTypeMatcher(

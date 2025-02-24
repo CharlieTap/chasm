@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.factory
 
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.RecursiveType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.copy.DeepCopier
 import io.github.charlietap.chasm.type.copy.RecursiveTypeDeepCopier
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller

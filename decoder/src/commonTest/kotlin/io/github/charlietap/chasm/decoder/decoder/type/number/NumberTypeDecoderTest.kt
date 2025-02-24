@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.decoder.decoder.type.number
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.NumberType
 import io.github.charlietap.chasm.decoder.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
+import io.github.charlietap.chasm.type.NumberType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

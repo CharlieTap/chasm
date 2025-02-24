@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.ir.module
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.Index.ElementIndex
 import io.github.charlietap.chasm.ir.module.Index.TableIndex
-import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.ReferenceType
 
 data class ElementSegment(
     val idx: ElementIndex,

@@ -1,16 +1,16 @@
 package io.github.charlietap.chasm.decoder.decoder.type.composite
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.ArrayType
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.StructType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
-import io.github.charlietap.chasm.fixture.ast.type.arrayType
-import io.github.charlietap.chasm.fixture.ast.type.functionType
-import io.github.charlietap.chasm.fixture.ast.type.structType
+import io.github.charlietap.chasm.fixture.type.arrayType
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.structType
+import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.StructType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

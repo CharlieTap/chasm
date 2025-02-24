@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.FieldType
-import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.ast.type.StorageType
+import io.github.charlietap.chasm.type.FieldType
+import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.StorageType
 
 internal fun FieldTypeMatcher(
     type1: FieldType,

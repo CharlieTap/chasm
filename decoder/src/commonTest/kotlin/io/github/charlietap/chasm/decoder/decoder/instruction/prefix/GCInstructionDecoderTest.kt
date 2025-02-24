@@ -6,8 +6,6 @@ import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.CastFlags
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.Nullability
@@ -19,7 +17,9 @@ import io.github.charlietap.chasm.fixture.ast.module.elementIndex
 import io.github.charlietap.chasm.fixture.ast.module.fieldIndex
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
-import io.github.charlietap.chasm.fixture.ast.type.heapType
+import io.github.charlietap.chasm.fixture.type.heapType
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

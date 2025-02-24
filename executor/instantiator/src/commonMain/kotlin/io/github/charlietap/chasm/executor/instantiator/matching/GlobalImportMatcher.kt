@@ -7,9 +7,9 @@ import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.global
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.ir.module.Import
-import io.github.charlietap.chasm.ir.type.GlobalType
-import io.github.charlietap.chasm.type.ir.matching.GlobalTypeMatcher
-import io.github.charlietap.chasm.type.ir.matching.TypeMatcher
+import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.matching.GlobalTypeMatcher
+import io.github.charlietap.chasm.type.matching.TypeMatcher
 
 internal typealias GlobalImportMatcher = (InstantiationContext, Import.Descriptor.Global, ExternalValue.Global) -> Result<Boolean, ModuleTrapError>
 

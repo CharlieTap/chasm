@@ -3,10 +3,6 @@ package io.github.charlietap.chasm.decoder.decoder.type.composite
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.ArrayType
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.StructType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.aggregate.ArrayTypeDecoder
@@ -14,6 +10,10 @@ import io.github.charlietap.chasm.decoder.decoder.type.aggregate.StructTypeDecod
 import io.github.charlietap.chasm.decoder.decoder.type.function.FunctionTypeDecoder
 import io.github.charlietap.chasm.decoder.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.StructType
 
 internal fun CompositeTypeDecoder(
     context: DecoderContext,

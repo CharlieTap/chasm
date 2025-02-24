@@ -1,21 +1,11 @@
 package io.github.charlietap.chasm.ast.instruction
 
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ControlInstruction : Instruction {
-
-    sealed interface BlockType {
-        data object Empty : BlockType
-
-        @JvmInline
-        value class ValType(val valueType: ValueType) : BlockType
-
-        @JvmInline
-        value class SignedTypeIndex(val typeIndex: Index.TypeIndex) : BlockType
-    }
 
     sealed interface CatchHandler {
 

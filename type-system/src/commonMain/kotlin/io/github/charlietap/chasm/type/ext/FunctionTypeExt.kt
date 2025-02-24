@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.type.ext
 
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.RecursiveType
-import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.RecursiveType
+import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 
 inline fun FunctionType.recursiveType() = RecursiveType(

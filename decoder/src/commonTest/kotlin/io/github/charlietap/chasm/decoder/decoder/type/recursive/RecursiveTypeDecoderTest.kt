@@ -1,16 +1,16 @@
 package io.github.charlietap.chasm.decoder.decoder.type.recursive
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.RecursiveType
-import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.ast.type.recursiveType
-import io.github.charlietap.chasm.fixture.ast.type.subType
+import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.type.subType
+import io.github.charlietap.chasm.type.RecursiveType
+import io.github.charlietap.chasm.type.SubType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

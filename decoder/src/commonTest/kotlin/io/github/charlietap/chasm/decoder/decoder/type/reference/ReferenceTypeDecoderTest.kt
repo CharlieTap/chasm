@@ -1,14 +1,14 @@
 package io.github.charlietap.chasm.decoder.decoder.type.reference
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.heap.ABSTRACT_HEAP_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

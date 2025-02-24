@@ -4,11 +4,11 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.mapError
-import io.github.charlietap.chasm.ast.type.BottomType
-import io.github.charlietap.chasm.ast.type.InstructionType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.stack.peek
 import io.github.charlietap.chasm.stack.pop
+import io.github.charlietap.chasm.type.BottomType
+import io.github.charlietap.chasm.type.InstructionType
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.matching.ValueTypeMatcher
 import io.github.charlietap.chasm.validator.context.ValidationContext

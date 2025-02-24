@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.validator.validator.tag
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Tag
-import io.github.charlietap.chasm.ast.type.TagType
+import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError

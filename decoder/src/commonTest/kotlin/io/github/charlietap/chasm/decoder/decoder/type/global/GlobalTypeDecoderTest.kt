@@ -1,14 +1,14 @@
 package io.github.charlietap.chasm.decoder.decoder.type.global
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.ast.type.mutability
-import io.github.charlietap.chasm.fixture.ast.type.valueType
+import io.github.charlietap.chasm.fixture.type.mutability
+import io.github.charlietap.chasm.fixture.type.valueType
+import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

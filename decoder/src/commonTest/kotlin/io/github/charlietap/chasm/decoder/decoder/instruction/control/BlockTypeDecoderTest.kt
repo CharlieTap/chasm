@@ -2,9 +2,6 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.control
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.value.NUMBER_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.decoder.type.value.REFERENCE_TYPE_RANGE
@@ -15,7 +12,9 @@ import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
-import io.github.charlietap.chasm.fixture.ast.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -88,7 +87,7 @@ class BlockTypeDecoderTest {
         )
         val context = decoderContext(reader)
 
-        val expected = Ok(BlockType.SignedTypeIndex(Index.TypeIndex(expectedInt)))
+        val expected = Ok(BlockType.SignedTypeIndex(expectedInt.toInt()))
 
         val actual = BlockTypeDecoder(context)
 

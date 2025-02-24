@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.type.rolling.substitution
 
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.SubType
 
 internal fun SubTypeSubstitutor(
     subType: SubType,

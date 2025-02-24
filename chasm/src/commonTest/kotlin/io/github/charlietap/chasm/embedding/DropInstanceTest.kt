@@ -20,9 +20,9 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.hostReferenceValue
-import io.github.charlietap.chasm.fixture.ir.type.memoryType
-import io.github.charlietap.chasm.fixture.ir.type.sharedStatus
-import io.github.charlietap.chasm.fixture.ir.type.unsharedStatus
+import io.github.charlietap.chasm.fixture.type.memoryType
+import io.github.charlietap.chasm.fixture.type.sharedStatus
+import io.github.charlietap.chasm.fixture.type.unsharedStatus
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

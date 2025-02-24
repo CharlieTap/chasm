@@ -5,10 +5,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.MemoryType
-import io.github.charlietap.chasm.ast.type.TableType
-import io.github.charlietap.chasm.ast.type.TagType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.TypeIndexDecoder
@@ -18,6 +14,10 @@ import io.github.charlietap.chasm.decoder.decoder.type.table.TableTypeDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.tag.TagTypeDecoder
 import io.github.charlietap.chasm.decoder.error.SectionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.MemoryType
+import io.github.charlietap.chasm.type.TableType
+import io.github.charlietap.chasm.type.TagType
 
 internal fun ImportDescriptorDecoder(
     context: DecoderContext,

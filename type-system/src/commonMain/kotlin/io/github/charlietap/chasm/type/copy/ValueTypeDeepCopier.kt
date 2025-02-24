@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.copy
 
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ValueType
 
 fun ValueTypeDeepCopier(
     input: ValueType,

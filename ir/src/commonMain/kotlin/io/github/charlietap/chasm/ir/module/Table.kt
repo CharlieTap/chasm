@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.ir.module
 
 import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.ir.type.TableType
+import io.github.charlietap.chasm.type.TableType
 
 data class Table(
     val idx: Index.TableIndex,

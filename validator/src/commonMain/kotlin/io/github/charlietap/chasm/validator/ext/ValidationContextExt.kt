@@ -2,16 +2,16 @@ package io.github.charlietap.chasm.validator.ext
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.toResultOr
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.LocalType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ResultType
-import io.github.charlietap.chasm.ast.type.TableType
-import io.github.charlietap.chasm.ast.type.TagType
+import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.LocalType
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ResultType
+import io.github.charlietap.chasm.type.TableType
+import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.validator.context.ValidationContext
@@ -36,6 +36,14 @@ internal inline fun ValidationContext.type(
     }
 }
 
+internal inline fun ValidationContext.type(
+    index: Int,
+): Result<DefinedType, ModuleValidatorError> {
+    return types.getOrNull(index).toResultOr {
+        FunctionValidatorError.UnknownType
+    }
+}
+
 internal inline fun ValidationContext.functionType(
     index: Index.FunctionIndex,
 ): Result<FunctionType, ModuleValidatorError> {
@@ -53,7 +61,7 @@ internal inline fun ValidationContext.functionType(
 }
 
 internal inline fun ValidationContext.functionType(
-    blockType: ControlInstruction.BlockType,
+    blockType: BlockType,
     blockTypeExpander: BlockTypeExpander = ::BlockTypeExpander,
 ): Result<FunctionType, ModuleValidatorError> {
     return blockTypeExpander(types, blockType).toResultOr {

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.ir.instruction
 
-import io.github.charlietap.chasm.ir.instruction.ControlInstruction.BlockType
 import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.type.BlockType
 
 sealed interface FusedControlInstruction : Instruction {
 

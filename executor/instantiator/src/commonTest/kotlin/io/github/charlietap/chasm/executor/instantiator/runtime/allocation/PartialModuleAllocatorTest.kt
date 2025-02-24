@@ -31,14 +31,14 @@ import io.github.charlietap.chasm.fixture.ir.module.table
 import io.github.charlietap.chasm.fixture.ir.module.tableImportDescriptor
 import io.github.charlietap.chasm.fixture.ir.module.type
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
-import io.github.charlietap.chasm.fixture.ir.type.finalSubType
-import io.github.charlietap.chasm.fixture.ir.type.functionCompositeType
-import io.github.charlietap.chasm.fixture.ir.type.functionType
-import io.github.charlietap.chasm.fixture.ir.type.recursiveType
-import io.github.charlietap.chasm.fixture.ir.type.refNullReferenceType
-import io.github.charlietap.chasm.ir.type.AbstractHeapType
-import io.github.charlietap.chasm.ir.type.RecursiveType
-import io.github.charlietap.chasm.type.ir.ext.definedTypeIr
+import io.github.charlietap.chasm.fixture.type.finalSubType
+import io.github.charlietap.chasm.fixture.type.functionCompositeType
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.type.refNullReferenceType
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.RecursiveType
+import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
@@ -105,7 +105,7 @@ class PartialModuleAllocatorTest {
         }
 
         val expected = ModuleInstance(
-            types = listOf(type.recursiveType.definedTypeIr()),
+            types = listOf(type.recursiveType.definedType()),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
             tableAddresses = mutableListOf(importTableAddress),
             memAddresses = mutableListOf(importMemoryAddress),

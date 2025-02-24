@@ -2,13 +2,12 @@ package io.github.charlietap.chasm.decoder.decoder.type.heap
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ConcreteHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -61,19 +60,19 @@ class HeapTypeDecoderTest {
                 Ok(concreteHeapTypeByte)
             }
 
-            val expectedTypeIndex = Index.TypeIndex(117u)
+            val expectedTypeIndex = 117u
 
             val peekReader = FakeWasmBinaryReader(
                 fakeUByteReader = fakeUByteReader,
             )
             val reader = FakeWasmBinaryReader(
                 fakeUByteReader = fakeUByteReader,
-                fakeS33Reader = { Ok(expectedTypeIndex.idx) },
+                fakeS33Reader = { Ok(expectedTypeIndex) },
                 fakePeekReader = { peekReader },
             )
             val context = decoderContext(reader)
 
-            val expected = ConcreteHeapType.TypeIndex(expectedTypeIndex)
+            val expected = ConcreteHeapType.TypeIndex(expectedTypeIndex.toInt())
 
             val actual = HeapTypeDecoder(context, abstractHeapTypeDecoder)
             assertEquals(Ok(expected), actual)

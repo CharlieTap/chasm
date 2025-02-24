@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.copy
 
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.ResultType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.ResultType
 
 fun FunctionTypeDeepCopier(
     input: FunctionType,

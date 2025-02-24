@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.validator.ext
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.FieldType
-import io.github.charlietap.chasm.ast.type.StructType
+import io.github.charlietap.chasm.type.FieldType
+import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
 

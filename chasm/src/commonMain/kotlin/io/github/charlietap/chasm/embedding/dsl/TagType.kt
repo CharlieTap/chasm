@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ir.type.FunctionType
-import io.github.charlietap.chasm.ir.type.TagType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.TagType
 
 class TagTypeBuilder {
 

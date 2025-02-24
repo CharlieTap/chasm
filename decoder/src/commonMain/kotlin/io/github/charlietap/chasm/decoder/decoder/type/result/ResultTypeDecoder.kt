@@ -2,13 +2,13 @@ package io.github.charlietap.chasm.decoder.decoder.type.result
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.ResultType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.value.ValueTypeDecoder
 import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.ResultType
+import io.github.charlietap.chasm.type.ValueType
 
 internal fun ResultTypeDecoder(
     context: DecoderContext,

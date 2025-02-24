@@ -2,9 +2,6 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.control
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.value.NUMBER_TYPE_RANGE
@@ -12,6 +9,8 @@ import io.github.charlietap.chasm.decoder.decoder.type.value.REFERENCE_TYPE_RANG
 import io.github.charlietap.chasm.decoder.decoder.type.value.VECTOR_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.decoder.type.value.ValueTypeDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.ValueType
 
 internal fun BlockTypeDecoder(
     context: DecoderContext,
@@ -44,7 +43,7 @@ internal inline fun BlockTypeDecoder(
 
         else -> {
             val idx = context.reader.s33().bind()
-            BlockType.SignedTypeIndex(Index.TypeIndex(idx))
+            BlockType.SignedTypeIndex(idx.toInt())
         }
     }
 }

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.validator.context
 
-import io.github.charlietap.chasm.ast.type.ReferenceType
+import io.github.charlietap.chasm.type.ReferenceType
 
 internal interface ElementSegmentContext {
     val elementSegmentType: ReferenceType?

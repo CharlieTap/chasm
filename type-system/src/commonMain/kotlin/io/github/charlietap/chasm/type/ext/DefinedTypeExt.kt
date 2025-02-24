@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.type.ext
 
-import io.github.charlietap.chasm.ast.type.ArrayType
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.StructType
+import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 
 inline fun DefinedType.functionType(

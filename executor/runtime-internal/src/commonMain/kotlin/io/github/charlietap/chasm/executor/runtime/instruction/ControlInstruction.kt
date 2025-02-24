@@ -5,8 +5,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.ir.type.DefinedType
-import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ControlInstruction : LinkedInstruction {

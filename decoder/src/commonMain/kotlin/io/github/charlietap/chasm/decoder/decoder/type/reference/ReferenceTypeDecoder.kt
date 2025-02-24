@@ -2,14 +2,14 @@ package io.github.charlietap.chasm.decoder.decoder.type.reference
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.heap.AbstractHeapTypeDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.heap.HeapTypeDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.ReferenceType
 
 internal fun ReferenceTypeDecoder(
     context: DecoderContext,

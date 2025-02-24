@@ -9,14 +9,11 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api(projects.ast)
                 api(libs.result)
             }
         }
-
         commonTest {
             dependencies {
-                implementation(projects.test.fixture.ast)
                 implementation(libs.kotlin.test)
             }
         }
@@ -24,6 +21,6 @@ kotlin {
 }
 
 configure<PublishingConventionsExtension> {
-    name = "type"
-    description = "extension functions for recursive module types"
+    name = "type-system"
+    description = "chasms internal type system"
 }

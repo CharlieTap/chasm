@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
-import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ReferenceInstruction : LinkedInstruction {

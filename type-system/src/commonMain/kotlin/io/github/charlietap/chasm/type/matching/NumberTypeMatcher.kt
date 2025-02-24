@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.NumberType
+import io.github.charlietap.chasm.type.NumberType
 
 @Suppress("UNUSED_PARAMETER")
 internal fun NumberTypeMatcher(

@@ -8,11 +8,11 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstanc
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.ir.module.labelIndex
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
-import io.github.charlietap.chasm.fixture.ir.type.definedType
-import io.github.charlietap.chasm.fixture.ir.type.referenceType
+import io.github.charlietap.chasm.fixture.type.definedType
+import io.github.charlietap.chasm.fixture.type.referenceType
 import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.ir.type.DefinedType
-import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.ReferenceType
 
 fun controlRuntimeInstruction(): ControlInstruction = unreachableRuntimeInstruction()
 

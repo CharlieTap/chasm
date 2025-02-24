@@ -3,10 +3,6 @@ package io.github.charlietap.chasm.decoder.decoder.type.value
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
-import io.github.charlietap.chasm.ast.type.VectorType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.heap.HEAP_TYPE_NO_FUNC
@@ -18,6 +14,10 @@ import io.github.charlietap.chasm.decoder.decoder.type.reference.ReferenceTypeDe
 import io.github.charlietap.chasm.decoder.decoder.type.vector.VECTOR_TYPE_128
 import io.github.charlietap.chasm.decoder.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.NumberType
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.chasm.type.VectorType
 
 internal fun ValueTypeDecoder(
     context: DecoderContext,

@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.HostFunctionMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocator
-import io.github.charlietap.chasm.ir.type.FunctionType
+import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction as InternalHostFunction
 
 fun function(

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.TagType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.TagType
 
 fun TagTypeMatcher(
     type1: TagType,

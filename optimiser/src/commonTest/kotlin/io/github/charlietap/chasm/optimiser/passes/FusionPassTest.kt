@@ -26,10 +26,10 @@ import io.github.charlietap.chasm.fixture.ir.module.localIndex
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.module.type
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
-import io.github.charlietap.chasm.fixture.ir.type.functionRecursiveType
-import io.github.charlietap.chasm.fixture.ir.type.functionType
-import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
-import io.github.charlietap.chasm.fixture.ir.type.resultType
+import io.github.charlietap.chasm.fixture.type.functionRecursiveType
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.resultType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

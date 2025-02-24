@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.type.Limits
+import io.github.charlietap.chasm.type.MemoryType
 
 fun MemoryTypeMatcher(
     type1: MemoryType,

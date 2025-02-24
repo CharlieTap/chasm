@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.type.ir.ext.functionType
+import io.github.charlietap.chasm.type.ext.functionType
 
 internal typealias ControlInstructionFuser = (PassContext, Int, ControlInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 

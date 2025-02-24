@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.ArrayType
-import io.github.charlietap.chasm.ast.type.FieldType
+import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.FieldType
 
 internal fun ArrayTypeMatcher(
     type1: ArrayType,

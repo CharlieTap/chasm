@@ -2,9 +2,6 @@ package io.github.charlietap.chasm.decoder.decoder.type.aggregate
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.PackedType
-import io.github.charlietap.chasm.ast.type.StorageType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.value.NUMBER_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.decoder.type.value.REFERENCE_TYPE_RANGE
@@ -13,8 +10,11 @@ import io.github.charlietap.chasm.decoder.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.ast.type.packedType
-import io.github.charlietap.chasm.fixture.ast.type.valueType
+import io.github.charlietap.chasm.fixture.type.packedType
+import io.github.charlietap.chasm.fixture.type.valueType
+import io.github.charlietap.chasm.type.PackedType
+import io.github.charlietap.chasm.type.StorageType
+import io.github.charlietap.chasm.type.ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

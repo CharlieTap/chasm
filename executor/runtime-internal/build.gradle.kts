@@ -12,7 +12,6 @@ kotlin {
                 api(projects.executor.runtimeExternal)
                 api(projects.ir)
                 api(projects.libs.stack)
-                api(projects.typeSystemIr)
                 api(libs.result)
             }
         }

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.Limits
+import io.github.charlietap.chasm.type.Limits
 
 fun LimitsMatcher(
     type1: Limits,

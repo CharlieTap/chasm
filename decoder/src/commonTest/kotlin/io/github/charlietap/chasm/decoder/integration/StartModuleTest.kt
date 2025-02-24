@@ -8,15 +8,15 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.StartFunction
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.SubType
 import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
-import io.github.charlietap.chasm.fixture.ast.type.recursiveType
-import io.github.charlietap.chasm.fixture.ast.type.resultType
+import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.SubType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

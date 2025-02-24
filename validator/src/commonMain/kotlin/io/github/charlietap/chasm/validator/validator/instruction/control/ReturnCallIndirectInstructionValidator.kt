@@ -5,8 +5,8 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.HeapType
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.type.matching.HeapTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher

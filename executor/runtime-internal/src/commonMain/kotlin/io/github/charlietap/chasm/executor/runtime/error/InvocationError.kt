@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.runtime.error
 import io.github.charlietap.chasm.executor.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.ir.type.ValueType
+import io.github.charlietap.chasm.type.ValueType
 import kotlin.jvm.JvmInline
 
 sealed interface InvocationError : ModuleTrapError {

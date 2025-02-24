@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.rolling.substitution
 
-import io.github.charlietap.chasm.ast.type.RecursiveType
-import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.RecursiveType
+import io.github.charlietap.chasm.type.SubType
 
 fun RecursiveTypeSubstitutor(
     recursiveType: RecursiveType,

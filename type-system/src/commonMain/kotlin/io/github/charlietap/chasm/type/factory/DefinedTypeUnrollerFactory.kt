@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.factory
 
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 
 typealias UnrollCache = HashMap<DefinedType, SubType>

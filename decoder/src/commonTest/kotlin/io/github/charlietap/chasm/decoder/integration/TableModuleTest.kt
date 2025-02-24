@@ -7,14 +7,14 @@ import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.Limits
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.TableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

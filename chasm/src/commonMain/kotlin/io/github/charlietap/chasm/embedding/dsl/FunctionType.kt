@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ir.type.FunctionType
-import io.github.charlietap.chasm.ir.type.ResultType
-import io.github.charlietap.chasm.ir.type.ValueType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.ResultType
+import io.github.charlietap.chasm.type.ValueType
 
 class FunctionTypeBuilder {
 

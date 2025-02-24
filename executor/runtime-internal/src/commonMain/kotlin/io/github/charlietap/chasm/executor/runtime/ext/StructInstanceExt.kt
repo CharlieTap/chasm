@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.ir.type.PackedType
-import io.github.charlietap.chasm.ir.type.StorageType
+import io.github.charlietap.chasm.type.PackedType
+import io.github.charlietap.chasm.type.StorageType
 
 fun StructInstance.field(
     index: Index.FieldIndex,

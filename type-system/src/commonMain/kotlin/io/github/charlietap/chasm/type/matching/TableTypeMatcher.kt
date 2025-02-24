@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.TableType
+import io.github.charlietap.chasm.type.Limits
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.TableType
 
 fun TableTypeMatcher(
     type1: TableType,

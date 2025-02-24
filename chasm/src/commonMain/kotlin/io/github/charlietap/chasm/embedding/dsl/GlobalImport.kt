@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.ir.type.GlobalType
+import io.github.charlietap.chasm.type.GlobalType
 
 fun globalImport(store: Store, builder: GlobalImportBuilder.() -> Unit): Import {
     return GlobalImportBuilder(store).apply(builder).build()

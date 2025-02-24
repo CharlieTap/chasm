@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.ir.type.GlobalType
-import io.github.charlietap.chasm.ir.type.Mutability
-import io.github.charlietap.chasm.ir.type.ValueType
+import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.ValueType
 
 class GlobalTypeBuilder {
 

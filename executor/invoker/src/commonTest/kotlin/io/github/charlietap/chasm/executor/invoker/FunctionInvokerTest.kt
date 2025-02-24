@@ -11,10 +11,10 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
-import io.github.charlietap.chasm.fixture.ir.type.functionType
-import io.github.charlietap.chasm.fixture.ir.type.i32ValueType
-import io.github.charlietap.chasm.fixture.ir.type.resultType
-import io.github.charlietap.chasm.type.ir.ext.definedType
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -5,29 +5,30 @@ import io.github.charlietap.chasm.fixture.ir.module.labelIndex
 import io.github.charlietap.chasm.fixture.ir.module.tableIndex
 import io.github.charlietap.chasm.fixture.ir.module.tagIndex
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
-import io.github.charlietap.chasm.fixture.ir.type.referenceType
-import io.github.charlietap.chasm.fixture.ir.type.valueType
+import io.github.charlietap.chasm.fixture.type.referenceType
+import io.github.charlietap.chasm.fixture.type.valueType
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.ir.type.ReferenceType
-import io.github.charlietap.chasm.ir.type.ValueType
+import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ValueType
 
 fun controlInstruction(): ControlInstruction = unreachableInstruction()
 
-fun blockType(): ControlInstruction.BlockType = emptyBlockType()
+fun blockType(): BlockType = emptyBlockType()
 
-fun emptyBlockType() = ControlInstruction.BlockType.Empty
+fun emptyBlockType() = BlockType.Empty
 
 fun valueBlockType(
     valueType: ValueType = valueType(),
-) = ControlInstruction.BlockType.ValType(
+) = BlockType.ValType(
     valueType = valueType,
 )
 
 fun signedTypeIndexBlockType(
-    typeIndex: Index.TypeIndex = typeIndex(),
-) = ControlInstruction.BlockType.SignedTypeIndex(
+    typeIndex: Int = 0,
+) = BlockType.SignedTypeIndex(
     typeIndex = typeIndex,
 )
 
@@ -66,7 +67,7 @@ fun unreachableInstruction() = ControlInstruction.Unreachable
 fun nopInstruction() = ControlInstruction.Nop
 
 fun blockInstruction(
-    blockType: ControlInstruction.BlockType = blockType(),
+    blockType: BlockType = blockType(),
     instructions: List<Instruction> = emptyList(),
 ) = ControlInstruction.Block(
     blockType = blockType,
@@ -74,7 +75,7 @@ fun blockInstruction(
 )
 
 fun loopInstruction(
-    blockType: ControlInstruction.BlockType = blockType(),
+    blockType: BlockType = blockType(),
     instructions: List<Instruction> = emptyList(),
 ) = ControlInstruction.Loop(
     blockType = blockType,
@@ -82,7 +83,7 @@ fun loopInstruction(
 )
 
 fun ifInstruction(
-    blockType: ControlInstruction.BlockType = blockType(),
+    blockType: BlockType = blockType(),
     thenInstructions: List<Instruction> = emptyList(),
     elseInstructions: List<Instruction>? = null,
 ) = ControlInstruction.If(

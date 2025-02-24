@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.fixture.ast.module
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Tag
-import io.github.charlietap.chasm.ast.type.TagType
-import io.github.charlietap.chasm.fixture.ast.type.tagType
+import io.github.charlietap.chasm.fixture.type.tagType
+import io.github.charlietap.chasm.type.TagType
 
 fun tag(
     index: Index.TagIndex = tagIndex(),

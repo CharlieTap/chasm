@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.type.rolling
 
-import io.github.charlietap.chasm.ast.type.RecursiveType
+import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.rolling.substitution.RecursiveTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeIndexToRecursiveTypeIndexSubsitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor

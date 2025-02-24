@@ -6,12 +6,12 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.GlobalType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.ExpressionDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.global.GlobalTypeDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.GlobalType
 
 internal fun GlobalDecoder(
     context: DecoderContext,

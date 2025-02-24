@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.ResultType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.ResultType
+import io.github.charlietap.chasm.type.ValueType
 
 fun ResultTypeMatcher(
     type1: ResultType,

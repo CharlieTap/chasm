@@ -5,11 +5,11 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
-import io.github.charlietap.chasm.ast.type.MemoryType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.memory.MemoryTypeDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.MemoryType
 
 internal fun MemoryDecoder(
     context: DecoderContext,

@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.executor.runtime.ext.element
 import io.github.charlietap.chasm.executor.runtime.ext.global
 import io.github.charlietap.chasm.executor.runtime.ext.memory
 import io.github.charlietap.chasm.executor.runtime.ext.table
-import io.github.charlietap.chasm.ir.type.SharedStatus
+import io.github.charlietap.chasm.type.SharedStatus
 
 fun dropInstance(
     store: Store,

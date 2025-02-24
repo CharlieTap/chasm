@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.allocation.element
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.ReferenceType
 
 internal typealias ElementAllocator = (Store, ReferenceType, LongArray) -> Address.Element
 

@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.executor.runtime.instruction
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.ir.type.ArrayType
-import io.github.charlietap.chasm.ir.type.DefinedType
-import io.github.charlietap.chasm.ir.type.StructType
+import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.StructType
 import kotlin.jvm.JvmInline
 
 sealed interface AggregateInstruction : LinkedInstruction {

@@ -2,11 +2,10 @@ package io.github.charlietap.chasm.executor.runtime
 
 import io.github.charlietap.chasm.executor.runtime.encoder.HeapTypeDecoder
 import io.github.charlietap.chasm.executor.runtime.encoder.HeapTypeEncoder
-import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.ir.type.AbstractHeapType
-import io.github.charlietap.chasm.ir.type.BottomType
-import io.github.charlietap.chasm.ir.type.ConcreteHeapType
-import io.github.charlietap.chasm.ir.type.HeapType
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.BottomType
+import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.HeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -119,7 +118,7 @@ class HeapTypeEncoderTest {
 
     @Test
     fun `encode and decode ConcreteHeapType TypeIndex`() {
-        val original = ConcreteHeapType.TypeIndex(Index.TypeIndex(117))
+        val original = ConcreteHeapType.TypeIndex(117)
         val encoded = HeapTypeEncoder(original)
         val decoded = HeapTypeDecoder(encoded)
         assertEquals(original, decoded)

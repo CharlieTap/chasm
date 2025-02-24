@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.type
 
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.ir.type.DefinedType
-import io.github.charlietap.chasm.ir.type.RecursiveType
-import io.github.charlietap.chasm.type.ir.rolling.DefinedTypeRoller
-import io.github.charlietap.chasm.type.ir.rolling.substitution.RecursiveTypeSubstitutor
-import io.github.charlietap.chasm.type.ir.rolling.substitution.TypeSubstitutor
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RecursiveType
+import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
+import io.github.charlietap.chasm.type.rolling.substitution.RecursiveTypeSubstitutor
+import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 internal typealias TypeAllocator = (InstantiationContext, List<RecursiveType>) -> List<DefinedType>
 

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.type.ext
 
-import io.github.charlietap.chasm.ast.type.FieldType
-import io.github.charlietap.chasm.ast.type.PackedType
-import io.github.charlietap.chasm.ast.type.StorageType
+import io.github.charlietap.chasm.type.FieldType
+import io.github.charlietap.chasm.type.PackedType
+import io.github.charlietap.chasm.type.StorageType
 
 inline fun FieldType.bitWidth() = when (val storageType = this.storageType) {
     is StorageType.Packed -> when (storageType.type) {

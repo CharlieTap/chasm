@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.embedding.dsl
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.tag
-import io.github.charlietap.chasm.ir.type.TagType
+import io.github.charlietap.chasm.type.TagType
 
 fun tagImport(store: Store, builder: TagImportBuilder.() -> Unit): Import {
     return TagImportBuilder(store).apply(builder).build()

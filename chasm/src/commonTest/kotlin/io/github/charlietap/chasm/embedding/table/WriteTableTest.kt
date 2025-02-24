@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExterna
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.functionReferenceValue
-import io.github.charlietap.chasm.ir.type.AbstractHeapType
+import io.github.charlietap.chasm.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

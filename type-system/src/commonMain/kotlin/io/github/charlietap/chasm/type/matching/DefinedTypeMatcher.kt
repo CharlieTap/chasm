@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.DefinedType
-import io.github.charlietap.chasm.ast.type.HeapType
-import io.github.charlietap.chasm.ast.type.RecursiveType
+import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.HeapType
+import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.rolling.substitution.DefinedTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 

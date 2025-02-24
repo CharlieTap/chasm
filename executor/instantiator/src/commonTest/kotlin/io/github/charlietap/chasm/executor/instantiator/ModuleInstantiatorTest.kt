@@ -26,7 +26,7 @@ import io.github.charlietap.chasm.fixture.ir.module.import
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.module.startFunction
 import io.github.charlietap.chasm.fixture.ir.module.table
-import io.github.charlietap.chasm.fixture.ir.type.heapType
+import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.ir.factory.ModuleFactory
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction

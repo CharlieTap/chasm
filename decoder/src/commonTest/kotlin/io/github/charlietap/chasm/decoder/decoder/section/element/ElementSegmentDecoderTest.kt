@@ -6,8 +6,6 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.ReferenceType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.reference.REFERENCE_TYPE_REF_NULL
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
@@ -20,6 +18,8 @@ import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
 import io.github.charlietap.chasm.fixture.ast.module.elementIndex
 import io.github.charlietap.chasm.fixture.ast.module.functionIndex
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

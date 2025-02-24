@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.rolling.substitution
 
-import io.github.charlietap.chasm.ast.type.ResultType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.ResultType
+import io.github.charlietap.chasm.type.ValueType
 
 internal fun ResultTypeSubstitutor(
     resultType: ResultType,

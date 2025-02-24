@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.FieldType
-import io.github.charlietap.chasm.ast.type.StructType
+import io.github.charlietap.chasm.type.FieldType
+import io.github.charlietap.chasm.type.StructType
 
 internal fun StructTypeMatcher(
     type1: StructType,

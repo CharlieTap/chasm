@@ -3,8 +3,6 @@ package io.github.charlietap.chasm.ir.factory
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.ValueType
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction as IRControlInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction as IRInstruction
 import io.github.charlietap.chasm.ir.module.Index.FunctionIndex as IRFunctionIndex
@@ -12,8 +10,6 @@ import io.github.charlietap.chasm.ir.module.Index.LabelIndex as IRLabelIndex
 import io.github.charlietap.chasm.ir.module.Index.TableIndex as IRTableIndex
 import io.github.charlietap.chasm.ir.module.Index.TagIndex as IRTagIndex
 import io.github.charlietap.chasm.ir.module.Index.TypeIndex as IRTypeIndex
-import io.github.charlietap.chasm.ir.type.ReferenceType as IRReferenceType
-import io.github.charlietap.chasm.ir.type.ValueType as IRValueType
 
 internal fun ControlInstructionFactory(
     instruction: ControlInstruction,
@@ -24,8 +20,6 @@ internal fun ControlInstructionFactory(
     tableIndexFactory = ::TableIndexFactory,
     tagIndexFactory = ::TagIndexFactory,
     typeIndexFactory = ::TypeIndexFactory,
-    valueTypeFactory = ::ValueTypeFactory,
-    referenceTypeFactory = ::ReferenceTypeFactory,
     instructionFactory = ::InstructionFactory,
 )
 
@@ -36,8 +30,6 @@ internal inline fun ControlInstructionFactory(
     tableIndexFactory: IRFactory<Index.TableIndex, IRTableIndex>,
     tagIndexFactory: IRFactory<Index.TagIndex, IRTagIndex>,
     typeIndexFactory: IRFactory<Index.TypeIndex, IRTypeIndex>,
-    valueTypeFactory: IRFactory<ValueType, IRValueType>,
-    referenceTypeFactory: IRFactory<ReferenceType, IRReferenceType>,
     instructionFactory: IRFactory<Instruction, IRInstruction>,
 ): IRControlInstruction {
     return when (instruction) {
@@ -46,23 +38,23 @@ internal inline fun ControlInstructionFactory(
         ControlInstruction.Nop -> IRControlInstruction.Nop
 
         is ControlInstruction.Block -> IRControlInstruction.Block(
-            blockType = BlockTypeFactory(instruction.blockType, valueTypeFactory, typeIndexFactory),
+            blockType = instruction.blockType,
             instructions = instruction.instructions.map(instructionFactory),
         )
 
         is ControlInstruction.Loop -> IRControlInstruction.Loop(
-            blockType = BlockTypeFactory(instruction.blockType, valueTypeFactory, typeIndexFactory),
+            blockType = instruction.blockType,
             instructions = instruction.instructions.map(instructionFactory),
         )
 
         is ControlInstruction.If -> IRControlInstruction.If(
-            blockType = BlockTypeFactory(instruction.blockType, valueTypeFactory, typeIndexFactory),
+            blockType = instruction.blockType,
             thenInstructions = instruction.thenInstructions.map(instructionFactory),
             elseInstructions = instruction.elseInstructions?.map(instructionFactory),
         )
 
         is ControlInstruction.TryTable -> IRControlInstruction.TryTable(
-            blockType = BlockTypeFactory(instruction.blockType, valueTypeFactory, typeIndexFactory),
+            blockType = instruction.blockType,
             handlers = instruction.handlers.map { CatchHandlerFactory(it, labelIndexFactory, tagIndexFactory) },
             instructions = instruction.instructions.map(instructionFactory),
         )
@@ -96,14 +88,14 @@ internal inline fun ControlInstructionFactory(
 
         is ControlInstruction.BrOnCast -> IRControlInstruction.BrOnCast(
             labelIndex = labelIndexFactory(instruction.labelIndex),
-            srcReferenceType = referenceTypeFactory(instruction.srcReferenceType),
-            dstReferenceType = referenceTypeFactory(instruction.dstReferenceType),
+            srcReferenceType = instruction.srcReferenceType,
+            dstReferenceType = instruction.dstReferenceType,
         )
 
         is ControlInstruction.BrOnCastFail -> IRControlInstruction.BrOnCastFail(
             labelIndex = labelIndexFactory(instruction.labelIndex),
-            srcReferenceType = referenceTypeFactory(instruction.srcReferenceType),
-            dstReferenceType = referenceTypeFactory(instruction.dstReferenceType),
+            srcReferenceType = instruction.srcReferenceType,
+            dstReferenceType = instruction.dstReferenceType,
         )
 
         ControlInstruction.Return -> IRControlInstruction.Return
@@ -132,22 +124,6 @@ internal inline fun ControlInstructionFactory(
         is ControlInstruction.ReturnCallIndirect -> IRControlInstruction.ReturnCallIndirect(
             typeIndex = typeIndexFactory(instruction.typeIndex),
             tableIndex = tableIndexFactory(instruction.tableIndex),
-        )
-    }
-}
-
-internal inline fun BlockTypeFactory(
-    blockType: ControlInstruction.BlockType,
-    valueTypeFactory: IRFactory<ValueType, IRValueType>,
-    typeIndexFactory: IRFactory<Index.TypeIndex, IRTypeIndex>,
-): IRControlInstruction.BlockType {
-    return when (blockType) {
-        ControlInstruction.BlockType.Empty -> IRControlInstruction.BlockType.Empty
-        is ControlInstruction.BlockType.ValType -> IRControlInstruction.BlockType.ValType(
-            valueType = valueTypeFactory(blockType.valueType),
-        )
-        is ControlInstruction.BlockType.SignedTypeIndex -> IRControlInstruction.BlockType.SignedTypeIndex(
-            typeIndex = typeIndexFactory(blockType.typeIndex),
         )
     }
 }

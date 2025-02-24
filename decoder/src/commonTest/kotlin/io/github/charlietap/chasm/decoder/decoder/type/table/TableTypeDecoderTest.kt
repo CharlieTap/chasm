@@ -1,19 +1,19 @@
 package io.github.charlietap.chasm.decoder.decoder.type.table
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.SharedStatus
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
-import io.github.charlietap.chasm.fixture.ast.type.limits
-import io.github.charlietap.chasm.fixture.ast.type.refNullReferenceType
-import io.github.charlietap.chasm.fixture.ast.type.sharedStatus
-import io.github.charlietap.chasm.fixture.ast.type.tableType
+import io.github.charlietap.chasm.fixture.type.limits
+import io.github.charlietap.chasm.fixture.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.type.sharedStatus
+import io.github.charlietap.chasm.fixture.type.tableType
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.Limits
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.SharedStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

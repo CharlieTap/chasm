@@ -2,13 +2,13 @@ package io.github.charlietap.chasm.decoder.decoder.type.memory
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.Limits
-import io.github.charlietap.chasm.ast.type.MemoryType
-import io.github.charlietap.chasm.ast.type.SharedStatus
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.limits.LimitsDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.Limits
+import io.github.charlietap.chasm.type.MemoryType
+import io.github.charlietap.chasm.type.SharedStatus
 
 internal fun MemoryTypeDecoder(
     context: DecoderContext,

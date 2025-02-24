@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.control
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.BlockType
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.decoder.context.scope.Scope
@@ -40,6 +39,7 @@ import io.github.charlietap.chasm.fixture.ast.instruction.instruction
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.tagIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.type.BlockType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

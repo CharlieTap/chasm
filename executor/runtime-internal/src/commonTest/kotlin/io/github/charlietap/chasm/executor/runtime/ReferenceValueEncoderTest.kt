@@ -6,9 +6,8 @@ import io.github.charlietap.chasm.executor.runtime.encoder.ReferenceValueEncoder
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.ir.type.AbstractHeapType
-import io.github.charlietap.chasm.ir.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ConcreteHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -61,7 +60,7 @@ class ReferenceValueEncoderTest {
 
     @Test
     fun `encode and decode ReferenceValue Null with ConcreteTypeIndex`() {
-        val original = ReferenceValue.Null(ConcreteHeapType.TypeIndex(Index.TypeIndex(117)))
+        val original = ReferenceValue.Null(ConcreteHeapType.TypeIndex(117))
         val encoded = ReferenceValueEncoder(original)
         val decoded = ReferenceValueDecoder(encoded)
         assertEquals(original, decoded)

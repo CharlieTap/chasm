@@ -1,14 +1,14 @@
 package io.github.charlietap.chasm.decoder.decoder.type.aggregate
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.ast.type.FieldType
-import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.ast.type.StorageType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
-import io.github.charlietap.chasm.fixture.ast.type.mutability
-import io.github.charlietap.chasm.fixture.ast.type.storageType
+import io.github.charlietap.chasm.fixture.type.mutability
+import io.github.charlietap.chasm.fixture.type.storageType
+import io.github.charlietap.chasm.type.FieldType
+import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.StorageType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

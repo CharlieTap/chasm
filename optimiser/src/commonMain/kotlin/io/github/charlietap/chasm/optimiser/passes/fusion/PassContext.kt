@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.ir.module.Import
 import io.github.charlietap.chasm.ir.module.Module
 import io.github.charlietap.chasm.ir.module.Type
-import io.github.charlietap.chasm.ir.type.DefinedType
-import io.github.charlietap.chasm.type.ir.rolling.DefinedTypeRoller
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 
 internal data class PassContext(
     val module: Module,

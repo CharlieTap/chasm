@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.ir.type.MemoryType
+import io.github.charlietap.chasm.type.MemoryType
 
 typealias MemoryAllocator = (Store, MemoryType) -> Address.Memory
 

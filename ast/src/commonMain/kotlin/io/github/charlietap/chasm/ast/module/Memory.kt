@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.ast.module
 
 import io.github.charlietap.chasm.ast.module.Index.MemoryIndex
-import io.github.charlietap.chasm.ast.type.MemoryType
+import io.github.charlietap.chasm.type.MemoryType
 
 data class Memory(
     val idx: MemoryIndex,

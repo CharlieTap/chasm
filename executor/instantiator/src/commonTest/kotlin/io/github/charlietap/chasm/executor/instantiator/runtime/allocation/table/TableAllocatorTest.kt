@@ -7,9 +7,9 @@ import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
-import io.github.charlietap.chasm.fixture.ir.type.limits
-import io.github.charlietap.chasm.fixture.ir.type.tableType
-import io.github.charlietap.chasm.ir.type.AbstractHeapType
+import io.github.charlietap.chasm.fixture.type.limits
+import io.github.charlietap.chasm.fixture.type.tableType
+import io.github.charlietap.chasm.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -14,8 +14,8 @@ import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstan
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.ir.module.function
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
-import io.github.charlietap.chasm.fixture.ir.type.functionType
-import io.github.charlietap.chasm.type.ir.ext.definedType
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

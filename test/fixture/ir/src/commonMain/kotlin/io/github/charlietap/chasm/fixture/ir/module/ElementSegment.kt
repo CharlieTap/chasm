@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.ElementSegment
 import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.ir.type.AbstractHeapType
-import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ReferenceType
 
 fun elementSegment(
     idx: Index.ElementIndex = elementIndex(),

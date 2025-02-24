@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
-import io.github.charlietap.chasm.ir.type.ReferenceType
+import io.github.charlietap.chasm.type.ReferenceType
 
 data class ElementInstance(
     var type: ReferenceType,

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.type.matching
 
-import io.github.charlietap.chasm.ast.type.GlobalType
-import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.ValueType
 
 fun GlobalTypeMatcher(
     type1: GlobalType,

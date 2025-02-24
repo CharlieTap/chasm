@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.copy
 
-import io.github.charlietap.chasm.ast.type.RecursiveType
-import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.RecursiveType
+import io.github.charlietap.chasm.type.SubType
 
 fun RecursiveTypeDeepCopier(
     input: RecursiveType,

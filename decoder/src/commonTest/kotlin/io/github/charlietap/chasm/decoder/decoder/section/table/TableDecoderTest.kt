@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.ast.type.TableType
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
@@ -14,7 +13,8 @@ import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.table
 import io.github.charlietap.chasm.fixture.ast.module.tableImport
 import io.github.charlietap.chasm.fixture.ast.module.tableIndex
-import io.github.charlietap.chasm.fixture.ast.type.tableType
+import io.github.charlietap.chasm.fixture.type.tableType
+import io.github.charlietap.chasm.type.TableType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail

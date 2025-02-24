@@ -3,12 +3,12 @@ package io.github.charlietap.chasm.decoder.decoder.type.heap
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.ast.type.AbstractHeapType
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.HeapType
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.HeapType
 
 internal fun HeapTypeDecoder(
     context: DecoderContext,
@@ -33,7 +33,7 @@ internal inline fun HeapTypeDecoder(
         }
         else -> {
             val typeIndex = Index.TypeIndex(context.reader.s33().bind())
-            ConcreteHeapType.TypeIndex(typeIndex)
+            ConcreteHeapType.TypeIndex(typeIndex.idx.toInt())
         }
     }
 }

@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
 import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.ir.type.FunctionType
+import io.github.charlietap.chasm.type.FunctionType
 
 fun functionImport(store: Store, builder: FunctionImportBuilder.() -> Unit): Import {
     return FunctionImportBuilder(store).apply(builder).build()

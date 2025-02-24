@@ -65,9 +65,9 @@ import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.ext.dataAddress
 import io.github.charlietap.chasm.predecoder.ext.elementAddress
-import io.github.charlietap.chasm.type.ir.ext.arrayType
-import io.github.charlietap.chasm.type.ir.ext.bitWidth
-import io.github.charlietap.chasm.type.ir.ext.structType
+import io.github.charlietap.chasm.type.ext.arrayType
+import io.github.charlietap.chasm.type.ext.bitWidth
+import io.github.charlietap.chasm.type.ext.structType
 
 internal fun AggregateInstructionPredecoder(
     context: PredecodingContext,

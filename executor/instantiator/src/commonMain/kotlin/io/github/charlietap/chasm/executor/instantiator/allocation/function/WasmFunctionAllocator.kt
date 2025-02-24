@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.ir.module.Function
-import io.github.charlietap.chasm.type.ir.ext.functionType
+import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
 
 internal typealias WasmFunctionAllocator = (InstantiationContext, ModuleInstance, Function) -> Result<Unit, ModuleTrapError>

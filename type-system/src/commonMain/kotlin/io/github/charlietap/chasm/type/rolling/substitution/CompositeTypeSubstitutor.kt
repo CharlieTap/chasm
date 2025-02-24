@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.type.rolling.substitution
 
-import io.github.charlietap.chasm.ast.type.ArrayType
-import io.github.charlietap.chasm.ast.type.CompositeType
-import io.github.charlietap.chasm.ast.type.FunctionType
-import io.github.charlietap.chasm.ast.type.StructType
+import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.CompositeType
+import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.StructType
 
 internal fun CompositeTypeSubstitutor(
     compositeType: CompositeType,

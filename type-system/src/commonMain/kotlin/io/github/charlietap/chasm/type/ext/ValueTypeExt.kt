@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type.ext
 
-import io.github.charlietap.chasm.ast.type.NumberType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.NumberType
+import io.github.charlietap.chasm.type.ValueType
 
 inline fun ValueType.bitWidth() = when (this) {
     is ValueType.Number -> when (this.numberType) {

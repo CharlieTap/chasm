@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.type.copy
 
-import io.github.charlietap.chasm.ast.type.PackedType
-import io.github.charlietap.chasm.ast.type.StorageType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.PackedType
+import io.github.charlietap.chasm.type.StorageType
+import io.github.charlietap.chasm.type.ValueType
 
 fun StorageTypeDeepCopier(
     input: StorageType,

@@ -5,11 +5,11 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
-import io.github.charlietap.chasm.ast.type.ConcreteHeapType
-import io.github.charlietap.chasm.ast.type.Mutability
-import io.github.charlietap.chasm.ast.type.ReferenceType
-import io.github.charlietap.chasm.ast.type.StorageType
-import io.github.charlietap.chasm.ast.type.ValueType
+import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.StorageType
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.ext.arrayType
 import io.github.charlietap.chasm.type.matching.StorageTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher

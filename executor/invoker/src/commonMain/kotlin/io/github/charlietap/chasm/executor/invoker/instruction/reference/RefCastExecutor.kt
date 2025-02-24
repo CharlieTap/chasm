@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.ir.type.ReferenceType
-import io.github.charlietap.chasm.type.ir.matching.ReferenceTypeMatcher
-import io.github.charlietap.chasm.type.ir.matching.TypeMatcher
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
+import io.github.charlietap.chasm.type.matching.TypeMatcher
 
 internal fun RefCastExecutor(
     context: ExecutionContext,

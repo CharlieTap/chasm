@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.validator.validator.type
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.type.RecursiveType
-import io.github.charlietap.chasm.ast.type.SubType
+import io.github.charlietap.chasm.type.RecursiveType
+import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.copy.DeepCopier
 import io.github.charlietap.chasm.type.copy.RecursiveTypeDeepCopier
 import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller

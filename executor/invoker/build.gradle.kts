@@ -11,7 +11,6 @@ kotlin {
             dependencies {
                 api(projects.ir)
                 api(projects.executor.runtimeInternal)
-                api(projects.typeSystemIr)
                 api(libs.result)
 
                 implementation(projects.executor.memory)
