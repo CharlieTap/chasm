@@ -17,6 +17,8 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Eqz
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Or
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Shl
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32ShrS
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32ShrU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Sub
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Xor
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Add
@@ -64,6 +66,8 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.I32Or -> binop(index, instruction, input, output, ::I32Or)
     is NumericInstruction.I32Xor -> binop(index, instruction, input, output, ::I32Xor)
     is NumericInstruction.I32Shl -> binop(index, instruction, input, output, ::I32Shl)
+    is NumericInstruction.I32ShrS -> binop(index, instruction, input, output, ::I32ShrS)
+    is NumericInstruction.I32ShrU -> binop(index, instruction, input, output, ::I32ShrU)
     is NumericInstruction.I32Eqz -> unop(index, instruction, input, output, ::I32Eqz)
     is NumericInstruction.I64Eqz -> unop(index, instruction, input, output, ::I64Eqz)
     is NumericInstruction.I64Add -> binop(index, instruction, input, output, ::I64Add)

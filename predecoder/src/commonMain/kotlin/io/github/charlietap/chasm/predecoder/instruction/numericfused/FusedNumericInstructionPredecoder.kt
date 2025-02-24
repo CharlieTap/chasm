@@ -20,6 +20,8 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32EqzD
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32MulDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32OrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ShlDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ShrSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ShrUDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32SubDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32XorDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64AddDispatcher
@@ -47,6 +49,8 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstr
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Mul
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Or
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Shl
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32ShrS
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32ShrU
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Sub
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Xor
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I64Add
@@ -78,6 +82,8 @@ internal fun FusedNumericInstructionPredecoder(
         i32DivSDispatcher = ::I32DivSDispatcher,
         i32DivUDispatcher = ::I32DivUDispatcher,
         i32ShlDispatcher = ::I32ShlDispatcher,
+        i32ShrSDispatcher = ::I32ShrSDispatcher,
+        i32ShrUDispatcher = ::I32ShrUDispatcher,
         i32EqzDispatcher = ::I32EqzDispatcher,
         i64EqzDispatcher = ::I64EqzDispatcher,
         f32AbsDispatcher = ::F32AbsDispatcher,
@@ -110,6 +116,8 @@ internal inline fun FusedNumericInstructionPredecoder(
     crossinline i32DivSDispatcher: Dispatcher<I32DivS>,
     crossinline i32DivUDispatcher: Dispatcher<I32DivU>,
     crossinline i32ShlDispatcher: Dispatcher<I32Shl>,
+    crossinline i32ShrSDispatcher: Dispatcher<I32ShrS>,
+    crossinline i32ShrUDispatcher: Dispatcher<I32ShrU>,
     crossinline i32EqzDispatcher: Dispatcher<I32Eqz>,
     crossinline i64EqzDispatcher: Dispatcher<I64Eqz>,
     crossinline f32AbsDispatcher: Dispatcher<F32Abs>,
@@ -273,6 +281,18 @@ internal inline fun FusedNumericInstructionPredecoder(
                 ),
             )
         }
+        is FusedNumericInstruction.I32ShrS -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i32ShrSDispatcher(I32ShrS(left, right, destination))
+        }
+        is FusedNumericInstruction.I32ShrU -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i32ShrUDispatcher(I32ShrU(left, right, destination))
+        }
         is FusedNumericInstruction.I64Eqz -> {
             val operand = loadFactory(context, instruction.operand)
             val destination = storeFactory(context, instruction.destination)
@@ -425,8 +445,6 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.I32RemU -> TODO()
         is FusedNumericInstruction.I32Rotl -> TODO()
         is FusedNumericInstruction.I32Rotr -> TODO()
-        is FusedNumericInstruction.I32ShrS -> TODO()
-        is FusedNumericInstruction.I32ShrU -> TODO()
         is FusedNumericInstruction.I32TruncF32S -> TODO()
         is FusedNumericInstruction.I32TruncF32U -> TODO()
         is FusedNumericInstruction.I32TruncF64S -> TODO()
