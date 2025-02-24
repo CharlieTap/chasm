@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.depth
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
+import io.github.charlietap.chasm.executor.runtime.stack.InstructionStack
 import io.github.charlietap.chasm.executor.runtime.stack.ValueStack
 import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 
@@ -34,9 +35,11 @@ internal fun ThreadExecutor(
 ): Result<List<Long>, InvocationError> = binding {
 
     val thread = configuration.thread
-    val cstack = ControlStack()
+    val istack = InstructionStack()
+    val cstack = ControlStack(
+        instructions = istack,
+    )
     val vstack = ValueStack()
-    val istack = cstack.instructionStack()
     val context = ExecutionContext(
         cstack = cstack,
         vstack = vstack,
