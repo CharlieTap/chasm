@@ -17,6 +17,10 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32AndD
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32DivSDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32DivUDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32EqzDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32GtSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32GtUDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32LtSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32LtUDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32MulDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32OrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ShlDispatcher
@@ -46,6 +50,10 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstr
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32DivS
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32DivU
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Eqz
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32GtS
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32GtU
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32LtS
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32LtU
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Mul
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Or
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Shl
@@ -84,6 +92,10 @@ internal fun FusedNumericInstructionPredecoder(
         i32ShlDispatcher = ::I32ShlDispatcher,
         i32ShrSDispatcher = ::I32ShrSDispatcher,
         i32ShrUDispatcher = ::I32ShrUDispatcher,
+        i32LtSDispatcher = ::I32LtSDispatcher,
+        i32LtUDispatcher = ::I32LtUDispatcher,
+        i32GtSDispatcher = ::I32GtSDispatcher,
+        i32GtUDispatcher = ::I32GtUDispatcher,
         i32EqzDispatcher = ::I32EqzDispatcher,
         i64EqzDispatcher = ::I64EqzDispatcher,
         f32AbsDispatcher = ::F32AbsDispatcher,
@@ -118,6 +130,10 @@ internal inline fun FusedNumericInstructionPredecoder(
     crossinline i32ShlDispatcher: Dispatcher<I32Shl>,
     crossinline i32ShrSDispatcher: Dispatcher<I32ShrS>,
     crossinline i32ShrUDispatcher: Dispatcher<I32ShrU>,
+    crossinline i32LtSDispatcher: Dispatcher<I32LtS>,
+    crossinline i32LtUDispatcher: Dispatcher<I32LtU>,
+    crossinline i32GtSDispatcher: Dispatcher<I32GtS>,
+    crossinline i32GtUDispatcher: Dispatcher<I32GtU>,
     crossinline i32EqzDispatcher: Dispatcher<I32Eqz>,
     crossinline i64EqzDispatcher: Dispatcher<I64Eqz>,
     crossinline f32AbsDispatcher: Dispatcher<F32Abs>,
@@ -382,6 +398,30 @@ internal inline fun FusedNumericInstructionPredecoder(
             val destination = storeFactory(context, instruction.destination)
             f64DivDispatcher(F64Div(left, right, destination))
         }
+        is FusedNumericInstruction.I32LtS -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i32LtSDispatcher(I32LtS(left, right, destination))
+        }
+        is FusedNumericInstruction.I32LtU -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i32LtUDispatcher(I32LtU(left, right, destination))
+        }
+        is FusedNumericInstruction.I32GtS -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i32GtSDispatcher(I32GtS(left, right, destination))
+        }
+        is FusedNumericInstruction.I32GtU -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            i32GtUDispatcher(I32GtU(left, right, destination))
+        }
         is FusedNumericInstruction.F32Ceil -> TODO()
         is FusedNumericInstruction.F32ConvertI32S -> TODO()
         is FusedNumericInstruction.F32ConvertI32U -> TODO()
@@ -432,12 +472,8 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.I32Extend8S -> TODO()
         is FusedNumericInstruction.I32GeS -> TODO()
         is FusedNumericInstruction.I32GeU -> TODO()
-        is FusedNumericInstruction.I32GtS -> TODO()
-        is FusedNumericInstruction.I32GtU -> TODO()
         is FusedNumericInstruction.I32LeS -> TODO()
         is FusedNumericInstruction.I32LeU -> TODO()
-        is FusedNumericInstruction.I32LtS -> TODO()
-        is FusedNumericInstruction.I32LtU -> TODO()
         is FusedNumericInstruction.I32Ne -> TODO()
         is FusedNumericInstruction.I32Popcnt -> TODO()
         is FusedNumericInstruction.I32ReinterpretF32 -> TODO()
