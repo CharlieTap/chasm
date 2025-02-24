@@ -129,6 +129,8 @@ data class ControlStack(
         }
     }
 
+    fun instructionStack() = instructions
+
     sealed interface Entry {
 
         data class Label(

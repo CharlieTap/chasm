@@ -34,19 +34,20 @@ internal fun ThreadExecutor(
 ): Result<List<Long>, InvocationError> = binding {
 
     val thread = configuration.thread
-    val controlStack = ControlStack()
-    val valueStack = ValueStack()
+    val cstack = ControlStack()
+    val vstack = ValueStack()
+    val istack = cstack.instructionStack()
     val context = ExecutionContext(
-        cstack = controlStack,
-        vstack = valueStack,
+        cstack = cstack,
+        vstack = vstack,
         store = configuration.store,
         instance = thread.frame.instance,
         config = configuration.config,
     )
 
-    controlStack.push(thread.frame)
+    cstack.push(thread.frame)
     params.forEach { param ->
-        valueStack.push(param.toLongFromBoxed())
+        vstack.push(param.toLongFromBoxed())
     }
 
     var loop = true
@@ -56,13 +57,13 @@ internal fun ThreadExecutor(
         loop = false
     }
 
-    controlStack.push(::exitLoop)
-    controlStack.push(frameCleaner)
-    controlStack.push(thread.instructions)
+    istack.push(::exitLoop)
+    istack.push(frameCleaner)
+    istack.pushAll(thread.instructions)
 
     try {
         while (loop) {
-            controlStack.popInstruction()(context)
+            istack.pop()(context)
         }
     } catch (exception: InvocationException) {
         Err(exception.error).bind()
@@ -73,6 +74,6 @@ internal fun ThreadExecutor(
     }
 
     List(thread.frame.arity) {
-        valueStack.pop()
+        vstack.pop()
     }.asReversed()
 }
