@@ -14,8 +14,12 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32And
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Eqz
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32GeS
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32GeU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32GtS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32GtU
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32LeS
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32LeU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32LtS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32LtU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Mul
@@ -76,6 +80,10 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.I32LtU -> binop(index, instruction, input, output, ::I32LtU)
     is NumericInstruction.I32GtS -> binop(index, instruction, input, output, ::I32GtS)
     is NumericInstruction.I32GtU -> binop(index, instruction, input, output, ::I32GtU)
+    is NumericInstruction.I32LeS -> binop(index, instruction, input, output, ::I32LeS)
+    is NumericInstruction.I32LeU -> binop(index, instruction, input, output, ::I32LeU)
+    is NumericInstruction.I32GeS -> binop(index, instruction, input, output, ::I32GeS)
+    is NumericInstruction.I32GeU -> binop(index, instruction, input, output, ::I32GeU)
     is NumericInstruction.I32Eqz -> unop(index, instruction, input, output, ::I32Eqz)
     is NumericInstruction.I64Eqz -> unop(index, instruction, input, output, ::I64Eqz)
     is NumericInstruction.I64Add -> binop(index, instruction, input, output, ::I64Add)
