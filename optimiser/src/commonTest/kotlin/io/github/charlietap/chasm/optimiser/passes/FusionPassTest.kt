@@ -372,7 +372,7 @@ class FusionPassTest {
     }
 
     @Test
-    fun `can fuse parametric with const, val2 and a destination`() {
+    fun `can fuse parametric with const val2 and a destination`() {
 
         val instructions = listOf(
             localGetInstruction(localIndex(2)),
@@ -404,7 +404,7 @@ class FusionPassTest {
     }
 
     @Test
-    fun `can fuse parametric with const, val2, val1 and a destination`() {
+    fun `can fuse parametric with const val2 val1 and a destination`() {
 
         val instructions = listOf(
             i32ConstInstruction(6),
