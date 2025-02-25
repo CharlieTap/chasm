@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.ir.instruction.FusedParametricInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
@@ -19,7 +20,6 @@ import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 import io.github.charlietap.chasm.ir.instruction.VectorInstruction
-import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.instruction.aggregate.AggregateInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.atomic.AtomicMemoryInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.control.ControlInstructionPredecoder
@@ -29,6 +29,7 @@ import io.github.charlietap.chasm.predecoder.instruction.memoryfused.FusedMemory
 import io.github.charlietap.chasm.predecoder.instruction.numeric.NumericInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.numericfused.FusedNumericInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.parametric.ParametricInstructionPredecoder
+import io.github.charlietap.chasm.predecoder.instruction.parametricfused.FusedParametricInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.reference.ReferenceInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.table.TableInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.variable.VariableInstructionPredecoder
@@ -48,6 +49,7 @@ internal fun InstructionPredecoder(
         fusedControlInstructionPredecoder = ::FusedControlInstructionPredecoder,
         fusedNumericInstructionPredecoder = ::FusedNumericInstructionPredecoder,
         fusedMemoryInstructionPredecoder = ::FusedMemoryInstructionPredecoder,
+        fusedParametricInstructionPredecoder = ::FusedParametricInstructionPredecoder,
         fusedVariableInstructionPredecoder = ::FusedVariableInstructionPredecoder,
         numericInstructionPredecoder = ::NumericInstructionPredecoder,
         memoryInstructionPredecoder = ::MemoryInstructionPredecoder,
@@ -67,6 +69,7 @@ internal inline fun InstructionPredecoder(
     crossinline fusedControlInstructionPredecoder: Predecoder<FusedControlInstruction, DispatchableInstruction>,
     crossinline fusedNumericInstructionPredecoder: Predecoder<FusedNumericInstruction, DispatchableInstruction>,
     crossinline fusedMemoryInstructionPredecoder: Predecoder<FusedMemoryInstruction, DispatchableInstruction>,
+    crossinline fusedParametricInstructionPredecoder: Predecoder<FusedParametricInstruction, DispatchableInstruction>,
     crossinline fusedVariableInstructionPredecoder: Predecoder<FusedVariableInstruction, DispatchableInstruction>,
     crossinline memoryInstructionPredecoder: Predecoder<MemoryInstruction, DispatchableInstruction>,
     crossinline numericInstructionPredecoder: Predecoder<NumericInstruction, DispatchableInstruction>,
@@ -89,6 +92,7 @@ internal inline fun InstructionPredecoder(
             is FusedControlInstruction -> fusedControlInstructionPredecoder(context, instruction).bind()
             is FusedNumericInstruction -> fusedNumericInstructionPredecoder(context, instruction).bind()
             is FusedMemoryInstruction -> fusedMemoryInstructionPredecoder(context, instruction).bind()
+            is FusedParametricInstruction -> fusedParametricInstructionPredecoder(context, instruction).bind()
             is FusedVariableInstruction -> fusedVariableInstructionPredecoder(context, instruction).bind()
             is ParametricInstruction -> parametricInstructionPredecoder(context, instruction).bind()
             is ReferenceInstruction -> referenceInstructionPredecoder(context, instruction).bind()

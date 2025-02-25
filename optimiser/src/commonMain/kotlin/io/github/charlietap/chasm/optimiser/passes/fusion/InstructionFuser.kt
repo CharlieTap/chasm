@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.ir.instruction.FusedParametricInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
@@ -33,6 +34,7 @@ internal fun InstructionFuser(
     controlInstructionFuser = ::ControlInstructionFuser,
     numericInstructionFuser = ::NumericInstructionFuser,
     memoryInstructionFuser = ::MemoryInstructionFuser,
+    parametricInstructionFuser = ::ParametricInstructionFuser,
     variableInstructionFuser = ::VariableInstructionFuser,
 )
 
@@ -45,6 +47,7 @@ internal inline fun InstructionFuser(
     controlInstructionFuser: ControlInstructionFuser,
     numericInstructionFuser: NumericInstructionFuser,
     memoryInstructionFuser: MemoryInstructionFuser,
+    parametricInstructionFuser: ParametricInstructionFuser,
     variableInstructionFuser: VariableInstructionFuser,
 ): Int = when (instruction) {
     is NumericInstruction.I32Const,
@@ -55,13 +58,13 @@ internal inline fun InstructionFuser(
     is VariableInstruction.LocalGet,
     is AggregateInstruction,
     is AtomicMemoryInstruction,
-    is ParametricInstruction,
     is ReferenceInstruction,
     is TableInstruction,
     is VectorInstruction,
     is FusedControlInstruction,
     is FusedNumericInstruction,
     is FusedMemoryInstruction,
+    is FusedParametricInstruction,
     is FusedVariableInstruction,
     -> {
         output.add(instruction)
@@ -70,5 +73,6 @@ internal inline fun InstructionFuser(
     is ControlInstruction -> controlInstructionFuser(context, index, instruction, input, output)
     is NumericInstruction -> numericInstructionFuser(context, index, instruction, input, output)
     is MemoryInstruction -> memoryInstructionFuser(context, index, instruction, input, output)
+    is ParametricInstruction -> parametricInstructionFuser(context, index, instruction, input, output)
     is VariableInstruction -> variableInstructionFuser(context, index, instruction, input, output)
 }

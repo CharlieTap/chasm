@@ -1,0 +1,20 @@
+package io.github.charlietap.chasm.executor.invoker.dispatch.parametricfused
+
+import io.github.charlietap.chasm.executor.invoker.instruction.parametricfused.SelectExecutor
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.execution.Executor
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedParametricInstruction
+
+fun SelectDispatcher(
+    instruction: FusedParametricInstruction.Select,
+) = SelectDispatcher(
+    instruction = instruction,
+    executor = ::SelectExecutor,
+)
+
+internal inline fun SelectDispatcher(
+    instruction: FusedParametricInstruction.Select,
+    crossinline executor: Executor<FusedParametricInstruction.Select>,
+): DispatchableInstruction = { context ->
+    executor(context, instruction)
+}

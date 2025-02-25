@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.fusedF32Abs
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedIf
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedLocalSet
+import io.github.charlietap.chasm.fixture.ir.instruction.fusedSelect
 import io.github.charlietap.chasm.fixture.ir.instruction.i32AddInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstOperand
@@ -18,6 +19,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.localGetOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.localSetInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.nopInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.selectInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.valueStackDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.valueStackOperand
 import io.github.charlietap.chasm.fixture.ir.module.function
@@ -297,6 +299,136 @@ class FusionPassTest {
                     localGetOperand(localIndex(1)),
                 ),
                 functionIndex = functionIndex(0),
+            ),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can fuse parametric with just a destination`() {
+
+        val instructions = listOf(
+            i32AddInstruction(),
+            selectInstruction(),
+            localSetInstruction(localIndex(1)),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            i32AddInstruction(),
+            fusedSelect(
+                const = valueStackOperand(),
+                val1 = valueStackOperand(),
+                val2 = valueStackOperand(),
+                destination = localSetDestination(localIndex(1)),
+            ),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can fuse parametric with const and a destination`() {
+
+        val instructions = listOf(
+            i32AddInstruction(),
+            i32ConstInstruction(5),
+            selectInstruction(),
+            localSetInstruction(localIndex(1)),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            i32AddInstruction(),
+            fusedSelect(
+                const = i32ConstOperand(5),
+                val1 = valueStackOperand(),
+                val2 = valueStackOperand(),
+                destination = localSetDestination(localIndex(1)),
+            ),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can fuse parametric with const, val2 and a destination`() {
+
+        val instructions = listOf(
+            localGetInstruction(localIndex(2)),
+            i32ConstInstruction(5),
+            selectInstruction(),
+            localSetInstruction(localIndex(1)),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            fusedSelect(
+                const = i32ConstOperand(5),
+                val1 = valueStackOperand(),
+                val2 = localGetOperand(localIndex(2)),
+                destination = localSetDestination(localIndex(1)),
+            ),
+        )
+        val actual = FusionPass(module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can fuse parametric with const, val2, val1 and a destination`() {
+
+        val instructions = listOf(
+            i32ConstInstruction(6),
+            localGetInstruction(localIndex(2)),
+            i32ConstInstruction(5),
+            selectInstruction(),
+            localSetInstruction(localIndex(1)),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions,
+                    ),
+                ),
+            ),
+        )
+
+        val expected = listOf(
+            fusedSelect(
+                const = i32ConstOperand(5),
+                val1 = i32ConstOperand(6),
+                val2 = localGetOperand(localIndex(2)),
+                destination = localSetDestination(localIndex(1)),
             ),
         )
         val actual = FusionPass(module).functions[0].body.instructions
