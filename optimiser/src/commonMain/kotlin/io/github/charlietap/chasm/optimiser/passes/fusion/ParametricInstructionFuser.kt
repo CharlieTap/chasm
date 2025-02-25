@@ -40,7 +40,7 @@ internal inline fun ParametricInstructionFuser(
 
         val const = input.getOrNull(index - 1)?.let(operandFactory)
         val val2 = input.getOrNull(index - 2)?.let(operandFactory)
-        var val1 = input.getOrNull(index - 3)?.let(operandFactory)
+        val val1 = input.getOrNull(index - 3)?.let(operandFactory)
         val destination = input.getOrNull(index + 1).let(destinationFactory)
 
         val instruction = if (const == null && destination == FusedDestination.ValueStack) {
