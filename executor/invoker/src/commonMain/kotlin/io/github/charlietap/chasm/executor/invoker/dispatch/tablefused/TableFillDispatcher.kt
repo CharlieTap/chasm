@@ -1,0 +1,20 @@
+package io.github.charlietap.chasm.executor.invoker.dispatch.tablefused
+
+import io.github.charlietap.chasm.executor.invoker.instruction.tablefused.TableFillExecutor
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.execution.Executor
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedTableInstruction
+
+fun TableFillDispatcher(
+    instruction: FusedTableInstruction.TableFill,
+) = TableFillDispatcher(
+    instruction = instruction,
+    executor = ::TableFillExecutor,
+)
+
+internal inline fun TableFillDispatcher(
+    instruction: FusedTableInstruction.TableFill,
+    crossinline executor: Executor<FusedTableInstruction.TableFill>,
+): DispatchableInstruction = { context ->
+    executor(context, instruction)
+}

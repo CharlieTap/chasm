@@ -16,14 +16,17 @@ internal fun FusedTableInstructionPredecoder(
         context = context,
         instruction = instruction,
         tableCopyPredecoder = ::TableCopyInstructionPredecoder,
+        tableFillPredecoder = ::TableFillInstructionPredecoder,
     )
 
 internal inline fun FusedTableInstructionPredecoder(
     context: PredecodingContext,
     instruction: FusedTableInstruction,
     crossinline tableCopyPredecoder: Predecoder<FusedTableInstruction.TableCopy, DispatchableInstruction>,
+    crossinline tableFillPredecoder: Predecoder<FusedTableInstruction.TableFill, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedTableInstruction.TableCopy -> tableCopyPredecoder(context, instruction).bind()
+        is FusedTableInstruction.TableFill -> tableFillPredecoder(context, instruction).bind()
     }
 }

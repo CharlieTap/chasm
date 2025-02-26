@@ -11,4 +11,11 @@ sealed interface FusedTableInstruction : LinkedInstruction {
         val srcTable: TableInstance,
         val destTable: TableInstance,
     ) : FusedTableInstruction
+
+    data class TableFill(
+        val elementsToFill: LoadOp,
+        val fillValue: LoadOp,
+        val tableOffset: LoadOp,
+        val table: TableInstance,
+    ) : FusedTableInstruction
 }

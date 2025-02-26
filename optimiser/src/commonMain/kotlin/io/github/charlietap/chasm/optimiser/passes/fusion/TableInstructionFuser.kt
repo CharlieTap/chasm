@@ -30,8 +30,8 @@ internal inline fun TableInstructionFuser(
     output: MutableList<Instruction>,
     operandFactory: FusedOperandFactory,
 ): Int = when (instruction) {
-    is TableInstruction.TableCopy,
-    -> {
+    is TableInstruction.TableCopy -> {
+
         val elementsToCopy = input.getOrNull(index - 1)?.let(operandFactory)
         val srcOffset = input.getOrNull(index - 2)?.let(operandFactory)
         val dstOffset = input.getOrNull(index - 3)?.let(operandFactory)
@@ -71,6 +71,52 @@ internal inline fun TableInstructionFuser(
                         dstOffset = dstOffset,
                         srcTableIdx = instruction.srcTableIdx,
                         destTableIdx = instruction.destTableIdx,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+        index
+    }
+    is TableInstruction.TableFill -> {
+
+        val elementsToFill = input.getOrNull(index - 1)?.let(operandFactory)
+        val fillValue = input.getOrNull(index - 2)?.let(operandFactory)
+        val tableOffset = input.getOrNull(index - 3)?.let(operandFactory)
+
+        val instruction = if (elementsToFill == null) {
+            instruction
+        } else {
+            when {
+                fillValue == null -> {
+                    output.removeLast()
+                    FusedTableInstruction.TableFill(
+                        elementsToFill = elementsToFill,
+                        fillValue = FusedOperand.ValueStack,
+                        tableOffset = FusedOperand.ValueStack,
+                        tableIdx = instruction.tableIdx,
+                    )
+                }
+                tableOffset == null -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedTableInstruction.TableFill(
+                        elementsToFill = elementsToFill,
+                        fillValue = fillValue,
+                        tableOffset = FusedOperand.ValueStack,
+                        tableIdx = instruction.tableIdx,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    FusedTableInstruction.TableFill(
+                        elementsToFill = elementsToFill,
+                        fillValue = fillValue,
+                        tableOffset = tableOffset,
+                        tableIdx = instruction.tableIdx,
                     )
                 }
             }
