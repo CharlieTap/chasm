@@ -67,6 +67,38 @@ internal inline fun TableInstructionFuser(
 
         nextIndex
     }
+    is TableInstruction.TableSet -> {
+
+        val value = input.getOrNull(index - 1)?.let(operandFactory)
+        val elementIdx = input.getOrNull(index - 2)?.let(operandFactory)
+
+        val instruction = if (value == null) {
+            instruction
+        } else {
+            when {
+                elementIdx == null -> {
+                    output.removeLast()
+                    FusedTableInstruction.TableSet(
+                        value = value,
+                        elementIdx = FusedOperand.ValueStack,
+                        tableIdx = instruction.tableIdx,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedTableInstruction.TableSet(
+                        value = value,
+                        elementIdx = elementIdx,
+                        tableIdx = instruction.tableIdx,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+        index
+    }
     is TableInstruction.TableCopy -> {
 
         val elementsToCopy = input.getOrNull(index - 1)?.let(operandFactory)

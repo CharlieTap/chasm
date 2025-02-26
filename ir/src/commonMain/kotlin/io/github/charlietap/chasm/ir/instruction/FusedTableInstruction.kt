@@ -11,6 +11,12 @@ sealed interface FusedTableInstruction : Instruction {
         val tableIdx: TableIndex,
     ) : FusedTableInstruction
 
+    data class TableSet(
+        val value: FusedOperand,
+        val elementIdx: FusedOperand,
+        val tableIdx: TableIndex,
+    ) : FusedTableInstruction
+
     data class TableCopy(
         val elementsToCopy: FusedOperand,
         val srcOffset: FusedOperand,

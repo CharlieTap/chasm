@@ -41,4 +41,10 @@ sealed interface FusedTableInstruction : LinkedInstruction {
         val destination: StoreOp,
         val table: TableInstance,
     ) : FusedTableInstruction
+
+    data class TableSet(
+        val value: LoadOp,
+        val elementIndex: LoadOp,
+        val table: TableInstance,
+    ) : FusedTableInstruction
 }
