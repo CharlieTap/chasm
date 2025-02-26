@@ -47,4 +47,9 @@ sealed interface FusedTableInstruction : LinkedInstruction {
         val elementIndex: LoadOp,
         val table: TableInstance,
     ) : FusedTableInstruction
+
+    data class TableSize(
+        val destination: StoreOp,
+        val table: TableInstance,
+    ) : FusedTableInstruction
 }

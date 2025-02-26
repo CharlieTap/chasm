@@ -290,6 +290,27 @@ internal inline fun TableInstructionFuser(
         output.add(instruction)
         index
     }
+    is TableInstruction.TableSize -> {
+        var nextIndex = index
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            FusedTableInstruction.TableSize(
+                destination = destination,
+                tableIdx = instruction.tableIdx,
+            )
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     else -> {
         output.add(instruction)
         index

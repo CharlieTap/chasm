@@ -46,4 +46,9 @@ sealed interface FusedTableInstruction : Instruction {
         val elemIdx: ElementIndex,
         val tableIdx: TableIndex,
     ) : FusedTableInstruction
+
+    data class TableSize(
+        val destination: FusedDestination,
+        val tableIdx: TableIndex,
+    ) : FusedTableInstruction
 }
