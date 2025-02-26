@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.ir.instruction
 
+import io.github.charlietap.chasm.ir.module.Index.ElementIndex
 import io.github.charlietap.chasm.ir.module.Index.TableIndex
 
 sealed interface FusedTableInstruction : Instruction {
@@ -23,6 +24,14 @@ sealed interface FusedTableInstruction : Instruction {
         val elementsToAdd: FusedOperand,
         val referenceValue: FusedOperand,
         val destination: FusedDestination,
+        val tableIdx: TableIndex,
+    ) : FusedTableInstruction
+
+    data class TableInit(
+        val elementsToInitialise: FusedOperand,
+        val segmentOffset: FusedOperand,
+        val tableOffset: FusedOperand,
+        val elemIdx: ElementIndex,
         val tableIdx: TableIndex,
     ) : FusedTableInstruction
 }

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
+import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 
 sealed interface FusedTableInstruction : LinkedInstruction {
@@ -25,5 +26,13 @@ sealed interface FusedTableInstruction : LinkedInstruction {
         val destination: StoreOp,
         val table: TableInstance,
         val max: Int,
-    ) : TableInstruction
+    ) : FusedTableInstruction
+
+    data class TableInit(
+        val elementsToInitialise: LoadOp,
+        val segmentOffset: LoadOp,
+        val tableOffset: LoadOp,
+        val element: ElementInstance,
+        val table: TableInstance,
+    ) : FusedTableInstruction
 }

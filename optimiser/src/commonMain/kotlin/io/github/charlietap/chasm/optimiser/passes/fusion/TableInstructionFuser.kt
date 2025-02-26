@@ -175,6 +175,55 @@ internal inline fun TableInstructionFuser(
 
         nextIndex
     }
+    is TableInstruction.TableInit -> {
+
+        val elementsToInit = input.getOrNull(index - 1)?.let(operandFactory)
+        val segmentOffset = input.getOrNull(index - 2)?.let(operandFactory)
+        val tableOffset = input.getOrNull(index - 3)?.let(operandFactory)
+
+        val instruction = if (elementsToInit == null) {
+            instruction
+        } else {
+            when {
+                segmentOffset == null -> {
+                    output.removeLast()
+                    FusedTableInstruction.TableInit(
+                        elementsToInitialise = elementsToInit,
+                        segmentOffset = FusedOperand.ValueStack,
+                        tableOffset = FusedOperand.ValueStack,
+                        tableIdx = instruction.tableIdx,
+                        elemIdx = instruction.elemIdx,
+                    )
+                }
+                tableOffset == null -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedTableInstruction.TableInit(
+                        elementsToInitialise = elementsToInit,
+                        segmentOffset = segmentOffset,
+                        tableOffset = FusedOperand.ValueStack,
+                        tableIdx = instruction.tableIdx,
+                        elemIdx = instruction.elemIdx,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    FusedTableInstruction.TableInit(
+                        elementsToInitialise = elementsToInit,
+                        segmentOffset = segmentOffset,
+                        tableOffset = tableOffset,
+                        tableIdx = instruction.tableIdx,
+                        elemIdx = instruction.elemIdx,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+        index
+    }
     else -> {
         output.add(instruction)
         index

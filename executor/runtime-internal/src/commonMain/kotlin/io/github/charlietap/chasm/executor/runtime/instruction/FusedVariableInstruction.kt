@@ -7,15 +7,15 @@ sealed interface FusedVariableInstruction : LinkedInstruction {
     data class GlobalSet(
         val operand: LoadOp,
         val global: GlobalInstance,
-    ) : VariableInstruction
+    ) : FusedVariableInstruction
 
     data class LocalSet(
         val operand: LoadOp,
         val localIdx: Int,
-    ) : VariableInstruction
+    ) : FusedVariableInstruction
 
     data class LocalTee(
         val operand: LoadOp,
         val localIdx: Int,
-    ) : VariableInstruction
+    ) : FusedVariableInstruction
 }
