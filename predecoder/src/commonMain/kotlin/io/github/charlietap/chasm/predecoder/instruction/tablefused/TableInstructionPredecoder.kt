@@ -17,6 +17,7 @@ internal fun FusedTableInstructionPredecoder(
         instruction = instruction,
         tableCopyPredecoder = ::TableCopyInstructionPredecoder,
         tableFillPredecoder = ::TableFillInstructionPredecoder,
+        tableGetPredecoder = ::TableGetInstructionPredecoder,
         tableGrowPredecoder = ::TableGrowInstructionPredecoder,
         tableInitPredecoder = ::TableInitInstructionPredecoder,
     )
@@ -26,12 +27,14 @@ internal inline fun FusedTableInstructionPredecoder(
     instruction: FusedTableInstruction,
     crossinline tableCopyPredecoder: Predecoder<FusedTableInstruction.TableCopy, DispatchableInstruction>,
     crossinline tableFillPredecoder: Predecoder<FusedTableInstruction.TableFill, DispatchableInstruction>,
+    crossinline tableGetPredecoder: Predecoder<FusedTableInstruction.TableGet, DispatchableInstruction>,
     crossinline tableGrowPredecoder: Predecoder<FusedTableInstruction.TableGrow, DispatchableInstruction>,
     crossinline tableInitPredecoder: Predecoder<FusedTableInstruction.TableInit, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedTableInstruction.TableCopy -> tableCopyPredecoder(context, instruction).bind()
         is FusedTableInstruction.TableFill -> tableFillPredecoder(context, instruction).bind()
+        is FusedTableInstruction.TableGet -> tableGetPredecoder(context, instruction).bind()
         is FusedTableInstruction.TableGrow -> tableGrowPredecoder(context, instruction).bind()
         is FusedTableInstruction.TableInit -> tableInitPredecoder(context, instruction).bind()
     }

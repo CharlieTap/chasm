@@ -5,6 +5,12 @@ import io.github.charlietap.chasm.ir.module.Index.TableIndex
 
 sealed interface FusedTableInstruction : Instruction {
 
+    data class TableGet(
+        val elementIndex: FusedOperand,
+        val destination: FusedDestination,
+        val tableIdx: TableIndex,
+    ) : FusedTableInstruction
+
     data class TableCopy(
         val elementsToCopy: FusedOperand,
         val srcOffset: FusedOperand,

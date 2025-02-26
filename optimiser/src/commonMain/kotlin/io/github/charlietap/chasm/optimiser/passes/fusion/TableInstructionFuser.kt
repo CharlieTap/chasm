@@ -33,6 +33,40 @@ internal inline fun TableInstructionFuser(
     operandFactory: FusedOperandFactory,
     destinationFactory: FusedDestinationFactory,
 ): Int = when (instruction) {
+    is TableInstruction.TableGet -> {
+
+        var nextIndex = index
+        val elementIndex = input.getOrNull(index - 1)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (elementIndex == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                elementIndex == null -> FusedTableInstruction.TableGet(
+                    elementIndex = FusedOperand.ValueStack,
+                    destination = destination,
+                    tableIdx = instruction.tableIdx,
+                )
+                else -> {
+                    output.removeLast()
+                    FusedTableInstruction.TableGet(
+                        elementIndex = elementIndex,
+                        destination = destination,
+                        tableIdx = instruction.tableIdx,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     is TableInstruction.TableCopy -> {
 
         val elementsToCopy = input.getOrNull(index - 1)?.let(operandFactory)
