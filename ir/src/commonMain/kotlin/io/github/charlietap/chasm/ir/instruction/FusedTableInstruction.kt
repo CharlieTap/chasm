@@ -18,4 +18,11 @@ sealed interface FusedTableInstruction : Instruction {
         val tableOffset: FusedOperand,
         val tableIdx: TableIndex,
     ) : FusedTableInstruction
+
+    data class TableGrow(
+        val elementsToAdd: FusedOperand,
+        val referenceValue: FusedOperand,
+        val destination: FusedDestination,
+        val tableIdx: TableIndex,
+    ) : FusedTableInstruction
 }

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.optimiser.passes.fusion
 
+import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.FusedTableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
@@ -20,6 +21,7 @@ internal fun TableInstructionFuser(
     input = input,
     output = output,
     operandFactory = ::FusedOperandFactory,
+    destinationFactory = ::FusedDestinationFactory,
 )
 
 internal inline fun TableInstructionFuser(
@@ -29,6 +31,7 @@ internal inline fun TableInstructionFuser(
     input: List<Instruction>,
     output: MutableList<Instruction>,
     operandFactory: FusedOperandFactory,
+    destinationFactory: FusedDestinationFactory,
 ): Int = when (instruction) {
     is TableInstruction.TableCopy -> {
 
@@ -124,6 +127,53 @@ internal inline fun TableInstructionFuser(
 
         output.add(instruction)
         index
+    }
+    is TableInstruction.TableGrow -> {
+
+        var nextIndex = index
+        val elementsToAdd = input.getOrNull(index - 1)?.let(operandFactory)
+        val referenceValue = input.getOrNull(index - 2)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (elementsToAdd == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                elementsToAdd == null -> FusedTableInstruction.TableGrow(
+                    elementsToAdd = FusedOperand.ValueStack,
+                    referenceValue = FusedOperand.ValueStack,
+                    destination = destination,
+                    tableIdx = instruction.tableIdx,
+                )
+                referenceValue == null -> {
+                    output.removeLast()
+                    FusedTableInstruction.TableGrow(
+                        elementsToAdd = elementsToAdd,
+                        referenceValue = FusedOperand.ValueStack,
+                        destination = destination,
+                        tableIdx = instruction.tableIdx,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedTableInstruction.TableGrow(
+                        elementsToAdd = elementsToAdd,
+                        referenceValue = referenceValue,
+                        destination = destination,
+                        tableIdx = instruction.tableIdx,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
     }
     else -> {
         output.add(instruction)

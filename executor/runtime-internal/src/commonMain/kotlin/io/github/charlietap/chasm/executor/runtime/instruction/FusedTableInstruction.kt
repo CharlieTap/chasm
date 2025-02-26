@@ -18,4 +18,12 @@ sealed interface FusedTableInstruction : LinkedInstruction {
         val tableOffset: LoadOp,
         val table: TableInstance,
     ) : FusedTableInstruction
+
+    data class TableGrow(
+        val elementsToAdd: LoadOp,
+        val referenceValue: LoadOp,
+        val destination: StoreOp,
+        val table: TableInstance,
+        val max: Int,
+    ) : TableInstruction
 }
