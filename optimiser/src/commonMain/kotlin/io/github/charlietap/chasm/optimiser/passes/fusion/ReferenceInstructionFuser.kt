@@ -33,6 +33,50 @@ internal inline fun ReferenceInstructionFuser(
     operandFactory: FusedOperandFactory,
     destinationFactory: FusedDestinationFactory,
 ): Int = when (instruction) {
+    is ReferenceInstruction.RefEq -> {
+        var nextIndex = index
+
+        val reference1 = input.getOrNull(index - 1)?.let(operandFactory)
+        val reference2 = input.getOrNull(index - 2)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (reference1 == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                reference1 == null -> FusedReferenceInstruction.RefEq(
+                    reference1 = FusedOperand.ValueStack,
+                    reference2 = FusedOperand.ValueStack,
+                    destination = destination,
+                )
+                reference2 == null -> {
+                    output.removeLast()
+                    FusedReferenceInstruction.RefEq(
+                        reference1 = reference1,
+                        reference2 = FusedOperand.ValueStack,
+                        destination = destination,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedReferenceInstruction.RefEq(
+                        reference1 = reference1,
+                        reference2 = reference2,
+                        destination = destination,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     is ReferenceInstruction.RefIsNull -> {
         var nextIndex = index
 
