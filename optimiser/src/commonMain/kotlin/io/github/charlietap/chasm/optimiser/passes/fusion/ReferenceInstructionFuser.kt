@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.optimiser.passes.fusion
 
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
+import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.FusedReferenceInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
@@ -19,6 +20,7 @@ internal fun ReferenceInstructionFuser(
     instruction = instruction,
     input = input,
     output = output,
+    operandFactory = ::FusedOperandFactory,
     destinationFactory = ::FusedDestinationFactory,
 )
 
@@ -28,8 +30,41 @@ internal inline fun ReferenceInstructionFuser(
     instruction: ReferenceInstruction,
     input: List<Instruction>,
     output: MutableList<Instruction>,
+    operandFactory: FusedOperandFactory,
     destinationFactory: FusedDestinationFactory,
 ): Int = when (instruction) {
+    is ReferenceInstruction.RefIsNull -> {
+        var nextIndex = index
+
+        val value = input.getOrNull(index - 1)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (value == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                value == null -> FusedReferenceInstruction.RefIsNull(
+                    value = FusedOperand.ValueStack,
+                    destination = destination,
+                )
+                else -> {
+                    output.removeLast()
+                    FusedReferenceInstruction.RefIsNull(
+                        value = value,
+                        destination = destination,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     is ReferenceInstruction.RefNull -> {
         var nextIndex = index
 
