@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.executor.runtime.instruction
 
+import io.github.charlietap.chasm.type.ReferenceType
+
 sealed interface FusedReferenceInstruction : LinkedInstruction {
 
     data class RefEq(
@@ -16,5 +18,11 @@ sealed interface FusedReferenceInstruction : LinkedInstruction {
     data class RefNull(
         val destination: StoreOp,
         val reference: Long,
+    ) : FusedReferenceInstruction
+
+    data class RefTest(
+        val reference: LoadOp,
+        val destination: StoreOp,
+        val referenceType: ReferenceType,
     ) : FusedReferenceInstruction
 }

@@ -131,6 +131,40 @@ internal inline fun ReferenceInstructionFuser(
 
         nextIndex
     }
+    is ReferenceInstruction.RefTest -> {
+        var nextIndex = index
+
+        val reference = input.getOrNull(index - 1)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (reference == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                reference == null -> FusedReferenceInstruction.RefTest(
+                    reference = FusedOperand.ValueStack,
+                    destination = destination,
+                    referenceType = instruction.referenceType,
+                )
+                else -> {
+                    output.removeLast()
+                    FusedReferenceInstruction.RefTest(
+                        reference = reference,
+                        destination = destination,
+                        referenceType = instruction.referenceType,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     else -> {
         output.add(instruction)
         index
