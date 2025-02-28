@@ -4,6 +4,12 @@ import io.github.charlietap.chasm.type.ReferenceType
 
 sealed interface FusedReferenceInstruction : LinkedInstruction {
 
+    data class RefCast(
+        val reference: LoadOp,
+        val destination: StoreOp,
+        val referenceType: ReferenceType,
+    ) : FusedReferenceInstruction
+
     data class RefEq(
         val reference1: LoadOp,
         val reference2: LoadOp,

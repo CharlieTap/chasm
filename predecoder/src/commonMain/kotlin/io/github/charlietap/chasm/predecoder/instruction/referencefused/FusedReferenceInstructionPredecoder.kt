@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.predecoder.instruction.referencefused
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefCastDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefEqDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefIsNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefNullDispatcher
@@ -10,6 +11,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefTe
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefCast
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefEq
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefIsNull
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefNull
@@ -29,6 +31,7 @@ internal fun FusedReferenceInstructionPredecoder(
         instruction = instruction,
         loadFactory = ::LoadFactory,
         storeFactory = ::StoreFactory,
+        refCastDispatcher = ::RefCastDispatcher,
         refEqDispatcher = ::RefEqDispatcher,
         refIsNullDispatcher = ::RefIsNullDispatcher,
         refNullDispatcher = ::RefNullDispatcher,
@@ -40,6 +43,7 @@ internal inline fun FusedReferenceInstructionPredecoder(
     instruction: FusedReferenceInstruction,
     crossinline loadFactory: LoadFactory,
     crossinline storeFactory: StoreFactory,
+    crossinline refCastDispatcher: Dispatcher<RefCast>,
     crossinline refEqDispatcher: Dispatcher<RefEq>,
     crossinline refIsNullDispatcher: Dispatcher<RefIsNull>,
     crossinline refNullDispatcher: Dispatcher<RefNull>,
@@ -82,6 +86,18 @@ internal inline fun FusedReferenceInstructionPredecoder(
 
             refTestDispatcher(
                 RefTest(
+                    reference = reference,
+                    destination = destination,
+                    referenceType = instruction.referenceType,
+                ),
+            )
+        }
+        is FusedReferenceInstruction.RefCast -> {
+            val reference = loadFactory(context, instruction.reference)
+            val destination = storeFactory(context, instruction.destination)
+
+            refCastDispatcher(
+                RefCast(
                     reference = reference,
                     destination = destination,
                     referenceType = instruction.referenceType,

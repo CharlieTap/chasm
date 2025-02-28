@@ -5,6 +5,12 @@ import io.github.charlietap.chasm.type.ReferenceType
 
 sealed interface FusedReferenceInstruction : Instruction {
 
+    data class RefCast(
+        val reference: FusedOperand,
+        val destination: FusedDestination,
+        val referenceType: ReferenceType,
+    ) : FusedReferenceInstruction
+
     data class RefEq(
         val reference1: FusedOperand,
         val reference2: FusedOperand,

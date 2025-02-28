@@ -33,6 +33,40 @@ internal inline fun ReferenceInstructionFuser(
     operandFactory: FusedOperandFactory,
     destinationFactory: FusedDestinationFactory,
 ): Int = when (instruction) {
+    is ReferenceInstruction.RefCast -> {
+        var nextIndex = index
+
+        val reference = input.getOrNull(index - 1)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (reference == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                reference == null -> FusedReferenceInstruction.RefCast(
+                    reference = FusedOperand.ValueStack,
+                    destination = destination,
+                    referenceType = instruction.referenceType,
+                )
+                else -> {
+                    output.removeLast()
+                    FusedReferenceInstruction.RefCast(
+                        reference = reference,
+                        destination = destination,
+                        referenceType = instruction.referenceType,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     is ReferenceInstruction.RefEq -> {
         var nextIndex = index
 
