@@ -4,6 +4,13 @@ import io.github.charlietap.chasm.ir.module.Index
 
 sealed interface FusedAggregateInstruction : Instruction {
 
+    data class ArrayGet(
+        val address: FusedOperand,
+        val field: FusedOperand,
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
     data class StructGet(
         val address: FusedOperand,
         val destination: FusedDestination,
