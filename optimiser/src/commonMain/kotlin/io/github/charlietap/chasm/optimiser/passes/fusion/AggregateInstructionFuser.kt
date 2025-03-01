@@ -80,6 +80,100 @@ internal inline fun AggregateInstructionFuser(
 
         nextIndex
     }
+    is AggregateInstruction.ArrayGetSigned -> {
+        var nextIndex = index
+
+        val field = input.getOrNull(index - 1)?.let(operandFactory)
+        val address = input.getOrNull(index - 2)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (field == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                field == null -> FusedAggregateInstruction.ArrayGetSigned(
+                    field = FusedOperand.ValueStack,
+                    address = FusedOperand.ValueStack,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                )
+                address == null -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayGetSigned(
+                        field = field,
+                        address = FusedOperand.ValueStack,
+                        destination = destination,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayGetSigned(
+                        field = field,
+                        address = address,
+                        destination = destination,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
+    is AggregateInstruction.ArrayGetUnsigned -> {
+        var nextIndex = index
+
+        val field = input.getOrNull(index - 1)?.let(operandFactory)
+        val address = input.getOrNull(index - 2)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (field == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                field == null -> FusedAggregateInstruction.ArrayGetUnsigned(
+                    field = FusedOperand.ValueStack,
+                    address = FusedOperand.ValueStack,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                )
+                address == null -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayGetUnsigned(
+                        field = field,
+                        address = FusedOperand.ValueStack,
+                        destination = destination,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayGetUnsigned(
+                        field = field,
+                        address = address,
+                        destination = destination,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     is AggregateInstruction.StructGet -> {
         var nextIndex = index
 

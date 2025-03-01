@@ -11,6 +11,20 @@ sealed interface FusedAggregateInstruction : Instruction {
         val typeIndex: Index.TypeIndex,
     ) : FusedAggregateInstruction
 
+    data class ArrayGetSigned(
+        val address: FusedOperand,
+        val field: FusedOperand,
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
+    data class ArrayGetUnsigned(
+        val address: FusedOperand,
+        val field: FusedOperand,
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
     data class StructGet(
         val address: FusedOperand,
         val destination: FusedDestination,

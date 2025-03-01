@@ -4,12 +4,16 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.ArrayGetDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.ArrayGetSignedDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.ArrayGetUnsignedDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetSignedDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetUnsignedDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.ArrayGet
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.ArrayGetSigned
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.ArrayGetUnsigned
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGet
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGetSigned
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGetUnsigned
@@ -28,6 +32,8 @@ internal fun FusedAggregateInstructionPredecoder(
         loadFactory = ::LoadFactory,
         storeFactory = ::StoreFactory,
         arrayGetDispatcher = ::ArrayGetDispatcher,
+        arrayGetSignedDispatcher = ::ArrayGetSignedDispatcher,
+        arrayGetUnsignedDispatcher = ::ArrayGetUnsignedDispatcher,
         structGetDispatcher = ::StructGetDispatcher,
         structGetSignedDispatcher = ::StructGetSignedDispatcher,
         structGetUnsignedDispatcher = ::StructGetUnsignedDispatcher,
@@ -39,6 +45,8 @@ internal inline fun FusedAggregateInstructionPredecoder(
     crossinline loadFactory: LoadFactory,
     crossinline storeFactory: StoreFactory,
     crossinline arrayGetDispatcher: Dispatcher<ArrayGet>,
+    crossinline arrayGetSignedDispatcher: Dispatcher<ArrayGetSigned>,
+    crossinline arrayGetUnsignedDispatcher: Dispatcher<ArrayGetUnsigned>,
     crossinline structGetDispatcher: Dispatcher<StructGet>,
     crossinline structGetSignedDispatcher: Dispatcher<StructGetSigned>,
     crossinline structGetUnsignedDispatcher: Dispatcher<StructGetUnsigned>,
@@ -52,6 +60,36 @@ internal inline fun FusedAggregateInstructionPredecoder(
 
             arrayGetDispatcher(
                 ArrayGet(
+                    field = field,
+                    address = address,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                ),
+            )
+        }
+        is FusedAggregateInstruction.ArrayGetSigned -> {
+
+            val field = loadFactory(context, instruction.field)
+            val address = loadFactory(context, instruction.address)
+            val destination = storeFactory(context, instruction.destination)
+
+            arrayGetSignedDispatcher(
+                ArrayGetSigned(
+                    field = field,
+                    address = address,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                ),
+            )
+        }
+        is FusedAggregateInstruction.ArrayGetUnsigned -> {
+
+            val field = loadFactory(context, instruction.field)
+            val address = loadFactory(context, instruction.address)
+            val destination = storeFactory(context, instruction.destination)
+
+            arrayGetUnsignedDispatcher(
+                ArrayGetUnsigned(
                     field = field,
                     address = address,
                     destination = destination,
