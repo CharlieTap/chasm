@@ -174,6 +174,53 @@ internal inline fun AggregateInstructionFuser(
 
         nextIndex
     }
+    is AggregateInstruction.ArraySet -> {
+
+        val value = input.getOrNull(index - 1)?.let(operandFactory)
+        val field = input.getOrNull(index - 2)?.let(operandFactory)
+        val address = input.getOrNull(index - 3)?.let(operandFactory)
+
+        val instruction = if (value == null) {
+            instruction
+        } else {
+            when {
+                field == null -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.ArraySet(
+                        value = value,
+                        field = FusedOperand.ValueStack,
+                        address = FusedOperand.ValueStack,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+                address == null -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArraySet(
+                        value = value,
+                        field = field,
+                        address = FusedOperand.ValueStack,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArraySet(
+                        value = value,
+                        field = field,
+                        address = address,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        index
+    }
     is AggregateInstruction.StructGet -> {
         var nextIndex = index
 

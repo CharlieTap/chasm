@@ -25,6 +25,13 @@ sealed interface FusedAggregateInstruction : LinkedInstruction {
         val typeIndex: Index.TypeIndex,
     ) : FusedAggregateInstruction
 
+    data class ArraySet(
+        val value: LoadOp,
+        val field: LoadOp,
+        val address: LoadOp,
+        val typeIndex: Index.TypeIndex,
+    ) : AggregateInstruction
+
     data class StructGet(
         val address: LoadOp,
         val destination: StoreOp,
