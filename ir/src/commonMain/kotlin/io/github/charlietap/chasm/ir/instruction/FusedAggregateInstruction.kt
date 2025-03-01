@@ -52,4 +52,11 @@ sealed interface FusedAggregateInstruction : Instruction {
         val typeIndex: Index.TypeIndex,
         val fieldIndex: Index.FieldIndex,
     ) : FusedAggregateInstruction
+
+    data class StructSet(
+        val value: FusedOperand,
+        val address: FusedOperand,
+        val typeIndex: Index.TypeIndex,
+        val fieldIndex: Index.FieldIndex,
+    ) : FusedAggregateInstruction
 }

@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.Array
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetSignedDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetUnsignedDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructSetDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.ArrayGet
@@ -19,6 +20,7 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateIns
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGet
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGetSigned
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGetUnsigned
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructSet
 import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
 import io.github.charlietap.chasm.predecoder.LoadFactory
 import io.github.charlietap.chasm.predecoder.PredecodingContext
@@ -40,6 +42,7 @@ internal fun FusedAggregateInstructionPredecoder(
         structGetDispatcher = ::StructGetDispatcher,
         structGetSignedDispatcher = ::StructGetSignedDispatcher,
         structGetUnsignedDispatcher = ::StructGetUnsignedDispatcher,
+        structSetDispatcher = ::StructSetDispatcher,
     )
 
 internal inline fun FusedAggregateInstructionPredecoder(
@@ -54,6 +57,7 @@ internal inline fun FusedAggregateInstructionPredecoder(
     crossinline structGetDispatcher: Dispatcher<StructGet>,
     crossinline structGetSignedDispatcher: Dispatcher<StructGetSigned>,
     crossinline structGetUnsignedDispatcher: Dispatcher<StructGetUnsigned>,
+    crossinline structSetDispatcher: Dispatcher<StructSet>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedAggregateInstruction.ArrayGet -> {
@@ -155,6 +159,19 @@ internal inline fun FusedAggregateInstructionPredecoder(
                     destination = destination,
                     typeIndex = instruction.typeIndex,
                     fieldIndex = instruction.fieldIndex,
+                ),
+            )
+        }
+        is FusedAggregateInstruction.StructSet -> {
+
+            val value = loadFactory(context, instruction.value)
+            val address = loadFactory(context, instruction.address)
+
+            structSetDispatcher(
+                StructSet(
+                    value = value,
+                    address = address,
+                    fieldIndex = instruction.fieldIndex.idx,
                 ),
             )
         }

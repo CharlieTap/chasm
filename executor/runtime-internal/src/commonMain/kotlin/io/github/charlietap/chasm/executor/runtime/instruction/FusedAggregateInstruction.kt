@@ -52,4 +52,10 @@ sealed interface FusedAggregateInstruction : LinkedInstruction {
         val typeIndex: Index.TypeIndex,
         val fieldIndex: Index.FieldIndex,
     ) : FusedAggregateInstruction
+
+    data class StructSet(
+        val value: LoadOp,
+        val address: LoadOp,
+        val fieldIndex: Int,
+    ) : FusedAggregateInstruction
 }

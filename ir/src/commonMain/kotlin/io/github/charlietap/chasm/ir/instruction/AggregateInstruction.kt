@@ -17,7 +17,10 @@ sealed interface AggregateInstruction : Instruction {
 
     data class StructGetUnsigned(val typeIndex: Index.TypeIndex, val fieldIndex: Index.FieldIndex) : AggregateInstruction
 
-    data class StructSet(val typeIndex: Index.TypeIndex, val fieldIndex: Index.FieldIndex) : AggregateInstruction
+    data class StructSet(
+        val typeIndex: Index.TypeIndex,
+        val fieldIndex: Index.FieldIndex,
+    ) : AggregateInstruction
 
     @JvmInline
     value class ArrayNew(val typeIndex: Index.TypeIndex) : AggregateInstruction

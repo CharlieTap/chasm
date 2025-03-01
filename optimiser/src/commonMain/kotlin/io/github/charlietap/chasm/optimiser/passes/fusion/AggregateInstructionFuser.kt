@@ -329,6 +329,41 @@ internal inline fun AggregateInstructionFuser(
 
         nextIndex
     }
+    is AggregateInstruction.StructSet -> {
+
+        val value = input.getOrNull(index - 1)?.let(operandFactory)
+        val address = input.getOrNull(index - 2)?.let(operandFactory)
+
+        val instruction = if (value == null) {
+            instruction
+        } else {
+            when {
+                address == null -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.StructSet(
+                        value = value,
+                        address = FusedOperand.ValueStack,
+                        typeIndex = instruction.typeIndex,
+                        fieldIndex = instruction.fieldIndex,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.StructSet(
+                        value = value,
+                        address = address,
+                        typeIndex = instruction.typeIndex,
+                        fieldIndex = instruction.fieldIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        index
+    }
     else -> {
         output.add(instruction)
         index
