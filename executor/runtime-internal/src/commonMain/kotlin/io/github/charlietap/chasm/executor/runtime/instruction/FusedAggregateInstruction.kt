@@ -9,5 +9,19 @@ sealed interface FusedAggregateInstruction : LinkedInstruction {
         val destination: StoreOp,
         val typeIndex: Index.TypeIndex,
         val fieldIndex: Index.FieldIndex,
-    ) : AggregateInstruction
+    ) : FusedAggregateInstruction
+
+    data class StructGetSigned(
+        val address: LoadOp,
+        val destination: StoreOp,
+        val typeIndex: Index.TypeIndex,
+        val fieldIndex: Index.FieldIndex,
+    ) : FusedAggregateInstruction
+
+    data class StructGetUnsigned(
+        val address: LoadOp,
+        val destination: StoreOp,
+        val typeIndex: Index.TypeIndex,
+        val fieldIndex: Index.FieldIndex,
+    ) : FusedAggregateInstruction
 }

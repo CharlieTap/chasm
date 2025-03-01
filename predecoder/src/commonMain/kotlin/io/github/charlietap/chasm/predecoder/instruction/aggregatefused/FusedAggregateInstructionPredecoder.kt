@@ -4,9 +4,13 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetSignedDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetUnsignedDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGet
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGetSigned
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.StructGetUnsigned
 import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
 import io.github.charlietap.chasm.predecoder.LoadFactory
 import io.github.charlietap.chasm.predecoder.PredecodingContext
@@ -22,6 +26,8 @@ internal fun FusedAggregateInstructionPredecoder(
         loadFactory = ::LoadFactory,
         storeFactory = ::StoreFactory,
         structGetDispatcher = ::StructGetDispatcher,
+        structGetSignedDispatcher = ::StructGetSignedDispatcher,
+        structGetUnsignedDispatcher = ::StructGetUnsignedDispatcher,
     )
 
 internal inline fun FusedAggregateInstructionPredecoder(
@@ -30,6 +36,8 @@ internal inline fun FusedAggregateInstructionPredecoder(
     crossinline loadFactory: LoadFactory,
     crossinline storeFactory: StoreFactory,
     crossinline structGetDispatcher: Dispatcher<StructGet>,
+    crossinline structGetSignedDispatcher: Dispatcher<StructGetSigned>,
+    crossinline structGetUnsignedDispatcher: Dispatcher<StructGetUnsigned>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedAggregateInstruction.StructGet -> {
@@ -39,6 +47,34 @@ internal inline fun FusedAggregateInstructionPredecoder(
 
             structGetDispatcher(
                 StructGet(
+                    address = address,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                    fieldIndex = instruction.fieldIndex,
+                ),
+            )
+        }
+        is FusedAggregateInstruction.StructGetSigned -> {
+
+            val address = loadFactory(context, instruction.address)
+            val destination = storeFactory(context, instruction.destination)
+
+            structGetSignedDispatcher(
+                StructGetSigned(
+                    address = address,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                    fieldIndex = instruction.fieldIndex,
+                ),
+            )
+        }
+        is FusedAggregateInstruction.StructGetUnsigned -> {
+
+            val address = loadFactory(context, instruction.address)
+            val destination = storeFactory(context, instruction.destination)
+
+            structGetUnsignedDispatcher(
+                StructGetUnsigned(
                     address = address,
                     destination = destination,
                     typeIndex = instruction.typeIndex,

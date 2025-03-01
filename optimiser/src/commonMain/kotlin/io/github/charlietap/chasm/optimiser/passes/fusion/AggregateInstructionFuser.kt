@@ -69,6 +69,78 @@ internal inline fun AggregateInstructionFuser(
 
         nextIndex
     }
+    is AggregateInstruction.StructGetSigned -> {
+        var nextIndex = index
+
+        val address = input.getOrNull(index - 1)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (address == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                address == null -> FusedAggregateInstruction.StructGetSigned(
+                    address = FusedOperand.ValueStack,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                    fieldIndex = instruction.fieldIndex,
+                )
+                else -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.StructGetSigned(
+                        address = address,
+                        destination = destination,
+                        typeIndex = instruction.typeIndex,
+                        fieldIndex = instruction.fieldIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
+    is AggregateInstruction.StructGetUnsigned -> {
+        var nextIndex = index
+
+        val address = input.getOrNull(index - 1)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (address == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                address == null -> FusedAggregateInstruction.StructGetUnsigned(
+                    address = FusedOperand.ValueStack,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                    fieldIndex = instruction.fieldIndex,
+                )
+                else -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.StructGetUnsigned(
+                        address = address,
+                        destination = destination,
+                        typeIndex = instruction.typeIndex,
+                        fieldIndex = instruction.fieldIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     else -> {
         output.add(instruction)
         index
