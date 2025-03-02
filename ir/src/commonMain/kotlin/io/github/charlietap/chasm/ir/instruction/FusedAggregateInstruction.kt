@@ -25,6 +25,11 @@ sealed interface FusedAggregateInstruction : Instruction {
         val typeIndex: Index.TypeIndex,
     ) : FusedAggregateInstruction
 
+    data class ArrayLen(
+        val address: FusedOperand,
+        val destination: FusedDestination,
+    ) : FusedAggregateInstruction
+
     data class ArraySet(
         val value: FusedOperand,
         val field: FusedOperand,

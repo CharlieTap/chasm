@@ -174,6 +174,38 @@ internal inline fun AggregateInstructionFuser(
 
         nextIndex
     }
+    is AggregateInstruction.ArrayLen -> {
+        var nextIndex = index
+
+        val address = input.getOrNull(index - 1)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (address == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                address == null -> FusedAggregateInstruction.ArrayLen(
+                    address = FusedOperand.ValueStack,
+                    destination = destination,
+                )
+                else -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayLen(
+                        address = address,
+                        destination = destination,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     is AggregateInstruction.ArraySet -> {
 
         val value = input.getOrNull(index - 1)?.let(operandFactory)

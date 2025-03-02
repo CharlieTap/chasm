@@ -1,0 +1,20 @@
+package io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused
+
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayLenExecutor
+import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.executor.runtime.execution.Executor
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction
+
+fun ArrayLenDispatcher(
+    instruction: FusedAggregateInstruction.ArrayLen,
+) = ArrayLenDispatcher(
+    instruction = instruction,
+    executor = ::ArrayLenExecutor,
+)
+
+internal inline fun ArrayLenDispatcher(
+    instruction: FusedAggregateInstruction.ArrayLen,
+    crossinline executor: Executor<FusedAggregateInstruction.ArrayLen>,
+): DispatchableInstruction = { context ->
+    executor(context, instruction)
+}
