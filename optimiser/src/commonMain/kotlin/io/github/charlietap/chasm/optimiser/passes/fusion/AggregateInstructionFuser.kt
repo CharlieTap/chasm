@@ -33,6 +33,95 @@ internal inline fun AggregateInstructionFuser(
     operandFactory: FusedOperandFactory,
     destinationFactory: FusedDestinationFactory,
 ): Int = when (instruction) {
+    is AggregateInstruction.ArrayCopy -> {
+
+        val elementsToCopy = input.getOrNull(index - 1)?.let(operandFactory)
+        val sourceOffset = input.getOrNull(index - 2)?.let(operandFactory)
+        val sourceAddress = input.getOrNull(index - 3)?.let(operandFactory)
+        val destinationOffset = input.getOrNull(index - 4)?.let(operandFactory)
+        val destinationAddress = input.getOrNull(index - 5)?.let(operandFactory)
+
+        val instruction = if (elementsToCopy == null) {
+            instruction
+        } else {
+            when {
+                sourceOffset == null -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayCopy(
+                        elementsToCopy = elementsToCopy,
+                        sourceOffset = FusedOperand.ValueStack,
+                        sourceAddress = FusedOperand.ValueStack,
+                        destinationOffset = FusedOperand.ValueStack,
+                        destinationAddress = FusedOperand.ValueStack,
+                        sourceTypeIndex = instruction.sourceTypeIndex,
+                        destinationTypeIndex = instruction.destinationTypeIndex,
+                    )
+                }
+                sourceAddress == null -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayCopy(
+                        elementsToCopy = elementsToCopy,
+                        sourceOffset = sourceOffset,
+                        sourceAddress = FusedOperand.ValueStack,
+                        destinationOffset = FusedOperand.ValueStack,
+                        destinationAddress = FusedOperand.ValueStack,
+                        sourceTypeIndex = instruction.sourceTypeIndex,
+                        destinationTypeIndex = instruction.destinationTypeIndex,
+                    )
+                }
+                destinationOffset == null -> {
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayCopy(
+                        elementsToCopy = elementsToCopy,
+                        sourceOffset = sourceOffset,
+                        sourceAddress = sourceAddress,
+                        destinationOffset = FusedOperand.ValueStack,
+                        destinationAddress = FusedOperand.ValueStack,
+                        sourceTypeIndex = instruction.sourceTypeIndex,
+                        destinationTypeIndex = instruction.destinationTypeIndex,
+                    )
+                }
+                destinationAddress == null -> {
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayCopy(
+                        elementsToCopy = elementsToCopy,
+                        sourceOffset = sourceOffset,
+                        sourceAddress = sourceAddress,
+                        destinationOffset = destinationOffset,
+                        destinationAddress = FusedOperand.ValueStack,
+                        sourceTypeIndex = instruction.sourceTypeIndex,
+                        destinationTypeIndex = instruction.destinationTypeIndex,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayCopy(
+                        elementsToCopy = elementsToCopy,
+                        sourceOffset = sourceOffset,
+                        sourceAddress = sourceAddress,
+                        destinationOffset = destinationOffset,
+                        destinationAddress = destinationAddress,
+                        sourceTypeIndex = instruction.sourceTypeIndex,
+                        destinationTypeIndex = instruction.destinationTypeIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        index
+    }
     is AggregateInstruction.ArrayGet -> {
         var nextIndex = index
 

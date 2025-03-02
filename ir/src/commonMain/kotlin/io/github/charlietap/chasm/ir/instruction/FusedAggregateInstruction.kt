@@ -4,6 +4,16 @@ import io.github.charlietap.chasm.ir.module.Index
 
 sealed interface FusedAggregateInstruction : Instruction {
 
+    data class ArrayCopy(
+        val elementsToCopy: FusedOperand,
+        val sourceOffset: FusedOperand,
+        val sourceAddress: FusedOperand,
+        val destinationOffset: FusedOperand,
+        val destinationAddress: FusedOperand,
+        val sourceTypeIndex: Index.TypeIndex,
+        val destinationTypeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
     data class ArrayGet(
         val address: FusedOperand,
         val field: FusedOperand,

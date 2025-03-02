@@ -4,6 +4,16 @@ import io.github.charlietap.chasm.ir.module.Index
 
 sealed interface FusedAggregateInstruction : LinkedInstruction {
 
+    data class ArrayCopy(
+        val elementsToCopy: LoadOp,
+        val sourceOffset: LoadOp,
+        val sourceAddress: LoadOp,
+        val destinationOffset: LoadOp,
+        val destinationAddress: LoadOp,
+        val sourceTypeIndex: Index.TypeIndex,
+        val destinationTypeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
     data class ArrayGet(
         val address: LoadOp,
         val field: LoadOp,
@@ -35,7 +45,7 @@ sealed interface FusedAggregateInstruction : LinkedInstruction {
         val field: LoadOp,
         val address: LoadOp,
         val typeIndex: Index.TypeIndex,
-    ) : AggregateInstruction
+    ) : FusedAggregateInstruction
 
     data class StructGet(
         val address: LoadOp,

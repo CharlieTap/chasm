@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.predecoder.instruction.aggregatefused
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.ArrayCopyDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.ArrayGetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.ArrayGetSignedDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.ArrayGetUnsignedDispatcher
@@ -14,6 +15,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.Struc
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructSetDispatcher
 import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.ArrayCopy
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.ArrayGet
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.ArrayGetSigned
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction.ArrayGetUnsigned
@@ -37,6 +39,7 @@ internal fun FusedAggregateInstructionPredecoder(
         instruction = instruction,
         loadFactory = ::LoadFactory,
         storeFactory = ::StoreFactory,
+        arrayCopyDispatcher = ::ArrayCopyDispatcher,
         arrayGetDispatcher = ::ArrayGetDispatcher,
         arrayGetSignedDispatcher = ::ArrayGetSignedDispatcher,
         arrayGetUnsignedDispatcher = ::ArrayGetUnsignedDispatcher,
@@ -53,6 +56,7 @@ internal inline fun FusedAggregateInstructionPredecoder(
     instruction: FusedAggregateInstruction,
     crossinline loadFactory: LoadFactory,
     crossinline storeFactory: StoreFactory,
+    crossinline arrayCopyDispatcher: Dispatcher<ArrayCopy>,
     crossinline arrayGetDispatcher: Dispatcher<ArrayGet>,
     crossinline arrayGetSignedDispatcher: Dispatcher<ArrayGetSigned>,
     crossinline arrayGetUnsignedDispatcher: Dispatcher<ArrayGetUnsigned>,
@@ -64,6 +68,26 @@ internal inline fun FusedAggregateInstructionPredecoder(
     crossinline structSetDispatcher: Dispatcher<StructSet>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
+        is FusedAggregateInstruction.ArrayCopy -> {
+
+            val elementsToCopy = loadFactory(context, instruction.elementsToCopy)
+            val sourceOffset = loadFactory(context, instruction.sourceOffset)
+            val sourceAddress = loadFactory(context, instruction.sourceAddress)
+            val destinationOffset = loadFactory(context, instruction.destinationOffset)
+            val destinationAddress = loadFactory(context, instruction.destinationAddress)
+
+            arrayCopyDispatcher(
+                ArrayCopy(
+                    elementsToCopy = elementsToCopy,
+                    sourceOffset = sourceOffset,
+                    sourceAddress = sourceAddress,
+                    destinationOffset = destinationOffset,
+                    destinationAddress = destinationAddress,
+                    sourceTypeIndex = instruction.sourceTypeIndex,
+                    destinationTypeIndex = instruction.destinationTypeIndex,
+                ),
+            )
+        }
         is FusedAggregateInstruction.ArrayGet -> {
 
             val field = loadFactory(context, instruction.field)
