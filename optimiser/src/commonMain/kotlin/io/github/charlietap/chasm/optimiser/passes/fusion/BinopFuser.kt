@@ -32,31 +32,31 @@ internal inline fun BinopFuser(
     operandFactory: FusedOperandFactory,
     destinationFactory: FusedDestinationFactory,
 ): Int {
+
     var nextIndex = index
-    var left = input.getOrNull(index - 2)?.let(operandFactory)
+
     val right = input.getOrNull(index - 1)?.let(operandFactory)
-
-    if (right == null) {
-        output.add(instruction)
-        return index
-    }
-
-    if (left == null) {
-        left = FusedOperand.ValueStack
-        output.removeLast()
-    } else {
-        output.removeLast()
-        output.removeLast()
-    }
-
+    val left = input.getOrNull(index - 2)?.let(operandFactory)
     val destination = input.getOrNull(index + 1).let(destinationFactory)
-    if (destination != FusedDestination.ValueStack) {
+
+    val instruction = when {
+        right == null -> instruction
+        left == null -> {
+            output.removeLast()
+            fusedInstructionFactory(FusedOperand.ValueStack, right, destination)
+        }
+        else -> {
+            output.removeLast()
+            output.removeLast()
+            fusedInstructionFactory(left, right, destination)
+        }
+    }
+
+    output.add(instruction)
+
+    if (right != null && destination != FusedDestination.ValueStack) {
         nextIndex++
     }
-
-    output.add(
-        fusedInstructionFactory(left, right, destination),
-    )
 
     return nextIndex
 }
