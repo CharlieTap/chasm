@@ -36,25 +36,31 @@ internal inline fun MemoryLoadFuser(
     operandFactory: FusedOperandFactory,
     destinationFactory: FusedDestinationFactory,
 ): Int {
-    var nextIndex = index
-    val operand = input.getOrNull(index - 1)?.let(operandFactory)
 
-    if (operand == null) {
-        output.add(instruction)
-        return index
+    var nextIndex = index
+
+    val operand = input.getOrNull(index - 1)?.let(operandFactory)
+    val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+    val instruction = if (operand == null && destination == FusedDestination.ValueStack) {
+        instruction
+    } else {
+        when {
+            operand == null -> {
+                fusedInstructionFactory(FusedOperand.ValueStack, destination, instruction.memoryIndex, instruction.memArg)
+            }
+            else -> {
+                output.removeLast()
+                fusedInstructionFactory(operand, destination, instruction.memoryIndex, instruction.memArg)
+            }
+        }
     }
 
-    output.removeLast()
-
-    val destination = input.getOrNull(index + 1).let(destinationFactory)
+    output.add(instruction)
 
     if (destination != FusedDestination.ValueStack) {
         nextIndex++
     }
-
-    output.add(
-        fusedInstructionFactory(operand, destination, instruction.memoryIndex, instruction.memArg),
-    )
 
     return nextIndex
 }
