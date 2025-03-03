@@ -42,17 +42,14 @@ internal inline fun MemoryLoadFuser(
     val operand = input.getOrNull(index - 1)?.let(operandFactory)
     val destination = input.getOrNull(index + 1).let(destinationFactory)
 
-    val instruction = if (operand == null && destination == FusedDestination.ValueStack) {
-        instruction
-    } else {
-        when {
-            operand == null -> {
-                fusedInstructionFactory(FusedOperand.ValueStack, destination, instruction.memoryIndex, instruction.memArg)
-            }
-            else -> {
-                output.removeLast()
-                fusedInstructionFactory(operand, destination, instruction.memoryIndex, instruction.memArg)
-            }
+    val instruction = when {
+        operand == null && destination == FusedDestination.ValueStack -> instruction
+        operand == null -> {
+            fusedInstructionFactory(FusedOperand.ValueStack, destination, instruction.memoryIndex, instruction.memArg)
+        }
+        else -> {
+            output.removeLast()
+            fusedInstructionFactory(operand, destination, instruction.memoryIndex, instruction.memArg)
         }
     }
 
