@@ -14,6 +14,14 @@ sealed interface FusedAggregateInstruction : Instruction {
         val destinationTypeIndex: Index.TypeIndex,
     ) : FusedAggregateInstruction
 
+    data class ArrayFill(
+        val elementsToFill: FusedOperand,
+        val fillValue: FusedOperand,
+        val arrayElementOffset: FusedOperand,
+        val address: FusedOperand,
+        val typeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
     data class ArrayGet(
         val address: FusedOperand,
         val field: FusedOperand,
@@ -38,6 +46,19 @@ sealed interface FusedAggregateInstruction : Instruction {
     data class ArrayLen(
         val address: FusedOperand,
         val destination: FusedDestination,
+    ) : FusedAggregateInstruction
+
+    data class ArrayNew(
+        val size: FusedOperand,
+        val value: FusedOperand,
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
+    data class ArrayNewFixed(
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+        val size: Int,
     ) : FusedAggregateInstruction
 
     data class ArraySet(
@@ -66,6 +87,16 @@ sealed interface FusedAggregateInstruction : Instruction {
         val destination: FusedDestination,
         val typeIndex: Index.TypeIndex,
         val fieldIndex: Index.FieldIndex,
+    ) : FusedAggregateInstruction
+
+    data class StructNew(
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
+    data class StructNewDefault(
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
     ) : FusedAggregateInstruction
 
     data class StructSet(

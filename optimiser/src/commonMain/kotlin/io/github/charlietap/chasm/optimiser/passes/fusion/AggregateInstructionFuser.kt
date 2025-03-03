@@ -122,6 +122,70 @@ internal inline fun AggregateInstructionFuser(
 
         index
     }
+    is AggregateInstruction.ArrayFill -> {
+
+        val elementsToFill = input.getOrNull(index - 1)?.let(operandFactory)
+        val fillValue = input.getOrNull(index - 2)?.let(operandFactory)
+        val arrayElementOffset = input.getOrNull(index - 3)?.let(operandFactory)
+        val address = input.getOrNull(index - 4)?.let(operandFactory)
+
+        val instruction = if (elementsToFill == null) {
+            instruction
+        } else {
+            when {
+                fillValue == null -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayFill(
+                        elementsToFill = elementsToFill,
+                        fillValue = FusedOperand.ValueStack,
+                        arrayElementOffset = FusedOperand.ValueStack,
+                        address = FusedOperand.ValueStack,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+                arrayElementOffset == null -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayFill(
+                        elementsToFill = elementsToFill,
+                        fillValue = fillValue,
+                        arrayElementOffset = FusedOperand.ValueStack,
+                        address = FusedOperand.ValueStack,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+                address == null -> {
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayFill(
+                        elementsToFill = elementsToFill,
+                        fillValue = fillValue,
+                        arrayElementOffset = arrayElementOffset,
+                        address = FusedOperand.ValueStack,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayFill(
+                        elementsToFill = elementsToFill,
+                        fillValue = fillValue,
+                        arrayElementOffset = arrayElementOffset,
+                        address = address,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        index
+    }
     is AggregateInstruction.ArrayGet -> {
         var nextIndex = index
 
@@ -295,6 +359,78 @@ internal inline fun AggregateInstructionFuser(
 
         nextIndex
     }
+    is AggregateInstruction.ArrayNew -> {
+
+        var nextIndex = index
+
+        val size = input.getOrNull(index - 1)?.let(operandFactory)
+        val value = input.getOrNull(index - 2)?.let(operandFactory)
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (size == null && destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            when {
+                size == null -> FusedAggregateInstruction.ArrayNew(
+                    size = FusedOperand.ValueStack,
+                    value = FusedOperand.ValueStack,
+                    destination = destination,
+                    typeIndex = instruction.typeIndex,
+                )
+                value == null -> {
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayNew(
+                        size = size,
+                        value = FusedOperand.ValueStack,
+                        destination = destination,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+                else -> {
+                    output.removeLast()
+                    output.removeLast()
+                    FusedAggregateInstruction.ArrayNew(
+                        size = size,
+                        value = value,
+                        destination = destination,
+                        typeIndex = instruction.typeIndex,
+                    )
+                }
+            }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
+    is AggregateInstruction.ArrayNewFixed -> {
+
+        var nextIndex = index
+
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            FusedAggregateInstruction.ArrayNewFixed(
+                destination = destination,
+                typeIndex = instruction.typeIndex,
+                size = instruction.size.toInt(),
+            )
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
     is AggregateInstruction.ArraySet -> {
 
         val value = input.getOrNull(index - 1)?.let(operandFactory)
@@ -440,6 +576,50 @@ internal inline fun AggregateInstructionFuser(
                     )
                 }
             }
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
+    is AggregateInstruction.StructNew -> {
+        var nextIndex = index
+
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            FusedAggregateInstruction.StructNew(
+                destination = destination,
+                typeIndex = instruction.typeIndex,
+            )
+        }
+
+        output.add(instruction)
+
+        if (destination != FusedDestination.ValueStack) {
+            nextIndex++
+        }
+
+        nextIndex
+    }
+    is AggregateInstruction.StructNewDefault -> {
+        var nextIndex = index
+
+        val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+        val instruction = if (destination == FusedDestination.ValueStack) {
+            instruction
+        } else {
+            FusedAggregateInstruction.StructNewDefault(
+                destination = destination,
+                typeIndex = instruction.typeIndex,
+            )
         }
 
         output.add(instruction)
