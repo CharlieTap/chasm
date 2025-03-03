@@ -7,13 +7,25 @@ import io.github.charlietap.chasm.ir.instruction.Instruction
 internal typealias BinopFusedInstructionFactory = (FusedOperand, FusedOperand, FusedDestination) -> Instruction
 internal typealias BinopFuser = (Int, Instruction, List<Instruction>, MutableList<Instruction>, BinopFusedInstructionFactory) -> Int
 
-internal fun BinopFuser(
+/**
+ * When we load two operands for a binary numeric operation we avoid
+ * storing them in temporary variables and place them directly into
+ * the numeric expression i.e.
+ *
+ * load_left operation load_right
+ *
+ * This wouldn't work if they both pull from the stack as right needs
+ * to be popped first and thus right would be in the left position. For
+ * this reason this specialised fuser exists which omits fusions where
+ * both operands are missing but the destination is present.
+ */
+internal fun NumericBinopFuser(
     index: Int,
     instruction: Instruction,
     input: List<Instruction>,
     output: MutableList<Instruction>,
     fusedInstructionFactory: BinopFusedInstructionFactory,
-): Int = BinopFuser(
+): Int = NumericBinopFuser(
     index = index,
     instruction = instruction,
     input = input,
@@ -23,7 +35,7 @@ internal fun BinopFuser(
     destinationFactory = ::FusedDestinationFactory,
 )
 
-internal inline fun BinopFuser(
+internal inline fun NumericBinopFuser(
     index: Int,
     instruction: Instruction,
     input: List<Instruction>,

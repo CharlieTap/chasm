@@ -53,7 +53,7 @@ internal fun NumericInstructionFuser(
     input = input,
     output = output,
     unop = ::UnopFuser,
-    binop = ::BinopFuser,
+    binop = ::NumericBinopFuser,
 )
 
 internal inline fun NumericInstructionFuser(
