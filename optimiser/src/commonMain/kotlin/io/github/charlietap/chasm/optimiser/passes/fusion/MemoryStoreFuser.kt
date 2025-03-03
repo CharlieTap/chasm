@@ -33,25 +33,23 @@ internal inline fun MemoryStoreFuser(
     fusedInstructionFactory: MemoryStoreInstructionFactory,
     operandFactory: FusedOperandFactory,
 ): Int {
-    var address = input.getOrNull(index - 2)?.let(operandFactory)
+
     val value = input.getOrNull(index - 1)?.let(operandFactory)
+    val address = input.getOrNull(index - 2)?.let(operandFactory)
 
-    if (value == null) {
-        output.add(instruction)
-        return index
+    val instruction = when {
+        value == null -> instruction
+        address == null -> {
+            output.removeLast()
+            fusedInstructionFactory(value, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg)
+        } else -> {
+            output.removeLast()
+            output.removeLast()
+            fusedInstructionFactory(value, address, instruction.memoryIndex, instruction.memArg)
+        }
     }
 
-    if (address == null) {
-        address = FusedOperand.ValueStack
-        output.removeLast()
-    } else {
-        output.removeLast()
-        output.removeLast()
-    }
-
-    output.add(
-        fusedInstructionFactory(value, address, instruction.memoryIndex, instruction.memArg),
-    )
+    output.add(instruction)
 
     return index
 }
