@@ -32,25 +32,28 @@ internal inline fun UnopFuser(
     operandFactory: FusedOperandFactory,
     destinationFactory: FusedDestinationFactory,
 ): Int {
-    var nextIndex = index
-    val operand = input.getOrNull(index - 1)?.let(operandFactory)
 
-    if (operand == null) {
-        output.add(instruction)
-        return index
+    var nextIndex = index
+
+    val operand = input.getOrNull(index - 1)?.let(operandFactory)
+    val destination = input.getOrNull(index + 1).let(destinationFactory)
+
+    val instruction = when {
+        operand == null && destination == FusedDestination.ValueStack -> instruction
+        operand == null -> {
+            fusedInstructionFactory(FusedOperand.ValueStack, destination)
+        }
+        else -> {
+            output.removeLast()
+            fusedInstructionFactory(operand, destination)
+        }
     }
 
-    output.removeLast()
-
-    val destination = input.getOrNull(index + 1).let(destinationFactory)
+    output.add(instruction)
 
     if (destination != FusedDestination.ValueStack) {
         nextIndex++
     }
-
-    output.add(
-        fusedInstructionFactory(operand, destination),
-    )
 
     return nextIndex
 }
