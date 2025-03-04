@@ -53,7 +53,8 @@ internal fun NumericInstructionFuser(
     input = input,
     output = output,
     unop = ::UnopFuser,
-    binop = ::NumericBinopFuser,
+    commutativeBinop = ::CommutativeBinopFuser,
+    nonCommutativeBinop = ::NonCommutativeBinopFuser,
 )
 
 internal inline fun NumericInstructionFuser(
@@ -63,43 +64,44 @@ internal inline fun NumericInstructionFuser(
     input: List<Instruction>,
     output: MutableList<Instruction>,
     unop: UnopFuser,
-    binop: BinopFuser,
+    commutativeBinop: BinopFuser,
+    nonCommutativeBinop: BinopFuser,
 ): Int = when (instruction) {
-    is NumericInstruction.I32Add -> binop(index, instruction, input, output, ::I32Add)
-    is NumericInstruction.I32Sub -> binop(index, instruction, input, output, ::I32Sub)
-    is NumericInstruction.I32Mul -> binop(index, instruction, input, output, ::I32Mul)
-    is NumericInstruction.I32DivS -> binop(index, instruction, input, output, ::I32DivS)
-    is NumericInstruction.I32DivU -> binop(index, instruction, input, output, ::I32DivU)
-    is NumericInstruction.I32And -> binop(index, instruction, input, output, ::I32And)
-    is NumericInstruction.I32Or -> binop(index, instruction, input, output, ::I32Or)
-    is NumericInstruction.I32Xor -> binop(index, instruction, input, output, ::I32Xor)
-    is NumericInstruction.I32Shl -> binop(index, instruction, input, output, ::I32Shl)
-    is NumericInstruction.I32ShrS -> binop(index, instruction, input, output, ::I32ShrS)
-    is NumericInstruction.I32ShrU -> binop(index, instruction, input, output, ::I32ShrU)
-    is NumericInstruction.I32LtS -> binop(index, instruction, input, output, ::I32LtS)
-    is NumericInstruction.I32LtU -> binop(index, instruction, input, output, ::I32LtU)
-    is NumericInstruction.I32GtS -> binop(index, instruction, input, output, ::I32GtS)
-    is NumericInstruction.I32GtU -> binop(index, instruction, input, output, ::I32GtU)
-    is NumericInstruction.I32LeS -> binop(index, instruction, input, output, ::I32LeS)
-    is NumericInstruction.I32LeU -> binop(index, instruction, input, output, ::I32LeU)
-    is NumericInstruction.I32GeS -> binop(index, instruction, input, output, ::I32GeS)
-    is NumericInstruction.I32GeU -> binop(index, instruction, input, output, ::I32GeU)
+    is NumericInstruction.I32Add -> nonCommutativeBinop(index, instruction, input, output, ::I32Add)
+    is NumericInstruction.I32Sub -> nonCommutativeBinop(index, instruction, input, output, ::I32Sub)
+    is NumericInstruction.I32Mul -> commutativeBinop(index, instruction, input, output, ::I32Mul)
+    is NumericInstruction.I32DivS -> nonCommutativeBinop(index, instruction, input, output, ::I32DivS)
+    is NumericInstruction.I32DivU -> nonCommutativeBinop(index, instruction, input, output, ::I32DivU)
+    is NumericInstruction.I32And -> commutativeBinop(index, instruction, input, output, ::I32And)
+    is NumericInstruction.I32Or -> commutativeBinop(index, instruction, input, output, ::I32Or)
+    is NumericInstruction.I32Xor -> commutativeBinop(index, instruction, input, output, ::I32Xor)
+    is NumericInstruction.I32Shl -> nonCommutativeBinop(index, instruction, input, output, ::I32Shl)
+    is NumericInstruction.I32ShrS -> nonCommutativeBinop(index, instruction, input, output, ::I32ShrS)
+    is NumericInstruction.I32ShrU -> nonCommutativeBinop(index, instruction, input, output, ::I32ShrU)
+    is NumericInstruction.I32LtS -> nonCommutativeBinop(index, instruction, input, output, ::I32LtS)
+    is NumericInstruction.I32LtU -> nonCommutativeBinop(index, instruction, input, output, ::I32LtU)
+    is NumericInstruction.I32GtS -> nonCommutativeBinop(index, instruction, input, output, ::I32GtS)
+    is NumericInstruction.I32GtU -> nonCommutativeBinop(index, instruction, input, output, ::I32GtU)
+    is NumericInstruction.I32LeS -> nonCommutativeBinop(index, instruction, input, output, ::I32LeS)
+    is NumericInstruction.I32LeU -> nonCommutativeBinop(index, instruction, input, output, ::I32LeU)
+    is NumericInstruction.I32GeS -> nonCommutativeBinop(index, instruction, input, output, ::I32GeS)
+    is NumericInstruction.I32GeU -> nonCommutativeBinop(index, instruction, input, output, ::I32GeU)
     is NumericInstruction.I32Eqz -> unop(index, instruction, input, output, ::I32Eqz)
     is NumericInstruction.I64Eqz -> unop(index, instruction, input, output, ::I64Eqz)
-    is NumericInstruction.I64Add -> binop(index, instruction, input, output, ::I64Add)
-    is NumericInstruction.I64Sub -> binop(index, instruction, input, output, ::I64Sub)
-    is NumericInstruction.I64Mul -> binop(index, instruction, input, output, ::I64Mul)
-    is NumericInstruction.I64DivS -> binop(index, instruction, input, output, ::I64DivS)
-    is NumericInstruction.I64DivU -> binop(index, instruction, input, output, ::I64DivU)
+    is NumericInstruction.I64Add -> nonCommutativeBinop(index, instruction, input, output, ::I64Add)
+    is NumericInstruction.I64Sub -> nonCommutativeBinop(index, instruction, input, output, ::I64Sub)
+    is NumericInstruction.I64Mul -> commutativeBinop(index, instruction, input, output, ::I64Mul)
+    is NumericInstruction.I64DivS -> nonCommutativeBinop(index, instruction, input, output, ::I64DivS)
+    is NumericInstruction.I64DivU -> nonCommutativeBinop(index, instruction, input, output, ::I64DivU)
     is NumericInstruction.F32Abs -> unop(index, instruction, input, output, ::F32Abs)
-    is NumericInstruction.F32Add -> binop(index, instruction, input, output, ::F32Add)
-    is NumericInstruction.F32Sub -> binop(index, instruction, input, output, ::F32Sub)
-    is NumericInstruction.F32Mul -> binop(index, instruction, input, output, ::F32Mul)
-    is NumericInstruction.F32Div -> binop(index, instruction, input, output, ::F32Div)
-    is NumericInstruction.F64Add -> binop(index, instruction, input, output, ::F64Add)
-    is NumericInstruction.F64Sub -> binop(index, instruction, input, output, ::F64Sub)
-    is NumericInstruction.F64Mul -> binop(index, instruction, input, output, ::F64Mul)
-    is NumericInstruction.F64Div -> binop(index, instruction, input, output, ::F64Div)
+    is NumericInstruction.F32Add -> commutativeBinop(index, instruction, input, output, ::F32Add)
+    is NumericInstruction.F32Sub -> nonCommutativeBinop(index, instruction, input, output, ::F32Sub)
+    is NumericInstruction.F32Mul -> commutativeBinop(index, instruction, input, output, ::F32Mul)
+    is NumericInstruction.F32Div -> nonCommutativeBinop(index, instruction, input, output, ::F32Div)
+    is NumericInstruction.F64Add -> nonCommutativeBinop(index, instruction, input, output, ::F64Add)
+    is NumericInstruction.F64Sub -> nonCommutativeBinop(index, instruction, input, output, ::F64Sub)
+    is NumericInstruction.F64Mul -> commutativeBinop(index, instruction, input, output, ::F64Mul)
+    is NumericInstruction.F64Div -> nonCommutativeBinop(index, instruction, input, output, ::F64Div)
     else -> {
         output.add(instruction)
         index
