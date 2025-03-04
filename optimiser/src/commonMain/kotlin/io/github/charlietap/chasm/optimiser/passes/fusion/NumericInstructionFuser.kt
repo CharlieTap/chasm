@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Add
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32And
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32DivU
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Eq
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Eqz
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32GeS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32GeU
@@ -86,6 +87,7 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.I32LeU -> nonCommutativeBinop(index, instruction, input, output, ::I32LeU)
     is NumericInstruction.I32GeS -> nonCommutativeBinop(index, instruction, input, output, ::I32GeS)
     is NumericInstruction.I32GeU -> nonCommutativeBinop(index, instruction, input, output, ::I32GeU)
+    is NumericInstruction.I32Eq -> commutativeBinop(index, instruction, input, output, ::I32Eq)
     is NumericInstruction.I32Eqz -> unop(index, instruction, input, output, ::I32Eqz)
     is NumericInstruction.I64Eqz -> unop(index, instruction, input, output, ::I64Eqz)
     is NumericInstruction.I64Add -> nonCommutativeBinop(index, instruction, input, output, ::I64Add)
