@@ -10,6 +10,8 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32MulD
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32SubDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64AddDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64DivDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64GeDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64LtDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64MulDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64SubDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32AddDispatcher
@@ -49,6 +51,8 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstr
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F32Sub
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Add
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Div
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Ge
+import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Lt
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Mul
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.F64Sub
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction.I32Add
@@ -130,6 +134,8 @@ internal fun FusedNumericInstructionPredecoder(
         f64SubDispatcher = ::F64SubDispatcher,
         f64MulDispatcher = ::F64MulDispatcher,
         f64DivDispatcher = ::F64DivDispatcher,
+        f64GeDispatcher = ::F64GeDispatcher,
+        f64LtDispatcher = ::F64LtDispatcher,
     )
 
 internal inline fun FusedNumericInstructionPredecoder(
@@ -174,6 +180,8 @@ internal inline fun FusedNumericInstructionPredecoder(
     crossinline f64SubDispatcher: Dispatcher<F64Sub>,
     crossinline f64MulDispatcher: Dispatcher<F64Mul>,
     crossinline f64DivDispatcher: Dispatcher<F64Div>,
+    crossinline f64GeDispatcher: Dispatcher<F64Ge>,
+    crossinline f64LtDispatcher: Dispatcher<F64Lt>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedNumericInstruction.I32Add -> {
@@ -496,6 +504,19 @@ internal inline fun FusedNumericInstructionPredecoder(
             val destination = storeFactory(context, instruction.destination)
             i32GeUDispatcher(I32GeU(left, right, destination))
         }
+        is FusedNumericInstruction.F64Ge -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            f64GeDispatcher(F64Ge(left, right, destination))
+        }
+        is FusedNumericInstruction.F64Lt -> {
+            val left = loadFactory(context, instruction.left)
+            val right = loadFactory(context, instruction.right)
+            val destination = storeFactory(context, instruction.destination)
+            f64LtDispatcher(F64Lt(left, right, destination))
+        }
+
         is FusedNumericInstruction.F32Ceil -> TODO()
         is FusedNumericInstruction.F32ConvertI32S -> TODO()
         is FusedNumericInstruction.F32ConvertI32U -> TODO()
@@ -526,10 +547,8 @@ internal inline fun FusedNumericInstructionPredecoder(
         is FusedNumericInstruction.F64Copysign -> TODO()
         is FusedNumericInstruction.F64Eq -> TODO()
         is FusedNumericInstruction.F64Floor -> TODO()
-        is FusedNumericInstruction.F64Ge -> TODO()
         is FusedNumericInstruction.F64Gt -> TODO()
         is FusedNumericInstruction.F64Le -> TODO()
-        is FusedNumericInstruction.F64Lt -> TODO()
         is FusedNumericInstruction.F64Max -> TODO()
         is FusedNumericInstruction.F64Min -> TODO()
         is FusedNumericInstruction.F64Ne -> TODO()

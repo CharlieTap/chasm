@@ -7,6 +7,8 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Sub
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Add
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Div
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Ge
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Lt
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Sub
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Add
@@ -106,6 +108,8 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.F64Sub -> nonCommutativeBinop(index, instruction, input, output, ::F64Sub)
     is NumericInstruction.F64Mul -> commutativeBinop(index, instruction, input, output, ::F64Mul)
     is NumericInstruction.F64Div -> nonCommutativeBinop(index, instruction, input, output, ::F64Div)
+    is NumericInstruction.F64Ge -> nonCommutativeBinop(index, instruction, input, output, ::F64Ge)
+    is NumericInstruction.F64Lt -> nonCommutativeBinop(index, instruction, input, output, ::F64Lt)
     else -> {
         output.add(instruction)
         index
