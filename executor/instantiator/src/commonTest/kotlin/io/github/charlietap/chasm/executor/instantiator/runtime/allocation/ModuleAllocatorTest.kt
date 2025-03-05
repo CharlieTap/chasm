@@ -10,8 +10,6 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.memory.Memory
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
-import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
@@ -61,14 +59,16 @@ import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.predecoder.Predecoder
+import io.github.charlietap.chasm.runtime.ext.toLong
+import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ext.definedType
 import io.github.charlietap.chasm.type.ext.recursiveType
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
-import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
+import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
 class ModuleAllocatorTest {
 

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.isNullableReference
-import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.ext.isNullableReference
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 
 internal fun BrOnNullExecutor(
     context: ExecutionContext,

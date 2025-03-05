@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.instance.DataInstance
+import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 
 internal inline fun DataDropExecutor(
     context: ExecutionContext,

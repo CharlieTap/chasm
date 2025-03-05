@@ -3,8 +3,8 @@
 package io.github.charlietap.chasm.executor.memory.grow
 
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory.Companion.PAGE_SIZE
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 
 actual inline fun LinearMemoryGrower(
     memory: LinearMemory,

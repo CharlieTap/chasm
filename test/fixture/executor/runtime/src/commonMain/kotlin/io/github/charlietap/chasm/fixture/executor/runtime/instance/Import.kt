@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instance
 
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.executor.runtime.instance.Import
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.instance.Import
 
 fun import(
     moduleName: String = "",

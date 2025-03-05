@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numericfused.unop
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
 import kotlin.math.absoluteValue
 
 internal inline fun F32AbsExecutor(

@@ -16,9 +16,9 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.transform.ImportableMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
 import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.executor.runtime.instance.Import as RuntimeImport
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.instance.Import as RuntimeImport
 
 fun instance(
     store: Store,

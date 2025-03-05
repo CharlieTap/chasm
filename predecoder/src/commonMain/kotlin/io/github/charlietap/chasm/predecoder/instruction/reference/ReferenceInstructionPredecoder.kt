@@ -10,19 +10,19 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefFuncDis
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefIsNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.reference.RefTestDispatcher
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
-import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefAsNonNull
-import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefCast
-import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefEq
-import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefFunc
-import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefIsNull
-import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefNull
-import io.github.charlietap.chasm.executor.runtime.instruction.ReferenceInstruction.RefTest
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.ext.functionAddress
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.toLong
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefAsNonNull
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefCast
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefEq
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefFunc
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefIsNull
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefNull
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefTest
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 internal fun ReferenceInstructionPredecoder(

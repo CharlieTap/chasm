@@ -6,16 +6,16 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.function.Wasm
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.addFunctionAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addMemoryAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addTableAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.executor.runtime.instance.Import
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.ir.module.Type
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.addFunctionAddress
+import io.github.charlietap.chasm.runtime.ext.addGlobalAddress
+import io.github.charlietap.chasm.runtime.ext.addMemoryAddress
+import io.github.charlietap.chasm.runtime.ext.addTableAddress
+import io.github.charlietap.chasm.runtime.ext.addTagAddress
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.instance.Import
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 
 internal typealias PartialModuleAllocator = (InstantiationContext, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
 

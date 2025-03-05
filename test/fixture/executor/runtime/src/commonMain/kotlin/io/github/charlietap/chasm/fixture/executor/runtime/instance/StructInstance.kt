@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instance
 
-import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.structType
+import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.StructType
 

@@ -12,8 +12,8 @@ import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.memory.size.MemoryInstanceSizer
 import io.github.charlietap.chasm.executor.memory.size.MemoryInstanceSizerImpl
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.memory
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.memory
 
 fun sizeMemory(
     store: Store,

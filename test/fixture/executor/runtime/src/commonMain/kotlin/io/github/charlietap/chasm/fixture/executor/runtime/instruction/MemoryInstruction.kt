@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
-import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.MemArg
-import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
+import io.github.charlietap.chasm.runtime.instance.DataInstance
+import io.github.charlietap.chasm.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.runtime.instruction.MemArg
+import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 
 fun memoryRuntimeInstruction(): MemoryInstruction = i32LoadRuntimeInstruction()
 

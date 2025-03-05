@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instance
 
-import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.instance.ExportInstance
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.type.DefinedType
 
 fun moduleInstance(

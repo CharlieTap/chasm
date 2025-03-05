@@ -8,18 +8,18 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefEq
 import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefIsNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.RefTestDispatcher
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefCast
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefEq
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefIsNull
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefNull
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefTest
 import io.github.charlietap.chasm.ir.instruction.FusedReferenceInstruction
 import io.github.charlietap.chasm.predecoder.LoadFactory
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.StoreFactory
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.toLong
+import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction.RefCast
+import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction.RefEq
+import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction.RefIsNull
+import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction.RefNull
+import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction.RefTest
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 internal fun FusedReferenceInstructionPredecoder(

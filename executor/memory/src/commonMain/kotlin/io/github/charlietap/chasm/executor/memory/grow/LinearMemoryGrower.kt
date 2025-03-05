@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.memory.grow
 
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 typealias LinearMemoryGrower = (LinearMemory, Int) -> LinearMemory
 

@@ -9,7 +9,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ir)
-                api(projects.executor.runtimeInternal)
+                api(projects.runtime.core)
                 implementation(projects.executor.invoker)
             }
         }

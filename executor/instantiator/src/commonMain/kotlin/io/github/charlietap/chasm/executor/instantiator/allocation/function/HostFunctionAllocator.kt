@@ -2,12 +2,12 @@ package io.github.charlietap.chasm.executor.instantiator.allocation.function
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostFunctionCallDispatcher
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
-import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.runtime.instance.HostFunction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ext.definedType
 

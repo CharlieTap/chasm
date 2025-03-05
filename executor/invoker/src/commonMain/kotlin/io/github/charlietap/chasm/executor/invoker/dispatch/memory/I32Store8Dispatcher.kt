@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.memory
 
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I32Store8Executor
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.execution.Executor
+import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 
 fun I32Store8Dispatcher(
     instruction: MemoryInstruction.I32Store8,

@@ -4,15 +4,15 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
-import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.executor.runtime.Configuration
-import io.github.charlietap.chasm.executor.runtime.Thread
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.function.Expression
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
-import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
-import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.runtime.Arity
+import io.github.charlietap.chasm.runtime.Configuration
+import io.github.charlietap.chasm.runtime.Thread
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.function.Expression
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.stack.ActivationFrame
+import io.github.charlietap.chasm.runtime.stack.StackDepths
+import io.github.charlietap.chasm.runtime.store.Store
 
 typealias ExpressionEvaluator = (RuntimeConfig, Store, ModuleInstance, Expression, Arity.Return) -> Result<Long?, InvocationError>
 

@@ -5,17 +5,17 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memoryfused.I64Load8UDispatcher
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.memory
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedMemoryInstruction.I64Load8U
 import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
 import io.github.charlietap.chasm.predecoder.LoadFactory
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.StoreFactory
 import io.github.charlietap.chasm.predecoder.ext.memoryAddress
 import io.github.charlietap.chasm.predecoder.instruction.MemArgPredecoder
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.InstantiationError
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.memory
+import io.github.charlietap.chasm.runtime.instruction.FusedMemoryInstruction.I64Load8U
 
 internal fun I64Load8UInstructionPredecoder(
     context: PredecodingContext,

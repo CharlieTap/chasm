@@ -5,8 +5,6 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModule
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
-import io.github.charlietap.chasm.executor.runtime.instance.Import
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
@@ -36,6 +34,8 @@ import io.github.charlietap.chasm.fixture.type.functionCompositeType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
+import io.github.charlietap.chasm.runtime.instance.Import
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.ext.definedType

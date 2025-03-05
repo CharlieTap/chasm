@@ -5,15 +5,15 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.memory.I32LoadDispatcher
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.InstantiationError
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.memory
-import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction.I32Load
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.ext.memoryAddress
 import io.github.charlietap.chasm.predecoder.instruction.MemArgPredecoder
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.InstantiationError
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.memory
+import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction.I32Load
 
 internal fun I32LoadInstructionPredecoder(
     context: PredecodingContext,

@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.stack
 
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
-import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
-import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.runtime.stack.ActivationFrame
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.StackDepths
 
 fun cstack(
     frames: List<ActivationFrame> = emptyList(),

@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memoryfused.stor
 import io.github.charlietap.chasm.executor.memory.BoundsChecker
 import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.executor.memory.write.I64ToI16Writer
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedMemoryInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.instruction.FusedMemoryInstruction
 
 fun I64Store16Executor(
     context: ExecutionContext,

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.memory.read
 
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 typealias BytesReader = (LinearMemory, ByteArray, Int, Int, Int) -> ByteArray
 

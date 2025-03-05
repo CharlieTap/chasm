@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.extendSigned
-import io.github.charlietap.chasm.executor.runtime.ext.popI31
-import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.ext.extendSigned
+import io.github.charlietap.chasm.runtime.ext.popI31
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 
 internal fun I31GetSignedExecutor(
     context: ExecutionContext,

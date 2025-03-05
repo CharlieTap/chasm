@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.global
 
-import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.instance.GlobalInstance
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.GlobalType
 
 typealias GlobalAllocator = (Store, GlobalType, Long) -> Address.Global

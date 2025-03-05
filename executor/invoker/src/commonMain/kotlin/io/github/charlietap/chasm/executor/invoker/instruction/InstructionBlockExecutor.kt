@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.executor.invoker.instruction
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.admin.LabelInstructionExecutor
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.runtime.stack.ControlStack
 
 internal typealias InstructionBlockExecutor = (ControlStack, ControlStack.Entry.Label, Array<DispatchableInstruction>, ExceptionHandler?) -> Unit
 

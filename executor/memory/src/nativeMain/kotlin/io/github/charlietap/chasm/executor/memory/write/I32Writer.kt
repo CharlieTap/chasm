@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.memory.write
 
 import io.github.charlietap.chasm.executor.memory.NativeLinearMemory
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import liblinmem.write_i32
 
 actual inline fun I32Writer(

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.parametricfused
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedParametricInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.instruction.FusedParametricInstruction
 
 internal inline fun SelectExecutor(
     context: ExecutionContext,

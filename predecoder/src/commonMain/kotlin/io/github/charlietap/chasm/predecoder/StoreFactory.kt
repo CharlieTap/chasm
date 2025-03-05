@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.predecoder
 
-import io.github.charlietap.chasm.executor.runtime.ext.global
-import io.github.charlietap.chasm.executor.runtime.instruction.StoreOp
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.predecoder.ext.globalAddress
+import io.github.charlietap.chasm.runtime.ext.global
+import io.github.charlietap.chasm.runtime.instruction.StoreOp
 
 internal typealias StoreFactory = (PredecodingContext, FusedDestination) -> StoreOp
 

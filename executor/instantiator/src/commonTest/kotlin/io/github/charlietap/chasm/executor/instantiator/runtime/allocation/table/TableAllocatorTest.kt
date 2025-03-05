@@ -1,14 +1,14 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.table
 
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
-import io.github.charlietap.chasm.executor.runtime.ext.toLong
-import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.value.nullReferenceValue
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.ext.toLong
+import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals

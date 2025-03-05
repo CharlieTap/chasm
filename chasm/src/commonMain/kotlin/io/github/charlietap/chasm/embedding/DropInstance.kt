@@ -6,11 +6,11 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
-import io.github.charlietap.chasm.executor.runtime.ext.data
-import io.github.charlietap.chasm.executor.runtime.ext.element
-import io.github.charlietap.chasm.executor.runtime.ext.global
-import io.github.charlietap.chasm.executor.runtime.ext.memory
-import io.github.charlietap.chasm.executor.runtime.ext.table
+import io.github.charlietap.chasm.runtime.ext.data
+import io.github.charlietap.chasm.runtime.ext.element
+import io.github.charlietap.chasm.runtime.ext.global
+import io.github.charlietap.chasm.runtime.ext.memory
+import io.github.charlietap.chasm.runtime.ext.table
 import io.github.charlietap.chasm.type.SharedStatus
 
 fun dropInstance(

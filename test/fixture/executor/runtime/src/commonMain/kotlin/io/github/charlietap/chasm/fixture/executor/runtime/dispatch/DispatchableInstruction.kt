@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.dispatch
 
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 
 fun dispatchableInstruction(
     executor: ((ExecutionContext) -> Result<Unit, InvocationError>)? = null,

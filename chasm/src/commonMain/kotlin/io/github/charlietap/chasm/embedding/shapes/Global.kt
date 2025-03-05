@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.embedding.shapes
 
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
 
 class Global internal constructor(internal val reference: ExternalValue.Global) : Importable {
     override fun equals(other: Any?): Boolean {

@@ -10,7 +10,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
-                api(projects.executor.runtimeInternal)
+                api(projects.runtime.core)
                 api(projects.executor.invoker)
                 api(projects.ir)
                 api(libs.result)

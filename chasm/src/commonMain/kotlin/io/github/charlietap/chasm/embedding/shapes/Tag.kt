@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.embedding.shapes
 
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
 
 class Tag internal constructor(internal val reference: ExternalValue.Tag) : Importable {
     override fun equals(other: Any?): Boolean {

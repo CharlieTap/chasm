@@ -45,8 +45,9 @@ kotlin {
 
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
-                implementation(projects.executor.runtimeInternal)
                 implementation(projects.executor.memory)
+
+                implementation(projects.runtime.core)
 
                 implementation(projects.typeSystem)
 

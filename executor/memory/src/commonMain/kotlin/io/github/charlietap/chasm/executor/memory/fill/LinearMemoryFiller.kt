@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.memory.fill
 
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 typealias LinearMemoryFiller = (LinearMemory, Int, Int, Byte, Int) -> Unit
 

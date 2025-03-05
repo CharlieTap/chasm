@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instance
 
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
 
 fun externalValue(): ExternalValue = functionExternalValue()
 

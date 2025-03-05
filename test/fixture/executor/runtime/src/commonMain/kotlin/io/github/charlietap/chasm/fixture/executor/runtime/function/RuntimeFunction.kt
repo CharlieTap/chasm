@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.function
 
-import io.github.charlietap.chasm.executor.runtime.function.Expression
-import io.github.charlietap.chasm.executor.runtime.function.Function
 import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.runtime.function.Expression
+import io.github.charlietap.chasm.runtime.function.Function
 
 fun runtimeFunction(
     idx: Index.FunctionIndex = Index.FunctionIndex(0),

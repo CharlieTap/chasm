@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.benchmark.instruction.memory
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.load.I64LoadExecutor
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.fixture.executor.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
@@ -16,6 +15,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.unsharedStatus
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit

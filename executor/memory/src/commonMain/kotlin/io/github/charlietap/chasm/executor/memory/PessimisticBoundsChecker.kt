@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.memory
 
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 
 inline fun <T> PessimisticBoundsChecker(
     address: Int,

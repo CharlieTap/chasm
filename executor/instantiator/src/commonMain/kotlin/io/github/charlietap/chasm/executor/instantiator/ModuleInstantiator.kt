@@ -11,18 +11,18 @@ import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryIni
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.instance.Import
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.ir.factory.ModuleFactory
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.optimiser.Optimiser
 import io.github.charlietap.chasm.predecoder.ExpressionPredecoder
 import io.github.charlietap.chasm.predecoder.Predecoder
+import io.github.charlietap.chasm.runtime.Arity
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.instance.Import
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.ast.module.Module as ASTModule
-import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
 
 typealias ModuleInstantiator = (RuntimeConfig, Store, ASTModule, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
 

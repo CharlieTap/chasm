@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.popStructAddress
-import io.github.charlietap.chasm.executor.runtime.ext.struct
-import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.ext.popStructAddress
+import io.github.charlietap.chasm.runtime.ext.struct
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 
 internal inline fun StructSetExecutor(
     context: ExecutionContext,

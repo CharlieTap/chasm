@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.predecoder.instruction
 
 import io.github.charlietap.chasm.ir.instruction.MemArg
-import io.github.charlietap.chasm.executor.runtime.instruction.MemArg as RuntimeMemArg
+import io.github.charlietap.chasm.runtime.instruction.MemArg as RuntimeMemArg
 
 internal typealias MemArgPredecoder = (MemArg) -> RuntimeMemArg
 

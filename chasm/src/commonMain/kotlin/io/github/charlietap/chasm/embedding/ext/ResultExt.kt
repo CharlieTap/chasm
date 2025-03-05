@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import kotlin.jvm.JvmName
 
 @JvmName("decoderToChasmResult")

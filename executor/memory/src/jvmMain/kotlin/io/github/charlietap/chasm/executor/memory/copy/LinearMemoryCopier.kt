@@ -3,9 +3,9 @@
 package io.github.charlietap.chasm.executor.memory.copy
 
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 actual inline fun LinearMemoryCopier(
     src: LinearMemory,

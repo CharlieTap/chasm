@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.executor.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 
 fun numericRuntimeInstruction(): NumericInstruction = i32ConstRuntimeInstruction()
 

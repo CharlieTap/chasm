@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.table
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 
 internal inline fun TableGrowExecutor(
     context: ExecutionContext,

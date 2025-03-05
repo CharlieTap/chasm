@@ -6,14 +6,14 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.variable.LocalGetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.variable.LocalSetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.variable.LocalTeeDispatcher
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction.LocalGet
-import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction.LocalSet
-import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction.LocalTee
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.predecoder.PredecodingContext
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.instruction.VariableInstruction.LocalGet
+import io.github.charlietap.chasm.runtime.instruction.VariableInstruction.LocalSet
+import io.github.charlietap.chasm.runtime.instruction.VariableInstruction.LocalTee
 
 internal fun VariableInstructionPredecoder(
     context: PredecodingContext,

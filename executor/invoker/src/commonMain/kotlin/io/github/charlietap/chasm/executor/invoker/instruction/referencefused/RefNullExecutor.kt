@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.referencefused
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction
 
 internal inline fun RefNullExecutor(
     context: ExecutionContext,

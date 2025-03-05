@@ -1,13 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.toExecutionValue
-import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
-import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instance.HostFunctionContext
 import io.github.charlietap.chasm.host.HostFunctionException
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.ext.toExecutionValue
+import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.runtime.instance.HostFunctionContext
 
 internal typealias HostFunctionCall = (ExecutionContext, FunctionInstance.HostFunction) -> Unit
 

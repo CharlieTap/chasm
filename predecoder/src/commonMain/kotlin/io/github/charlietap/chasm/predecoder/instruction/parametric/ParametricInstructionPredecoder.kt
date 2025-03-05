@@ -6,13 +6,13 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.parametric.DropDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.parametric.SelectDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.parametric.SelectWithTypeDispatcher
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.instruction.ParametricInstruction.Drop
-import io.github.charlietap.chasm.executor.runtime.instruction.ParametricInstruction.Select
-import io.github.charlietap.chasm.executor.runtime.instruction.ParametricInstruction.SelectWithType
 import io.github.charlietap.chasm.ir.instruction.ParametricInstruction
 import io.github.charlietap.chasm.predecoder.PredecodingContext
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction.Drop
+import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction.Select
+import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction.SelectWithType
 
 internal fun ParametricInstructionPredecoder(
     context: PredecodingContext,

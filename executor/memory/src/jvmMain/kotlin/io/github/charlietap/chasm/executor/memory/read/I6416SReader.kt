@@ -4,7 +4,7 @@ package io.github.charlietap.chasm.executor.memory.read
 
 import io.github.charlietap.chasm.executor.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.executor.memory.ext.toShortLittleEndian
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 actual inline fun I6416SReader(
     memory: LinearMemory,

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.executor.runtime
 
-import io.github.charlietap.chasm.executor.runtime.Arity
+import io.github.charlietap.chasm.runtime.Arity
 
 fun arity(value: Int = 0) = argumentArity(value)
 

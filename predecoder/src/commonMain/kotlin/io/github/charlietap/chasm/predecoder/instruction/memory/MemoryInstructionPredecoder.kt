@@ -2,8 +2,6 @@ package io.github.charlietap.chasm.predecoder.instruction.memory
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.predecoder.PredecodingContext
@@ -30,6 +28,8 @@ import io.github.charlietap.chasm.predecoder.instruction.memory.store.I64Store16
 import io.github.charlietap.chasm.predecoder.instruction.memory.store.I64Store32InstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.memory.store.I64Store8InstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.memory.store.I64StoreInstructionPredecoder
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 
 internal fun MemoryInstructionPredecoder(
     context: PredecodingContext,

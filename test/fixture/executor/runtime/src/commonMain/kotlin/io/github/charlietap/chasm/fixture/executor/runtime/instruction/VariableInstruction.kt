@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.VariableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalInstance
+import io.github.charlietap.chasm.runtime.instance.GlobalInstance
+import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
 
 fun variableRuntimeInstruction(): VariableInstruction = localGetRuntimeInstruction()
 

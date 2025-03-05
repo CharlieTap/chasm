@@ -45,7 +45,6 @@ include(":decoder")
 include(":executor:instantiator")
 include(":executor:invoker")
 include(":executor:memory")
-include(":executor:runtime-internal")
 
 include(":host")
 include(":ir")
@@ -59,6 +58,7 @@ include(":predecoder")
 include(":optimiser")
 
 include(":runtime:address")
+include(":runtime:core")
 include(":runtime:type")
 include(":runtime:value")
 

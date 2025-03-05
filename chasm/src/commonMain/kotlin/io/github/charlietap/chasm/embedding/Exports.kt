@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.embedding.shapes.Importable
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.transform.BidirectionalMapper
 import io.github.charlietap.chasm.embedding.transform.ImportableMapper
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
 
 fun exports(
     instance: Instance,

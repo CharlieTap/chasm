@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.embedding.shapes.Importable
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Table
 import io.github.charlietap.chasm.embedding.shapes.Tag
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
 
 object ImportableMapper : BidirectionalMapper<Importable, ExternalValue> {
     override fun map(input: Importable): ExternalValue = when (input) {

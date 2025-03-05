@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.memory.init
 
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 typealias LinearMemoryInitialiser = (UByteArray, LinearMemory, Int, Int, Int, Int, Int) -> Unit
 

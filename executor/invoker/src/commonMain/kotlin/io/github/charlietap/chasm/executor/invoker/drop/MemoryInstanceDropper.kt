@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.drop
 
 import io.github.charlietap.chasm.executor.memory.destruct.LinearMemoryDestructor
-import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.type.Limits
 
 typealias MemoryInstanceDropper = (MemoryInstance) -> Unit

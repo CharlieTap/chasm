@@ -7,7 +7,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
-                api(projects.executor.runtimeInternal)
+                api(projects.runtime.core)
                 api(projects.test.fixture.ir)
                 api(projects.test.fixture.config)
             }

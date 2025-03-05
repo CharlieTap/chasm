@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.table
 
 import io.github.charlietap.chasm.executor.invoker.instruction.table.TableSetExecutor
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.execution.Executor
+import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 
 fun TableSetDispatcher(
     instruction: TableInstruction.TableSet,

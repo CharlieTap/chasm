@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.data
 
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
-import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.instance.DataInstance
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

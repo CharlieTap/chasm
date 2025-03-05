@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.predecoder
 
-import io.github.charlietap.chasm.executor.runtime.ext.global
-import io.github.charlietap.chasm.executor.runtime.instruction.LoadOp
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.predecoder.ext.globalAddress
+import io.github.charlietap.chasm.runtime.ext.global
+import io.github.charlietap.chasm.runtime.instruction.LoadOp
 
 internal typealias LoadFactory = (PredecodingContext, FusedOperand) -> LoadOp
 

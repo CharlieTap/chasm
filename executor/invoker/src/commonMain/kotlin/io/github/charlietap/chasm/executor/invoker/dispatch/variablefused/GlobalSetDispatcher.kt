@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.variablefused
 
 import io.github.charlietap.chasm.executor.invoker.instruction.variablefused.GlobalSetExecutor
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedVariableInstruction
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.execution.Executor
+import io.github.charlietap.chasm.runtime.instruction.FusedVariableInstruction
 
 fun GlobalSetDispatcher(
     instruction: FusedVariableInstruction.GlobalSet,

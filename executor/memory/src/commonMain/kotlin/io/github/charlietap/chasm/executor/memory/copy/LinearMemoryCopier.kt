@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.memory.copy
 
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 typealias LinearMemoryCopier = (LinearMemory, LinearMemory, Int, Int, Int, Int, Int) -> Unit
 

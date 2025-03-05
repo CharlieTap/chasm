@@ -1,15 +1,15 @@
 package io.github.charlietap.chasm.fixture.executor.runtime
 
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
-import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
-import io.github.charlietap.chasm.executor.runtime.instance.ExceptionInstance
-import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instance.GlobalInstance
-import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
-import io.github.charlietap.chasm.executor.runtime.instance.TagInstance
-import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.instance.DataInstance
+import io.github.charlietap.chasm.runtime.instance.ElementInstance
+import io.github.charlietap.chasm.runtime.instance.ExceptionInstance
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.runtime.instance.GlobalInstance
+import io.github.charlietap.chasm.runtime.instance.MemoryInstance
+import io.github.charlietap.chasm.runtime.instance.TableInstance
+import io.github.charlietap.chasm.runtime.instance.TagInstance
+import io.github.charlietap.chasm.runtime.store.Store
 
 fun store(
     data: MutableList<DataInstance> = mutableListOf(),

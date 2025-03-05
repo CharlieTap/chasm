@@ -17,28 +17,28 @@ import io.github.charlietap.chasm.executor.instantiator.context.InstantiationCon
 import io.github.charlietap.chasm.executor.instantiator.ext.asPredecodingContext
 import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
-import io.github.charlietap.chasm.executor.runtime.Arity
-import io.github.charlietap.chasm.executor.runtime.error.InvocationError
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.addDataAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addElementAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addExport
-import io.github.charlietap.chasm.executor.runtime.ext.addGlobalAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addMemoryAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addTableAddress
-import io.github.charlietap.chasm.executor.runtime.ext.addTagAddress
-import io.github.charlietap.chasm.executor.runtime.ext.function
-import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
-import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.predecoder.ExpressionPredecoder
 import io.github.charlietap.chasm.predecoder.FunctionPredecoder
 import io.github.charlietap.chasm.predecoder.Predecoder
+import io.github.charlietap.chasm.runtime.Arity
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.addDataAddress
+import io.github.charlietap.chasm.runtime.ext.addElementAddress
+import io.github.charlietap.chasm.runtime.ext.addExport
+import io.github.charlietap.chasm.runtime.ext.addGlobalAddress
+import io.github.charlietap.chasm.runtime.ext.addMemoryAddress
+import io.github.charlietap.chasm.runtime.ext.addTableAddress
+import io.github.charlietap.chasm.runtime.ext.addTagAddress
+import io.github.charlietap.chasm.runtime.ext.function
+import io.github.charlietap.chasm.runtime.instance.ExportInstance
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import kotlin.jvm.JvmName
-import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
-import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
+import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
 internal typealias ModuleAllocator = (InstantiationContext, ModuleInstance, LongArray) -> Result<ModuleInstance, ModuleTrapError>
 

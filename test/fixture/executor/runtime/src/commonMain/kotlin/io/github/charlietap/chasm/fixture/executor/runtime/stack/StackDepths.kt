@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.stack
 
-import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
+import io.github.charlietap.chasm.runtime.stack.StackDepths
 
 fun stackDepths(
     handlers: Int = 0,

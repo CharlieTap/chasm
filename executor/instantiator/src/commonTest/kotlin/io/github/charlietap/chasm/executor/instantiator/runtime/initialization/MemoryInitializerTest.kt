@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
-import io.github.charlietap.chasm.executor.runtime.Arity
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -20,9 +19,10 @@ import io.github.charlietap.chasm.fixture.ir.module.memoryIndex
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.predecoder.Predecoder
+import io.github.charlietap.chasm.runtime.Arity
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
 
 class MemoryInitializerTest {
 

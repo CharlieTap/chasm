@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayLenExecutor
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.execution.Executor
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 
 fun ArrayLenDispatcher(
     instruction: AggregateInstruction.ArrayLen,

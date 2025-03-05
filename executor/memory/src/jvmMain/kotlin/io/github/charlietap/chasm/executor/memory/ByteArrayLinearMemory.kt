@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.memory
 
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 data class ByteArrayLinearMemory(
     var memory: ByteArray,

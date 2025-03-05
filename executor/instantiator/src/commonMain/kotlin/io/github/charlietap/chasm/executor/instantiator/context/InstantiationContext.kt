@@ -1,15 +1,15 @@
 package io.github.charlietap.chasm.executor.instantiator.context
 
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.LoadOp
-import io.github.charlietap.chasm.executor.runtime.instruction.StoreOp
-import io.github.charlietap.chasm.executor.runtime.store.Store
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.module.Module
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.instruction.LoadOp
+import io.github.charlietap.chasm.runtime.instruction.StoreOp
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.factory.DefinedTypeUnrollerFactory

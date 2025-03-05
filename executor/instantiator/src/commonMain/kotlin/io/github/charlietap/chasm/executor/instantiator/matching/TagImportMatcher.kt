@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.executor.instantiator.matching
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.tag
-import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.tag
+import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.matching.TagTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher

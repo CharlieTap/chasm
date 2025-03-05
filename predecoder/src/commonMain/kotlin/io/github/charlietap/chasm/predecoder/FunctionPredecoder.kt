@@ -2,12 +2,12 @@ package io.github.charlietap.chasm.predecoder
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.executor.runtime.ext.default
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.Function
-import io.github.charlietap.chasm.executor.runtime.function.Expression as RuntimeExpression
-import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.ext.default
+import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
+import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
 fun FunctionPredecoder(
     context: PredecodingContext,

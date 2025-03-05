@@ -23,7 +23,7 @@ kotlin {
 
        commonMain {
             dependencies {
-                api(projects.executor.runtimeInternal)
+                api(projects.runtime.core)
                 api(libs.result)
             }
         }

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.memory.destruct
 
-import io.github.charlietap.chasm.executor.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 typealias LinearMemoryDestructor = (LinearMemory) -> Unit
 

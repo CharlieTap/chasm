@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.extendUnsigned
-import io.github.charlietap.chasm.executor.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.ext.extendUnsigned
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 
 internal fun I31GetUnsignedExecutor(
     context: ExecutionContext,

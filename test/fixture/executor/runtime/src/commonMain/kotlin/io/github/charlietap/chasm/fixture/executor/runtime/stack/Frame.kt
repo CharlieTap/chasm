@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.stack
 
-import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
-import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.stack.ActivationFrame
+import io.github.charlietap.chasm.runtime.stack.StackDepths
 
 fun frame(
     arity: Int = 0,

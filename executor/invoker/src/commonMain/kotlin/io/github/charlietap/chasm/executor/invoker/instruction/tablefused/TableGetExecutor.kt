@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.tablefused
 
-import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.executor.runtime.ext.element
-import io.github.charlietap.chasm.executor.runtime.instruction.FusedTableInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.ext.element
+import io.github.charlietap.chasm.runtime.instruction.FusedTableInstruction
 
 internal inline fun TableGetExecutor(
     context: ExecutionContext,

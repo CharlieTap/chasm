@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.memory
 
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.F64StoreExecutor
-import io.github.charlietap.chasm.executor.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.executor.runtime.execution.Executor
-import io.github.charlietap.chasm.executor.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.execution.Executor
+import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 
 fun F64StoreDispatcher(
     instruction: MemoryInstruction.F64Store,

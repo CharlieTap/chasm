@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instruction
 
-import io.github.charlietap.chasm.executor.runtime.instance.ElementInstance
-import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
-import io.github.charlietap.chasm.executor.runtime.instruction.TableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementInstance
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableInstance
+import io.github.charlietap.chasm.runtime.instance.ElementInstance
+import io.github.charlietap.chasm.runtime.instance.TableInstance
+import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 
 fun tableRuntimeInstruction(): TableInstruction = tableGetRuntimeInstruction()
 
