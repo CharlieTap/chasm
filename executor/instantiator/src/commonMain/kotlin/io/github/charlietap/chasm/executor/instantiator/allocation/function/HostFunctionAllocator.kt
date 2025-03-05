@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ext.definedType
 

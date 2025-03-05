@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.script.action
 
 import io.github.charlietap.chasm.embedding.error.ChasmError
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.sweet.lib.command.Command
 import kotlin.jvm.JvmInline
 

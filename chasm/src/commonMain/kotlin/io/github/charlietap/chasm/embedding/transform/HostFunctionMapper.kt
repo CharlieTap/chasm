@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.embedding.shapes.HostFunction
 import io.github.charlietap.chasm.embedding.shapes.HostFunctionContext
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.executor.runtime.instance.HostFunction as InternalHostFunction
 
 internal object HostFunctionMapper : Mapper<HostFunction, InternalHostFunction> {

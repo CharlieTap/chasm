@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.executor.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedAggregateInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 internal inline fun StructNewDefaultExecutor(
     context: ExecutionContext,

@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.embedding.transform.ExportDescriptorMapper
 import io.github.charlietap.chasm.embedding.transform.ImportDescriptorMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
-import io.github.charlietap.chasm.executor.runtime.type.ExternalType
+import io.github.charlietap.chasm.runtime.type.ExternalType
 
 fun moduleInfo(
     module: Module,

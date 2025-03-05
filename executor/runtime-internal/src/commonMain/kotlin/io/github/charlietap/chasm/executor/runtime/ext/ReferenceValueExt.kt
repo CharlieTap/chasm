@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_I31
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_NULL
 import io.github.charlietap.chasm.executor.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.executor.runtime.encoder.ReferenceValueEncoder
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 inline fun ReferenceValue.toLongFromBoxed(): Long = ReferenceValueEncoder(this)
 

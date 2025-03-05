@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.executor.instantiator.allocation.global.GlobalAllocator
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.type.GlobalType
 
 fun global(

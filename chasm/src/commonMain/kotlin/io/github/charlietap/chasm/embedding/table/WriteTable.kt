@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.embedding.shapes.Table
 import io.github.charlietap.chasm.executor.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.executor.runtime.ext.table
 import io.github.charlietap.chasm.executor.runtime.ext.toLongFromBoxed
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 fun writeTable(
     store: Store,

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.instance
 
 import io.github.charlietap.chasm.executor.runtime.instance.ExceptionInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.runtime.address.Address
 
 fun exceptionInstance(
     tagAddress: Address.Tag = tagAddress(),

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.data
 
 import io.github.charlietap.chasm.executor.runtime.instance.DataInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.runtime.address.Address
 
 internal typealias DataAllocator = (Store, UByteArray) -> Address.Data
 

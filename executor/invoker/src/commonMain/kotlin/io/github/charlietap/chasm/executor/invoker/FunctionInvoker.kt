@@ -13,9 +13,9 @@ import io.github.charlietap.chasm.executor.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.executor.runtime.stack.StackDepths
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
 typealias FunctionInvoker = (RuntimeConfig, Store, Address.Function, List<ExecutionValue>) -> Result<List<ExecutionValue>, InvocationError>
 

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
-import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.type.DefinedType
 
 data class ModuleInstance(

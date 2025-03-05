@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.action.ActionResult
 import io.github.charlietap.chasm.script.action.ActionRunner

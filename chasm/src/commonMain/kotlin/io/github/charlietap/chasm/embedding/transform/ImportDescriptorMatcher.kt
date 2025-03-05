@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.embedding.transform
 
 import io.github.charlietap.chasm.ast.module.Import
-import io.github.charlietap.chasm.executor.runtime.type.ExternalType
+import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.ext.functionType
 
 internal class ImportDescriptorMapper : Mapper<Import.Descriptor, ExternalType> {

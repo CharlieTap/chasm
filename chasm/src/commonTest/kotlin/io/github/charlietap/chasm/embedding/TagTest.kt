@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.embedding
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTag
 import io.github.charlietap.chasm.executor.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.fixture.type.tagType
+import io.github.charlietap.chasm.runtime.address.Address
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.embedding.transform
 
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Module
-import io.github.charlietap.chasm.executor.runtime.type.ExternalType
+import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.ext.functionType
 
 internal class ExportDescriptorMapper(

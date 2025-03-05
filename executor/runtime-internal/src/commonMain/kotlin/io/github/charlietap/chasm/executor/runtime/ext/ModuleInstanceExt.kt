@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.runtime.ext
 
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.runtime.address.Address
 
 inline fun ModuleInstance.addFunctionAddress(address: Address.Function) = apply { this.functionAddresses.add(address) }
 

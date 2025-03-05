@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.value
 
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.runtime.value.NumberValue
 
 fun i32(
     value: Int = 0,

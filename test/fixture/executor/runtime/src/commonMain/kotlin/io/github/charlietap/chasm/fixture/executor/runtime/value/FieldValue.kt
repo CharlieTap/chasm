@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.value
 
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.FieldValue
-import io.github.charlietap.chasm.executor.runtime.value.PackedValue
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.FieldValue
+import io.github.charlietap.chasm.runtime.value.PackedValue
 
 fun fieldValue(): FieldValue = executionFieldValue()
 

@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.executor.runtime.value.VectorValue
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.runtime.value.VectorValue
 
 inline fun ExecutionValue.toLongFromBoxed(): Long = when (this) {
     is ExecutionValue.Uninitialised -> 0L

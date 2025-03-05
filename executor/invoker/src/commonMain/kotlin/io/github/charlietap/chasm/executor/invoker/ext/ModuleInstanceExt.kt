@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.executor.runtime.error.InvocationError
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
 import io.github.charlietap.chasm.executor.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.type.DefinedType
 
 inline fun ModuleInstance.definedType(

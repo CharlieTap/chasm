@@ -36,7 +36,6 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.config)
-                api(projects.executor.runtimeExternal)
                 api(projects.host)
                 api(projects.stream)
 

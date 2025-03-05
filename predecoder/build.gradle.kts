@@ -10,7 +10,6 @@ kotlin {
             dependencies {
                 api(projects.ir)
                 api(projects.executor.runtimeInternal)
-                api(projects.executor.runtimeExternal)
                 implementation(projects.executor.invoker)
             }
         }

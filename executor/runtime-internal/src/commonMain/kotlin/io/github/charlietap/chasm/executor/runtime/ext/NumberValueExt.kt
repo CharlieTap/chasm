@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.ext
 
-import io.github.charlietap.chasm.executor.runtime.value.NumberValue
+import io.github.charlietap.chasm.runtime.value.NumberValue
 
 fun NumberValue.I32.map(transform: (Int) -> Int): NumberValue.I32 = NumberValue.I32(transform(value))
 

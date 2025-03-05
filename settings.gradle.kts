@@ -46,7 +46,6 @@ include(":executor:instantiator")
 include(":executor:invoker")
 include(":executor:memory")
 include(":executor:runtime-internal")
-include(":executor:runtime-external")
 
 include(":host")
 include(":ir")
@@ -58,6 +57,11 @@ include(":libs:stack")
 include(":predecoder")
 
 include(":optimiser")
+
+include(":runtime:address")
+include(":runtime:type")
+include(":runtime:value")
+
 include(":stream")
 
 include(":test:fake:decoder")

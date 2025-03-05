@@ -15,8 +15,8 @@ import io.github.charlietap.chasm.executor.runtime.ext.toExceptionAddress
 import io.github.charlietap.chasm.executor.runtime.ext.toLong
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.executor.runtime.stack.ControlStack
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 internal fun ThrowRefExecutor(
     context: ExecutionContext,

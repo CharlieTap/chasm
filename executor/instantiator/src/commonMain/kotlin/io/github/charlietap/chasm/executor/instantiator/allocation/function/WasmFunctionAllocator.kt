@@ -12,8 +12,8 @@ import io.github.charlietap.chasm.executor.runtime.ext.addFunctionAddress
 import io.github.charlietap.chasm.executor.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.executor.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.executor.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.ir.module.Function
+import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.executor.runtime.function.Function as RuntimeFunction
 

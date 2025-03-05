@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.runtime.instance
 
-import io.github.charlietap.chasm.executor.runtime.store.Address
+import io.github.charlietap.chasm.runtime.address.Address
 import kotlin.jvm.JvmInline
 
 sealed interface ExternalValue {

@@ -55,7 +55,7 @@ data class I32Load(
 ```
 
 At runtime the wasm specification defines that you should use the index to resolve a MemoryInstance and then perform the
-load on this instance. However, Wasm modules are validated and instantiated before execution, thie means we can safely resolve
+load on this instance. However, Wasm modules are validated and instantiated before execution, this means we can safely resolve
 memory indices AOT. This eliminates the need for per-instruction lookups during execution.
 
 ```kotlin

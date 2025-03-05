@@ -1,12 +1,12 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.value
 
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.hostAddress
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.structAddress
 import io.github.charlietap.chasm.fixture.type.heapType
+import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.HeapType
 
 fun referenceValue(): ReferenceValue = nullReferenceValue()

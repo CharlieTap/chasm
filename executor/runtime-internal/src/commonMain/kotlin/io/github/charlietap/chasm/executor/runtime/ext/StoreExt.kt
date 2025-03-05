@@ -22,8 +22,8 @@ import io.github.charlietap.chasm.executor.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.executor.runtime.instance.StructInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TableInstance
 import io.github.charlietap.chasm.executor.runtime.instance.TagInstance
-import io.github.charlietap.chasm.executor.runtime.store.Address
 import io.github.charlietap.chasm.executor.runtime.store.Store
+import io.github.charlietap.chasm.runtime.address.Address
 
 inline fun Store.function(address: Address.Function): FunctionInstance = try {
     functions[address.address]

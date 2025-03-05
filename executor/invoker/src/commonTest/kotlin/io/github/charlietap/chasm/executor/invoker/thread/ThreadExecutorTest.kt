@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.thread
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.executor.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.fixture.executor.runtime.configuration
 import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
@@ -9,6 +8,7 @@ import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.executor.runtime.thread
 import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
+import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

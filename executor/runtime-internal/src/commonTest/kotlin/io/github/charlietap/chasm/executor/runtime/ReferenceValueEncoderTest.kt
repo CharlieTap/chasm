@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.executor.runtime.encoder.HeapTypeEncoder
 import io.github.charlietap.chasm.executor.runtime.encoder.ReferenceValueDecoder
 import io.github.charlietap.chasm.executor.runtime.encoder.ReferenceValueEncoder
 import io.github.charlietap.chasm.executor.runtime.exception.InvocationException
-import io.github.charlietap.chasm.executor.runtime.store.Address
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import kotlin.test.Test

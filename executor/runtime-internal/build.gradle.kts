@@ -9,10 +9,12 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
-                api(projects.executor.runtimeExternal)
+                api(projects.config)
                 api(projects.ir)
                 api(projects.libs.stack)
                 api(libs.result)
+                api(projects.runtime.type)
+                api(projects.runtime.value)
             }
         }
 

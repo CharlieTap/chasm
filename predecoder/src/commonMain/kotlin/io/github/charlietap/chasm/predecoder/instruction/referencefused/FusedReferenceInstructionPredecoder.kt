@@ -16,11 +16,11 @@ import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceIns
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefIsNull
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefNull
 import io.github.charlietap.chasm.executor.runtime.instruction.FusedReferenceInstruction.RefTest
-import io.github.charlietap.chasm.executor.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.ir.instruction.FusedReferenceInstruction
 import io.github.charlietap.chasm.predecoder.LoadFactory
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.StoreFactory
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 internal fun FusedReferenceInstructionPredecoder(
     context: PredecodingContext,

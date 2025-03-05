@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.fixture.executor.runtime.value
 
-import io.github.charlietap.chasm.executor.runtime.value.PackedValue
+import io.github.charlietap.chasm.runtime.value.PackedValue
 
 fun packedValue(): PackedValue = bytePackedValue()
 
