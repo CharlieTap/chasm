@@ -4,11 +4,11 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.executor.memory.read.BytesReader
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.memory.read.BytesReader
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import kotlin.test.Test
 import kotlin.test.assertEquals

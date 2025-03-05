@@ -44,7 +44,6 @@ include(":decoder")
 
 include(":executor:instantiator")
 include(":executor:invoker")
-include(":executor:memory")
 
 include(":host")
 include(":ir")
@@ -52,6 +51,8 @@ include(":ir-factory")
 
 include(":libs:sse2")
 include(":libs:stack")
+
+include(":memory")
 
 include(":predecoder")
 

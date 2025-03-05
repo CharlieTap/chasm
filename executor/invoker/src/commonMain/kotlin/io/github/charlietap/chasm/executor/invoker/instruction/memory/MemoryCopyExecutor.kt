@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memory
 
-import io.github.charlietap.chasm.executor.memory.copy.LinearMemoryCopier
+import io.github.charlietap.chasm.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 

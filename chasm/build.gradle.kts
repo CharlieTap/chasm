@@ -37,20 +37,16 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.host)
+                api(projects.runtime.value)
                 api(projects.stream)
 
                 implementation(projects.ast)
-
                 implementation(projects.decoder)
-
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
-                implementation(projects.executor.memory)
-
+                implementation(projects.memory)
                 implementation(projects.runtime.core)
-
                 implementation(projects.typeSystem)
-
                 implementation(projects.validator)
 
                 implementation(libs.result)

@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.executor.invoker.ext
 
-import io.github.charlietap.chasm.executor.memory.ext.toDoubleLittleEndian
-import io.github.charlietap.chasm.executor.memory.ext.toFloatLittleEndian
-import io.github.charlietap.chasm.executor.memory.ext.toIntLittleEndian
-import io.github.charlietap.chasm.executor.memory.ext.toLongLittleEndian
-import io.github.charlietap.chasm.executor.memory.ext.toShortLittleEndian
+import io.github.charlietap.chasm.memory.ext.toDoubleLittleEndian
+import io.github.charlietap.chasm.memory.ext.toFloatLittleEndian
+import io.github.charlietap.chasm.memory.ext.toIntLittleEndian
+import io.github.charlietap.chasm.memory.ext.toLongLittleEndian
+import io.github.charlietap.chasm.memory.ext.toShortLittleEndian
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.type.FieldType

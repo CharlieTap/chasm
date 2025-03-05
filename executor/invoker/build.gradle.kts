@@ -13,7 +13,7 @@ kotlin {
                 api(projects.runtime.core)
                 api(libs.result)
 
-                implementation(projects.executor.memory)
+                implementation(projects.memory)
                 implementation(projects.host)
                 implementation(projects.libs.sse2)
             }

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.memoryfused.store
 
-import io.github.charlietap.chasm.executor.memory.BoundsChecker
-import io.github.charlietap.chasm.executor.memory.PessimisticBoundsChecker
-import io.github.charlietap.chasm.executor.memory.write.F64Writer
+import io.github.charlietap.chasm.memory.BoundsChecker
+import io.github.charlietap.chasm.memory.PessimisticBoundsChecker
+import io.github.charlietap.chasm.memory.write.F64Writer
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.FusedMemoryInstruction
 

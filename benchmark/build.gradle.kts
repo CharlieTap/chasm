@@ -29,7 +29,7 @@ kotlin {
             dependencies {
                 implementation(projects.chasm)
                 implementation(projects.executor.invoker)
-                implementation(projects.executor.memory)
+                implementation(projects.memory)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.runtime)
 

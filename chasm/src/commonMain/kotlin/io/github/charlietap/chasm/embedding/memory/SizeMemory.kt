@@ -10,8 +10,8 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.memory.size.MemoryInstanceSizer
-import io.github.charlietap.chasm.executor.memory.size.MemoryInstanceSizerImpl
+import io.github.charlietap.chasm.memory.size.MemoryInstanceSizer
+import io.github.charlietap.chasm.memory.size.MemoryInstanceSizerImpl
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.memory
 
