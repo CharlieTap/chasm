@@ -1,13 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
-import io.github.charlietap.chasm.fixture.executor.runtime.store
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i64
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.stack.cstack
+import io.github.charlietap.chasm.fixture.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.runtime.stack.vstack
+import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.value.i32
+import io.github.charlietap.chasm.fixture.runtime.value.i64
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType

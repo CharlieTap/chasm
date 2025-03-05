@@ -15,16 +15,16 @@ import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.getOrNull
 import io.github.charlietap.chasm.embedding.shapes.map
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.tagExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.globalAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.globalExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.tableAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.tableExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.tagAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.tagExternalValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

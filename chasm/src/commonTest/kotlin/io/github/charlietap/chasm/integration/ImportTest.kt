@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.table
 import io.github.charlietap.chasm.embedding.tag
-import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.constMutability
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
 import io.github.charlietap.chasm.fixture.type.functionType

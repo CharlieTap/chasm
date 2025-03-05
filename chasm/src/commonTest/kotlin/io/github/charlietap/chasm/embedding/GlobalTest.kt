@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicGlobal
 import io.github.charlietap.chasm.embedding.fixture.publicStore
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
+import io.github.charlietap.chasm.fixture.runtime.instance.globalExternalValue
+import io.github.charlietap.chasm.fixture.runtime.value.i32
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.runtime.address.Address
 import kotlin.test.Test

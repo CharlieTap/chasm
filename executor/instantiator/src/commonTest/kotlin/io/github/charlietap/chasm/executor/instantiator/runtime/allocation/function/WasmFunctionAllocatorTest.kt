@@ -5,12 +5,12 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.executor.runtime.dispatch.dispatchableInstruction
-import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeFunction
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.ir.module.function
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
+import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance

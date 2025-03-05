@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.element
 
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.elementInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.instance.elementInstance
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.instance.ElementInstance

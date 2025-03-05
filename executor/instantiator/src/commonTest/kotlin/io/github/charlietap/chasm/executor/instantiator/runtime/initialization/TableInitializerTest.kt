@@ -5,9 +5,6 @@ import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.ir.instruction.elemDropInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
@@ -18,6 +15,9 @@ import io.github.charlietap.chasm.fixture.ir.module.elementIndex
 import io.github.charlietap.chasm.fixture.ir.module.elementSegment
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.module.tableIndex
+import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.ElementSegment
 import io.github.charlietap.chasm.predecoder.Predecoder

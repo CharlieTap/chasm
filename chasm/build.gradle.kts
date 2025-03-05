@@ -62,7 +62,7 @@ kotlin {
                 implementation(projects.test.fake.decoder)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.config)
-                implementation(projects.test.fixture.executor.runtime)
+                implementation(projects.test.fixture.runtime)
                 implementation(projects.test.fixture.ir)
 
                 implementation(libs.kotlin.test)

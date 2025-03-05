@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.arrayAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.value.arrayReferenceValue
+import io.github.charlietap.chasm.fixture.runtime.instance.arrayAddress
+import io.github.charlietap.chasm.fixture.runtime.value.arrayReferenceValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals

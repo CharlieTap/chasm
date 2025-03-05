@@ -4,10 +4,10 @@ import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Global
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.instance.globalAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.globalExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test

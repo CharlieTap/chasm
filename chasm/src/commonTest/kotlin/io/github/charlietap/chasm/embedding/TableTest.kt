@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
-import io.github.charlietap.chasm.fixture.executor.runtime.value.referenceValue
+import io.github.charlietap.chasm.fixture.runtime.value.referenceValue
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.instance.ExternalValue

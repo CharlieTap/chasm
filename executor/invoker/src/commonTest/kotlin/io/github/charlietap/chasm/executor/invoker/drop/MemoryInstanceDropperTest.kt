@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.drop
 
 import io.github.charlietap.chasm.executor.memory.destruct.LinearMemoryDestructor
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.memory.linearMemory
+import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
+import io.github.charlietap.chasm.fixture.runtime.memory.linearMemory
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.fixture.type.unsharedStatus

@@ -31,7 +31,7 @@ kotlin {
                 implementation(projects.executor.invoker)
                 implementation(projects.executor.memory)
                 implementation(projects.test.fixture.ast)
-                implementation(projects.test.fixture.executor.runtime)
+                implementation(projects.test.fixture.runtime)
 
                 implementation(libs.kotlinx.benchmark)
                 implementation(libs.kotlinx.datetime)

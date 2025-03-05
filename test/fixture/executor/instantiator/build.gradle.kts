@@ -9,7 +9,7 @@ kotlin {
             dependencies {
                 api(projects.executor.instantiator)
                 api(projects.test.fixture.ast)
-                api(projects.test.fixture.executor.runtime)
+                api(projects.test.fixture.runtime)
             }
         }
     }

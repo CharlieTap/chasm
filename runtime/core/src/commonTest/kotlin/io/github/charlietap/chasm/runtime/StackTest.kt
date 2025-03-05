@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.runtime
 
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.label
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
+import io.github.charlietap.chasm.fixture.runtime.stack.cstack
+import io.github.charlietap.chasm.fixture.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.runtime.stack.label
+import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

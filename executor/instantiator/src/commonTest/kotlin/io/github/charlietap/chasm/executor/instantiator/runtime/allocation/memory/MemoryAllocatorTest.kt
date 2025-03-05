@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.memo
 
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.memory.factory.LinearMemoryFactory
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.memory.linearMemory
-import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
+import io.github.charlietap.chasm.fixture.runtime.memory.linearMemory
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.runtime.address.Address

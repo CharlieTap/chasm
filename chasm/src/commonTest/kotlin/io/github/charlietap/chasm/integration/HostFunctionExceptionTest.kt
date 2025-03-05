@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.HostFunction
-import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType

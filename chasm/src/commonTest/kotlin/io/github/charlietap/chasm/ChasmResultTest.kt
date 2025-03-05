@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.embedding.shapes.getOrNull
 import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.embedding.shapes.onError
 import io.github.charlietap.chasm.embedding.shapes.onSuccess
-import io.github.charlietap.chasm.fixture.executor.runtime.error.moduleRuntimeError
+import io.github.charlietap.chasm.fixture.runtime.error.moduleRuntimeError
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

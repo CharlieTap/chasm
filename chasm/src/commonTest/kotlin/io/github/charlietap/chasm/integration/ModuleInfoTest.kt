@@ -9,11 +9,11 @@ import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.embedding.shapes.getOrNull
 import io.github.charlietap.chasm.embedding.shapes.map
-import io.github.charlietap.chasm.fixture.executor.runtime.type.functionExternalType
-import io.github.charlietap.chasm.fixture.executor.runtime.type.globalExternalType
-import io.github.charlietap.chasm.fixture.executor.runtime.type.memoryExternalType
-import io.github.charlietap.chasm.fixture.executor.runtime.type.tableExternalType
-import io.github.charlietap.chasm.fixture.executor.runtime.type.tagExternalType
+import io.github.charlietap.chasm.fixture.runtime.type.functionExternalType
+import io.github.charlietap.chasm.fixture.runtime.type.globalExternalType
+import io.github.charlietap.chasm.fixture.runtime.type.memoryExternalType
+import io.github.charlietap.chasm.fixture.runtime.type.tableExternalType
+import io.github.charlietap.chasm.fixture.runtime.type.tagExternalType
 import io.github.charlietap.chasm.fixture.type.constMutability
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
 import io.github.charlietap.chasm.fixture.type.functionType

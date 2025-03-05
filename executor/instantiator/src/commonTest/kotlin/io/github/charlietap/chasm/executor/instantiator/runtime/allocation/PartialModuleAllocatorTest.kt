@@ -6,15 +6,6 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.function.Wasm
 import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.globalExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.memoryExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.tableExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.ir.module.dataSegment
 import io.github.charlietap.chasm.fixture.ir.module.elementSegment
 import io.github.charlietap.chasm.fixture.ir.module.function
@@ -29,6 +20,15 @@ import io.github.charlietap.chasm.fixture.ir.module.table
 import io.github.charlietap.chasm.fixture.ir.module.tableImportDescriptor
 import io.github.charlietap.chasm.fixture.ir.module.type
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.globalAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.globalExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.tableAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.tableExternalValue
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionCompositeType
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -41,7 +41,7 @@ import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
+import io.github.charlietap.chasm.fixture.runtime.instance.import as runtimeImport
 
 class PartialModuleAllocatorTest {
 

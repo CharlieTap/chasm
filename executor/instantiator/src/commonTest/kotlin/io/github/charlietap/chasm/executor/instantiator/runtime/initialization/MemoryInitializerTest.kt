@@ -5,9 +5,6 @@ import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.ir.instruction.dataDropInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
@@ -17,6 +14,9 @@ import io.github.charlietap.chasm.fixture.ir.module.dataIndex
 import io.github.charlietap.chasm.fixture.ir.module.dataSegment
 import io.github.charlietap.chasm.fixture.ir.module.memoryIndex
 import io.github.charlietap.chasm.fixture.ir.module.module
+import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.runtime.Arity

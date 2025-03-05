@@ -25,7 +25,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.test.fixture.executor.instantiator)
-                implementation(projects.test.fixture.executor.runtime)
+                implementation(projects.test.fixture.runtime)
                 implementation(projects.test.fixture.ir)
                 implementation(libs.kotlin.test)
             }

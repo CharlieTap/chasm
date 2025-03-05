@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.fixture
 
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.config.runtimeConfig
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.cstack
-import io.github.charlietap.chasm.fixture.executor.runtime.stack.vstack
-import io.github.charlietap.chasm.fixture.executor.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.stack.cstack
+import io.github.charlietap.chasm.fixture.runtime.stack.vstack
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ControlStack

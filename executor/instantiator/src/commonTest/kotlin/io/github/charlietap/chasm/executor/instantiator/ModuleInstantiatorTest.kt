@@ -9,12 +9,6 @@ import io.github.charlietap.chasm.executor.instantiator.initialization.TableInit
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.executor.runtime.function.runtimeExpression
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.returnArity
-import io.github.charlietap.chasm.fixture.executor.runtime.store
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.module.elementSegment
 import io.github.charlietap.chasm.fixture.ir.module.function
@@ -23,6 +17,12 @@ import io.github.charlietap.chasm.fixture.ir.module.import
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.module.startFunction
 import io.github.charlietap.chasm.fixture.ir.module.table
+import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.returnArity
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.ir.factory.ModuleFactory
 import io.github.charlietap.chasm.ir.instruction.Expression
@@ -36,7 +36,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.fixture.ast.module.module as astModule
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.import as runtimeImport
+import io.github.charlietap.chasm.fixture.runtime.instance.import as runtimeImport
 import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
 
 class ModuleInstantiatorTest {

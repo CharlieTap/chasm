@@ -5,11 +5,11 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportDescriptorMatcher
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.externalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.import
 import io.github.charlietap.chasm.fixture.ir.module.functionImport
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.value.nameValue
+import io.github.charlietap.chasm.fixture.runtime.instance.externalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.import
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import kotlin.test.Test
 import kotlin.test.assertEquals

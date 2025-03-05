@@ -8,12 +8,12 @@ import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.exportInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionAddress
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.functionExternalValue
-import io.github.charlietap.chasm.fixture.executor.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.executor.runtime.value.i32
 import io.github.charlietap.chasm.fixture.ir.value.nameValue
+import io.github.charlietap.chasm.fixture.runtime.instance.exportInstance
+import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.value.i32
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.test.Test
