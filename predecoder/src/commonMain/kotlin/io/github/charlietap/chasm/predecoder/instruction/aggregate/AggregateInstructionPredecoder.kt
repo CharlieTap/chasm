@@ -1,45 +1,12 @@
 package io.github.charlietap.chasm.predecoder.instruction.aggregate
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.AnyConvertExternDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayCopyDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayFillDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayGetDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayGetSignedDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayGetUnsignedDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayInitDataDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayInitElementDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayLenDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayNewDataDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayNewDefaultDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayNewDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayNewElementDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArrayNewFixedDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ArraySetDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.ExternConvertAnyDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.I31GetSignedDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.I31GetUnsignedDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.RefI31Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructGetDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructGetSignedDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructGetUnsignedDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructNewDefaultDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructNewDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.StructSetDispatcher
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
+import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.predecoder.PredecodingContext
-import io.github.charlietap.chasm.predecoder.ext.dataAddress
-import io.github.charlietap.chasm.predecoder.ext.elementAddress
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.ext.data
-import io.github.charlietap.chasm.runtime.ext.default
-import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction.AnyConvertExtern
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction.ArrayCopy
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction.ArrayFill
@@ -65,9 +32,6 @@ import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction.Struc
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction.StructNew
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction.StructNewDefault
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction.StructSet
-import io.github.charlietap.chasm.type.ext.arrayType
-import io.github.charlietap.chasm.type.ext.bitWidth
-import io.github.charlietap.chasm.type.ext.structType
 
 internal fun AggregateInstructionPredecoder(
     context: PredecodingContext,
@@ -76,177 +40,87 @@ internal fun AggregateInstructionPredecoder(
     AggregateInstructionPredecoder(
         context = context,
         instruction = instruction,
-        anyConvertExternDispatcher = ::AnyConvertExternDispatcher,
-        arrayCopyDispatcher = ::ArrayCopyDispatcher,
-        arrayFillDispatcher = ::ArrayFillDispatcher,
-        arrayGetDispatcher = ::ArrayGetDispatcher,
-        arrayGetSignedDispatcher = ::ArrayGetSignedDispatcher,
-        arrayGetUnsignedDispatcher = ::ArrayGetUnsignedDispatcher,
-        arrayInitDataDispatcher = ::ArrayInitDataDispatcher,
-        arrayInitElementDispatcher = ::ArrayInitElementDispatcher,
-        arrayLenDispatcher = ::ArrayLenDispatcher,
-        arrayNewDispatcher = ::ArrayNewDispatcher,
-        arrayNewDataDispatcher = ::ArrayNewDataDispatcher,
-        arrayNewDefaultDispatcher = ::ArrayNewDefaultDispatcher,
-        arrayNewElementDispatcher = ::ArrayNewElementDispatcher,
-        arrayNewFixedDispatcher = ::ArrayNewFixedDispatcher,
-        arraySetDispatcher = ::ArraySetDispatcher,
-        externConvertAnyDispatcher = ::ExternConvertAnyDispatcher,
-        i31GetSignedDispatcher = ::I31GetSignedDispatcher,
-        i31GetUnsignedDispatcher = ::I31GetUnsignedDispatcher,
-        refI31Dispatcher = ::RefI31Dispatcher,
-        structGetDispatcher = ::StructGetDispatcher,
-        structGetSignedDispatcher = ::StructGetSignedDispatcher,
-        structGetUnsignedDispatcher = ::StructGetUnsignedDispatcher,
-        structNewDispatcher = ::StructNewDispatcher,
-        structNewDefaultDispatcher = ::StructNewDefaultDispatcher,
-        structSetDispatcher = ::StructSetDispatcher,
+        anyConvertExternPredecoder = ::AnyConvertExternInstructionPredecoder,
+        arrayCopyPredecoder = ::ArrayCopyInstructionPredecoder,
+        arrayFillPredecoder = ::ArrayFillInstructionPredecoder,
+        arrayGetPredecoder = ::ArrayGetInstructionPredecoder,
+        arrayGetSignedPredecoder = ::ArrayGetSignedInstructionPredecoder,
+        arrayGetUnsignedPredecoder = ::ArrayGetUnsignedInstructionPredecoder,
+        arrayInitDataPredecoder = ::ArrayInitDataInstructionPredecoder,
+        arrayInitElementPredecoder = ::ArrayInitElementInstructionPredecoder,
+        arrayLenPredecoder = ::ArrayLenInstructionPredecoder,
+        arrayNewPredecoder = ::ArrayNewInstructionPredecoder,
+        arrayNewDataPredecoder = ::ArrayNewDataInstructionPredecoder,
+        arrayNewDefaultPredecoder = ::ArrayNewDefaultInstructionPredecoder,
+        arrayNewElementPredecoder = ::ArrayNewElementInstructionPredecoder,
+        arrayNewFixedPredecoder = ::ArrayNewFixedInstructionPredecoder,
+        arraySetPredecoder = ::ArraySetInstructionPredecoder,
+        externConvertAnyPredecoder = ::ExternConvertAnyInstructionPredecoder,
+        i31GetSignedPredecoder = ::I31GetSignedInstructionPredecoder,
+        i31GetUnsignedPredecoder = ::I31GetUnsignedInstructionPredecoder,
+        refI31Predecoder = ::RefI31InstructionPredecoder,
+        structGetPredecoder = ::StructGetInstructionPredecoder,
+        structGetSignedPredecoder = ::StructGetSignedInstructionPredecoder,
+        structGetUnsignedPredecoder = ::StructGetUnsignedInstructionPredecoder,
+        structNewPredecoder = ::StructNewInstructionPredecoder,
+        structNewDefaultPredecoder = ::StructNewDefaultInstructionPredecoder,
+        structSetPredecoder = ::StructSetInstructionPredecoder,
     )
 
 internal inline fun AggregateInstructionPredecoder(
     context: PredecodingContext,
     instruction: AggregateInstruction,
-    crossinline anyConvertExternDispatcher: Dispatcher<AnyConvertExtern>,
-    crossinline arrayCopyDispatcher: Dispatcher<ArrayCopy>,
-    crossinline arrayFillDispatcher: Dispatcher<ArrayFill>,
-    crossinline arrayGetDispatcher: Dispatcher<ArrayGet>,
-    crossinline arrayGetSignedDispatcher: Dispatcher<ArrayGetSigned>,
-    crossinline arrayGetUnsignedDispatcher: Dispatcher<ArrayGetUnsigned>,
-    crossinline arrayInitDataDispatcher: Dispatcher<ArrayInitData>,
-    crossinline arrayInitElementDispatcher: Dispatcher<ArrayInitElement>,
-    crossinline arrayLenDispatcher: Dispatcher<ArrayLen>,
-    crossinline arrayNewDispatcher: Dispatcher<ArrayNew>,
-    crossinline arrayNewDataDispatcher: Dispatcher<ArrayNewData>,
-    crossinline arrayNewDefaultDispatcher: Dispatcher<ArrayNewDefault>,
-    crossinline arrayNewElementDispatcher: Dispatcher<ArrayNewElement>,
-    crossinline arrayNewFixedDispatcher: Dispatcher<ArrayNewFixed>,
-    crossinline arraySetDispatcher: Dispatcher<ArraySet>,
-    crossinline externConvertAnyDispatcher: Dispatcher<ExternConvertAny>,
-    crossinline i31GetSignedDispatcher: Dispatcher<I31GetSigned>,
-    crossinline i31GetUnsignedDispatcher: Dispatcher<I31GetUnsigned>,
-    crossinline refI31Dispatcher: Dispatcher<RefI31>,
-    crossinline structGetDispatcher: Dispatcher<StructGet>,
-    crossinline structGetSignedDispatcher: Dispatcher<StructGetSigned>,
-    crossinline structGetUnsignedDispatcher: Dispatcher<StructGetUnsigned>,
-    crossinline structNewDispatcher: Dispatcher<StructNew>,
-    crossinline structNewDefaultDispatcher: Dispatcher<StructNewDefault>,
-    crossinline structSetDispatcher: Dispatcher<StructSet>,
+    crossinline anyConvertExternPredecoder: Predecoder<AggregateInstruction.AnyConvertExtern, DispatchableInstruction>,
+    crossinline arrayCopyPredecoder: Predecoder<AggregateInstruction.ArrayCopy, DispatchableInstruction>,
+    crossinline arrayFillPredecoder: Predecoder<AggregateInstruction.ArrayFill, DispatchableInstruction>,
+    crossinline arrayGetPredecoder: Predecoder<AggregateInstruction.ArrayGet, DispatchableInstruction>,
+    crossinline arrayGetSignedPredecoder: Predecoder<AggregateInstruction.ArrayGetSigned, DispatchableInstruction>,
+    crossinline arrayGetUnsignedPredecoder: Predecoder<AggregateInstruction.ArrayGetUnsigned, DispatchableInstruction>,
+    crossinline arrayInitDataPredecoder: Predecoder<AggregateInstruction.ArrayInitData, DispatchableInstruction>,
+    crossinline arrayInitElementPredecoder: Predecoder<AggregateInstruction.ArrayInitElement, DispatchableInstruction>,
+    crossinline arrayLenPredecoder: Predecoder<AggregateInstruction.ArrayLen, DispatchableInstruction>,
+    crossinline arrayNewPredecoder: Predecoder<AggregateInstruction.ArrayNew, DispatchableInstruction>,
+    crossinline arrayNewDataPredecoder: Predecoder<AggregateInstruction.ArrayNewData, DispatchableInstruction>,
+    crossinline arrayNewDefaultPredecoder: Predecoder<AggregateInstruction.ArrayNewDefault, DispatchableInstruction>,
+    crossinline arrayNewElementPredecoder: Predecoder<AggregateInstruction.ArrayNewElement, DispatchableInstruction>,
+    crossinline arrayNewFixedPredecoder: Predecoder<AggregateInstruction.ArrayNewFixed, DispatchableInstruction>,
+    crossinline arraySetPredecoder: Predecoder<AggregateInstruction.ArraySet, DispatchableInstruction>,
+    crossinline externConvertAnyPredecoder: Predecoder<AggregateInstruction.ExternConvertAny, DispatchableInstruction>,
+    crossinline i31GetSignedPredecoder: Predecoder<AggregateInstruction.I31GetSigned, DispatchableInstruction>,
+    crossinline i31GetUnsignedPredecoder: Predecoder<AggregateInstruction.I31GetUnsigned, DispatchableInstruction>,
+    crossinline refI31Predecoder: Predecoder<AggregateInstruction.RefI31, DispatchableInstruction>,
+    crossinline structGetPredecoder: Predecoder<AggregateInstruction.StructGet, DispatchableInstruction>,
+    crossinline structGetSignedPredecoder: Predecoder<AggregateInstruction.StructGetSigned, DispatchableInstruction>,
+    crossinline structGetUnsignedPredecoder: Predecoder<AggregateInstruction.StructGetUnsigned, DispatchableInstruction>,
+    crossinline structNewPredecoder: Predecoder<AggregateInstruction.StructNew, DispatchableInstruction>,
+    crossinline structNewDefaultPredecoder: Predecoder<AggregateInstruction.StructNewDefault, DispatchableInstruction>,
+    crossinline structSetPredecoder: Predecoder<AggregateInstruction.StructSet, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
-        is AggregateInstruction.AnyConvertExtern -> anyConvertExternDispatcher(AnyConvertExtern)
-        is AggregateInstruction.ArrayCopy -> arrayCopyDispatcher(ArrayCopy(instruction.sourceTypeIndex, instruction.destinationTypeIndex))
-        is AggregateInstruction.ArrayFill -> arrayFillDispatcher(ArrayFill(instruction.typeIndex))
-        is AggregateInstruction.ArrayGet -> arrayGetDispatcher(ArrayGet(instruction.typeIndex))
-        is AggregateInstruction.ArrayGetSigned -> arrayGetSignedDispatcher(ArrayGetSigned(instruction.typeIndex))
-        is AggregateInstruction.ArrayGetUnsigned -> arrayGetUnsignedDispatcher(ArrayGetUnsigned(instruction.typeIndex))
-        is AggregateInstruction.ArrayInitData -> {
-            val definedType = context.types[instruction.typeIndex.idx]
-            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
-                InvocationError.ArrayCompositeTypeExpected,
-            ).bind()
-            val dataAddress = context.instance.dataAddress(instruction.dataIndex).bind()
-            val dataInstance = context.store.data(dataAddress)
-            val fieldWidthInBytes = arrayType.fieldType.bitWidth()?.let { sizeInBits ->
-                sizeInBits / 8
-            } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
-
-            arrayInitDataDispatcher(ArrayInitData(instruction.typeIndex, dataInstance, fieldWidthInBytes))
-        }
-        is AggregateInstruction.ArrayInitElement -> {
-            val elementAddress = context.instance.elementAddress(instruction.elementIndex).bind()
-            val elementInstance = context.store.element(elementAddress)
-            arrayInitElementDispatcher(
-                ArrayInitElement(instruction.typeIndex, elementInstance),
-            )
-        }
-        is AggregateInstruction.ArrayLen -> arrayLenDispatcher(ArrayLen)
-        is AggregateInstruction.ArrayNew -> {
-            val definedType = context.types[instruction.typeIndex.idx]
-            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
-                InvocationError.ArrayCompositeTypeExpected,
-            ).bind()
-
-            arrayNewDispatcher(
-                ArrayNew(definedType, arrayType),
-            )
-        }
-        is AggregateInstruction.ArrayNewData -> {
-            val dataAddress = context.instance.dataAddress(instruction.dataIndex).bind()
-            val dataInstance = context.store.data(dataAddress)
-            val definedType = context.types[instruction.typeIndex.idx]
-            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
-                InvocationError.ArrayCompositeTypeExpected,
-            ).bind()
-            val fieldWidthInBytes = arrayType.fieldType.bitWidth()?.let { sizeInBits ->
-                sizeInBits / 8
-            } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
-
-            arrayNewDataDispatcher(
-                ArrayNewData(definedType, arrayType, dataInstance, fieldWidthInBytes),
-            )
-        }
-        is AggregateInstruction.ArrayNewDefault -> {
-            val definedType = context.types[instruction.typeIndex.idx]
-            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
-                InvocationError.ArrayCompositeTypeExpected,
-            ).bind()
-            val field = arrayType.fieldType.default(context)
-
-            arrayNewDefaultDispatcher(
-                ArrayNewDefault(definedType, arrayType, field),
-            )
-        }
-        is AggregateInstruction.ArrayNewElement -> {
-            val elementAddress = context.instance.elementAddress(instruction.elementIndex).bind()
-            val elementInstance = context.store.element(elementAddress)
-            val definedType = context.types[instruction.typeIndex.idx]
-            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
-                InvocationError.ArrayCompositeTypeExpected,
-            ).bind()
-
-            arrayNewElementDispatcher(
-                ArrayNewElement(definedType, arrayType, elementInstance),
-            )
-        }
-        is AggregateInstruction.ArrayNewFixed -> {
-            val definedType = context.types[instruction.typeIndex.idx]
-            val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
-                InvocationError.ArrayCompositeTypeExpected,
-            ).bind()
-
-            arrayNewFixedDispatcher(ArrayNewFixed(definedType, arrayType, instruction.size))
-        }
-        is AggregateInstruction.ArraySet -> arraySetDispatcher(ArraySet(instruction.typeIndex))
-        is AggregateInstruction.ExternConvertAny -> externConvertAnyDispatcher(ExternConvertAny)
-        is AggregateInstruction.I31GetSigned -> i31GetSignedDispatcher(I31GetSigned)
-        is AggregateInstruction.I31GetUnsigned -> i31GetUnsignedDispatcher(I31GetUnsigned)
-        is AggregateInstruction.RefI31 -> refI31Dispatcher(RefI31)
-        is AggregateInstruction.StructGet -> structGetDispatcher(StructGet(instruction.typeIndex, instruction.fieldIndex))
-        is AggregateInstruction.StructGetSigned -> structGetSignedDispatcher(StructGetSigned(instruction.typeIndex, instruction.fieldIndex))
-        is AggregateInstruction.StructGetUnsigned -> structGetUnsignedDispatcher(
-            StructGetUnsigned(instruction.typeIndex, instruction.fieldIndex),
-        )
-        is AggregateInstruction.StructNew -> {
-            val definedType = context.types[instruction.typeIndex.idx]
-            val structType = context.unroller(definedType).compositeType.structType() ?: Err(
-                InvocationError.StructCompositeTypeExpected,
-            ).bind()
-
-            structNewDispatcher(StructNew(definedType, structType))
-        }
-        is AggregateInstruction.StructNewDefault -> {
-            val definedType = context.types[instruction.typeIndex.idx]
-            val structType = context.unroller(definedType).compositeType.structType() ?: Err(
-                InvocationError.StructCompositeTypeExpected,
-            ).bind()
-            val fields = LongArray(structType.fields.size) { idx ->
-                structType.fields[idx].default(context)
-            }
-
-            structNewDefaultDispatcher(StructNewDefault(definedType, structType, fields))
-        }
-        is AggregateInstruction.StructSet -> {
-            structSetDispatcher(StructSet(instruction.fieldIndex.idx))
-        }
+        is AggregateInstruction.AnyConvertExtern -> anyConvertExternPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayCopy -> arrayCopyPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayFill -> arrayFillPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayGet -> arrayGetPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayGetSigned -> arrayGetSignedPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayGetUnsigned -> arrayGetUnsignedPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayInitData -> arrayInitDataPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayInitElement -> arrayInitElementPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayLen -> arrayLenPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayNew -> arrayNewPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayNewData -> arrayNewDataPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayNewDefault -> arrayNewDefaultPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayNewElement -> arrayNewElementPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArrayNewFixed -> arrayNewFixedPredecoder(context, instruction).bind()
+        is AggregateInstruction.ArraySet -> arraySetPredecoder(context, instruction).bind()
+        is AggregateInstruction.ExternConvertAny -> externConvertAnyPredecoder(context, instruction).bind()
+        is AggregateInstruction.I31GetSigned -> i31GetSignedPredecoder(context, instruction).bind()
+        is AggregateInstruction.I31GetUnsigned -> i31GetUnsignedPredecoder(context, instruction).bind()
+        is AggregateInstruction.RefI31 -> refI31Predecoder(context, instruction).bind()
+        is AggregateInstruction.StructGet -> structGetPredecoder(context, instruction).bind()
+        is AggregateInstruction.StructGetSigned -> structGetSignedPredecoder(context, instruction).bind()
+        is AggregateInstruction.StructGetUnsigned -> structGetUnsignedPredecoder(context, instruction).bind()
+        is AggregateInstruction.StructNew -> structNewPredecoder(context, instruction).bind()
+        is AggregateInstruction.StructNewDefault -> structNewDefaultPredecoder(context, instruction).bind()
+        is AggregateInstruction.StructSet -> structSetPredecoder(context, instruction).bind()
     }
 }
