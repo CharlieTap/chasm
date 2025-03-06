@@ -1,33 +1,12 @@
 package io.github.charlietap.chasm.predecoder.instruction.control
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrIfDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrOnCastDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrOnCastFailDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrOnNonNullDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrOnNullDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrTableDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallIndirectDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallRefDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.NopDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnCallIndirectDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnCallRefDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.UnreachableDispatcher
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.predecoder.PredecodingContext
-import io.github.charlietap.chasm.predecoder.ext.tableAddress
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.ext.table
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.Br
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.BrIf
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.BrOnCast
@@ -53,118 +32,77 @@ internal fun ControlInstructionPredecoder(
         context = context,
         instruction = instruction,
         blockInstructionPredecoder = ::BlockInstructionPredecoder,
+        brInstructionPredecoder = ::BrInstructionPredecoder,
+        brIfInstructionPredecoder = ::BrIfInstructionPredecoder,
+        brOnCastInstructionPredecoder = ::BrOnCastInstructionPredecoder,
+        brOnCastFailInstructionPredecoder = ::BrOnCastFailInstructionPredecoder,
+        brOnNonNullInstructionPredecoder = ::BrOnNonNullInstructionPredecoder,
+        brOnNullInstructionPredecoder = ::BrOnNullInstructionPredecoder,
+        brTableInstructionPredecoder = ::BrTableInstructionPredecoder,
         callInstructionPredecoder = ::CallInstructionPredecoder,
+        callIndirectInstructionPredecoder = ::CallIndirectInstructionPredecoder,
+        callRefInstructionPredecoder = ::CallRefInstructionPredecoder,
         ifInstructionPredecoder = ::IfInstructionPredecoder,
         loopInstructionPredecoder = ::LoopInstructionPredecoder,
+        nopInstructionPredecoder = ::NopInstructionPredecoder,
+        returnInstructionPredecoder = ::ReturnInstructionPredecoder,
         returnCallInstructionPredecoder = ::ReturnCallInstructionPredecoder,
+        returnCallIndirectInstructionPredecoder = ::ReturnCallIndirectInstructionPredecoder,
+        returnCallRefInstructionPredecoder = ::ReturnCallRefInstructionPredecoder,
+        throwInstructionPredecoder = ::ThrowInstructionPredecoder,
+        throwRefInstructionPredecoder = ::ThrowRefInstructionPredecoder,
         tryTableInstructionPredecoder = ::TryTableInstructionPredecoder,
-        brDispatcher = ::BrDispatcher,
-        brIfDispatcher = ::BrIfDispatcher,
-        brOnCastDispatcher = ::BrOnCastDispatcher,
-        brOnCastFailDispatcher = ::BrOnCastFailDispatcher,
-        brOnNonNullDispatcher = ::BrOnNonNullDispatcher,
-        brOnNullDispatcher = ::BrOnNullDispatcher,
-        brTableDispatcher = ::BrTableDispatcher,
-        callIndirectDispatcher = ::CallIndirectDispatcher,
-        callRefDispatcher = ::CallRefDispatcher,
-        nopDispatcher = ::NopDispatcher,
-        returnDispatcher = ::ReturnDispatcher,
-        returnCallIndirectDispatcher = ::ReturnCallIndirectDispatcher,
-        returnCallRefDispatcher = ::ReturnCallRefDispatcher,
-        throwDispatcher = ::ThrowDispatcher,
-        throwRefDispatcher = ::ThrowRefDispatcher,
-        unreachableDispatcher = ::UnreachableDispatcher,
+        unreachableInstructionPredecoder = ::UnreachableInstructionPredecoder,
     )
 
 internal inline fun ControlInstructionPredecoder(
     context: PredecodingContext,
     instruction: ControlInstruction,
     crossinline blockInstructionPredecoder: Predecoder<ControlInstruction.Block, DispatchableInstruction>,
-    crossinline ifInstructionPredecoder: Predecoder<ControlInstruction.If, DispatchableInstruction>,
+    crossinline brInstructionPredecoder: Predecoder<ControlInstruction.Br, DispatchableInstruction>,
+    crossinline brIfInstructionPredecoder: Predecoder<ControlInstruction.BrIf, DispatchableInstruction>,
+    crossinline brOnCastInstructionPredecoder: Predecoder<ControlInstruction.BrOnCast, DispatchableInstruction>,
+    crossinline brOnCastFailInstructionPredecoder: Predecoder<ControlInstruction.BrOnCastFail, DispatchableInstruction>,
+    crossinline brOnNonNullInstructionPredecoder: Predecoder<ControlInstruction.BrOnNonNull, DispatchableInstruction>,
+    crossinline brOnNullInstructionPredecoder: Predecoder<ControlInstruction.BrOnNull, DispatchableInstruction>,
+    crossinline brTableInstructionPredecoder: Predecoder<ControlInstruction.BrTable, DispatchableInstruction>,
     crossinline callInstructionPredecoder: Predecoder<ControlInstruction.Call, DispatchableInstruction>,
+    crossinline callIndirectInstructionPredecoder: Predecoder<ControlInstruction.CallIndirect, DispatchableInstruction>,
+    crossinline callRefInstructionPredecoder: Predecoder<ControlInstruction.CallRef, DispatchableInstruction>,
+    crossinline ifInstructionPredecoder: Predecoder<ControlInstruction.If, DispatchableInstruction>,
     crossinline loopInstructionPredecoder: Predecoder<ControlInstruction.Loop, DispatchableInstruction>,
+    crossinline nopInstructionPredecoder: Predecoder<ControlInstruction.Nop, DispatchableInstruction>,
+    crossinline returnInstructionPredecoder: Predecoder<ControlInstruction.Return, DispatchableInstruction>,
     crossinline returnCallInstructionPredecoder: Predecoder<ControlInstruction.ReturnCall, DispatchableInstruction>,
+    crossinline returnCallIndirectInstructionPredecoder: Predecoder<ControlInstruction.ReturnCallIndirect, DispatchableInstruction>,
+    crossinline returnCallRefInstructionPredecoder: Predecoder<ControlInstruction.ReturnCallRef, DispatchableInstruction>,
+    crossinline throwInstructionPredecoder: Predecoder<ControlInstruction.Throw, DispatchableInstruction>,
+    crossinline throwRefInstructionPredecoder: Predecoder<ControlInstruction.ThrowRef, DispatchableInstruction>,
     crossinline tryTableInstructionPredecoder: Predecoder<ControlInstruction.TryTable, DispatchableInstruction>,
-    crossinline brDispatcher: Dispatcher<Br>,
-    crossinline brIfDispatcher: Dispatcher<BrIf>,
-    crossinline brOnCastDispatcher: Dispatcher<BrOnCast>,
-    crossinline brOnCastFailDispatcher: Dispatcher<BrOnCastFail>,
-    crossinline brOnNonNullDispatcher: Dispatcher<BrOnNonNull>,
-    crossinline brOnNullDispatcher: Dispatcher<BrOnNull>,
-    crossinline brTableDispatcher: Dispatcher<BrTable>,
-    crossinline callIndirectDispatcher: Dispatcher<CallIndirect>,
-    crossinline callRefDispatcher: Dispatcher<CallRef>,
-    crossinline nopDispatcher: Dispatcher<Nop>,
-    crossinline returnDispatcher: Dispatcher<Return>,
-    crossinline returnCallIndirectDispatcher: Dispatcher<ReturnCallIndirect>,
-    crossinline returnCallRefDispatcher: Dispatcher<ReturnCallRef>,
-    crossinline throwDispatcher: Dispatcher<Throw>,
-    crossinline throwRefDispatcher: Dispatcher<ThrowRef>,
-    crossinline unreachableDispatcher: Dispatcher<Unreachable>,
+    crossinline unreachableInstructionPredecoder: Predecoder<ControlInstruction.Unreachable, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is ControlInstruction.Block -> blockInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.Br -> brDispatcher(Br(instruction.labelIndex))
-        is ControlInstruction.BrIf -> brIfDispatcher(BrIf(instruction.labelIndex))
-        is ControlInstruction.BrOnCast -> brOnCastDispatcher(
-            BrOnCast(
-                labelIndex = instruction.labelIndex,
-                srcReferenceType = instruction.srcReferenceType,
-                dstReferenceType = instruction.dstReferenceType,
-            ),
-        )
-        is ControlInstruction.BrOnCastFail -> brOnCastFailDispatcher(
-            BrOnCastFail(
-                labelIndex = instruction.labelIndex,
-                srcReferenceType = instruction.srcReferenceType,
-                dstReferenceType = instruction.dstReferenceType,
-            ),
-        )
-        is ControlInstruction.BrOnNonNull -> brOnNonNullDispatcher(BrOnNonNull(instruction.labelIndex))
-        is ControlInstruction.BrOnNull -> brOnNullDispatcher(BrOnNull(instruction.labelIndex))
-        is ControlInstruction.BrTable -> brTableDispatcher(
-            BrTable(
-                labelIndices = instruction.labelIndices,
-                defaultLabelIndex = instruction.defaultLabelIndex,
-            ),
-        )
+        is ControlInstruction.Br -> brInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.BrIf -> brIfInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.BrOnCast -> brOnCastInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.BrOnCastFail -> brOnCastFailInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.BrOnNonNull -> brOnNonNullInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.BrOnNull -> brOnNullInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.BrTable -> brTableInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Call -> callInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.CallIndirect -> {
-
-            val address = context.instance.tableAddress(instruction.tableIndex)?.bind()
-                ?: Err(InstantiationError.PredecodingError).bind()
-            val table = context.store.table(address)
-
-            callIndirectDispatcher(
-                CallIndirect(
-                    type = context.types[instruction.typeIndex.idx],
-                    table = table,
-                ),
-            )
-        }
-        is ControlInstruction.CallRef -> callRefDispatcher(CallRef(instruction.typeIndex))
+        is ControlInstruction.CallIndirect -> callIndirectInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.CallRef -> callRefInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.If -> ifInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Loop -> loopInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.Nop -> nopDispatcher(Nop)
-        is ControlInstruction.Return -> returnDispatcher(Return)
+        is ControlInstruction.Nop -> nopInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.Return -> returnInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.ReturnCall -> returnCallInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.ReturnCallIndirect -> {
-
-            val address = context.instance.tableAddress(instruction.tableIndex)?.bind()
-                ?: Err(InstantiationError.PredecodingError).bind()
-            val table = context.store.table(address)
-
-            returnCallIndirectDispatcher(
-                ReturnCallIndirect(
-                    type = context.types[instruction.typeIndex.idx],
-                    table = table,
-                ),
-            )
-        }
-        is ControlInstruction.ReturnCallRef -> returnCallRefDispatcher(ReturnCallRef(instruction.typeIndex))
-        is ControlInstruction.Throw -> throwDispatcher(Throw(instruction.tagIndex))
-        is ControlInstruction.ThrowRef -> throwRefDispatcher(ThrowRef)
+        is ControlInstruction.ReturnCallIndirect -> returnCallIndirectInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.ReturnCallRef -> returnCallRefInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.Throw -> throwInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.ThrowRef -> throwRefInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.TryTable -> tryTableInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.Unreachable -> unreachableDispatcher(Unreachable)
+        is ControlInstruction.Unreachable -> unreachableInstructionPredecoder(context, instruction).bind()
     }
 }
