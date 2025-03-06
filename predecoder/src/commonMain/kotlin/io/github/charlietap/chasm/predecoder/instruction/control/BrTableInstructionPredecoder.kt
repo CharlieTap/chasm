@@ -31,4 +31,4 @@ internal inline fun BrTableInstructionPredecoder(
             defaultLabelIndex = instruction.defaultLabelIndex,
         ),
     )
-} 
+}

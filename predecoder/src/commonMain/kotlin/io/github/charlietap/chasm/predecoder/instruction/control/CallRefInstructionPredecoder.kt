@@ -26,4 +26,4 @@ internal inline fun CallRefInstructionPredecoder(
     crossinline dispatcher: Dispatcher<CallRef>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     dispatcher(CallRef(instruction.typeIndex))
-} 
+}

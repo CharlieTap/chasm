@@ -26,4 +26,4 @@ internal inline fun BrOnNullInstructionPredecoder(
     crossinline dispatcher: Dispatcher<BrOnNull>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     dispatcher(BrOnNull(instruction.labelIndex))
-} 
+}

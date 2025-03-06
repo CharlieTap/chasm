@@ -26,4 +26,4 @@ internal inline fun UnreachableInstructionPredecoder(
     crossinline dispatcher: Dispatcher<Unreachable>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     dispatcher(Unreachable)
-} 
+}

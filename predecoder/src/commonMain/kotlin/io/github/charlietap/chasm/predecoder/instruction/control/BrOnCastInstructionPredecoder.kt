@@ -32,4 +32,4 @@ internal inline fun BrOnCastInstructionPredecoder(
             dstReferenceType = instruction.dstReferenceType,
         ),
     )
-} 
+}

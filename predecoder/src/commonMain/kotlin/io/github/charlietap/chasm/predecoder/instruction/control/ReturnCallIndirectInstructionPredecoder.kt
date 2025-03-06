@@ -39,4 +39,4 @@ internal inline fun ReturnCallIndirectInstructionPredecoder(
             table = table,
         ),
     )
-} 
+}

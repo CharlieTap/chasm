@@ -26,4 +26,4 @@ internal inline fun ThrowInstructionPredecoder(
     crossinline dispatcher: Dispatcher<Throw>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     dispatcher(Throw(instruction.tagIndex))
-} 
+}

@@ -26,4 +26,4 @@ internal inline fun NopInstructionPredecoder(
     crossinline dispatcher: Dispatcher<Nop>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     dispatcher(Nop)
-} 
+}
