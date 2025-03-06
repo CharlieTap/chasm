@@ -44,4 +44,4 @@ internal inline fun F64NeInstructionPredecoder(
             destination = destination,
         ),
     )
-} 
+}

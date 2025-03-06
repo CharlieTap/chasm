@@ -12,4 +12,4 @@ internal inline fun F32LtExecutor(
     val right = Float.fromBits(instruction.right(stack).toInt())
 
     instruction.destination(if (left < right) 1L else 0L, stack)
-} 
+}

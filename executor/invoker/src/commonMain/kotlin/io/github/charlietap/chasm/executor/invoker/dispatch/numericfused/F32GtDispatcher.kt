@@ -17,4 +17,4 @@ internal inline fun F32GtDispatcher(
     crossinline executor: Executor<FusedNumericInstruction.F32Gt>,
 ): DispatchableInstruction = { context ->
     executor(context, instruction)
-} 
+}

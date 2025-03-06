@@ -44,4 +44,4 @@ internal inline fun F32EqInstructionPredecoder(
             destination = destination,
         ),
     )
-} 
+}

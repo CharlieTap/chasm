@@ -44,4 +44,4 @@ internal inline fun F32LtInstructionPredecoder(
             destination = destination,
         ),
     )
-} 
+}

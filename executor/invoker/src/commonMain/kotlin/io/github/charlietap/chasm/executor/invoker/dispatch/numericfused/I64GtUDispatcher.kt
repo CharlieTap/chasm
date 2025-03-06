@@ -17,4 +17,4 @@ internal inline fun I64GtUDispatcher(
     crossinline executor: Executor<FusedNumericInstruction.I64GtU>,
 ): DispatchableInstruction = { context ->
     executor(context, instruction)
-} 
+}

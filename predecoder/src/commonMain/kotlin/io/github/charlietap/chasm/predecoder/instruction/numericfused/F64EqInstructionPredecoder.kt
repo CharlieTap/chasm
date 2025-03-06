@@ -44,4 +44,4 @@ internal inline fun F64EqInstructionPredecoder(
             destination = destination,
         ),
     )
-} 
+}

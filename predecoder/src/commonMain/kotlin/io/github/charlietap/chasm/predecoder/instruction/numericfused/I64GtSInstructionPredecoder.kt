@@ -44,4 +44,4 @@ internal inline fun I64GtSInstructionPredecoder(
             destination = destination,
         ),
     )
-} 
+}

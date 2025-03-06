@@ -44,4 +44,4 @@ internal inline fun I64LeUInstructionPredecoder(
             destination = destination,
         ),
     )
-} 
+}

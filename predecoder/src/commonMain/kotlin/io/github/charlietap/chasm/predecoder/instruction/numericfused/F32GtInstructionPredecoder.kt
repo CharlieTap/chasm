@@ -44,4 +44,4 @@ internal inline fun F32GtInstructionPredecoder(
             destination = destination,
         ),
     )
-} 
+}

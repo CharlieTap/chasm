@@ -12,4 +12,4 @@ internal inline fun I64LeSExecutor(
     val right = instruction.right(stack)
 
     instruction.destination(if (left <= right) 1L else 0L, stack)
-} 
+}

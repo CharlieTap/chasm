@@ -17,4 +17,4 @@ internal inline fun I64LeUDispatcher(
     crossinline executor: Executor<FusedNumericInstruction.I64LeU>,
 ): DispatchableInstruction = { context ->
     executor(context, instruction)
-} 
+}

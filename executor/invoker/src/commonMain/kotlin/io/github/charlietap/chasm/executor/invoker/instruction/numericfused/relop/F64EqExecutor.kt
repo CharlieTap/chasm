@@ -12,4 +12,4 @@ internal inline fun F64EqExecutor(
     val right = Double.fromBits(instruction.right(stack))
 
     instruction.destination(if (left == right) 1L else 0L, stack)
-} 
+}

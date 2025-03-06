@@ -31,7 +31,7 @@ internal inline fun Double.min(other: Double): Double = kotlin.math.min(this, ot
 
 internal inline fun Double.sqrt(): Double = fsqrt()
 
-internal inline fun Double.trunc(): Double = kotlin.math.truncate(this)
+internal inline fun Double.trunc(): Double = truncate(this)
 
 internal inline fun Double.truncI32s(): Int = toInt()
 
