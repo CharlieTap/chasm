@@ -22,11 +22,18 @@ tasks.register("clean",Delete::class){
     delete(rootProject.layout.buildDirectory)
 }
 
-tasks.register("dev") {
-    group = "development"
-    description = "Developer loop, run tests and linting"
+tasks.register("fmt") {
+    group = "formatting"
+    description = "Format sources"
 
     val lintingTasks = subprojects.mapNotNull { it.tasks.findByName("formatKotlin") }
+
+    dependsOn(lintingTasks)
+}
+
+tasks.register("test") {
+    group = "development"
+    description = "Developer loop, run testsuite designed for fast feedback"
 
     val jvmTestTasks = subprojects.mapNotNull { subproject ->
         subproject.tasks.findByName("jvmTest")?.also { task ->
@@ -34,5 +41,5 @@ tasks.register("dev") {
         }
     }
 
-    dependsOn(jvmTestTasks + lintingTasks)
+    dependsOn(jvmTestTasks)
 }
