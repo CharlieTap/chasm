@@ -3,6 +3,11 @@ package io.github.charlietap.chasm.optimiser.passes.fusion
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Abs
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Add
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Ceil
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32ConvertI32S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32ConvertI32U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32ConvertI64S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32ConvertI64U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32DemoteF64
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Div
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Eq
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Floor
@@ -20,6 +25,10 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Trun
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Abs
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Add
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Ceil
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64ConvertI32S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64ConvertI32U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64ConvertI64S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64ConvertI64U
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Div
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Eq
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Floor
@@ -31,6 +40,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Ne
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Nearest
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Neg
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64PromoteF32
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Sqrt
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Sub
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Trunc
@@ -60,6 +70,15 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Shl
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32ShrS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32ShrU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Sub
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32TruncF32S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32TruncF32U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32TruncF64S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32TruncF64U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32TruncSatF32S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32TruncSatF32U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32TruncSatF64S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32TruncSatF64U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32WrapI64
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Xor
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Add
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Clz
@@ -71,6 +90,8 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Eqz
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Extend16S
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Extend32S
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Extend8S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64ExtendI32S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64ExtendI32U
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64GeS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64GeU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64GtS
@@ -83,6 +104,14 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Ne
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Popcnt
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Sub
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncF32S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncF32U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncF64S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncF64U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncSatF32S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncSatF32U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncSatF64S
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncSatF64U
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
 
@@ -198,6 +227,35 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.I64LeU -> nonCommutativeBinop(index, instruction, input, output, ::I64LeU)
     is NumericInstruction.I64GeS -> nonCommutativeBinop(index, instruction, input, output, ::I64GeS)
     is NumericInstruction.I64GeU -> nonCommutativeBinop(index, instruction, input, output, ::I64GeU)
+    is NumericInstruction.F32ConvertI32S -> unop(index, instruction, input, output, ::F32ConvertI32S)
+    is NumericInstruction.F32ConvertI32U -> unop(index, instruction, input, output, ::F32ConvertI32U)
+    is NumericInstruction.F32ConvertI64S -> unop(index, instruction, input, output, ::F32ConvertI64S)
+    is NumericInstruction.F32ConvertI64U -> unop(index, instruction, input, output, ::F32ConvertI64U)
+    is NumericInstruction.F64ConvertI32S -> unop(index, instruction, input, output, ::F64ConvertI32S)
+    is NumericInstruction.F64ConvertI32U -> unop(index, instruction, input, output, ::F64ConvertI32U)
+    is NumericInstruction.F64ConvertI64S -> unop(index, instruction, input, output, ::F64ConvertI64S)
+    is NumericInstruction.F64ConvertI64U -> unop(index, instruction, input, output, ::F64ConvertI64U)
+    is NumericInstruction.F32DemoteF64 -> unop(index, instruction, input, output, ::F32DemoteF64)
+    is NumericInstruction.F64PromoteF32 -> unop(index, instruction, input, output, ::F64PromoteF32)
+    is NumericInstruction.I32WrapI64 -> unop(index, instruction, input, output, ::I32WrapI64)
+    is NumericInstruction.I64ExtendI32S -> unop(index, instruction, input, output, ::I64ExtendI32S)
+    is NumericInstruction.I64ExtendI32U -> unop(index, instruction, input, output, ::I64ExtendI32U)
+    is NumericInstruction.I32TruncF32S -> unop(index, instruction, input, output, ::I32TruncF32S)
+    is NumericInstruction.I32TruncF32U -> unop(index, instruction, input, output, ::I32TruncF32U)
+    is NumericInstruction.I32TruncF64S -> unop(index, instruction, input, output, ::I32TruncF64S)
+    is NumericInstruction.I32TruncF64U -> unop(index, instruction, input, output, ::I32TruncF64U)
+    is NumericInstruction.I64TruncF32S -> unop(index, instruction, input, output, ::I64TruncF32S)
+    is NumericInstruction.I64TruncF32U -> unop(index, instruction, input, output, ::I64TruncF32U)
+    is NumericInstruction.I64TruncF64S -> unop(index, instruction, input, output, ::I64TruncF64S)
+    is NumericInstruction.I64TruncF64U -> unop(index, instruction, input, output, ::I64TruncF64U)
+    is NumericInstruction.I32TruncSatF32S -> unop(index, instruction, input, output, ::I32TruncSatF32S)
+    is NumericInstruction.I32TruncSatF32U -> unop(index, instruction, input, output, ::I32TruncSatF32U)
+    is NumericInstruction.I32TruncSatF64S -> unop(index, instruction, input, output, ::I32TruncSatF64S)
+    is NumericInstruction.I32TruncSatF64U -> unop(index, instruction, input, output, ::I32TruncSatF64U)
+    is NumericInstruction.I64TruncSatF32S -> unop(index, instruction, input, output, ::I64TruncSatF32S)
+    is NumericInstruction.I64TruncSatF32U -> unop(index, instruction, input, output, ::I64TruncSatF32U)
+    is NumericInstruction.I64TruncSatF64S -> unop(index, instruction, input, output, ::I64TruncSatF64S)
+    is NumericInstruction.I64TruncSatF64U -> unop(index, instruction, input, output, ::I64TruncSatF64U)
     else -> {
         output.add(instruction)
         index
