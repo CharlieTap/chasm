@@ -1,5 +1,3 @@
-
-
 plugins {
     alias(libs.plugins.kotlin.allopen) apply false
     alias(libs.plugins.kotlin.android) apply false
@@ -22,4 +20,19 @@ plugins {
 
 tasks.register("clean",Delete::class){
     delete(rootProject.layout.buildDirectory)
+}
+
+tasks.register("dev") {
+    group = "development"
+    description = "Developer loop, run tests and linting"
+
+    val lintingTasks = subprojects.mapNotNull { it.tasks.findByName("formatKotlin") }
+
+    val jvmTestTasks = subprojects.mapNotNull { subproject ->
+        subproject.tasks.findByName("jvmTest")?.also { task ->
+            (task as Test).exclude("**/WehTest.class")
+        }
+    }
+
+    dependsOn(jvmTestTasks + lintingTasks)
 }
