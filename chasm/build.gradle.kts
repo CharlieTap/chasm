@@ -77,7 +77,8 @@ configure<PublishingConventionsExtension> {
 }
 
 tasks.named {
-    it.contains("lintKotlinCommonTest")
+    it.contains("lintKotlinCommonTest") ||
+    it.contains("formatKotlinCommonTest")
 }.configureEach {
     dependsOn(tasks.withType<GenerateTestsTask>())
 }
