@@ -15,7 +15,7 @@ internal inline fun I32TruncF64SExecutor(
     val operand = Double.fromBits(instruction.operand(stack))
     val result = try {
         operand.truncI32sTrapping().toLong()
-    } catch (e: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ConvertOperationFailed)
     }
 

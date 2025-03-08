@@ -15,7 +15,7 @@ internal inline fun I64TruncF64UExecutor(
     val operand = Double.fromBits(instruction.operand(stack))
     val result = try {
         operand.truncI64uTrapping()
-    } catch (e: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ConvertOperationFailed)
     }
 
