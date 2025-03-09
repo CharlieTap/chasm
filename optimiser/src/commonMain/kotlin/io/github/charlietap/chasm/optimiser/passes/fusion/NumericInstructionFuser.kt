@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Conv
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32ConvertI32U
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32ConvertI64S
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32ConvertI64U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Copysign
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32DemoteF64
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Div
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Eq
@@ -15,6 +16,8 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Ge
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Gt
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Le
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Lt
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Max
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Min
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Ne
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F32Nearest
@@ -29,6 +32,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Conv
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64ConvertI32U
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64ConvertI64S
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64ConvertI64U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Copysign
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Div
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Eq
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Floor
@@ -36,6 +40,8 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Ge
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Gt
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Le
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Lt
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Max
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Min
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Ne
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.F64Nearest
@@ -66,6 +72,10 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Ne
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Or
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Popcnt
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32RemS
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32RemU
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Rotl
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Rotr
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Shl
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32ShrS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32ShrU
@@ -81,6 +91,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Trun
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32WrapI64
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I32Xor
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Add
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64And
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Clz
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Ctz
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64DivS
@@ -102,7 +113,15 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64LtS
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64LtU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Mul
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Ne
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Or
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Popcnt
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64RemS
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64RemU
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Rotl
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Rotr
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Shl
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64ShrS
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64ShrU
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Sub
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncF32S
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncF32U
@@ -112,6 +131,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Trun
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncSatF32U
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncSatF64S
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64TruncSatF64U
+import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Xor
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
 
@@ -256,6 +276,26 @@ internal inline fun NumericInstructionFuser(
     is NumericInstruction.I64TruncSatF32U -> unop(index, instruction, input, output, ::I64TruncSatF32U)
     is NumericInstruction.I64TruncSatF64S -> unop(index, instruction, input, output, ::I64TruncSatF64S)
     is NumericInstruction.I64TruncSatF64U -> unop(index, instruction, input, output, ::I64TruncSatF64U)
+    is NumericInstruction.I32RemS -> nonCommutativeBinop(index, instruction, input, output, ::I32RemS)
+    is NumericInstruction.I32RemU -> nonCommutativeBinop(index, instruction, input, output, ::I32RemU)
+    is NumericInstruction.I32Rotl -> nonCommutativeBinop(index, instruction, input, output, ::I32Rotl)
+    is NumericInstruction.I32Rotr -> nonCommutativeBinop(index, instruction, input, output, ::I32Rotr)
+    is NumericInstruction.I64And -> commutativeBinop(index, instruction, input, output, ::I64And)
+    is NumericInstruction.I64Or -> commutativeBinop(index, instruction, input, output, ::I64Or)
+    is NumericInstruction.I64Xor -> commutativeBinop(index, instruction, input, output, ::I64Xor)
+    is NumericInstruction.I64RemS -> nonCommutativeBinop(index, instruction, input, output, ::I64RemS)
+    is NumericInstruction.I64RemU -> nonCommutativeBinop(index, instruction, input, output, ::I64RemU)
+    is NumericInstruction.I64Rotl -> nonCommutativeBinop(index, instruction, input, output, ::I64Rotl)
+    is NumericInstruction.I64Rotr -> nonCommutativeBinop(index, instruction, input, output, ::I64Rotr)
+    is NumericInstruction.I64Shl -> nonCommutativeBinop(index, instruction, input, output, ::I64Shl)
+    is NumericInstruction.I64ShrS -> nonCommutativeBinop(index, instruction, input, output, ::I64ShrS)
+    is NumericInstruction.I64ShrU -> nonCommutativeBinop(index, instruction, input, output, ::I64ShrU)
+    is NumericInstruction.F32Min -> commutativeBinop(index, instruction, input, output, ::F32Min)
+    is NumericInstruction.F32Max -> commutativeBinop(index, instruction, input, output, ::F32Max)
+    is NumericInstruction.F32Copysign -> nonCommutativeBinop(index, instruction, input, output, ::F32Copysign)
+    is NumericInstruction.F64Min -> commutativeBinop(index, instruction, input, output, ::F64Min)
+    is NumericInstruction.F64Max -> commutativeBinop(index, instruction, input, output, ::F64Max)
+    is NumericInstruction.F64Copysign -> nonCommutativeBinop(index, instruction, input, output, ::F64Copysign)
     else -> {
         output.add(instruction)
         index
