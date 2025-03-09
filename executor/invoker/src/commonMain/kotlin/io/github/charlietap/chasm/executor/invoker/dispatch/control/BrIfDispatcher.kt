@@ -15,6 +15,6 @@ fun BrIfDispatcher(
 internal inline fun BrIfDispatcher(
     instruction: ControlInstruction.BrIf,
     crossinline executor: Executor<ControlInstruction.BrIf>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

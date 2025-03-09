@@ -15,6 +15,6 @@ fun ThrowDispatcher(
 internal inline fun ThrowDispatcher(
     instruction: ControlInstruction.Throw,
     crossinline executor: Executor<ControlInstruction.Throw>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun IfDispatcher(
 internal inline fun IfDispatcher(
     instruction: FusedControlInstruction.If,
     crossinline executor: Executor<FusedControlInstruction.If>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

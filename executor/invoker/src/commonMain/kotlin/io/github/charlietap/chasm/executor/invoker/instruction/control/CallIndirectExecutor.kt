@@ -11,14 +11,23 @@ import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 
 internal fun CallIndirectExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.CallIndirect,
 ) = CallIndirectExecutor(
+    vstack = vstack,
+    cstack = cstack,
+    store = store,
     context = context,
     table = instruction.table,
     type = instruction.type,
@@ -28,6 +37,9 @@ internal fun CallIndirectExecutor(
 )
 
 internal inline fun CallIndirectExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     table: TableInstance,
     type: DefinedType,
@@ -35,10 +47,7 @@ internal inline fun CallIndirectExecutor(
     crossinline wasmFunctionCall: WasmFunctionCall,
     crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
 ) {
-    val stack = context.vstack
-    val store = context.store
-
-    val elementIndex = stack.popI32()
+    val elementIndex = vstack.popI32()
     val address = table.element(elementIndex).toFunctionAddress()
 
     val functionInstance = store.function(address)
@@ -47,7 +56,7 @@ internal inline fun CallIndirectExecutor(
     }
 
     when (functionInstance) {
-        is FunctionInstance.HostFunction -> hostFunctionCall(context, functionInstance)
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(context, functionInstance)
+        is FunctionInstance.HostFunction -> hostFunctionCall(vstack, cstack, store, context, functionInstance)
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(vstack, cstack, store, context, functionInstance)
     }
 }

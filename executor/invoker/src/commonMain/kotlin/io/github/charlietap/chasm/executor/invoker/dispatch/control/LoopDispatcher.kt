@@ -15,6 +15,6 @@ fun LoopDispatcher(
 internal inline fun LoopDispatcher(
     instruction: ControlInstruction.Loop,
     crossinline executor: Executor<ControlInstruction.Loop>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

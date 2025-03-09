@@ -6,25 +6,34 @@ import io.github.charlietap.chasm.runtime.ext.field
 import io.github.charlietap.chasm.runtime.ext.popStructAddress
 import io.github.charlietap.chasm.runtime.ext.struct
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun StructGetExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: AggregateInstruction.StructGet,
 ) = StructGetExecutor(
+    vstack = vstack,
+    cstack = cstack,
+    store = store,
     context = context,
     fieldIndex = instruction.fieldIndex,
 )
 
 internal inline fun StructGetExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     fieldIndex: Index.FieldIndex,
 ) {
-    val store = context.store
-    val stack = context.vstack
-
-    val address = stack.popStructAddress()
+    val address = vstack.popStructAddress()
     val structInstance = store.struct(address)
     val fieldValue = structInstance.field(fieldIndex)
 
-    stack.push(fieldValue)
+    vstack.push(fieldValue)
 }

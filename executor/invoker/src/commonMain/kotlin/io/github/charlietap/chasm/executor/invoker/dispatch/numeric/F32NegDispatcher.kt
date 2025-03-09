@@ -15,6 +15,6 @@ fun F32NegDispatcher(
 internal inline fun F32NegDispatcher(
     instruction: NumericInstruction.F32Neg,
     crossinline executor: Executor<NumericInstruction.F32Neg>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

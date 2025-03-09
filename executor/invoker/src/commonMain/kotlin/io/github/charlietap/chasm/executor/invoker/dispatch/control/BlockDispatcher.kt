@@ -15,6 +15,6 @@ fun BlockDispatcher(
 internal inline fun BlockDispatcher(
     instruction: ControlInstruction.Block,
     crossinline executor: Executor<ControlInstruction.Block>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -6,22 +6,27 @@ import io.github.charlietap.chasm.runtime.ext.pushReference
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 
 internal fun ExternConvertAnyExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: AggregateInstruction.ExternConvertAny,
 ) {
-    val stack = context.vstack
-    val referenceValue = stack.pop()
+    val referenceValue = vstack.pop()
     when {
         referenceValue.isNullableReference() -> {
-            stack.push(ReferenceValue.Null(AbstractHeapType.Extern).toLong())
+            vstack.push(ReferenceValue.Null(AbstractHeapType.Extern).toLong())
         }
         else -> {
             val extern = referenceValue.toReferenceValue()
-            stack.pushReference(ReferenceValue.Extern(extern))
+            vstack.pushReference(ReferenceValue.Extern(extern))
         }
     }
 }

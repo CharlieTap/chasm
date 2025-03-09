@@ -15,6 +15,6 @@ fun I32GeSDispatcher(
 internal inline fun I32GeSDispatcher(
     instruction: FusedNumericInstruction.I32GeS,
     crossinline executor: Executor<FusedNumericInstruction.I32GeS>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

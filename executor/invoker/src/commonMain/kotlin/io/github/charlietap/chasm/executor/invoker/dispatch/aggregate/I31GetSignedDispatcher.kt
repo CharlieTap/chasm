@@ -15,6 +15,6 @@ fun I31GetSignedDispatcher(
 internal inline fun I31GetSignedDispatcher(
     instruction: AggregateInstruction.I31GetSigned,
     crossinline executor: Executor<AggregateInstruction.I31GetSigned>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -2,16 +2,20 @@ package io.github.charlietap.chasm.executor.invoker.instruction.numericfused.uno
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 import kotlin.math.absoluteValue
 
 internal inline fun F32AbsExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: FusedNumericInstruction.F32Abs,
 ) {
-    val stack = context.vstack
-
-    val float = Float.fromBits(instruction.operand(stack).toInt())
+    val float = Float.fromBits(instruction.operand(vstack).toInt())
     val result = float.absoluteValue.toRawBits().toLong()
 
-    instruction.destination(result, stack)
+    instruction.destination(result, vstack)
 }

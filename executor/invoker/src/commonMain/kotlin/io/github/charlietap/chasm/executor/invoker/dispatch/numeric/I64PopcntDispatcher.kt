@@ -15,6 +15,6 @@ fun I64PopcntDispatcher(
 internal inline fun I64PopcntDispatcher(
     instruction: NumericInstruction.I64Popcnt,
     crossinline executor: Executor<NumericInstruction.I64Popcnt>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

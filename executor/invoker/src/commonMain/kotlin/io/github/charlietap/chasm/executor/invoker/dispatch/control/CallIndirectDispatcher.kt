@@ -15,6 +15,6 @@ fun CallIndirectDispatcher(
 internal inline fun CallIndirectDispatcher(
     instruction: ControlInstruction.CallIndirect,
     crossinline executor: Executor<ControlInstruction.CallIndirect>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

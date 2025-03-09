@@ -5,16 +5,22 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I32RemSExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RemS,
 ) {
-    val operand = context.vstack.peekNthI32(0)
+    val operand = vstack.peekNthI32(0)
 
     if (operand == 0) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }
 
-    context.vstack.binaryOperation(Int::rem)
+    vstack.binaryOperation(Int::rem)
 }

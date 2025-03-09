@@ -5,17 +5,20 @@ import io.github.charlietap.chasm.runtime.ext.field
 import io.github.charlietap.chasm.runtime.ext.struct
 import io.github.charlietap.chasm.runtime.ext.toStructAddress
 import io.github.charlietap.chasm.runtime.instruction.FusedAggregateInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun StructGetExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: FusedAggregateInstruction.StructGet,
 ) {
-    val store = context.store
-    val stack = context.vstack
-
-    val address = instruction.address(stack).toStructAddress()
+    val address = instruction.address(vstack).toStructAddress()
     val structInstance = store.struct(address)
     val fieldValue = structInstance.field(instruction.fieldIndex)
 
-    instruction.destination(fieldValue, stack)
+    instruction.destination(fieldValue, vstack)
 }

@@ -15,6 +15,6 @@ fun ArrayCopyDispatcher(
 internal inline fun ArrayCopyDispatcher(
     instruction: AggregateInstruction.ArrayCopy,
     crossinline executor: Executor<AggregateInstruction.ArrayCopy>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

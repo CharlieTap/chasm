@@ -15,6 +15,6 @@ fun I64Extend8SDispatcher(
 internal inline fun I64Extend8SDispatcher(
     instruction: FusedNumericInstruction.I64Extend8S,
     crossinline executor: Executor<FusedNumericInstruction.I64Extend8S>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

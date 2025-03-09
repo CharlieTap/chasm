@@ -6,19 +6,23 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.array
 import io.github.charlietap.chasm.runtime.ext.popArrayAddress
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun ArrayInitElementExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayInitElement,
 ) {
-    val stack = context.vstack
-    val store = context.store
     val elementInstance = instruction.elementInstance
 
-    val elementsToCopy = stack.popI32()
-    val sourceOffsetInElementSegment = stack.popI32()
-    val destinationOffsetInArray = stack.popI32()
-    val address = stack.popArrayAddress()
+    val elementsToCopy = vstack.popI32()
+    val sourceOffsetInElementSegment = vstack.popI32()
+    val destinationOffsetInArray = vstack.popI32()
+    val address = vstack.popArrayAddress()
     val arrayInstance = store.array(address)
 
     try {

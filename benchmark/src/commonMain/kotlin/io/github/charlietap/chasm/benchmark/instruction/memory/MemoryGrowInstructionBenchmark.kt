@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instruction.memoryGrowRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -35,9 +36,14 @@ import kotlinx.benchmark.Warmup
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 class MemoryGrowInstructionBenchmark {
 
+    private val vstack = vstack()
+    private val cstack = cstack()
+    private val store = store()
+
     private val context = executionContext(
-        cstack = cstack(),
-        store = store(),
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
         instance = moduleInstance(),
     )
 
@@ -77,7 +83,7 @@ class MemoryGrowInstructionBenchmark {
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
         context.vstack.pushI32(pagesToGrow)
-        val result = MemoryGrowExecutor(context, instruction)
+        val result = MemoryGrowExecutor(vstack, cstack, store, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

@@ -15,6 +15,6 @@ fun I32WrapI64Dispatcher(
 internal inline fun I32WrapI64Dispatcher(
     instruction: FusedNumericInstruction.I32WrapI64,
     crossinline executor: Executor<FusedNumericInstruction.I32WrapI64>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

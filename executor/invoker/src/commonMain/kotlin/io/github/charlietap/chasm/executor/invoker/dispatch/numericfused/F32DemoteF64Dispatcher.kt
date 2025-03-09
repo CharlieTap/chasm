@@ -15,6 +15,6 @@ fun F32DemoteF64Dispatcher(
 internal inline fun F32DemoteF64Dispatcher(
     instruction: FusedNumericInstruction.F32DemoteF64,
     crossinline executor: Executor<FusedNumericInstruction.F32DemoteF64>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

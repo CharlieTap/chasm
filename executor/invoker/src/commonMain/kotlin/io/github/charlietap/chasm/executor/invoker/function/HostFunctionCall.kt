@@ -8,16 +8,19 @@ import io.github.charlietap.chasm.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.HostFunctionContext
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
-internal typealias HostFunctionCall = (ExecutionContext, FunctionInstance.HostFunction) -> Unit
+internal typealias HostFunctionCall = (ValueStack, ControlStack, Store, ExecutionContext, FunctionInstance.HostFunction) -> Unit
 
 internal fun HostFunctionCall(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     function: FunctionInstance.HostFunction,
 ) {
-    val cstack = context.cstack
-    val vstack = context.vstack
-    val store = context.store
     val frame = cstack.peekFrame()
     val type = function.functionType
 

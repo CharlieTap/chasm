@@ -15,6 +15,6 @@ fun MemorySizeDispatcher(
 internal inline fun MemorySizeDispatcher(
     instruction: MemoryInstruction.MemorySize,
     crossinline executor: Executor<MemoryInstruction.MemorySize>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

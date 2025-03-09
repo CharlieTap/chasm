@@ -5,14 +5,23 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.DefinedType
 
 internal fun ArrayNewFixedExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewFixed,
 ) = ArrayNewFixedExecutor(
+    vstack = vstack,
+    cstack = cstack,
+    store = store,
     context = context,
     definedType = instruction.definedType,
     arrayType = instruction.arrayType,
@@ -20,18 +29,18 @@ internal fun ArrayNewFixedExecutor(
 )
 
 internal inline fun ArrayNewFixedExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     definedType: DefinedType,
     arrayType: ArrayType,
     size: Int,
 ) {
-    val store = context.store
-    val stack = context.vstack
-
     val fields = LongArray(size)
     var index = size - 1
     while (index >= 0) {
-        fields[index] = stack.pop()
+        fields[index] = vstack.pop()
         index--
     }
 
@@ -39,5 +48,5 @@ internal inline fun ArrayNewFixedExecutor(
     store.arrays.add(instance)
     val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 
-    stack.push(reference.toLong())
+    vstack.push(reference.toLong())
 }

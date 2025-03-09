@@ -15,6 +15,6 @@ fun I32EqzDispatcher(
 internal inline fun I32EqzDispatcher(
     instruction: FusedNumericInstruction.I32Eqz,
     crossinline executor: Executor<FusedNumericInstruction.I32Eqz>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun I64Store16Dispatcher(
 internal inline fun I64Store16Dispatcher(
     instruction: FusedMemoryInstruction.I64Store16,
     crossinline executor: Executor<FusedMemoryInstruction.I64Store16>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

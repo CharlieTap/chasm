@@ -5,20 +5,23 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instruction.FusedAggregateInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 internal inline fun ArrayNewFixedExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: FusedAggregateInstruction.ArrayNewFixed,
 ) {
-    val store = context.store
-    val stack = context.vstack
-
     val size = instruction.size
     val fields = LongArray(size)
     var index = size - 1
     while (index >= 0) {
-        fields[index] = stack.pop()
+        fields[index] = vstack.pop()
         index--
     }
 
@@ -26,5 +29,5 @@ internal inline fun ArrayNewFixedExecutor(
     store.arrays.add(instance)
     val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 
-    instruction.destination(reference.toLong(), stack)
+    instruction.destination(reference.toLong(), vstack)
 }

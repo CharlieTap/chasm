@@ -15,6 +15,6 @@ fun BrOnCastDispatcher(
 internal inline fun BrOnCastDispatcher(
     instruction: ControlInstruction.BrOnCast,
     crossinline executor: Executor<ControlInstruction.BrOnCast>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun ArrayNewDispatcher(
 internal inline fun ArrayNewDispatcher(
     instruction: FusedAggregateInstruction.ArrayNew,
     crossinline executor: Executor<FusedAggregateInstruction.ArrayNew>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

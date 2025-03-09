@@ -15,6 +15,6 @@ fun I64RemSDispatcher(
 internal inline fun I64RemSDispatcher(
     instruction: FusedNumericInstruction.I64RemS,
     crossinline executor: Executor<FusedNumericInstruction.I64RemS>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

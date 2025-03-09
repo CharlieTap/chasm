@@ -15,6 +15,6 @@ fun F32EqDispatcher(
 internal inline fun F32EqDispatcher(
     instruction: FusedNumericInstruction.F32Eq,
     crossinline executor: Executor<FusedNumericInstruction.F32Eq>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

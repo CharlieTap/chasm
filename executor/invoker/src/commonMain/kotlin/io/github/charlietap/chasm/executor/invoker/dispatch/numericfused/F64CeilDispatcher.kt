@@ -15,6 +15,6 @@ fun F64CeilDispatcher(
 internal inline fun F64CeilDispatcher(
     instruction: FusedNumericInstruction.F64Ceil,
     crossinline executor: Executor<FusedNumericInstruction.F64Ceil>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

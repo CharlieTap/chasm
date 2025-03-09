@@ -15,6 +15,6 @@ fun ArraySetDispatcher(
 internal inline fun ArraySetDispatcher(
     instruction: FusedAggregateInstruction.ArraySet,
     crossinline executor: Executor<FusedAggregateInstruction.ArraySet>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

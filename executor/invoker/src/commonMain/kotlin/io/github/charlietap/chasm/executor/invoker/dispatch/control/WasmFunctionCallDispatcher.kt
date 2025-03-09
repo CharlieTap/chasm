@@ -16,6 +16,6 @@ fun WasmFunctionCallDispatcher(
 internal inline fun WasmFunctionCallDispatcher(
     instruction: ControlInstruction.WasmFunctionCall,
     crossinline executor: Executor<WasmFunction>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction.instance)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction.instance)
 }

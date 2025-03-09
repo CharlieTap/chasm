@@ -5,13 +5,18 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun RefAsNonNullExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefAsNonNull,
 ) {
-    val stack = context.vstack
-    val value = stack.peek()
+    val value = vstack.peek()
 
     if (value.isNullableReference()) {
         throw InvocationException(InvocationError.NonNullReferenceExpected)

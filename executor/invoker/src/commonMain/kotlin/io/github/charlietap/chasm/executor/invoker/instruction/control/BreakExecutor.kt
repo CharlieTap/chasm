@@ -6,15 +6,19 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal typealias BreakExecutor = (ControlStack, ValueStack, Index.LabelIndex) -> Unit
 
 internal inline fun BreakExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.Br,
 ) = BreakExecutor(
-    controlStack = context.cstack,
-    valueStack = context.vstack,
+    controlStack = cstack,
+    valueStack = vstack,
     labelIndex = instruction.labelIndex,
 )
 

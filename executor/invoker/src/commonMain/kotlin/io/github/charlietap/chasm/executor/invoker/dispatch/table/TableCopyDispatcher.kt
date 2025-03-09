@@ -15,6 +15,6 @@ fun TableCopyDispatcher(
 internal inline fun TableCopyDispatcher(
     instruction: TableInstruction.TableCopy,
     crossinline executor: Executor<TableInstruction.TableCopy>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

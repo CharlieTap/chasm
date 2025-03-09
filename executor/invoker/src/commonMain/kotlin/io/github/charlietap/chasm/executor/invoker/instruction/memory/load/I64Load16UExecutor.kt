@@ -7,12 +7,21 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I64Load16UExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load16U,
 ) =
     I64Load16UExecutor(
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
         context = context,
         instruction = instruction,
         boundsChecker = ::OptimisticBoundsChecker,
@@ -20,15 +29,17 @@ internal inline fun I64Load16UExecutor(
     )
 
 internal inline fun I64Load16UExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load16U,
     crossinline boundsChecker: BoundsChecker<Long>,
     crossinline reader: I6416UReader,
 ) {
-    val stack = context.vstack
     val memory = instruction.memory
 
-    val baseAddress = stack.popI32()
+    val baseAddress = vstack.popI32()
     val offset = instruction.memArg.offset
     val effectiveAddress = baseAddress + offset
 
@@ -40,5 +51,5 @@ internal inline fun I64Load16UExecutor(
         reader(memory.data, effectiveAddress)
     }
 
-    stack.pushI64(result)
+    vstack.pushI64(result)
 }

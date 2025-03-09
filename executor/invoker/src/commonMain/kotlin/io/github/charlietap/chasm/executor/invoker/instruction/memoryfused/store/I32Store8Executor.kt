@@ -5,12 +5,21 @@ import io.github.charlietap.chasm.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.memory.write.I32ToI8Writer
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.FusedMemoryInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 fun I32Store8Executor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: FusedMemoryInstruction.I32Store8,
 ) =
     I32Store8Executor(
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
         context = context,
         instruction = instruction,
         boundsChecker = ::PessimisticBoundsChecker,
@@ -18,16 +27,18 @@ fun I32Store8Executor(
     )
 
 internal inline fun I32Store8Executor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: FusedMemoryInstruction.I32Store8,
     crossinline boundsChecker: BoundsChecker<Unit>,
     crossinline writer: I32ToI8Writer,
 ) {
-    val stack = context.vstack
     val memory = instruction.memory
 
-    val valueToStore = instruction.value(stack).toInt()
-    val baseAddress = instruction.address(stack).toInt()
+    val valueToStore = instruction.value(vstack).toInt()
+    val baseAddress = instruction.address(vstack).toInt()
     val effectiveAddress = baseAddress + instruction.memArg.offset
 
     boundsChecker(effectiveAddress, Byte.SIZE_BYTES, memory.size) {

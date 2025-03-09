@@ -15,6 +15,6 @@ fun I32Load16SDispatcher(
 internal inline fun I32Load16SDispatcher(
     instruction: MemoryInstruction.I32Load16S,
     crossinline executor: Executor<MemoryInstruction.I32Load16S>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

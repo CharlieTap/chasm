@@ -15,6 +15,6 @@ fun F64ConvertI32SDispatcher(
 internal inline fun F64ConvertI32SDispatcher(
     instruction: NumericInstruction.F64ConvertI32S,
     crossinline executor: Executor<NumericInstruction.F64ConvertI32S>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

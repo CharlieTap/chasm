@@ -8,22 +8,25 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 internal inline fun ArrayNewDataExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewData,
 ) {
-    val stack = context.vstack
-    val store = context.store
-
     val arrayType = instruction.arrayType
     val dataInstance = instruction.dataInstance
     val byteArray = dataInstance.bytes
     val fieldWidthInBytes = instruction.fieldWidthInBytes
 
-    val arrayLength = stack.popI32()
-    val arrayStartOffsetInSegment = stack.popI32()
+    val arrayLength = vstack.popI32()
+    val arrayStartOffsetInSegment = vstack.popI32()
 
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * fieldWidthInBytes)
     if (arrayEndOffsetInSegment > byteArray.size) {
@@ -39,5 +42,5 @@ internal inline fun ArrayNewDataExecutor(
     store.arrays.add(instance)
     val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 
-    stack.push(reference.toLong())
+    vstack.push(reference.toLong())
 }

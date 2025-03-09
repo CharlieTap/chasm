@@ -15,6 +15,6 @@ fun DataDropDispatcher(
 internal inline fun DataDropDispatcher(
     instruction: MemoryInstruction.DataDrop,
     crossinline executor: Executor<MemoryInstruction.DataDrop>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

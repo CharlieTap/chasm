@@ -15,6 +15,6 @@ fun GlobalGetDispatcher(
 internal inline fun GlobalGetDispatcher(
     instruction: VariableInstruction.GlobalGet,
     crossinline executor: Executor<VariableInstruction.GlobalGet>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

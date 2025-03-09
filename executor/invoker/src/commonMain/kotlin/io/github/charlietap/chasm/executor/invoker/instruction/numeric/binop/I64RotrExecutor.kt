@@ -4,10 +4,16 @@ import io.github.charlietap.chasm.executor.invoker.ext.rotateRight
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I64RotrExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: NumericInstruction.I64Rotr,
 ) {
-    context.vstack.binaryOperation(Long::rotateRight)
+    vstack.binaryOperation(Long::rotateRight)
 }

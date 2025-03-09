@@ -15,6 +15,6 @@ fun F32LeDispatcher(
 internal inline fun F32LeDispatcher(
     instruction: NumericInstruction.F32Le,
     crossinline executor: Executor<NumericInstruction.F32Le>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

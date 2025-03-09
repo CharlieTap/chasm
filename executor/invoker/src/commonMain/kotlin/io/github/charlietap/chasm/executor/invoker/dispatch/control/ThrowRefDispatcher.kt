@@ -15,6 +15,6 @@ fun ThrowRefDispatcher(
 internal inline fun ThrowRefDispatcher(
     instruction: ControlInstruction.ThrowRef,
     crossinline executor: Executor<ControlInstruction.ThrowRef>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

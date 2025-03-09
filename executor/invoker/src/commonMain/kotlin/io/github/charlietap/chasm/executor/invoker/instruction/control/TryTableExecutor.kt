@@ -6,24 +6,32 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.StackDepths
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun TryTableExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.TryTable,
 ) = TryTableExecutor(
+    vstack = vstack,
+    cstack = cstack,
+    store = store,
     context = context,
     instruction = instruction,
     blockExecutor = ::InstructionBlockExecutor,
 )
 
 internal inline fun TryTableExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.TryTable,
     crossinline blockExecutor: InstructionBlockExecutor,
 ) {
-    val cstack = context.cstack
-    val vstack = context.vstack
-
     val label = ControlStack.Entry.Label(
         arity = instruction.results,
         depths = StackDepths(

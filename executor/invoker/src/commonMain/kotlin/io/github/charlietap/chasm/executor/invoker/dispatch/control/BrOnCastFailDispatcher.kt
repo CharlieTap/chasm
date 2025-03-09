@@ -15,6 +15,6 @@ fun BrOnCastFailDispatcher(
 internal inline fun BrOnCastFailDispatcher(
     instruction: ControlInstruction.BrOnCastFail,
     crossinline executor: Executor<ControlInstruction.BrOnCastFail>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

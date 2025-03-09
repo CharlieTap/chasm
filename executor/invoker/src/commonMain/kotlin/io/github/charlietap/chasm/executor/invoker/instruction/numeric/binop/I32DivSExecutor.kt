@@ -5,21 +5,26 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I32DivSExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: NumericInstruction.I32DivS,
 ) {
-    val stack = context.vstack
-    val operand1 = stack.peekNthI32(1)
-    val operand2 = stack.peekNthI32(0)
+    val operand1 = vstack.peekNthI32(1)
+    val operand2 = vstack.peekNthI32(0)
 
     if (operand1 == Int.MIN_VALUE && operand2 == -1) {
         throw InvocationException(InvocationError.IntegerOverflow)
     }
 
     try {
-        stack.binaryOperation(Int::div)
+        vstack.binaryOperation(Int::div)
     } catch (_: ArithmeticException) {
         throw InvocationException(InvocationError.CannotDivideIntegerByZero)
     }

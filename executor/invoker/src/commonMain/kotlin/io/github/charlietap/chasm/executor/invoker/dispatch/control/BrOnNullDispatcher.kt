@@ -15,6 +15,6 @@ fun BrOnNullDispatcher(
 internal inline fun BrOnNullDispatcher(
     instruction: ControlInstruction.BrOnNull,
     crossinline executor: Executor<ControlInstruction.BrOnNull>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

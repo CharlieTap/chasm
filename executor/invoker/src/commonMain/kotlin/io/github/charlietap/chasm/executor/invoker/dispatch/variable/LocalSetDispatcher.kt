@@ -15,6 +15,6 @@ fun LocalSetDispatcher(
 internal inline fun LocalSetDispatcher(
     instruction: VariableInstruction.LocalSet,
     crossinline executor: Executor<VariableInstruction.LocalSet>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

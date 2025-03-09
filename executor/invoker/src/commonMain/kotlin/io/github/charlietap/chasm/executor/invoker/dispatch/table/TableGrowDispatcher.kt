@@ -15,6 +15,6 @@ fun TableGrowDispatcher(
 internal inline fun TableGrowDispatcher(
     instruction: TableInstruction.TableGrow,
     crossinline executor: Executor<TableInstruction.TableGrow>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

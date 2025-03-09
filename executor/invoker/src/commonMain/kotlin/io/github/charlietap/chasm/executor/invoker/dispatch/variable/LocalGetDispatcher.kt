@@ -15,6 +15,6 @@ fun LocalGetDispatcher(
 internal inline fun LocalGetDispatcher(
     instruction: VariableInstruction.LocalGet,
     crossinline executor: Executor<VariableInstruction.LocalGet>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

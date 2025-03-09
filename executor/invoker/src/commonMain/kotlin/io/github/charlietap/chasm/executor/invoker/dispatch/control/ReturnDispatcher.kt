@@ -15,6 +15,6 @@ fun ReturnDispatcher(
 internal inline fun ReturnDispatcher(
     instruction: ControlInstruction.Return,
     crossinline executor: Executor<ControlInstruction.Return>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun StructNewDefaultDispatcher(
 internal inline fun StructNewDefaultDispatcher(
     instruction: AggregateInstruction.StructNewDefault,
     crossinline executor: Executor<AggregateInstruction.StructNewDefault>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun I32Load8UDispatcher(
 internal inline fun I32Load8UDispatcher(
     instruction: MemoryInstruction.I32Load8U,
     crossinline executor: Executor<MemoryInstruction.I32Load8U>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

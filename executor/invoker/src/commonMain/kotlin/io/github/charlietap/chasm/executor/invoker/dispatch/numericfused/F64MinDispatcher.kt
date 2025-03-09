@@ -15,6 +15,6 @@ fun F64MinDispatcher(
 internal inline fun F64MinDispatcher(
     instruction: FusedNumericInstruction.F64Min,
     crossinline executor: Executor<FusedNumericInstruction.F64Min>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

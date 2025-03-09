@@ -70,6 +70,9 @@ class HostFunctionCallTest {
         vstack.pushI64(116)
 
         val actual = HostFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
             context = context,
             function = functionInstance,
         )

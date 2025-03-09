@@ -15,6 +15,6 @@ fun F64GeDispatcher(
 internal inline fun F64GeDispatcher(
     instruction: FusedNumericInstruction.F64Ge,
     crossinline executor: Executor<FusedNumericInstruction.F64Ge>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

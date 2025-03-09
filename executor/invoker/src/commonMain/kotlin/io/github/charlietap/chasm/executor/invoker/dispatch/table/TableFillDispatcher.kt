@@ -15,6 +15,6 @@ fun TableFillDispatcher(
 internal inline fun TableFillDispatcher(
     instruction: TableInstruction.TableFill,
     crossinline executor: Executor<TableInstruction.TableFill>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun I64XorDispatcher(
 internal inline fun I64XorDispatcher(
     instruction: NumericInstruction.I64Xor,
     crossinline executor: Executor<NumericInstruction.I64Xor>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

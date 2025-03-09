@@ -15,6 +15,6 @@ fun I64RotlDispatcher(
 internal inline fun I64RotlDispatcher(
     instruction: NumericInstruction.I64Rotl,
     crossinline executor: Executor<NumericInstruction.I64Rotl>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

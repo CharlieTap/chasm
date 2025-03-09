@@ -3,20 +3,24 @@ package io.github.charlietap.chasm.executor.invoker.instruction.reference
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun RefEqExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefEq,
 ) {
-    val stack = context.vstack
-
-    val reference1 = stack.pop()
-    val reference2 = stack.pop()
+    val reference1 = vstack.pop()
+    val reference2 = vstack.pop()
 
     val bothTypesAreNull = reference1.isNullableReference() && reference2.isNullableReference()
     if (bothTypesAreNull || reference1 == reference2) {
-        stack.push(1L)
+        vstack.push(1L)
     } else {
-        stack.push(0L)
+        vstack.push(0L)
     }
 }

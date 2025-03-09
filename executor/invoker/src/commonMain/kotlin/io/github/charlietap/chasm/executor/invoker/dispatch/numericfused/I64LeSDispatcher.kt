@@ -15,6 +15,6 @@ fun I64LeSDispatcher(
 internal inline fun I64LeSDispatcher(
     instruction: FusedNumericInstruction.I64LeS,
     crossinline executor: Executor<FusedNumericInstruction.I64LeS>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

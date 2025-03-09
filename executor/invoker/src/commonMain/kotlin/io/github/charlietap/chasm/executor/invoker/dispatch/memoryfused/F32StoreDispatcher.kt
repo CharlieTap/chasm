@@ -15,6 +15,6 @@ fun F32StoreDispatcher(
 internal inline fun F32StoreDispatcher(
     instruction: FusedMemoryInstruction.F32Store,
     crossinline executor: Executor<FusedMemoryInstruction.F32Store>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

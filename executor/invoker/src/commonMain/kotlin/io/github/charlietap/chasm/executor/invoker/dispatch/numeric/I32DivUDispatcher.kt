@@ -15,6 +15,6 @@ fun I32DivUDispatcher(
 internal inline fun I32DivUDispatcher(
     instruction: NumericInstruction.I32DivU,
     crossinline executor: Executor<NumericInstruction.I32DivU>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

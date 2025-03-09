@@ -6,18 +6,21 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.array
 import io.github.charlietap.chasm.runtime.ext.toArrayAddress
 import io.github.charlietap.chasm.runtime.instruction.FusedAggregateInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun ArrayFillExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: FusedAggregateInstruction.ArrayFill,
 ) {
-    val store = context.store
-    val stack = context.vstack
-
-    val elementsToFill = instruction.elementsToFill(stack).toInt()
-    val fillValue = instruction.fillValue(stack)
-    val arrayElementOffset = instruction.arrayElementOffset(stack).toInt()
-    val address = instruction.address(stack).toArrayAddress()
+    val elementsToFill = instruction.elementsToFill(vstack).toInt()
+    val fillValue = instruction.fillValue(vstack)
+    val arrayElementOffset = instruction.arrayElementOffset(vstack).toInt()
+    val address = instruction.address(vstack).toArrayAddress()
     val arrayInstance = store.array(address)
 
     try {

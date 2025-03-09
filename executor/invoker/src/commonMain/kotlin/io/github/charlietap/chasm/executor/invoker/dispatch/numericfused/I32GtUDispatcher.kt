@@ -15,6 +15,6 @@ fun I32GtUDispatcher(
 internal inline fun I32GtUDispatcher(
     instruction: FusedNumericInstruction.I32GtU,
     crossinline executor: Executor<FusedNumericInstruction.I32GtU>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

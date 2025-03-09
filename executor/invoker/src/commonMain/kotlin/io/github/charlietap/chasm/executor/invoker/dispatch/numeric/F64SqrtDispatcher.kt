@@ -15,6 +15,6 @@ fun F64SqrtDispatcher(
 internal inline fun F64SqrtDispatcher(
     instruction: NumericInstruction.F64Sqrt,
     crossinline executor: Executor<NumericInstruction.F64Sqrt>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

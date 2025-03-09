@@ -15,6 +15,6 @@ fun F64NegDispatcher(
 internal inline fun F64NegDispatcher(
     instruction: NumericInstruction.F64Neg,
     crossinline executor: Executor<NumericInstruction.F64Neg>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

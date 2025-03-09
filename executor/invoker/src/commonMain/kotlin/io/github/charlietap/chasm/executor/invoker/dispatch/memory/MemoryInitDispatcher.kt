@@ -15,6 +15,6 @@ fun MemoryInitDispatcher(
 internal inline fun MemoryInitDispatcher(
     instruction: MemoryInstruction.MemoryInit,
     crossinline executor: Executor<MemoryInstruction.MemoryInit>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

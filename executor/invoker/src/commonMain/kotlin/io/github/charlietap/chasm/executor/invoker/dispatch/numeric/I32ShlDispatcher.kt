@@ -15,6 +15,6 @@ fun I32ShlDispatcher(
 internal inline fun I32ShlDispatcher(
     instruction: NumericInstruction.I32Shl,
     crossinline executor: Executor<NumericInstruction.I32Shl>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

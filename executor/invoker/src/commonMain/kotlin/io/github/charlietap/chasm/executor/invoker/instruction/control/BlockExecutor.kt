@@ -12,12 +12,15 @@ import io.github.charlietap.chasm.runtime.store.Store
 internal typealias BlockExecutor = (Store, ControlStack, ValueStack, Int, Int, Array<DispatchableInstruction>) -> Unit
 
 internal inline fun BlockExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.Block,
 ) = BlockExecutor(
     store = context.store,
-    controlStack = context.cstack,
-    valueStack = context.vstack,
+    controlStack = cstack,
+    valueStack = vstack,
     params = instruction.params,
     results = instruction.results,
     instructions = instruction.instructions,

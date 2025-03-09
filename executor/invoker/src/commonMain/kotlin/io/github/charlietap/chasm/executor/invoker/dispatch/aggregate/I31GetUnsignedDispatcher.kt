@@ -15,6 +15,6 @@ fun I31GetUnsignedDispatcher(
 internal inline fun I31GetUnsignedDispatcher(
     instruction: AggregateInstruction.I31GetUnsigned,
     crossinline executor: Executor<AggregateInstruction.I31GetUnsigned>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

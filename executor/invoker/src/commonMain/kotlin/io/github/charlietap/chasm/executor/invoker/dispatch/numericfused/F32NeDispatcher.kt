@@ -15,6 +15,6 @@ fun F32NeDispatcher(
 internal inline fun F32NeDispatcher(
     instruction: FusedNumericInstruction.F32Ne,
     crossinline executor: Executor<FusedNumericInstruction.F32Ne>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

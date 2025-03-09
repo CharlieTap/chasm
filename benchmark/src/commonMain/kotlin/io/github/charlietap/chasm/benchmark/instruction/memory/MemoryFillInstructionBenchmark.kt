@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instruction.memoryFillRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -35,9 +36,14 @@ import kotlinx.benchmark.Warmup
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 class MemoryFillInstructionBenchmark {
 
+    private val vstack = vstack()
+    private val cstack = cstack()
+    private val store = store()
+
     private val context = executionContext(
-        cstack = cstack(),
-        store = store(),
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
         instance = moduleInstance(),
     )
 
@@ -81,7 +87,7 @@ class MemoryFillInstructionBenchmark {
         context.vstack.pushI32(offset)
         context.vstack.pushI32(fillValue)
         context.vstack.pushI32(bytesToFill)
-        val result = MemoryFillExecutor(context, instruction)
+        val result = MemoryFillExecutor(vstack, cstack, store, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

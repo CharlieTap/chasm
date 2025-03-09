@@ -4,18 +4,23 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.FusedTableInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun TableCopyExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: FusedTableInstruction.TableCopy,
 ) {
-    val stack = context.vstack
     val srcTableInstance = instruction.srcTable // taby
     val dstTableInstance = instruction.destTable // tabx
 
-    val elementsToCopy = instruction.elementsToCopy(stack).toInt()
-    val srcOffset = instruction.srcOffset(stack).toInt()
-    val dstOffset = instruction.dstOffset(stack).toInt()
+    val elementsToCopy = instruction.elementsToCopy(vstack).toInt()
+    val srcOffset = instruction.srcOffset(vstack).toInt()
+    val dstOffset = instruction.dstOffset(vstack).toInt()
 
     try {
         srcTableInstance.elements.copyInto(

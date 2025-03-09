@@ -15,6 +15,6 @@ fun F32ConvertI32UDispatcher(
 internal inline fun F32ConvertI32UDispatcher(
     instruction: FusedNumericInstruction.F32ConvertI32U,
     crossinline executor: Executor<FusedNumericInstruction.F32ConvertI32U>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

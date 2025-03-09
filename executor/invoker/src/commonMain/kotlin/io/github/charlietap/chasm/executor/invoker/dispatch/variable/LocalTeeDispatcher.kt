@@ -15,6 +15,6 @@ fun LocalTeeDispatcher(
 internal inline fun LocalTeeDispatcher(
     instruction: VariableInstruction.LocalTee,
     crossinline executor: Executor<VariableInstruction.LocalTee>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun I32PopcntDispatcher(
 internal inline fun I32PopcntDispatcher(
     instruction: FusedNumericInstruction.I32Popcnt,
     crossinline executor: Executor<FusedNumericInstruction.I32Popcnt>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

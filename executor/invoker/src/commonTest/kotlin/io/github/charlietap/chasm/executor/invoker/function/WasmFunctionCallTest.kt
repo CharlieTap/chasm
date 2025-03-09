@@ -108,6 +108,9 @@ class WasmFunctionCallTest {
         }
 
         val actual = WasmFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
             context = context,
             instance = functionInstance,
             instructionBlockExecutor = instructionBlockExecutor,
@@ -177,6 +180,9 @@ class WasmFunctionCallTest {
         )
 
         val actual = ReturnWasmFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
             context = context,
             instance = functionInstance,
         )

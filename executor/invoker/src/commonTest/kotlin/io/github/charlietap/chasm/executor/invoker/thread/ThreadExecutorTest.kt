@@ -22,11 +22,11 @@ class ThreadExecutorTest {
             instance = moduleInstance(),
         )
 
-        val instructionDispatchable = dispatchableInstruction { context ->
-            assertEquals(2, context.vstack.depth())
-            assertEquals(2, context.cstack.instructionsDepth())
-            context.vstack.clear()
-            context.vstack.pushI32(0)
+        val instructionDispatchable = dispatchableInstruction { vstack, cstack, store, context ->
+            assertEquals(2, vstack.depth())
+            assertEquals(2, cstack.instructionsDepth())
+            vstack.clear()
+            vstack.pushI32(0)
             Ok(Unit)
         }
         val thread = thread(
@@ -41,9 +41,9 @@ class ThreadExecutorTest {
             thread = thread,
         )
 
-        val frameDispatchable = dispatchableInstruction { context ->
-            context.cstack.popFrame()
-            assertEquals(1, context.cstack.instructionsDepth()) // exit loop instr
+        val frameDispatchable = dispatchableInstruction { vstack, cstack, store, context ->
+            cstack.popFrame()
+            assertEquals(1, cstack.instructionsDepth()) // exit loop instr
             Ok(Unit)
         }
         val params = mutableListOf<ExecutionValue>(i32(2), i32(3))

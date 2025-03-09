@@ -15,6 +15,6 @@ fun I32SubDispatcher(
 internal inline fun I32SubDispatcher(
     instruction: FusedNumericInstruction.I32Sub,
     crossinline executor: Executor<FusedNumericInstruction.I32Sub>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

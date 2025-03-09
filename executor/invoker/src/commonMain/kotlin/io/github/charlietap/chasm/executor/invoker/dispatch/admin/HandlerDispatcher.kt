@@ -16,6 +16,6 @@ internal fun HandlerDispatcher(
 internal inline fun HandlerDispatcher(
     handler: ExceptionHandler,
     crossinline executor: Executor<AdminInstruction.Handler>,
-): DispatchableInstruction = { context ->
-    executor(context, AdminInstruction.Handler(handler))
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, AdminInstruction.Handler(handler))
 }

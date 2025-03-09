@@ -8,28 +8,36 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.StackDepths
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
-internal typealias WasmFunctionCall = (ExecutionContext, FunctionInstance.WasmFunction) -> Unit
+internal typealias WasmFunctionCall = (ValueStack, ControlStack, Store, ExecutionContext, FunctionInstance.WasmFunction) -> Unit
 
 internal inline fun WasmFunctionCall(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
-) =
-    WasmFunctionCall(
-        context = context,
-        instance = instance,
-        instructionBlockExecutor = ::InstructionBlockExecutor,
-        frameCleaner = ::FrameInstructionExecutor,
-    )
+) = WasmFunctionCall(
+    vstack = vstack,
+    cstack = cstack,
+    store = store,
+    context = context,
+    instance = instance,
+    instructionBlockExecutor = ::InstructionBlockExecutor,
+    frameCleaner = ::FrameInstructionExecutor,
+)
 
 internal inline fun WasmFunctionCall(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
     crossinline instructionBlockExecutor: InstructionBlockExecutor,
     noinline frameCleaner: DispatchableInstruction,
 ) {
-    val cstack = context.cstack
-    val vstack = context.vstack
     val type = instance.functionType
     val params = type.params.types.size
     val results = type.results.types.size

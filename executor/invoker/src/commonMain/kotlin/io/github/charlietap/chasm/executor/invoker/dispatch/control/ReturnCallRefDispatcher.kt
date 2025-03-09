@@ -15,6 +15,6 @@ fun ReturnCallRefDispatcher(
 internal inline fun ReturnCallRefDispatcher(
     instruction: ControlInstruction.ReturnCallRef,
     crossinline executor: Executor<ControlInstruction.ReturnCallRef>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

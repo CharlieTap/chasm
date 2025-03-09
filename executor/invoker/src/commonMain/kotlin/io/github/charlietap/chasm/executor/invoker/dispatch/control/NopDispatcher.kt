@@ -15,6 +15,6 @@ fun NopDispatcher(
 internal inline fun NopDispatcher(
     instruction: ControlInstruction.Nop,
     crossinline executor: Executor<ControlInstruction.Nop>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

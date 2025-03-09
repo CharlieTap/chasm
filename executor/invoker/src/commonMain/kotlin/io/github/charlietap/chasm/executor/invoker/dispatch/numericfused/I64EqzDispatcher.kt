@@ -15,6 +15,6 @@ fun I64EqzDispatcher(
 internal inline fun I64EqzDispatcher(
     instruction: FusedNumericInstruction.I64Eqz,
     crossinline executor: Executor<FusedNumericInstruction.I64Eqz>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

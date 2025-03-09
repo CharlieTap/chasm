@@ -15,6 +15,6 @@ fun I32OrDispatcher(
 internal inline fun I32OrDispatcher(
     instruction: NumericInstruction.I32Or,
     crossinline executor: Executor<NumericInstruction.I32Or>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

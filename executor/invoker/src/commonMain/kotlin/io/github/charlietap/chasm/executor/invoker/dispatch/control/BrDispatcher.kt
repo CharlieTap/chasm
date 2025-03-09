@@ -15,6 +15,6 @@ fun BrDispatcher(
 internal inline fun BrDispatcher(
     instruction: ControlInstruction.Br,
     crossinline executor: Executor<ControlInstruction.Br>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun I32ConstDispatcher(
 internal inline fun I32ConstDispatcher(
     instruction: NumericInstruction.I32Const,
     crossinline executor: Executor<NumericInstruction.I32Const>,
-): DispatchableInstruction = { context ->
-    executor(context, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context ->
+    executor(vstack, cstack, store, context, instruction)
 }

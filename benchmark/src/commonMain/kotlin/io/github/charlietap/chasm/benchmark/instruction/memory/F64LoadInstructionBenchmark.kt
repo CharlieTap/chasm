@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.fixture.runtime.instruction.f64LoadRuntimeInst
 import io.github.charlietap.chasm.fixture.runtime.instruction.runtimeMemArg
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
+import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -36,9 +37,14 @@ import kotlinx.benchmark.Warmup
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 class F64LoadInstructionBenchmark {
 
+    private val vstack = vstack()
+    private val cstack = cstack()
+    private val store = store()
+
     private val context = executionContext(
-        cstack = cstack(),
-        store = store(),
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
         instance = moduleInstance(),
     )
 
@@ -79,7 +85,7 @@ class F64LoadInstructionBenchmark {
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
         context.vstack.pushI32(baseAddress)
-        val result = F64LoadExecutor(context, instruction)
+        val result = F64LoadExecutor(vstack, cstack, store, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

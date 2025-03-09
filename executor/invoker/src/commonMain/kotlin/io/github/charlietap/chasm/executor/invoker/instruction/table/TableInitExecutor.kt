@@ -4,18 +4,23 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
+import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun TableInitExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
     context: ExecutionContext,
     instruction: TableInstruction.TableInit,
 ) {
-    val stack = context.vstack
     val tableInstance = instruction.table
     val elementInstance = instruction.element
 
-    val elementsToInitialise = stack.popI32()
-    val segmentOffset = stack.popI32()
-    val tableOffset = stack.popI32()
+    val elementsToInitialise = vstack.popI32()
+    val segmentOffset = vstack.popI32()
+    val tableOffset = vstack.popI32()
 
     try {
         elementInstance.elements.copyInto(tableInstance.elements, tableOffset, segmentOffset, segmentOffset + elementsToInitialise)
