@@ -50,7 +50,7 @@ internal inline fun ReferenceInstructionFuser(
                     referenceType = instruction.referenceType,
                 )
                 else -> {
-                    output.removeLast()
+                    output.removeAt(output.lastIndex)
                     FusedReferenceInstruction.RefCast(
                         reference = reference,
                         destination = destination,
@@ -85,7 +85,7 @@ internal inline fun ReferenceInstructionFuser(
                     destination = destination,
                 )
                 reference2 == null -> {
-                    output.removeLast()
+                    output.removeAt(output.lastIndex)
                     FusedReferenceInstruction.RefEq(
                         reference1 = reference1,
                         reference2 = FusedOperand.ValueStack,
@@ -93,8 +93,8 @@ internal inline fun ReferenceInstructionFuser(
                     )
                 }
                 else -> {
-                    output.removeLast()
-                    output.removeLast()
+                    output.removeAt(output.lastIndex)
+                    output.removeAt(output.lastIndex)
                     FusedReferenceInstruction.RefEq(
                         reference1 = reference1,
                         reference2 = reference2,
@@ -127,7 +127,7 @@ internal inline fun ReferenceInstructionFuser(
                     destination = destination,
                 )
                 else -> {
-                    output.removeLast()
+                    output.removeAt(output.lastIndex)
                     FusedReferenceInstruction.RefIsNull(
                         value = value,
                         destination = destination,
@@ -182,7 +182,7 @@ internal inline fun ReferenceInstructionFuser(
                     referenceType = instruction.referenceType,
                 )
                 else -> {
-                    output.removeLast()
+                    output.removeAt(output.lastIndex)
                     FusedReferenceInstruction.RefTest(
                         reference = reference,
                         destination = destination,

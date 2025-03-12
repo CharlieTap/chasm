@@ -40,11 +40,11 @@ internal inline fun MemoryStoreFuser(
     val instruction = when {
         value == null -> instruction
         address == null -> {
-            output.removeLast()
+            output.removeAt(output.lastIndex)
             fusedInstructionFactory(value, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg)
         } else -> {
-            output.removeLast()
-            output.removeLast()
+            output.removeAt(output.lastIndex)
+            output.removeAt(output.lastIndex)
             fusedInstructionFactory(value, address, instruction.memoryIndex, instruction.memArg)
         }
     }

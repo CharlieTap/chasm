@@ -44,7 +44,7 @@ internal inline fun UnopFuser(
             fusedInstructionFactory(FusedOperand.ValueStack, destination)
         }
         else -> {
-            output.removeLast()
+            output.removeAt(output.lastIndex)
             fusedInstructionFactory(operand, destination)
         }
     }

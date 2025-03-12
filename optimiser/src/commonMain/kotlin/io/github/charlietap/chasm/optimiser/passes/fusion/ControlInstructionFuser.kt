@@ -54,7 +54,7 @@ internal inline fun ControlInstructionFuser(
         if (operand == null) {
             output.add(instruction)
         } else {
-            output.removeLast()
+            output.removeAt(output.lastIndex)
             output.add(
                 FusedControlInstruction.BrIf(
                     operand = operand,
@@ -84,7 +84,7 @@ internal inline fun ControlInstructionFuser(
                 ),
             )
         } else {
-            output.removeLast()
+            output.removeAt(output.lastIndex)
             output.add(
                 FusedControlInstruction.If(
                     operand = operand,
@@ -136,7 +136,7 @@ internal inline fun ControlInstructionFuser(
             }.asReversed()
 
             if (operands.all { it != null }) {
-                repeat(type.params.types.size) { output.removeLast() }
+                repeat(type.params.types.size) { output.removeAt(output.lastIndex) }
                 output.add(
                     FusedControlInstruction.Call(
                         operands = operands.map { it ?: FusedOperand.ValueStack },
