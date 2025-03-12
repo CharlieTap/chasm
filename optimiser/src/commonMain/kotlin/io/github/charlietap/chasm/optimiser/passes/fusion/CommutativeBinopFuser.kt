@@ -44,7 +44,7 @@ internal inline fun CommutativeBinopFuser(
             destination,
         )
         left == null -> {
-            output.removeAt(output.lastIndex)
+            output.removeLast()
             fusedInstructionFactory(
                 FusedOperand.ValueStack,
                 right,
@@ -52,8 +52,8 @@ internal inline fun CommutativeBinopFuser(
             )
         }
         else -> {
-            output.removeAt(output.lastIndex)
-            output.removeAt(output.lastIndex)
+            output.removeLast()
+            output.removeLast()
             fusedInstructionFactory(left, right, destination)
         }
     }

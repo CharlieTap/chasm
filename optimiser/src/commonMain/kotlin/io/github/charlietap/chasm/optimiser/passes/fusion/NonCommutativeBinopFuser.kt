@@ -54,12 +54,12 @@ internal inline fun NonCommutativeBinopFuser(
     val instruction = when {
         right == null -> instruction
         left == null -> {
-            output.removeAt(output.lastIndex)
+            output.removeLast()
             fusedInstructionFactory(FusedOperand.ValueStack, right, destination)
         }
         else -> {
-            output.removeAt(output.lastIndex)
-            output.removeAt(output.lastIndex)
+            output.removeLast()
+            output.removeLast()
             fusedInstructionFactory(left, right, destination)
         }
     }

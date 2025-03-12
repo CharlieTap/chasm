@@ -48,7 +48,7 @@ internal inline fun MemoryLoadFuser(
             fusedInstructionFactory(FusedOperand.ValueStack, destination, instruction.memoryIndex, instruction.memArg)
         }
         else -> {
-            output.removeAt(output.lastIndex)
+            output.removeLast()
             fusedInstructionFactory(operand, destination, instruction.memoryIndex, instruction.memArg)
         }
     }

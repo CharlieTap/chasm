@@ -35,7 +35,7 @@ internal inline fun VariableInstructionFuser(
         if (operand == null) {
             output.add(instruction)
         } else {
-            output.removeAt(output.lastIndex)
+            output.removeLast()
             output.add(
                 FusedVariableInstruction.GlobalSet(
                     operand = operand,
@@ -51,7 +51,7 @@ internal inline fun VariableInstructionFuser(
         if (operand == null) {
             output.add(instruction)
         } else {
-            output.removeAt(output.lastIndex)
+            output.removeLast()
             output.add(
                 FusedVariableInstruction.LocalSet(
                     operand = operand,
@@ -67,7 +67,7 @@ internal inline fun VariableInstructionFuser(
         if (operand == null) {
             output.add(instruction)
         } else {
-            output.removeAt(output.lastIndex)
+            output.removeLast()
             output.add(
                 FusedVariableInstruction.LocalTee(
                     operand = operand,

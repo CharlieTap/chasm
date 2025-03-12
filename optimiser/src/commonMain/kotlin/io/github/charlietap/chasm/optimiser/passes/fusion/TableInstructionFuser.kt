@@ -50,7 +50,7 @@ internal inline fun TableInstructionFuser(
                     tableIdx = instruction.tableIdx,
                 )
                 else -> {
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
                     FusedTableInstruction.TableGet(
                         elementIndex = elementIndex,
                         destination = destination,
@@ -78,7 +78,7 @@ internal inline fun TableInstructionFuser(
         } else {
             when {
                 elementIdx == null -> {
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
                     FusedTableInstruction.TableSet(
                         value = value,
                         elementIdx = FusedOperand.ValueStack,
@@ -86,8 +86,8 @@ internal inline fun TableInstructionFuser(
                     )
                 }
                 else -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
                     FusedTableInstruction.TableSet(
                         value = value,
                         elementIdx = elementIdx,
@@ -111,7 +111,7 @@ internal inline fun TableInstructionFuser(
         } else {
             when {
                 srcOffset == null -> {
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
                     FusedTableInstruction.TableCopy(
                         elementsToCopy = elementsToCopy,
                         srcOffset = FusedOperand.ValueStack,
@@ -121,8 +121,8 @@ internal inline fun TableInstructionFuser(
                     )
                 }
                 dstOffset == null -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
                     FusedTableInstruction.TableCopy(
                         elementsToCopy = elementsToCopy,
                         srcOffset = srcOffset,
@@ -132,9 +132,9 @@ internal inline fun TableInstructionFuser(
                     )
                 }
                 else -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
                     FusedTableInstruction.TableCopy(
                         elementsToCopy = elementsToCopy,
                         srcOffset = srcOffset,
@@ -160,7 +160,7 @@ internal inline fun TableInstructionFuser(
         } else {
             when {
                 fillValue == null -> {
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
                     FusedTableInstruction.TableFill(
                         elementsToFill = elementsToFill,
                         fillValue = FusedOperand.ValueStack,
@@ -169,8 +169,8 @@ internal inline fun TableInstructionFuser(
                     )
                 }
                 tableOffset == null -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
                     FusedTableInstruction.TableFill(
                         elementsToFill = elementsToFill,
                         fillValue = fillValue,
@@ -179,9 +179,9 @@ internal inline fun TableInstructionFuser(
                     )
                 }
                 else -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
                     FusedTableInstruction.TableFill(
                         elementsToFill = elementsToFill,
                         fillValue = fillValue,
@@ -213,7 +213,7 @@ internal inline fun TableInstructionFuser(
                     tableIdx = instruction.tableIdx,
                 )
                 referenceValue == null -> {
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
                     FusedTableInstruction.TableGrow(
                         elementsToAdd = elementsToAdd,
                         referenceValue = FusedOperand.ValueStack,
@@ -222,8 +222,8 @@ internal inline fun TableInstructionFuser(
                     )
                 }
                 else -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
                     FusedTableInstruction.TableGrow(
                         elementsToAdd = elementsToAdd,
                         referenceValue = referenceValue,
@@ -253,7 +253,7 @@ internal inline fun TableInstructionFuser(
         } else {
             when {
                 segmentOffset == null -> {
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
                     FusedTableInstruction.TableInit(
                         elementsToInitialise = elementsToInit,
                         segmentOffset = FusedOperand.ValueStack,
@@ -263,8 +263,8 @@ internal inline fun TableInstructionFuser(
                     )
                 }
                 tableOffset == null -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
                     FusedTableInstruction.TableInit(
                         elementsToInitialise = elementsToInit,
                         segmentOffset = segmentOffset,
@@ -274,9 +274,9 @@ internal inline fun TableInstructionFuser(
                     )
                 }
                 else -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
                     FusedTableInstruction.TableInit(
                         elementsToInitialise = elementsToInit,
                         segmentOffset = segmentOffset,

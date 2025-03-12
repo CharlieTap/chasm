@@ -55,7 +55,7 @@ internal inline fun ParametricInstructionFuser(
                     destination = destination,
                 )
                 val2 == null -> {
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
                     FusedParametricInstruction.Select(
                         const = const,
                         val1 = FusedOperand.ValueStack,
@@ -64,8 +64,8 @@ internal inline fun ParametricInstructionFuser(
                     )
                 }
                 val1 == null -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
                     FusedParametricInstruction.Select(
                         const = const,
                         val1 = FusedOperand.ValueStack,
@@ -74,9 +74,9 @@ internal inline fun ParametricInstructionFuser(
                     )
                 }
                 else -> {
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
-                    output.removeAt(output.lastIndex)
+                    output.removeLast()
+                    output.removeLast()
+                    output.removeLast()
                     FusedParametricInstruction.Select(
                         const = const,
                         val1 = val1,

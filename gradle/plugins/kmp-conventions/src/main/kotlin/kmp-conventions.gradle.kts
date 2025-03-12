@@ -31,6 +31,7 @@ kotlin {
     compilerOptions {
         extraWarnings.set(true)
 
+        freeCompilerArgs.add("-Xjdk-release=" + libs.versions.java.bytecode.version.get().toInt())
         freeCompilerArgs.add("-opt-in=kotlin.ExperimentalUnsignedTypes")
 
         freeCompilerArgs.add("-Xsuppress-warning=NOTHING_TO_INLINE")
