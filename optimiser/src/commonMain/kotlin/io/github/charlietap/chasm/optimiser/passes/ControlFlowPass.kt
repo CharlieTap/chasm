@@ -1,26 +1,24 @@
 package io.github.charlietap.chasm.optimiser.passes
 
 import io.github.charlietap.chasm.ir.module.Module
-import io.github.charlietap.chasm.optimiser.passes.fusion.ExpressionFuser
+import io.github.charlietap.chasm.optimiser.passes.controlflow.FunctionRewriter
 
-internal fun FusionPass(
+internal fun ControlFlowPass(
     module: Module,
 ): Module =
-    FusionPass(
+    ControlFlowPass(
         module = module,
-        expressionFuser = ::ExpressionFuser,
+        functionRewriter = ::FunctionRewriter,
     )
 
-internal inline fun FusionPass(
+internal inline fun ControlFlowPass(
     module: Module,
-    expressionFuser: ExpressionFuser,
+    functionRewriter: FunctionRewriter,
 ): Module {
     val context = PassContext(module)
     return module.copy(
         functions = module.functions.map { function ->
-            function.copy(
-                body = expressionFuser(context, function.body),
-            )
+            functionRewriter(context, function)
         },
     )
 }

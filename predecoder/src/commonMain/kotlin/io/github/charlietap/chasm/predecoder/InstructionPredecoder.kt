@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.predecoder
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ir.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
@@ -21,6 +22,7 @@ import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 import io.github.charlietap.chasm.ir.instruction.VectorInstruction
+import io.github.charlietap.chasm.predecoder.instruction.admin.AdminInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.aggregate.AggregateInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.aggregatefused.FusedAggregateInstructionPredecoder
 import io.github.charlietap.chasm.predecoder.instruction.atomic.AtomicMemoryInstructionPredecoder
@@ -49,6 +51,7 @@ internal fun InstructionPredecoder(
     InstructionPredecoder(
         context = context,
         instruction = instruction,
+        adminInstructionPredecoder = ::AdminInstructionPredecoder,
         aggregateInstructionPredecoder = ::AggregateInstructionPredecoder,
         atomicMemoryInstructionPredecoder = ::AtomicMemoryInstructionPredecoder,
         controlInstructionPredecoder = ::ControlInstructionPredecoder,
@@ -72,6 +75,7 @@ internal fun InstructionPredecoder(
 internal inline fun InstructionPredecoder(
     context: PredecodingContext,
     instruction: Instruction,
+    crossinline adminInstructionPredecoder: Predecoder<AdminInstruction, DispatchableInstruction>,
     crossinline aggregateInstructionPredecoder: Predecoder<AggregateInstruction, DispatchableInstruction>,
     crossinline atomicMemoryInstructionPredecoder: Predecoder<AtomicMemoryInstruction, DispatchableInstruction>,
     crossinline controlInstructionPredecoder: Predecoder<ControlInstruction, DispatchableInstruction>,
@@ -96,6 +100,7 @@ internal inline fun InstructionPredecoder(
 
     if (dispatchable == null) {
         dispatchable = when (instruction) {
+            is AdminInstruction -> adminInstructionPredecoder(context, instruction).bind()
             is AggregateInstruction -> aggregateInstructionPredecoder(context, instruction).bind()
             is AtomicMemoryInstruction -> atomicMemoryInstructionPredecoder(context, instruction).bind()
             is ControlInstruction -> controlInstructionPredecoder(context, instruction).bind()

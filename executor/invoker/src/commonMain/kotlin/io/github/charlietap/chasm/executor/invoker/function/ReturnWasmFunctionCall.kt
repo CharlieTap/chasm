@@ -20,8 +20,7 @@ internal inline fun ReturnWasmFunctionCall(
     val depths = frame.depths
 
     cstack.shrinkHandlers(depths.handlers)
-    // leave frame and label admin instructions on the stack
-    cstack.shrinkInstructions(depths.instructions + 2)
+    cstack.shrinkInstructions(depths.instructions)
     // leave top label in place
     cstack.shrinkLabels(depths.labels + 1)
     vstack.shrink(params, depths.values)

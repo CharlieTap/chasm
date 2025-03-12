@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
+import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
@@ -21,7 +22,7 @@ internal inline fun TryTableExecutor(
     store = store,
     context = context,
     instruction = instruction,
-    blockExecutor = ::InstructionBlockExecutor,
+    handlerDispatcher = ::HandlerDispatcher,
 )
 
 internal inline fun TryTableExecutor(
@@ -30,7 +31,7 @@ internal inline fun TryTableExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.TryTable,
-    crossinline blockExecutor: InstructionBlockExecutor,
+    crossinline handlerDispatcher: Dispatcher<ExceptionHandler>,
 ) {
     val label = ControlStack.Entry.Label(
         arity = instruction.results,
@@ -50,5 +51,8 @@ internal inline fun TryTableExecutor(
         instructionsDepth = cstack.instructionsDepth(),
     )
 
-    blockExecutor(cstack, label, instruction.instructions, handler)
+    cstack.push(handler)
+    cstack.push(handlerDispatcher(handler))
+    cstack.push(label)
+    cstack.push(instruction.instructions)
 }

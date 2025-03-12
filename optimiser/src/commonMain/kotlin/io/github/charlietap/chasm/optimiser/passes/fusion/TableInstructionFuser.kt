@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.FusedTableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
+import io.github.charlietap.chasm.optimiser.passes.PassContext
 
 internal typealias TableInstructionFuser = (PassContext, Int, TableInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 

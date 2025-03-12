@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
+import io.github.charlietap.chasm.optimiser.passes.PassContext
 
 internal typealias AggregateInstructionFuser = (PassContext, Int, AggregateInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 

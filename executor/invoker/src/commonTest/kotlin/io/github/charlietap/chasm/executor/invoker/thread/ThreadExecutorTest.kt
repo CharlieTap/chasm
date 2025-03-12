@@ -24,7 +24,7 @@ class ThreadExecutorTest {
 
         val instructionDispatchable = dispatchableInstruction { vstack, cstack, store, context ->
             assertEquals(2, vstack.depth())
-            assertEquals(2, cstack.instructionsDepth())
+            assertEquals(1, cstack.instructionsDepth())
             vstack.clear()
             vstack.pushI32(0)
             Ok(Unit)
@@ -41,16 +41,10 @@ class ThreadExecutorTest {
             thread = thread,
         )
 
-        val frameDispatchable = dispatchableInstruction { vstack, cstack, store, context ->
-            cstack.popFrame()
-            assertEquals(1, cstack.instructionsDepth()) // exit loop instr
-            Ok(Unit)
-        }
         val params = mutableListOf<ExecutionValue>(i32(2), i32(3))
 
         val actual = ThreadExecutor(
             configuration = configuration,
-            frameCleaner = frameDispatchable,
             params = params,
         )
 

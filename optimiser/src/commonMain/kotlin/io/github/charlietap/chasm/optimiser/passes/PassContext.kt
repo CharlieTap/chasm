@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.optimiser.passes.fusion
+package io.github.charlietap.chasm.optimiser.passes
 
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.ir.module.Import

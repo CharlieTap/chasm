@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.optimiser.passes.fusion
 
+import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ir.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
@@ -19,6 +20,7 @@ import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 import io.github.charlietap.chasm.ir.instruction.VectorInstruction
+import io.github.charlietap.chasm.optimiser.passes.PassContext
 
 internal typealias InstructionFuser = (PassContext, Int, Instruction, List<Instruction>, MutableList<Instruction>) -> Int
 
@@ -65,6 +67,7 @@ internal inline fun InstructionFuser(
     is NumericInstruction.F64Const,
     is VariableInstruction.GlobalGet,
     is VariableInstruction.LocalGet,
+    is AdminInstruction,
     is AtomicMemoryInstruction,
     is ReferenceInstruction,
     is VectorInstruction,

@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.FusedParametricInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.ParametricInstruction
+import io.github.charlietap.chasm.optimiser.passes.PassContext
 
 internal typealias ParametricInstructionFuser = (PassContext, Int, ParametricInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 

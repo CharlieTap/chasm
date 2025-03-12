@@ -3,9 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.thread
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.instruction.admin.FrameInstructionExecutor
 import io.github.charlietap.chasm.runtime.Configuration
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -22,17 +20,6 @@ internal typealias ThreadExecutor = (Configuration, List<ExecutionValue>) -> Res
 internal fun ThreadExecutor(
     configuration: Configuration,
     params: List<ExecutionValue>,
-): Result<List<Long>, InvocationError> =
-    ThreadExecutor(
-        configuration = configuration,
-        params = params,
-        frameCleaner = ::FrameInstructionExecutor,
-    )
-
-internal fun ThreadExecutor(
-    configuration: Configuration,
-    params: List<ExecutionValue>,
-    frameCleaner: DispatchableInstruction,
 ): Result<List<Long>, InvocationError> = binding {
 
     val thread = configuration.thread
@@ -68,7 +55,6 @@ internal fun ThreadExecutor(
     }
 
     istack.push(::exitLoop)
-    istack.push(frameCleaner)
     istack.pushAll(thread.instructions)
 
     try {

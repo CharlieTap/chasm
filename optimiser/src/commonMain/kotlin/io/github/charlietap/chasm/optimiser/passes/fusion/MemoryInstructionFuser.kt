@@ -23,6 +23,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Store
 import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Store8
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
+import io.github.charlietap.chasm.optimiser.passes.PassContext
 
 internal typealias MemoryInstructionFuser = (PassContext, Int, MemoryInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 

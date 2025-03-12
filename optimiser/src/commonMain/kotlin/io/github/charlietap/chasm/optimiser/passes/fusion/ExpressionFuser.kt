@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.optimiser.passes.fusion
 
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.Instruction
+import io.github.charlietap.chasm.optimiser.passes.PassContext
 
 internal typealias ExpressionFuser = (PassContext, Expression) -> Expression
 

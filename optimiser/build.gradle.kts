@@ -16,6 +16,7 @@ kotlin {
 
        commonMain {
             dependencies {
+                api(projects.config)
                 api(projects.ir)
             }
         }

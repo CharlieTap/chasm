@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
@@ -26,23 +25,6 @@ internal inline fun BlockExecutor(
     instructions = instruction.instructions,
 )
 
-internal inline fun BlockExecutor(
-    store: Store,
-    controlStack: ControlStack,
-    valueStack: ValueStack,
-    params: Int,
-    results: Int,
-    instructions: Array<DispatchableInstruction>,
-) = BlockExecutor(
-    store = store,
-    controlStack = controlStack,
-    valueStack = valueStack,
-    params = params,
-    results = results,
-    instructions = instructions,
-    instructionBlockExecutor = ::InstructionBlockExecutor,
-)
-
 @Suppress("UNUSED_PARAMETER")
 internal inline fun BlockExecutor(
     store: Store,
@@ -51,7 +33,6 @@ internal inline fun BlockExecutor(
     params: Int,
     results: Int,
     instructions: Array<DispatchableInstruction>,
-    crossinline instructionBlockExecutor: InstructionBlockExecutor,
 ) {
     val label = ControlStack.Entry.Label(
         arity = results,
@@ -64,5 +45,6 @@ internal inline fun BlockExecutor(
         continuation = null,
     )
 
-    instructionBlockExecutor(controlStack, label, instructions, null)
+    controlStack.push(label)
+    controlStack.push(instructions)
 }

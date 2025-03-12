@@ -1,8 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import io.github.charlietap.chasm.executor.invoker.instruction.InstructionBlockExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.admin.FrameInstructionExecutor
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.stack.ActivationFrame
@@ -19,24 +16,6 @@ internal inline fun WasmFunctionCall(
     store: Store,
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
-) = WasmFunctionCall(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    instance = instance,
-    instructionBlockExecutor = ::InstructionBlockExecutor,
-    frameCleaner = ::FrameInstructionExecutor,
-)
-
-internal inline fun WasmFunctionCall(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instance: FunctionInstance.WasmFunction,
-    crossinline instructionBlockExecutor: InstructionBlockExecutor,
-    noinline frameCleaner: DispatchableInstruction,
 ) {
     val type = instance.functionType
     val params = type.params.types.size
@@ -59,11 +38,10 @@ internal inline fun WasmFunctionCall(
     )
 
     cstack.push(frame)
-    cstack.push(frameCleaner)
 
     val labelDepths = StackDepths(
         handlers = cstack.handlersDepth(),
-        instructions = cstack.instructionsDepth(),
+        instructions = cstack.instructionsDepth() + 1, // account for endfunction instruction added later
         labels = cstack.labelsDepth(),
         values = vstack.depth(),
     )
@@ -75,5 +53,6 @@ internal inline fun WasmFunctionCall(
     )
 
     vstack.framePointer = valuesDepth
-    instructionBlockExecutor(cstack, label, instance.function.body.instructions, null)
+    cstack.push(label)
+    cstack.push(instance.function.body.instructions)
 }

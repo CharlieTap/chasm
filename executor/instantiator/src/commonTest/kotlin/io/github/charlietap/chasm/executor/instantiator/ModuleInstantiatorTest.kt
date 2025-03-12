@@ -80,7 +80,8 @@ class ModuleInstantiatorTest {
             module
         }
 
-        val optimiser: Optimiser = { _module ->
+        val optimiser: Optimiser = { _config, _module ->
+            assertEquals(config, _config)
             assertEquals(module, _module)
             module
         }

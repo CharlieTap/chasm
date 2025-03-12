@@ -1,17 +1,9 @@
 package io.github.charlietap.chasm.fixture.runtime.instruction
 
-import io.github.charlietap.chasm.fixture.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.runtime.stack.label
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.stack.ActivationFrame
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 
-fun adminInstruction(): AdminInstruction = frameAdminInstruction()
+fun adminInstruction(): AdminInstruction = endFunctionAdminInstruction()
 
-fun frameAdminInstruction(
-    frame: ActivationFrame = frame(),
-) = AdminInstruction.Frame(frame)
+fun endBlockAdminInstruction() = AdminInstruction.EndBlock
 
-fun labelAdminInstruction(
-    label: ControlStack.Entry.Label = label(),
-) = AdminInstruction.Label(label)
+fun endFunctionAdminInstruction() = AdminInstruction.EndFunction
