@@ -1,6 +1,6 @@
 [versions]
 
-version-name = "0.9.6"
+version-name = "0.9.61"
 
 application-id = "com.tap.chasm"
 application-namespace = "com.tap.chasm"
