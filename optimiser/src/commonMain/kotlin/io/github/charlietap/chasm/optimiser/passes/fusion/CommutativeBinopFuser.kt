@@ -60,7 +60,7 @@ internal inline fun CommutativeBinopFuser(
 
     output.add(instruction)
 
-    if (right != null && destination != FusedDestination.ValueStack) {
+    if (destination != FusedDestination.ValueStack) {
         nextIndex++
     }
 
