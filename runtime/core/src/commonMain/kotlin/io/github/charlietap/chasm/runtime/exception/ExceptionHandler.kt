@@ -7,4 +7,5 @@ data class ExceptionHandler(
     val framesDepth: Int,
     val instructionsDepth: Int,
     val labelsDepth: Int,
+    val framePointer: Int,
 )

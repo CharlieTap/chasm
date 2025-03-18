@@ -56,7 +56,7 @@ internal inline fun ThrowRefExecutor(
     val instance = store.exception(exceptionAddress)
     val address = instance.tagAddress
 
-    val handler = jumpToHandlerInstruction(cstack)
+    val handler = jumpToHandlerInstruction(cstack, vstack)
 
     if (handler.instructions.isEmpty()) {
         vstack.push(ReferenceValue.Exception(exceptionAddress).toLong())
@@ -120,13 +120,17 @@ internal inline fun ThrowRefExecutor(
     }
 }
 
-private inline fun jumpToHandlerInstruction(controlStack: ControlStack): ExceptionHandler {
+private inline fun jumpToHandlerInstruction(
+    controlStack: ControlStack,
+    valueStack: ValueStack,
+): ExceptionHandler {
 
     val handler = controlStack.popHandler()
 
     controlStack.shrinkLabels(handler.labelsDepth)
     controlStack.shrinkFrames(handler.framesDepth)
     controlStack.shrinkInstructions(handler.instructionsDepth)
+    valueStack.framePointer = handler.framePointer
 
     return handler
 }

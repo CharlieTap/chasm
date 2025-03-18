@@ -49,6 +49,7 @@ internal inline fun TryTableExecutor(
         framesDepth = cstack.framesDepth(),
         labelsDepth = cstack.labelsDepth(),
         instructionsDepth = cstack.instructionsDepth(),
+        framePointer = vstack.framePointer,
     )
 
     cstack.push(handler)

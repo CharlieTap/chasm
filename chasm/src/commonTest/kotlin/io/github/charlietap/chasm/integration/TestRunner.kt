@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.instance
@@ -21,6 +22,7 @@ fun testRunner(
     imports: List<Import> = emptyList(),
     functionName: String = fileName.replace(".wasm", ""),
     setupFunctions: List<Pair<String, List<ExecutionValue>>> = emptyList(),
+    config: RuntimeConfig = RuntimeConfig(),
 ): ChasmResult<List<ExecutionValue>, ChasmError> {
 
     val byteStream = Resource(fileDirectory + fileName).readBytes()
@@ -30,7 +32,7 @@ fun testRunner(
         .flatMap { module ->
             validate(module)
         }.flatMap { module ->
-            instance(store, module, imports)
+            instance(store, module, imports, config)
         }.flatMap { instance ->
 
             setupFunctions.forEach { (function, args) ->

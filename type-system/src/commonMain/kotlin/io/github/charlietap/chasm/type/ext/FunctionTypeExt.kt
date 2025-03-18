@@ -16,4 +16,4 @@ inline fun FunctionType.recursiveType() = RecursiveType(
 
 inline fun FunctionType.definedType(
     definedTypeRoller: DefinedTypeRoller = ::DefinedTypeRoller,
-): DefinedType = definedTypeRoller(-1, this.recursiveType()).first()
+): DefinedType = definedTypeRoller(Int.MIN_VALUE, this.recursiveType()).first()
