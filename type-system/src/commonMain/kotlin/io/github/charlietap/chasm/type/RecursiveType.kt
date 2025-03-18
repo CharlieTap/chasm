@@ -21,6 +21,7 @@ data class RecursiveType(
         // Represents the final state where:
         // - All type indices pointing to recursive types in the same group are replaced with recursive type indices.
         // - Type indices pointing to types in other recursive groups are replaced with concrete defined type references.
+        // In this form there are no module contextual type indices so it is safe to use the recursive type across module boundaries
         const val STATE_CLOSED: Byte = 2
     }
 }

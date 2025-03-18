@@ -26,9 +26,10 @@ internal inline fun TypeAllocator(
     definedTypeRoller: DefinedTypeRoller,
 ): List<DefinedType> {
     return types.flatMap { type ->
-        // This closes the recursive type in the sense it replaces its TypeIndex's with defined types
-        // preventing the defined type roller replacing them with RecursiveTypeIndex's which cannot be
-        // used across module boundaries
+        // Close all recursive types by first substituting all type indices that
+        // point to external recursive types then run the DefinedTypeRoller on the result
+        // which will replace all the remaining type indices which point to internal recursive
+        // types with recursive type indices
         val substituted = recursiveTypeSubstitutor(type, context.substitutor)
         val definedTypes = definedTypeRoller(context.types.size, substituted)
         context.types += definedTypes
