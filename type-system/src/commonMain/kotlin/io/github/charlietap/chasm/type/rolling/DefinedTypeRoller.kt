@@ -12,22 +12,22 @@ import io.github.charlietap.chasm.type.RecursiveType
 typealias DefinedTypeRoller = (Int, RecursiveType) -> List<DefinedType>
 
 fun DefinedTypeRoller(
-    index: Int,
+    typeIndex: Int,
     recursiveType: RecursiveType,
 ): List<DefinedType> =
     DefinedTypeRoller(
-        index = index,
+        typeIndex = typeIndex,
         recursiveType = recursiveType,
         recursiveTypeRoller = ::RecursiveTypeRoller,
     )
 
 internal fun DefinedTypeRoller(
-    index: Int,
+    typeIndex: Int,
     recursiveType: RecursiveType,
     recursiveTypeRoller: RecursiveTypeRoller,
 ): List<DefinedType> {
-    val rolledRecursiveType = recursiveTypeRoller(index, recursiveType)
+    val rolledRecursiveType = recursiveTypeRoller(typeIndex, recursiveType)
     return List(rolledRecursiveType.subTypes.size) { subTypeIndex ->
-        DefinedType(rolledRecursiveType, subTypeIndex)
+        DefinedType(typeIndex, rolledRecursiveType, subTypeIndex)
     }
 }

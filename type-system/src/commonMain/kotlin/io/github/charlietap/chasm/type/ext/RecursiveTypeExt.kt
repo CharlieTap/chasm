@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 
 inline fun RecursiveType.definedType(
     definedTypeRoller: DefinedTypeRoller = ::DefinedTypeRoller,
-): DefinedType = definedTypeRoller(0, this).first()
+): DefinedType = definedTypeRoller(-1, this).first()
 
 inline fun RecursiveType.functionType(
     definedTypeRoller: DefinedTypeRoller = ::DefinedTypeRoller,
