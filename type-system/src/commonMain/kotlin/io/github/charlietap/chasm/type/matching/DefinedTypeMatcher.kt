@@ -30,24 +30,20 @@ internal inline fun DefinedTypeMatcher(
     else -> {
         val substitution = context.substitutor
 
-        val closedType1 = if (type1.recursiveType.state != RecursiveType.STATE_CLOSED) {
+        if (type1.recursiveType.state != RecursiveType.STATE_CLOSED) {
             definedTypeSubstitutor(type1, substitution)
-        } else {
-            type1
         }
 
-        val closedType2 = if (type2.recursiveType.state != RecursiveType.STATE_CLOSED) {
+        if (type2.recursiveType.state != RecursiveType.STATE_CLOSED) {
             definedTypeSubstitutor(type2, substitution)
-        } else {
-            type2
         }
 
-        if (closedType1 == closedType2) {
+        if (type1 == type2) {
             true
         } else {
-            val subType = context.unroller(closedType1)
+            val subType = context.unroller(type1)
             subType.superTypes.any { ht1 ->
-                heapTypeMatcher(ht1, ConcreteHeapType.Defined(closedType2), context)
+                heapTypeMatcher(ht1, ConcreteHeapType.Defined(type2), context)
             }
         }
     }
