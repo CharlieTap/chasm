@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.matching.CompositeTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
@@ -25,7 +24,6 @@ internal fun SubTypeValidator(
         type = type,
         compositeTypeMatcher = ::CompositeTypeMatcher,
         compositeTypeValidator = ::CompositeTypeValidator,
-        definedTypeUnroller = ::DefinedTypeUnroller,
         heapTypeValidator = ::HeapTypeValidator,
     )
 
@@ -34,7 +32,6 @@ internal inline fun SubTypeValidator(
     type: SubType,
     crossinline compositeTypeMatcher: TypeMatcher<CompositeType>,
     crossinline compositeTypeValidator: Validator<CompositeType>,
-    crossinline definedTypeUnroller: DefinedTypeUnroller,
     crossinline heapTypeValidator: Validator<HeapType>,
 ): Result<Unit, ModuleValidatorError> = binding {
     compositeTypeValidator(context, type.compositeType).bind()
@@ -43,7 +40,7 @@ internal inline fun SubTypeValidator(
         when (superType) {
             is ConcreteHeapType.TypeIndex -> {
                 val definedType = context.type(superType.index).bind()
-                val subType = definedTypeUnroller(definedType)
+                val subType = context.unroller(definedType)
                 if (subType is SubType.Final) {
                     Err(TypeValidatorError.TypeMismatch).bind()
                 }
