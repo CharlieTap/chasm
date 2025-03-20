@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.type.RecursiveType
 /*
     Turn a single recursive type in a list of defined types
     Each DefinedType will contain the same reference to a substituted
-    version of the original RecursiveType where its TypeIndexs are now
-    RecursiveTypeIndexes which are faster for comparison
+    version of the original RecursiveType where its TypeIndices are now
+    RecursiveTypeIndices
  */
 typealias DefinedTypeRoller = (Int, RecursiveType) -> List<DefinedType>
 
