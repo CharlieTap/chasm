@@ -21,7 +21,7 @@ fun AssertInvalidCommandRunner(
         .flatMap { module ->
             validate(module)
         }.fold({ _ ->
-            CommandResult.Failure(command, "invalid module was decoded when it should have failed")
+            CommandResult.Failure(command, "invalid module was validated when it should have failed")
         }) {
             CommandResult.Success
         }
