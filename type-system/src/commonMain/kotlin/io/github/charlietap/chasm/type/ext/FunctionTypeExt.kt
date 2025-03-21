@@ -11,7 +11,7 @@ inline fun FunctionType.recursiveType() = RecursiveType(
     subTypes = listOf(
         SubType.Final(emptyList(), CompositeType.Function(this)),
     ),
-    state = RecursiveType.STATE_CLOSED,
+    state = RecursiveType.State.CLOSED,
 )
 
 inline fun FunctionType.definedType(

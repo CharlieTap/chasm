@@ -5,18 +5,18 @@ import io.github.charlietap.chasm.type.FieldType
 
 internal fun ArrayTypeSubstitutor(
     arrayType: ArrayType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): ArrayType =
     ArrayTypeSubstitutor(
         arrayType = arrayType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         fieldTypeSubstitutor = ::FieldTypeSubstitutor,
     )
 
 internal fun ArrayTypeSubstitutor(
     arrayType: ArrayType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     fieldTypeSubstitutor: TypeSubstitutor<FieldType>,
 ): ArrayType = ArrayType(
-    fieldTypeSubstitutor(arrayType.fieldType, concreteHeapTypeSubstitutor),
+    fieldTypeSubstitutor(arrayType.fieldType, substitution),
 )

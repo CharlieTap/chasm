@@ -57,7 +57,7 @@ class PartialModuleAllocatorTest {
             subTypes = listOf(
                 finalSubType(emptyList(), functionCompositeType(functionType)),
             ),
-            state = RecursiveType.STATE_CLOSED,
+            state = RecursiveType.State.CLOSED,
         )
         val type = type(
             idx = typeIndex,

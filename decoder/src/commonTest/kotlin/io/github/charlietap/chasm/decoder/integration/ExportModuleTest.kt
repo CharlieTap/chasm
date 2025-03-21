@@ -54,7 +54,7 @@ class ExportModuleTest {
             subTypes = listOf(
                 SubType.Final(emptyList(), CompositeType.Function(expectedFunctionType)),
             ),
-            state = RecursiveType.STATE_SYNTAX,
+            state = RecursiveType.State.SYNTAX,
         )
 
         val expectedFunctionExportType = Type(Index.TypeIndex(0u), expectedRecursiveType)

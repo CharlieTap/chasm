@@ -1,12 +1,10 @@
 package io.github.charlietap.chasm.type.rolling
 
-import io.github.charlietap.chasm.type.ConcreteHeapType
-import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.copy.DeepCopier
 import io.github.charlietap.chasm.type.copy.RecursiveTypeDeepCopier
-import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.RecursiveTypeSubstitutor
+import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 typealias RecursiveTypeUnroller = (RecursiveType) -> RecursiveType
@@ -25,17 +23,10 @@ internal fun RecursiveTypeUnroller(
     recursiveTypeSubstitutor: TypeSubstitutor<RecursiveType>,
     recursiveTypeDeepCopier: DeepCopier<RecursiveType>,
 ): RecursiveType {
-    val substitutor: ConcreteHeapTypeSubstitutor = { heapType ->
-        when (heapType) {
-            is ConcreteHeapType.RecursiveTypeIndex -> ConcreteHeapType.Defined(
-                DefinedType(recursiveType, heapType.index),
-            )
-            else -> heapType
-        }
-    }
+    val substitution = Substitution.RecursiveTypeIndexToDefinedType(recursiveType)
     // Its important we copy when making this version as part of rolling,
     //  else we will alter the type in the context, and it's outer defined type
     // will now contain a recursive type which includes a reference to itself
     val copy = recursiveTypeDeepCopier(recursiveType)
-    return recursiveTypeSubstitutor(copy, substitutor)
+    return recursiveTypeSubstitutor(copy, substitution)
 }

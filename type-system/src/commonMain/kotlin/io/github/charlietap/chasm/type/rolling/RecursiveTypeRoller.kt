@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.type.rolling
 
 import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.rolling.substitution.RecursiveTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.TypeIndexToRecursiveTypeIndexSubsitutor
+import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 import io.github.charlietap.chasm.type.rolling.substitution.TypeSubstitutor
 
 internal typealias RecursiveTypeRoller = (Int, RecursiveType) -> RecursiveType
@@ -23,6 +23,6 @@ internal fun RecursiveTypeRoller(
     recursiveTypeSubstitutor: TypeSubstitutor<RecursiveType>,
 ): RecursiveType {
     val upperBound = typeIndex + recursiveType.subTypes.size
-    val substitutor = TypeIndexToRecursiveTypeIndexSubsitutor(typeIndex, upperBound)
-    return recursiveTypeSubstitutor(recursiveType, substitutor)
+    val substitution = Substitution.TypeIndexToRecursiveTypeIndex(typeIndex, upperBound)
+    return recursiveTypeSubstitutor(recursiveType, substitution)
 }

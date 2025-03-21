@@ -5,20 +5,20 @@ import io.github.charlietap.chasm.type.StructType
 
 internal fun StructTypeSubstitutor(
     structType: StructType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): StructType =
     StructTypeSubstitutor(
         structType = structType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         fieldTypeSubstitutor = ::FieldTypeSubstitutor,
     )
 
 internal fun StructTypeSubstitutor(
     structType: StructType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     fieldTypeSubstitutor: TypeSubstitutor<FieldType>,
 ): StructType = StructType(
     structType.fields.map { fieldType ->
-        fieldTypeSubstitutor(fieldType, concreteHeapTypeSubstitutor)
+        fieldTypeSubstitutor(fieldType, substitution)
     },
 )

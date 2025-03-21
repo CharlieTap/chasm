@@ -5,18 +5,18 @@ import io.github.charlietap.chasm.type.RecursiveType
 
 fun DefinedTypeSubstitutor(
     definedType: DefinedType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): DefinedType =
     DefinedTypeSubstitutor(
         definedType = definedType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         recursiveTypeSubstitutor = ::RecursiveTypeSubstitutor,
     )
 
 internal fun DefinedTypeSubstitutor(
     definedType: DefinedType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     recursiveTypeSubstitutor: TypeSubstitutor<RecursiveType>,
 ): DefinedType = definedType.apply {
-    recursiveType = recursiveTypeSubstitutor(definedType.recursiveType, concreteHeapTypeSubstitutor)
+    recursiveType = recursiveTypeSubstitutor(definedType.recursiveType, substitution)
 }

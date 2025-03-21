@@ -5,17 +5,17 @@ import io.github.charlietap.chasm.type.ValueType
 
 internal fun ValueTypeSubstitutor(
     valueType: ValueType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): ValueType =
     ValueTypeSubstitutor(
         valueType = valueType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         referenceTypeSubstitutor = ::ReferenceTypeSubstitutor,
     )
 
 internal fun ValueTypeSubstitutor(
     valueType: ValueType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     referenceTypeSubstitutor: TypeSubstitutor<ReferenceType>,
 ): ValueType = when (valueType) {
     is ValueType.Number,
@@ -26,7 +26,7 @@ internal fun ValueTypeSubstitutor(
         ValueType.Reference(
             referenceTypeSubstitutor(
                 valueType.referenceType,
-                concreteHeapTypeSubstitutor,
+                substitution,
             ),
         )
     }

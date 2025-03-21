@@ -5,20 +5,20 @@ import io.github.charlietap.chasm.type.ValueType
 
 internal fun ResultTypeSubstitutor(
     resultType: ResultType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): ResultType =
     ResultTypeSubstitutor(
         resultType = resultType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         valueTypeSubstitutor = ::ValueTypeSubstitutor,
     )
 
 internal fun ResultTypeSubstitutor(
     resultType: ResultType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     valueTypeSubstitutor: TypeSubstitutor<ValueType>,
 ): ResultType = ResultType(
     resultType.types.map { valueType ->
-        valueTypeSubstitutor(valueType, concreteHeapTypeSubstitutor)
+        valueTypeSubstitutor(valueType, substitution)
     },
 )

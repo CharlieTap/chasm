@@ -5,27 +5,25 @@ import io.github.charlietap.chasm.type.SubType
 
 fun RecursiveTypeSubstitutor(
     recursiveType: RecursiveType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): RecursiveType =
     RecursiveTypeSubstitutor(
         recursiveType = recursiveType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         subTypeSubstitutor = ::SubTypeSubstitutor,
     )
 
 internal fun RecursiveTypeSubstitutor(
     recursiveType: RecursiveType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     subTypeSubstitutor: TypeSubstitutor<SubType>,
 ) = recursiveType.apply {
     subTypes = recursiveType.subTypes.map { subType ->
-        subTypeSubstitutor(subType, concreteHeapTypeSubstitutor)
+        subTypeSubstitutor(subType, substitution)
     }
-    state = when (recursiveType.state) {
-        RecursiveType.STATE_SUBSTITUTED,
-        RecursiveType.STATE_CLOSED,
-        -> RecursiveType.STATE_CLOSED
-
-        else -> RecursiveType.STATE_SUBSTITUTED
+    state = when {
+        state == RecursiveType.State.INTERNAL_SUBSTITUTED && substitution.outputState == RecursiveType.State.EXTERNAL_SUBSTITUTED -> RecursiveType.State.CLOSED
+        state == RecursiveType.State.EXTERNAL_SUBSTITUTED && substitution.outputState == RecursiveType.State.INTERNAL_SUBSTITUTED -> RecursiveType.State.CLOSED
+        else -> substitution.outputState
     }
 }

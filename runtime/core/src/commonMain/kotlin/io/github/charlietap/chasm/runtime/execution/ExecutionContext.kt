@@ -11,8 +11,7 @@ import io.github.charlietap.chasm.type.factory.DefinedTypeUnrollerFactory
 import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
-import io.github.charlietap.chasm.type.rolling.substitution.ConcreteHeapTypeSubstitutor
-import io.github.charlietap.chasm.type.rolling.substitution.TypeIndexToDefinedTypeSubstitutor
+import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 
 data class ExecutionContext(
     val cstack: ControlStack,
@@ -30,6 +29,6 @@ data class ExecutionContext(
     override val reverseLookup: DefinedTypeReverseLookup
         get() = TODO("Not yet implemented")
 
-    override val substitutor: ConcreteHeapTypeSubstitutor = TypeIndexToDefinedTypeSubstitutor(instance.types)
+    override val substitution: Substitution.TypeIndexToDefinedType = Substitution.TypeIndexToDefinedType(instance.types)
     override val unroller: DefinedTypeUnroller = DefinedTypeUnrollerFactory(unrollCache)
 }

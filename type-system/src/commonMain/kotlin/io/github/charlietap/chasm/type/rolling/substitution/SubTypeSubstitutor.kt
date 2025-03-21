@@ -6,35 +6,31 @@ import io.github.charlietap.chasm.type.SubType
 
 internal fun SubTypeSubstitutor(
     subType: SubType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): SubType =
     SubTypeSubstitutor(
         subType = subType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         heapTypeSubstitutor = ::HeapTypeSubstitutor,
         compositeTypeSubstitutor = ::CompositeTypeSubstitutor,
     )
 
 internal fun SubTypeSubstitutor(
     subType: SubType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     heapTypeSubstitutor: TypeSubstitutor<HeapType>,
     compositeTypeSubstitutor: TypeSubstitutor<CompositeType>,
 ): SubType = when (subType) {
     is SubType.Open -> subType.apply {
         superTypes = subType.superTypes.map { heapType ->
-            heapTypeSubstitutor(heapType, concreteHeapTypeSubstitutor)
+            heapTypeSubstitutor(heapType, substitution)
         }
-        compositeType = subType.compositeType.let { compositeType ->
-            compositeTypeSubstitutor(compositeType, concreteHeapTypeSubstitutor)
-        }
+        compositeType = compositeTypeSubstitutor(subType.compositeType, substitution)
     }
     is SubType.Final -> subType.apply {
         superTypes = subType.superTypes.map { heapType ->
-            heapTypeSubstitutor(heapType, concreteHeapTypeSubstitutor)
+            heapTypeSubstitutor(heapType, substitution)
         }
-        compositeType = subType.compositeType.let { compositeType ->
-            compositeTypeSubstitutor(compositeType, concreteHeapTypeSubstitutor)
-        }
+        compositeType = compositeTypeSubstitutor(subType.compositeType, substitution)
     }
 }

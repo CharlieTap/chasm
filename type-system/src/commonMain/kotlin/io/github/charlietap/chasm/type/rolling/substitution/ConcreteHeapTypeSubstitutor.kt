@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.type.rolling.substitution
 
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RecursiveType
 
 typealias ConcreteHeapTypeSubstitutor = (ConcreteHeapType) -> ConcreteHeapType
 
@@ -32,5 +33,16 @@ fun TypeIndexToDefinedTypeSubstitutor(
             concreteHeapType
         }
         else -> concreteHeapType
+    }
+}
+
+fun RecursiveTypeIndexToDefinedTypeSubstitutor(
+    recursiveType: RecursiveType,
+): ConcreteHeapTypeSubstitutor = { heapType ->
+    when (heapType) {
+        is ConcreteHeapType.RecursiveTypeIndex -> ConcreteHeapType.Defined(
+            DefinedType(recursiveType, heapType.index),
+        )
+        else -> heapType
     }
 }

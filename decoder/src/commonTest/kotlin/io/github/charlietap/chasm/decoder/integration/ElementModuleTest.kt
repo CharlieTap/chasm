@@ -46,7 +46,7 @@ class ElementModuleTest {
             subTypes = listOf(
                 SubType.Final(emptyList(), CompositeType.Function(expectedFunctionType)),
             ),
-            state = RecursiveType.STATE_SYNTAX,
+            state = RecursiveType.State.SYNTAX,
         )
         val expectedType = Type(Index.TypeIndex(0u), expectedRecursiveType)
 

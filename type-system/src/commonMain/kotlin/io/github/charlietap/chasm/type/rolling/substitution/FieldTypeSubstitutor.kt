@@ -5,18 +5,18 @@ import io.github.charlietap.chasm.type.StorageType
 
 internal fun FieldTypeSubstitutor(
     fieldType: FieldType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): FieldType =
     FieldTypeSubstitutor(
         fieldType = fieldType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         storageTypeSubstitutor = ::StorageTypeSubstitutor,
     )
 
 internal fun FieldTypeSubstitutor(
     fieldType: FieldType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     storageTypeSubstitutor: TypeSubstitutor<StorageType>,
 ): FieldType = fieldType.apply {
-    storageType = storageTypeSubstitutor(fieldType.storageType, concreteHeapTypeSubstitutor)
+    storageType = storageTypeSubstitutor(fieldType.storageType, substitution)
 }

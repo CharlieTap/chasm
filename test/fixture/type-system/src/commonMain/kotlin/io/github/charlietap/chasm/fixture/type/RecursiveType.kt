@@ -3,12 +3,11 @@ package io.github.charlietap.chasm.fixture.type
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.RecursiveType
-import io.github.charlietap.chasm.type.RecursiveType.Companion.STATE_SYNTAX
 import io.github.charlietap.chasm.type.SubType
 
 fun recursiveType(
     subTypes: List<SubType> = emptyList(),
-    state: Byte = STATE_SYNTAX,
+    state: RecursiveType.State = RecursiveType.State.SYNTAX,
 ) = RecursiveType(
     subTypes = subTypes,
     state = state,
@@ -16,7 +15,7 @@ fun recursiveType(
 
 fun functionRecursiveType(
     functionType: FunctionType = functionType(),
-    state: Byte = STATE_SYNTAX,
+    state: RecursiveType.State = RecursiveType.State.SYNTAX,
 ) = RecursiveType(
     subTypes = listOf(
         SubType.Final(emptyList(), CompositeType.Function(functionType)),

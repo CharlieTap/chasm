@@ -5,20 +5,20 @@ import io.github.charlietap.chasm.type.ReferenceType
 
 fun ReferenceTypeSubstitutor(
     referenceType: ReferenceType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): ReferenceType =
     ReferenceTypeSubstitutor(
         referenceType = referenceType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         heapTypeSubstitutor = ::HeapTypeSubstitutor,
     )
 
 internal fun ReferenceTypeSubstitutor(
     referenceType: ReferenceType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     heapTypeSubstitutor: TypeSubstitutor<HeapType>,
 ): ReferenceType {
-    val heapType = heapTypeSubstitutor(referenceType.heapType, concreteHeapTypeSubstitutor)
+    val heapType = heapTypeSubstitutor(referenceType.heapType, substitution)
     return when (referenceType) {
         is ReferenceType.Ref -> ReferenceType.Ref(heapType)
         is ReferenceType.RefNull -> ReferenceType.RefNull(heapType)

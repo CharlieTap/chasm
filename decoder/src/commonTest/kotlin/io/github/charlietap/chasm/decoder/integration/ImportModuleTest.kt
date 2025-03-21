@@ -51,7 +51,7 @@ class ImportModuleTest {
                     compositeType = functionCompositeType(expectedFunctionType),
                 ),
             ),
-            state = RecursiveType.STATE_SYNTAX,
+            state = RecursiveType.State.SYNTAX,
         )
 
         val expectedType = type(
@@ -60,7 +60,7 @@ class ImportModuleTest {
         )
         val expectedDefinedType = definedType(
             expectedRecursiveType.copy(
-                state = RecursiveType.STATE_SUBSTITUTED,
+                state = RecursiveType.State.INTERNAL_SUBSTITUTED,
             ),
         )
 

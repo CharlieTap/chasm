@@ -30,7 +30,7 @@ internal inline fun TypeAllocator(
         // point to external recursive types then run the DefinedTypeRoller on the result
         // which will replace all the remaining type indices which point to internal recursive
         // types with recursive type indices
-        val substituted = recursiveTypeSubstitutor(type, context.substitutor)
+        val substituted = recursiveTypeSubstitutor(type, context.substitution)
         val definedTypes = definedTypeRoller(context.types.size, substituted)
         context.types += definedTypes
         definedTypes

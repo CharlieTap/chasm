@@ -5,19 +5,19 @@ import io.github.charlietap.chasm.type.ResultType
 
 internal fun FunctionTypeSubstitutor(
     functionType: FunctionType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): FunctionType =
     FunctionTypeSubstitutor(
         functionType = functionType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         resultTypeSubstitutor = ::ResultTypeSubstitutor,
     )
 
 internal fun FunctionTypeSubstitutor(
     functionType: FunctionType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     resultTypeSubstitutor: TypeSubstitutor<ResultType>,
 ): FunctionType = functionType.apply {
-    params = resultTypeSubstitutor(functionType.params, concreteHeapTypeSubstitutor)
-    results = resultTypeSubstitutor(functionType.results, concreteHeapTypeSubstitutor)
+    params = resultTypeSubstitutor(functionType.params, substitution)
+    results = resultTypeSubstitutor(functionType.results, substitution)
 }

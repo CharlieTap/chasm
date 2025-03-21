@@ -44,7 +44,7 @@ class RecursiveTypeDecoderTest {
 
         val expected = recursiveType(
             subTypes = subTypes,
-            state = RecursiveType.STATE_SYNTAX,
+            state = RecursiveType.State.SYNTAX,
         )
 
         val actual = RecursiveTypeDecoder(
@@ -79,7 +79,7 @@ class RecursiveTypeDecoderTest {
 
         val expected = recursiveType(
             subTypes = listOf(subType),
-            state = RecursiveType.STATE_SYNTAX,
+            state = RecursiveType.State.SYNTAX,
         )
 
         val actual = RecursiveTypeDecoder(

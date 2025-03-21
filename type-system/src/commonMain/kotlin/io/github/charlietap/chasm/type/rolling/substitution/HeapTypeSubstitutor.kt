@@ -5,9 +5,9 @@ import io.github.charlietap.chasm.type.HeapType
 
 internal fun HeapTypeSubstitutor(
     heapType: HeapType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): HeapType = when (heapType) {
-    is ConcreteHeapType.TypeIndex -> concreteHeapTypeSubstitutor(heapType)
-    is ConcreteHeapType.RecursiveTypeIndex -> concreteHeapTypeSubstitutor(heapType)
+    is ConcreteHeapType.TypeIndex -> substitution.concreteHeapTypeSubstitutor(heapType)
+    is ConcreteHeapType.RecursiveTypeIndex -> substitution.concreteHeapTypeSubstitutor(heapType)
     else -> heapType
 }

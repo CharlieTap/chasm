@@ -28,13 +28,13 @@ internal inline fun DefinedTypeMatcher(
 ): Boolean = when {
     type1 === type2 -> true
     else -> {
-        val substitution = context.substitutor
+        val substitution = context.substitution
 
-        if (type1.recursiveType.state != RecursiveType.STATE_CLOSED) {
+        if (type1.recursiveType.state != RecursiveType.State.CLOSED) {
             definedTypeSubstitutor(type1, substitution)
         }
 
-        if (type2.recursiveType.state != RecursiveType.STATE_CLOSED) {
+        if (type2.recursiveType.state != RecursiveType.State.CLOSED) {
             definedTypeSubstitutor(type2, substitution)
         }
 

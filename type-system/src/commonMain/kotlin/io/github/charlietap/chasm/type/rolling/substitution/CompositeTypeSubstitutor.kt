@@ -7,11 +7,11 @@ import io.github.charlietap.chasm.type.StructType
 
 internal fun CompositeTypeSubstitutor(
     compositeType: CompositeType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
 ): CompositeType =
     CompositeTypeSubstitutor(
         compositeType = compositeType,
-        concreteHeapTypeSubstitutor = concreteHeapTypeSubstitutor,
+        substitution = substitution,
         structTypeSubstitutor = ::StructTypeSubstitutor,
         arrayTypeSubstitutor = ::ArrayTypeSubstitutor,
         functionTypeSubstitutor = ::FunctionTypeSubstitutor,
@@ -19,18 +19,18 @@ internal fun CompositeTypeSubstitutor(
 
 internal fun CompositeTypeSubstitutor(
     compositeType: CompositeType,
-    concreteHeapTypeSubstitutor: ConcreteHeapTypeSubstitutor,
+    substitution: Substitution,
     structTypeSubstitutor: TypeSubstitutor<StructType>,
     arrayTypeSubstitutor: TypeSubstitutor<ArrayType>,
     functionTypeSubstitutor: TypeSubstitutor<FunctionType>,
 ): CompositeType = when (compositeType) {
     is CompositeType.Struct -> CompositeType.Struct(
-        structTypeSubstitutor(compositeType.structType, concreteHeapTypeSubstitutor),
+        structTypeSubstitutor(compositeType.structType, substitution),
     )
     is CompositeType.Array -> CompositeType.Array(
-        arrayTypeSubstitutor(compositeType.arrayType, concreteHeapTypeSubstitutor),
+        arrayTypeSubstitutor(compositeType.arrayType, substitution),
     )
     is CompositeType.Function -> CompositeType.Function(
-        functionTypeSubstitutor(compositeType.functionType, concreteHeapTypeSubstitutor),
+        functionTypeSubstitutor(compositeType.functionType, substitution),
     )
 }
