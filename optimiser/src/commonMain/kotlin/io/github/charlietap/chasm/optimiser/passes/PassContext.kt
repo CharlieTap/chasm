@@ -3,9 +3,6 @@ package io.github.charlietap.chasm.optimiser.passes
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.ir.module.Import
 import io.github.charlietap.chasm.ir.module.Module
-import io.github.charlietap.chasm.ir.module.Type
-import io.github.charlietap.chasm.type.DefinedType
-import io.github.charlietap.chasm.type.rolling.DefinedTypeRoller
 
 internal data class PassContext(
     val module: Module,
@@ -18,17 +15,9 @@ internal data class PassContext(
             .map(Import.Descriptor.Function::type)
 
         val functions = module.functions.map(Function::typeIndex).map { index ->
-            types[index.idx]
+            module.definedTypes[index.idx]
         }
 
         imports + functions
-    }
-
-    val types by lazy {
-        module.types.map(Type::recursiveType).fold(mutableListOf<DefinedType>()) { acc, type ->
-            val definedTypes = DefinedTypeRoller(acc.size, type)
-            acc += definedTypes
-            acc
-        }
     }
 }

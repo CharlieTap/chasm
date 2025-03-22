@@ -28,6 +28,7 @@ import io.github.charlietap.chasm.fixture.ir.module.localIndex
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.module.type
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
@@ -265,21 +266,23 @@ class FusionPassTest {
             localGetInstruction(localIndex(1)),
             callInstruction(functionIndex(0)),
         )
-        val module = module(
-            types = listOf(
-                type(
-                    recursiveType = functionRecursiveType(
-                        functionType(
-                            params = resultType(
-                                types = listOf(
-                                    i32ValueType(),
-                                    i32ValueType(),
-                                    i32ValueType(),
-                                ),
-                            ),
-                        ),
+        val recursiveType = functionRecursiveType(
+            functionType(
+                params = resultType(
+                    types = listOf(
+                        i32ValueType(),
+                        i32ValueType(),
+                        i32ValueType(),
                     ),
                 ),
+            ),
+        )
+        val module = module(
+            types = listOf(
+                type(recursiveType = recursiveType),
+            ),
+            definedTypes = listOf(
+                definedType(recursiveType = recursiveType),
             ),
             functions = listOf(
                 function(
