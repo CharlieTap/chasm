@@ -60,7 +60,7 @@ class ImportModuleTest {
         )
         val expectedDefinedType = definedType(
             expectedRecursiveType.copy(
-                state = RecursiveType.State.INTERNAL_SUBSTITUTED,
+                state = RecursiveType.State.CLOSED,
             ),
         )
 
