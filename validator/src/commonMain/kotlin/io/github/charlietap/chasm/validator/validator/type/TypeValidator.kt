@@ -23,5 +23,6 @@ internal inline fun TypeValidator(
     type: Type,
     crossinline recursiveTypeValidator: Validator<RecursiveType>,
 ): Result<Unit, ModuleValidatorError> = binding {
+    context.definedTypesValidated += type.recursiveType.subTypes.size
     recursiveTypeValidator(context, type.recursiveType).bind()
 }

@@ -25,7 +25,8 @@ import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 internal data class ValidationContext(
     val config: ModuleConfig,
     val module: Module,
-    val types: MutableList<DefinedType> = mutableListOf<DefinedType>(),
+    val types: List<DefinedType> = module.definedTypes,
+    var definedTypesValidated: Int = 0,
     val elementSegmentContext: ElementSegmentContext = ElementSegmentContextImpl(),
     val exportContext: ExportContext = ExportContextImpl(),
     val expressionContext: ExpressionContext = ExpressionContextImpl(),
@@ -42,6 +43,8 @@ internal data class ValidationContext(
     RefsContext by refsContext,
     TypeContext by typeContext,
     TypeMatcherContext {
+
+    val validTypeIndices get() = 0..(definedTypesValidated - 1)
 
     val functions by lazy {
         val importedFunctions = module.imports

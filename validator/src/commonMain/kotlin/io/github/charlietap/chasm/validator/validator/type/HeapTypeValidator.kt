@@ -32,7 +32,7 @@ internal inline fun HeapTypeValidator(
         is ConcreteHeapType.Defined -> definedTypeValidator(context, type.definedType).bind()
         is ConcreteHeapType.RecursiveTypeIndex -> Unit
         is ConcreteHeapType.TypeIndex -> {
-            if (type.index !in context.types.indices) {
+            if (type.index !in context.validTypeIndices) {
                 Err(TypeValidatorError.TypeMismatch).bind()
             }
         }
