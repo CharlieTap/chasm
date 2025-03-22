@@ -12,8 +12,8 @@ import io.github.charlietap.chasm.fixture.ast.module.globalImportDescriptor
 import io.github.charlietap.chasm.fixture.ast.module.memoryImportDescriptor
 import io.github.charlietap.chasm.fixture.ast.module.tableImportDescriptor
 import io.github.charlietap.chasm.fixture.ast.module.tagImportDescriptor
-import io.github.charlietap.chasm.fixture.ast.module.type
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.fixture.type.limits
@@ -27,7 +27,6 @@ import io.github.charlietap.chasm.type.Limits
 import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
-import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -40,18 +39,16 @@ class ImportDescriptorDecoderTest {
         val descriptor = IMPORT_DESCRIPTOR_TYPE_FUNCTION
 
         val recursiveType = functionRecursiveType()
-        val functionType = DefinedTypeFactory(listOf(recursiveType))
-        val expected = Ok(functionImportDescriptor(functionType.first()))
+        val functionType = definedType(recursiveType)
+        val expected = Ok(functionImportDescriptor(functionType))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
         }
         val context = decoderContext(
             reader = reader,
-            types = mutableListOf(
-                type(
-                    recursiveType = recursiveType,
-                ),
+            definedTypes = mutableListOf(
+                definedType(recursiveType),
             ),
         )
 

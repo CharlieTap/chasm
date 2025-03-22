@@ -101,6 +101,7 @@ class ImportModuleTest {
             module(
                 version = Version.One,
                 types = listOf(expectedType),
+                definedTypes = listOf(expectedDefinedType),
                 imports = listOf(
                     expectedFunctionImport,
                     expectedTableImport,

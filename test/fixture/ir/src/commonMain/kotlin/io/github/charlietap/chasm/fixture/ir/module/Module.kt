@@ -14,10 +14,12 @@ import io.github.charlietap.chasm.ir.module.Table
 import io.github.charlietap.chasm.ir.module.Tag
 import io.github.charlietap.chasm.ir.module.Type
 import io.github.charlietap.chasm.ir.module.Version
+import io.github.charlietap.chasm.type.DefinedType
 
 fun module(
     version: Version = Version.One,
     types: List<Type> = emptyList(),
+    definedTypes: List<DefinedType> = emptyList(),
     imports: List<Import> = emptyList(),
     functions: List<Function> = emptyList(),
     tables: List<Table> = emptyList(),
@@ -32,6 +34,7 @@ fun module(
 ) = Module(
     version = version,
     types = types,
+    definedTypes = definedTypes,
     imports = imports,
     functions = functions,
     tables = tables,

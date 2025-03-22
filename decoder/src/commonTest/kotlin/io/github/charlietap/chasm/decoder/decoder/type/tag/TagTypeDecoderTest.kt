@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.fixture.ast.module.type
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.attribute
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.type.TagType
@@ -19,13 +20,15 @@ class TagTypeDecoderTest {
     fun `can decode an encoded tag type`() {
 
         val functionType = functionType()
+        val functionRecursiveType = functionRecursiveType(
+            functionType = functionType,
+        )
         val context = decoderContext(
             types = mutableListOf(
-                type(
-                    recursiveType = functionRecursiveType(
-                        functionType = functionType,
-                    ),
-                ),
+                type(recursiveType = functionRecursiveType),
+            ),
+            definedTypes = mutableListOf(
+                definedType(functionRecursiveType),
             ),
         )
 

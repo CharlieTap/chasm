@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.decoder.reader.WasmBinaryReader
 import io.github.charlietap.chasm.decoder.section.SectionSize
 import io.github.charlietap.chasm.decoder.section.SectionType
+import io.github.charlietap.chasm.type.DefinedType
 
 internal fun decoderContext(
     reader: WasmBinaryReader = FakeWasmBinaryReader(),
@@ -21,6 +22,7 @@ internal fun decoderContext(
     sectionSize: SectionSize = sectionSize(),
     sectionType: SectionType = sectionType(),
     types: MutableList<Type> = mutableListOf(),
+    definedTypes: MutableList<DefinedType> = mutableListOf(),
     blockEndOpcode: UByte = 0u,
     imports: List<Import> = emptyList(),
     index: Int = 0,
@@ -39,6 +41,7 @@ internal fun decoderContext(
     ),
     typeContext = TypeContextImpl(
         types = types,
+        definedTypes = definedTypes,
     ),
     vectorContext = VectorContextImpl(
         index = index,

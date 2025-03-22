@@ -24,9 +24,11 @@ import io.github.charlietap.chasm.decoder.decoder.section.function.FunctionHeade
 import io.github.charlietap.chasm.decoder.error.ModuleDecodeError
 import io.github.charlietap.chasm.decoder.error.ModuleDecoderError
 import io.github.charlietap.chasm.decoder.error.SectionDecodeError
+import io.github.charlietap.chasm.type.DefinedType
 
 internal class ModuleBuilder(private val version: Version) {
     private var types: MutableList<Type> = mutableListOf()
+    private var definedTypes: MutableList<DefinedType> = mutableListOf()
     private var functionHeaders: MutableList<FunctionHeader> = mutableListOf()
     private var functionBodies: MutableList<FunctionBody> = mutableListOf()
     private var tables: MutableList<Table> = mutableListOf()
@@ -41,7 +43,13 @@ internal class ModuleBuilder(private val version: Version) {
     private var customs: MutableList<Custom> = mutableListOf()
     private var dataCount: UInt? = null
 
-    fun types(types: List<Type>) = apply { this.types += types }
+    fun types(
+        types: List<Type>,
+        definedTypes: List<DefinedType>,
+    ) = apply {
+        this.types += types
+        this.definedTypes += definedTypes
+    }
 
     fun imports(imports: List<Import>) = apply { this.imports += imports }
 
@@ -109,6 +117,7 @@ internal class ModuleBuilder(private val version: Version) {
         Module(
             version = version,
             types = types,
+            definedTypes = definedTypes,
             functions = functions,
             tables = tables,
             memories = memories,

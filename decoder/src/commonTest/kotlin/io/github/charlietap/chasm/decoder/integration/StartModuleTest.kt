@@ -12,10 +12,12 @@ import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.SubType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -43,6 +45,9 @@ class StartModuleTest {
             ),
         )
         val expectedType = Type(Index.TypeIndex(0u), expectedRecursiveType)
+        val expectedDefinedType = definedType(
+            expectedRecursiveType.copy(state = RecursiveType.State.CLOSED),
+        )
 
         val expectedFunction = Function(
             idx = Index.FunctionIndex(0u),
@@ -57,6 +62,7 @@ class StartModuleTest {
             module(
                 version = Version.One,
                 types = listOf(expectedType),
+                definedTypes = listOf(expectedDefinedType),
                 imports = emptyList(),
                 functions = listOf(expectedFunction),
                 tables = emptyList(),

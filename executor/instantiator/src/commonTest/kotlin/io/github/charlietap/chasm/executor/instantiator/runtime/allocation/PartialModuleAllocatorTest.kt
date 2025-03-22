@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.ir.module.dataSegment
@@ -29,6 +28,7 @@ import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.tableExternalValue
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionCompositeType
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -38,7 +38,6 @@ import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.RecursiveType
-import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.fixture.runtime.instance.import as runtimeImport
@@ -63,6 +62,7 @@ class PartialModuleAllocatorTest {
             idx = typeIndex,
             recursiveType = recursiveType,
         )
+        val definedType = definedType(recursiveType)
         val table = table()
         val memory = memory()
         val global = global()
@@ -89,6 +89,7 @@ class PartialModuleAllocatorTest {
 
         val module = module(
             types = listOf(type),
+            definedTypes = listOf(definedType),
             functions = listOf(function),
             tables = listOf(table),
             memories = listOf(memory),
@@ -105,7 +106,7 @@ class PartialModuleAllocatorTest {
         }
 
         val expected = ModuleInstance(
-            types = listOf(type.recursiveType.definedType()),
+            types = listOf(definedType),
             functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
             tableAddresses = mutableListOf(importTableAddress),
             memAddresses = mutableListOf(importMemoryAddress),
@@ -119,7 +120,6 @@ class PartialModuleAllocatorTest {
             context = context,
             imports = imports,
             wasmFunctionAllocator = ::WasmFunctionAllocator,
-            typeAllocator = ::TypeAllocator,
             importMatcher = importMatcher,
         )
 

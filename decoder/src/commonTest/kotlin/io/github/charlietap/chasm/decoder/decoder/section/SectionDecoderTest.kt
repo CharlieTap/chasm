@@ -80,7 +80,7 @@ class SectionDecoderTest {
         val sectionType = SectionType.Type
         val sectionSize = SectionSize(117u)
 
-        val expectedSection = TypeSection(emptyList())
+        val expectedSection = TypeSection(emptyList(), emptyList())
 
         val positions = sequenceOf(0u, sectionSize.size).iterator()
         val reader = FakePositionReader {

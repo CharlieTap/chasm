@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.decoder.section
 
 import io.github.charlietap.chasm.ast.module.Type
-import kotlin.jvm.JvmInline
+import io.github.charlietap.chasm.type.DefinedType
 
-@JvmInline
-internal value class TypeSection(val types: List<Type>) : Section
+internal data class TypeSection(
+    val types: List<Type>,
+    val definedTypes: List<DefinedType>,
+) : Section

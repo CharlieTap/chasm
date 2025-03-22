@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.f32ValueType
 import io.github.charlietap.chasm.fixture.type.f64ValueType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
@@ -18,6 +19,7 @@ import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.FunctionType
+import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.ValueType
@@ -55,6 +57,7 @@ class TypeModuleTest {
             ),
         )
         val expectedNumberType = Type(Index.TypeIndex(0u), expectedNumberTypeRecursiveType)
+        val expectedNumberDefinedType = definedType(expectedNumberTypeRecursiveType.copy(state = RecursiveType.State.CLOSED))
 
         val expectedVectorTypeFunctionType = FunctionType(
             params = resultType(
@@ -73,6 +76,7 @@ class TypeModuleTest {
             ),
         )
         val expectedVectorType = Type(Index.TypeIndex(1u), expectedVectorTypeRecursiveType)
+        val expectedVectorDefinedType = definedType(expectedVectorTypeRecursiveType.copy(state = RecursiveType.State.CLOSED))
 
         val expectedReferenceTypeFunctionType = FunctionType(
             params = resultType(
@@ -92,6 +96,7 @@ class TypeModuleTest {
             ),
         )
         val expectedReferenceType = Type(Index.TypeIndex(2u), expectedReferenceTypeRecursiveType)
+        val expectedReferenceDefinedType = definedType(expectedReferenceTypeRecursiveType.copy(state = RecursiveType.State.CLOSED))
 
         val expected = Ok(
             module(
@@ -100,6 +105,11 @@ class TypeModuleTest {
                     expectedNumberType,
                     expectedVectorType,
                     expectedReferenceType,
+                ),
+                definedTypes = listOf(
+                    expectedNumberDefinedType,
+                    expectedVectorDefinedType,
+                    expectedReferenceDefinedType,
                 ),
                 imports = emptyList(),
                 functions = emptyList(),

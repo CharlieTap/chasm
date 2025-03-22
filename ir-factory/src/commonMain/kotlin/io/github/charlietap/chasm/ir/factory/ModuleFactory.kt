@@ -69,6 +69,7 @@ internal inline fun ModuleFactory(
     return IRModule(
         version = versionFactory(module.version),
         types = module.types.map(typeFactory),
+        definedTypes = module.definedTypes,
         imports = module.imports.map(importFactory),
         functions = module.functions.map(functionFactory),
         tables = module.tables.map(tableFactory),

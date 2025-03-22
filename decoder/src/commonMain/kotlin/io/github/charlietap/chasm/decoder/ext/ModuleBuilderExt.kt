@@ -20,7 +20,7 @@ import io.github.charlietap.chasm.decoder.section.TypeSection
 internal fun ModuleBuilder.section(section: Section) = when (section) {
     is CustomSection -> custom(section.custom)
     is DataSection -> dataSegments(section.segments)
-    is TypeSection -> types(section.types)
+    is TypeSection -> types(section.types, section.definedTypes)
     is ImportSection -> imports(section.imports)
     is ExportSection -> exports(section.exports)
     is FunctionSection -> functionHeaders(section.headers)

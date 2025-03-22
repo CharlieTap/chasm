@@ -3,10 +3,8 @@ package io.github.charlietap.chasm.executor.instantiator.allocation
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
-import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
-import io.github.charlietap.chasm.ir.module.Type
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.addFunctionAddress
 import io.github.charlietap.chasm.runtime.ext.addGlobalAddress
@@ -27,7 +25,6 @@ internal fun PartialModuleAllocator(
         context = context,
         imports = imports,
         wasmFunctionAllocator = ::WasmFunctionAllocator,
-        typeAllocator = ::TypeAllocator,
         importMatcher = ::ImportMatcher,
     )
 
@@ -35,15 +32,14 @@ internal inline fun PartialModuleAllocator(
     context: InstantiationContext,
     imports: List<Import>,
     crossinline wasmFunctionAllocator: WasmFunctionAllocator,
-    crossinline typeAllocator: TypeAllocator,
     crossinline importMatcher: ImportMatcher,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val module = context.module
-    val types = typeAllocator(context, module.types.map(Type::recursiveType))
+    val instance = ModuleInstance(module.definedTypes)
 
-    val instance = ModuleInstance(types)
     context.instance = instance
+    context.types += instance.types
 
     val matchedImports = importMatcher(context, imports).bind()
 

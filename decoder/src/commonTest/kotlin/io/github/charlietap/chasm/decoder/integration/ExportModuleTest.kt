@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -58,6 +59,9 @@ class ExportModuleTest {
         )
 
         val expectedFunctionExportType = Type(Index.TypeIndex(0u), expectedRecursiveType)
+        val expectedDefinedType = definedType(
+            expectedRecursiveType.copy(state = RecursiveType.State.CLOSED),
+        )
 
         val expectedFunction = Function(
             idx = Index.FunctionIndex(0u),
@@ -114,6 +118,7 @@ class ExportModuleTest {
             module(
                 version = Version.One,
                 types = listOf(expectedFunctionExportType),
+                definedTypes = listOf(expectedDefinedType),
                 imports = emptyList(),
                 functions = listOf(expectedFunction),
                 tables = listOf(expectedTable),
