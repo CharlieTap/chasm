@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.type
 
 data class DefinedType(
-    var recursiveType: RecursiveType,
+    val recursiveType: RecursiveType,
     val recursiveTypeIndex: Int,
 ) {
     var typeIndex: Int = -1
