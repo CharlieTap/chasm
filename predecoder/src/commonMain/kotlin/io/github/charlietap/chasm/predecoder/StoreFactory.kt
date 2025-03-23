@@ -18,11 +18,11 @@ internal inline fun StoreFactory(
                 val global = context.store.global(address);
                 { value, _ -> global.value = value }
             }
-            is FusedDestination.LocalSet -> {
-                { value, stack -> stack.setLocal(destination.index.idx, value) }
+            is FusedDestination.LocalSet -> { value, stack ->
+                stack.setLocal(destination.index.idx, value)
             }
-            FusedDestination.ValueStack -> {
-                { value, stack -> stack.push(value) }
+            FusedDestination.ValueStack -> { value, stack ->
+                stack.push(value)
             }
         }
     }

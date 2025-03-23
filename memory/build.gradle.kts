@@ -38,5 +38,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "memory"
-    description = "chasms memory instance functionality"
+    description = "a kotlin multiplatform wasm linear memory implementation"
 }

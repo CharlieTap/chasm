@@ -36,7 +36,7 @@ hilt-integrations = "1.2.0"
 
 junit = "4.13.2"
 
-kotlin = "2.1.0"
+kotlin = "2.1.20"
 k-poet = "1.18.1"
 kotlinter = "5.0.1"
 
@@ -48,7 +48,7 @@ kotlinx-io = "0.6.0"
 kotlinx-serialization = "1.8.0"
 kotlinx-test-resources = "0.10.0"
 
-ksp = "2.1.0-1.0.29"
+ksp = "2.1.20-1.0.31"
 
 result = "2.0.1"
 

@@ -13,28 +13,28 @@ internal inline fun LoadFactory(
 ): LoadOp {
     return context.loadCache.getOrPut(operand) {
         when (operand) {
-            is FusedOperand.I32Const -> {
-                { operand.const.toLong() }
+            is FusedOperand.I32Const -> { _ ->
+                operand.const.toLong()
             }
-            is FusedOperand.I64Const -> {
-                { operand.const }
+            is FusedOperand.I64Const -> { _ ->
+                operand.const
             }
-            is FusedOperand.F32Const -> {
-                { operand.const.toRawBits().toLong() }
+            is FusedOperand.F32Const -> { _ ->
+                operand.const.toRawBits().toLong()
             }
-            is FusedOperand.F64Const -> {
-                { operand.const.toRawBits() }
+            is FusedOperand.F64Const -> { _ ->
+                operand.const.toRawBits()
             }
             is FusedOperand.GlobalGet -> {
                 val address = context.instance.globalAddress(operand.index).value
                 val global = context.store.global(address);
                 { global.value }
             }
-            is FusedOperand.LocalGet -> {
-                { stack -> stack.getLocal(operand.index.idx) }
+            is FusedOperand.LocalGet -> { stack ->
+                stack.getLocal(operand.index.idx)
             }
-            is FusedOperand.ValueStack -> {
-                { stack -> stack.pop() }
+            is FusedOperand.ValueStack -> { stack ->
+                stack.pop()
             }
         }
     }
