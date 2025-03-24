@@ -28,6 +28,6 @@ internal fun DefinedTypeRoller(
 ): List<DefinedType> {
     val rolledRecursiveType = recursiveTypeRoller(typeIndex, recursiveType)
     return List(rolledRecursiveType.subTypes.size) { subTypeIndex ->
-        DefinedType(typeIndex + subTypeIndex, rolledRecursiveType, subTypeIndex)
+        DefinedType(rolledRecursiveType, subTypeIndex, typeIndex + subTypeIndex)
     }
 }
