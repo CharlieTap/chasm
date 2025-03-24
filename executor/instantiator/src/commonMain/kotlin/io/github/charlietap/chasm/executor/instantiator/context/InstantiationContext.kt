@@ -14,7 +14,6 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 
 data class InstantiationContext(
     val config: RuntimeConfig,
@@ -34,6 +33,4 @@ data class InstantiationContext(
     override val reverseLookup: DefinedTypeReverseLookup = { type ->
         types.indexOfFirst { definedType -> type == definedType }
     }
-
-    override val substitution: Substitution.TypeIndexToDefinedType = Substitution.TypeIndexToDefinedType(types)
 }

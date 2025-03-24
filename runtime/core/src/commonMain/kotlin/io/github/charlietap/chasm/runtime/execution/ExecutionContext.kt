@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 
 data class ExecutionContext(
     val cstack: ControlStack,
@@ -24,6 +23,4 @@ data class ExecutionContext(
 
     override val reverseLookup: DefinedTypeReverseLookup
         get() = TODO("Not yet implemented")
-
-    override val substitution: Substitution.TypeIndexToDefinedType = Substitution.TypeIndexToDefinedType(instance.types)
 }

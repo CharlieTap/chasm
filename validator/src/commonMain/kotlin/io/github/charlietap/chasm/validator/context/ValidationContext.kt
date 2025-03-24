@@ -17,7 +17,6 @@ import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 
 internal data class ValidationContext(
     val config: ModuleConfig,
@@ -117,6 +116,4 @@ internal data class ValidationContext(
 
     override val reverseLookup: DefinedTypeReverseLookup
         get() = TODO("Not yet implemented")
-
-    override val substitution: Substitution.TypeIndexToDefinedType = Substitution.TypeIndexToDefinedType(types)
 }

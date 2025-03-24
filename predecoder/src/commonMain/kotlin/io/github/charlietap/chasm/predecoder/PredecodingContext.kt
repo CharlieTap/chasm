@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 
 data class PredecodingContext(
     val instance: ModuleInstance,
@@ -29,6 +28,4 @@ data class PredecodingContext(
     override val reverseLookup: DefinedTypeReverseLookup = { type ->
         types.indexOfFirst { definedType -> type == definedType }
     }
-
-    override val substitution: Substitution.TypeIndexToDefinedType = Substitution.TypeIndexToDefinedType(types)
 }
