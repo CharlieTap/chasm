@@ -9,13 +9,10 @@ import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.VectorType
-import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 
-fun ValueType.default(
-    context: TypeMatcherContext,
-): Long = when (this) {
+fun ValueType.default(): Long = when (this) {
     is ValueType.Number -> default()
-    is ValueType.Reference -> default(context)
+    is ValueType.Reference -> default()
     is ValueType.Vector -> default()
     is ValueType.Bottom -> throw InvocationException(InvocationError.UndefinedDefaultBottomType)
 }
@@ -28,13 +25,11 @@ fun ValueType.Number.default(): Long = when (this.numberType) {
     -> 0L
 }
 
-fun ValueType.Reference.default(
-    context: TypeMatcherContext,
-): Long = when (val refType = this.referenceType) {
+fun ValueType.Reference.default(): Long = when (val refType = this.referenceType) {
     is ReferenceType.RefNull -> {
         val substituted = when (val heapType = refType.heapType) {
             is ConcreteHeapType.Defined -> {
-                val typeIndex = context.reverseLookup(heapType.definedType)
+                val typeIndex = heapType.definedType.typeIndex
                 ConcreteHeapType.TypeIndex(typeIndex)
             }
             else -> heapType

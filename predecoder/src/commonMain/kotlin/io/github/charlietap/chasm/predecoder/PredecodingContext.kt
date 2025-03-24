@@ -10,7 +10,6 @@ import io.github.charlietap.chasm.runtime.instruction.StoreOp
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
-import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 
 data class PredecodingContext(
@@ -23,9 +22,5 @@ data class PredecodingContext(
 ) : TypeMatcherContext {
     override val lookup: DefinedTypeLookup = { index ->
         types.getOrNull(index)
-    }
-
-    override val reverseLookup: DefinedTypeReverseLookup = { type ->
-        types.indexOfFirst { definedType -> type == definedType }
     }
 }

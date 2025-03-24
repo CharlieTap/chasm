@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
-import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
 
 internal data class ValidationContext(
@@ -113,7 +112,4 @@ internal data class ValidationContext(
     override val lookup: DefinedTypeLookup = { index ->
         types.getOrNull(index)
     }
-
-    override val reverseLookup: DefinedTypeReverseLookup
-        get() = TODO("Not yet implemented")
 }

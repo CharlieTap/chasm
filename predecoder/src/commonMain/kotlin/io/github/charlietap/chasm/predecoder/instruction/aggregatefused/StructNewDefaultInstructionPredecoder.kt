@@ -39,7 +39,7 @@ internal inline fun StructNewDefaultInstructionPredecoder(
         InvocationError.StructCompositeTypeExpected,
     ).bind()
     val fields = LongArray(structType.fields.size) { idx ->
-        structType.fields[idx].default(context)
+        structType.fields[idx].default()
     }
 
     dispatcher(

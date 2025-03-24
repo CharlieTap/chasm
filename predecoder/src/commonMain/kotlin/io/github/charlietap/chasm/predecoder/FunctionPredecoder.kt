@@ -28,9 +28,7 @@ internal inline fun FunctionPredecoder(
         idx = function.idx,
         typeIndex = function.typeIndex,
         locals = LongArray(function.locals.size) { index ->
-            function.locals[index]
-                .type
-                .default(context)
+            function.locals[index].type.default()
         },
         body = expressionPredecoder(context, function.body).bind(),
     )
