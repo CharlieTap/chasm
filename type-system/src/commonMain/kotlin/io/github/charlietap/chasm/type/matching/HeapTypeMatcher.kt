@@ -57,7 +57,7 @@ internal fun HeapTypeMatcher(
         context,
     )
     type1 is ConcreteHeapType.Defined && type2 !is ConcreteHeapType.Defined -> CompositeTypeHeapTypeMatcher(
-        definedTypeExpander(type1.definedType),
+        definedTypeExpander(type1.definedType, context.unroller),
         type2,
     )
     else -> type1 == type2

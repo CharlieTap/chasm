@@ -24,7 +24,7 @@ internal fun ArrayNewDataInstructionValidator(
 
     val definedType = context.type(instruction.typeIndex).bind()
     val arrayType = definedType
-        .arrayType()
+        .arrayType(context.unroller)
         .toResultOr {
             TypeValidatorError.TypeMismatch
         }.bind()

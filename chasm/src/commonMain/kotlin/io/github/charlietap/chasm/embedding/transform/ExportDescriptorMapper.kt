@@ -15,7 +15,7 @@ internal class ExportDescriptorMapper(
                 val function = module.functions.first { function ->
                     function.idx == input.functionIndex
                 }
-                val functionType = module.types[function.typeIndex.idx.toInt()].recursiveType.functionType()
+                val functionType = module.definedTypes[function.typeIndex.idx.toInt()].functionType()
                 ExternalType.Function(functionType!!)
             }
             is Export.Descriptor.Global -> {

@@ -25,7 +25,7 @@ internal fun RecursiveTypeUnroller(
 ): RecursiveType {
     val substitution = Substitution.RecursiveTypeIndexToDefinedType(recursiveType)
     // Its important we copy when making this version as part of rolling,
-    //  else we will alter the type in the context, and it's outer defined type
+    // else we will alter the type in the context, and it's outer defined type
     // will now contain a recursive type which includes a reference to itself
     val copy = recursiveTypeDeepCopier(recursiveType)
     return recursiveTypeSubstitutor(copy, substitution)
