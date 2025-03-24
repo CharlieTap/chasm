@@ -40,7 +40,7 @@ internal inline fun FusedIfInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
 
     val operand = loadFactory(context, instruction.operand)
-    val functionType = blockTypeExpander(context.types, instruction.blockType, context.unroller)
+    val functionType = blockTypeExpander(context.types, instruction.blockType)
         .toResultOr {
             InstantiationError.PredecodingError
         }.bind()

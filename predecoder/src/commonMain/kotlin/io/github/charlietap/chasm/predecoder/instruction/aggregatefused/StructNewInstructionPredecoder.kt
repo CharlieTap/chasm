@@ -34,7 +34,7 @@ internal inline fun StructNewInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val destination = storeFactory(context, instruction.destination)
     val definedType = context.types[instruction.typeIndex.idx]
-    val structType = context.unroller(definedType).compositeType.structType() ?: Err(
+    val structType = definedType.asSubType.compositeType.structType() ?: Err(
         InvocationError.StructCompositeTypeExpected,
     ).bind()
 

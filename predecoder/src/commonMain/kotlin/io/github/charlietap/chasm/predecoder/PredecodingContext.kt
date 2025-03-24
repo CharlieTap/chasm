@@ -9,12 +9,9 @@ import io.github.charlietap.chasm.runtime.instruction.LoadOp
 import io.github.charlietap.chasm.runtime.instruction.StoreOp
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.DefinedType
-import io.github.charlietap.chasm.type.SubType
-import io.github.charlietap.chasm.type.factory.DefinedTypeUnrollerFactory
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 
 data class PredecodingContext(
@@ -22,7 +19,6 @@ data class PredecodingContext(
     val store: Store,
     val instructionCache: HashMap<Instruction, DispatchableInstruction>,
     val types: MutableList<DefinedType>,
-    val unrollCache: HashMap<DefinedType, SubType>,
     val loadCache: HashMap<FusedOperand, LoadOp>,
     val storeCache: HashMap<FusedDestination, StoreOp>,
 ) : TypeMatcherContext {
@@ -35,5 +31,4 @@ data class PredecodingContext(
     }
 
     override val substitution: Substitution.TypeIndexToDefinedType = Substitution.TypeIndexToDefinedType(types)
-    override val unroller: DefinedTypeUnroller = DefinedTypeUnrollerFactory(unrollCache)
 }

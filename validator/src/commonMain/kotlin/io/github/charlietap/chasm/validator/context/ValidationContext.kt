@@ -12,14 +12,11 @@ import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.MemoryType
-import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
-import io.github.charlietap.chasm.type.factory.DefinedTypeUnrollerFactory
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.type.matching.DefinedTypeReverseLookup
 import io.github.charlietap.chasm.type.matching.TypeMatcherContext
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 
 internal data class ValidationContext(
@@ -34,7 +31,6 @@ internal data class ValidationContext(
     val instructionContext: InstructionContext = InstructionContextImpl(),
     val refsContext: RefsContext = RefsContextImpl(module),
     val typeContext: TypeContext = TypeContextImpl(),
-    val unrollCache: HashMap<DefinedType, SubType> = hashMapOf(),
 ) : ElementSegmentContext by elementSegmentContext,
     ExportContext by exportContext,
     ExpressionContext by expressionContext,
@@ -123,5 +119,4 @@ internal data class ValidationContext(
         get() = TODO("Not yet implemented")
 
     override val substitution: Substitution.TypeIndexToDefinedType = Substitution.TypeIndexToDefinedType(types)
-    override val unroller: DefinedTypeUnroller = DefinedTypeUnrollerFactory(unrollCache)
 }

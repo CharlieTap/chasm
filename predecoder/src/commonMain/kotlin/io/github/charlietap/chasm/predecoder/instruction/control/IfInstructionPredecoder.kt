@@ -36,7 +36,7 @@ internal inline fun IfInstructionPredecoder(
     crossinline ifDispatcher: Dispatcher<If>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
 
-    val functionType = blockTypeExpander(context.types, instruction.blockType, context.unroller)
+    val functionType = blockTypeExpander(context.types, instruction.blockType)
         .toResultOr {
             InstantiationError.PredecodingError
         }.bind()

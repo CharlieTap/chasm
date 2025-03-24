@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.decoder.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.ext.functionType
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 
 internal fun TagTypeDecoder(
     context: DecoderContext,
@@ -32,7 +31,7 @@ internal inline fun TagTypeDecoder(
     val index = typeIndexDecoder(context).bind()
 
     val type = context.definedTypes[index.idx.toInt()]
-    val functionType = type.functionType(::DefinedTypeUnroller) ?: Err(TypeDecodeError.InvalidTagType).bind()
+    val functionType = type.functionType() ?: Err(TypeDecodeError.InvalidTagType).bind()
 
     TagType(attribute, functionType)
 }

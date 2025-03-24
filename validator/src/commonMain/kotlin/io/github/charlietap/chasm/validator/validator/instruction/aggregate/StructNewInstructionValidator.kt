@@ -23,7 +23,7 @@ internal fun StructNewInstructionValidator(
 
     val definedType = context.type(instruction.typeIndex).bind()
     val structType = definedType
-        .structType(context.unroller)
+        .structType()
         .toResultOr {
             TypeValidatorError.TypeMismatch
         }.bind()

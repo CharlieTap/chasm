@@ -30,7 +30,7 @@ internal inline fun ArrayNewDefaultInstructionPredecoder(
     crossinline dispatcher: Dispatcher<ArrayNewDefault>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val definedType = context.types[instruction.typeIndex.idx]
-    val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
+    val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
     val field = arrayType.fieldType.default(context)

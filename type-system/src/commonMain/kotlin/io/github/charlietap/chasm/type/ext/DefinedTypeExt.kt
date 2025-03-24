@@ -5,19 +5,15 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 
 inline fun DefinedType.functionType(
-    noinline definedTypeUnroller: DefinedTypeUnroller,
     definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpander,
-): FunctionType? = definedTypeExpander(this, definedTypeUnroller).functionType()
+): FunctionType? = definedTypeExpander(this).functionType()
 
 inline fun DefinedType.structType(
-    noinline definedTypeUnroller: DefinedTypeUnroller,
     definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpander,
-): StructType? = definedTypeExpander(this, definedTypeUnroller).structType()
+): StructType? = definedTypeExpander(this).structType()
 
 inline fun DefinedType.arrayType(
-    noinline definedTypeUnroller: DefinedTypeUnroller,
     definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpander,
-): ArrayType? = definedTypeExpander(this, definedTypeUnroller).arrayType()
+): ArrayType? = definedTypeExpander(this).arrayType()

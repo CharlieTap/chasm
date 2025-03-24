@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.optimiser.passes.PassContext
 import io.github.charlietap.chasm.type.ext.functionType
-import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 
 internal typealias ControlInstructionFuser = (PassContext, Int, ControlInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
@@ -125,7 +124,7 @@ internal inline fun ControlInstructionFuser(
     // TODO Implement logic to fuse operands that do not immediately precede the call instructions
     is ControlInstruction.Call -> {
 
-        val type = context.functionTypes[instruction.functionIndex.idx].functionType(::DefinedTypeUnroller)
+        val type = context.functionTypes[instruction.functionIndex.idx].functionType()
 
         if (type == null) {
             output.add(instruction)

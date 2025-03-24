@@ -40,7 +40,7 @@ internal inline fun SubTypeValidator(
         when (superType) {
             is ConcreteHeapType.TypeIndex -> {
                 val definedType = context.type(superType.index).bind()
-                val subType = context.unroller(definedType)
+                val subType = definedType.asSubType
                 if (subType is SubType.Final) {
                     Err(TypeValidatorError.TypeMismatch).bind()
                 }

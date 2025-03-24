@@ -24,7 +24,7 @@ internal inline fun DefinedTypeMatcher(
     type1 === type2 -> true
     type1 == type2 -> true
     else -> {
-        val subType = context.unroller(type1)
+        val subType = type1.asSubType
         subType.superTypes.any { ht1 ->
             heapTypeMatcher(ht1, ConcreteHeapType.Defined(type2), context)
         }

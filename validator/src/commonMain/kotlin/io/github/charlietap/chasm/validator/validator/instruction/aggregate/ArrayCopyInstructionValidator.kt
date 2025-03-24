@@ -38,14 +38,14 @@ internal inline fun ArrayCopyInstructionValidator(
 
     val srcDefinedType = context.type(instruction.sourceTypeIndex).bind()
     val srcArrayType = srcDefinedType
-        .arrayType(context.unroller)
+        .arrayType()
         .toResultOr {
             TypeValidatorError.TypeMismatch
         }.bind()
 
     val dstDefinedType = context.type(instruction.destinationTypeIndex).bind()
     val dstArrayType = dstDefinedType
-        .arrayType(context.unroller)
+        .arrayType()
         .toResultOr {
             TypeValidatorError.TypeMismatch
         }.bind()

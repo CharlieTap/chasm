@@ -35,7 +35,7 @@ internal inline fun ArrayNewDataInstructionPredecoder(
     val dataAddress = context.instance.dataAddress(instruction.dataIndex).bind()
     val dataInstance = context.store.data(dataAddress)
     val definedType = context.types[instruction.typeIndex.idx]
-    val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
+    val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
     val fieldWidthInBytes = arrayType.fieldType.bitWidth()?.let { sizeInBits ->

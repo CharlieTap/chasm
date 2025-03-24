@@ -33,7 +33,7 @@ internal inline fun ArrayInitDataInstructionPredecoder(
     crossinline dispatcher: Dispatcher<ArrayInitData>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val definedType = context.types[instruction.typeIndex.idx]
-    val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
+    val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
     val dataAddress = context.instance.dataAddress(instruction.dataIndex).bind()

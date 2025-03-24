@@ -33,7 +33,7 @@ internal inline fun ArrayNewElementInstructionPredecoder(
     val elementAddress = context.instance.elementAddress(instruction.elementIndex).bind()
     val elementInstance = context.store.element(elementAddress)
     val definedType = context.types[instruction.typeIndex.idx]
-    val arrayType = context.unroller(definedType).compositeType.arrayType() ?: Err(
+    val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
 

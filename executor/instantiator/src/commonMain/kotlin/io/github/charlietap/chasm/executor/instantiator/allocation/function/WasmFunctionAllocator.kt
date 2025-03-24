@@ -41,7 +41,7 @@ internal inline fun WasmFunctionAllocator(
     val store = context.store
     val type = moduleInstance.types.getOrNull(function.typeIndex.idx)
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
-    val functionType = type.functionType(context.unroller)
+    val functionType = type.functionType()
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
 
     // We create a function instance with a temp inner function that will be replaced after
