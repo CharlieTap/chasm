@@ -47,7 +47,7 @@ internal inline fun ValidationContext.type(
 internal inline fun ValidationContext.functionType(
     index: Index.FunctionIndex,
 ): Result<FunctionType, ModuleValidatorError> {
-    return functions.getOrNull(index.idx.toInt())?.functionType().toResultOr {
+    return functions.getOrNull(index.idx.toInt())?.functionType(unroller).toResultOr {
         FunctionValidatorError.UnknownType
     }
 }
@@ -55,7 +55,7 @@ internal inline fun ValidationContext.functionType(
 internal inline fun ValidationContext.functionType(
     index: Index.TypeIndex,
 ): Result<FunctionType, ModuleValidatorError> {
-    return types.getOrNull(index.idx.toInt())?.functionType().toResultOr {
+    return types.getOrNull(index.idx.toInt())?.functionType(unroller).toResultOr {
         FunctionValidatorError.UnknownType
     }
 }
@@ -64,7 +64,7 @@ internal inline fun ValidationContext.functionType(
     blockType: BlockType,
     blockTypeExpander: BlockTypeExpander = ::BlockTypeExpander,
 ): Result<FunctionType, ModuleValidatorError> {
-    return blockTypeExpander(types, blockType).toResultOr {
+    return blockTypeExpander(types, blockType, unroller).toResultOr {
         FunctionValidatorError.UnknownType
     }
 }

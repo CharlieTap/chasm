@@ -36,7 +36,7 @@ internal inline fun TryTableInstructionPredecoder(
     crossinline tryTableDispatcher: Dispatcher<TryTable>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
 
-    val functionType = blockTypeExpander(context.types, instruction.blockType)
+    val functionType = blockTypeExpander(context.types, instruction.blockType, context.unroller)
         .toResultOr {
             InstantiationError.PredecodingError
         }.bind()

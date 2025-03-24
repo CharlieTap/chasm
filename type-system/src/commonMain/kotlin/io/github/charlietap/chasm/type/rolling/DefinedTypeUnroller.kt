@@ -15,11 +15,10 @@ typealias DefinedTypeUnroller = (DefinedType) -> SubType
 
 fun DefinedTypeUnroller(
     definedType: DefinedType,
-): SubType =
-    DefinedTypeUnroller(
-        definedType = definedType,
-        recursiveTypeUnroller = ::RecursiveTypeUnroller,
-    )
+): SubType = DefinedTypeUnroller(
+    definedType = definedType,
+    recursiveTypeUnroller = ::RecursiveTypeUnroller,
+)
 
 internal fun DefinedTypeUnroller(
     definedType: DefinedType,

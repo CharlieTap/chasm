@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 
 inline fun DefinedType.functionType(
-    noinline definedTypeUnroller: DefinedTypeUnroller = ::DefinedTypeUnroller,
+    noinline definedTypeUnroller: DefinedTypeUnroller,
     definedTypeExpander: DefinedTypeExpander = ::DefinedTypeExpander,
 ): FunctionType? = definedTypeExpander(this, definedTypeUnroller).functionType()
 
