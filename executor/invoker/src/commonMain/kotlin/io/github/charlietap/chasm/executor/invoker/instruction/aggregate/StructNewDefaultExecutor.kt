@@ -17,7 +17,7 @@ internal inline fun StructNewDefaultExecutor(
     context: ExecutionContext,
     instruction: AggregateInstruction.StructNewDefault,
 ) {
-    val instance = StructInstance(instruction.definedType, instruction.structType, instruction.fields)
+    val instance = StructInstance(instruction.rtt, instruction.structType, instruction.fields)
     store.structs.add(instance)
     val reference = ReferenceValue.Struct(Address.Struct(store.structs.size - 1))
 

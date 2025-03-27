@@ -11,6 +11,10 @@ data class DefinedType(
         DefinedTypeUnroller(this)
     }
 
+    val parent by lazy {
+        (asSubType.superTypes.firstOrNull() as? ConcreteHeapType.Defined)?.definedType
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false

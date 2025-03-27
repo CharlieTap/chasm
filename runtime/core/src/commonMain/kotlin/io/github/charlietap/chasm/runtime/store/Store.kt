@@ -11,6 +11,8 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instance.TagInstance
+import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RTT
 
 data class Store(
     val functions: MutableList<FunctionInstance> = mutableListOf(),
@@ -24,4 +26,5 @@ data class Store(
     val instructions: MutableList<DispatchableInstruction> = mutableListOf(),
     val structs: MutableList<StructInstance> = mutableListOf(),
     val arrays: MutableList<ArrayInstance> = mutableListOf(),
+    val rttCache: MutableMap<DefinedType, RTT> = mutableMapOf(),
 )

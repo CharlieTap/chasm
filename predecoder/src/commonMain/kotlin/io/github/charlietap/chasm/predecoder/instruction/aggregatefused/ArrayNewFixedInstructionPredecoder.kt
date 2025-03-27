@@ -36,13 +36,14 @@ internal inline fun ArrayNewFixedInstructionPredecoder(
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
 
     val destination = storeFactory(context, instruction.destination)
 
     dispatcher(
         ArrayNewFixed(
             destination = destination,
-            definedType = definedType,
+            rtt = rtt,
             arrayType = arrayType,
             size = instruction.size,
         ),

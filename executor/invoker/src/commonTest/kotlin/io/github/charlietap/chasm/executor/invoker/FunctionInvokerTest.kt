@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
-import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
@@ -14,7 +13,6 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -34,13 +32,9 @@ class FunctionInvokerTest {
                 listOf(i32ValueType()),
             ),
         )
-        val definedType = functionType.definedType()
-        val function = runtimeFunction()
         val functionInstance = wasmFunctionInstance(
-            definedType,
-            functionType,
-            moduleInstance,
-            function,
+            functionType = functionType,
+            module = moduleInstance,
         )
         val functionInstruction = dispatchableInstruction()
         val store = store(

@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ext.definedType
+import io.github.charlietap.chasm.type.factory.RTTFactory
 
 typealias HostFunctionAllocator = (Store, FunctionType, HostFunction) -> ExternalValue.Function
 
@@ -23,6 +24,7 @@ fun HostFunctionAllocator(
         functionType = functionType,
         function = function,
         callDispatcher = ::HostFunctionCallDispatcher,
+        rttFactory = ::RTTFactory,
     )
 
 fun HostFunctionAllocator(
@@ -30,10 +32,12 @@ fun HostFunctionAllocator(
     functionType: FunctionType,
     function: HostFunction,
     callDispatcher: Dispatcher<ControlInstruction.HostFunctionCall>,
+    rttFactory: RTTFactory,
 ): ExternalValue.Function {
 
     val type = functionType.definedType()
-    val instance = FunctionInstance.HostFunction(type, functionType, function)
+    val rtt = rttFactory(type, store.rttCache)
+    val instance = FunctionInstance.HostFunction(type, rtt, functionType, function)
 
     store.functions.add(instance)
     val address = Address.Function(store.functions.size - 1)

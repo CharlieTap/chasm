@@ -33,7 +33,7 @@ internal inline fun ArrayNewElementExecutor(
     val fields = LongArray(arrayLength)
     elements.copyInto(fields, 0, arrayStartOffsetInSegment, arrayEndOffsetInSegment)
 
-    val instance = ArrayInstance(instruction.definedType, instruction.arrayType, fields)
+    val instance = ArrayInstance(instruction.rtt, instruction.arrayType, fields)
     store.arrays.add(instance)
     val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 

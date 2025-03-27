@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.runtime.instance
 
-import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.StructType
 
 data class StructInstance(
-    val definedType: DefinedType,
+    val rtt: RTT,
     val structType: StructType,
     val fields: LongArray,
 ) {
@@ -14,7 +14,7 @@ data class StructInstance(
 
         other as StructInstance
 
-        if (definedType != other.definedType) return false
+        if (rtt != other.rtt) return false
         if (structType != other.structType) return false
         if (!fields.contentEquals(other.fields)) return false
 
@@ -22,7 +22,7 @@ data class StructInstance(
     }
 
     override fun hashCode(): Int {
-        var result = definedType.hashCode()
+        var result = rtt.hashCode()
         result = 31 * result + structType.hashCode()
         result = 31 * result + fields.contentHashCode()
         return result

@@ -33,7 +33,8 @@ internal inline fun ArrayNewDefaultInstructionPredecoder(
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
     val field = arrayType.fieldType.default()
 
-    dispatcher(ArrayNewDefault(definedType, arrayType, field))
+    dispatcher(ArrayNewDefault(rtt, arrayType, field))
 }

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
@@ -12,9 +13,7 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.HostFunction
-import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -51,7 +50,6 @@ class HostFunctionCallTest {
                 ),
             ),
         )
-        val definedType = functionType.definedType()
 
         val hostFunction: HostFunction = {
             listOf(
@@ -60,8 +58,7 @@ class HostFunctionCallTest {
             )
         }
 
-        val functionInstance = FunctionInstance.HostFunction(
-            type = definedType,
+        val functionInstance = hostFunctionInstance(
             functionType = functionType,
             function = hostFunction,
         )

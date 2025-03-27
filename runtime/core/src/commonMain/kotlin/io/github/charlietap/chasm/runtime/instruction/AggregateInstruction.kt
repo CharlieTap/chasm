@@ -4,19 +4,19 @@ import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.StructType
 import kotlin.jvm.JvmInline
 
 sealed interface AggregateInstruction : LinkedInstruction {
 
     data class StructNew(
-        val definedType: DefinedType,
+        val rtt: RTT,
         val structType: StructType,
     ) : AggregateInstruction
 
     data class StructNewDefault(
-        val definedType: DefinedType,
+        val rtt: RTT,
         val structType: StructType,
         val fields: LongArray,
     ) : AggregateInstruction
@@ -33,31 +33,31 @@ sealed interface AggregateInstruction : LinkedInstruction {
     ) : AggregateInstruction
 
     data class ArrayNew(
-        val definedType: DefinedType,
+        val rtt: RTT,
         val arrayType: ArrayType,
     ) : AggregateInstruction
 
     data class ArrayNewFixed(
-        val definedType: DefinedType,
+        val rtt: RTT,
         val arrayType: ArrayType,
         val size: UInt,
     ) : AggregateInstruction
 
     data class ArrayNewDefault(
-        val definedType: DefinedType,
+        val rtt: RTT,
         val arrayType: ArrayType,
         val field: Long,
     ) : AggregateInstruction
 
     data class ArrayNewData(
-        val definedType: DefinedType,
+        val rtt: RTT,
         val arrayType: ArrayType,
         val dataInstance: DataInstance,
         val fieldWidthInBytes: Int,
     ) : AggregateInstruction
 
     data class ArrayNewElement(
-        val definedType: DefinedType,
+        val rtt: RTT,
         val arrayType: ArrayType,
         val elementInstance: ElementInstance,
     ) : AggregateInstruction

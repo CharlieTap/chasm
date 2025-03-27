@@ -1,15 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
-import io.github.charlietap.chasm.executor.invoker.type.TypeOf
-import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
+import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.type.ReferenceType
-import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
-import io.github.charlietap.chasm.type.matching.TypeMatcher
 
 internal fun RefTestExecutor(
     vstack: ValueStack,
@@ -23,8 +19,7 @@ internal fun RefTestExecutor(
     store = store,
     context = context,
     instruction = instruction,
-    referenceTypeMatcher = ::ReferenceTypeMatcher,
-    typeOfReferenceValue = ::TypeOfReferenceValue,
+    caster = ::Caster,
 )
 
 internal inline fun RefTestExecutor(
@@ -33,14 +28,12 @@ internal inline fun RefTestExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefTest,
-    crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
-    crossinline typeOfReferenceValue: TypeOf<Long, ReferenceType>,
+    crossinline caster: Caster,
 ) {
     val frame = cstack.peekFrame()
     val moduleInstance = frame.instance
 
-    val referenceType = typeOfReferenceValue(vstack.pop(), store, moduleInstance)
-    if (referenceTypeMatcher(referenceType, instruction.referenceType, context)) {
+    if (caster(vstack.pop(), instruction.referenceType, moduleInstance, store)) {
         vstack.push(1L)
     } else {
         vstack.push(0L)

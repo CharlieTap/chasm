@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.ir.module.dataSegment
@@ -37,6 +38,7 @@ import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.RecursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,7 +51,6 @@ class PartialModuleAllocatorTest {
 
         val store = store()
         val typeIndex = typeIndex(0)
-        val functionAddress = functionAddress(0)
         val function = function(typeIndex = typeIndex)
         val functionType = functionType()
         val recursiveType = recursiveType(
@@ -101,13 +102,25 @@ class PartialModuleAllocatorTest {
         )
         val context = instantiationContext(store, module)
 
+        val runtimeTypes = emptyList<RTT>()
+        val typeAllocator: TypeAllocator = { module, store ->
+            runtimeTypes
+        }
+
         val importMatcher: ImportMatcher = { _, _ ->
             Ok(imports.map(Import::externalValue))
         }
 
+        val wasmFunctionAllocator: WasmFunctionAllocator = { _instance, _function, _store ->
+            assertEquals(function, _function)
+            assertEquals(store, _store)
+            Ok(Unit)
+        }
+
         val expected = ModuleInstance(
+            runtimeTypes = runtimeTypes,
             types = listOf(definedType),
-            functionAddresses = mutableListOf(importFunctionAddress, functionAddress),
+            functionAddresses = mutableListOf(importFunctionAddress),
             tableAddresses = mutableListOf(importTableAddress),
             memAddresses = mutableListOf(importMemoryAddress),
             globalAddresses = mutableListOf(importGlobalAddress),
@@ -119,8 +132,9 @@ class PartialModuleAllocatorTest {
         val actual = PartialModuleAllocator(
             context = context,
             imports = imports,
-            wasmFunctionAllocator = ::WasmFunctionAllocator,
             importMatcher = importMatcher,
+            typeAllocator = typeAllocator,
+            wasmFunctionAllocator = wasmFunctionAllocator,
         )
 
         assertEquals(Ok(expected), actual)

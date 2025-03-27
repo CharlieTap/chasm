@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.referencefused
 
-import io.github.charlietap.chasm.executor.invoker.type.TypeOf
-import io.github.charlietap.chasm.executor.invoker.type.TypeOfReferenceValue
+import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -9,9 +8,6 @@ import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.type.ReferenceType
-import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
-import io.github.charlietap.chasm.type.matching.TypeMatcher
 
 internal fun RefCastExecutor(
     vstack: ValueStack,
@@ -25,8 +21,7 @@ internal fun RefCastExecutor(
     store = store,
     context = context,
     instruction = instruction,
-    referenceTypeMatcher = ::ReferenceTypeMatcher,
-    typeOfReferenceValue = ::TypeOfReferenceValue,
+    caster = ::Caster,
 )
 
 internal inline fun RefCastExecutor(
@@ -35,16 +30,13 @@ internal inline fun RefCastExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: FusedReferenceInstruction.RefCast,
-    crossinline referenceTypeMatcher: TypeMatcher<ReferenceType>,
-    crossinline typeOfReferenceValue: TypeOf<Long, ReferenceType>,
+    crossinline caster: Caster,
 ) {
     val frame = cstack.peekFrame()
     val moduleInstance = frame.instance
 
     val referenceValue = instruction.reference(vstack)
-    val referenceType = typeOfReferenceValue(referenceValue, store, moduleInstance)
-
-    if (referenceTypeMatcher(referenceType, instruction.referenceType, context)) {
+    if (caster(referenceValue, instruction.referenceType, moduleInstance, store)) {
         instruction.destination(referenceValue, vstack)
     } else {
         throw InvocationException(InvocationError.FailedToCastReference)

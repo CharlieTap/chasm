@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
 
 internal inline fun ReturnCallIndirectExecutor(
     vstack: ValueStack,
@@ -24,5 +23,4 @@ internal inline fun ReturnCallIndirectExecutor(
     type = instruction.type,
     hostFunctionCall = ::HostFunctionCall,
     wasmFunctionCall = ::ReturnWasmFunctionCall,
-    definedTypeMatcher = ::DefinedTypeMatcher,
 )

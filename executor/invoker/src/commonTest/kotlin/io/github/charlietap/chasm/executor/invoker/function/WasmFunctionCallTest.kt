@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
-import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
@@ -16,8 +16,6 @@ import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.runtime.ext.toLong
-import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -49,7 +47,6 @@ class WasmFunctionCallTest {
                 ),
             ),
         )
-        val definedType = functionType.definedType()
 
         val function = runtimeFunction(
             locals = longArrayOf(
@@ -65,10 +62,8 @@ class WasmFunctionCallTest {
             ),
         )
 
-        val functionInstance = FunctionInstance.WasmFunction(
-            type = definedType,
+        val functionInstance = wasmFunctionInstance(
             functionType = functionType,
-            module = moduleInstance(),
             function = function,
         )
 
@@ -113,7 +108,6 @@ class WasmFunctionCallTest {
                 ),
             ),
         )
-        val definedType = functionType.definedType()
 
         val function = runtimeFunction(
             locals = longArrayOf(),
@@ -125,10 +119,8 @@ class WasmFunctionCallTest {
             ),
         )
 
-        val functionInstance = FunctionInstance.WasmFunction(
-            type = definedType,
+        val functionInstance = wasmFunctionInstance(
             functionType = functionType,
-            module = moduleInstance(),
             function = function,
         )
 

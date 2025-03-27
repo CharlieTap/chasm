@@ -24,7 +24,7 @@ internal inline fun ArrayNewExecutor(
         value
     }
 
-    val instance = ArrayInstance(instruction.definedType, instruction.arrayType, fields)
+    val instance = ArrayInstance(instruction.rtt, instruction.arrayType, fields)
     store.arrays.add(instance)
     val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 

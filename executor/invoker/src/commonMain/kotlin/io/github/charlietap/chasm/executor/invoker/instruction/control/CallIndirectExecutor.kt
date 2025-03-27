@@ -14,9 +14,7 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.type.DefinedType
-import io.github.charlietap.chasm.type.matching.DefinedTypeMatcher
-import io.github.charlietap.chasm.type.matching.TypeMatcher
+import io.github.charlietap.chasm.type.RTT
 
 internal fun CallIndirectExecutor(
     vstack: ValueStack,
@@ -33,7 +31,6 @@ internal fun CallIndirectExecutor(
     type = instruction.type,
     hostFunctionCall = ::HostFunctionCall,
     wasmFunctionCall = ::WasmFunctionCall,
-    definedTypeMatcher = ::DefinedTypeMatcher,
 )
 
 internal inline fun CallIndirectExecutor(
@@ -42,17 +39,22 @@ internal inline fun CallIndirectExecutor(
     store: Store,
     context: ExecutionContext,
     table: TableInstance,
-    type: DefinedType,
+    type: RTT,
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
-    crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
 ) {
     val elementIndex = vstack.popI32()
     val address = table.element(elementIndex).toFunctionAddress()
 
     val functionInstance = store.function(address)
-    if (!definedTypeMatcher(functionInstance.type, type, context)) {
-        throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
+    val actualType = functionInstance.rtt
+    if (actualType !== type) {
+        if (actualType.superTypes.none { superType ->
+                superType === type
+            }
+        ) {
+            throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
+        }
     }
 
     when (functionInstance) {

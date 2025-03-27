@@ -27,7 +27,7 @@ internal inline fun StructNewExecutor(
         index--
     }
 
-    val instance = StructInstance(instruction.definedType, structType, fields)
+    val instance = StructInstance(instruction.rtt, structType, fields)
     store.structs.add(instance)
     val reference = ReferenceValue.Struct(Address.Struct(store.structs.size - 1))
 

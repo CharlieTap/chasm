@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator.allocation
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
+import io.github.charlietap.chasm.executor.instantiator.allocation.type.TypeAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.matching.ImportMatcher
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
@@ -24,19 +25,24 @@ internal fun PartialModuleAllocator(
     PartialModuleAllocator(
         context = context,
         imports = imports,
-        wasmFunctionAllocator = ::WasmFunctionAllocator,
         importMatcher = ::ImportMatcher,
+        typeAllocator = ::TypeAllocator,
+        wasmFunctionAllocator = ::WasmFunctionAllocator,
     )
 
 internal inline fun PartialModuleAllocator(
     context: InstantiationContext,
     imports: List<Import>,
-    crossinline wasmFunctionAllocator: WasmFunctionAllocator,
     crossinline importMatcher: ImportMatcher,
+    crossinline typeAllocator: TypeAllocator,
+    crossinline wasmFunctionAllocator: WasmFunctionAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val module = context.module
-    val instance = ModuleInstance(module.definedTypes)
+    val store = context.store
+
+    val runtimeTypes = typeAllocator(module, store)
+    val instance = ModuleInstance(module.definedTypes, runtimeTypes)
 
     context.instance = instance
     context.types += instance.types
@@ -54,7 +60,7 @@ internal inline fun PartialModuleAllocator(
     }
 
     module.functions.forEach { function ->
-        wasmFunctionAllocator(context, instance, function).bind()
+        wasmFunctionAllocator(instance, function, store).bind()
     }
 
     instance

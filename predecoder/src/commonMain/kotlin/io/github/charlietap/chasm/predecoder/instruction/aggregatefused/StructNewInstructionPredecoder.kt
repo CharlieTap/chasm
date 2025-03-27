@@ -37,12 +37,13 @@ internal inline fun StructNewInstructionPredecoder(
     val structType = definedType.asSubType.compositeType.structType() ?: Err(
         InvocationError.StructCompositeTypeExpected,
     ).bind()
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
 
     dispatcher(
         StructNew(
             destination = destination,
             structType = structType,
-            definedType = definedType,
+            rtt = rtt,
         ),
     )
 }

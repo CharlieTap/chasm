@@ -33,9 +33,10 @@ internal inline fun StructNewDefaultInstructionPredecoder(
     val structType = definedType.asSubType.compositeType.structType() ?: Err(
         InvocationError.StructCompositeTypeExpected,
     ).bind()
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
     val fields = LongArray(structType.fields.size) { idx ->
         structType.fields[idx].default()
     }
 
-    dispatcher(StructNewDefault(definedType, structType, fields))
+    dispatcher(StructNewDefault(rtt, structType, fields))
 }

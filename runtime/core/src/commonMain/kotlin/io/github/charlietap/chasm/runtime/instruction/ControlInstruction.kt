@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
@@ -171,12 +171,12 @@ sealed interface ControlInstruction : LinkedInstruction {
     value class CallRef(val typeIndex: Index.TypeIndex) : ControlInstruction
 
     data class CallIndirect(
-        val type: DefinedType,
+        val type: RTT,
         val table: TableInstance,
     ) : ControlInstruction
 
     data class ReturnCallIndirect(
-        val type: DefinedType,
+        val type: RTT,
         val table: TableInstance,
     ) : ControlInstruction
 }

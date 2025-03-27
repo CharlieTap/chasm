@@ -40,6 +40,7 @@ internal inline fun ArrayNewInstructionPredecoder(
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
 
     val size = loadFactory(context, instruction.size)
     val value = loadFactory(context, instruction.value)
@@ -50,7 +51,7 @@ internal inline fun ArrayNewInstructionPredecoder(
             size = size,
             value = value,
             destination = destination,
-            definedType = definedType,
+            rtt = rtt,
             arrayType = arrayType,
         ),
     )

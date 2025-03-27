@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.runtime.instance
 
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RTT
 
 data class ArrayInstance(
-    val definedType: DefinedType,
+    val rtt: RTT,
     val arrayType: ArrayType,
     val fields: LongArray,
 ) {
@@ -14,7 +14,7 @@ data class ArrayInstance(
 
         other as ArrayInstance
 
-        if (definedType != other.definedType) return false
+        if (rtt != other.rtt) return false
         if (arrayType != other.arrayType) return false
         if (!fields.contentEquals(other.fields)) return false
 
@@ -22,7 +22,7 @@ data class ArrayInstance(
     }
 
     override fun hashCode(): Int {
-        var result = definedType.hashCode()
+        var result = rtt.hashCode()
         result = 31 * result + arrayType.hashCode()
         result = 31 * result + fields.contentHashCode()
         return result

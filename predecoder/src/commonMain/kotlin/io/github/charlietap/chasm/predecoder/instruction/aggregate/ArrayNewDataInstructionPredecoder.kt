@@ -35,6 +35,7 @@ internal inline fun ArrayNewDataInstructionPredecoder(
     val dataAddress = context.instance.dataAddress(instruction.dataIndex).bind()
     val dataInstance = context.store.data(dataAddress)
     val definedType = context.types[instruction.typeIndex.idx]
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
@@ -42,5 +43,5 @@ internal inline fun ArrayNewDataInstructionPredecoder(
         sizeInBits / 8
     } ?: throw InvocationException(InvocationError.UnobservableBitWidth)
 
-    dispatcher(ArrayNewData(definedType, arrayType, dataInstance, fieldWidthInBytes))
+    dispatcher(ArrayNewData(rtt, arrayType, dataInstance, fieldWidthInBytes))
 }

@@ -35,7 +35,7 @@ internal inline fun CallIndirectInstructionPredecoder(
 
     dispatcher(
         CallIndirect(
-            type = context.types[instruction.typeIndex.idx],
+            type = context.instance.runtimeTypes[instruction.typeIndex.idx],
             table = table,
         ),
     )

@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.StructType
 
 sealed interface FusedAggregateInstruction : LinkedInstruction {
@@ -55,13 +55,13 @@ sealed interface FusedAggregateInstruction : LinkedInstruction {
         val size: LoadOp,
         val value: LoadOp,
         val destination: StoreOp,
-        val definedType: DefinedType,
+        val rtt: RTT,
         val arrayType: ArrayType,
     ) : FusedAggregateInstruction
 
     data class ArrayNewFixed(
         val destination: StoreOp,
-        val definedType: DefinedType,
+        val rtt: RTT,
         val arrayType: ArrayType,
         val size: Int,
     ) : FusedAggregateInstruction
@@ -96,13 +96,13 @@ sealed interface FusedAggregateInstruction : LinkedInstruction {
 
     data class StructNew(
         val destination: StoreOp,
-        val definedType: DefinedType,
+        val rtt: RTT,
         val structType: StructType,
     ) : FusedAggregateInstruction
 
     data class StructNewDefault(
         val destination: StoreOp,
-        val definedType: DefinedType,
+        val rtt: RTT,
         val structType: StructType,
         val fields: LongArray,
     ) : FusedAggregateInstruction

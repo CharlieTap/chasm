@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.WasmFunctionAllocator
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.ir.module.function
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
@@ -12,6 +11,7 @@ import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.rtt
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
@@ -29,12 +29,10 @@ class WasmFunctionAllocatorTest {
         val store = store(
             functions = functions,
         )
-        val context = instantiationContext(
-            store = store,
-        )
 
         val functionType = functionType()
         val type = functionType.definedType()
+        val rtt = rtt()
         val typeIndex = typeIndex(0)
         val wasmFunction = function(
             typeIndex = typeIndex,
@@ -45,6 +43,7 @@ class WasmFunctionAllocatorTest {
 
         val moduleInstance = moduleInstance(
             types = mutableListOf(type),
+            runtimeTypes = listOf(rtt),
         )
 
         val functionInstruction = dispatchableInstruction()
@@ -54,15 +53,16 @@ class WasmFunctionAllocatorTest {
 
         val expectedInstance = FunctionInstance.WasmFunction(
             type = type,
+            rtt = rtt,
             functionType = functionType,
             function = runtimeFunction,
             module = moduleInstance,
         )
 
         val actual = WasmFunctionAllocator(
-            context = context,
             moduleInstance = moduleInstance,
             function = wasmFunction,
+            store = store,
             callDispatcher = callDispatcher,
         )
 
@@ -76,9 +76,6 @@ class WasmFunctionAllocatorTest {
         val functions = mutableListOf<FunctionInstance>()
         val store = store(
             functions = functions,
-        )
-        val context = instantiationContext(
-            store = store,
         )
 
         val typeIndex = typeIndex(0)
@@ -94,7 +91,7 @@ class WasmFunctionAllocatorTest {
             ),
         )
 
-        val actual = WasmFunctionAllocator(context, moduleInstance, wasmFunction)
+        val actual = WasmFunctionAllocator(moduleInstance, wasmFunction, store)
 
         assertEquals(expected, actual)
         assertTrue(functions.isEmpty())

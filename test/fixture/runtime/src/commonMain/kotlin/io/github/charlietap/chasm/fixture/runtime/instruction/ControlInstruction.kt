@@ -4,14 +4,14 @@ import io.github.charlietap.chasm.fixture.ir.module.labelIndex
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.referenceType
+import io.github.charlietap.chasm.fixture.type.rtt
 import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.ReferenceType
 
 fun controlRuntimeInstruction(): ControlInstruction = unreachableRuntimeInstruction()
@@ -127,7 +127,7 @@ fun callRefRuntimeInstruction(
 )
 
 fun callIndirectRuntimeInstruction(
-    type: DefinedType = definedType(),
+    type: RTT = rtt(),
     table: TableInstance = tableInstance(),
 ) = ControlInstruction.CallIndirect(
     type = type,
@@ -135,7 +135,7 @@ fun callIndirectRuntimeInstruction(
 )
 
 fun returnCallIndirectRuntimeInstruction(
-    type: DefinedType = definedType(),
+    type: RTT = rtt(),
     table: TableInstance = tableInstance(),
 ) = ControlInstruction.ReturnCallIndirect(
     type = type,

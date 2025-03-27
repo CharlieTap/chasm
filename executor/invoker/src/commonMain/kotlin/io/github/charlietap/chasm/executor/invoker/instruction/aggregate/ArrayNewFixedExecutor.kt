@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.type.RTT
 
 internal fun ArrayNewFixedExecutor(
     vstack: ValueStack,
@@ -23,7 +23,7 @@ internal fun ArrayNewFixedExecutor(
     cstack = cstack,
     store = store,
     context = context,
-    definedType = instruction.definedType,
+    rtt = instruction.rtt,
     arrayType = instruction.arrayType,
     size = instruction.size.toInt(),
 )
@@ -33,7 +33,7 @@ internal inline fun ArrayNewFixedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    definedType: DefinedType,
+    rtt: RTT,
     arrayType: ArrayType,
     size: Int,
 ) {
@@ -44,7 +44,7 @@ internal inline fun ArrayNewFixedExecutor(
         index--
     }
 
-    val instance = ArrayInstance(definedType, arrayType, fields)
+    val instance = ArrayInstance(rtt, arrayType, fields)
     store.arrays.add(instance)
     val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 
