@@ -9,11 +9,5 @@ inline fun RTTFactory(
     type: DefinedType,
     cache: Map<DefinedType, RTT>,
 ): RTT {
-    val superTypes = mutableListOf<RTT>()
-    var superType = type.parent
-    while (superType != null) {
-        superTypes.add(cache[superType]!!)
-        superType = superType.parent
-    }
-    return RTT(superTypes)
+    return RTT(type, cache)
 }

@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.SubType
 
 fun recursiveType(
-    subTypes: List<SubType> = emptyList(),
+    subTypes: List<SubType> = listOf(subType()),
     state: RecursiveType.State = RecursiveType.State.SYNTAX,
 ) = RecursiveType(
     subTypes = subTypes,

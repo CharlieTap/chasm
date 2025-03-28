@@ -1,9 +1,12 @@
 package io.github.charlietap.chasm.fixture.type
 
+import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.RTT
 
 fun rtt(
-    superTypes: List<RTT> = emptyList(),
+    type: DefinedType = definedType(),
+    cache: Map<DefinedType, RTT> = emptyMap(),
 ) = RTT(
-    superTypes = superTypes,
+    type = type,
+    cache = cache,
 )

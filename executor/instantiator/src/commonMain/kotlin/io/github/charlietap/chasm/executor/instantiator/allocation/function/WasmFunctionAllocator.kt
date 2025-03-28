@@ -40,8 +40,9 @@ internal inline fun WasmFunctionAllocator(
 
     val type = moduleInstance.types.getOrNull(function.typeIndex.idx)
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
-    val runtimeType = moduleInstance.runtimeTypes.getOrNull(function.typeIndex.idx)
-        ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
+    val runtimeType = moduleInstance.runtimeTypes.getOrNull(function.typeIndex.idx)?.apply {
+        hydrate()
+    } ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
     val functionType = type.functionType()
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
 

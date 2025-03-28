@@ -21,6 +21,7 @@ import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction.
 import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction.RefNull
 import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction.RefTest
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.type.ConcreteHeapType
 
 internal fun FusedReferenceInstructionPredecoder(
     context: PredecodingContext,
@@ -84,6 +85,12 @@ internal inline fun FusedReferenceInstructionPredecoder(
             val reference = loadFactory(context, instruction.reference)
             val destination = storeFactory(context, instruction.destination)
 
+            // Pre resolve supertypes
+            when (val heapType = instruction.referenceType.heapType) {
+                is ConcreteHeapType.TypeIndex -> context.instance.runtimeTypes[heapType.index].hydrate()
+                else -> Unit
+            }
+
             refTestDispatcher(
                 RefTest(
                     reference = reference,
@@ -95,6 +102,12 @@ internal inline fun FusedReferenceInstructionPredecoder(
         is FusedReferenceInstruction.RefCast -> {
             val reference = loadFactory(context, instruction.reference)
             val destination = storeFactory(context, instruction.destination)
+
+            // Pre resolve supertypes
+            when (val heapType = instruction.referenceType.heapType) {
+                is ConcreteHeapType.TypeIndex -> context.instance.runtimeTypes[heapType.index].hydrate()
+                else -> Unit
+            }
 
             refCastDispatcher(
                 RefCast(

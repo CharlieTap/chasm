@@ -36,7 +36,10 @@ fun HostFunctionAllocator(
 ): ExternalValue.Function {
 
     val type = functionType.definedType()
-    val rtt = rttFactory(type, store.rttCache)
+    val rtt = rttFactory(type, store.rttCache).apply {
+        hydrate()
+    }
+
     val instance = FunctionInstance.HostFunction(type, rtt, functionType, function)
 
     store.functions.add(instance)

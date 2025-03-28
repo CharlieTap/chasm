@@ -24,6 +24,7 @@ import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefIs
 import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefNull
 import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction.RefTest
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.type.ConcreteHeapType
 
 internal fun ReferenceInstructionPredecoder(
     context: PredecodingContext,
@@ -65,7 +66,23 @@ internal inline fun ReferenceInstructionPredecoder(
             refFuncDispatcher(RefFunc(reference))
         }
         is ReferenceInstruction.RefEq -> refEqDispatcher(RefEq)
-        is ReferenceInstruction.RefTest -> refTestDispatcher(RefTest(instruction.referenceType))
-        is ReferenceInstruction.RefCast -> refCastDispatcher(RefCast(instruction.referenceType))
+        is ReferenceInstruction.RefTest -> {
+            // Pre resolve supertypes
+            when (val heapType = instruction.referenceType.heapType) {
+                is ConcreteHeapType.TypeIndex -> context.instance.runtimeTypes[heapType.index].hydrate()
+                else -> Unit
+            }
+
+            refTestDispatcher(RefTest(instruction.referenceType))
+        }
+        is ReferenceInstruction.RefCast -> {
+            // Pre resolve supertypes
+            when (val heapType = instruction.referenceType.heapType) {
+                is ConcreteHeapType.TypeIndex -> context.instance.runtimeTypes[heapType.index].hydrate()
+                else -> Unit
+            }
+
+            refCastDispatcher(RefCast(instruction.referenceType))
+        }
     }
 }
