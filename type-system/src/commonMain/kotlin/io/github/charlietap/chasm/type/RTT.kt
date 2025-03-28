@@ -5,13 +5,13 @@ class RTT(
     val cache: Map<DefinedType, RTT>,
 ) {
     val superTypes: List<RTT> by lazy {
-        val superTypes = mutableListOf<RTT>()
         var superType = type.parent
-        while (superType != null) {
-            superTypes.add(cache[superType]!!)
-            superType = superType.parent
+        buildList {
+            while (superType != null) {
+                add(cache[superType]!!)
+                superType = superType.parent
+            }
         }
-        superTypes
     }
 
     //  Force evaluation of lazy property AOT
