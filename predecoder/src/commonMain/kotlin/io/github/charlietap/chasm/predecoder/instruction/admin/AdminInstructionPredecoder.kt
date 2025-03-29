@@ -32,5 +32,12 @@ internal inline fun AdminInstructionPredecoder(
     when (instruction) {
         is AdminInstruction.EndBlock -> endBlockDispatcher(EndBlock)
         is AdminInstruction.EndFunction -> endFunctionDispatcher(EndFunction)
+        is AdminInstruction.Jump -> TODO()
+        is AdminInstruction.JumpIf -> TODO()
+        is AdminInstruction.JumpOnCast -> TODO()
+        is AdminInstruction.JumpOnCastFail -> TODO()
+        is AdminInstruction.JumpOnNonNull -> TODO()
+        is AdminInstruction.JumpOnNull -> TODO()
+        is AdminInstruction.JumpTable -> TODO()
     }
 }
