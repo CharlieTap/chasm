@@ -2,27 +2,12 @@ package io.github.charlietap.chasm.predecoder.instruction.control
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.Br
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.BrIf
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.BrOnCast
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.BrOnCastFail
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.BrOnNonNull
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.BrOnNull
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.BrTable
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.CallIndirect
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.CallRef
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.Nop
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.Return
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.ReturnCallIndirect
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.ReturnCallRef
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.Throw
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.ThrowRef
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.Unreachable
 
 internal fun ControlInstructionPredecoder(
     context: PredecodingContext,
@@ -104,5 +89,13 @@ internal inline fun ControlInstructionPredecoder(
         is ControlInstruction.ThrowRef -> throwRefInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.TryTable -> tryTableInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Unreachable -> unreachableInstructionPredecoder(context, instruction).bind()
+        is AdminInstruction.Jump -> TODO()
+        is AdminInstruction.JumpIf -> TODO()
+        is AdminInstruction.JumpIfNot -> TODO()
+        is AdminInstruction.JumpOnCast -> TODO()
+        is AdminInstruction.JumpOnCastFail -> TODO()
+        is AdminInstruction.JumpOnNonNull -> TODO()
+        is AdminInstruction.JumpOnNull -> TODO()
+        is AdminInstruction.JumpTable -> TODO()
     }
 }
