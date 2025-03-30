@@ -5,6 +5,10 @@ import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.StructType
 
+inline fun CompositeType.arrayType(): ArrayType? {
+    return (this as? CompositeType.Array)?.arrayType
+}
+
 inline fun CompositeType.functionType(): FunctionType? {
     return (this as? CompositeType.Function)?.functionType
 }
@@ -13,6 +17,14 @@ inline fun CompositeType.structType(): StructType? {
     return (this as? CompositeType.Struct)?.structType
 }
 
-inline fun CompositeType.arrayType(): ArrayType? {
-    return (this as? CompositeType.Array)?.arrayType
+inline fun CompositeType.asArrayType(): ArrayType {
+    return (this as CompositeType.Array).arrayType
+}
+
+inline fun CompositeType.asFunctionType(): FunctionType {
+    return (this as CompositeType.Function).functionType
+}
+
+inline fun CompositeType.asStructType(): StructType {
+    return (this as CompositeType.Struct).structType
 }
