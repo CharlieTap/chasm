@@ -2,12 +2,11 @@ package io.github.charlietap.chasm.optimiser.passes.controlflow
 
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
 
-internal typealias ExpressionRewriter = (PassContext, Expression) -> Expression
+internal typealias ExpressionRewriter = (ControlFlowContext, Expression) -> Expression
 
 internal fun ExpressionRewriter(
-    context: PassContext,
+    context: ControlFlowContext,
     expression: Expression,
 ): Expression = ExpressionRewriter(
     context = context,
@@ -16,7 +15,7 @@ internal fun ExpressionRewriter(
 )
 
 internal inline fun ExpressionRewriter(
-    context: PassContext,
+    context: ControlFlowContext,
     expression: Expression,
     instructionRewriter: InstructionRewriter,
 ): Expression {

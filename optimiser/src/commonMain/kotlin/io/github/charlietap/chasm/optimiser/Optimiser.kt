@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ir.module.Module
 import io.github.charlietap.chasm.optimiser.passes.ControlFlowPass
 import io.github.charlietap.chasm.optimiser.passes.FusionPass
 import io.github.charlietap.chasm.optimiser.passes.Pass
+import io.github.charlietap.chasm.optimiser.passes.PassContext
 
 typealias Optimiser = (RuntimeConfig, Module) -> Module
 
@@ -22,14 +23,18 @@ fun Optimiser(
 internal inline fun Optimiser(
     config: RuntimeConfig,
     module: Module,
-    control: Pass,
-    fusion: Pass,
+    noinline control: Pass,
+    noinline fusion: Pass,
 ): Module {
-    return control(module).let { compiled ->
+    val context = PassContext(module)
+    val passes = buildList {
         if (config.bytecodeFusion) {
-            fusion(compiled)
-        } else {
-            compiled
+            add(fusion)
         }
+        add(control)
+    }
+
+    return passes.fold(module) { module, pass ->
+        pass(context, module)
     }
 }

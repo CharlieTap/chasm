@@ -5,12 +5,12 @@ import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.FusedParametricInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.ParametricInstruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 
-internal typealias ParametricInstructionFuser = (PassContext, Int, ParametricInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias ParametricInstructionFuser = (PassContextt, Int, ParametricInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun ParametricInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: ParametricInstruction,
     input: List<Instruction>,
@@ -26,7 +26,7 @@ internal fun ParametricInstructionFuser(
 )
 
 internal inline fun ParametricInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: ParametricInstruction,
     input: List<Instruction>,

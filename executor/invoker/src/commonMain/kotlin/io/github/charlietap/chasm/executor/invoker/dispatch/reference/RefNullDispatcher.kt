@@ -15,6 +15,6 @@ fun RefNullDispatcher(
 internal inline fun RefNullDispatcher(
     instruction: ReferenceInstruction.RefNull,
     crossinline executor: Executor<ReferenceInstruction.RefNull>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

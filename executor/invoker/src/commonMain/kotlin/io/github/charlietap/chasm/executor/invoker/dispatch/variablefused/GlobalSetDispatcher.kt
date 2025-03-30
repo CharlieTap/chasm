@@ -15,6 +15,6 @@ fun GlobalSetDispatcher(
 internal inline fun GlobalSetDispatcher(
     instruction: FusedVariableInstruction.GlobalSet,
     crossinline executor: Executor<FusedVariableInstruction.GlobalSet>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

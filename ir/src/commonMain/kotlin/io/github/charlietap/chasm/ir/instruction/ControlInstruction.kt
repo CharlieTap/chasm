@@ -45,7 +45,10 @@ sealed interface ControlInstruction : Instruction {
     @JvmInline
     value class BrIf(val labelIndex: Index.LabelIndex) : ControlInstruction
 
-    data class BrTable(val labelIndices: List<Index.LabelIndex>, val defaultLabelIndex: Index.LabelIndex) : ControlInstruction
+    data class BrTable(
+        val labelIndices: List<Index.LabelIndex>,
+        val defaultLabelIndex: Index.LabelIndex,
+    ) : ControlInstruction
 
     @JvmInline
     value class BrOnNull(val labelIndex: Index.LabelIndex) : ControlInstruction
@@ -66,6 +69,8 @@ sealed interface ControlInstruction : Instruction {
     ) : ControlInstruction
 
     data object Return : ControlInstruction
+
+    data object ReturnExpression : ControlInstruction
 
     @JvmInline
     value class ReturnCall(val functionIndex: Index.FunctionIndex) : ControlInstruction

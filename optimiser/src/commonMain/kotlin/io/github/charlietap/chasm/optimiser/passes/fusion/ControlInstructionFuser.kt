@@ -5,13 +5,13 @@ import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 import io.github.charlietap.chasm.type.ext.functionType
 
-internal typealias ControlInstructionFuser = (PassContext, Int, ControlInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias ControlInstructionFuser = (PassContextt, Int, ControlInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun ControlInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: ControlInstruction,
     input: List<Instruction>,
@@ -27,7 +27,7 @@ internal fun ControlInstructionFuser(
 )
 
 internal inline fun ControlInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: ControlInstruction,
     input: List<Instruction>,

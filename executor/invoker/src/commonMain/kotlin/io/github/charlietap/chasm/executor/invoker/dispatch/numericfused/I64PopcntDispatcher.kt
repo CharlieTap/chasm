@@ -15,6 +15,6 @@ fun I64PopcntDispatcher(
 internal inline fun I64PopcntDispatcher(
     instruction: FusedNumericInstruction.I64Popcnt,
     crossinline executor: Executor<FusedNumericInstruction.I64Popcnt>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

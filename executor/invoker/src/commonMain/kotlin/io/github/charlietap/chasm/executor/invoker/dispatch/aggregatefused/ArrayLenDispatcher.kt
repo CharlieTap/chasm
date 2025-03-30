@@ -15,6 +15,6 @@ fun ArrayLenDispatcher(
 internal inline fun ArrayLenDispatcher(
     instruction: FusedAggregateInstruction.ArrayLen,
     crossinline executor: Executor<FusedAggregateInstruction.ArrayLen>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

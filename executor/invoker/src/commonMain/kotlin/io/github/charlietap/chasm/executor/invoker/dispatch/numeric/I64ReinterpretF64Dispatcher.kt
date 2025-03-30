@@ -15,6 +15,6 @@ fun I64ReinterpretF64Dispatcher(
 internal inline fun I64ReinterpretF64Dispatcher(
     instruction: NumericInstruction.I64ReinterpretF64,
     crossinline executor: Executor<NumericInstruction.I64ReinterpretF64>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

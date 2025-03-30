@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
@@ -17,12 +18,14 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.RTT
 
 internal fun CallIndirectExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.CallIndirect,
 ) = CallIndirectExecutor(
+    ip = ip,
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -34,6 +37,7 @@ internal fun CallIndirectExecutor(
 )
 
 internal inline fun CallIndirectExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
@@ -42,7 +46,7 @@ internal inline fun CallIndirectExecutor(
     type: RTT,
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
-) {
+): InstructionPointer {
     val elementIndex = vstack.popI32()
     val address = table.element(elementIndex).toFunctionAddress()
 
@@ -57,8 +61,8 @@ internal inline fun CallIndirectExecutor(
         }
     }
 
-    when (functionInstance) {
-        is FunctionInstance.HostFunction -> hostFunctionCall(vstack, cstack, store, context, functionInstance)
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(vstack, cstack, store, context, functionInstance)
+    return when (functionInstance) {
+        is FunctionInstance.HostFunction -> hostFunctionCall(ip, vstack, cstack, store, context, functionInstance)
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(ip, vstack, cstack, store, context, functionInstance)
     }
 }

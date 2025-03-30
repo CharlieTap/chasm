@@ -20,12 +20,12 @@ import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
 import io.github.charlietap.chasm.ir.instruction.VectorInstruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 
-internal typealias InstructionFuser = (PassContext, Int, Instruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias InstructionFuser = (PassContextt, Int, Instruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun InstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: Instruction,
     input: List<Instruction>,
@@ -47,7 +47,7 @@ internal fun InstructionFuser(
 )
 
 internal inline fun InstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: Instruction,
     input: List<Instruction>,

@@ -15,6 +15,6 @@ fun ArrayGetUnsignedDispatcher(
 internal inline fun ArrayGetUnsignedDispatcher(
     instruction: FusedAggregateInstruction.ArrayGetUnsigned,
     crossinline executor: Executor<FusedAggregateInstruction.ArrayGetUnsigned>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

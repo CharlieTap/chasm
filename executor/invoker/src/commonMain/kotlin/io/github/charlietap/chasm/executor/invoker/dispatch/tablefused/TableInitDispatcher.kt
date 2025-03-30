@@ -15,6 +15,6 @@ fun TableInitDispatcher(
 internal inline fun TableInitDispatcher(
     instruction: FusedTableInstruction.TableInit,
     crossinline executor: Executor<FusedTableInstruction.TableInit>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

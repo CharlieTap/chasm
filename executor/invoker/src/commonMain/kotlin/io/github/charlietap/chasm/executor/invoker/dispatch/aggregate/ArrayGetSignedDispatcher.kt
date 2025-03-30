@@ -15,6 +15,6 @@ fun ArrayGetSignedDispatcher(
 internal inline fun ArrayGetSignedDispatcher(
     instruction: AggregateInstruction.ArrayGetSigned,
     crossinline executor: Executor<AggregateInstruction.ArrayGetSigned>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

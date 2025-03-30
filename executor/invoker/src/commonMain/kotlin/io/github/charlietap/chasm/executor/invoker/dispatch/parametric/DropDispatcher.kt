@@ -15,6 +15,6 @@ fun DropDispatcher(
 internal inline fun DropDispatcher(
     instruction: ParametricInstruction.Drop,
     crossinline executor: Executor<ParametricInstruction.Drop>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun I64CtzDispatcher(
 internal inline fun I64CtzDispatcher(
     instruction: NumericInstruction.I64Ctz,
     crossinline executor: Executor<NumericInstruction.I64Ctz>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

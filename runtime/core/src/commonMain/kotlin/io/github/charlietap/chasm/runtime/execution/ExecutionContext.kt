@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.execution
 
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -14,6 +15,8 @@ data class ExecutionContext(
     val store: Store,
     val instance: ModuleInstance,
     val config: RuntimeConfig,
+    val getInstructions: () -> Array<DispatchableInstruction>,
+    val setInstructions: (Array<DispatchableInstruction>) -> Unit,
 ) : TypeMatcherContext {
     override val lookup: (Int) -> DefinedType? = { index ->
         instance.types.getOrNull(index)

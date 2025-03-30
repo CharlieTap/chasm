@@ -15,6 +15,6 @@ fun F32NearestDispatcher(
 internal inline fun F32NearestDispatcher(
     instruction: FusedNumericInstruction.F32Nearest,
     crossinline executor: Executor<FusedNumericInstruction.F32Nearest>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

@@ -40,8 +40,6 @@ class RefCastIssueExceptionTest {
             config = config,
         )
 
-        print(result)
-
         assertIs<ChasmResult.Success<Unit>>(result)
     }
 

@@ -15,6 +15,6 @@ fun MemoryFillDispatcher(
 internal inline fun MemoryFillDispatcher(
     instruction: MemoryInstruction.MemoryFill,
     crossinline executor: Executor<MemoryInstruction.MemoryFill>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

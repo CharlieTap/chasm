@@ -15,6 +15,6 @@ fun F32CopysignDispatcher(
 internal inline fun F32CopysignDispatcher(
     instruction: FusedNumericInstruction.F32Copysign,
     crossinline executor: Executor<FusedNumericInstruction.F32Copysign>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun I32ReinterpretF32Dispatcher(
 internal inline fun I32ReinterpretF32Dispatcher(
     instruction: NumericInstruction.I32ReinterpretF32,
     crossinline executor: Executor<NumericInstruction.I32ReinterpretF32>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

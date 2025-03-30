@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
+import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
@@ -35,6 +36,9 @@ class FunctionInvokerTest {
         val functionInstance = wasmFunctionInstance(
             functionType = functionType,
             module = moduleInstance,
+            function = runtimeFunction(
+                locals = longArrayOf(1L),
+            ),
         )
         val functionInstruction = dispatchableInstruction()
         val store = store(
@@ -42,9 +46,10 @@ class FunctionInvokerTest {
             instructions = mutableListOf(functionInstruction),
         )
 
-        val threadExecutor: ThreadExecutor = { _config, _params ->
+        val threadExecutor: ThreadExecutor = { _config, _params, _locals ->
             assertEquals(config, _config.config)
             assertEquals(params, _params)
+            assertEquals(functionInstance.function.locals, _locals)
             Ok(listOf(117L))
         }
 

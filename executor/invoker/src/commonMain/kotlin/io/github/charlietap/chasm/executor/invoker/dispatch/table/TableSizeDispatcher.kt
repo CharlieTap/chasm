@@ -15,6 +15,6 @@ fun TableSizeDispatcher(
 internal inline fun TableSizeDispatcher(
     instruction: TableInstruction.TableSize,
     crossinline executor: Executor<TableInstruction.TableSize>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

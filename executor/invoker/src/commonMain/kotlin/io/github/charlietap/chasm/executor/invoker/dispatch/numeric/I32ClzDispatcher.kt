@@ -15,6 +15,6 @@ fun I32ClzDispatcher(
 internal inline fun I32ClzDispatcher(
     instruction: NumericInstruction.I32Clz,
     crossinline executor: Executor<NumericInstruction.I32Clz>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

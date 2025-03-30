@@ -15,6 +15,6 @@ fun I32MulDispatcher(
 internal inline fun I32MulDispatcher(
     instruction: NumericInstruction.I32Mul,
     crossinline executor: Executor<NumericInstruction.I32Mul>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

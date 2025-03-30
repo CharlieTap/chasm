@@ -25,8 +25,7 @@ internal inline fun ExpressionPredecoder(
 ): Result<RuntimeExpression, ModuleTrapError> = binding {
 
     val instructions: Array<DispatchableInstruction> = Array(expression.instructions.size) { idx ->
-        val reversedIndex = expression.instructions.size - 1 - idx
-        val predispatch = expression.instructions[reversedIndex]
+        val predispatch = expression.instructions[idx]
         instructionPredecoder(context, predispatch).bind()
     }
 

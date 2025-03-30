@@ -15,6 +15,6 @@ fun ArrayGetDispatcher(
 internal inline fun ArrayGetDispatcher(
     instruction: FusedAggregateInstruction.ArrayGet,
     crossinline executor: Executor<FusedAggregateInstruction.ArrayGet>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

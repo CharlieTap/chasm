@@ -6,19 +6,22 @@ import io.github.charlietap.chasm.memory.read.I6432SReader
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.instruction.FusedMemoryInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I64Load32SExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: FusedMemoryInstruction.I64Load32S,
-) =
+): InstructionPointer =
     I64Load32SExecutor(
+        ip = ip,
         vstack = vstack,
         cstack = cstack,
         store = store,
@@ -29,6 +32,7 @@ internal inline fun I64Load32SExecutor(
     )
 
 internal inline fun I64Load32SExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
@@ -36,7 +40,7 @@ internal inline fun I64Load32SExecutor(
     instruction: FusedMemoryInstruction.I64Load32S,
     crossinline boundsChecker: BoundsChecker<Long>,
     crossinline reader: I6432SReader,
-) {
+): InstructionPointer {
     val memory = instruction.memory
 
     val baseAddress = instruction.address(vstack).toInt()
@@ -52,4 +56,6 @@ internal inline fun I64Load32SExecutor(
     }
 
     instruction.destination(result, vstack)
+
+    return ip + 1
 }

@@ -134,12 +134,12 @@ import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Trun
 import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction.I64Xor
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 
-internal typealias NumericInstructionFuser = (PassContext, Int, NumericInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias NumericInstructionFuser = (PassContextt, Int, NumericInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun NumericInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: NumericInstruction,
     input: List<Instruction>,
@@ -155,7 +155,7 @@ internal fun NumericInstructionFuser(
 )
 
 internal inline fun NumericInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: NumericInstruction,
     input: List<Instruction>,

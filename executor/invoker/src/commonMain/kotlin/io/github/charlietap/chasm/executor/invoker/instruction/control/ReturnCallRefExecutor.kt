@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.popFunctionAddress
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -13,12 +14,14 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun ReturnCallRefExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.ReturnCallRef,
 ) = ReturnCallRefExecutor(
+    ip = ip,
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -28,17 +31,18 @@ internal fun ReturnCallRefExecutor(
 )
 
 internal inline fun ReturnCallRefExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
-) {
+): InstructionPointer {
     val address = vstack.popFunctionAddress()
 
-    when (val instance = store.function(address)) {
-        is FunctionInstance.HostFunction -> hostFunctionCall(vstack, cstack, store, context, instance)
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(vstack, cstack, store, context, instance)
+    return when (val instance = store.function(address)) {
+        is FunctionInstance.HostFunction -> hostFunctionCall(ip, vstack, cstack, store, context, instance)
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(ip, vstack, cstack, store, context, instance)
     }
 }

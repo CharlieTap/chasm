@@ -15,6 +15,6 @@ fun F32FloorDispatcher(
 internal inline fun F32FloorDispatcher(
     instruction: NumericInstruction.F32Floor,
     crossinline executor: Executor<NumericInstruction.F32Floor>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

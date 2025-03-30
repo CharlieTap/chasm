@@ -15,6 +15,6 @@ fun I32LoadDispatcher(
 internal inline fun I32LoadDispatcher(
     instruction: MemoryInstruction.I32Load,
     crossinline executor: Executor<MemoryInstruction.I32Load>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

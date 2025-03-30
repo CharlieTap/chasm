@@ -15,6 +15,6 @@ fun StructGetSignedDispatcher(
 internal inline fun StructGetSignedDispatcher(
     instruction: AggregateInstruction.StructGetSigned,
     crossinline executor: Executor<AggregateInstruction.StructGetSigned>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

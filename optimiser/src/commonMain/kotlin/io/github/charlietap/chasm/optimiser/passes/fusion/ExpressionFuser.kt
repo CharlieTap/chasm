@@ -2,12 +2,12 @@ package io.github.charlietap.chasm.optimiser.passes.fusion
 
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 
-internal typealias ExpressionFuser = (PassContext, Expression) -> Expression
+internal typealias ExpressionFuser = (PassContextt, Expression) -> Expression
 
 internal fun ExpressionFuser(
-    context: PassContext,
+    context: PassContextt,
     expression: Expression,
 ): Expression =
     ExpressionFuser(
@@ -17,7 +17,7 @@ internal fun ExpressionFuser(
     )
 
 internal inline fun ExpressionFuser(
-    context: PassContext,
+    context: PassContextt,
     expression: Expression,
     fuser: InstructionFuser,
 ): Expression {

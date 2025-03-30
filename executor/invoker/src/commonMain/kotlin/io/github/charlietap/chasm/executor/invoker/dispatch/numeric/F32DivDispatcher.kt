@@ -15,6 +15,6 @@ fun F32DivDispatcher(
 internal inline fun F32DivDispatcher(
     instruction: NumericInstruction.F32Div,
     crossinline executor: Executor<NumericInstruction.F32Div>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

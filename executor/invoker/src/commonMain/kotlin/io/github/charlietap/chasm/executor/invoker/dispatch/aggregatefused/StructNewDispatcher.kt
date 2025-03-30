@@ -15,6 +15,6 @@ fun StructNewDispatcher(
 internal inline fun StructNewDispatcher(
     instruction: FusedAggregateInstruction.StructNew,
     crossinline executor: Executor<FusedAggregateInstruction.StructNew>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

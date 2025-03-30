@@ -4,47 +4,57 @@ import io.github.charlietap.chasm.type.ReferenceType
 
 sealed interface AdminInstruction : Instruction {
 
-    data object EndBlock : AdminInstruction
+    sealed interface JumpInstruction : AdminInstruction {
 
-    data object EndFunction : AdminInstruction
+        data class Jump(
+            var offset: Int,
+        ) : JumpInstruction
 
-    data class Jump(
-        val offset: Int,
-        val adjustment: StackAdjustment,
-    ) : AdminInstruction
+        data class JumpAdjusting(
+            var offset: Int,
+            val adjustment: StackAdjustment,
+        ) : JumpInstruction
 
-    data class JumpIf(
-        val offset: Int,
-        val adjustment: StackAdjustment,
-    ) : AdminInstruction
+        data class JumpIf(
+            var offset: Int,
+            val adjustment: StackAdjustment,
+        ) : JumpInstruction
 
-    data class JumpTable(
-        val offsets: List<Int>,
-        val defaultOffset: Int,
-        val adjustments: List<StackAdjustment>,
-    ) : AdminInstruction
+        data class JumpIfNot(
+            var offset: Int,
+        ) : JumpInstruction
 
-    data class JumpOnNull(
-        val offset: Int,
-        val adjustment: StackAdjustment,
-    ) : AdminInstruction
+        data class JumpTable(
+            val offsets: MutableList<Int>,
+            val adjustments: List<StackAdjustment>,
+            var defaultOffset: Int,
+            val defaultAdjustment: StackAdjustment,
+        ) : JumpInstruction
 
-    data class JumpOnNonNull(
-        val offset: Int,
-        val adjustment: StackAdjustment,
-    ) : AdminInstruction
+        data class JumpOnNull(
+            var offset: Int,
+            val adjustment: StackAdjustment,
+        ) : JumpInstruction
 
-    data class JumpOnCast(
-        val offset: Int,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
-        val adjustment: StackAdjustment,
-    ) : AdminInstruction
+        data class JumpOnNonNull(
+            var offset: Int,
+            val adjustment: StackAdjustment,
+        ) : JumpInstruction
 
-    data class JumpOnCastFail(
-        val offset: Int,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
-        val adjustment: StackAdjustment,
-    ) : AdminInstruction
+        data class JumpOnCast(
+            var offset: Int,
+            val adjustment: StackAdjustment,
+            val srcReferenceType: ReferenceType,
+            val dstReferenceType: ReferenceType,
+        ) : JumpInstruction
+
+        data class JumpOnCastFail(
+            var offset: Int,
+            val adjustment: StackAdjustment,
+            val srcReferenceType: ReferenceType,
+            val dstReferenceType: ReferenceType,
+        ) : JumpInstruction
+    }
+
+    data class ReturnFunction(val adjustment: StackAdjustment) : AdminInstruction
 }

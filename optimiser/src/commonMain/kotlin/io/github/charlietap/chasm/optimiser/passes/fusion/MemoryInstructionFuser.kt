@@ -23,12 +23,12 @@ import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Store
 import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Store8
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 
-internal typealias MemoryInstructionFuser = (PassContext, Int, MemoryInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias MemoryInstructionFuser = (PassContextt, Int, MemoryInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun MemoryInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: MemoryInstruction,
     input: List<Instruction>,
@@ -44,7 +44,7 @@ internal fun MemoryInstructionFuser(
 )
 
 internal inline fun MemoryInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: MemoryInstruction,
     input: List<Instruction>,

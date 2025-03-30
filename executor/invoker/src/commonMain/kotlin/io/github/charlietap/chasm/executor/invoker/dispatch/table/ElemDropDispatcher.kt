@@ -15,6 +15,6 @@ fun ElemDropDispatcher(
 internal inline fun ElemDropDispatcher(
     instruction: TableInstruction.ElemDrop,
     crossinline executor: Executor<TableInstruction.ElemDrop>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

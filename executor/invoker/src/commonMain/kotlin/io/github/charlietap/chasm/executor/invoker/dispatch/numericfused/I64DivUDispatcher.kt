@@ -15,6 +15,6 @@ fun I64DivUDispatcher(
 internal inline fun I64DivUDispatcher(
     instruction: FusedNumericInstruction.I64DivU,
     crossinline executor: Executor<FusedNumericInstruction.I64DivU>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

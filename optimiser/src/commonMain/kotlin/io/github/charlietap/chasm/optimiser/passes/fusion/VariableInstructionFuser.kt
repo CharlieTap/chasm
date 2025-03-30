@@ -3,12 +3,12 @@ package io.github.charlietap.chasm.optimiser.passes.fusion
 import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 
-internal typealias VariableInstructionFuser = (PassContext, Int, VariableInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias VariableInstructionFuser = (PassContextt, Int, VariableInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun VariableInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: VariableInstruction,
     input: List<Instruction>,
@@ -23,7 +23,7 @@ internal fun VariableInstructionFuser(
 )
 
 internal inline fun VariableInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: VariableInstruction,
     input: List<Instruction>,

@@ -6,19 +6,22 @@ import io.github.charlietap.chasm.memory.read.F64Reader
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 fun F64LoadExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.F64Load,
-) =
+): InstructionPointer =
     F64LoadExecutor(
+        ip = ip,
         vstack = vstack,
         cstack = cstack,
         store = store,
@@ -29,6 +32,7 @@ fun F64LoadExecutor(
     )
 
 internal inline fun F64LoadExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
@@ -36,7 +40,7 @@ internal inline fun F64LoadExecutor(
     instruction: MemoryInstruction.F64Load,
     crossinline boundsChecker: BoundsChecker<Double>,
     crossinline reader: F64Reader,
-) {
+): InstructionPointer {
     val memory = instruction.memory
 
     val baseAddress = vstack.popI32()
@@ -52,4 +56,5 @@ internal inline fun F64LoadExecutor(
     }
 
     vstack.pushF64(result)
+    return ip + 1
 }

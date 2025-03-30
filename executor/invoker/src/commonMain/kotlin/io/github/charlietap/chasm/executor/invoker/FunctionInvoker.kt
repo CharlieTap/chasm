@@ -8,8 +8,8 @@ import io.github.charlietap.chasm.runtime.Configuration
 import io.github.charlietap.chasm.runtime.Thread
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.function
-import io.github.charlietap.chasm.runtime.ext.instruction
 import io.github.charlietap.chasm.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.stack.ActivationFrame
@@ -42,16 +42,18 @@ internal inline fun FunctionInvoker(
 ): Result<List<ExecutionValue>, InvocationError> = binding {
 
     val function = store.function(address) as FunctionInstance.WasmFunction
-    val instruction = store.instruction(address)
     val arity = function.functionType.results.types.size
 
     val thread = Thread(
         frame = ActivationFrame(
             arity = arity,
             instance = function.module,
-            depths = StackDepths(0, 0, 0, 0),
+            depths = StackDepths(0, 0),
+            previousInstructions = emptyArray(),
+            previousInstructionPointer = InstructionPointer(-2),
+            previousFramePointer = 0,
         ),
-        instructions = arrayOf(instruction),
+        instructions = function.function.body.instructions,
     )
 
     val configuration = Configuration(
@@ -60,7 +62,7 @@ internal inline fun FunctionInvoker(
         config = config,
     )
 
-    threadExecutor(configuration, values).bind().mapIndexed { idx, result ->
+    threadExecutor(configuration, values, function.function.locals).bind().mapIndexed { idx, result ->
         val expected = function.functionType.results.types[idx]
         result.toExecutionValue(expected)
     }

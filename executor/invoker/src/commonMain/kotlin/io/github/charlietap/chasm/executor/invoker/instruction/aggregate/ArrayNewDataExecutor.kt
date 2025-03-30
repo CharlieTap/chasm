@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
@@ -14,12 +15,13 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 internal inline fun ArrayNewDataExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewData,
-) {
+): InstructionPointer {
     val arrayType = instruction.arrayType
     val dataInstance = instruction.dataInstance
     val byteArray = dataInstance.bytes
@@ -43,4 +45,6 @@ internal inline fun ArrayNewDataExecutor(
     val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
 
     vstack.push(reference.toLong())
+
+    return ip + 1
 }

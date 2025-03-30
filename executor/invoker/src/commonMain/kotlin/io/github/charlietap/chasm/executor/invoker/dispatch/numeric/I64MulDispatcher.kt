@@ -15,6 +15,6 @@ fun I64MulDispatcher(
 internal inline fun I64MulDispatcher(
     instruction: NumericInstruction.I64Mul,
     crossinline executor: Executor<NumericInstruction.I64Mul>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused
 
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.FieldUnpacker
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.packedField
 import io.github.charlietap.chasm.runtime.ext.struct
 import io.github.charlietap.chasm.runtime.ext.toStructAddress
@@ -11,12 +12,14 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun StructGetSignedExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: FusedAggregateInstruction.StructGetSigned,
 ) = StructGetSignedExecutor(
+    ip = ip,
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -26,13 +29,14 @@ internal inline fun StructGetSignedExecutor(
 )
 
 internal inline fun StructGetSignedExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: FusedAggregateInstruction.StructGetSigned,
     crossinline fieldUnpacker: FieldUnpacker,
-) {
+): InstructionPointer {
     val address = instruction.address(vstack).toStructAddress()
     val structInstance = store.struct(address)
 
@@ -40,4 +44,6 @@ internal inline fun StructGetSignedExecutor(
     val unpackedValue = fieldUnpacker(packed, type, true)
 
     instruction.destination(unpackedValue, vstack)
+
+    return ip + 1
 }

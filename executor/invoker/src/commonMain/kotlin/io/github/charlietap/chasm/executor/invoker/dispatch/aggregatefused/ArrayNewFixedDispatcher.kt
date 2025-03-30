@@ -15,6 +15,6 @@ fun ArrayNewFixedDispatcher(
 internal inline fun ArrayNewFixedDispatcher(
     instruction: FusedAggregateInstruction.ArrayNewFixed,
     crossinline executor: Executor<FusedAggregateInstruction.ArrayNewFixed>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.array
 import io.github.charlietap.chasm.runtime.ext.popArrayAddress
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
@@ -12,12 +13,13 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun ArrayInitDataExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayInitData,
-) {
+): InstructionPointer {
     val dataInstance = instruction.dataInstance
 
     val elementsToCopy = vstack.popI32()
@@ -36,7 +38,7 @@ internal inline fun ArrayInitDataExecutor(
         ) {
             throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
         }
-        return
+        return ip + 1
     }
 
     val byteArray = dataInstance.bytes
@@ -49,4 +51,6 @@ internal inline fun ArrayInitDataExecutor(
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
+
+    return ip + 1
 }

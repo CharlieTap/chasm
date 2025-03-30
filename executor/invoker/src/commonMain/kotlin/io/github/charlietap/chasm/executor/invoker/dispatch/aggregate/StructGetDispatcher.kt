@@ -15,6 +15,6 @@ fun StructGetDispatcher(
 internal inline fun StructGetDispatcher(
     instruction: AggregateInstruction.StructGet,
     crossinline executor: Executor<AggregateInstruction.StructGet>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

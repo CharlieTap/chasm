@@ -5,12 +5,12 @@ import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 
-internal typealias AggregateInstructionFuser = (PassContext, Int, AggregateInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias AggregateInstructionFuser = (PassContextt, Int, AggregateInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun AggregateInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: AggregateInstruction,
     input: List<Instruction>,
@@ -26,7 +26,7 @@ internal fun AggregateInstructionFuser(
 )
 
 internal inline fun AggregateInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: AggregateInstruction,
     input: List<Instruction>,

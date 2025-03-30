@@ -15,21 +15,16 @@ internal fun FusedControlInstructionPredecoder(
     FusedControlInstructionPredecoder(
         context = context,
         instruction = instruction,
-        fusedBrIfPredecoder = ::FusedBrIfInstructionPredecoder,
         fusedCallPredecoder = ::FusedCallInstructionPredecoder,
-        fusedIfPredecoder = ::FusedIfInstructionPredecoder,
     )
 
 internal inline fun FusedControlInstructionPredecoder(
     context: PredecodingContext,
     instruction: FusedControlInstruction,
-    crossinline fusedBrIfPredecoder: Predecoder<FusedControlInstruction.BrIf, DispatchableInstruction>,
     crossinline fusedCallPredecoder: Predecoder<FusedControlInstruction.Call, DispatchableInstruction>,
-    crossinline fusedIfPredecoder: Predecoder<FusedControlInstruction.If, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
-        is FusedControlInstruction.BrIf -> fusedBrIfPredecoder(context, instruction).bind()
         is FusedControlInstruction.Call -> fusedCallPredecoder(context, instruction).bind()
-        is FusedControlInstruction.If -> fusedIfPredecoder(context, instruction).bind()
+        else -> TODO()
     }
 }

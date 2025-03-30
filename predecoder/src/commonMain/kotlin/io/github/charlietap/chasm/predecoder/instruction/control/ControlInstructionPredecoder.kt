@@ -15,21 +15,11 @@ internal fun ControlInstructionPredecoder(
     ControlInstructionPredecoder(
         context = context,
         instruction = instruction,
-        blockInstructionPredecoder = ::BlockInstructionPredecoder,
-        brInstructionPredecoder = ::BrInstructionPredecoder,
-        brIfInstructionPredecoder = ::BrIfInstructionPredecoder,
-        brOnCastInstructionPredecoder = ::BrOnCastInstructionPredecoder,
-        brOnCastFailInstructionPredecoder = ::BrOnCastFailInstructionPredecoder,
-        brOnNonNullInstructionPredecoder = ::BrOnNonNullInstructionPredecoder,
-        brOnNullInstructionPredecoder = ::BrOnNullInstructionPredecoder,
-        brTableInstructionPredecoder = ::BrTableInstructionPredecoder,
         callInstructionPredecoder = ::CallInstructionPredecoder,
         callIndirectInstructionPredecoder = ::CallIndirectInstructionPredecoder,
         callRefInstructionPredecoder = ::CallRefInstructionPredecoder,
-        ifInstructionPredecoder = ::IfInstructionPredecoder,
-        loopInstructionPredecoder = ::LoopInstructionPredecoder,
         nopInstructionPredecoder = ::NopInstructionPredecoder,
-        returnInstructionPredecoder = ::ReturnInstructionPredecoder,
+        returnFunctionInstructionPredecoder = ::ReturnExpressionInstructionPredecoder,
         returnCallInstructionPredecoder = ::ReturnCallInstructionPredecoder,
         returnCallIndirectInstructionPredecoder = ::ReturnCallIndirectInstructionPredecoder,
         returnCallRefInstructionPredecoder = ::ReturnCallRefInstructionPredecoder,
@@ -42,21 +32,11 @@ internal fun ControlInstructionPredecoder(
 internal inline fun ControlInstructionPredecoder(
     context: PredecodingContext,
     instruction: ControlInstruction,
-    crossinline blockInstructionPredecoder: Predecoder<ControlInstruction.Block, DispatchableInstruction>,
-    crossinline brInstructionPredecoder: Predecoder<ControlInstruction.Br, DispatchableInstruction>,
-    crossinline brIfInstructionPredecoder: Predecoder<ControlInstruction.BrIf, DispatchableInstruction>,
-    crossinline brOnCastInstructionPredecoder: Predecoder<ControlInstruction.BrOnCast, DispatchableInstruction>,
-    crossinline brOnCastFailInstructionPredecoder: Predecoder<ControlInstruction.BrOnCastFail, DispatchableInstruction>,
-    crossinline brOnNonNullInstructionPredecoder: Predecoder<ControlInstruction.BrOnNonNull, DispatchableInstruction>,
-    crossinline brOnNullInstructionPredecoder: Predecoder<ControlInstruction.BrOnNull, DispatchableInstruction>,
-    crossinline brTableInstructionPredecoder: Predecoder<ControlInstruction.BrTable, DispatchableInstruction>,
     crossinline callInstructionPredecoder: Predecoder<ControlInstruction.Call, DispatchableInstruction>,
     crossinline callIndirectInstructionPredecoder: Predecoder<ControlInstruction.CallIndirect, DispatchableInstruction>,
     crossinline callRefInstructionPredecoder: Predecoder<ControlInstruction.CallRef, DispatchableInstruction>,
-    crossinline ifInstructionPredecoder: Predecoder<ControlInstruction.If, DispatchableInstruction>,
-    crossinline loopInstructionPredecoder: Predecoder<ControlInstruction.Loop, DispatchableInstruction>,
     crossinline nopInstructionPredecoder: Predecoder<ControlInstruction.Nop, DispatchableInstruction>,
-    crossinline returnInstructionPredecoder: Predecoder<ControlInstruction.Return, DispatchableInstruction>,
+    crossinline returnFunctionInstructionPredecoder: Predecoder<ControlInstruction.ReturnExpression, DispatchableInstruction>,
     crossinline returnCallInstructionPredecoder: Predecoder<ControlInstruction.ReturnCall, DispatchableInstruction>,
     crossinline returnCallIndirectInstructionPredecoder: Predecoder<ControlInstruction.ReturnCallIndirect, DispatchableInstruction>,
     crossinline returnCallRefInstructionPredecoder: Predecoder<ControlInstruction.ReturnCallRef, DispatchableInstruction>,
@@ -66,21 +46,12 @@ internal inline fun ControlInstructionPredecoder(
     crossinline unreachableInstructionPredecoder: Predecoder<ControlInstruction.Unreachable, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
-        is ControlInstruction.Block -> blockInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.Br -> brInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrIf -> brIfInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrOnCast -> brOnCastInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrOnCastFail -> brOnCastFailInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrOnNonNull -> brOnNonNullInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrOnNull -> brOnNullInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrTable -> brTableInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Call -> callInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.CallIndirect -> callIndirectInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.CallRef -> callRefInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.If -> ifInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.Loop -> loopInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Nop -> nopInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.Return -> returnInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.Return -> throw Exception("Attempt to predecode nested control flow instruction")
+        is ControlInstruction.ReturnExpression -> returnFunctionInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.ReturnCall -> returnCallInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.ReturnCallIndirect -> returnCallIndirectInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.ReturnCallRef -> returnCallRefInstructionPredecoder(context, instruction).bind()
@@ -88,5 +59,16 @@ internal inline fun ControlInstructionPredecoder(
         is ControlInstruction.ThrowRef -> throwRefInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.TryTable -> tryTableInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Unreachable -> unreachableInstructionPredecoder(context, instruction).bind()
+        is ControlInstruction.Block,
+        is ControlInstruction.Br,
+        is ControlInstruction.BrIf,
+        is ControlInstruction.BrOnCast,
+        is ControlInstruction.BrOnCastFail,
+        is ControlInstruction.BrOnNonNull,
+        is ControlInstruction.BrOnNull,
+        is ControlInstruction.BrTable,
+        is ControlInstruction.If,
+        is ControlInstruction.Loop,
+        -> throw Exception("Attempt to predecode nested control flow instruction $instruction")
     }
 }

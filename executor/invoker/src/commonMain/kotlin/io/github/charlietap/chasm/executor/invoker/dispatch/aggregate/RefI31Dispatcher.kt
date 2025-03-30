@@ -15,6 +15,6 @@ fun RefI31Dispatcher(
 internal inline fun RefI31Dispatcher(
     instruction: AggregateInstruction.RefI31,
     crossinline executor: Executor<AggregateInstruction.RefI31>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

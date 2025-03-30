@@ -138,16 +138,18 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
     }
 
     fun shrink(
-        preserveTopN: Int,
+        keep: Int,
         depth: Int,
     ) {
+        val destinationIndex = framePointer + depth
+
         elements.copyInto(
             destination = elements,
-            destinationOffset = depth,
-            startIndex = top - preserveTopN,
+            destinationOffset = destinationIndex,
+            startIndex = top - keep,
             endIndex = top,
         )
-        top = depth + preserveTopN
+        top = destinationIndex + keep
     }
 
     fun depth(): Int = top

@@ -6,18 +6,21 @@ import io.github.charlietap.chasm.memory.read.I3216SReader
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I32Load16SExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load16S,
-) = I32Load16SExecutor(
+): InstructionPointer = I32Load16SExecutor(
+    ip = ip,
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -28,6 +31,7 @@ internal inline fun I32Load16SExecutor(
 )
 
 internal inline fun I32Load16SExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
@@ -35,7 +39,7 @@ internal inline fun I32Load16SExecutor(
     instruction: MemoryInstruction.I32Load16S,
     crossinline boundsChecker: BoundsChecker<Int>,
     crossinline reader: I3216SReader,
-) {
+): InstructionPointer {
     val memory = instruction.memory
 
     val baseAddress = vstack.popI32()
@@ -51,4 +55,6 @@ internal inline fun I32Load16SExecutor(
     }
 
     vstack.pushI32(result)
+
+    return ip + 1
 }

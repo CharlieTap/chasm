@@ -17,7 +17,6 @@ sweet {
     testPackageName = "io.github.charlietap.chasm.testsuite"
     proposals = listOf(
         "multi-memory",
-        "exception-handling",
         "gc",
     )
     excludes = listOf(

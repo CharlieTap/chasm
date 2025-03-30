@@ -146,6 +146,8 @@ fun brOnCastFailInstruction(
 
 fun returnInstruction() = ControlInstruction.Return
 
+fun returnExpressionInstruction() = ControlInstruction.ReturnExpression
+
 fun returnCallInstruction(
     functionIndex: Index.FunctionIndex = functionIndex(),
 ) = ControlInstruction.ReturnCall(

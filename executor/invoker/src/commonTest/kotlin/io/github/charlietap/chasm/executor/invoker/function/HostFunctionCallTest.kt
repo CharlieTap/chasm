@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
+import io.github.charlietap.chasm.fixture.runtime.execution.ip
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
@@ -22,6 +23,7 @@ class HostFunctionCallTest {
     @Test
     fun `can execute a host function call and return a result`() {
 
+        val ip = ip()
         val store = store()
         val cstack = cstack()
         val vstack = vstack()
@@ -72,9 +74,10 @@ class HostFunctionCallTest {
             store = store,
             context = context,
             function = functionInstance,
+            ip = ip,
         )
 
-        assertEquals(Unit, actual)
+        assertEquals(ip + 1, actual)
         assertEquals(1, cstack.framesDepth())
         assertEquals(2, vstack.depth())
         assertEquals(118, vstack.pop())

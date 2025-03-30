@@ -15,6 +15,6 @@ fun SelectDispatcher(
 internal inline fun SelectDispatcher(
     instruction: FusedParametricInstruction.Select,
     crossinline executor: Executor<FusedParametricInstruction.Select>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

@@ -15,6 +15,6 @@ fun TryTableDispatcher(
 internal inline fun TryTableDispatcher(
     instruction: ControlInstruction.TryTable,
     crossinline executor: Executor<ControlInstruction.TryTable>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = { ip, vstack, cstack, store, context ->
+    executor(ip, vstack, cstack, store, context, instruction)
 }

@@ -5,12 +5,12 @@ import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.FusedReferenceInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.optimiser.passes.PassContext
+import io.github.charlietap.chasm.optimiser.passes.PassContextt
 
-internal typealias ReferenceInstructionFuser = (PassContext, Int, ReferenceInstruction, List<Instruction>, MutableList<Instruction>) -> Int
+internal typealias ReferenceInstructionFuser = (PassContextt, Int, ReferenceInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
 internal fun ReferenceInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: ReferenceInstruction,
     input: List<Instruction>,
@@ -26,7 +26,7 @@ internal fun ReferenceInstructionFuser(
 )
 
 internal inline fun ReferenceInstructionFuser(
-    context: PassContext,
+    context: PassContextt,
     index: Int,
     instruction: ReferenceInstruction,
     input: List<Instruction>,

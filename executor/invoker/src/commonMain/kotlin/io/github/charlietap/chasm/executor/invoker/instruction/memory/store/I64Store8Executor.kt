@@ -4,19 +4,22 @@ import io.github.charlietap.chasm.memory.BoundsChecker
 import io.github.charlietap.chasm.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.memory.write.I64ToI8Writer
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I64Store8Executor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Store8,
-) =
+): InstructionPointer =
     I64Store8Executor(
+        ip = ip,
         vstack = vstack,
         cstack = cstack,
         store = store,
@@ -27,6 +30,7 @@ internal inline fun I64Store8Executor(
     )
 
 internal inline fun I64Store8Executor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
@@ -34,7 +38,7 @@ internal inline fun I64Store8Executor(
     instruction: MemoryInstruction.I64Store8,
     crossinline boundsChecker: BoundsChecker<Unit>,
     crossinline writer: I64ToI8Writer,
-) {
+): InstructionPointer {
     val memory = instruction.memory
 
     val valueToStore = vstack.popI64()
@@ -44,4 +48,5 @@ internal inline fun I64Store8Executor(
     boundsChecker(effectiveAddress, 1, memory.size) {
         writer(memory.data, effectiveAddress, valueToStore)
     }
+    return ip + 1
 }

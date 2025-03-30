@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -12,15 +13,16 @@ import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
-internal typealias HostFunctionCall = (ValueStack, ControlStack, Store, ExecutionContext, FunctionInstance.HostFunction) -> Unit
+internal typealias HostFunctionCall = (InstructionPointer, ValueStack, ControlStack, Store, ExecutionContext, FunctionInstance.HostFunction) -> InstructionPointer
 
 internal fun HostFunctionCall(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     function: FunctionInstance.HostFunction,
-) {
+): InstructionPointer {
     val frame = cstack.peekFrame()
     val type = function.functionType
 
@@ -50,4 +52,6 @@ internal fun HostFunctionCall(
     results.forEach { result ->
         vstack.push(result.toLongFromBoxed())
     }
+
+    return ip + 1
 }

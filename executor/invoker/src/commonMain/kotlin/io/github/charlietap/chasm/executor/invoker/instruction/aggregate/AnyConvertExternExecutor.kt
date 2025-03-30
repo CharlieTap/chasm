@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.isExternReference
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.ext.pushReference
@@ -16,12 +17,13 @@ import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 
 internal fun AnyConvertExternExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: AggregateInstruction.AnyConvertExtern,
-) {
+): InstructionPointer {
     val referenceValue = vstack.pop()
     when {
         referenceValue.isNullableReference() -> {
@@ -33,4 +35,5 @@ internal fun AnyConvertExternExecutor(
         }
         else -> throw InvocationException(InvocationError.UnexpectedReferenceValue)
     }
+    return ip + 1
 }

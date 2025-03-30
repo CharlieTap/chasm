@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused
 
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.FieldUnpacker
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.execution.InstructionPointer
 import io.github.charlietap.chasm.runtime.ext.array
 import io.github.charlietap.chasm.runtime.ext.packedField
 import io.github.charlietap.chasm.runtime.ext.toArrayAddress
@@ -11,12 +12,14 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun ArrayGetSignedExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: FusedAggregateInstruction.ArrayGetSigned,
-) = ArrayGetSignedExecutor(
+): InstructionPointer = ArrayGetSignedExecutor(
+    ip = ip,
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -26,13 +29,14 @@ internal inline fun ArrayGetSignedExecutor(
 )
 
 internal inline fun ArrayGetSignedExecutor(
+    ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instruction: FusedAggregateInstruction.ArrayGetSigned,
     crossinline fieldUnpacker: FieldUnpacker,
-) {
+): InstructionPointer {
     val fieldIndex = instruction.field(vstack).toInt()
     val address = instruction.address(vstack).toArrayAddress()
     val arrayInstance = store.array(address)
@@ -41,4 +45,5 @@ internal inline fun ArrayGetSignedExecutor(
     val unpackedValue = fieldUnpacker(packed, type, true)
 
     instruction.destination(unpackedValue, vstack)
+    return ip + 1
 }
