@@ -203,14 +203,20 @@ internal inline fun InstructionRewriter(
             updateJumpOffsets(ip, expression.instructions.size, usedBlock)
         }
         is ControlInstruction.TryTable -> {
-            val expression = expressionRewriter(context, Expression(instruction.instructions))
+            val ip = context.ip
+            val functionType = instruction.blockType.asFunctionType(context.module.definedTypes)
+            val blockSp = context.sp - functionType.params.types.size
+            val stackAdjustment = StackAdjustment(blockSp, functionType.results.types.size)
 
-            val rewritten = instruction.copy(
-                instructions = buildList {
-                    addAll(expression.instructions)
-                },
-            )
-            output.add(rewritten)
+            val block = Block(stackAdjustment)
+            context.blocks.addFirst(block)
+
+            val expression = expressionRewriter(context, Expression(instruction.instructions))
+            output.addAll(expression.instructions)
+            output.add(AdminInstruction.PopInstructionHandler)
+
+            val usedBlock = context.blocks.removeFirst()
+            updateJumpOffsets(ip, expression.instructions.size, usedBlock)
         }
         is ControlInstruction.Return -> {
             val block = context.blocks.last()

@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
-import io.github.charlietap.chasm.executor.invoker.instruction.admin.ExceptionHandlerInstructionExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.admin.PopExceptionHandlerInstructionExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.runtime.execution.Executor
@@ -10,7 +10,7 @@ internal fun HandlerDispatcher(
     handler: ExceptionHandler,
 ) = HandlerDispatcher(
     handler = handler,
-    executor = ::ExceptionHandlerInstructionExecutor,
+    executor = ::PopExceptionHandlerInstructionExecutor,
 )
 
 internal inline fun HandlerDispatcher(

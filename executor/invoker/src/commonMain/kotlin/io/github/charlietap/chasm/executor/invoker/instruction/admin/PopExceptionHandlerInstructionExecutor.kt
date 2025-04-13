@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 @Suppress("UNUSED_PARAMETER")
-internal inline fun ExceptionHandlerInstructionExecutor(
+internal inline fun PopExceptionHandlerInstructionExecutor(
     ip: InstructionPointer,
     vstack: ValueStack,
     cstack: ControlStack,

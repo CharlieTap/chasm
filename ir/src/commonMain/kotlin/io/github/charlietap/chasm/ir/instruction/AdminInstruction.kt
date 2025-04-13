@@ -56,5 +56,7 @@ sealed interface AdminInstruction : Instruction {
         ) : JumpInstruction
     }
 
+    data object PopInstructionHandler: AdminInstruction
+
     data class ReturnFunction(val adjustment: StackAdjustment) : AdminInstruction
 }

@@ -17,7 +17,7 @@ internal inline fun TryTableExecutor(
     instruction: ControlInstruction.TryTable,
 ): InstructionPointer {
     val handler = ExceptionHandler(
-        instructions = instruction.handlers,
+        handlers = instruction.handlers,
         framesDepth = cstack.framesDepth(),
         framePointer = vstack.framePointer,
     )

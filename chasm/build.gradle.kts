@@ -16,8 +16,9 @@ sweet {
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm.testsuite"
     proposals = listOf(
-        "multi-memory",
+        "exception-handling",
         "gc",
+        "multi-memory",
     )
     excludes = listOf(
         "simd_*/**", "**/simd_*",
