@@ -2,8 +2,9 @@
 
 package io.github.charlietap.chasm.memory.fill
 
-import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
-import io.github.charlietap.chasm.memory.OptimisticBoundsChecker
+import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
+import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 actual inline fun LinearMemoryFiller(
@@ -13,8 +14,18 @@ actual inline fun LinearMemoryFiller(
     fillValue: Byte,
     upperBound: Int,
 ) {
-    val byteArray = (memory as ByteArrayLinearMemory)
-    OptimisticBoundsChecker(address, bytesToFill, upperBound) {
-        byteArray.memory.fill(fillValue, address, address + bytesToFill)
+    if (bytesToFill < 0 || address < 0 || address > upperBound - bytesToFill) {
+        throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
+    }
+
+    val buffer = (memory as ByteBufferLinearMemory).memory
+
+    val slice = buffer.duplicate().apply {
+        position(address)
+        limit(address + bytesToFill)
+    }
+
+    repeat(bytesToFill) {
+        slice.put(fillValue)
     }
 }

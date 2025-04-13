@@ -2,10 +2,12 @@
 
 package io.github.charlietap.chasm.memory.init
 
-import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
+import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import java.nio.BufferOverflowException
+import java.nio.BufferUnderflowException
 
 actual inline fun LinearMemoryInitialiser(
     src: UByteArray,
@@ -16,12 +18,18 @@ actual inline fun LinearMemoryInitialiser(
     srcUpperBound: Int,
     dstUpperBound: Int,
 ) {
-    val byteArray = (dst as ByteArrayLinearMemory).memory
+    val buffer = (dst as ByteBufferLinearMemory).memory
     try {
-        src.asByteArray().copyInto(byteArray, dstOffset, srcOffset, srcOffset + bytesToInit)
+        buffer.position(dstOffset)
+        val byteArray = src.asByteArray()
+        buffer.put(byteArray, srcOffset, bytesToInit)
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
     } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
+    } catch (_: BufferOverflowException) {
+        throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
+    } catch (_: BufferUnderflowException) {
         throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
     }
 }

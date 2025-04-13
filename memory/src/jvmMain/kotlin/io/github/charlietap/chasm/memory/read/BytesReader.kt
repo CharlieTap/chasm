@@ -2,7 +2,7 @@
 
 package io.github.charlietap.chasm.memory.read
 
-import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
+import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 actual inline fun BytesReader(
@@ -12,7 +12,10 @@ actual inline fun BytesReader(
     bytesToRead: Int,
     bufferPointer: Int,
 ): ByteArray {
-    val byteArray = (memory as ByteArrayLinearMemory).memory
-    byteArray.copyInto(buffer, bufferPointer, memoryPointer, memoryPointer + bytesToRead)
+    val byteBuffer = (memory as ByteBufferLinearMemory).memory
+
+    byteBuffer.position(memoryPointer)
+    byteBuffer.get(buffer, 0, bytesToRead)
+
     return buffer
 }

@@ -1,16 +1,14 @@
-@file:JvmName("16432UReaderJvm")
+@file:JvmName("I6432UReaderJvm")
 
 package io.github.charlietap.chasm.memory.read
 
-import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
-import io.github.charlietap.chasm.memory.ext.toUIntLittleEndian
+import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 actual inline fun I6432UReader(
     memory: LinearMemory,
     address: Int,
 ): Long {
-    val byteArray = (memory as ByteArrayLinearMemory).memory
-    val value = byteArray.sliceArray(address until address + Int.SIZE_BYTES).toUIntLittleEndian()
-    return value.toLong()
+    val buffer = (memory as ByteBufferLinearMemory).memory
+    return buffer.getInt(address).toUInt().toLong()
 }

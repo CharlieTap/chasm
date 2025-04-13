@@ -2,7 +2,7 @@
 
 package io.github.charlietap.chasm.memory.write
 
-import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
+import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 actual inline fun BytesWriter(
@@ -13,6 +13,7 @@ actual inline fun BytesWriter(
     bytesToWrite: Int,
     bufferPointer: Int,
 ) {
-    val byteArray = (memory as ByteArrayLinearMemory).memory
-    buffer.copyInto(byteArray, memoryPointer, bufferPointer, bufferPointer + bytesToWrite)
+    val byteBuffer = (memory as ByteBufferLinearMemory).memory
+    byteBuffer.position(memoryPointer)
+    byteBuffer.put(buffer, bufferPointer, bytesToWrite)
 }

@@ -2,44 +2,47 @@
 
 package io.github.charlietap.chasm.memory.read
 
-import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
+import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
 
 actual inline fun NullTerminatedStringReader(
     memory: LinearMemory,
     memoryPointer: Int,
 ): String {
-    val byteArray = (memory as ByteArrayLinearMemory).memory
-    val length = findNull(byteArray, memoryPointer) - 1
-    return byteArray.decodeToString(
-        startIndex = memoryPointer,
-        endIndex = memoryPointer + length,
-    )
+    val buffer = (memory as ByteBufferLinearMemory).memory
+    val length = findNull(buffer, memoryPointer)
+    if (length == -1) return ""
+
+    val bytes = ByteArray(length)
+
+    buffer.position(memoryPointer)
+    buffer.limit(memoryPointer + length)
+    buffer.get(bytes, 0, length)
+
+    return String(bytes, StandardCharsets.UTF_8)
 }
 
-inline fun findNull(memory: ByteArray, pointer: Int): Int {
-    val size = memory.size
-    var index = pointer
+inline fun findNull(buffer: ByteBuffer, startIndex: Int): Int {
+    val limit = buffer.limit()
+    var index = startIndex
 
-    val buffer = ByteBuffer.wrap(memory).order(ByteOrder.LITTLE_ENDIAN)
-
-    while (index + 7 < size) {
+    while (index + 7 < limit) {
         val word = buffer.getLong(index)
         if (word.containsNullByte()) {
             for (i in 0 until 8) {
-                if (memory[index + i] == 0.toByte()) {
-                    return index + i
+                if (buffer.get(index + i) == 0.toByte()) {
+                    return index + i - startIndex
                 }
             }
         }
         index += 8
     }
 
-    while (index < size) {
-        if (memory[index] == 0.toByte()) {
-            return index
+    while (index < limit) {
+        if (buffer.get(index) == 0.toByte()) {
+            return index - startIndex
         }
         index++
     }
