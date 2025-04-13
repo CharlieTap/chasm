@@ -41,14 +41,14 @@ encoded as either a .wasm or .wat file, currently chasm supports decoding only .
 
 ```kotlin
 val wasmFileAsByteArray = ...
-val result = module(wasmFileAsByteArray)
+val module = module(wasmFileAsByteArray)
 ```
 
 Once a module has been decoded you'll need to instantiate it, and for that you'll need also need a store
 
 ```kotlin
 val store = store()
-val result = instance(store, module)
+val instance = instance(store, module)
 ```
 
 Instances allow you to invoke functions that are exported from the module
@@ -86,7 +86,7 @@ val import = Import(
     "import entity name",
     function,
 )
-val result = instance(store, module, listOf(import))
+val instance = instance(store, module, listOf(import))
 ```
 
 ### Host functions
