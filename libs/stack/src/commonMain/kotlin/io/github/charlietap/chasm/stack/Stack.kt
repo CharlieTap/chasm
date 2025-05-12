@@ -43,6 +43,7 @@ class Stack<T>
             elements[top] = null
             value
         } catch (_: Exception) {
+            top++
             null
         }
 

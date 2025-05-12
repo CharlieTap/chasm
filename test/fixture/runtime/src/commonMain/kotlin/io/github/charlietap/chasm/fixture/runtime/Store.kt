@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.fixture.runtime
 
+import io.github.charlietap.chasm.runtime.Heap
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
@@ -21,6 +22,7 @@ fun store(
     tables: MutableList<TableInstance> = mutableListOf(),
     tags: MutableList<TagInstance> = mutableListOf(),
     instructions: MutableList<DispatchableInstruction> = mutableListOf(),
+    heap: Heap = heap(),
 ) = Store(
     data = data,
     elements = elements,
@@ -31,4 +33,5 @@ fun store(
     tables = tables,
     tags = tags,
     instructions = instructions,
+    heap = heap,
 )

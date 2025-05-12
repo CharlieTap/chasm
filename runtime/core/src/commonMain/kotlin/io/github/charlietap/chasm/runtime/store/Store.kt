@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.store
 
+import io.github.charlietap.chasm.runtime.Heap
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instance.DataInstance
@@ -24,7 +25,8 @@ data class Store(
     val data: MutableList<DataInstance> = mutableListOf(),
     val exceptions: MutableList<ExceptionInstance> = mutableListOf(),
     val instructions: MutableList<DispatchableInstruction> = mutableListOf(),
-    val structs: MutableList<StructInstance> = mutableListOf(),
-    val arrays: MutableList<ArrayInstance> = mutableListOf(),
+    val structs: MutableList<StructInstance?> = mutableListOf(),
+    val arrays: MutableList<ArrayInstance?> = mutableListOf(),
     val rttCache: MutableMap<DefinedType, RTT> = mutableMapOf(),
+    val heap: Heap = Heap(),
 )

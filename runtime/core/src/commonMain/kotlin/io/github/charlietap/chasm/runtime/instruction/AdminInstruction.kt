@@ -11,4 +11,8 @@ sealed interface AdminInstruction : LinkedInstruction {
 
     @JvmInline
     value class Handler(val handler: ExceptionHandler) : AdminInstruction
+
+    data object Pause : AdminInstruction
+
+    data object PauseIf : AdminInstruction
 }

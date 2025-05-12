@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused
 
-import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.executor.invoker.ext.allocateArray
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
@@ -26,8 +26,8 @@ internal inline fun ArrayNewFixedExecutor(
     }
 
     val instance = ArrayInstance(instruction.rtt, instruction.arrayType, fields)
-    store.arrays.add(instance)
-    val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
+    val address = store.allocateArray(instance)
+    val reference = ReferenceValue.Array(address)
 
     instruction.destination(reference.toLong(), vstack)
 }

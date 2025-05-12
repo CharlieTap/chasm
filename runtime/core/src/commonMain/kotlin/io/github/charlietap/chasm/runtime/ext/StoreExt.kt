@@ -98,17 +98,21 @@ inline fun Store.instruction(address: Address.Function): DispatchableInstruction
 }
 
 inline fun Store.struct(address: Address.Struct): StructInstance = try {
-    structs[address.address]
+    structs[address.address]!!
 } catch (_: IndexOutOfBoundsException) {
     throw InvocationException(InvocationError.StructLookupFailed(address))
 } catch (_: IllegalArgumentException) {
+    throw InvocationException(InvocationError.StructLookupFailed(address))
+} catch (_: NullPointerException) {
     throw InvocationException(InvocationError.StructLookupFailed(address))
 }
 
 inline fun Store.array(address: Address.Array): ArrayInstance = try {
-    arrays[address.address]
+    arrays[address.address]!!
 } catch (_: IndexOutOfBoundsException) {
     throw InvocationException(InvocationError.ArrayLookupFailed(address))
 } catch (_: IllegalArgumentException) {
+    throw InvocationException(InvocationError.ArrayLookupFailed(address))
+} catch (_: NullPointerException) {
     throw InvocationException(InvocationError.ArrayLookupFailed(address))
 }

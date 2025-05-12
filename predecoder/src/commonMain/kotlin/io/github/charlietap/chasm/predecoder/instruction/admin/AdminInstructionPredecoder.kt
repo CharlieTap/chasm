@@ -5,12 +5,16 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndBlockDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PauseDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PauseIfDispatcher
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.EndBlock
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.EndFunction
+import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.Pause
+import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.PauseIf
 
 internal fun AdminInstructionPredecoder(
     context: PredecodingContext,
@@ -21,6 +25,8 @@ internal fun AdminInstructionPredecoder(
         instruction = instruction,
         endBlockDispatcher = ::EndBlockDispatcher,
         endFunctionDispatcher = ::EndFunctionDispatcher,
+        pauseInstructionDispatcher = ::PauseDispatcher,
+        pauseIfInstructionDispatcher = ::PauseIfDispatcher,
     )
 
 internal inline fun AdminInstructionPredecoder(
@@ -28,10 +34,14 @@ internal inline fun AdminInstructionPredecoder(
     instruction: AdminInstruction,
     crossinline endBlockDispatcher: Dispatcher<EndBlock>,
     crossinline endFunctionDispatcher: Dispatcher<EndFunction>,
+    crossinline pauseInstructionDispatcher: Dispatcher<Pause>,
+    crossinline pauseIfInstructionDispatcher: Dispatcher<PauseIf>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is AdminInstruction.EndBlock -> endBlockDispatcher(EndBlock)
         is AdminInstruction.EndFunction -> endFunctionDispatcher(EndFunction)
+        is AdminInstruction.Pause -> pauseInstructionDispatcher(Pause)
+        is AdminInstruction.PauseIf -> pauseIfInstructionDispatcher(PauseIf)
         is AdminInstruction.Jump -> TODO()
         is AdminInstruction.JumpIf -> TODO()
         is AdminInstruction.JumpOnCast -> TODO()

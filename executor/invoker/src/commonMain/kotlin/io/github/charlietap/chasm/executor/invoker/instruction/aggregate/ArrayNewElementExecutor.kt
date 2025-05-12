@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.executor.invoker.ext.allocateArray
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -34,8 +34,8 @@ internal inline fun ArrayNewElementExecutor(
     elements.copyInto(fields, 0, arrayStartOffsetInSegment, arrayEndOffsetInSegment)
 
     val instance = ArrayInstance(instruction.rtt, instruction.arrayType, fields)
-    store.arrays.add(instance)
-    val reference = ReferenceValue.Array(Address.Array(store.arrays.size - 1))
+    val address = store.allocateArray(instance)
+    val reference = ReferenceValue.Array(address)
 
     vstack.push(reference.toLong())
 }

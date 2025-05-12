@@ -23,6 +23,7 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation(projects.test.fixture.config)
                 implementation(projects.test.fixture.ir)
 
                 implementation(libs.kotlin.test)

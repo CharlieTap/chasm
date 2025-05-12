@@ -1,10 +1,12 @@
 package io.github.charlietap.chasm.optimiser.passes
 
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.ir.module.Import
 import io.github.charlietap.chasm.ir.module.Module
 
 internal data class PassContext(
+    val config: RuntimeConfig,
     val module: Module,
 ) {
     val functionTypes by lazy {
