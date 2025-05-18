@@ -47,4 +47,8 @@ sealed interface AdminInstruction : Instruction {
         val dstReferenceType: ReferenceType,
         val adjustment: StackAdjustment,
     ) : AdminInstruction
+
+    data object Pause : AdminInstruction
+
+    data object PauseIf : AdminInstruction
 }

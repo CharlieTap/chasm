@@ -192,4 +192,7 @@ sealed interface InvocationError : ModuleTrapError {
     value class HostFunctionError(val error: String) : InvocationError
 
     data object ProgramFinishedInconsistentState : InvocationError
+
+    @JvmInline
+    value class GarbageCollectionFailed(val message: String) : InvocationError
 }

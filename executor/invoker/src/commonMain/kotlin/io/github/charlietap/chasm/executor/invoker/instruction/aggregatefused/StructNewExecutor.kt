@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused
 
-import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.executor.invoker.ext.allocateStruct
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.StructInstance
@@ -28,8 +28,8 @@ internal inline fun StructNewExecutor(
     }
 
     val instance = StructInstance(instruction.rtt, structType, fields)
-    store.structs.add(instance)
-    val reference = ReferenceValue.Struct(Address.Struct(store.structs.size - 1))
+    val address = store.allocateStruct(instance)
+    val reference = ReferenceValue.Struct(address)
 
     instruction.destination(reference.toLong(), vstack)
 }

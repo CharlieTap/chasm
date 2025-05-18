@@ -4,18 +4,20 @@ import io.github.charlietap.chasm.ir.module.Module
 import io.github.charlietap.chasm.optimiser.passes.fusion.ExpressionFuser
 
 internal fun FusionPass(
+    context: PassContext,
     module: Module,
 ): Module =
     FusionPass(
+        context = context,
         module = module,
         expressionFuser = ::ExpressionFuser,
     )
 
 internal inline fun FusionPass(
+    context: PassContext,
     module: Module,
     expressionFuser: ExpressionFuser,
 ): Module {
-    val context = PassContext(module)
     return module.copy(
         functions = module.functions.map { function ->
             function.copy(

@@ -40,7 +40,7 @@ sealed interface AggregateInstruction : LinkedInstruction {
     data class ArrayNewFixed(
         val rtt: RTT,
         val arrayType: ArrayType,
-        val size: UInt,
+        val length: UInt,
     ) : AggregateInstruction
 
     data class ArrayNewDefault(

@@ -162,6 +162,8 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         elements = elements.copyOf(newCapacity)
     }
 
+    fun iterator(): Iterator<Long> = elements.slice(0..top - 1).iterator()
+
     override fun toString(): String {
         return buildString {
             append("[")

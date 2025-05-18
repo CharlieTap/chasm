@@ -55,13 +55,14 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = fusedI32Add(
             left = localGetOperand(localIndex(0)),
             right = localGetOperand(localIndex(1)),
             destination = valueStackDestination(),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(1, actual.size)
         assertEquals(expected, actual.first())
@@ -84,12 +85,13 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = fusedF32Abs(
             operand = localGetOperand(localIndex(0)),
             destination = localSetDestination(localIndex(2)),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(1, actual.size)
         assertEquals(expected, actual.first())
@@ -113,13 +115,14 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = fusedI32Add(
             left = localGetOperand(localIndex(0)),
             right = localGetOperand(localIndex(1)),
             destination = localSetDestination(localIndex(2)),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(1, actual.size)
         assertEquals(expected, actual.first())
@@ -142,6 +145,7 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             nopInstruction(),
@@ -151,7 +155,7 @@ class FusionPassTest {
                 destination = valueStackDestination(),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
@@ -172,13 +176,14 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             fusedIf(
                 operand = i32ConstOperand(5),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
@@ -208,6 +213,7 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             blockInstruction(
@@ -224,7 +230,7 @@ class FusionPassTest {
                 ),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
@@ -245,6 +251,7 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             fusedLocalSet(
@@ -252,7 +259,7 @@ class FusionPassTest {
                 localIdx = localIndex(0),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
@@ -277,6 +284,7 @@ class FusionPassTest {
                 ),
             ),
         )
+
         val module = module(
             types = listOf(
                 type(recursiveType = recursiveType),
@@ -293,6 +301,7 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             fusedCall(
@@ -304,7 +313,7 @@ class FusionPassTest {
                 functionIndex = functionIndex(0),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
@@ -326,6 +335,7 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             i32AddInstruction(),
@@ -336,7 +346,7 @@ class FusionPassTest {
                 destination = localSetDestination(localIndex(1)),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
@@ -359,6 +369,7 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             i32AddInstruction(),
@@ -369,7 +380,7 @@ class FusionPassTest {
                 destination = localSetDestination(localIndex(1)),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
@@ -392,6 +403,7 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             fusedSelect(
@@ -401,7 +413,7 @@ class FusionPassTest {
                 destination = localSetDestination(localIndex(1)),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
@@ -425,6 +437,7 @@ class FusionPassTest {
                 ),
             ),
         )
+        val context = passContext(module = module)
 
         val expected = listOf(
             fusedSelect(
@@ -434,7 +447,7 @@ class FusionPassTest {
                 destination = localSetDestination(localIndex(1)),
             ),
         )
-        val actual = FusionPass(module).functions[0].body.instructions
+        val actual = FusionPass(context, module).functions[0].body.instructions
 
         assertEquals(expected, actual)
     }
