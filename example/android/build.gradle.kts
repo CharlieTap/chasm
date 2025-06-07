@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.symbol.processing)
 
+
     alias(libs.plugins.conventions.linting)
 }
 
@@ -33,12 +34,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.bytecode.version.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.java.bytecode.version.get())
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = libs.versions.java.bytecode.version.get()
     }
 
     buildFeatures {
@@ -49,8 +50,12 @@ android {
 
 dependencies {
 
+    implementation(projects.consumerAndroidFibonacci)
+    implementation(projects.consumerJvmTest)
+    implementation(projects.consumerMultiplatformFactorial)
+
     implementation(libs.chasm.jvm)
-    implementation(libs.hilt.core)
+    implementation(libs.hilt.android)
     implementation(libs.bundles.androidx)
     implementation(libs.bundles.compose.ui)
 

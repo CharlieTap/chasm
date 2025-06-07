@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.compileOnly
+
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`

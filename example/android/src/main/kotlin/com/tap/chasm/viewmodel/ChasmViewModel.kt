@@ -1,96 +1,109 @@
 package com.tap.chasm.viewmodel
 
-import android.content.res.AssetManager
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.test.chasm.FactorialService
+import com.test.chasm.FibonacciService
+import com.test.chasm.TestService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.charlietap.chasm.embedding.instance
-import io.github.charlietap.chasm.embedding.invoke
-import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.shapes.flatMap
-import io.github.charlietap.chasm.embedding.shapes.map
-import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class ChasmViewModel
-    @Inject
-    constructor(
-        private val assetManager: AssetManager,
-    ) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>() {
-        private val store = store()
-        private lateinit var instance: Instance
+class ChasmViewModel @Inject constructor(
+    private val factorialService: FactorialService,
+    private val fibonacciService: FibonacciService,
+    private val testService: TestService,
+) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>() {
 
-        init {
-            viewModelScope.launch {
-                val bytes = readWasmFileBytes(FILENAME)
-                instance = instantiateModule(bytes)
-            }
-        }
+    init {
+        factorialPrinter()
+        testPrinter()
+    }
 
-        private val nth = MutableStateFlow(ChasmState.DEFAULT.nth)
-        private val fibonacci = MutableStateFlow<Int?>(null)
+    private val nth = MutableStateFlow(ChasmState.DEFAULT.nth)
+    private val fibonacci = MutableStateFlow<Int?>(null)
 
-        private val _state = combine(nth, fibonacci) { n, fib ->
+    private val _state = combine(nth, fibonacci) { n, fib ->
 
-            val sliderInfo = "Compute the {${n.toInt()}} number in the fibonacci sequence"
+        val sliderInfo = "Compute the {${n.toInt()}} number in the fibonacci sequence"
 
-            val result = fib?.let {
-                "The calculated fibonacci number is: $fib"
-            } ?: ChasmState.DEFAULT.result
+        val result = fib?.let {
+            "The calculated fibonacci number is: $fib"
+        } ?: ChasmState.DEFAULT.result
 
-            ChasmState.DEFAULT.copy(
-                nth = n,
-                sliderInfo = sliderInfo,
-                result = result,
-            )
-        }
-        override val state: StateFlow<ChasmState> = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChasmState.DEFAULT)
+        ChasmState.DEFAULT.copy(
+            nth = n,
+            sliderInfo = sliderInfo,
+            result = result,
+        )
+    }
+    override val state: StateFlow<ChasmState> = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChasmState.DEFAULT)
 
-        override fun handleEvent(event: ChasmEvent) {
-            when (event) {
-                is ChasmEvent.ChangeFibonacciIndex -> {
-                    viewModelScope.launch {
-                        nth.emit(event.nth)
-                    }
-                }
-                is ChasmEvent.CalculateFibonacci -> {
-                    viewModelScope.launch {
-                        fibonacci.emit(calculateFibonacci(nth.value.toInt()))
-                    }
+    override fun handleEvent(event: ChasmEvent) {
+        when (event) {
+            is ChasmEvent.ChangeFibonacciIndex -> {
+                viewModelScope.launch {
+                    nth.emit(event.nth)
                 }
             }
-        }
 
-        private suspend fun readWasmFileBytes(filename: String): ByteArray = withContext(Dispatchers.IO) {
-            assetManager.open(filename).readBytes()
-        }
-
-        private fun instantiateModule(byteArray: ByteArray): Instance {
-            return module(byteArray)
-                .flatMap { module ->
-                    instance(store, module, emptyList())
-                }.expect("Failed to instantiate module")
-        }
-
-        private fun calculateFibonacci(n: Int): Int {
-            return invoke(store, instance, "fibonacci", listOf(NumberValue.I32(n)))
-                .map {
-                    (it.first() as NumberValue.I32).value
-                }.expect("Failed to calculate fibonacci")
-        }
-
-        companion object {
-            private const val FILENAME = "fibonacci.wasm"
+            is ChasmEvent.CalculateFibonacci -> {
+                viewModelScope.launch {
+                    val fib = runCatching {  calculateFibonacci(nth.value.toInt()) }
+                    Log.d("ChasmViewModel", fib.toString())
+                    fibonacci.emit(calculateFibonacci(nth.value.toInt()))
+                }
+            }
         }
     }
+
+    private fun calculateFibonacci(n: Int): Int {
+        return fibonacciService.fibonacci(n)
+    }
+
+    private fun factorialPrinter() {
+        val factorial = factorialService.factorial(5)
+        Log.d("ChasmViewModel", "factorial: $factorial")
+    }
+
+    private fun testPrinter() {
+        var mutableGlobal = testService.mutableGlobal
+        Log.d("ChasmViewModel", "mutableGlobal: $mutableGlobal")
+        val immutableGlobal = testService.immutableGlobal
+        Log.d("ChasmViewModel", "immutableGlobal: $immutableGlobal")
+
+        testService.mutableGlobal = 118
+        mutableGlobal = testService.mutableGlobal
+        Log.d("ChasmViewModel", "mutableGlobal after change: $mutableGlobal")
+
+        val intFunction = testService.intFunction()
+        Log.d("ChasmViewModel", "int function: $intFunction")
+
+        val longFunction = testService.longFunction()
+        Log.d("ChasmViewModel", "long function: $longFunction")
+
+        val floatFunction = testService.floatFunction()
+        Log.d("ChasmViewModel", "float function: $floatFunction")
+
+        val doubleFunction = testService.doubleFunction()
+        Log.d("ChasmViewModel", "double function: $doubleFunction")
+
+        val unitFunction = testService.unitFunction()
+        Log.d("ChasmViewModel", "unit function: $unitFunction ${testService.mutableGlobal}")
+
+        val multipleParamFunction = testService.multipleParamFunction(5, 2.2)
+        Log.d("ChasmViewModel", "multiple param function: $multipleParamFunction")
+
+        val multipleReturnFunction = testService.multipleReturnFunction()
+        Log.d("ChasmViewModel", "multiple return function: r0 = ${multipleReturnFunction.r0} r1 = ${multipleReturnFunction.r1}")
+
+        val stringFunction = testService.stringFunction()
+        Log.d("ChasmViewModel", "string function: $stringFunction")
+    }
+}

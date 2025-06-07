@@ -27,17 +27,18 @@ develocity {
 
 dependencyResolutionManagement {
     repositories {
+        gradlePluginPortal()
         google()
         mavenCentral()
         mavenLocal()
         maven(url = "https://jitpack.io" )
-
     }
 }
 
 include(":ast")
 include(":benchmark")
 include(":chasm")
+include(":chasm-gradle-plugin")
 include(":config")
 
 include(":decoder")
@@ -68,6 +69,7 @@ include(":stream")
 include(":test:fake:decoder")
 
 include(":test:fixture:ast")
+include(":test:fixture:chasm")
 include(":test:fixture:config")
 include(":test:fixture:executor:instantiator")
 include(":test:fixture:ir")
@@ -78,7 +80,7 @@ include(":type-system")
 include(":validator")
 
 includeBuild("bolt")
-includeBuild("example")
+//includeBuild("example")
 includeBuild("sweet")
 
 rootProject.name = "chasm-multiplatform"
