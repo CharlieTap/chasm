@@ -1,0 +1,58 @@
+package io.github.charlietap.chasm.gradle
+
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+
+internal class DataClassGenerator {
+    operator fun invoke(
+        packageName: String,
+        type: GeneratedType,
+    ): TypeSpec = TypeSpec.classBuilder(ClassName(packageName, type.name)).apply {
+        addModifiers(KModifier.DATA)
+
+        val constructor = FunSpec.constructorBuilder()
+
+        type.fields.forEach { field ->
+            val typeName = field.type.asTypeName()
+            val param = ParameterSpec.builder(field.name, typeName).build()
+            constructor.addParameter(param)
+
+            val property = PropertySpec.builder(field.name, typeName).apply {
+                initializer(field.name)
+            }.build()
+            addProperty(property)
+        }
+        primaryConstructor(constructor.build())
+    }.build()
+}
+
+internal class WasmInterfaceGenerator(
+    private val dataClassGenerator: DataClassGenerator = DataClassGenerator(),
+    private val classInterfaceGenerator: ClassInterfaceGenerator = ClassInterfaceGenerator(),
+    private val classImplementationGenerator: ClassImplementationGenerator = ClassImplementationGenerator(),
+) {
+    operator fun invoke(
+        name: String,
+        packageName: String,
+        wasmInterface: WasmInterface,
+    ): List<FileSpec> {
+
+        val interfaceFile = FileSpec.builder(packageName, name).apply {
+            wasmInterface.types.forEach { type ->
+                addType(dataClassGenerator(packageName, type))
+            }
+            addType(classInterfaceGenerator(packageName, name, wasmInterface))
+        }.build()
+
+        val implementationFile = FileSpec.builder(packageName, name + "Impl").apply {
+            addType(classImplementationGenerator(packageName, name, wasmInterface))
+        }.build()
+
+        return listOf(interfaceFile, implementationFile)
+    }
+}

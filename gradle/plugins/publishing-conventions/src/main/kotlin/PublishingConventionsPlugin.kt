@@ -4,6 +4,7 @@ import com.vanniktech.maven.publish.MavenPublishPlugin
 import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Project.DEFAULT_VERSION
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.*
 import org.gradle.kotlin.dsl.create
@@ -19,7 +20,9 @@ class PublishingConventionsPlugin : Plugin<Project> {
         val extension = project.extensions.create<PublishingConventionsExtension>("publishing-convention-extension")
 
         project.group = "io.github.charlietap.chasm"
-        project.version = project.extensions.getByType(VersionCatalogsExtension::class.java).find("libs").get().findVersion("version-name").get().requiredVersion
+        if(project.version == DEFAULT_VERSION) {
+            project.version = project.extensions.getByType(VersionCatalogsExtension::class.java).find("libs").get().findVersion("version-name").get().requiredVersion
+        }
 
         project.tasks.withType<DokkaTask>().configureEach {
             notCompatibleWithConfigurationCache("https://github.com/Kotlin/dokka/issues/2231")

@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+        mavenLocal()
     }
 
     includeBuild("../gradle/plugins/linting-conventions")
@@ -23,7 +24,9 @@ dependencyResolutionManagement {
 
 include(":android")
 include(":benchmark")
-include(":fibonacci-wasm")
+include(":consumer-android-fibonacci")
+include(":consumer-jvm-test")
+include(":consumer-multiplatform-factorial")
 
 rootProject.name = "chasm-example"
 

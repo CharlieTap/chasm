@@ -2,6 +2,8 @@ package com.tap.chasm.di
 
 import android.content.Context
 import android.content.res.AssetManager
+import com.test.chasm.FibonacciService
+import com.test.chasm.FibonacciServiceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,13 +13,12 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class AppModule {
-
+class AndroidBindingModule {
     @Singleton
     @Provides
-    fun assetManager(
+    fun fibonacciService(
         @ApplicationContext context: Context,
-    ): AssetManager {
-        return context.assets
+    ): FibonacciService {
+        return FibonacciServiceImpl(context.assets.open("fibonacci.wasm").readBytes())
     }
 }
