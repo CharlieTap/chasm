@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.symbol.processing)
+    alias(libs.plugins.chasm)
 
     alias(libs.plugins.conventions.linting)
 }

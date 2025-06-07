@@ -6,6 +6,7 @@ pluginManagement {
     }
 
     includeBuild("../gradle/plugins/linting-conventions")
+//    includeBuild("../chasm-gradle-plugin")
 }
 
 dependencyResolutionManagement {

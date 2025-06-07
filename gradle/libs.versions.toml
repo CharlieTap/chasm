@@ -59,6 +59,7 @@ android-benchmark = { id = "androidx.benchmark", version.ref = "androidx-benchma
 android-library = { id = "com.android.library", version.ref = "android-build-tools-plugin" }
 android-test = { id = "com.android.test", version.ref = "android-build-tools-plugin" }
 bolt = { id = "io.github.charlietap.bolt.plugin" }
+chasm = { id = "io.github.charlietap.chasm.gradle" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref="dependency-analysis" }
 dokka = { id = "org.jetbrains.dokka", version.ref="dokka" }
