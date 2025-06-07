@@ -37,6 +37,7 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.host)
+                api(projects.runtime.type)
                 api(projects.runtime.value)
                 api(projects.stream)
 
