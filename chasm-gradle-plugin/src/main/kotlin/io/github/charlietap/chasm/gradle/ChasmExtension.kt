@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
+import java.io.Serializable
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -13,7 +14,7 @@ enum class Mode {
 data class CodegenConfig(
     val transformStrings: Boolean = true,
     val generateTypesafeGlobalFunctions: Boolean = false,
-)
+): Serializable
 
 open class ChasmExtension @Inject constructor(
     layout: ProjectLayout,

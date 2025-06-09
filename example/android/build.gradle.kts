@@ -1,3 +1,6 @@
+import io.github.charlietap.chasm.gradle.CodegenConfig
+import io.github.charlietap.chasm.gradle.Mode
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +10,14 @@ plugins {
     alias(libs.plugins.chasm)
 
     alias(libs.plugins.conventions.linting)
+}
+
+chasm {
+    mode = Mode.CONSUMER
+    packageName = "com.test.chasm"
+    config = CodegenConfig(
+        generateTypesafeGlobalFunctions = true,
+    )
 }
 
 android {

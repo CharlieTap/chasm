@@ -1,6 +1,8 @@
 plugins {
+    alias(libs.plugins.kotlin.jvm)
     `kotlin-dsl`
     `java-gradle-plugin`
+    `maven-publish`
 }
 
 group = "io.github.charlietap.chasm"

@@ -4,7 +4,17 @@ import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.ValueType
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeFirstWord
+import org.jetbrains.kotlin.gradle.utils.property
+
+internal class CamelCaseFormatter {
+    operator fun invoke(snakeCase: String): String {
+        return snakeCase.split('_')
+            .mapIndexed { index, word ->
+                if (index == 0) word else word.replaceFirstChar { it.uppercaseChar() }
+            }
+            .joinToString("")
+    }
+}
 
 internal class ParameterFactory
 {
@@ -25,10 +35,10 @@ internal class ReturnFactory
         functionName: String,
         returns: List<ValueType>,
     ): FunctionReturn {
-        return when (returns.size) {
-            0 -> FunctionReturn.Unit
-            1 -> FunctionReturn.Primitive(returns.first())
-            2 if config.transformStrings && returns.matchesStringReturnType() -> FunctionReturn.String
+        return when {
+            returns.size == 0 -> FunctionReturn.Unit
+            returns.size == 1 -> FunctionReturn.Primitive(returns.first())
+            returns.size == 2 && config.transformStrings && returns.matchesStringReturnType() -> FunctionReturn.String
             else -> FunctionReturn.Type(
                 GeneratedType(
                     name = "${functionName}Result",
@@ -45,6 +55,7 @@ internal class ReturnFactory
 }
 
 internal class WasmInterfaceFactory(
+    private val formatter: CamelCaseFormatter = CamelCaseFormatter(),
     private val parameterFactory: ParameterFactory = ParameterFactory(),
     private val returnFactory: ReturnFactory = ReturnFactory(),
 ) {
@@ -61,21 +72,22 @@ internal class WasmInterfaceFactory(
             when(val type = export.type) {
                 is ExternalType.Function -> {
                     val function = Function(
-                        name = export.name,
+                        name = formatter(export.name),
                         params = parameterFactory(type.functionType.params.types),
                         returns = returnFactory(config, export.name, type.functionType.results.types),
                     )
                     functions.add(function)
                 }
                 is ExternalType.Global -> {
-                    val property = Property.GlobalProperty(export.name)
+                    val name = formatter(export.name)
+                    val property = Property.GlobalProperty(name)
                     properties.add(property)
 
                     if(config.generateTypesafeGlobalFunctions) {
                         val globalType = type.globalType
 
                         val readFunction = Function(
-                            name = "read" + export.name.capitalizeFirstWord(),
+                            name = formatter("read_" + export.name),
                             params = emptyList(),
                             returns = FunctionReturn.Primitive(globalType.valueType)
                         )
@@ -83,8 +95,8 @@ internal class WasmInterfaceFactory(
 
                         if(globalType.mutability == Mutability.Var) {
                             val writeFunction = Function(
-                                name = "write" + export.name.capitalizeFirstWord(),
-                                params = listOf(FunctionParameter("value", globalType.valueType)),
+                                name = formatter("write_" + export.name),
+                                params = listOf(FunctionParameter("global", globalType.valueType)),
                                 returns = FunctionReturn.Unit,
                             )
                             functions.add(writeFunction)
@@ -92,15 +104,18 @@ internal class WasmInterfaceFactory(
                     }
                 }
                 is ExternalType.Memory -> {
-                    val property = Property.MemoryProperty(export.name)
+                    val name = formatter(export.name)
+                    val property = Property.MemoryProperty(name)
                     properties.add(property)
                 }
                 is ExternalType.Table -> {
-                    val property = Property.TableProperty(export.name)
+                    val name = formatter(export.name)
+                    val property = Property.TableProperty(name)
                     properties.add(property)
                 }
                 is ExternalType.Tag -> {
-                    val property = Property.TagProperty(export.name)
+                    val name = formatter(export.name)
+                    val property = Property.TagProperty(name)
                     properties.add(property)
                 }
             }

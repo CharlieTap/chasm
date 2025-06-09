@@ -2,9 +2,12 @@ package io.github.charlietap.chasm.gradle
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.UNIT
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Table
@@ -34,8 +37,15 @@ internal class FunctionGenerator
     operator fun invoke(
         function: Function,
     ) = FunSpec.builder(function.name).apply {
+        addModifiers(KModifier.ABSTRACT)
         function.params.forEach { param ->
             addParameter(param.name, param.type.asTypeName())
+        }
+        when(function.returns) {
+            is FunctionReturn.Primitive -> returns(function.returns.type.asTypeName())
+            FunctionReturn.String -> returns(STRING)
+            is FunctionReturn.Type -> TODO()
+            FunctionReturn.Unit -> returns(UNIT)
         }
     }.build()
 }
@@ -66,6 +76,7 @@ internal class WasmInterfaceGenerator(
         packageName: String,
         wasmInterface: WasmInterface,
     ): FileSpec = FileSpec.builder(name, packageName).apply {
+
 
         wasmInterface.types.forEach { type ->
            addType(dataClassGenerator(type))

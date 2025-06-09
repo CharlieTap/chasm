@@ -11,11 +11,11 @@ internal sealed interface FunctionReturn {
     @JvmInline
     value class Primitive(val type: ValueType) : FunctionReturn
 
-    data object String: FunctionReturn
+    object String: FunctionReturn
 
     data class Type(val generated: GeneratedType) : FunctionReturn
 
-    data object Unit: FunctionReturn
+    object Unit: FunctionReturn
 }
 
 internal data class Function(

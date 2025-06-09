@@ -3,10 +3,10 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+        mavenLocal()
     }
 
     includeBuild("../gradle/plugins/linting-conventions")
-//    includeBuild("../chasm-gradle-plugin")
 }
 
 dependencyResolutionManagement {

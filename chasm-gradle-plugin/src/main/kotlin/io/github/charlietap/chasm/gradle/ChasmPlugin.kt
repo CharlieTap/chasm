@@ -14,7 +14,7 @@ class ChasmPlugin : Plugin<Project> {
         project.afterEvaluate {
             when (extension.mode.get()) {
                 Mode.CONSUMER -> {
-                    registerCodegenTask()
+                    registerCodegenTask(extension)
                 }
 //                Mode.PRODUCER -> {
 //                    project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
@@ -34,12 +34,16 @@ class ChasmPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.registerCodegenTask() {
+    private fun Project.registerCodegenTask(
+        extension: ChasmExtension,
+    ) {
         tasks.register<CodegenTask>("codegen") {
             group = "chasm"
             description = "Generates a typesafe Kotlin interface from a wasm binary"
-            binary.set(layout.buildDirectory.file("wasm/test.wasm"))
-            outputDirectory.set(layout.buildDirectory.dir("generated/sources/chasm"))
+            binary.set(layout.projectDirectory.dir("src/main/wasm").file("test.wasm"))
+            config.set(extension.config)
+            packageName.set(extension.packageName)
+            outputDirectory.set(layout.buildDirectory.dir("generated/source/chasm"))
         }
     }
 }
