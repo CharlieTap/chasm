@@ -43,7 +43,7 @@ class ChasmPlugin : Plugin<Project> {
             binary.set(layout.projectDirectory.dir("src/main/wasm").file("test.wasm"))
             config.set(extension.config)
             packageName.set(extension.packageName)
-            outputDirectory.set(layout.buildDirectory.dir("generated/source/chasm"))
+            outputDirectory.set(layout.buildDirectory.dir("generated/source/chasm/kotlin"))
         }
     }
 }

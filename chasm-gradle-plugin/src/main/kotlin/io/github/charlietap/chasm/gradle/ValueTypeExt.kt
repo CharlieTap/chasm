@@ -1,29 +1,23 @@
 package io.github.charlietap.chasm.gradle
 
-import com.squareup.kotlinpoet.DOUBLE
-import com.squareup.kotlinpoet.FLOAT
-import com.squareup.kotlinpoet.INT
-import com.squareup.kotlinpoet.LONG
-import com.squareup.kotlinpoet.TypeName
-import com.squareup.kotlinpoet.asTypeName
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
 
-internal fun ValueType.isI32() = this == ValueType.Number(NumberType.I32)
-
-internal fun ValueType.asTypeName(): TypeName {
+internal fun ValueType.asType(): Type {
     return when (this) {
         is ValueType.Number -> when(this.numberType) {
-            NumberType.I32 -> INT
-            NumberType.I64 -> LONG
-            NumberType.F32 -> FLOAT
-            NumberType.F64 -> DOUBLE
+            NumberType.I32 -> Scalar.Integer
+            NumberType.I64 -> Scalar.Long
+            NumberType.F32 -> Scalar.Float
+            NumberType.F64 -> Scalar.Double
         }
         is ValueType.Bottom,
         is ValueType.Reference,
-        is ValueType.Vector -> this::class.asTypeName()
+        is ValueType.Vector -> throw IllegalStateException("Cannot convert $this to Type")
     }
 }
+
+internal fun ValueType.isI32() = this == ValueType.Number(NumberType.I32)
 
 internal fun List<ValueType>.matchesStringReturnType() = all { valueType ->
     valueType.isI32()

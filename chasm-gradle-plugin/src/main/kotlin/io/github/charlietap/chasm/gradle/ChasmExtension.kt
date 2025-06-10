@@ -13,7 +13,7 @@ enum class Mode {
 
 data class CodegenConfig(
     val transformStrings: Boolean = true,
-    val generateTypesafeGlobalFunctions: Boolean = false,
+    val generateTypesafeGlobalProperties: Boolean = false,
 ): Serializable
 
 open class ChasmExtension @Inject constructor(

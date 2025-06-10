@@ -1,22 +1,35 @@
 package io.github.charlietap.chasm.gradle
 
-import io.github.charlietap.chasm.type.ValueType
+internal sealed interface Type
+
+internal sealed interface Scalar: Type {
+    object Integer : Scalar
+
+    object Long : Scalar
+
+    object Float : Scalar
+
+    object Double : Scalar
+
+    object String: Scalar
+
+    object Unit: Scalar
+}
+
+internal data class Aggregate(
+    val generated: GeneratedType,
+): Type
+
 
 internal data class FunctionParameter(
     val name: String,
-    val type: ValueType,
+    val type: Type,
 )
 
-internal sealed interface FunctionReturn {
-    @JvmInline
-    value class Primitive(val type: ValueType) : FunctionReturn
-
-    object String: FunctionReturn
-
-    data class Type(val generated: GeneratedType) : FunctionReturn
-
-    object Unit: FunctionReturn
-}
+@JvmInline
+internal value class FunctionReturn(
+    val type: Type,
+)
 
 internal data class Function(
     val name: String,
@@ -26,7 +39,7 @@ internal data class Function(
 
 internal data class Field(
     val name: String,
-    val type: ValueType,
+    val type: Type,
 )
 
 internal data class GeneratedType(
@@ -34,26 +47,11 @@ internal data class GeneratedType(
     val fields: List<Field>,
 )
 
-internal sealed interface Property {
-
-    val name: String
-
-    data class GlobalProperty(
-        override val name: String,
-    ): Property
-
-    data class MemoryProperty(
-        override val name: String,
-    ): Property
-
-    data class TableProperty(
-        override val name: String,
-    ): Property
-
-    data class TagProperty(
-        override val name: String,
-    ): Property
-}
+internal data class Property(
+    val name: String,
+    val type: Type,
+    val const: Boolean,
+)
 
 internal data class WasmInterface(
     val types: List<GeneratedType>,

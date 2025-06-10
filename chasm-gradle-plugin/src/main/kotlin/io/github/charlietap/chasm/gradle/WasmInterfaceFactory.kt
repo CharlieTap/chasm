@@ -4,15 +4,23 @@ import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.ValueType
-import org.jetbrains.kotlin.gradle.utils.property
 
 internal class CamelCaseFormatter {
     operator fun invoke(snakeCase: String): String {
         return snakeCase.split('_')
             .mapIndexed { index, word ->
                 if (index == 0) word else word.replaceFirstChar { it.uppercaseChar() }
-            }
-            .joinToString("")
+            }.joinToString("")
+    }
+}
+
+internal class ClassNameFormatter(
+    private val camelCaseFormatter: CamelCaseFormatter = CamelCaseFormatter(),
+) {
+    operator fun invoke(snakeCase: String): String {
+        return camelCaseFormatter(snakeCase).let { name ->
+            name.replaceFirstChar { it.uppercaseChar() }
+        }
     }
 }
 
@@ -23,34 +31,56 @@ internal class ParameterFactory
     ): List<FunctionParameter> = params.mapIndexed { idx, param ->
         FunctionParameter(
             name = "p$idx",
-            type = param,
+            type = param.asType(),
         )
     }
 }
 
-internal class ReturnFactory
-{
+internal class ReturnTypeFactory(
+    private val classNameFormatter: ClassNameFormatter = ClassNameFormatter(),
+) {
+    operator fun invoke(
+        name: String,
+        config: CodegenConfig,
+        input: List<ValueType>,
+        types: MutableList<GeneratedType>,
+    ): Type = when {
+        input.size == 0 -> Scalar.Unit
+        input.size == 1 -> input.first().asType()
+        input.size == 2 && config.transformStrings && input.matchesStringReturnType() -> Scalar.String
+        else -> {
+            val type =  GeneratedType(
+                name = classNameFormatter(name) + "Result",
+                fields = input.mapIndexed { idx, type ->
+                    Field(
+                        name = "r$idx",
+                        type = type.asType(),
+                    )
+                }
+            )
+            types.add(type)
+            Aggregate(type)
+        }
+    }
+}
+
+internal class ReturnFactory(
+    private val typeFactory: ReturnTypeFactory = ReturnTypeFactory(),
+) {
     operator fun invoke(
         config: CodegenConfig,
         functionName: String,
         returns: List<ValueType>,
+        types: MutableList<GeneratedType>,
     ): FunctionReturn {
-        return when {
-            returns.size == 0 -> FunctionReturn.Unit
-            returns.size == 1 -> FunctionReturn.Primitive(returns.first())
-            returns.size == 2 && config.transformStrings && returns.matchesStringReturnType() -> FunctionReturn.String
-            else -> FunctionReturn.Type(
-                GeneratedType(
-                    name = "${functionName}Result",
-                    fields = returns.mapIndexed { idx, type ->
-                        Field(
-                            name = "r$idx",
-                            type = type,
-                        )
-                    }
-                )
-            )
-        }
+        return FunctionReturn(
+            type = typeFactory(
+                name = functionName,
+                config = config,
+                input = returns,
+                types = types
+            ),
+        )
     }
 }
 
@@ -74,50 +104,23 @@ internal class WasmInterfaceFactory(
                     val function = Function(
                         name = formatter(export.name),
                         params = parameterFactory(type.functionType.params.types),
-                        returns = returnFactory(config, export.name, type.functionType.results.types),
+                        returns = returnFactory(config, export.name, type.functionType.results.types, types),
                     )
                     functions.add(function)
                 }
                 is ExternalType.Global -> {
-                    val name = formatter(export.name)
-                    val property = Property.GlobalProperty(name)
-                    properties.add(property)
-
-                    if(config.generateTypesafeGlobalFunctions) {
-                        val globalType = type.globalType
-
-                        val readFunction = Function(
-                            name = formatter("read_" + export.name),
-                            params = emptyList(),
-                            returns = FunctionReturn.Primitive(globalType.valueType)
+                    if(config.generateTypesafeGlobalProperties) {
+                        val property = Property(
+                            name = formatter(export.name),
+                            type = type.globalType.valueType.asType(),
+                            const = type.globalType.mutability == Mutability.Const,
                         )
-                        functions.add(readFunction)
-
-                        if(globalType.mutability == Mutability.Var) {
-                            val writeFunction = Function(
-                                name = formatter("write_" + export.name),
-                                params = listOf(FunctionParameter("global", globalType.valueType)),
-                                returns = FunctionReturn.Unit,
-                            )
-                            functions.add(writeFunction)
-                        }
+                        properties.add(property)
                     }
                 }
-                is ExternalType.Memory -> {
-                    val name = formatter(export.name)
-                    val property = Property.MemoryProperty(name)
-                    properties.add(property)
-                }
-                is ExternalType.Table -> {
-                    val name = formatter(export.name)
-                    val property = Property.TableProperty(name)
-                    properties.add(property)
-                }
-                is ExternalType.Tag -> {
-                    val name = formatter(export.name)
-                    val property = Property.TagProperty(name)
-                    properties.add(property)
-                }
+                is ExternalType.Memory,
+                is ExternalType.Table,
+                is ExternalType.Tag -> Unit
             }
         }
 

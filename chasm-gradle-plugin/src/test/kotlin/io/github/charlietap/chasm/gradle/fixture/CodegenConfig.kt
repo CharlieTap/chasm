@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.gradle.CodegenConfig
 
 internal fun codegenConfig(
     transformStrings: Boolean = true,
-    generateTypesafeGlobalFunctions: Boolean = false,
+    generateTypesafeGlobalProperties: Boolean = false,
 ) = CodegenConfig(
     transformStrings = transformStrings,
-    generateTypesafeGlobalFunctions = generateTypesafeGlobalFunctions,
+    generateTypesafeGlobalProperties = generateTypesafeGlobalProperties,
 )

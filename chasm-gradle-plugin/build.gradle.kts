@@ -39,6 +39,7 @@ kotlin {
         implementation(libs.kotlin.poet)
 
         testImplementation(libs.kotlin.test)
+        testImplementation(projects.test.fixture.chasm)
     }
 }
 

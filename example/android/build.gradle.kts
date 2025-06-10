@@ -16,7 +16,7 @@ chasm {
     mode = Mode.CONSUMER
     packageName = "com.test.chasm"
     config = CodegenConfig(
-        generateTypesafeGlobalFunctions = true,
+        generateTypesafeGlobalProperties = true,
     )
 }
 
