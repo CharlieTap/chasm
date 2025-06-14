@@ -8,11 +8,6 @@ plugins {
 group = "io.github.charlietap.chasm"
 version = "0.1.0"
 
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-    mavenLocal()
-}
 
 gradlePlugin {
     plugins {
@@ -36,6 +31,7 @@ kotlin {
         implementation(projects.chasm)
 
         implementation(libs.kotlin.gradle.plugin)
+        implementation(libs.android.gradle.plugin)
         implementation(libs.kotlin.poet)
 
         testImplementation(libs.kotlin.test)

@@ -1,5 +1,4 @@
 import io.github.charlietap.chasm.gradle.CodegenConfig
-import io.github.charlietap.chasm.gradle.Mode
 
 plugins {
     alias(libs.plugins.android.application)
@@ -13,11 +12,15 @@ plugins {
 }
 
 chasm {
-    mode = Mode.CONSUMER
-    packageName = "com.test.chasm"
-    config = CodegenConfig(
-        generateTypesafeGlobalProperties = true,
-    )
+    modules {
+        create("Fibonacci") {
+            binary = layout.projectDirectory.file("src/main/wasm/test.wasm")
+            packageName = "com.test.chasm"
+            codegenConfig = CodegenConfig(
+                generateTypesafeGlobalProperties = true,
+            )
+        }
+    }
 }
 
 android {

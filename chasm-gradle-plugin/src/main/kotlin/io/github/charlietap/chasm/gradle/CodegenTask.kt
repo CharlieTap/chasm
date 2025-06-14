@@ -31,6 +31,9 @@ abstract class CodegenTask @Inject constructor(
     abstract val config: Property<CodegenConfig>
 
     @get:Input
+    abstract val interfaceName: Property<String>
+
+    @get:Input
     abstract val packageName: Property<String>
 
     @get:OutputDirectory
@@ -48,7 +51,7 @@ abstract class CodegenTask @Inject constructor(
         val generator = WasmInterfaceGenerator()
 
         val instance = factory(config.get(), info)
-        val interfaceSpec = generator("TestInterface", "com.test.codegen", instance)
+        val interfaceSpec = generator(interfaceName.get(), packageName.get(), instance)
 
         val outputDir = outputDirectory.get().asFile
         interfaceSpec.writeTo(outputDir.toPath())

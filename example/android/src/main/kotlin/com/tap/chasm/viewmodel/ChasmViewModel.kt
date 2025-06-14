@@ -2,6 +2,8 @@ package com.tap.chasm.viewmodel
 
 import android.content.res.AssetManager
 import androidx.lifecycle.viewModelScope
+import com.test.chasm.Fibonacci
+import com.test.chasm.MultipleReturnFunctionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -56,6 +58,47 @@ class ChasmViewModel
             )
         }
         override val state: StateFlow<ChasmState> = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChasmState.DEFAULT)
+
+        private val test = object: Fibonacci {
+            override var mutableGlobal: Int
+                get() = TODO("Not yet implemented")
+                set(value) {}
+            override val immutableGlobal: Int
+                get() = TODO("Not yet implemented")
+
+            override fun intFunction(): Int {
+                TODO("Not yet implemented")
+            }
+
+            override fun longFunction(): Long {
+                TODO("Not yet implemented")
+            }
+
+            override fun floatFunction(): Float {
+                TODO("Not yet implemented")
+            }
+
+            override fun doubleFunction(): Double {
+                TODO("Not yet implemented")
+            }
+
+            override fun stringFunction(): String {
+                TODO("Not yet implemented")
+            }
+
+            override fun unitFunction() {
+                TODO("Not yet implemented")
+            }
+
+            override fun multipleParamFunction(p0: Int, p1: Double) {
+                TODO("Not yet implemented")
+            }
+
+            override fun multipleReturnFunction(): MultipleReturnFunctionResult {
+                TODO("Not yet implemented")
+            }
+
+        }
 
         override fun handleEvent(event: ChasmEvent) {
             when (event) {
