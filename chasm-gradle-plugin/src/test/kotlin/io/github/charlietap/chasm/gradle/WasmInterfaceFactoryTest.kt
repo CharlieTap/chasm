@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.gradle.fixture.doubleScalarType
 import io.github.charlietap.chasm.gradle.fixture.field
 import io.github.charlietap.chasm.gradle.fixture.floatScalarType
 import io.github.charlietap.chasm.gradle.fixture.function
+import io.github.charlietap.chasm.gradle.fixture.functionProxy
 import io.github.charlietap.chasm.gradle.fixture.functionReturn
 import io.github.charlietap.chasm.gradle.fixture.generatedType
 import io.github.charlietap.chasm.gradle.fixture.integerScalarType
@@ -62,6 +63,9 @@ class WasmInterfaceFactoryTest {
                     name = "string",
                     returns = functionReturn(
                         stringScalarType(),
+                    ),
+                    implementation = functionProxy(
+                        name = "string",
                     ),
                 ),
             ),
@@ -122,6 +126,9 @@ class WasmInterfaceFactoryTest {
                     name = "string",
                     returns = functionReturn(
                         aggregateType(generated = type),
+                    ),
+                    implementation = functionProxy(
+                        name = "string",
                     ),
                 ),
             ),
@@ -192,6 +199,9 @@ class WasmInterfaceFactoryTest {
                         aggregateType(
                             generated = type,
                         )
+                    ),
+                    implementation = functionProxy(
+                        name = "multiple_return",
                     ),
                 ),
             ),
