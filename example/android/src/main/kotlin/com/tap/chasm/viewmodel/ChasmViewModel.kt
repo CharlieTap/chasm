@@ -5,15 +5,27 @@ import androidx.lifecycle.viewModelScope
 import com.test.chasm.Fibonacci
 import com.test.chasm.MultipleReturnFunctionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.charlietap.chasm.config.Config
+import io.github.charlietap.chasm.embedding.global.readGlobal
+import io.github.charlietap.chasm.embedding.global.writeGlobal
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
+import io.github.charlietap.chasm.embedding.memory.readUtf8String
 import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.shapes.Export
+import io.github.charlietap.chasm.embedding.shapes.Function
+import io.github.charlietap.chasm.embedding.shapes.Global
+import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
+import io.github.charlietap.chasm.embedding.shapes.Module
+import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.stream.SourceReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,6 +34,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.reflect.Executable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,39 +72,84 @@ class ChasmViewModel
         }
         override val state: StateFlow<ChasmState> = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChasmState.DEFAULT)
 
-        private val test = object: Fibonacci {
+        class FibonacciImpl(
+            private val module: Module,
+            private val imports: List<Import> = emptyList(),
+            private val config: Config = Config(),
+        ) : Fibonacci {
+
+            constructor(
+                binary: ByteArray,
+                imports: List<Import> = emptyList(),
+                config: Config = Config(),
+            ) : this(
+                module = module(binary, config.moduleConfig).expect("Failed to instantiate module"),
+                imports = imports,
+                config = config,
+            )
+
+            constructor(
+                reader: SourceReader,
+                imports: List<Import> = emptyList(),
+                config: Config = Config(),
+            ) : this(
+                module = module(reader, config.moduleConfig).expect("Failed to instantiate module"),
+                imports = imports,
+                config = config,
+            )
+
+            private val store = store()
+            private val instance = instance(store, module, imports, config.runtimeConfig).expect("Failed to instantiate module " + this::class.simpleName)
+
             override var mutableGlobal: Int
-                get() = TODO("Not yet implemented")
-                set(value) {}
+                get() {
+                    val global = instance.exports.first { it.name == "mutable_global" }.value as Global
+                    return readGlobal(store, global).map { (it as NumberValue.I32).value }.expect("Failed to read global")
+                }
+                set(value) {
+                    val global = instance.exports.first { it.name == "mutable_global" }.value as Global
+                    writeGlobal(store, global, NumberValue.I32(value))
+                }
+
             override val immutableGlobal: Int
-                get() = TODO("Not yet implemented")
+                get()  {
+                    val global = instance.exports.first { it.name == "immutable_global" }.value as Global
+                    return readGlobal(store, global).map { (it as NumberValue.I32).value }.expect("Failed to read global")
+                }
 
             override fun intFunction(): Int {
-                TODO("Not yet implemented")
+                return invoke(store, instance, "int_function").map { (it.first() as NumberValue.I32).value }.expect("Failed to invoke function")
             }
 
             override fun longFunction(): Long {
-                TODO("Not yet implemented")
+                return invoke(store, instance, "long_function").map { (it.first() as NumberValue.I64).value }.expect("Failed to invoke function")
             }
 
             override fun floatFunction(): Float {
-                TODO("Not yet implemented")
+                return invoke(store, instance, "float_function").map { (it.first() as NumberValue.F32).value }.expect("Failed to invoke function")
             }
 
             override fun doubleFunction(): Double {
-                TODO("Not yet implemented")
+                return invoke(store, instance, "double_function").map { (it.first() as NumberValue.F64).value }.expect("Failed to invoke function")
             }
 
             override fun stringFunction(): String {
-                TODO("Not yet implemented")
+                val memory = instance.exports.firstNotNullOf { it.value as? Memory }
+                return invoke(store, instance, "string_function").flatMap { (pointer, length) ->
+                    readUtf8String(store, memory, (pointer as NumberValue.I32).value, (length as NumberValue.I32).value)
+                }.expect("Failed to invoke function")
             }
 
             override fun unitFunction() {
-                TODO("Not yet implemented")
+                invoke(store, instance, "unit_function").expect("Failed to invoke function")
             }
 
             override fun multipleParamFunction(p0: Int, p1: Double) {
-                TODO("Not yet implemented")
+                val input = buildList {
+                    add(NumberValue.I32(p0))
+                    add(NumberValue.F64(p1))
+                }
+                invoke(store, instance, "multiple_param_function", input).expect("Failed to invoke function")
             }
 
             override fun multipleReturnFunction(): MultipleReturnFunctionResult {

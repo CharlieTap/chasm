@@ -33,6 +33,7 @@ internal value class FunctionReturn(
 
 internal data class Function(
     val name: String,
+    val wasmName: String,
     val params: List<FunctionParameter>,
     val returns: FunctionReturn,
 )
@@ -49,6 +50,7 @@ internal data class GeneratedType(
 
 internal data class Property(
     val name: String,
+    val wasmName: String,
     val type: Type,
     val const: Boolean,
 )

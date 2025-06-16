@@ -53,6 +53,8 @@ abstract class CodegenTask @Inject constructor(
         val instance = factory(config.get(), info)
         val interfaceSpec = generator(interfaceName.get(), packageName.get(), instance)
 
+        println(interfaceSpec)
+
         val outputDir = outputDirectory.get().asFile
         interfaceSpec.writeTo(outputDir.toPath())
     }

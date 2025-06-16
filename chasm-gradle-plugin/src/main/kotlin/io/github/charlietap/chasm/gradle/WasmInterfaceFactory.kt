@@ -103,6 +103,7 @@ internal class WasmInterfaceFactory(
                 is ExternalType.Function -> {
                     val function = Function(
                         name = formatter(export.name),
+                        wasmName = export.name,
                         params = parameterFactory(type.functionType.params.types),
                         returns = returnFactory(config, export.name, type.functionType.results.types, types),
                     )
@@ -112,6 +113,7 @@ internal class WasmInterfaceFactory(
                     if(config.generateTypesafeGlobalProperties) {
                         val property = Property(
                             name = formatter(export.name),
+                            wasmName = export.name,
                             type = type.globalType.valueType.asType(),
                             const = type.globalType.mutability == Mutability.Const,
                         )

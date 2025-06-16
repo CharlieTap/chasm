@@ -58,8 +58,8 @@ class ChasmPlugin : Plugin<Project> {
         sourceSetName: String,
     ): List<TaskProvider<CodegenTask>> {
         return extension.modules.map { module ->
-            val taskSourceName = sourceSetName.replaceFirstChar { it.uppercase() }
-            tasks.register<CodegenTask>("codegenModule$taskSourceName${module.name}") {
+            val capitalizedSourceName = sourceSetName.replaceFirstChar { it.uppercase() }
+            tasks.register<CodegenTask>("codegenModule$capitalizedSourceName${module.name}") {
                 group = "chasm"
                 description = "Generates a typesafe Kotlin interface from a wasm binary"
                 binary.set(module.binary)
