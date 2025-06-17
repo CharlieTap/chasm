@@ -118,7 +118,10 @@ class ChasmViewModel
                 }
 
             override fun intFunction(): Int {
-                return invoke(store, instance, "int_function").map { (it.first() as NumberValue.I32).value }.expect("Failed to invoke function")
+                val args = listOf(
+                    NumberValue.I32(1),
+                )
+                return invoke(store, instance, "int_function", args).map { (it.first() as NumberValue.I32).value }.expect("Failed to invoke function")
             }
 
             override fun longFunction(): Long {
