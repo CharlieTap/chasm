@@ -1,21 +1,18 @@
 (module
-  (type $type (func (param i32) (result i32)))
-
-  (func $fibonacci (type $type) (param i32) (result i32)
-    local.get 0
-    i32.const 1
-    i32.le_s
-    if
-      local.get 0
-      return
-    end
-
-    local.get 0
-    i32.const 1
-    i32.sub
-    ref.func $fibonacci
-    return_call_ref $type
+  (func $fib_rec (param $n i32) (param $a i32) (param $b i32) (result i32)
+    (if (i32.eqz (local.get $n))
+      (then (return (local.get $a)))
+    )
+    (return_call $fib_rec
+      (i32.sub (local.get $n) (i32.const 1))
+      (local.get $b)
+      (i32.add (local.get $a) (local.get $b))
+    )
   )
 
-  (export "fibonacci" (func $fibonacci))
+  (func $fib (param $n i32) (result i32)
+    (call $fib_rec (local.get $n) (i32.const 0) (i32.const 1))
+  )
+
+  (export "fibonacci" (func $fib))
 )

@@ -1,5 +1,6 @@
 package com.tap.chasm.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.test.chasm.FibonacciService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,6 +46,8 @@ class ChasmViewModel @Inject constructor(
 
             is ChasmEvent.CalculateFibonacci -> {
                 viewModelScope.launch {
+                    val fib = runCatching {  calculateFibonacci(nth.value.toInt()) }
+                    Log.d("ChasmViewModel", fib.toString())
                     fibonacci.emit(calculateFibonacci(nth.value.toInt()))
                 }
             }
