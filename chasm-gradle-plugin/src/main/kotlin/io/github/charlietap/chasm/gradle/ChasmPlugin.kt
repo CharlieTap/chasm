@@ -46,8 +46,8 @@ class ChasmPlugin : Plugin<Project> {
             androidComponents.onVariants { variant: Variant ->
                 val tasks = project.configureCodegenTasks(extension, variant.name)
                 tasks.forEach { task ->
-                    variant.sources.kotlin?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
-                    androidExtension.sourceSets.getByName(variant.name).kotlin.srcDir(project.layout.buildDirectory.dir("generated/kotlin/${task.name}"))
+                    variant.sources.java?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
+                    androidExtension.sourceSets.getByName(variant.name).kotlin.srcDir(project.layout.buildDirectory.dir("generated/java/${task.name}"))
                 }
             }
         }

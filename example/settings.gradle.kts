@@ -24,7 +24,7 @@ dependencyResolutionManagement {
 
 include(":android")
 include(":benchmark")
-include(":fibonacci-wasm")
+include(":consumer-fibonacci")
 
 rootProject.name = "chasm-example"
 

@@ -1,26 +1,12 @@
-import io.github.charlietap.chasm.gradle.CodegenConfig
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.symbol.processing)
-    alias(libs.plugins.chasm)
+
 
     alias(libs.plugins.conventions.linting)
-}
-
-chasm {
-    modules {
-        create("Fibonacci") {
-            binary = layout.projectDirectory.file("src/main/wasm/test.wasm")
-            packageName = "com.test.chasm"
-            codegenConfig = CodegenConfig(
-                generateTypesafeGlobalProperties = true,
-            )
-        }
-    }
 }
 
 android {
@@ -48,12 +34,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.bytecode.version.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.java.bytecode.version.get())
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = libs.versions.java.bytecode.version.get()
     }
 
     buildFeatures {
@@ -63,6 +49,8 @@ android {
 }
 
 dependencies {
+
+    implementation(projects.consumerFibonacci)
 
     implementation(libs.chasm.jvm)
     implementation(libs.hilt.core)
