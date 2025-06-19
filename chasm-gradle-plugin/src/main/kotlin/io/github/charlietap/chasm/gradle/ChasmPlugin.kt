@@ -9,13 +9,20 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
+import org.gradle.plugins.ide.idea.model.IdeaModel
+import org.gradle.plugins.ide.idea.model.IdeaProject
+import org.jetbrains.gradle.ext.IdeaExtPlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.gradle.ext.settings
+import org.jetbrains.gradle.ext.taskTriggers
 
 class ChasmPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
 
         val extension = project.extensions.create<ChasmExtension>("chasm")
+
+        project.rootProject.pluginManager.apply(IdeaExtPlugin::class.java)
 
         project.plugins.withType(KotlinBasePlugin::class.java) {
             val multiplatform = project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")
@@ -49,6 +56,14 @@ class ChasmPlugin : Plugin<Project> {
                     variant.sources.java?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
                     androidExtension.sourceSets.getByName(variant.name).kotlin.srcDir(project.layout.buildDirectory.dir("generated/java/${task.name}"))
                 }
+            }
+        }
+        
+        project.gradle.projectsEvaluated {
+            val tasksToTrigger = project.tasks.withType(CodegenTask::class.java).toTypedArray()
+            val ideaModel = project.rootProject.extensions.getByType(IdeaModel::class.java)
+            ideaModel.project.settings {
+                taskTriggers.afterSync(*tasksToTrigger)
             }
         }
     }

@@ -35,6 +35,8 @@ gradle-maven-publish-plugin = "0.30.0"
 hilt-core = "2.54"
 hilt-integrations = "1.2.0"
 
+idea-ext-plugin = "1.1.10"
+
 junit = "4.13.2"
 
 kotlin = "2.1.21"
@@ -137,6 +139,7 @@ android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref
 dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradle-maven-publish-plugin" }
 gradle-versions-plugin = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versions-plugin" }
+idea-ext-gradle-plugin = { module = "org.jetbrains.gradle.plugin.idea-ext:org.jetbrains.gradle.plugin.idea-ext.gradle.plugin", version.ref = "idea-ext-plugin"}
 kotlinter-gradle-plugin = { module = "org.jmailen.gradle:kotlinter-gradle", version.ref = "kotlinter" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 

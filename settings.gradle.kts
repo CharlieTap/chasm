@@ -27,6 +27,7 @@ develocity {
 
 dependencyResolutionManagement {
     repositories {
+        gradlePluginPortal()
         google()
         mavenCentral()
         mavenLocal()
