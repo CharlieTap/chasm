@@ -50,10 +50,12 @@ abstract class CodegenTask @Inject constructor(
         val factory = WasmInterfaceFactory()
         val generator = WasmInterfaceGenerator()
 
-        val instance = factory(config.get(), info)
-        val interfaceSpec = generator(interfaceName.get(), packageName.get(), instance)
+        val data = factory(config.get(), info)
+        val specs = generator(interfaceName.get(), packageName.get(), data)
 
         val outputDir = outputDirectory.get().asFile
-        interfaceSpec.writeTo(outputDir.toPath())
+        specs.forEach { spec ->
+            spec.writeTo(outputDir)
+        }
     }
 }

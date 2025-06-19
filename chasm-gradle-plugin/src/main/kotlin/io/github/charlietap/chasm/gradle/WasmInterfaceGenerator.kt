@@ -7,6 +7,7 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 
 internal class DataClassGenerator
 {
@@ -41,15 +42,19 @@ internal class WasmInterfaceGenerator(
         name: String,
         packageName: String,
         wasmInterface: WasmInterface,
-    ): FileSpec = FileSpec.builder(packageName, name).apply {
+    ): List<FileSpec> {
 
-        wasmInterface.types.forEach { type ->
-           addType(dataClassGenerator(packageName, type))
-        }
+        val interfaceFile = FileSpec.builder(packageName, name).apply {
+            wasmInterface.types.forEach { type ->
+                addType(dataClassGenerator(packageName, type))
+            }
+            addType(classInterfaceGenerator(packageName, name, wasmInterface))
+        }.build()
 
-        addType(classInterfaceGenerator(packageName, name, wasmInterface))
+        val implementationFile = FileSpec.builder(packageName, name + "Impl").apply {
+            addType(classImplementationGenerator(packageName, name, wasmInterface))
+        }.build()
 
-        addType(classImplementationGenerator(packageName, name, wasmInterface))
-
-    }.build()
+        return listOf(interfaceFile, implementationFile)
+    }
 }

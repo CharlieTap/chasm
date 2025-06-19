@@ -10,7 +10,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.gradle.plugins.ide.idea.model.IdeaModel
-import org.gradle.plugins.ide.idea.model.IdeaProject
 import org.jetbrains.gradle.ext.IdeaExtPlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.gradle.ext.settings
@@ -58,7 +57,7 @@ class ChasmPlugin : Plugin<Project> {
                 }
             }
         }
-        
+
         project.gradle.projectsEvaluated {
             val tasksToTrigger = project.tasks.withType(CodegenTask::class.java).toTypedArray()
             val ideaModel = project.rootProject.extensions.getByType(IdeaModel::class.java)
