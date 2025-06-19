@@ -7,7 +7,6 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 
 internal class DataClassGenerator
 {

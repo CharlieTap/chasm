@@ -29,7 +29,6 @@ import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.stream.SourceReader
 import kotlin.reflect.KClass
-import org.codehaus.groovy.ast.tools.GeneralUtils.param
 
 private val LIST_CLASS_NAME = List::class.asClassName()
 private val IMPORT_CLASS_NAME = Import::class.asClassName()
