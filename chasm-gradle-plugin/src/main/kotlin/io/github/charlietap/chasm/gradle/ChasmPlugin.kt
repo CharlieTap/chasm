@@ -9,6 +9,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
 
 class ChasmPlugin : Plugin<Project> {
@@ -16,6 +17,15 @@ class ChasmPlugin : Plugin<Project> {
     override fun apply(project: Project) {
 
         val extension = project.extensions.create<ChasmExtension>("chasm")
+
+        project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
+            val mpp = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
+
+            extension.modules.configureEach {
+                val task = registerCodegenTask(project, this, "commonMain")
+                mpp.sourceSets.getByName("commonMain").kotlin.srcDir(task.flatMap { it.outputDirectory })
+            }
+        }
 
         project.plugins.withId("org.jetbrains.kotlin.jvm") {
             val jvmExtension = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
@@ -25,9 +35,6 @@ class ChasmPlugin : Plugin<Project> {
                 val task = registerCodegenTask(project, this, MAIN_COMPILATION_NAME)
                 mainCompilation.defaultSourceSet {
                     kotlin.srcDir(task.flatMap { it.outputDirectory })
-                }
-                mainCompilation.compileKotlinTaskProvider.configure {
-                    dependsOn(task)
                 }
             }
         }

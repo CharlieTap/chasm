@@ -2,6 +2,7 @@ package com.tap.chasm.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.test.chasm.FactorialService
 import com.test.chasm.FibonacciService
 import com.test.chasm.TestService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,12 +16,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChasmViewModel @Inject constructor(
+    private val factorialService: FactorialService,
     private val fibonacciService: FibonacciService,
     private val testService: TestService,
 ) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>() {
 
     init {
-        runTestService()
+        factorialPrinter()
+        testPrinter()
     }
 
     private val nth = MutableStateFlow(ChasmState.DEFAULT.nth)
@@ -64,7 +67,12 @@ class ChasmViewModel @Inject constructor(
         return fibonacciService.fibonacci(n)
     }
 
-    private fun runTestService() {
+    private fun factorialPrinter() {
+        val factorial = factorialService.factorial(5)
+        Log.d("ChasmViewModel", "factorial: $factorial")
+    }
+
+    private fun testPrinter() {
         var mutableGlobal = testService.mutableGlobal
         Log.d("ChasmViewModel", "mutableGlobal: $mutableGlobal")
         val immutableGlobal = testService.immutableGlobal
