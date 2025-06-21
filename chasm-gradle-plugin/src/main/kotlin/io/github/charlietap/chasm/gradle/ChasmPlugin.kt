@@ -17,39 +17,16 @@ class ChasmPlugin : Plugin<Project> {
 
         val extension = project.extensions.create<ChasmExtension>("chasm")
 
-//        project.plugins.withType(KotlinBasePlugin::class.java) {
-//            val multiplatform = project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")
-//
-//            val kotlinSourceSet = if(multiplatform) {
-//                project.extensions
-//                    .getByType(org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension::class.java)
-//                    .sourceSets
-//                    .named("commonMain")
-//            } else {
-//                project.extensions
-//                    .getByType(org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension::class.java)
-//                    .sourceSets
-//                    .named("main")
-//            }
-//
-//            kotlinSourceSet.configure {
-//                val tasks = project.configureCodegenTasks(extension, this.name)
-//                tasks.forEach { task ->
-//                    this.kotlin.srcDir(task.flatMap { it.outputDirectory })
-//                }
-//            }
-//        }
-
         project.plugins.withId("org.jetbrains.kotlin.jvm") {
-            val ext = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
-            val compilation = ext.target.compilations.getByName(MAIN_COMPILATION_NAME)
+            val jvmExtension = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
+            val mainCompilation = jvmExtension.target.compilations.getByName(MAIN_COMPILATION_NAME)
 
             extension.modules.configureEach {
                 val task = registerCodegenTask(project, this, MAIN_COMPILATION_NAME)
-                compilation.defaultSourceSet {
+                mainCompilation.defaultSourceSet {
                     kotlin.srcDir(task.flatMap { it.outputDirectory })
                 }
-                compilation.compileKotlinTaskProvider.configure {
+                mainCompilation.compileKotlinTaskProvider.configure {
                     dependsOn(task)
                 }
             }
