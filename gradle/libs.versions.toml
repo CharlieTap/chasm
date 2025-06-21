@@ -32,7 +32,7 @@ dokka="2.0.0"
 
 gradle-maven-publish-plugin = "0.30.0"
 
-hilt-core = "2.54"
+dagger = "2.56.2"
 hilt-integrations = "1.2.0"
 
 idea-ext-plugin = "1.1.10"
@@ -66,7 +66,7 @@ chasm = { id = "io.github.charlietap.chasm.gradle", version.ref = "chasm-plugin"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref="dependency-analysis" }
 dokka = { id = "org.jetbrains.dokka", version.ref="dokka" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt-core" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
 gradle-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "gradle-maven-publish-plugin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -108,8 +108,9 @@ androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-
 
 chasm-jvm = { module = "io.github.charlietap.chasm:chasm-jvm", version.ref = "version-name"}
 
-hilt-core = { module = "com.google.dagger:hilt-android", version.ref = "hilt-core"}
-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt-core"}
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger"}
+hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "dagger"}
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger"}
 hilt-integrations-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-integrations"}
 
 junit = { module = "junit:junit", version.ref = "junit"}
@@ -161,10 +162,6 @@ compose-ui = [
     "androidx-compose-tooling",
     "androidx-compose-activity",
     "androidx-compose-viewmodel"
-]
-
-hilt-deps = [
-    "hilt-core",
 ]
 
 hilt-compilers = [

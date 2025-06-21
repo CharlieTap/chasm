@@ -38,7 +38,7 @@ android {
 
 dependencies {
     implementation(libs.chasm.jvm)
-    implementation(libs.hilt.core)
+    implementation(libs.hilt.android)
 
     ksp(libs.bundles.hilt.compilers)
 }

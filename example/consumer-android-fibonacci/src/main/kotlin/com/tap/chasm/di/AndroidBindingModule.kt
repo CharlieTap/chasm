@@ -13,21 +13,12 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class LibModule {
-
-    @Singleton
-    @Provides
-    fun assetManager(
-        @ApplicationContext context: Context,
-    ): AssetManager {
-        return context.assets
-    }
-
+class AndroidBindingModule {
     @Singleton
     @Provides
     fun fibonacciService(
-        assetManager: AssetManager,
+        @ApplicationContext context: Context,
     ): FibonacciService {
-        return FibonacciServiceImpl(assetManager.open("fibonacci.wasm").readBytes())
+        return FibonacciServiceImpl(context.assets.open("fibonacci.wasm").readBytes())
     }
 }

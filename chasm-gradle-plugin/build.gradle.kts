@@ -32,7 +32,6 @@ kotlin {
 
         implementation(libs.kotlin.gradle.plugin)
         implementation(libs.android.gradle.plugin)
-        implementation(libs.idea.ext.gradle.plugin)
         implementation(libs.kotlin.poet)
 
         testImplementation(libs.kotlin.test)

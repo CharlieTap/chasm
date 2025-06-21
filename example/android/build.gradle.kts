@@ -50,10 +50,11 @@ android {
 
 dependencies {
 
-    implementation(projects.consumerFibonacci)
+    implementation(projects.consumerAndroidFibonacci)
+    implementation(projects.consumerJvmTest)
 
     implementation(libs.chasm.jvm)
-    implementation(libs.hilt.core)
+    implementation(libs.hilt.android)
     implementation(libs.bundles.androidx)
     implementation(libs.bundles.compose.ui)
 

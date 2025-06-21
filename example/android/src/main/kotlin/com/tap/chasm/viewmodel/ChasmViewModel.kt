@@ -3,6 +3,7 @@ package com.tap.chasm.viewmodel
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.test.chasm.FibonacciService
+import com.test.chasm.TestService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +16,12 @@ import javax.inject.Inject
 @HiltViewModel
 class ChasmViewModel @Inject constructor(
     private val fibonacciService: FibonacciService,
+    private val testService: TestService,
 ) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>() {
+
+    init {
+        runTestService()
+    }
 
     private val nth = MutableStateFlow(ChasmState.DEFAULT.nth)
     private val fibonacci = MutableStateFlow<Int?>(null)
@@ -56,5 +62,40 @@ class ChasmViewModel @Inject constructor(
 
     private fun calculateFibonacci(n: Int): Int {
         return fibonacciService.fibonacci(n)
+    }
+
+    private fun runTestService() {
+        var mutableGlobal = testService.mutableGlobal
+        Log.d("ChasmViewModel", "mutableGlobal: $mutableGlobal")
+        val immutableGlobal = testService.immutableGlobal
+        Log.d("ChasmViewModel", "immutableGlobal: $immutableGlobal")
+
+        testService.mutableGlobal = 118
+        mutableGlobal = testService.mutableGlobal
+        Log.d("ChasmViewModel", "mutableGlobal after change: $mutableGlobal")
+
+        val intFunction = testService.intFunction()
+        Log.d("ChasmViewModel", "int function: $intFunction")
+
+        val longFunction = testService.longFunction()
+        Log.d("ChasmViewModel", "long function: $longFunction")
+
+        val floatFunction = testService.floatFunction()
+        Log.d("ChasmViewModel", "float function: $floatFunction")
+
+        val doubleFunction = testService.doubleFunction()
+        Log.d("ChasmViewModel", "double function: $doubleFunction")
+
+        val unitFunction = testService.unitFunction()
+        Log.d("ChasmViewModel", "unit function: $unitFunction ${testService.mutableGlobal}")
+
+        val multipleParamFunction = testService.multipleParamFunction(5, 2.2)
+        Log.d("ChasmViewModel", "multiple param function: $multipleParamFunction")
+
+        val multipleReturnFunction = testService.multipleReturnFunction()
+        Log.d("ChasmViewModel", "multiple return function: r0 = ${multipleReturnFunction.r0} r1 = ${multipleReturnFunction.r1}")
+
+        val stringFunction = testService.stringFunction()
+        Log.d("ChasmViewModel", "string function: $stringFunction")
     }
 }
