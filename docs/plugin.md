@@ -1,4 +1,4 @@
-## Chasm Gradle Plugin
+# Chasm Gradle Plugin
 
 The chasm gradle plugin creates a kotlin typesafe interface from a wasm binary which hides
 the complexities of chasms lower level virtual machine api.
