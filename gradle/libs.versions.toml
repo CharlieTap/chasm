@@ -39,7 +39,7 @@ idea-ext-plugin = "1.1.10"
 
 junit = "4.13.2"
 
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 k-poet = "2.2.0"
 kotlinter = "5.0.1"
 
@@ -51,7 +51,7 @@ kotlinx-io = "0.6.0"
 kotlinx-serialization = "1.8.0"
 kotlinx-test-resources = "0.10.0"
 
-ksp = "2.1.21-2.0.1"
+ksp = "2.2.0-2.0.2"
 
 result = "2.0.1"
 

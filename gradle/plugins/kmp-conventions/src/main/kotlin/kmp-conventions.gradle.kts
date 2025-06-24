@@ -33,9 +33,9 @@ kotlin {
 
         freeCompilerArgs.add("-opt-in=kotlin.ExperimentalUnsignedTypes")
 
-        freeCompilerArgs.add("-Xsuppress-warning=NOTHING_TO_INLINE")
-        freeCompilerArgs.add("-Xsuppress-warning=UNUSED_ANONYMOUS_PARAMETER")
-        freeCompilerArgs.add("-Xsuppress-warning=REDUNDANT_VISIBILITY_MODIFIER")
+        freeCompilerArgs.add("-Xwarning-level=NOTHING_TO_INLINE:disabled")
+        freeCompilerArgs.add("-Xwarning-level=UNUSED_ANONYMOUS_PARAMETER:disabled")
+        freeCompilerArgs.add("-Xwarning-level=REDUNDANT_VISIBILITY_MODIFIER:disabled")
 
         freeCompilerArgs.add("-Xnon-local-break-continue")
         freeCompilerArgs.add("-Xwhen-guards")
