@@ -3,6 +3,8 @@
     "extends": [
         "config:recommended"
     ],
+    "minimumReleaseAge": "1 hour",
+    "prHourlyLimit": 4,
     "schedule": [
         "* 1-5 * * *"
     ]
