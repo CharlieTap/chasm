@@ -2,6 +2,16 @@ name: Publish
 on:
   release:
     types: [released, prereleased]
+  workflow_dispatch:
+    inputs:
+      module:
+        description: 'Module to publish'
+        required: false
+        type: choice
+        options:
+          - ''
+          - ':chasm-gradle-plugin:'
+        default: ''
 jobs:
   publish:
     name: Release build and publish
@@ -17,7 +27,7 @@ jobs:
           java-version: '21'
 
       - name: Publish to MavenCentral
-        run: ./gradlew publishToMavenCentral --no-configuration-cache
+        run: ./gradlew ${{ github.event.inputs.module }}publishToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
