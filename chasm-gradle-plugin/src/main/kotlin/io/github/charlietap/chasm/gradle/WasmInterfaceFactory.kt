@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.type.ValueType
 
 internal class CamelCaseFormatter {
     operator fun invoke(snakeCase: String): String {
-        return snakeCase.split('_')
+        return snakeCase.removePrefix("_").split('_')
             .mapIndexed { index, word ->
                 if (index == 0) word else word.replaceFirstChar { it.uppercaseChar() }
             }.joinToString("")

@@ -27,6 +27,8 @@ include(":benchmark")
 include(":consumer-android-fibonacci")
 include(":consumer-jvm-test")
 include(":consumer-multiplatform-factorial")
+include(":producer")
+
 
 rootProject.name = "chasm-example"
 

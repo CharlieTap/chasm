@@ -53,6 +53,7 @@ dependencies {
     implementation(projects.consumerAndroidFibonacci)
     implementation(projects.consumerJvmTest)
     implementation(projects.consumerMultiplatformFactorial)
+    implementation(projects.producer)
 
     implementation(libs.chasm.jvm)
     implementation(libs.hilt.android)

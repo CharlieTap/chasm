@@ -124,9 +124,54 @@ will become
   val immutableGlobal: Int
 ```
 
-
-
-
 ## Producer config
 
-Producer mode is under development and cannot currently be enabled
+Producers are kotlin multiplatform modules that use the wasm target to turn kotlin code into wasm binaries which chasm can then generate
+an interface for. You can find an example of a producer module in the [example project](../example/producer/build.gradle.kts)
+
+Typical configuration for a producer will involve enabling the wasm target and other targets you would like to share
+the code generated classes with. For example, say we want to integrate chasm codegen in an android application you would enable both
+the wasm target and the jvm target
+
+```kotlin
+kotlin {
+    jvm()
+    wasmWasi {
+        binaries.executable()
+    }
+}
+```
+
+You'll also need to add this config to ensure the wasm binaries created use the latest opcodes for exception handling, by default the
+kotlin wasm compiler generates legacy opcodes.
+
+```kotlin
+tasks.withType<KotlinJsCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xwasm-use-new-exception-proposal")
+    }
+}
+```
+
+Then configure the chasm plugin:
+
+```kotlin
+chasm {
+    mode = Mode.PRODUCER
+    modules {
+        create("FooService") {
+            packageName = "com.foo.bar"
+        }
+    }
+}
+```
+
+Now any dependant JVM or android modules will be able to see the classes code generated as part of the producer modules
+compilation. Code generation itself happens on Gradle sync or by manually running the task:
+
+```shell
+./gradlew codegenModuleWasmWasiFooService
+```
+
+
+

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.test.chasm.FactorialService
 import com.test.chasm.FibonacciService
 import com.test.chasm.TestService
+import com.test.chasm.producer.ProducerService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,11 +19,13 @@ import javax.inject.Inject
 class ChasmViewModel @Inject constructor(
     private val factorialService: FactorialService,
     private val fibonacciService: FibonacciService,
+    private val producerService: ProducerService,
     private val testService: TestService,
 ) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>() {
 
     init {
         factorialPrinter()
+        producerPrinter()
         testPrinter()
     }
 
@@ -70,6 +73,11 @@ class ChasmViewModel @Inject constructor(
     private fun factorialPrinter() {
         val factorial = factorialService.factorial(5)
         Log.d("ChasmViewModel", "factorial: $factorial")
+    }
+
+    private fun producerPrinter() {
+        val gcd = producerService.gcd(48, 18)
+        Log.d("ChasmViewModel", "greatest common divisor: $gcd")
     }
 
     private fun testPrinter() {
