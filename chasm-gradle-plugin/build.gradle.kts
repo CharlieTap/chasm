@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.charlietap.chasm"
-version = "0.1.1"
+version = libs.versions.chasm.plugin.get()
 
 configure<PublishingConventionsExtension> {
     name = "chasm-gradle-plugin"
