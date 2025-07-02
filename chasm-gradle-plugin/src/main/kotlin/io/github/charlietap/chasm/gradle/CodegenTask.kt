@@ -8,6 +8,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -35,6 +36,9 @@ abstract class CodegenTask
         @get:Input
         abstract val packageName: Property<String>
 
+        @get:Input
+        abstract val initializers: SetProperty<String>
+
         @get:OutputDirectory
         abstract val outputDirectory: DirectoryProperty
 
@@ -52,7 +56,7 @@ abstract class CodegenTask
             val logger: (String) -> Unit = {
                 logger.warn(it)
             }
-            val data = factory(config.get(), info, logger)
+            val data = factory(config.get(), info, initializers.get(), logger)
             val specs = generator(interfaceName.get(), packageName.get(), data)
 
             val outputDir = outputDirectory.get().asFile

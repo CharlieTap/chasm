@@ -51,15 +51,21 @@ class WasmInterfaceFactoryTest {
                 ),
             ),
         )
+        val initializers = setOf(
+            "foo",
+            "bar",
+        )
 
         val factory = WasmInterfaceFactory()
         val actual = factory(
             config = config,
             info = info,
+            initializers = initializers,
             logger = LOGGER,
         )
 
         val expected = wasmInterface(
+            initializers = initializers,
             functions = listOf(
                 function(
                     name = "string",
@@ -98,11 +104,16 @@ class WasmInterfaceFactoryTest {
                 ),
             ),
         )
+        val initializers = setOf(
+            "foo",
+            "bar",
+        )
 
         val factory = WasmInterfaceFactory()
         val actual = factory(
             config = config,
             info = info,
+            initializers = initializers,
             logger = LOGGER,
         )
 
@@ -121,6 +132,7 @@ class WasmInterfaceFactoryTest {
         )
 
         val expected = wasmInterface(
+            initializers = initializers,
             types = listOf(
                 type,
             ),
@@ -162,11 +174,16 @@ class WasmInterfaceFactoryTest {
                 ),
             ),
         )
+        val initializers = setOf(
+            "foo",
+            "bar",
+        )
 
         val factory = WasmInterfaceFactory()
         val actual = factory(
             config = config,
             info = info,
+            initializers = initializers,
             logger = LOGGER,
         )
 
@@ -193,6 +210,7 @@ class WasmInterfaceFactoryTest {
         )
 
         val expected = wasmInterface(
+            initializers = initializers,
             types = listOf(
                 type,
             ),

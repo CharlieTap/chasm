@@ -111,10 +111,12 @@ internal fun property(
 )
 
 internal fun wasmInterface(
+    initializers: Set<String> = emptySet(),
     types: List<GeneratedType> = emptyList(),
     functions: List<Function> = emptyList(),
     properties: List<Property> = emptyList(),
 ) = WasmInterface(
+    initializers = initializers,
     types = types,
     functions = functions,
     properties = properties,

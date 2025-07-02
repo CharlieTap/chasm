@@ -70,6 +70,7 @@ internal data class Property(
 )
 
 internal data class WasmInterface(
+    val initializers: Set<String>,
     val types: List<GeneratedType>,
     val functions: List<Function>,
     val properties: List<Property>,

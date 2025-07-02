@@ -135,6 +135,7 @@ class ChasmPlugin : Plugin<Project> {
             config.set(module.codegenConfig)
             interfaceName.set(module.name)
             packageName.set(module.packageName)
+            initializers.set(module.initializers)
             outputDirectory.set(project.layout.buildDirectory.dir("generated/kotlin/$sourceSetName"))
         }
     }

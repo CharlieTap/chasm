@@ -148,6 +148,22 @@ internal class GlobalPropertyGetterImplementationGenerator {
     }.build()
 }
 
+internal class InitializerBlockGenerator() {
+    operator fun invoke(
+        initializers: Set<String>,
+    ): CodeBlock = CodeBlock.builder().apply {
+        initializers.forEach { name ->
+            addStatement(
+                "%M(store, instance, %S, emptyList()).%M(%S)",
+                INVOKE_FUNCTION,
+                name,
+                EXPECT_RESULT_FUNCTION,
+                "Initializer function $name failed",
+            )
+        }
+    }.build()
+}
+
 internal class GlobalPropertySetterImplementationGenerator {
     operator fun invoke(
         type: Type,
@@ -356,6 +372,7 @@ internal class ClassPropertiesGenerator(
 
 internal class ClassImplementationGenerator(
     private val constructorGenerator: ConstructorGenerator = ConstructorGenerator(),
+    private val initializerBlockGenerator: InitializerBlockGenerator = InitializerBlockGenerator(),
     private val functionImplementationGenerator: FunctionImplementationGenerator = FunctionImplementationGenerator(),
     private val propertiesGenerator: ClassPropertiesGenerator = ClassPropertiesGenerator(),
 ) {
@@ -372,6 +389,10 @@ internal class ClassImplementationGenerator(
         val properties = propertiesGenerator(name, wasmInterface)
         properties.forEach { property ->
             addProperty(property)
+        }
+
+        if (wasmInterface.initializers.isNotEmpty()) {
+            addInitializerBlock(initializerBlockGenerator(wasmInterface.initializers))
         }
 
         wasmInterface.functions.forEach { function ->

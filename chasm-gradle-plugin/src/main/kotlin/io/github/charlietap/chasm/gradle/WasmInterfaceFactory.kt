@@ -91,6 +91,7 @@ internal class WasmInterfaceFactory(
     operator fun invoke(
         config: CodegenConfig,
         info: ModuleInfo,
+        initializers: Set<String>,
         logger: (String) -> Unit,
     ): WasmInterface {
 
@@ -102,6 +103,7 @@ internal class WasmInterfaceFactory(
             when (val type = export.type) {
                 is ExternalType.Function -> {
                     try {
+                        if (initializers.contains(export.name)) return@forEach
                         val function = Function(
                             name = formatter(export.name),
                             params = parameterFactory(type.functionType.params.types),
@@ -136,6 +138,7 @@ internal class WasmInterfaceFactory(
         }
 
         return WasmInterface(
+            initializers = initializers,
             functions = functions,
             properties = properties,
             types = types,

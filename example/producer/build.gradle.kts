@@ -36,6 +36,7 @@ chasm {
     modules {
         create("ProducerService") {
             packageName = "com.test.chasm.producer"
+            initializers = setOf("_initialize")
         }
     }
 }

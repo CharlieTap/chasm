@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.gradle
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import javax.inject.Inject
 
 @ChasmDsl
@@ -15,6 +16,7 @@ abstract class WasmModule
         abstract val binary: RegularFileProperty
         abstract val codegenConfig: Property<CodegenConfig>
         abstract val packageName: Property<String>
+        abstract val initializers: SetProperty<String>
 
         init {
             binary.convention(project.layout.projectDirectory.file(DEFAULT_MODULE_FILE_PATH))
