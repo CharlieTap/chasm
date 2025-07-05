@@ -5,6 +5,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 
 open class BoltExtension @Inject constructor(
@@ -18,6 +19,7 @@ open class BoltExtension @Inject constructor(
         DIR_ARTIFACTS
     ))
     val defFile: RegularFileProperty = objects.fileProperty().convention(layout.buildDirectory.file(FILE_DEF))
+    val linkerOptions: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
 
     private companion object {
         private const val DIR_ARTIFACTS = "bolt-artifacts"

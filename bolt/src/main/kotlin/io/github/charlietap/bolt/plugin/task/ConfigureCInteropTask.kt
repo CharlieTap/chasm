@@ -4,6 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
@@ -23,6 +24,9 @@ abstract class ConfigureCInteropTask : DefaultTask() {
 
     @get:Input
     abstract val targets: SetProperty<String>
+
+    @get:Input
+    abstract val linkerOptions: MapProperty<String, String>
 
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:InputDirectory
@@ -62,6 +66,11 @@ abstract class ConfigureCInteropTask : DefaultTask() {
                 compilerOpts = $compilerOpts
             """.trimIndent() + "\n"
         )
+
+        linkerOptions.get().forEach { target, options ->
+            val options = "linkerOpts.$target = $options\n"
+            defFile.appendText(options)
+        }
 
         targets.forEach { target ->
 

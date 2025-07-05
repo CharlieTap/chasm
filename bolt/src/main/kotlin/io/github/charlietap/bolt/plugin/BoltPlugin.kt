@@ -45,6 +45,7 @@ class BoltPlugin : Plugin<Project> {
                 library.set(extension.library)
 
                 artifactsDir.set(downloadArtifactsTask.flatMap { it.outputDirectory })
+                linkerOptions.set(extension.linkerOptions)
                 targets.set(enabledKmpTargets)
                 outputFile.set(extension.defFile)
             }
