@@ -26,6 +26,10 @@ fun KotlinMultiplatformExtension.unixTargets() = setOf(
     linuxX64(),
 )
 
+fun KotlinMultiplatformExtension.nativeTargets() = setOf(
+    mingwX64()
+) + unixTargets()
+
 kotlin {
 
     compilerOptions {
@@ -50,7 +54,7 @@ kotlin {
             freeCompilerArgs.add("-Xno-receiver-assertions")
         }
     }
-    unixTargets()
+    nativeTargets()
 
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))

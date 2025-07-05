@@ -9,6 +9,9 @@ plugins {
 bolt {
     library = "liblinmem"
     url = "https://github.com/CharlieTap/linmem/releases/download/0.1.48/"
+    linkerOptions = mapOf(
+        "mingw_x64" to "-lntdll"
+    )
 }
 
 kotlin {
