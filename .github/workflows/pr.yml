@@ -25,6 +25,8 @@ jobs:
             task: iosSimulatorArm64Test
           - os: ubuntu-latest
             task: linuxX64Test
+          - os: windows-latest
+            task: mingwX64Test
     uses: ./.github/workflows/task-runner.yml
     with:
       runner: ${{ matrix.os }}
