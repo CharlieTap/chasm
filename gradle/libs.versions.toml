@@ -12,7 +12,7 @@ java-compiler-version = "21"
 java-bytecode-version = "11"
 
 android-build-tools-plugin = "8.8.0"
-chasm-plugin = "0.1.1"
+chasm-plugin = "0.1.2"
 versions-plugin = "0.51.0"
 
 androidx-appcompat = "1.6.1"
