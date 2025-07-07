@@ -56,8 +56,15 @@ abstract class CodegenTask
             val logger: (String) -> Unit = {
                 logger.warn(it)
             }
-            val data = factory(config.get(), info, initializers.get(), logger)
-            val specs = generator(interfaceName.get(), packageName.get(), data)
+            val data = factory(
+                interfaceName = interfaceName.get(),
+                packageName = packageName.get(),
+                config = config.get(),
+                info = info,
+                initializers = initializers.get(),
+                logger = logger,
+            )
+            val specs = generator(data)
 
             val outputDir = outputDirectory.get().asFile
             specs.forEach { spec ->

@@ -31,6 +31,8 @@ class WasmInterfaceFactoryTest {
     @Test
     fun `can generate a function with a string return type when config value is set to true`() {
 
+        val packageName = "package name"
+        val interfaceName = "interface name"
         val config = codegenConfig(
             transformStrings = true,
         )
@@ -58,6 +60,8 @@ class WasmInterfaceFactoryTest {
 
         val factory = WasmInterfaceFactory()
         val actual = factory(
+            interfaceName = interfaceName,
+            packageName = packageName,
             config = config,
             info = info,
             initializers = initializers,
@@ -65,6 +69,8 @@ class WasmInterfaceFactoryTest {
         )
 
         val expected = wasmInterface(
+            interfaceName = interfaceName,
+            packageName = packageName,
             initializers = initializers,
             functions = listOf(
                 function(
@@ -84,6 +90,8 @@ class WasmInterfaceFactoryTest {
     @Test
     fun `generates a new type when return type qualifies as string but when config value is set to false`() {
 
+        val packageName = "package name"
+        val interfaceName = "interface name"
         val config = codegenConfig(
             transformStrings = false,
         )
@@ -111,6 +119,8 @@ class WasmInterfaceFactoryTest {
 
         val factory = WasmInterfaceFactory()
         val actual = factory(
+            interfaceName = interfaceName,
+            packageName = packageName,
             config = config,
             info = info,
             initializers = initializers,
@@ -132,6 +142,8 @@ class WasmInterfaceFactoryTest {
         )
 
         val expected = wasmInterface(
+            interfaceName = interfaceName,
+            packageName = packageName,
             initializers = initializers,
             types = listOf(
                 type,
@@ -154,6 +166,8 @@ class WasmInterfaceFactoryTest {
     @Test
     fun `can generate a new type when the return type has multiple values`() {
 
+        val packageName = "package name"
+        val interfaceName = "interface name"
         val config = codegenConfig()
         val info = moduleInfo(
             exports = listOf(
@@ -181,6 +195,8 @@ class WasmInterfaceFactoryTest {
 
         val factory = WasmInterfaceFactory()
         val actual = factory(
+            interfaceName = interfaceName,
+            packageName = packageName,
             config = config,
             info = info,
             initializers = initializers,
@@ -210,6 +226,8 @@ class WasmInterfaceFactoryTest {
         )
 
         val expected = wasmInterface(
+            interfaceName = interfaceName,
+            packageName = packageName,
             initializers = initializers,
             types = listOf(
                 type,

@@ -89,6 +89,8 @@ internal class WasmInterfaceFactory(
     private val returnFactory: ReturnFactory = ReturnFactory(),
 ) {
     operator fun invoke(
+        interfaceName: String,
+        packageName: String,
         config: CodegenConfig,
         info: ModuleInfo,
         initializers: Set<String>,
@@ -138,6 +140,8 @@ internal class WasmInterfaceFactory(
         }
 
         return WasmInterface(
+            interfaceName = interfaceName,
+            packageName = packageName,
             initializers = initializers,
             functions = functions,
             properties = properties,
