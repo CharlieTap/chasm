@@ -42,13 +42,13 @@ internal class WasmInterfaceGenerator(
 
         val interfaceFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName).apply {
             wasmInterface.types.forEach { type ->
-                addType(dataClassGenerator(packageName, type))
+                addType(dataClassGenerator(wasmInterface.packageName, type))
             }
-            addType(classInterfaceGenerator(packageName, name, wasmInterface))
+            addType(classInterfaceGenerator(wasmInterface.packageName, wasmInterface.interfaceName, wasmInterface))
         }.build()
 
         val implementationFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
-            addType(classImplementationGenerator(packageName, name, wasmInterface))
+            addType(classImplementationGenerator(wasmInterface.packageName, wasmInterface.interfaceName, wasmInterface))
         }.build()
 
         return listOf(interfaceFile, implementationFile)

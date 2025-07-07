@@ -48,9 +48,9 @@ internal class ClassInterfaceGenerator(
 ) {
     operator fun invoke(
         packageName: String,
-        name: String,
+        interfaceName: String,
         wasmInterface: WasmInterface,
-    ) = TypeSpec.interfaceBuilder(name).apply {
+    ) = TypeSpec.interfaceBuilder(interfaceName).apply {
 
         wasmInterface.functions.forEach { function ->
             addFunction(functionGenerator(packageName, function))

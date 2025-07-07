@@ -378,15 +378,15 @@ internal class ClassImplementationGenerator(
 ) {
     operator fun invoke(
         packageName: String,
-        name: String,
+        interfaceName: String,
         wasmInterface: WasmInterface,
-    ): TypeSpec = TypeSpec.classBuilder(name + "Impl").apply {
+    ): TypeSpec = TypeSpec.classBuilder(interfaceName + "Impl").apply {
 
-        addSuperinterface(ClassName(packageName, name))
+        addSuperinterface(ClassName(packageName, interfaceName))
 
         addConstructor(constructorGenerator)
 
-        val properties = propertiesGenerator(name, wasmInterface)
+        val properties = propertiesGenerator(interfaceName, wasmInterface)
         properties.forEach { property ->
             addProperty(property)
         }
