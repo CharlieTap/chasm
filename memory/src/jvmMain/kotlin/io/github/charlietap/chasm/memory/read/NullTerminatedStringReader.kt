@@ -18,7 +18,6 @@ actual inline fun NullTerminatedStringReader(
     val bytes = ByteArray(length)
 
     buffer.position(memoryPointer)
-    buffer.limit(memoryPointer + length)
     buffer.get(bytes, 0, length)
 
     return String(bytes, StandardCharsets.UTF_8)
