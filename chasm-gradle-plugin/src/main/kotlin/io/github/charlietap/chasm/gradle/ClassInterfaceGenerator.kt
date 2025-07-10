@@ -11,6 +11,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.UNIT
+import io.github.charlietap.chasm.gradle.ext.asTypeName
 
 internal class FunctionGenerator {
     operator fun invoke(

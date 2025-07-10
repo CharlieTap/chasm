@@ -1,21 +1,17 @@
 package io.github.charlietap.chasm.gradle
 
+import java.io.Serializable
 import kotlin.reflect.KClass
 
-internal sealed interface Type
+sealed interface Type : Serializable
 
-internal sealed interface Scalar : Type {
-    object Integer : Scalar
-
-    object Long : Scalar
-
-    object Float : Scalar
-
-    object Double : Scalar
-
-    object String : Scalar
-
-    object Unit : Scalar
+enum class Scalar : Type {
+    Integer,
+    Long,
+    Float,
+    Double,
+    String,
+    Unit,
 }
 
 internal data class Aggregate(
@@ -25,11 +21,12 @@ internal data class Aggregate(
 internal data class FunctionParameter(
     val name: String,
     val type: Type,
+    val stringEncodingStrategy: StringEncodingStrategy? = null,
 )
 
-@JvmInline
-internal value class FunctionReturn(
+internal data class FunctionReturn(
     val type: Type,
+    val stringEncodingStrategy: StringEncodingStrategy? = null,
 )
 
 internal sealed interface FunctionImplementation

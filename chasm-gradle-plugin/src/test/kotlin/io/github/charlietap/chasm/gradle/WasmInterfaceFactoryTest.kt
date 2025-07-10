@@ -15,153 +15,21 @@ import io.github.charlietap.chasm.gradle.fixture.doubleScalarType
 import io.github.charlietap.chasm.gradle.fixture.field
 import io.github.charlietap.chasm.gradle.fixture.floatScalarType
 import io.github.charlietap.chasm.gradle.fixture.function
+import io.github.charlietap.chasm.gradle.fixture.functionParameter
+import io.github.charlietap.chasm.gradle.fixture.functionParameterDefinition
 import io.github.charlietap.chasm.gradle.fixture.functionProxy
 import io.github.charlietap.chasm.gradle.fixture.functionReturn
 import io.github.charlietap.chasm.gradle.fixture.generatedType
 import io.github.charlietap.chasm.gradle.fixture.integerScalarType
 import io.github.charlietap.chasm.gradle.fixture.longScalarType
-import io.github.charlietap.chasm.gradle.fixture.stringScalarType
+import io.github.charlietap.chasm.gradle.fixture.returnTypeDefinition
+import io.github.charlietap.chasm.gradle.fixture.wasmFunction
 import io.github.charlietap.chasm.gradle.fixture.wasmInterface
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
 class WasmInterfaceFactoryTest {
-
-    @Test
-    fun `can generate a function with a string return type when config value is set to true`() {
-
-        val packageName = "package name"
-        val interfaceName = "interface name"
-        val config = codegenConfig(
-            transformStrings = true,
-        )
-        val info = moduleInfo(
-            exports = listOf(
-                exportDefinition(
-                    name = "string",
-                    type = functionExternalType(
-                        functionType = functionType(
-                            results = resultType(
-                                listOf(
-                                    i32ValueType(),
-                                    i32ValueType(),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        )
-        val initializers = setOf(
-            "foo",
-            "bar",
-        )
-
-        val factory = WasmInterfaceFactory()
-        val actual = factory(
-            interfaceName = interfaceName,
-            packageName = packageName,
-            config = config,
-            info = info,
-            initializers = initializers,
-            logger = LOGGER,
-        )
-
-        val expected = wasmInterface(
-            interfaceName = interfaceName,
-            packageName = packageName,
-            initializers = initializers,
-            functions = listOf(
-                function(
-                    name = "string",
-                    returns = functionReturn(
-                        stringScalarType(),
-                    ),
-                    implementation = functionProxy(
-                        name = "string",
-                    ),
-                ),
-            ),
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `generates a new type when return type qualifies as string but when config value is set to false`() {
-
-        val packageName = "package name"
-        val interfaceName = "interface name"
-        val config = codegenConfig(
-            transformStrings = false,
-        )
-        val info = moduleInfo(
-            exports = listOf(
-                exportDefinition(
-                    name = "string",
-                    type = functionExternalType(
-                        functionType = functionType(
-                            results = resultType(
-                                listOf(
-                                    i32ValueType(),
-                                    i32ValueType(),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        )
-        val initializers = setOf(
-            "foo",
-            "bar",
-        )
-
-        val factory = WasmInterfaceFactory()
-        val actual = factory(
-            interfaceName = interfaceName,
-            packageName = packageName,
-            config = config,
-            info = info,
-            initializers = initializers,
-            logger = LOGGER,
-        )
-
-        val type = generatedType(
-            name = "StringResult",
-            fields = listOf(
-                field(
-                    name = "r0",
-                    type = integerScalarType(),
-                ),
-                field(
-                    name = "r1",
-                    type = integerScalarType(),
-                ),
-            ),
-        )
-
-        val expected = wasmInterface(
-            interfaceName = interfaceName,
-            packageName = packageName,
-            initializers = initializers,
-            types = listOf(
-                type,
-            ),
-            functions = listOf(
-                function(
-                    name = "string",
-                    returns = functionReturn(
-                        aggregateType(generated = type),
-                    ),
-                    implementation = functionProxy(
-                        name = "string",
-                    ),
-                ),
-            ),
-        )
-        assertEquals(expected, actual)
-    }
 
     @Test
     fun `can generate a new type when the return type has multiple values`() {
@@ -200,6 +68,7 @@ class WasmInterfaceFactoryTest {
             config = config,
             info = info,
             initializers = initializers,
+            wasmFunctions = emptyList(),
             logger = LOGGER,
         )
 
@@ -242,6 +111,93 @@ class WasmInterfaceFactoryTest {
                     ),
                     implementation = functionProxy(
                         name = "multiple_return",
+                    ),
+                ),
+            ),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can generate a function from a given wasm function spec`() {
+
+        val packageName = "package name"
+        val interfaceName = "interface name"
+        val config = codegenConfig()
+        val info = moduleInfo(
+            exports = listOf(
+                exportDefinition(
+                    name = "foo",
+                    type = functionExternalType(
+                        functionType = functionType(
+                            params = resultType(
+                                listOf(
+                                    i32ValueType(),
+                                    i32ValueType(),
+                                ),
+                            ),
+                            results = resultType(
+                                listOf(
+                                    i32ValueType(),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val function = wasmFunction(
+            name = "foo",
+            parameters = listOf(
+                functionParameterDefinition(
+                    name = "a",
+                    type = integerScalarType(),
+                ),
+                functionParameterDefinition(
+                    name = "b",
+                    type = integerScalarType(),
+                ),
+            ),
+            returnType = returnTypeDefinition(
+                type = integerScalarType(),
+            ),
+        )
+
+        val factory = WasmInterfaceFactory()
+        val actual = factory(
+            interfaceName = interfaceName,
+            packageName = packageName,
+            config = config,
+            info = info,
+            initializers = emptySet(),
+            wasmFunctions = listOf(function),
+            logger = LOGGER,
+        )
+
+        val expected = wasmInterface(
+            interfaceName = interfaceName,
+            packageName = packageName,
+            initializers = emptySet(),
+            types = emptyList(),
+            functions = listOf(
+                function(
+                    name = "foo",
+                    params = listOf(
+                        functionParameter(
+                            name = "a",
+                            type = integerScalarType(),
+                        ),
+                        functionParameter(
+                            name = "b",
+                            type = integerScalarType(),
+                        ),
+                    ),
+                    returns = functionReturn(
+                        integerScalarType(),
+                    ),
+                    implementation = functionProxy(
+                        name = "foo",
                     ),
                 ),
             ),

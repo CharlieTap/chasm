@@ -73,36 +73,12 @@ chasm {
             binary = ...
             packageName = ...
             codegenConfig = CodegenConfig(
-                transformStrings = true,
                 generateTypesafeGlobalProperties = true,
             )
         }
     }
 }
 ```
-
-### `transformStrings`
-
-default = false
-
-When set chasm will assume wasm functions that return exactly two i32's are in fact returning Strings. It will look
-for an exported memory and attempt read a utf8 encoded string from it.
-
-For example the following wat
-
-```wat
-   (func $string_function (export "string_function") (result i32 i32)
-     i32.const 1
-     i32.const 10
-   )
-```
-
-Will become
-
-```kotlin
-fun stringFunction(): String
-```
-
 ### `generateTypesafeGlobalProperties`
 
 default = false

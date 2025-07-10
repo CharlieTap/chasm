@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.gradle
+package io.github.charlietap.chasm.gradle.ext
 
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.FLOAT
@@ -6,6 +6,9 @@ import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.UNIT
+import io.github.charlietap.chasm.gradle.Aggregate
+import io.github.charlietap.chasm.gradle.Scalar
+import io.github.charlietap.chasm.gradle.Type
 import io.github.charlietap.chasm.runtime.value.NumberValue
 
 internal fun Type.asExecutionValue() = when (this) {

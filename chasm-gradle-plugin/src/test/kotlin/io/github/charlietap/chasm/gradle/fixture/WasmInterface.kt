@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.gradle.GlobalProxy
 import io.github.charlietap.chasm.gradle.Property
 import io.github.charlietap.chasm.gradle.PropertyImplementation
 import io.github.charlietap.chasm.gradle.Scalar
+import io.github.charlietap.chasm.gradle.StringEncodingStrategy
 import io.github.charlietap.chasm.gradle.Type
 import io.github.charlietap.chasm.gradle.WasmInterface
 import kotlin.reflect.KClass
@@ -57,15 +58,19 @@ internal fun aggregateType(
 internal fun functionParameter(
     name: String = "",
     type: Type = type(),
+    stringEncodingStrategy: StringEncodingStrategy? = null,
 ) = FunctionParameter(
     name = name,
     type = type,
+    stringEncodingStrategy = stringEncodingStrategy,
 )
 
 internal fun functionReturn(
     type: Type = type(),
+    stringEncodingStrategy: StringEncodingStrategy? = null,
 ) = FunctionReturn(
     type = type,
+    stringEncodingStrategy = stringEncodingStrategy,
 )
 
 internal fun functionImplementation(): FunctionImplementation = functionProxy()

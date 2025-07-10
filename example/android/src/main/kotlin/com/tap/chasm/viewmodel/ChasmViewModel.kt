@@ -111,7 +111,16 @@ class ChasmViewModel @Inject constructor(
         val multipleReturnFunction = testService.multipleReturnFunction()
         Log.d("ChasmViewModel", "multiple return function: r0 = ${multipleReturnFunction.r0} r1 = ${multipleReturnFunction.r1}")
 
-        val stringFunction = testService.stringFunction()
-        Log.d("ChasmViewModel", "string function: $stringFunction")
+        val palStringFunction = testService.palStringFunction()
+        Log.d("ChasmViewModel", "pointer and length string function: $palStringFunction")
+
+        val nullTerminatedStringFunction = testService.nullTerminatedStringFunction()
+        Log.d("ChasmViewModel", "null terminated string function: $nullTerminatedStringFunction")
+
+        val lengthPrefixedStringFunction = testService.lengthPrefixedStringFunction()
+        Log.d("ChasmViewModel", "length prefixed string function: $lengthPrefixedStringFunction")
+
+        val packedI64StringFunction = testService.packedI64StringFunction()
+        Log.d("ChasmViewModel", "packed i64 string function: $packedI64StringFunction")
     }
 }

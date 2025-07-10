@@ -1,5 +1,7 @@
-package io.github.charlietap.chasm.gradle
+package io.github.charlietap.chasm.gradle.ext
 
+import io.github.charlietap.chasm.gradle.Scalar
+import io.github.charlietap.chasm.gradle.Type
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.NumberType

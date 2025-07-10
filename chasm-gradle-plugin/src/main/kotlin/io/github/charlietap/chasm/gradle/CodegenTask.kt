@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.embedding.shapes.map
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
@@ -39,6 +40,9 @@ abstract class CodegenTask
         @get:Input
         abstract val initializers: SetProperty<String>
 
+        @get:Input
+        abstract val functions: ListProperty<WasmFunction>
+
         @get:OutputDirectory
         abstract val outputDirectory: DirectoryProperty
 
@@ -54,7 +58,7 @@ abstract class CodegenTask
             val generator = WasmInterfaceGenerator()
 
             val logger: (String) -> Unit = {
-                logger.warn(it)
+                logger.lifecycle(it)
             }
             val data = factory(
                 interfaceName = interfaceName.get(),
@@ -62,6 +66,7 @@ abstract class CodegenTask
                 config = config.get(),
                 info = info,
                 initializers = initializers.get(),
+                wasmFunctions = functions.get(),
                 logger = logger,
             )
             val specs = generator(data)

@@ -5,7 +5,10 @@
   (table $table (export "table") 2 funcref)
   (tag $tag (export "tag") (param i64))
 
-  (data (i32.const 1) "Hello WASM")
+  (data (i32.const 1) "pointer and length")
+  (data (i32.const 36) "\0F\00\00\00length prefixed")
+  (data (i32.const 80) "null terminated\00")
+  (data (i32.const 120) "packed pointer and length")
 
    (func $int_function (export "int_function") (result i32)
      i32.const 1
@@ -23,9 +26,21 @@
      f64.const 4.2
    )
 
-   (func $string_function (export "string_function") (result i32 i32)
+   (func $pal_string_function (export "pal_string_function") (result i32 i32)
      i32.const 1
-     i32.const 10
+     i32.const 18
+   )
+
+   (func $length_prefixed_string_function (export "length_prefixed_string_function") (result i32)
+     i32.const 36
+   )
+
+   (func $null_terminated_string_function (export "null_terminated_string_function") (result i32)
+     i32.const 80
+   )
+
+   (func $packed_i64_string_function (export "packed_i64_string_function") (result i64)
+     i64.const 0x0000007800000019
    )
 
    (func $unit_function (export "unit_function")
