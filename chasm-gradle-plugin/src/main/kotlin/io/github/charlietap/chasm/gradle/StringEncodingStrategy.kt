@@ -16,8 +16,8 @@ enum class StringEncodingStrategy {
     NULL_TERMINATED,
 
     /**
-     * The pointer of the string is encoded in an I32 and length of the string is encoded in the byte
-     * found at that pointer
+     * The pointer of the string is encoded in an I32 and length of the string is encoded in an integer (4 bytes)
+     * found at that pointer with the bytes of the string following
      */
     LENGTH_PREFIXED,
 
