@@ -1,6 +1,6 @@
 [versions]
 
-version-name = "0.9.71"
+version-name = "0.9.80"
 
 application-id = "com.tap.chasm"
 application-namespace = "com.tap.chasm"
@@ -12,7 +12,7 @@ java-compiler-version = "21"
 java-bytecode-version = "11"
 
 android-build-tools-plugin = "8.8.0"
-chasm-plugin = "0.1.21"
+chasm-plugin = "0.2.0"
 versions-plugin = "0.51.0"
 
 androidx-appcompat = "1.6.1"
