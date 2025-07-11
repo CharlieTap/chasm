@@ -62,44 +62,6 @@ public interface FibonacciService {
 }
 ```
 
-## Codegen config
-
-You can control the output of the codegen using the [CodegenConfig](../chasm-gradle-plugin/src/main/kotlin/io/github/charlietap/chasm/gradle/CodegenConfig.kt) object
-
-```kotlin
-chasm {
-    modules {
-        create("") {
-            binary = ...
-            packageName = ...
-            codegenConfig = CodegenConfig(
-                generateTypesafeGlobalProperties = true,
-            )
-        }
-    }
-}
-```
-### `generateTypesafeGlobalProperties`
-
-default = false
-
-When set chasm will generate properties for globals in the interface it generates, if the global is mutable then chasm will generate a var
-else it will create a val.
-
-For example the following wat
-
-```wat
-    (global $mutable_global (export "mutable_global") (mut i32) (i32.const 117))
-    (global $immutable_global (export "immutable_global") i32 (i32.const 117))
-```
-
-will become
-
-```kotlin
-  var mutableGlobal: Int
-  val immutableGlobal: Int
-```
-
 ## Producer config
 
 Producers are kotlin multiplatform modules that use the wasm target to turn kotlin code into wasm binaries which chasm can then generate
@@ -114,17 +76,6 @@ kotlin {
     jvm()
     wasmWasi {
         binaries.executable()
-    }
-}
-```
-
-You'll also need to add this config to ensure the wasm binaries created use the latest opcodes for exception handling, by default the
-kotlin wasm compiler generates legacy opcodes.
-
-```kotlin
-tasks.withType<KotlinJsCompile>().configureEach {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xwasm-use-new-exception-proposal")
     }
 }
 ```
@@ -148,6 +99,166 @@ compilation. Code generation itself happens on Gradle sync or by manually runnin
 ```shell
 ./gradlew codegenModuleWasmWasiFooService
 ```
+
+# Module Configuration
+
+Each module declared in the extensions DSL can be individually configured, the following configuration options are available:
+
+### `binary: File`
+
+A file pointing to the wasm binary the codegen should use to generate the kotlin interface, this option is only used when in
+`Mode.CONSUMER`
+
+### `packageName: String`
+
+The package name for each of the code generated files
+
+### `initializers: Set<String>`
+
+This property takes a set of strings, each string should be the name of a function appearing in the wasm binary. Each initializer
+function will be called once and only once on instantiation of the module.
+
+
+## Function configuration
+
+Each function within a module is configurable through the Gradle plugin extension you can specify parameter names and String
+encoding strategies.
+
+### Configuring parameters
+
+For example say you have the following wasm function:
+
+```wat
+   (func $multiple_param_function (export "multiple_param_function") (param i32 f64) (result f64)
+     local.get 0
+     f64.convert_i32_s
+     local.get 1
+     f64.mul
+   )
+```
+
+You can now configure the names of the params through the gradle extension
+
+```kotlin
+chasm {
+    modules {
+        create("FooService") {
+            function("multiple_param_function") {
+                intParam("a")
+                doubleParam("b")
+                doubleReturnType()
+            }
+        }
+    }
+}
+```
+
+### Configuring string encoding
+
+For example say you have a function in your wasm module which returns a string encoded in two integers:
+
+```wat
+   (func $string_function (export "string_function") (result i32 i32)
+     i32.const 1
+     i32.const 18
+   )
+```
+
+You can now tell the codegen to produce a string by providing a function definition in the gradle plugin extension
+
+```kotlin
+chasm {
+    modules {
+        create("FooService") {
+            function("string_function") {
+                stringReturnType()
+            }
+        }
+    }
+}
+```
+
+Different compilers use different strategies to encode strings into memory, the codegen supports the following strategies:
+
+```kotlin
+enum class StringEncodingStrategy {
+    /**
+     * The pointer and length of the string are encoded in two I32s
+     */
+    POINTER_AND_LENGTH,
+
+    /**
+     * The pointer of the string is encoded in an I32 and end of the String is the first null byte
+     * encountered after that pointer
+     */
+    NULL_TERMINATED,
+
+    /**
+     * The pointer of the string is encoded in an I32 and length of the string is encoded in an integer (4 bytes)
+     * found at that pointer with the bytes of the string following
+     */
+    LENGTH_PREFIXED,
+
+    /**
+     * The pointer and length of the string are encoded in a single I64
+     */
+    PACKED_POINTER_AND_LENGTH,
+}
+```
+
+By default codegen will assume pointer and length encoding, but the encoding can optionally given in the configuration
+
+```kotlin
+chasm {
+    modules {
+        create("FooService") {
+            function("string_function") {
+                stringReturnType(StringEncodingStrategy.NULL_TERMINATED)
+            }
+        }
+    }
+}
+```
+
+## Codegen config
+
+You can control the output of the codegen using the [CodegenConfig](../chasm-gradle-plugin/src/main/kotlin/io/github/charlietap/chasm/gradle/CodegenConfig.kt) object
+
+```kotlin
+chasm {
+    modules {
+        create("") {
+            binary = ...
+            packageName = ...
+            codegenConfig = CodegenConfig(
+                generateTypesafeGlobalProperties = true,
+            )
+        }
+    }
+}
+```
+### `generateTypesafeGlobalProperties: Boolean`
+
+default = false
+
+When set chasm will generate properties for globals in the interface it generates, if the global is mutable then chasm will generate a var
+else it will create a val.
+
+For example the following wat
+
+```wat
+    (global $mutable_global (export "mutable_global") (mut i32) (i32.const 117))
+    (global $immutable_global (export "immutable_global") i32 (i32.const 117))
+```
+
+will become
+
+```kotlin
+  var mutableGlobal: Int
+  val immutableGlobal: Int
+```
+
+
 
 
 
