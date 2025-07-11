@@ -10,6 +10,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
@@ -46,6 +47,12 @@ class ChasmPlugin : Plugin<Project> {
                             if (wasmTargets.isEmpty()) {
                                 project.logger.warn("Producer mode requires at least one WASM target (wasmJs or wasmWasi)")
                                 return@configureEach
+                            }
+
+                            project.tasks.withType(KotlinJsCompile::class.java).configureEach {
+                                compilerOptions.freeCompilerArgs.add(
+                                    "-Xwasm-use-new-exception-proposal",
+                                )
                             }
 
                             wasmTargets.forEach { target ->

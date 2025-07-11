@@ -2,7 +2,6 @@
 
 import io.github.charlietap.chasm.gradle.Mode
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -40,11 +39,3 @@ chasm {
         }
     }
 }
-
-tasks.withType<KotlinJsCompile>().configureEach {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xwasm-use-new-exception-proposal")
-    }
-}
-
-
