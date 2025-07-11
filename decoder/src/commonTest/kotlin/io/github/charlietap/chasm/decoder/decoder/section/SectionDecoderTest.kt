@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Custom
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.StartFunction
+import io.github.charlietap.chasm.ast.module.Uninterpreted
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
@@ -36,7 +37,7 @@ class SectionDecoderTest {
         val sectionType = SectionType.Custom
         val sectionSize = SectionSize(117u)
 
-        val expectedSection = CustomSection(Custom(NameValue(""), ubyteArrayOf()))
+        val expectedSection = CustomSection(Uninterpreted(NameValue(""), ubyteArrayOf()))
 
         val positions = sequenceOf(0u, sectionSize.size).iterator()
         val reader = FakePositionReader {

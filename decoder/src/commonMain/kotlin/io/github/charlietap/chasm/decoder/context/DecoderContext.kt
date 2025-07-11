@@ -8,6 +8,7 @@ internal data class DecoderContext(
     val reader: WasmBinaryReader,
     val blockContext: BlockContext = BlockContextImpl(),
     val moduleContext: ModuleContext = ModuleContextImpl(),
+    val nameSectionContext: NameSectionContext = NameSectionContextImpl(),
     val sectionContext: SectionContext = SectionContextImpl(),
     val typeContext: TypeContext = TypeContextImpl(),
     val vectorContext: VectorContext = VectorContextImpl(),
