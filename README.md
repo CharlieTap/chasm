@@ -24,6 +24,7 @@ Additionally, the runtime supports the following proposals
 - [x] Wasm GC
 - [x] Multiple Memories
 - [x] Exception Handling
+- [x] Extended Name Sections
 
 # Setup
 
