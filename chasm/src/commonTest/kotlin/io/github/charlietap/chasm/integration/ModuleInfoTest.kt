@@ -1,14 +1,17 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.moduleInfo
-import io.github.charlietap.chasm.embedding.shapes.ExportDefinition
-import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.embedding.shapes.getOrNull
 import io.github.charlietap.chasm.embedding.shapes.map
+import io.github.charlietap.chasm.fixture.chasm.embedding.exportDefinition
+import io.github.charlietap.chasm.fixture.chasm.embedding.functionNameData
+import io.github.charlietap.chasm.fixture.chasm.embedding.importDefinition
+import io.github.charlietap.chasm.fixture.chasm.embedding.nameData
 import io.github.charlietap.chasm.fixture.runtime.type.functionExternalType
 import io.github.charlietap.chasm.fixture.runtime.type.globalExternalType
 import io.github.charlietap.chasm.fixture.runtime.type.memoryExternalType
@@ -39,7 +42,18 @@ class ModuleInfoTest {
         val importedFunctionType = functionType(
             params = resultType(listOf(i32ValueType())),
         )
-        val exportedFunctionType = functionType()
+        val exportedFunctionType = functionType(
+            params = resultType(
+                types = listOf(
+                    i32ValueType(),
+                    i32ValueType(),
+                ),
+            ),
+        )
+        val functionNameData = functionNameData(
+            name = "exported_function_name",
+            localNames = listOf("a", "b"),
+        )
 
         val importedGlobalType = globalType(i32ValueType(), constMutability())
         val exportedGlobalType = globalType(i32ValueType(), varMutability())
@@ -61,58 +75,60 @@ class ModuleInfoTest {
 
         val byteStream = Resource(FILE_DIR + "module_info.wasm").readBytes()
         val reader = FakeSourceReader(byteStream)
+        val config = moduleConfig(decodeNameSection = true)
 
-        val actual = module(reader)
+        val actual = module(reader, config)
             .map { module ->
                 moduleInfo(module)
             }.getOrNull()
 
         val expected = ModuleInfo(
             imports = listOf(
-                ImportDefinition(
+                importDefinition(
                     moduleName = "env",
                     entityName = "imported_function",
                     type = functionExternalType(importedFunctionType),
                 ),
-                ImportDefinition(
+                importDefinition(
                     moduleName = "env",
                     entityName = "imported_global",
                     type = globalExternalType(importedGlobalType),
                 ),
-                ImportDefinition(
+                importDefinition(
                     moduleName = "env",
                     entityName = "imported_memory",
                     type = memoryExternalType(importedMemoryType),
                 ),
-                ImportDefinition(
+                importDefinition(
                     moduleName = "env",
                     entityName = "imported_table",
                     type = tableExternalType(importedTableType),
                 ),
-                ImportDefinition(
+                importDefinition(
                     moduleName = "env",
                     entityName = "imported_tag",
                     type = tagExternalType(importedTagType),
                 ),
             ),
             exports = listOf(
-                ExportDefinition(
+                exportDefinition(
                     name = "exported_function",
                     type = functionExternalType(exportedFunctionType),
+                    nameData = functionNameData,
                 ),
-                ExportDefinition(
+                exportDefinition(
                     name = "exported_global",
                     type = globalExternalType(exportedGlobalType),
                 ),
-                ExportDefinition(
+                exportDefinition(
                     name = "exported_memory",
                     type = memoryExternalType(exportedMemoryType),
                 ),
-                ExportDefinition(
+                exportDefinition(
                     name = "exported_table",
                     type = tableExternalType(exportedTableType),
                 ),
-                ExportDefinition(
+                exportDefinition(
                     name = "exported_tag",
                     type = tagExternalType(exportedTagType),
                 ),

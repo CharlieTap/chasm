@@ -6,36 +6,28 @@ import io.github.charlietap.chasm.embedding.shapes.ExportDefinition
 import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
-import io.github.charlietap.chasm.embedding.transform.ExportDescriptorMapper
-import io.github.charlietap.chasm.embedding.transform.ImportDescriptorMapper
+import io.github.charlietap.chasm.embedding.transform.ExportMapper
+import io.github.charlietap.chasm.embedding.transform.ImportMapper
 import io.github.charlietap.chasm.embedding.transform.Mapper
-import io.github.charlietap.chasm.runtime.type.ExternalType
 
 fun moduleInfo(
     module: Module,
 ): ModuleInfo = moduleInfo(
     module = module,
-    importDescriptorMapper = ImportDescriptorMapper.instance,
-    exportDescriptorMapper = ExportDescriptorMapper(module.module),
+    importMapper = ImportMapper.instance,
+    exportMapper = ExportMapper(module.module),
 )
 
 internal fun moduleInfo(
     module: Module,
-    importDescriptorMapper: Mapper<Import.Descriptor, ExternalType>,
-    exportDescriptorMapper: Mapper<Export.Descriptor, ExternalType>,
+    importMapper: Mapper<Import, ImportDefinition>,
+    exportMapper: Mapper<Export, ExportDefinition>,
 ): ModuleInfo {
 
     val internalModule = module.module
 
-    val imports = internalModule.imports.map { import ->
-        val type = importDescriptorMapper.map(import.descriptor)
-        ImportDefinition(import.moduleName.name, import.entityName.name, type)
-    }
-
-    val exports = internalModule.exports.map { export ->
-        val type = exportDescriptorMapper.map(export.descriptor)
-        ExportDefinition(export.name.name, type)
-    }
+    val imports = internalModule.imports.map(importMapper::map)
+    val exports = internalModule.exports.map(exportMapper::map)
 
     return ModuleInfo(imports, exports)
 }

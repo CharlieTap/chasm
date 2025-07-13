@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
+import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.expect
@@ -49,7 +50,8 @@ abstract class CodegenTask
         @TaskAction
         fun generate() {
 
-            val info = module(binary.get().asFile.readBytes())
+            val moduleConfig = ModuleConfig(decodeNameSection = true)
+            val info = module(binary.get().asFile.readBytes(), moduleConfig)
                 .map { module ->
                     moduleInfo(module)
                 }.expect("Failed to find module at path: ${binary.get().asFile.absolutePath}")
