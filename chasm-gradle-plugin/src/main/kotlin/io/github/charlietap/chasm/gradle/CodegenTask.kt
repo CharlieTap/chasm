@@ -50,7 +50,9 @@ abstract class CodegenTask
         @TaskAction
         fun generate() {
 
-            val moduleConfig = ModuleConfig(decodeNameSection = true)
+            val moduleConfig = ModuleConfig(
+                decodeNameSection = true,
+            )
             val info = module(binary.get().asFile.readBytes(), moduleConfig)
                 .map { module ->
                     moduleInfo(module)

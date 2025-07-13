@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
+import io.github.charlietap.chasm.embedding.shapes.FunctionNameData
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.gradle.ext.asExecutionValue
 import io.github.charlietap.chasm.gradle.ext.asType
@@ -86,9 +87,10 @@ internal class ClassNameFormatter(
 internal class ParameterFactory {
     operator fun invoke(
         params: List<ValueType>,
+        localNames: List<String>?,
     ): List<FunctionParameter> = params.mapIndexed { idx, param ->
         FunctionParameter(
-            name = "p$idx",
+            name = localNames?.getOrNull(idx) ?: "p$idx",
             type = param.asType(),
         )
     }
@@ -153,6 +155,7 @@ internal class FunctionFactory(
         config: CodegenConfig,
         types: MutableList<GeneratedType>,
         function: WasmFunction?,
+        nameData: FunctionNameData?,
     ): Function {
 
         function?.let {
@@ -164,7 +167,7 @@ internal class FunctionFactory(
                 name = name,
                 type = type,
             )
-        } ?: parameterFactory(type.params.types)
+        } ?: parameterFactory(type.params.types, nameData?.localNames)
 
         val returnType = function?.returnType?.let {
             FunctionReturn(
@@ -231,6 +234,7 @@ internal class WasmInterfaceFactory(
                             config = config,
                             types = types,
                             function = wasmFunctions.firstOrNull { it.name == export.name },
+                            nameData = export.nameData as? FunctionNameData,
                         )
                         functions.add(function)
                     } catch (exception: Exception) {
