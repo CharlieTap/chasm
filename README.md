@@ -34,26 +34,86 @@ dependencies {
 }
 ```
 
-# Usage
+# Usage with the Gradle plugin
+
+Chasm provides a Gradle plugin that can generate a typesafe Kotlin
+interface from your WebAssembly module. When you apply the plugin to a
+Kotlin JVM, Kotlin Multiplatform or Android module the build will read
+your `.wasm` binary and produce a class and interface pair with Kotlin functions
+for each function marked as exported in your wasm binary.
+
+To use the plugin you need to:
+
+* Add the plugin to your build script.
+* Declare your wasm module(s) in the `chasm` extension.
+* Add the appropriate chasm runtime dependency (`chasm‑jvm` on JVM and
+  Android).
+
+A minimal example using the plugin looks like this:
+
+```kotlin
+// build.gradle.kts
+
+plugins {
+    id("org.jetbrains.kotlin.jvm")
+    id("io.github.charlietap.chasm.gradle") version "0.2.2"
+}
+
+chasm {
+    modules {
+        create("ExampleService") {
+            // Path to the wasm binary to generate an interface for
+            binary = layout.projectDirectory.file("src/main/resources/example.wasm")
+            // Package for the generated class
+            packageName = "com.example"
+        }
+    }
+}
+
+dependencies {
+    implementation("io.github.charlietap.chasm:chasm-jvm:0.9.81")
+}
+```
+
+With this configuration a Kotlin class called `ExampleService` will be
+generated in the specified package. Each exported function in
+`example.wasm` will be exposed as a Kotlin function with correctly named
+parameters. The plugin runs on JVM, Kotlin Multiplatform and Android
+modules and uses the Names section of your wasm binary to name
+parameters.
+
+For more information please see the plugin documentation [here](./docs/plugin.md) and for
+a working example please see the example project in `example/` for Android, JVM and
+Multiplatform demonstrations of the plugin.
+
+# Usage without the Gradle plugin
+
+If you prefer to work with the low‑level API directly, chasm also
+exposes a set of functions for decoding, instantiating and invoking
+wasm modules. The following examples demonstrate how to use these
+APIs without the plugin.
 
 ### Invoking functions
 
-Webassembly compilations output a [Module](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Module.kt)
-encoded as either a .wasm or .wat file, currently chasm supports decoding only .wasm binaries
+WebAssembly compilations output a [Module](chasm/src/commonMain/kotlin/io/gi
+thub/charlietap/chasm/embedding/shapes/Module.kt) encoded as either a
+`.wasm` or `.wat` file (currently only `.wasm` binaries are supported):
 
 ```kotlin
 val wasmFileAsByteArray = ...
 val module = module(wasmFileAsByteArray)
 ```
 
-Once a module has been decoded you'll need to instantiate it, and for that you'll need also need a store
+Once a module has been decoded you'll need to instantiate it, and for
+that you'll also need a store:
 
 ```kotlin
 val store = store()
 val instance = instance(store, module)
 ```
 
-Instances allow you to invoke functions that are exported from the module
+Instances allow you to invoke functions that are exported from the
+module:
 
 ```kotlin
 val result = invoke(store, instance, "fibonacci")
@@ -61,7 +121,9 @@ val result = invoke(store, instance, "fibonacci")
 
 ### Imports
 
-Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Import.kt), imports can be one of the following:
+Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/char
+lietap/chasm/embedding/shapes/Import.kt). Imports can be one of the
+following:
 
 - Functions
 - Globals
@@ -69,8 +131,10 @@ Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/charliet
 - Tables
 - Tags
 
-For the most part imports will actually be exports from other modules, this is the mechanism that wasm uses to share data/behaviour between modules.
-However you can also allocate them separately using the factory functions:
+For the most part imports will actually be exports from other modules;
+this is the mechanism that wasm uses to share data/behaviour between
+modules. However you can also allocate them separately using the
+factory functions:
 
 ```kotlin
 val function = function(store, functionType, hostFunction)
@@ -80,7 +144,8 @@ val table = table(store, tableType, initialValue)
 val tag = tag(store, tagType)
 ```
 
-Once you have your importables you can pass them in at instantiation time.
+Once you have your importables you can pass them in at instantiation
+time:
 
 ```kotlin
 val import = Import(
@@ -93,14 +158,15 @@ val instance = instance(store, module, listOf(import))
 
 ### Host functions
 
-Host functions are kotlin functions that can be called by wasm programs at runtime.
-The majority of host functions represent system calls, WASI for example is intended to be integrated as imports of host functions.
+Host functions are Kotlin functions that can be called by wasm programs
+at runtime. The majority of host functions represent system calls (for
+example WASI APIs).
 
-Allocation of a host function requires a [FunctionType](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/FunctionType.kt)
-
-The function type describes the inputs and outputs of your function so the runtime can call it and use its results
-
-Once you have defined a function type you can allocate the host function like so
+Allocation of a host function requires a [FunctionType](chasm/src/commonMain
+/kotlin/io/github/charlietap/chasm/embedding/shapes/FunctionType.kt). The
+function type describes the inputs and outputs of your function so the
+runtime can call it and use its results. Once you have defined a
+function type you can allocate the host function like so:
 
 ```kotlin
 val functionType = FunctionType(emptyList(), listOf(ValueType.Number.I32))
@@ -109,88 +175,7 @@ val hostFunction = HostFunction { params ->
     listOf(Value.Number.I32(117))
 }
 
-val result = function(store, funcType, hostFunction)
-```
-
-### Working with Strings
-
-The WebAssembly type system does not currently support Strings, when you compile functions that give or take strings to WebAssembly
-compilers will replace them with pointers. Using these pointers alongside an exported memory will give you the ability to work with
-Strings and create high level wrappers for your exported wasm functions.
-
-#### Get access to the memory
-
-For most scenarios you can just look for an exported memory in the exports of an instance:
-
-```kotlin
-instance.exports.firstNotNullOf { it.value as? Memory }
-```
-
-If you're compiling to wasm-wasi, the wasi standard specifies the export will also have the name "memory"
-
-```kotlin
-instance.exports.first { it.name == "memory" && it.value is Memory }.value
-```
-Chasm supports the multiple memories proposal so it's possible that there exists more than one memory if the compiler supports it.
-In this case you'll need to follow the guidance of the compiler.
-
-#### Transforming pointers to strings
-
-Say you have a function like the following which you compile to WebAssembly:
-
-```kotlin
-fun concat(input: String): String
-```
-
-The compiler will either output:
-
-2 Integers
-
-```wat
-(func $concat (param i32 i32) (result i32 i32)
-```
-
-This is by far the most common transformation, where the string is replaced with two ints, the first its pointer in memory and the
-second is its length in bytes.
-
-Or
-
-1 Integer
-
-```wat
-(func $concat (param i32) (result i32)
-```
-
-In this case each integer is a pointer, but instead the length is encoded in the bytes where it resides. Either by prefixing the string
-with its length in bytes or by terminating the string with a null byte, please follow the guidance of the source compiler for learning
-the encoding strategy.
-
-Once you know the encoding you can use one of chasm's many functions for working with memories to read or write the string.
-
-```kotlin
-readByte(store, memory, int)
-readBytes(store, memory, buffer, srcPointer, bytesToRead, dstPointer)
-readUtf8String(store, memory, pointer, stringLengthInBytes)
-readNullTerminatedUtf8String(store, memory, pointer)
-writeUtf8String(store, memory, pointer, string)
-```
-
-#### Calling functions which take Strings
-
- You will need to write the string to memory before invoking the function:
-
-```kotlin
-writeUtf8String(store, memory, pointer, string)
-invoke(store, instance, "concat", listOf(pointer, stringLengthInBytes))
-```
-
-#### Calling functions which return Strings
-
-```kotlin
-val results = invoke(store, instance, "concat", args).expect("")
-val pointer = (results[0] as NumberValue.I32).value
-val stringLengthInBytes = (results[1] as NumberValue.I32).value
-val string = readUtf8String(store, memory, pointer, stringLengthInBytes)
+val result = function(store, functionType, hostFunction)
 ```
 
 ## License
