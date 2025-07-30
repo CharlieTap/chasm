@@ -52,8 +52,6 @@ To use the plugin you need to:
 A minimal example using the plugin looks like this:
 
 ```kotlin
-// build.gradle.kts
-
 plugins {
     id("org.jetbrains.kotlin.jvm")
     id("io.github.charlietap.chasm.gradle") version "0.2.2"
@@ -77,10 +75,8 @@ dependencies {
 
 With this configuration a Kotlin class called `ExampleService` will be
 generated in the specified package. Each exported function in
-`example.wasm` will be exposed as a Kotlin function with correctly named
-parameters. The plugin runs on JVM, Kotlin Multiplatform and Android
-modules and uses the Names section of your wasm binary to name
-parameters.
+`example.wasm` will be exposed as a Kotlin function. The plugin runs on JVM,
+Kotlin Multiplatform and Android module.
 
 For more information please see the plugin documentation [here](./docs/plugin.md) and for
 a working example please see the example project in `example/` for Android, JVM and
