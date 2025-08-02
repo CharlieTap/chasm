@@ -25,6 +25,7 @@ import io.github.charlietap.chasm.fixture.type.exceptionAttribute
 import io.github.charlietap.chasm.fixture.type.functionHeapType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.type.i32AddressType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -140,7 +141,7 @@ class ImportTest {
 
         assertEquals(expected, actual)
         assertEquals(1, store.store.memories.size)
-        assertEquals(memoryType(limits(1u)), store.store.memories[0].type)
+        assertEquals(memoryType(i32AddressType(), limits(1u)), store.store.memories[0].type)
     }
 
     @Test
@@ -174,7 +175,7 @@ class ImportTest {
 
         assertEquals(expected, actual)
         assertEquals(1, store.store.tables.size)
-        assertEquals(tableType(refNullReferenceType(AbstractHeapType.Func), limits(1u)), store.store.tables[0].type)
+        assertEquals(tableType(i32AddressType(), refNullReferenceType(AbstractHeapType.Func), limits(1u)), store.store.tables[0].type)
         assertEquals(
             functionAddress(0),
             (

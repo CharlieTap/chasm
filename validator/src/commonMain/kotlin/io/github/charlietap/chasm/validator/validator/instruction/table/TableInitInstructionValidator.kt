@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
 import io.github.charlietap.chasm.validator.ext.popI32
+import io.github.charlietap.chasm.validator.ext.popTableAddress
 import io.github.charlietap.chasm.validator.ext.referenceType
 import io.github.charlietap.chasm.validator.ext.tableType
 
@@ -37,7 +38,7 @@ internal inline fun TableInitInstructionValidator(
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()
     }
 
-    repeat(3) {
-        context.popI32().bind()
-    }
+    context.popI32().bind()
+    context.popI32().bind()
+    context.popTableAddress(instruction.tableIdx).bind()
 }

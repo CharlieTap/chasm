@@ -16,14 +16,10 @@ import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.globalType
-import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
-import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.fixture.type.tagType
-import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.GlobalType
-import io.github.charlietap.chasm.type.Limits
 import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
@@ -74,7 +70,7 @@ class ImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_TABLE
 
-        val tableType = tableType(refNullReferenceType(AbstractHeapType.Func), Limits(117u))
+        val tableType = tableType()
         val expected = Ok(tableImportDescriptor(tableType))
 
         val reader = FakeUByteReader {
@@ -103,7 +99,7 @@ class ImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_MEMORY
 
-        val memoryType = memoryType(limits(117u))
+        val memoryType = memoryType()
         val expected = Ok(memoryImportDescriptor(memoryType))
 
         val reader = FakeUByteReader {

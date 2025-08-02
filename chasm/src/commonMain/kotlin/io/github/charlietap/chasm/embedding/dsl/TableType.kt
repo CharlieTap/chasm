@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.embedding.dsl
 
+import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.Limits
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.TableType
@@ -14,6 +15,7 @@ class TableTypeBuilder {
     }
 
     fun build() = TableType(
+        addressType = AddressType.I32,
         referenceType = requireNotNull(referenceType),
         limits = requireNotNull(limits),
     )

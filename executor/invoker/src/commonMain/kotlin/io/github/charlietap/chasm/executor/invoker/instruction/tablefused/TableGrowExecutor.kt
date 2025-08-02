@@ -25,7 +25,7 @@ internal inline fun TableGrowExecutor(
         return
     }
 
-    tableInstance.type.limits.min = proposedLength.toUInt()
+    tableInstance.type.limits.min = proposedLength.toULong()
     tableInstance.elements += LongArray(elementsToAdd) { referenceValue }
     instruction.destination(tableSize.toLong(), vstack)
 }

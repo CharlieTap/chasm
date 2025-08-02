@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.type.limits.LimitsDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.reference.ReferenceTypeDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
+import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.Limits
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.SharedStatus
@@ -23,9 +24,9 @@ internal fun TableTypeDecoder(
 internal inline fun TableTypeDecoder(
     context: DecoderContext,
     crossinline referenceTypeDecoder: Decoder<ReferenceType>,
-    crossinline limitsDecoder: Decoder<Pair<Limits, SharedStatus>>,
+    crossinline limitsDecoder: Decoder<Triple<Limits, SharedStatus, AddressType>>,
 ): Result<TableType, WasmDecodeError> = binding {
     val referenceType = referenceTypeDecoder(context).bind()
-    val (limits, _) = limitsDecoder(context).bind()
-    TableType(referenceType, limits)
+    val (limits, _, addressType) = limitsDecoder(context).bind()
+    TableType(addressType, referenceType, limits)
 }

@@ -5,8 +5,6 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
-import io.github.charlietap.chasm.validator.context.scope.DataSegmentScope
-import io.github.charlietap.chasm.validator.context.scope.Scope
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 
 internal fun DataSegmentValidator(
@@ -16,16 +14,13 @@ internal fun DataSegmentValidator(
     DataSegmentValidator(
         context = context,
         segment = segment,
-        scope = ::DataSegmentScope,
         segmentModeValidator = ::DataSegmentModeValidator,
     )
 
 internal inline fun DataSegmentValidator(
     context: ValidationContext,
     segment: DataSegment,
-    crossinline scope: Scope<DataSegment>,
     crossinline segmentModeValidator: Validator<DataSegment.Mode>,
 ): Result<Unit, ModuleValidatorError> = binding {
-    val scopedContext = scope(context, segment).bind()
-    segmentModeValidator(scopedContext, segment.mode).bind()
+    segmentModeValidator(context, segment.mode).bind()
 }

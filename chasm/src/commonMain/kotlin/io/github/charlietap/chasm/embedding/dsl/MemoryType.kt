@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.embedding.dsl
 
+import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.Limits
 import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.SharedStatus
@@ -14,6 +15,7 @@ class MemoryTypeBuilder {
     }
 
     fun build() = MemoryType(
+        addressType = AddressType.I32,
         limits = requireNotNull(limits),
         shared = if (shared) SharedStatus.Shared else SharedStatus.Unshared,
     )

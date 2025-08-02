@@ -21,6 +21,8 @@ internal interface WasmBinaryReader {
 
     fun long(): Result<Long, WasmDecodeError>
 
+    fun ulong(): Result<ULong, WasmDecodeError>
+
     fun float(): Result<Float, WasmDecodeError>
 
     fun double(): Result<Double, WasmDecodeError>

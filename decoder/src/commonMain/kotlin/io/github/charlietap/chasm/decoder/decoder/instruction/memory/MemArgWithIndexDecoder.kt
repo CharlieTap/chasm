@@ -31,7 +31,7 @@ internal inline fun MemArgWithIndexDecoder(
 
         exponentValidator(exponent).bind()
 
-        val offset = context.reader.uint().bind()
+        val offset = context.reader.ulong().bind()
         val memArg = MemArg(exponent, offset)
 
         MemArgWithIndex(Index.MemoryIndex(0u), memArg)
@@ -41,7 +41,7 @@ internal inline fun MemArgWithIndexDecoder(
         exponentValidator(computedExponent).bind()
 
         val index = memoryIndexDecoder(context).bind()
-        val offset = context.reader.uint().bind()
+        val offset = context.reader.ulong().bind()
 
         MemArgWithIndex(index, MemArg(computedExponent, offset))
     } else {

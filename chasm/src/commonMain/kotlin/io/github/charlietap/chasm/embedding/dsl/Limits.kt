@@ -8,8 +8,8 @@ fun limits(builder: LimitsBuilder.() -> Unit): Limits {
 
 class LimitsBuilder {
 
-    var min: UInt = 0u
-    var max: UInt? = null
+    var min: ULong = 0u
+    var max: ULong? = null
 
     fun build(): Limits = Limits(min, max)
 }

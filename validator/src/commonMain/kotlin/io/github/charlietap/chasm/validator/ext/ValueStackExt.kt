@@ -8,8 +8,10 @@ import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.toResultOr
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.stack.peekNth
 import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.BottomType
 import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.NumberType
@@ -105,6 +107,46 @@ internal inline fun ValidationContext.popRefNull(): Result<ReferenceType.RefNull
         Ok(reference)
     } else {
         Err(TypeValidatorError.TypeMismatch)
+    }
+}
+
+internal inline fun ValidationContext.popMemoryAddress(
+    index: Index.MemoryIndex,
+): Result<ValueType, ModuleValidatorError> = binding {
+    val memory = memoryType(index).bind()
+    when (memory.addressType) {
+        AddressType.I32 -> popI32().bind()
+        AddressType.I64 -> popI64().bind()
+    }
+}
+
+internal inline fun ValidationContext.pushMemoryAddress(
+    index: Index.MemoryIndex,
+): Result<Unit, ModuleValidatorError> = binding {
+    val memory = memoryType(index).bind()
+    when (memory.addressType) {
+        AddressType.I32 -> pushI32()
+        AddressType.I64 -> pushI64()
+    }
+}
+
+internal inline fun ValidationContext.popTableAddress(
+    index: Index.TableIndex,
+): Result<ValueType, ModuleValidatorError> = binding {
+    val memory = tableType(index).bind()
+    when (memory.addressType) {
+        AddressType.I32 -> popI32().bind()
+        AddressType.I64 -> popI64().bind()
+    }
+}
+
+internal inline fun ValidationContext.pushTableAddress(
+    index: Index.TableIndex,
+): Result<Unit, ModuleValidatorError> = binding {
+    val memory = tableType(index).bind()
+    when (memory.addressType) {
+        AddressType.I32 -> pushI32()
+        AddressType.I64 -> pushI64()
     }
 }
 

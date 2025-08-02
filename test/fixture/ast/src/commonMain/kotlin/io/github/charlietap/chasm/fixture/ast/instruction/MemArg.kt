@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.ast.instruction.MemArg
 
 fun memArg(
     align: UInt = 0u,
-    offset: UInt = 0u,
+    offset: ULong = 0u,
 ) = MemArg(
     align = align,
     offset = offset,

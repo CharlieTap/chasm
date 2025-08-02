@@ -23,4 +23,6 @@ sealed interface InstantiationError : ModuleTrapError {
     data object ClassificationError : InstantiationError
 
     data object PredecodingError : InstantiationError
+
+    data object UnsupportedMemory64Module : InstantiationError
 }

@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.type.definedType
+import io.github.charlietap.chasm.fixture.type.i32AddressType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -75,7 +76,7 @@ class ExportModuleTest {
             descriptor = Export.Descriptor.Function(Index.FunctionIndex(0u)),
         )
 
-        val expectedTableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u))
+        val expectedTableType = TableType(i32AddressType(), ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u))
         val expectedTable = Table(
             idx = Index.TableIndex(0u),
             type = expectedTableType,
@@ -87,7 +88,7 @@ class ExportModuleTest {
             descriptor = Export.Descriptor.Table(Index.TableIndex(0u)),
         )
 
-        val expectedMemoryType = memoryType(limits(1u))
+        val expectedMemoryType = memoryType(i32AddressType(), limits(1u))
         val expectedMemory = Memory(
             idx = Index.MemoryIndex(0u),
             type = expectedMemoryType,

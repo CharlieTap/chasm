@@ -40,7 +40,7 @@ internal inline fun MemoryGrowExecutor(
         vstack.push(-1L)
     } else {
 
-        memory.type.limits.min = newSizeInPages.toUInt()
+        memory.type.limits.min = newSizeInPages.toULong()
         memory.data = grower(memory.data, pagesToAdd)
         memory.refresh()
 

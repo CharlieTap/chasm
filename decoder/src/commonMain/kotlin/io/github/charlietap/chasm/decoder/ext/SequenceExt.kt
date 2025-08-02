@@ -88,3 +88,24 @@ internal fun Sequence<UByte>.toUIntLeb128(): UInt {
 
     return result
 }
+
+internal fun Sequence<UByte>.toULongLeb128(): ULong {
+    val iter = iterator()
+    var result = 0uL
+    var shift = 0
+    var byte: UByte
+
+    do {
+        byte = iter.next()
+        val value = (byte and 0x7Fu).toULong()
+        result = result or (value shl shift)
+        shift += 7
+    } while (byte and CONTINUATION_BIT.toUByte() != 0u.toUByte())
+
+    val mask = ((-1 shl (Long.SIZE_BITS % 7)) and 0x7F).toUByte()
+    if (shift > MAX_SHIFT_LONG || (shift == MAX_SHIFT_LONG && byte and mask != 0u.toUByte())) {
+        throw IllegalArgumentException("unsigned long too large")
+    }
+
+    return result
+}

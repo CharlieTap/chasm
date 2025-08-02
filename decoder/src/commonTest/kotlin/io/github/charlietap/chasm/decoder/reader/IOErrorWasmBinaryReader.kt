@@ -21,6 +21,8 @@ internal fun IOErrorWasmFileReader(err: Result<Nothing, WasmDecodeError.IOError>
 
     override fun long(): Result<Long, WasmDecodeError> = err
 
+    override fun ulong(): Result<ULong, WasmDecodeError> = err
+
     override fun float(): Result<Float, WasmDecodeError> = err
 
     override fun double(): Result<Double, WasmDecodeError> = err

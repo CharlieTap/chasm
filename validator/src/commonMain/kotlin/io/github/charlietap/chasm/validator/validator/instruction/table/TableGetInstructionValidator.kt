@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
-import io.github.charlietap.chasm.validator.ext.popI32
+import io.github.charlietap.chasm.validator.ext.popTableAddress
 import io.github.charlietap.chasm.validator.ext.push
 import io.github.charlietap.chasm.validator.ext.tableType
 
@@ -17,6 +17,6 @@ internal fun TableGetInstructionValidator(
 
     val tableType = context.tableType(instruction.tableIdx).bind()
 
-    context.popI32().bind()
+    context.popTableAddress(instruction.tableIdx).bind()
     context.push(ValueType.Reference(tableType.referenceType))
 }

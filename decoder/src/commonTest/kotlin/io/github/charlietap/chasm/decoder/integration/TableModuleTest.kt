@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.config.moduleConfig
 import io.github.charlietap.chasm.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.type.i32AddressType
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.Limits
 import io.github.charlietap.chasm.type.ReferenceType
@@ -31,6 +32,7 @@ class TableModuleTest {
         val expectedTable = Table(
             idx = Index.TableIndex(0u),
             type = TableType(
+                addressType = i32AddressType(),
                 referenceType = ReferenceType.RefNull(AbstractHeapType.Func),
                 limits = Limits(1u, 2u),
             ),

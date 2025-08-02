@@ -7,5 +7,5 @@ internal inline fun MemArgFactory(
     arg: MemArg,
 ) = IRMemArg(
     align = arg.align,
-    offset = arg.offset,
+    offset = arg.offset.toUInt(),
 )

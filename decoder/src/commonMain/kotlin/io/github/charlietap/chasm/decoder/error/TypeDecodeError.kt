@@ -33,6 +33,8 @@ sealed interface TypeDecodeError : WasmDecodeError {
     @JvmInline
     value class UnknownLimitsFlag(val encoded: UByte) : TypeDecodeError
 
+    data object UnboundedSharedLimits : TypeDecodeError
+
     @JvmInline
     value class UnknownMutabilityFlag(val encoded: UByte) : TypeDecodeError
 

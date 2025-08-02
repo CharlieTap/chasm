@@ -7,6 +7,8 @@ import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
+import io.github.charlietap.chasm.validator.context.scope.ActiveDataSegmentScope
+import io.github.charlietap.chasm.validator.context.scope.Scope
 import io.github.charlietap.chasm.validator.error.DataSegmentValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.instruction.ExpressionValidator
@@ -18,12 +20,14 @@ internal fun DataSegmentModeValidator(
     DataSegmentModeValidator(
         context = context,
         mode = mode,
+        scope = ::ActiveDataSegmentScope,
         expressionValidator = ::ExpressionValidator,
     )
 
 internal inline fun DataSegmentModeValidator(
     context: ValidationContext,
     mode: DataSegment.Mode,
+    crossinline scope: Scope<DataSegment.Mode.Active>,
     crossinline expressionValidator: Validator<Expression>,
 ): Result<Unit, ModuleValidatorError> = binding {
     when (mode) {
@@ -31,7 +35,8 @@ internal inline fun DataSegmentModeValidator(
             if (mode.memoryIndex.idx.toInt() !in context.memories.indices) {
                 Err(DataSegmentValidatorError.UnknownMemory).bind<Unit>()
             }
-            expressionValidator(context, mode.offset).bind()
+            val scopedContext = scope(context, mode).bind()
+            expressionValidator(scopedContext, mode.offset).bind()
         }
         DataSegment.Mode.Passive -> Unit
     }

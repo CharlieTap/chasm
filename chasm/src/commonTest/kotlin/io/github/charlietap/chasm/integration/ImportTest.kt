@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.fixture.type.constMutability
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.type.i32AddressType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -60,7 +61,7 @@ class ImportTest {
             globalExternal,
         )
 
-        val memoryType = memoryType(limits(1u))
+        val memoryType = memoryType(i32AddressType(), limits(1u))
         val memoryExternal = memory(store, memoryType)
 
         val memoryImport = Import(
@@ -69,7 +70,7 @@ class ImportTest {
             memoryExternal,
         )
 
-        val tableType = tableType(refNullReferenceType(AbstractHeapType.Func), limits(1u))
+        val tableType = tableType(i32AddressType(), refNullReferenceType(AbstractHeapType.Func), limits(1u))
         val tableExternal = table(store, tableType, ReferenceValue.Null(AbstractHeapType.Func))
         val tableImport = Import(
             "env",

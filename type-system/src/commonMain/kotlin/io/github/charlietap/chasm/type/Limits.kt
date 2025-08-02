@@ -1,3 +1,3 @@
 package io.github.charlietap.chasm.type
 
-data class Limits(var min: UInt, val max: UInt? = null) : Type
+data class Limits(var min: ULong, val max: ULong? = null) : Type

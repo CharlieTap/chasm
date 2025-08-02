@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.ext.pop
 import io.github.charlietap.chasm.validator.ext.popI32
 import io.github.charlietap.chasm.validator.ext.popI64
+import io.github.charlietap.chasm.validator.ext.popMemoryAddress
 import io.github.charlietap.chasm.validator.ext.push
 import io.github.charlietap.chasm.validator.ext.pushI32
 import io.github.charlietap.chasm.validator.validator.index.MemoryIndexValidator
@@ -43,7 +44,7 @@ internal inline fun AtomicMemoryInstructionValidator(
             memArgValidator(context, instruction.memArg).bind()
 
             context.popI32().bind()
-            context.popI32().bind()
+            context.popMemoryAddress(instruction.memoryIndex).bind()
 
             context.pushI32()
         }
@@ -54,7 +55,7 @@ internal inline fun AtomicMemoryInstructionValidator(
 
             context.popI64().bind()
             context.popI32().bind()
-            context.popI32().bind()
+            context.popMemoryAddress(instruction.memoryIndex).bind()
 
             context.pushI32()
         }
@@ -65,7 +66,7 @@ internal inline fun AtomicMemoryInstructionValidator(
 
             context.popI64().bind()
             context.popI64().bind()
-            context.popI32().bind()
+            context.popMemoryAddress(instruction.memoryIndex).bind()
 
             context.pushI32()
         }
@@ -74,7 +75,7 @@ internal inline fun AtomicMemoryInstructionValidator(
             memoryIndexValidator(context, instruction.memoryIndex).bind()
             memArgValidator(context, instruction.memArg).bind()
 
-            context.popI32().bind()
+            context.popMemoryAddress(instruction.memoryIndex).bind()
 
             val valueType = when (instruction) {
                 is AtomicMemoryInstruction.Load.I32 -> ValueType.Number(NumberType.I32)
@@ -92,7 +93,7 @@ internal inline fun AtomicMemoryInstructionValidator(
                 is AtomicMemoryInstruction.Store.I64 -> ValueType.Number(NumberType.I64)
             }
             context.pop(valueType).bind()
-            context.popI32().bind()
+            context.popMemoryAddress(instruction.memoryIndex).bind()
         }
         is AtomicMemoryInstruction.ReadModifyWrite -> {
 
@@ -105,7 +106,7 @@ internal inline fun AtomicMemoryInstructionValidator(
             }
 
             context.pop(valueType).bind()
-            context.popI32().bind()
+            context.popMemoryAddress(instruction.memoryIndex).bind()
 
             context.push(valueType)
         }
@@ -121,7 +122,7 @@ internal inline fun AtomicMemoryInstructionValidator(
 
             context.pop(valueType).bind()
             context.pop(valueType).bind()
-            context.popI32().bind()
+            context.popMemoryAddress(instruction.memoryIndex).bind()
 
             context.push(valueType)
         }

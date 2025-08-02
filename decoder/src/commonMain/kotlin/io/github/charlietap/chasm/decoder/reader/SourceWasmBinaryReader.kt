@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.decoder.ext.toFloatLe
 import io.github.charlietap.chasm.decoder.ext.toIntLeb128
 import io.github.charlietap.chasm.decoder.ext.toLongLeb128
 import io.github.charlietap.chasm.decoder.ext.toUIntLeb128
+import io.github.charlietap.chasm.decoder.ext.toULongLeb128
 import io.github.charlietap.chasm.stream.SourceReader
 
 internal class SourceWasmBinaryReader(
@@ -52,6 +53,8 @@ internal class SourceWasmBinaryReader(
     override fun s33(): Result<UInt, WasmDecodeError> = tryRead { byteStream.toLongLeb128().toUInt() }
 
     override fun long(): Result<Long, WasmDecodeError> = tryRead { byteStream.toLongLeb128() }
+
+    override fun ulong(): Result<ULong, WasmDecodeError> = tryRead { unsignedByteStream.toULongLeb128() }
 
     override fun float(): Result<Float, WasmDecodeError> = binding {
         val bytes = bytes(4).bind()

@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.LocalType
+import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.TableType
@@ -74,6 +75,14 @@ internal inline fun ValidationContext.globalType(
 ): Result<GlobalType, ModuleValidatorError> {
     return globals.getOrNull(index.idx.toInt()).toResultOr {
         InstructionValidatorError.UnknownGlobal
+    }
+}
+
+internal inline fun ValidationContext.memoryType(
+    index: Index.MemoryIndex,
+): Result<MemoryType, ModuleValidatorError> {
+    return memories.getOrNull(index.idx.toInt()).toResultOr {
+        InstructionValidatorError.UnknownMemory
     }
 }
 

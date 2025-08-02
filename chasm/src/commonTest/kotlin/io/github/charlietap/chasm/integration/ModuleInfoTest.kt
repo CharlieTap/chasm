@@ -21,6 +21,7 @@ import io.github.charlietap.chasm.fixture.type.constMutability
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
+import io.github.charlietap.chasm.fixture.type.i32AddressType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.limits
@@ -58,11 +59,11 @@ class ModuleInfoTest {
         val importedGlobalType = globalType(i32ValueType(), constMutability())
         val exportedGlobalType = globalType(i32ValueType(), varMutability())
 
-        val importedMemoryType = memoryType(limits(1u))
-        val exportedMemoryType = memoryType(limits(2u))
+        val importedMemoryType = memoryType(i32AddressType(), limits(1u))
+        val exportedMemoryType = memoryType(i32AddressType(), limits(2u))
 
-        val importedTableType = tableType(refNullReferenceType(AbstractHeapType.Func), limits(1u))
-        val exportedTableType = tableType(refNullReferenceType(AbstractHeapType.Func), limits(2u))
+        val importedTableType = tableType(i32AddressType(), refNullReferenceType(AbstractHeapType.Func), limits(1u))
+        val exportedTableType = tableType(i32AddressType(), refNullReferenceType(AbstractHeapType.Func), limits(2u))
 
         val importedTagFunctionType = functionType(
             params = resultType(listOf(i32ValueType())),

@@ -5,6 +5,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
+import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.asPredecodingContext
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
@@ -37,6 +38,7 @@ fun ModuleInstantiator(
         store = store,
         module = module,
         imports = imports,
+        compatibilityChecker = ::CompatibilityChecker,
         moduleFactory = ::ModuleFactory,
         optimiser = ::Optimiser,
         partialAllocator = ::PartialModuleAllocator,
@@ -53,6 +55,7 @@ internal inline fun ModuleInstantiator(
     store: Store,
     module: ASTModule,
     imports: List<Import>,
+    crossinline compatibilityChecker: CompatibilityChecker,
     crossinline moduleFactory: ModuleFactory,
     crossinline optimiser: Optimiser,
     crossinline partialAllocator: PartialModuleAllocator,
@@ -63,6 +66,8 @@ internal inline fun ModuleInstantiator(
     crossinline memoryInitializer: MemoryInitializer,
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
+
+    compatibilityChecker(module).bind()
 
     val irModule = optimiser(config, moduleFactory(module))
     val context = InstantiationContext(config, store, irModule)

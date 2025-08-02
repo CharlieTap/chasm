@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionCompositeType
+import io.github.charlietap.chasm.fixture.type.i32AddressType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -70,7 +71,7 @@ class ImportModuleTest {
             descriptor = Import.Descriptor.Function(expectedDefinedType),
         )
 
-        val expectedTableType = TableType(ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u, 2u))
+        val expectedTableType = TableType(i32AddressType(), ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u, 2u))
 
         val expectedTableImport = Import(
             moduleName = NameValue("env"),
@@ -78,7 +79,7 @@ class ImportModuleTest {
             descriptor = Import.Descriptor.Table(expectedTableType),
         )
 
-        val expectedMemoryType = memoryType(limits(1u, 2u))
+        val expectedMemoryType = memoryType(i32AddressType(), limits(1u, 2u))
 
         val expectedMemoryImport = Import(
             moduleName = NameValue("env"),

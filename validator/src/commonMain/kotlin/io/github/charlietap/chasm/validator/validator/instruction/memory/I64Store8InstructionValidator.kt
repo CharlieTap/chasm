@@ -8,8 +8,8 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
-import io.github.charlietap.chasm.validator.ext.popI32
 import io.github.charlietap.chasm.validator.ext.popI64
+import io.github.charlietap.chasm.validator.ext.popMemoryAddress
 import io.github.charlietap.chasm.validator.validator.index.MemoryIndexValidator
 import io.github.charlietap.chasm.validator.validator.instruction.MemArgValidator
 
@@ -35,5 +35,5 @@ internal inline fun I64Store8InstructionValidator(
     memoryIndexValidator(context, instruction.memoryIndex).bind()
 
     context.popI64().bind()
-    context.popI32().bind()
+    context.popMemoryAddress(instruction.memoryIndex).bind()
 }

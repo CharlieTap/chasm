@@ -6,11 +6,13 @@ import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
+import io.github.charlietap.chasm.fixture.type.addressType
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.sharedStatus
 import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.AddressType
 import io.github.charlietap.chasm.type.Limits
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.SharedStatus
@@ -36,11 +38,12 @@ class TableTypeDecoderTest {
 
         val limits = limits(117u, 121u)
         val status = sharedStatus()
-        val limitsDecoder: Decoder<Pair<Limits, SharedStatus>> = {
-            Ok(limits to status)
+        val addressType = addressType()
+        val limitsDecoder: Decoder<Triple<Limits, SharedStatus, AddressType>> = {
+            Ok(Triple(limits, status, addressType))
         }
 
-        val expected = Ok(tableType(refType, limits))
+        val expected = Ok(tableType(addressType, refType, limits))
 
         val actual = TableTypeDecoder(
             context,

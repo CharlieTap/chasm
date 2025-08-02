@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.ext.popI32
+import io.github.charlietap.chasm.validator.ext.popMemoryAddress
 import io.github.charlietap.chasm.validator.validator.index.DataIndexValidator
 import io.github.charlietap.chasm.validator.validator.index.MemoryIndexValidator
 
@@ -32,7 +33,7 @@ internal inline fun MemoryInitInstructionValidator(
     dataIndexValidator(context, instruction.dataIndex).bind()
     memoryIndexValidator(context, instruction.memoryIndex).bind()
 
-    repeat(3) {
-        context.popI32().bind()
-    }
+    context.popI32().bind()
+    context.popI32().bind()
+    context.popMemoryAddress(instruction.memoryIndex).bind()
 }

@@ -23,7 +23,7 @@ internal inline fun MemoryAllocator(
     type: MemoryType,
     crossinline memoryFactory: LinearMemoryFactory,
 ): Address.Memory {
-    val pages = LinearMemory.Pages(type.limits.min)
+    val pages = LinearMemory.Pages(type.limits.min.toUInt())
     val memory = memoryFactory(pages)
     val instance = MemoryInstance(type, memory)
 

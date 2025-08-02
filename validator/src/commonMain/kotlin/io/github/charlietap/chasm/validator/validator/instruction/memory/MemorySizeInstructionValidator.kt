@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
-import io.github.charlietap.chasm.validator.ext.pushI32
+import io.github.charlietap.chasm.validator.ext.pushMemoryAddress
 import io.github.charlietap.chasm.validator.validator.index.MemoryIndexValidator
 
 internal fun MemorySizeInstructionValidator(
@@ -28,5 +28,5 @@ internal inline fun MemorySizeInstructionValidator(
 
     memoryIndexValidator(context, instruction.memoryIndex).bind()
 
-    context.pushI32()
+    context.pushMemoryAddress(instruction.memoryIndex).bind()
 }

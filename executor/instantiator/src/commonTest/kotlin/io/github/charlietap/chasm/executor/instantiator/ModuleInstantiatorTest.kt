@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
+import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
@@ -74,6 +75,11 @@ class ModuleInstantiatorTest {
         val partialInstance = moduleInstance(
             functionAddresses = mutableListOf(functionAddress(0)),
         )
+
+        val compatibilityChecker: CompatibilityChecker = { _module ->
+            assertEquals(astModule, _module)
+            Ok(Unit)
+        }
 
         val moduleFactory: ModuleFactory = { _module ->
             assertEquals(astModule, _module)
@@ -148,6 +154,7 @@ class ModuleInstantiatorTest {
             store = store,
             module = astModule,
             imports = imports,
+            compatibilityChecker = compatibilityChecker,
             moduleFactory = moduleFactory,
             optimiser = optimiser,
             partialAllocator = pallocator,

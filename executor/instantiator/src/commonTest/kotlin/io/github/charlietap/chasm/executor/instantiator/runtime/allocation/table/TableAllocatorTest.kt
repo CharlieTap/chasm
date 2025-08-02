@@ -24,7 +24,7 @@ class TableAllocatorTest {
         )
 
         val min = 3
-        val limits = limits(min.toUInt())
+        val limits = limits(min.toULong())
         val type = tableType(limits = limits)
 
         val refValue = nullReferenceValue(AbstractHeapType.Func).toLong()

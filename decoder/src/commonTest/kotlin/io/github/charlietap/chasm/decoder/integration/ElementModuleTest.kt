@@ -22,6 +22,7 @@ import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionCompositeType
+import io.github.charlietap.chasm.fixture.type.i32AddressType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.resultType
@@ -68,7 +69,7 @@ class ElementModuleTest {
 
         val table = table(
             idx = tableIndex(0u),
-            type = tableType(refNullReferenceType(AbstractHeapType.Func), Limits(1u)),
+            type = tableType(i32AddressType(), refNullReferenceType(AbstractHeapType.Func), Limits(1u)),
             initExpression = expression(listOf(ReferenceInstruction.RefNull(AbstractHeapType.Func))),
         )
 
