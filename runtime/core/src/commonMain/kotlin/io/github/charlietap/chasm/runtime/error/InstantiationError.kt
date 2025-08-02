@@ -25,4 +25,6 @@ sealed interface InstantiationError : ModuleTrapError {
     data object PredecodingError : InstantiationError
 
     data object UnsupportedMemory64Module : InstantiationError
+
+    data object UnsupportedThreadsModule : InstantiationError
 }
