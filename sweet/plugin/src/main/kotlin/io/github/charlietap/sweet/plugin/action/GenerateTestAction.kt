@@ -8,6 +8,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import java.io.File
 
 interface GenerateTestParams: WorkParameters {
     val proposal: ListProperty<Proposal>
@@ -23,7 +24,7 @@ abstract class GenerateTestAction : WorkAction<GenerateTestParams> {
 
         val filePath = parameters.testFile.get().asFile.toString()
         val phaseSupport = parameters.proposal.get().firstOrNull {
-            filePath.contains("proposal/${it.name}")
+            filePath.contains("proposal${File.separator}${it.name}")
         }?.phaseSupport ?: SemanticPhase.EXECUTION
 
         val fileSpec = testFileSpec(
