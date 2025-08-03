@@ -1,5 +1,6 @@
 package io.github.charlietap.sweet.plugin.task
 
+import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.action.GenerateTestAction
 import io.github.charlietap.sweet.plugin.ext.backtrackCollectingDirectoriesUntil
 import io.github.charlietap.sweet.plugin.ext.snakeCaseToPascalCase
@@ -9,6 +10,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -31,6 +33,12 @@ abstract class GenerateTestsTask : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val inputFiles: ConfigurableFileTree
+
+    @get:Input
+    abstract val excludes: ListProperty<String>
+
+    @get:Input
+    abstract val proposals: ListProperty<Proposal>
 
     @get:Input
     abstract val scriptRunner: Property<String>
@@ -91,6 +99,7 @@ abstract class GenerateTestsTask : DefaultTask() {
     ) {
         val queue = workerExecutor.noIsolation()
         queue.submit(GenerateTestAction::class.java) {
+            proposal = proposals
             runner = scriptRunner
             scriptFile = change.file
             testPackage = testPackageName

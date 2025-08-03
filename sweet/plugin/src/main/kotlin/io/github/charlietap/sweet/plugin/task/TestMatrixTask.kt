@@ -37,7 +37,7 @@ abstract class TestMatrixTask : DefaultTask() {
         }
 
         val size = references.size
-        var remainder = size % MAX_PARALLELISM
+        val remainder = size % MAX_PARALLELISM
         val taskLists = if(size <= MAX_PARALLELISM) {
             references.chunked(1)
         } else {

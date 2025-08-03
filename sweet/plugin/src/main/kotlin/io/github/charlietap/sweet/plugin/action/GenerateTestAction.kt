@@ -1,12 +1,16 @@
 package io.github.charlietap.sweet.plugin.action
 
+import io.github.charlietap.sweet.lib.SemanticPhase
+import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.spec.testFileSpec
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 
 interface GenerateTestParams: WorkParameters {
+    val proposal: ListProperty<Proposal>
     val runner: Property<String>
     val testPackage: Property<String>
     val scriptFile: RegularFileProperty
@@ -17,7 +21,13 @@ abstract class GenerateTestAction : WorkAction<GenerateTestParams> {
 
     override fun execute() {
 
+        val filePath = parameters.testFile.get().asFile.toString()
+        val phaseSupport = parameters.proposal.get().firstOrNull {
+            filePath.contains("proposal/${it.name}")
+        }?.phaseSupport ?: SemanticPhase.EXECUTION
+
         val fileSpec = testFileSpec(
+            phaseSupport = phaseSupport,
             runner = parameters.runner.get(),
             script = parameters.scriptFile.get().asFile,
             test = parameters.testFile.get().asFile,

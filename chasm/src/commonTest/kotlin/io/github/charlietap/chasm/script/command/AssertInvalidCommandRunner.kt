@@ -14,7 +14,8 @@ fun AssertInvalidCommandRunner(
     context: ScriptContext,
     command: AssertInvalidCommand,
 ): CommandResult {
-    val moduleFilePath = context.binaryDirectory + "/" + command.filename
+    val moduleFilename = command.binaryFilename ?: command.filename
+    val moduleFilePath = context.binaryDirectory + "/" + moduleFilename
     val bytes = moduleFilePath.readBytesFromPath()
 
     return module(bytes, context.config.moduleConfig)

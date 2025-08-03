@@ -1,11 +1,18 @@
 package io.github.charlietap.sweet.plugin
 
+import io.github.charlietap.sweet.lib.SemanticPhase
 import javax.inject.Inject
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import java.io.Serializable
+
+data class Proposal(
+    val name: String,
+    val phaseSupport: SemanticPhase = SemanticPhase.EXECUTION,
+): Serializable
 
 open class WasmTestSuiteGenPluginExtension @Inject constructor(
     layout: ProjectLayout,
@@ -31,7 +38,7 @@ open class WasmTestSuiteGenPluginExtension @Inject constructor(
         DIR_TEST_SUITE_TESTS
     ))
 
-    val proposals: ListProperty<String> = objects.listProperty(String::class.java).convention(emptyList())
+    val proposals: ListProperty<Proposal> = objects.listProperty(Proposal::class.java).convention(emptyList())
 
     val excludes: ListProperty<String> = objects.listProperty(String::class.java).convention(emptyList())
 

@@ -16,6 +16,7 @@ kotlin {
     }
 
     dependencies {
+        api(projects.lib)
         implementation(libs.kotlin.gradle.plugin)
         implementation(libs.kotlinx.serialization)
         implementation(libs.kotlin.poet)

@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.script.command
 
-import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.fold
@@ -9,13 +8,13 @@ import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.ext.readBytesFromPath
 import io.github.charlietap.sweet.lib.SemanticPhase
-import io.github.charlietap.sweet.lib.command.ModuleCommand
+import io.github.charlietap.sweet.lib.command.ModuleDefinitionCommand
 
-typealias ModuleCommandRunner = (ScriptContext, ModuleCommand) -> CommandResult
+typealias ModuleDefinitionCommandRunner = (ScriptContext, ModuleDefinitionCommand) -> CommandResult
 
-fun ModuleCommandRunner(
+fun ModuleDefinitionCommandRunner(
     context: ScriptContext,
-    command: ModuleCommand,
+    command: ModuleDefinitionCommand,
 ): CommandResult {
 
     val moduleFilename = command.binaryFilename ?: command.filename
@@ -32,12 +31,10 @@ fun ModuleCommandRunner(
         SemanticPhase.EXECUTION -> module(bytes, context.config.moduleConfig)
             .flatMap { module ->
                 validate(module)
-            }.flatMap { module ->
-                instance(context.store, module, context.imports, context.config.runtimeConfig)
-            }.map { instance ->
-                context.instances[null] = instance
+            }.map { module ->
+                context.modules[null] = module
                 command.name?.let {
-                    context.instances[command.name] = instance
+                    context.modules[command.name] = module
                 }
             }
     }

@@ -30,7 +30,7 @@ abstract class SyncRepositoryTask : DefaultTask() {
     fun sync() {
         try {
             syncRepository()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             wipeDirectory()
             syncRepository()
         }

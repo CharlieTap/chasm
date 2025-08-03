@@ -62,7 +62,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
                 from(syncRepositoryTask.flatMap { it.outputDirectory })
                 include("*.wast")
                 extension.proposals.get().forEach { proposal ->
-                    include("proposals/$proposal/*.wast")
+                    include("proposals/${proposal.name}/*.wast")
                 }
                 exclude(extension.excludes.get())
                 builtBy(syncRepositoryTask)
@@ -86,6 +86,8 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
                 builtBy(prepareTestSuiteTask)
             }
 
+            excludes.set(extension.excludes)
+            proposals.set(extension.proposals)
             scriptRunner.set(extension.scriptRunner)
             testPackageName.set(extension.testPackageName)
             outputDirectory.set(extension.testSuiteTestsDirectory)

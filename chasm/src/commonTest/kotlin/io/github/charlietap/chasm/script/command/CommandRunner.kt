@@ -12,6 +12,8 @@ import io.github.charlietap.sweet.lib.command.AssertUninstantiableCommand
 import io.github.charlietap.sweet.lib.command.AssertUnlinkableCommand
 import io.github.charlietap.sweet.lib.command.Command
 import io.github.charlietap.sweet.lib.command.ModuleCommand
+import io.github.charlietap.sweet.lib.command.ModuleDefinitionCommand
+import io.github.charlietap.sweet.lib.command.ModuleInstanceCommand
 import io.github.charlietap.sweet.lib.command.RegisterCommand
 
 typealias CommandRunner = (ScriptContext, Command) -> CommandResult
@@ -32,6 +34,8 @@ fun CommandRunner(
     assertUninstantiableCommandRunner = ::AssertUninstantiableCommandRunner,
     assertUnlinkableCommandRunner = ::AssertUnlinkableCommandRunner,
     moduleCommandRunner = ::ModuleCommandRunner,
+    moduleDefinitionCommandRunner = ::ModuleDefinitionCommandRunner,
+    moduleInstanceCommandRunner = ::ModuleInstanceCommandRunner,
     registerCommandRunner = ::RegisterCommandRunner,
 )
 
@@ -48,6 +52,8 @@ private fun CommandRunner(
     assertUninstantiableCommandRunner: AssertUninstantiableCommandRunner,
     assertUnlinkableCommandRunner: AssertUnlinkableCommandRunner,
     moduleCommandRunner: ModuleCommandRunner,
+    moduleDefinitionCommandRunner: ModuleDefinitionCommandRunner,
+    moduleInstanceCommandRunner: ModuleInstanceCommandRunner,
     registerCommandRunner: RegisterCommandRunner,
 ): CommandResult = when (command) {
     is ActionCommand -> actionCommandRunner(context, command)
@@ -60,5 +66,7 @@ private fun CommandRunner(
     is AssertUninstantiableCommand -> assertUninstantiableCommandRunner(context, command)
     is AssertUnlinkableCommand -> assertUnlinkableCommandRunner(context, command)
     is ModuleCommand -> moduleCommandRunner(context, command)
+    is ModuleDefinitionCommand -> moduleDefinitionCommandRunner(context, command)
+    is ModuleInstanceCommand -> moduleInstanceCommandRunner(context, command)
     is RegisterCommand -> registerCommandRunner(context, command)
 }

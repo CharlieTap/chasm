@@ -1,5 +1,6 @@
 package io.github.charlietap.sweet.plugin.task
 
+import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.action.WasmToolsAction
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -39,7 +40,7 @@ abstract class PrepareTestSuiteTask : DefaultTask() {
     abstract val excludes: ListProperty<String>
 
     @get:Input
-    abstract val proposals: ListProperty<String>
+    abstract val proposals: ListProperty<Proposal>
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty

@@ -1,4 +1,6 @@
 
+import io.github.charlietap.sweet.lib.SemanticPhase
+import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 
 plugins {
@@ -11,16 +13,19 @@ plugins {
 }
 
 sweet {
-    wasmToolsVersion = "1.222.0"
+    wasmToolsVersion = "1.236.0"
     testSuiteCommit = "88e97b0f742f4c3ee01fea683da130f344dd7b02"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm.testsuite"
     proposals = listOf(
-        "multi-memory",
-        "exception-handling",
-        "gc",
+        Proposal("multi-memory"),
+        Proposal("exception-handling"),
+        Proposal("gc"),
+        Proposal("threads", SemanticPhase.DECODING),
+        Proposal("wasm-3.0", SemanticPhase.DECODING),
     )
     excludes = listOf(
+        "**/relaxed_*", "**/*_relaxed_*",
         "simd_*/**", "**/simd_*",
         "align.wast", "binary.wast", "data.wast", "elem.wast", "global.wast", "imports.wast", "memory.wast",
         "proposals/exception-handling/binary.wast",

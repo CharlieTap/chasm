@@ -4,5 +4,5 @@ interface ScriptRunner {
 
     fun readFile(path: String): String
 
-    fun execute(directory: String, script: Script): ScriptResult
+    fun execute(directory: String, script: Script, phaseSupport: SemanticPhase): ScriptResult
 }

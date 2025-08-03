@@ -5,13 +5,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("assert_invalid")
-data class AssertInvalidCommand(
-    override val line: Int,
+@SerialName("module_definition")
+data class ModuleDefinitionCommand(
     val filename: String,
-    val text: String,
+    override val line: Int,
+    val name: String? = null,
     @SerialName("module_type")
-    val moduleType: ModuleType,
+    val type: ModuleType? = null,
     @SerialName("binary_filename")
     val binaryFilename: String? = null,
 ): Command

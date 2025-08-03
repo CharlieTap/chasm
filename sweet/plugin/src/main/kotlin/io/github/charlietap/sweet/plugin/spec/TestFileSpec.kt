@@ -7,11 +7,13 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import io.github.charlietap.sweet.lib.SemanticPhase
 import io.github.charlietap.sweet.plugin.ext.backtrackCollectingDirectoriesUntil
 import io.github.charlietap.sweet.plugin.ext.snakeCaseToPascalCase
 import java.io.File
 
 fun testFileSpec(
+    phaseSupport: SemanticPhase,
     testPackage: String,
     runner: String,
     script: File,
@@ -20,6 +22,7 @@ fun testFileSpec(
 
     val scriptClassName = ClassName("io.github.charlietap.sweet.lib", "Script")
     val scriptResultClassName = ClassName("io.github.charlietap.sweet.lib", "ScriptResult")
+    val semanticPhaseClassName = ClassName("io.github.charlietap.sweet.lib", "SemanticPhase")
     val jsonClassName = ClassName("kotlinx.serialization.json", "Json")
     val testAnnotation = ClassName("kotlin.test", "Test")
     val assertEqualsFunction = ClassName("kotlin.test", "assertEquals")
@@ -38,11 +41,13 @@ fun testFileSpec(
     }
 
     return testFileSpec(
+        phaseSupport,
         runner,
         script,
         test,
         scriptClassName,
         scriptResultClassName,
+        semanticPhaseClassName,
         jsonClassName,
         testAnnotation,
         assertEqualsFunction,
@@ -51,11 +56,13 @@ fun testFileSpec(
 }
 
 private fun testFileSpec(
+    phaseSupport: SemanticPhase,
     runner: String,
     script: File,
     test: File,
     scriptClassName: ClassName,
     scriptResultClassName: ClassName,
+    semanticPhaseClassName: ClassName,
     jsonClassName: ClassName,
     testAnnotation: ClassName,
     assertEqualsFunction: ClassName,
@@ -83,11 +90,11 @@ private fun testFileSpec(
                         """
                     val file = runner.readFile(TEST_DIR + "${script.name}")
                     val script = %T.decodeFromString<%T>(file)
-                    val result = runner.execute(TEST_DIR, script)
+                    val result = runner.execute(TEST_DIR, script, %T.${phaseSupport.name})
 
                     %T(%T.Success, result)
                     """.trimIndent(),
-                        jsonClassName, scriptClassName, assertEqualsFunction, scriptResultClassName
+                        jsonClassName, scriptClassName, semanticPhaseClassName, assertEqualsFunction, scriptResultClassName
                     )
                     .build()
             )
