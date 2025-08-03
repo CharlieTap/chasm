@@ -5,7 +5,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.Decoder
-import io.github.charlietap.chasm.decoder.decoder.type.heap.HEAP_TYPE_NO_FUNC
+import io.github.charlietap.chasm.decoder.decoder.type.heap.HEAP_TYPE_NO_EXCEPTION
 import io.github.charlietap.chasm.decoder.decoder.type.number.NUMBER_TYPE_F64
 import io.github.charlietap.chasm.decoder.decoder.type.number.NUMBER_TYPE_I32
 import io.github.charlietap.chasm.decoder.decoder.type.number.NumberTypeDecoder
@@ -57,4 +57,4 @@ internal inline fun ValueTypeDecoder(
 
 internal val NUMBER_TYPE_RANGE = NUMBER_TYPE_F64..NUMBER_TYPE_I32
 internal val VECTOR_TYPE_RANGE = VECTOR_TYPE_128..VECTOR_TYPE_128
-internal val REFERENCE_TYPE_RANGE = REFERENCE_TYPE_REF_NULL..HEAP_TYPE_NO_FUNC
+internal val REFERENCE_TYPE_RANGE = REFERENCE_TYPE_REF_NULL..HEAP_TYPE_NO_EXCEPTION
