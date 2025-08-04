@@ -15,7 +15,7 @@ import io.github.charlietap.chasm.validator.validator.instruction.MemArgValidato
 
 internal fun I32Store8InstructionValidator(
     context: ValidationContext,
-    instruction: MemoryInstruction.I32Store8,
+    instruction: MemoryInstruction.Store.I32Store8,
 ): Result<Unit, ModuleValidatorError> =
     I32Store8InstructionValidator(
         context = context,
@@ -26,7 +26,7 @@ internal fun I32Store8InstructionValidator(
 
 internal inline fun I32Store8InstructionValidator(
     context: ValidationContext,
-    instruction: MemoryInstruction.I32Store8,
+    instruction: MemoryInstruction.Store.I32Store8,
     crossinline memArgValidator: Validator<MemArg>,
     crossinline memoryIndexValidator: Validator<Index.MemoryIndex>,
 ): Result<Unit, ModuleValidatorError> = binding {

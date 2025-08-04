@@ -89,32 +89,32 @@ fun Instruction?.size(): Int = when (this) {
     is AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange16 -> 2
     is AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange32 -> 4
 
-    is MemoryInstruction.I32Load -> 4
-    is MemoryInstruction.I32Load8S -> 1
-    is MemoryInstruction.I32Load8U -> 1
-    is MemoryInstruction.I32Load16S -> 2
-    is MemoryInstruction.I32Load16U -> 2
+    is MemoryInstruction.Load.I32Load -> 4
+    is MemoryInstruction.Load.I32Load8S -> 1
+    is MemoryInstruction.Load.I32Load8U -> 1
+    is MemoryInstruction.Load.I32Load16S -> 2
+    is MemoryInstruction.Load.I32Load16U -> 2
 
-    is MemoryInstruction.I64Load -> 8
-    is MemoryInstruction.I64Load8S -> 1
-    is MemoryInstruction.I64Load8U -> 1
-    is MemoryInstruction.I64Load16S -> 2
-    is MemoryInstruction.I64Load16U -> 2
-    is MemoryInstruction.I64Load32S -> 4
-    is MemoryInstruction.I64Load32U -> 4
+    is MemoryInstruction.Load.I64Load -> 8
+    is MemoryInstruction.Load.I64Load8S -> 1
+    is MemoryInstruction.Load.I64Load8U -> 1
+    is MemoryInstruction.Load.I64Load16S -> 2
+    is MemoryInstruction.Load.I64Load16U -> 2
+    is MemoryInstruction.Load.I64Load32S -> 4
+    is MemoryInstruction.Load.I64Load32U -> 4
 
-    is MemoryInstruction.I32Store -> 4
-    is MemoryInstruction.I32Store8 -> 1
-    is MemoryInstruction.I32Store16 -> 2
-    is MemoryInstruction.I64Store -> 8
-    is MemoryInstruction.I64Store8 -> 1
-    is MemoryInstruction.I64Store16 -> 2
-    is MemoryInstruction.I64Store32 -> 4
+    is MemoryInstruction.Store.I32Store -> 4
+    is MemoryInstruction.Store.I32Store8 -> 1
+    is MemoryInstruction.Store.I32Store16 -> 2
+    is MemoryInstruction.Store.I64Store -> 8
+    is MemoryInstruction.Store.I64Store8 -> 1
+    is MemoryInstruction.Store.I64Store16 -> 2
+    is MemoryInstruction.Store.I64Store32 -> 4
 
-    is MemoryInstruction.F32Load -> 4
-    is MemoryInstruction.F64Load -> 8
-    is MemoryInstruction.F32Store -> 4
-    is MemoryInstruction.F64Store -> 8
+    is MemoryInstruction.Load.F32Load -> 4
+    is MemoryInstruction.Load.F64Load -> 8
+    is MemoryInstruction.Store.F32Store -> 4
+    is MemoryInstruction.Store.F64Store -> 8
 
     else -> 0
 }
