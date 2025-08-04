@@ -22,7 +22,7 @@ sweet {
         Proposal("exception-handling"),
         Proposal("gc"),
         Proposal("threads", SemanticPhase.DECODING),
-        Proposal("wasm-3.0", SemanticPhase.DECODING),
+        Proposal("wasm-3.0", SemanticPhase.VALIDATION),
     )
     excludes = listOf(
         "**/relaxed_*", "**/*_relaxed_*",

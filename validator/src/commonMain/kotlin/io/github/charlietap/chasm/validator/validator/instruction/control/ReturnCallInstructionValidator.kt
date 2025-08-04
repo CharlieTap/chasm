@@ -26,6 +26,6 @@ internal fun ReturnCallInstructionValidator(
     context.popValues(functionType.params.types).bind()
     context.pushValues(functionType.results.types)
 
-    context.popValues(context.result?.types?.asReversed() ?: emptyList()).bind()
+    context.popValues(context.result?.types ?: emptyList()).bind()
     context.unreachable().bind()
 }

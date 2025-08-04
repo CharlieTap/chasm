@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.ext.functionType
-import io.github.charlietap.chasm.validator.ext.popI32
+import io.github.charlietap.chasm.validator.ext.popTableAddress
 import io.github.charlietap.chasm.validator.ext.popValues
 import io.github.charlietap.chasm.validator.ext.pushValues
 import io.github.charlietap.chasm.validator.ext.tableType
@@ -40,7 +40,7 @@ internal inline fun CallIndirectValidator(
 
     val functionType = context.functionType(instruction.typeIndex).bind()
 
-    context.popI32().bind()
+    context.popTableAddress(instruction.tableIndex).bind()
     context.popValues(functionType.params.types).bind()
     context.pushValues(functionType.results.types)
 }

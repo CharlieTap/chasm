@@ -15,20 +15,26 @@ internal fun ImportValidator(
         context = context,
         import = import,
         functionImportValidator = ::FunctionImportValidator,
+        globalImportValidator = ::GlobalImportValidator,
         memoryImportValidator = ::MemoryImportValidator,
+        tableImportValidator = ::TableImportValidator,
+        tagImportValidator = ::TagImportValidator,
     )
 
 internal inline fun ImportValidator(
     context: ValidationContext,
     import: Import,
     crossinline functionImportValidator: Validator<Import.Descriptor.Function>,
+    crossinline globalImportValidator: Validator<Import.Descriptor.Global>,
     crossinline memoryImportValidator: Validator<Import.Descriptor.Memory>,
+    crossinline tableImportValidator: Validator<Import.Descriptor.Table>,
+    crossinline tagImportValidator: Validator<Import.Descriptor.Tag>,
 ): Result<Unit, ModuleValidatorError> = binding {
     when (val descriptor = import.descriptor) {
         is Import.Descriptor.Function -> functionImportValidator(context, descriptor).bind()
-        is Import.Descriptor.Global -> Unit
+        is Import.Descriptor.Global -> globalImportValidator(context, descriptor).bind()
         is Import.Descriptor.Memory -> memoryImportValidator(context, descriptor).bind()
-        is Import.Descriptor.Table -> Unit
-        is Import.Descriptor.Tag -> Unit
+        is Import.Descriptor.Table -> tableImportValidator(context, descriptor).bind()
+        is Import.Descriptor.Tag -> tagImportValidator(context, descriptor).bind()
     }
 }

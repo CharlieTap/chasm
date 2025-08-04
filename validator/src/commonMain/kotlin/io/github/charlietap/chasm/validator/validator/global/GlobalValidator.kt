@@ -4,14 +4,14 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Global
-import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.context.scope.GlobalScope
 import io.github.charlietap.chasm.validator.context.scope.Scope
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.instruction.ExpressionValidator
-import io.github.charlietap.chasm.validator.validator.type.ValueTypeValidator
+import io.github.charlietap.chasm.validator.validator.type.GlobalTypeValidator
 
 internal fun GlobalValidator(
     context: ValidationContext,
@@ -22,7 +22,7 @@ internal fun GlobalValidator(
         global = global,
         scope = ::GlobalScope,
         expressionValidator = ::ExpressionValidator,
-        valueTypeValidator = ::ValueTypeValidator,
+        globalTypeValidator = ::GlobalTypeValidator,
     )
 
 internal inline fun GlobalValidator(
@@ -30,9 +30,9 @@ internal inline fun GlobalValidator(
     global: Global,
     crossinline scope: Scope<Global>,
     crossinline expressionValidator: Validator<Expression>,
-    crossinline valueTypeValidator: Validator<ValueType>,
+    crossinline globalTypeValidator: Validator<GlobalType>,
 ): Result<Unit, ModuleValidatorError> = binding {
     val scopedContext = scope(context, global).bind()
     expressionValidator(scopedContext, global.initExpression).bind()
-    valueTypeValidator(scopedContext, global.type.valueType).bind()
+    globalTypeValidator(scopedContext, global.type).bind()
 }

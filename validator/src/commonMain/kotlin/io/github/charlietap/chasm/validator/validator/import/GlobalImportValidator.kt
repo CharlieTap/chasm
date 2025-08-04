@@ -3,26 +3,26 @@ package io.github.charlietap.chasm.validator.validator.import
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Import
-import io.github.charlietap.chasm.type.MemoryType
+import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
-import io.github.charlietap.chasm.validator.validator.type.MemoryTypeValidator
+import io.github.charlietap.chasm.validator.validator.type.GlobalTypeValidator
 
-internal fun MemoryImportValidator(
+internal fun GlobalImportValidator(
     context: ValidationContext,
-    descriptor: Import.Descriptor.Memory,
+    descriptor: Import.Descriptor.Global,
 ): Result<Unit, ModuleValidatorError> =
-    MemoryImportValidator(
+    GlobalImportValidator(
         context = context,
         descriptor = descriptor,
-        typeValidator = ::MemoryTypeValidator,
+        typeValidator = ::GlobalTypeValidator,
     )
 
-internal inline fun MemoryImportValidator(
+internal inline fun GlobalImportValidator(
     context: ValidationContext,
-    descriptor: Import.Descriptor.Memory,
-    crossinline typeValidator: Validator<MemoryType>,
+    descriptor: Import.Descriptor.Global,
+    crossinline typeValidator: Validator<GlobalType>,
 ): Result<Unit, ModuleValidatorError> = binding {
     typeValidator(context, descriptor.type).bind()
 }

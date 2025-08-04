@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.validator.error.InstructionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
 import io.github.charlietap.chasm.validator.ext.functionType
-import io.github.charlietap.chasm.validator.ext.popI32
+import io.github.charlietap.chasm.validator.ext.popTableAddress
 import io.github.charlietap.chasm.validator.ext.popValues
 import io.github.charlietap.chasm.validator.ext.pushValues
 import io.github.charlietap.chasm.validator.ext.tableType
@@ -45,11 +45,11 @@ internal inline fun ReturnCallIndirectInstructionValidator(
         Err(TypeValidatorError.TypeMismatch).bind<Unit>()
     }
 
-    context.popI32().bind()
+    context.popTableAddress(instruction.tableIndex).bind()
 
     context.popValues(functionType.params.types).bind()
     context.pushValues(functionType.results.types)
 
-    context.popValues(context.result?.types?.asReversed() ?: emptyList()).bind()
+    context.popValues(context.result?.types ?: emptyList()).bind()
     context.unreachable().bind()
 }

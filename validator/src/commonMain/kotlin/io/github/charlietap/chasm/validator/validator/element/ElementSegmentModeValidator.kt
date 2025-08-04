@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.type.matching.ReferenceTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
-import io.github.charlietap.chasm.validator.context.scope.ElementSegmentModeScope
+import io.github.charlietap.chasm.validator.context.scope.ActiveElementSegmentModeScope
 import io.github.charlietap.chasm.validator.context.scope.Scope
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
@@ -25,7 +25,7 @@ internal fun ElementSegmentModeValidator(
     ElementSegmentModeValidator(
         context = context,
         mode = mode,
-        scope = ::ElementSegmentModeScope,
+        scope = ::ActiveElementSegmentModeScope,
         expressionValidator = ::ExpressionValidator,
         typeMatcher = ::ReferenceTypeMatcher,
     )
@@ -33,12 +33,10 @@ internal fun ElementSegmentModeValidator(
 internal inline fun ElementSegmentModeValidator(
     context: ValidationContext,
     mode: ElementSegment.Mode,
-    crossinline scope: Scope<ElementSegment.Mode>,
+    crossinline scope: Scope<ElementSegment.Mode.Active>,
     crossinline expressionValidator: Validator<Expression>,
     crossinline typeMatcher: TypeMatcher<ReferenceType>,
 ): Result<Unit, ModuleValidatorError> = binding {
-
-    val scopedContext = scope(context, mode).bind()
 
     when (mode) {
         is ElementSegment.Mode.Active -> {
@@ -50,6 +48,7 @@ internal inline fun ElementSegmentModeValidator(
                 Err(TypeValidatorError.TypeMismatch).bind<Unit>()
             }
 
+            val scopedContext = scope(context, mode).bind()
             expressionValidator(scopedContext, mode.offsetExpr).bind()
         }
         ElementSegment.Mode.Declarative -> Unit

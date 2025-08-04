@@ -36,7 +36,6 @@ internal inline fun ElementSegmentValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val scopedContext = scope(context, segment).bind()
-
     referenceTypeValidator(scopedContext, segment.type).bind()
     segmentModeValidator(scopedContext, segment.mode).bind()
 
