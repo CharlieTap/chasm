@@ -6,6 +6,8 @@ import io.github.charlietap.chasm.type.Limits
 import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
+import io.github.charlietap.chasm.validator.context.scope.MemoryTypeScope
+import io.github.charlietap.chasm.validator.context.scope.Scope
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.type.limits.LimitsValidator
 
@@ -16,13 +18,16 @@ internal fun MemoryTypeValidator(
     MemoryTypeValidator(
         context = context,
         type = type,
+        scope = ::MemoryTypeScope,
         limitsValidator = ::LimitsValidator,
     )
 
 internal inline fun MemoryTypeValidator(
     context: ValidationContext,
     type: MemoryType,
+    crossinline scope: Scope<MemoryType>,
     crossinline limitsValidator: Validator<Limits>,
 ): Result<Unit, ModuleValidatorError> = binding {
-    limitsValidator(context, type.limits).bind()
+    val scopedContext = scope(context, type).bind()
+    limitsValidator(scopedContext, type.limits).bind()
 }
