@@ -1,3 +1,6 @@
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+
 plugins {
     alias(libs.plugins.conventions.kmp)
     alias(libs.plugins.conventions.linting)
@@ -17,13 +20,6 @@ kotlin {
     }
 
     sourceSets {
-
-        all {
-            languageSettings {
-                optIn("kotlinx.cinterop.ExperimentalForeignApi")
-            }
-        }
-
        commonMain {
             dependencies {}
         }
@@ -33,6 +29,12 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
+    }
+}
+
+tasks.withType<KotlinNativeCompile>().configureEach {
+    compilerOptions {
+        optIn.add("kotlinx.cinterop.ExperimentalForeignApi")
     }
 }
 
