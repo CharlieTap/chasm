@@ -26,14 +26,6 @@ Additionally, the runtime supports the following proposals
 - [x] Exception Handling
 - [x] Extended Name Sections
 
-# Setup
-
-```kotlin
-dependencies {
-    implementation("io.github.charlietap.chasm:chasm:0.9.81")
-}
-```
-
 # Usage with the Gradle plugin
 
 Chasm provides a Gradle plugin that can generate a typesafe Kotlin
@@ -60,9 +52,7 @@ plugins {
 chasm {
     modules {
         create("ExampleService") {
-            // Path to the wasm binary to generate an interface for
             binary = layout.projectDirectory.file("src/main/resources/example.wasm")
-            // Package for the generated class
             packageName = "com.example"
         }
     }
@@ -88,6 +78,12 @@ If you prefer to work with the low‑level API directly, chasm also
 exposes a set of functions for decoding, instantiating and invoking
 wasm modules. The following examples demonstrate how to use these
 APIs without the plugin.
+
+```kotlin
+dependencies {
+    implementation("io.github.charlietap.chasm:chasm:0.9.81")
+}
+```
 
 ### Invoking functions
 
