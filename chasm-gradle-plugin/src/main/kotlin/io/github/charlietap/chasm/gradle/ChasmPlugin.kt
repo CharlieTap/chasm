@@ -4,6 +4,7 @@ import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import io.github.charlietap.chasm.chasm_gradle_plugin.BuildConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -14,6 +15,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import java.io.File
 import kotlin.jvm.java
@@ -26,6 +30,10 @@ class ChasmPlugin : Plugin<Project> {
 
         project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
             val mpp = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
+
+            mpp.targets.configureEach {
+                addChasmRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
+            }
 
             project.afterEvaluate {
                 extension.modules.configureEach {
@@ -87,6 +95,8 @@ class ChasmPlugin : Plugin<Project> {
             val jvmExtension = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
             val mainCompilation = jvmExtension.target.compilations.getByName(MAIN_COMPILATION_NAME)
 
+            addChasmRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
+
             extension.modules.configureEach {
                 if (extension.mode.get() == Mode.PRODUCER) {
                     project.logger.error("Producer mode is only supported for Kotlin Multiplatform projects with WASM targets")
@@ -103,6 +113,9 @@ class ChasmPlugin : Plugin<Project> {
         project.plugins.withId("com.android.base") {
             val androidExtension = project.extensions.getByType(BaseExtension::class.java)
             val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
+
+            addChasmRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
+
             androidComponents.onVariants { variant: Variant ->
                 extension.modules.configureEach {
                     if (extension.mode.get() == Mode.PRODUCER) {
@@ -146,5 +159,73 @@ class ChasmPlugin : Plugin<Project> {
             functions.set(module.functions)
             outputDirectory.set(project.layout.buildDirectory.dir("generated/kotlin/$sourceSetName"))
         }
+    }
+
+    private fun artifactSuffixFor(target: KotlinTarget): String? = when (target.platformType) {
+        KotlinPlatformType.jvm -> "jvm"
+        KotlinPlatformType.js -> "js"
+        KotlinPlatformType.androidJvm -> "android"
+        KotlinPlatformType.wasm -> null
+        KotlinPlatformType.native -> {
+            val kn = (target as KotlinNativeTarget).konanTarget.name
+            kn.lowercase().replace("_", "")
+        }
+        else -> null
+    }
+
+    private fun KotlinTarget.addChasmRuntimeToKmpTarget(
+        configuration: RuntimeDependencyConfiguration,
+    ) {
+        val suffix = artifactSuffixFor(this) ?: return
+        val notation = resolveChasmRuntimeNotation(suffix)
+
+        val compilation = compilations.getByName("main")
+        val configurationName = when (configuration) {
+            RuntimeDependencyConfiguration.API -> compilation.defaultSourceSet.apiConfigurationName
+            RuntimeDependencyConfiguration.IMPLEMENTATION -> compilation.defaultSourceSet.implementationConfigurationName
+        }
+
+        val exists = project.configurations.getByName(configurationName).dependencies.any {
+            it.group == CHASM_RUNTIME_GROUP && it.name == "$CHASM_RUNTIME_ARTIFACT-$suffix"
+        }
+        if (!exists) {
+            project.dependencies.add(configurationName, notation)
+        }
+    }
+
+    private fun addChasmRuntimeForJvmOrAndroid(
+        project: Project,
+        configuration: RuntimeDependencyConfiguration,
+    ) {
+        val configurationName = configuration.name.lowercase()
+        val notation = resolveChasmRuntimeNotation(CHASM_RUNTIME_JVM_ARTIFACT_SUFFIX)
+        if (!runtimeDependencyExists(project, configurationName)) {
+            project.dependencies.add(configurationName, notation)
+        }
+    }
+
+    private fun resolveChasmRuntimeNotation(
+        suffix: String,
+    ): Any {
+        val group = CHASM_RUNTIME_GROUP
+        val artifact = "$CHASM_RUNTIME_ARTIFACT-$suffix"
+        val version = BuildConfig.RUNTIME_VERSION
+        return "$group:$artifact:$version"
+    }
+
+    private fun runtimeDependencyExists(
+        project: Project,
+        configurationName: String,
+    ): Boolean {
+        val dependencies = project.configurations.findByName(configurationName)?.allDependencies.orEmpty()
+        return dependencies.any { dep ->
+            dep.group == CHASM_RUNTIME_GROUP && (dep.name == CHASM_RUNTIME_ARTIFACT || dep.name == "$CHASM_RUNTIME_ARTIFACT-$CHASM_RUNTIME_JVM_ARTIFACT_SUFFIX")
+        }
+    }
+
+    private companion object {
+        private const val CHASM_RUNTIME_GROUP = "io.github.charlietap.chasm"
+        private const val CHASM_RUNTIME_ARTIFACT = "chasm"
+        private const val CHASM_RUNTIME_JVM_ARTIFACT_SUFFIX = "jvm"
     }
 }

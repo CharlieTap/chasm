@@ -25,7 +25,6 @@ kotlin {
 
     sourceSets {
         jvmMain.dependencies {
-            implementation(libs.chasm.jvm)
             implementation(libs.hilt.core)
         }
     }

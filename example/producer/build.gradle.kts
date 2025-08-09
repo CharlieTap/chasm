@@ -16,11 +16,9 @@ kotlin {
     wasmWasi {
         binaries.executable()
     }
-    iosArm64()
 
     sourceSets {
         jvmMain.dependencies {
-            implementation(libs.chasm.jvm)
             implementation(libs.hilt.core)
         }
     }

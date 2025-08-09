@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.build.config)
     `kotlin-dsl`
     `java-gradle-plugin`
 
@@ -8,7 +9,11 @@ plugins {
 }
 
 group = "io.github.charlietap.chasm"
-version = libs.versions.chasm.plugin.get()
+version = libs.versions.version.name.get()
+
+buildConfig {
+    buildConfigField("RUNTIME_VERSION", libs.versions.version.name.get())
+}
 
 configure<PublishingConventionsExtension> {
     name = "chasm-gradle-plugin"

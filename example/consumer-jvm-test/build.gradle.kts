@@ -34,7 +34,6 @@ chasm {
 }
 
 dependencies {
-    implementation(libs.chasm.jvm)
     implementation(libs.hilt.core)
 
     ksp(libs.hilt.compiler)

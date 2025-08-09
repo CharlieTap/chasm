@@ -12,7 +12,7 @@ java-compiler-version = "21"
 java-bytecode-version = "11"
 
 android-build-tools-plugin = "8.11.0"
-chasm-plugin = "0.2.2"
+build-config-plugin = "5.6.7"
 versions-plugin = "0.51.0"
 
 androidx-appcompat = "1.6.1"
@@ -62,7 +62,8 @@ android-benchmark = { id = "androidx.benchmark", version.ref = "androidx-benchma
 android-library = { id = "com.android.library", version.ref = "android-build-tools-plugin" }
 android-test = { id = "com.android.test", version.ref = "android-build-tools-plugin" }
 bolt = { id = "io.github.charlietap.bolt.plugin" }
-chasm = { id = "io.github.charlietap.chasm.gradle", version.ref = "chasm-plugin" }
+build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config-plugin" }
+chasm = { id = "io.github.charlietap.chasm.gradle", version.ref = "version-name" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref="dependency-analysis" }
 dokka = { id = "org.jetbrains.dokka", version.ref="dokka" }
@@ -107,6 +108,7 @@ androidx-compose-activity = { module = "androidx.activity:activity-compose", ver
 androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewmodel"}
 
 chasm-jvm = { module = "io.github.charlietap.chasm:chasm-jvm", version.ref = "version-name"}
+chasm-kmp = { module = "io.github.charlietap.chasm:chasm", version.ref = "version-name"}
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger"}
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "dagger"}

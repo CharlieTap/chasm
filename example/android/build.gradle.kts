@@ -55,7 +55,6 @@ dependencies {
     implementation(projects.consumerMultiplatformFactorial)
     implementation(projects.producer)
 
-    implementation(libs.chasm.jvm)
     implementation(libs.hilt.android)
     implementation(libs.bundles.androidx)
     implementation(libs.bundles.compose.ui)
