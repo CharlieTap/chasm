@@ -14,6 +14,11 @@ enum class RuntimeDependencyConfiguration {
     IMPLEMENTATION,
 }
 
+enum class TypeVisibility {
+    INTERNAL,
+    PUBLIC,
+}
+
 @ChasmDsl
 open class ChasmExtension
     @Inject

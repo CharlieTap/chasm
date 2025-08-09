@@ -278,8 +278,15 @@ internal class ClassImplementationGenerator(
     operator fun invoke(
         packageName: String,
         interfaceName: String,
+        visibility: TypeVisibility,
         wasmInterface: WasmInterface,
     ): TypeSpec = TypeSpec.classBuilder(interfaceName + "Impl").apply {
+
+        val visibilityModifier = when (visibility) {
+            TypeVisibility.INTERNAL -> KModifier.INTERNAL
+            TypeVisibility.PUBLIC -> KModifier.PUBLIC
+        }
+        addModifiers(visibilityModifier)
 
         addSuperinterface(ClassName(packageName, interfaceName))
 

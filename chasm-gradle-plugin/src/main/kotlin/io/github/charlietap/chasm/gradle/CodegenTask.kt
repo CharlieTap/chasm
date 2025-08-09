@@ -39,6 +39,12 @@ abstract class CodegenTask
         abstract val packageName: Property<String>
 
         @get:Input
+        abstract val interfaceVisibility: Property<TypeVisibility>
+
+        @get:Input
+        abstract val implementationVisibility: Property<TypeVisibility>
+
+        @get:Input
         abstract val initializers: SetProperty<String>
 
         @get:Input
@@ -73,7 +79,7 @@ abstract class CodegenTask
                 wasmFunctions = functions.get(),
                 logger = logger,
             )
-            val specs = generator(data)
+            val specs = generator(interfaceVisibility.get(), implementationVisibility.get(), data)
 
             val outputDir = outputDirectory.get().asFile
             specs.forEach { spec ->

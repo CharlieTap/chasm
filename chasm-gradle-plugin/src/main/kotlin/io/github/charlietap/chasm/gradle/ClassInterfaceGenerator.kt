@@ -50,8 +50,15 @@ internal class ClassInterfaceGenerator(
     operator fun invoke(
         packageName: String,
         interfaceName: String,
+        visibility: TypeVisibility,
         wasmInterface: WasmInterface,
     ) = TypeSpec.interfaceBuilder(interfaceName).apply {
+
+        val visibilityModifier = when (visibility) {
+            TypeVisibility.INTERNAL -> KModifier.INTERNAL
+            TypeVisibility.PUBLIC -> KModifier.PUBLIC
+        }
+        addModifiers(visibilityModifier)
 
         wasmInterface.functions.forEach { function ->
             addFunction(functionGenerator(packageName, function))

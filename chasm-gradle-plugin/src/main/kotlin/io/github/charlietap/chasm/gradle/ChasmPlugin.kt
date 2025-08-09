@@ -155,6 +155,8 @@ class ChasmPlugin : Plugin<Project> {
             config.set(module.codegenConfig)
             interfaceName.set(module.name)
             packageName.set(module.packageName)
+            interfaceVisibility.set(module.interfaceVisibility)
+            implementationVisibility.set(module.implementationVisibility)
             initializers.set(module.initializers)
             functions.set(module.functions)
             outputDirectory.set(project.layout.buildDirectory.dir("generated/kotlin/$sourceSetName"))

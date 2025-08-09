@@ -19,11 +19,15 @@ abstract class WasmModule
         abstract val packageName: Property<String>
         abstract val initializers: SetProperty<String>
         abstract val functions: ListProperty<WasmFunction>
+        abstract val interfaceVisibility: Property<TypeVisibility>
+        abstract val implementationVisibility: Property<TypeVisibility>
 
         init {
             binary.convention(project.layout.projectDirectory.file(DEFAULT_MODULE_FILE_PATH))
             codegenConfig.convention(CodegenConfig())
             functions.convention(emptyList())
+            interfaceVisibility.convention(TypeVisibility.PUBLIC)
+            implementationVisibility.convention(TypeVisibility.INTERNAL)
         }
 
         fun function(name: String, configuration: WasmFunctionBuilder.() -> Unit) {
