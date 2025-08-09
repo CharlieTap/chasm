@@ -1,3 +1,7 @@
+import kotlinx.benchmark.gradle.NativeSourceGeneratorTask
+import org.gradle.kotlin.dsl.withType
+import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
+
 plugins {
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.benchmark)
@@ -22,7 +26,6 @@ kotlin {
 
     jvm()
     macosArm64()
-
 
     sourceSets {
         commonMain {
@@ -52,4 +55,8 @@ tasks.register<JavaExec>("coremark") {
     description = "Run the Coremark benchmark"
     classpath = kotlin.jvm().compilations["main"].run { runtimeDependencyFiles + output.allOutputs }
     mainClass.set("io.github.charlietap.chasm.benchmark.coremark.CoremarkBenchmarkKt")
+}
+
+tasks.withType<ConfigurableKtLintTask>().configureEach {
+    dependsOn(tasks.withType<NativeSourceGeneratorTask>())
 }

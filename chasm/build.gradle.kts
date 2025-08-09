@@ -2,6 +2,8 @@
 import io.github.charlietap.sweet.lib.SemanticPhase
 import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
+import org.gradle.kotlin.dsl.withType
+import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
     alias(libs.plugins.conventions.kmp)
@@ -83,9 +85,6 @@ configure<PublishingConventionsExtension> {
     description = "A wasm runtime for Kotlin Multiplatform"
 }
 
-tasks.named {
-    it.contains("lintKotlinCommonTest") ||
-    it.contains("formatKotlinCommonTest")
-}.configureEach {
+tasks.withType<ConfigurableKtLintTask>().configureEach {
     dependsOn(tasks.withType<GenerateTestsTask>())
 }
