@@ -10,7 +10,7 @@ jobs:
   abi:
     uses: ./.github/workflows/task-runner.yml
     with:
-      runner: ubuntu-24.04-arm
+      runner: ubuntu-24.04
       task: checkLegacyAbi
 
   lint:
