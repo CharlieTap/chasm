@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.memory.readNullTerminatedUtf8String
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.getOrNull
 import io.github.charlietap.chasm.embedding.shapes.map
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

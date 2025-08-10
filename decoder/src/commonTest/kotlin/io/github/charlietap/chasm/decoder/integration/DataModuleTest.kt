@@ -8,10 +8,10 @@ import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Memory
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.fixture.config.moduleConfig
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import kotlin.test.Test

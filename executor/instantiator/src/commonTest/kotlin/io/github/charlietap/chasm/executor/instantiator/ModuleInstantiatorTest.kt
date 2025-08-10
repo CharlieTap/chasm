@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
@@ -9,6 +8,7 @@ import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryIni
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.module.elementSegment

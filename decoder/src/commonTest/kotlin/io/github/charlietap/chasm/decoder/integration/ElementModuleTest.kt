@@ -8,9 +8,8 @@ import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.fixture.config.moduleConfig
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.ast.instruction.expression
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.ast.module.functionIndex
@@ -19,6 +18,7 @@ import io.github.charlietap.chasm.fixture.ast.module.table
 import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.ast.module.type
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionCompositeType

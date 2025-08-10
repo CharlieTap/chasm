@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.exports
 import io.github.charlietap.chasm.embedding.fixture.publicExport
 import io.github.charlietap.chasm.embedding.fixture.publicFunction
@@ -15,6 +14,7 @@ import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.shapes.getOrNull
 import io.github.charlietap.chasm.embedding.shapes.map
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.globalAddress

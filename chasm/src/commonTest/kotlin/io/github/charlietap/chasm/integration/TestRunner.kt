@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -12,6 +11,7 @@ import io.github.charlietap.chasm.embedding.shapes.Import
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.validate
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
 fun testRunner(

@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.configuration
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance

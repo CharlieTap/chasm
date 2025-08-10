@@ -5,12 +5,12 @@ import com.goncalossilva.resources.Resource
 import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Version
 import io.github.charlietap.chasm.ast.value.NameValue
-import io.github.charlietap.chasm.fixture.config.moduleConfig
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.ast.module.type
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
+import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionCompositeType

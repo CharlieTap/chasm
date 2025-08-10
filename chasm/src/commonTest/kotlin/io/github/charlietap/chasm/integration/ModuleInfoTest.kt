@@ -1,17 +1,17 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.fixture.config.moduleConfig
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.embedding.shapes.getOrNull
 import io.github.charlietap.chasm.embedding.shapes.map
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.chasm.embedding.exportDefinition
 import io.github.charlietap.chasm.fixture.chasm.embedding.functionNameData
 import io.github.charlietap.chasm.fixture.chasm.embedding.importDefinition
 import io.github.charlietap.chasm.fixture.chasm.embedding.nameData
+import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.fixture.runtime.type.functionExternalType
 import io.github.charlietap.chasm.fixture.runtime.type.globalExternalType
 import io.github.charlietap.chasm.fixture.runtime.type.memoryExternalType

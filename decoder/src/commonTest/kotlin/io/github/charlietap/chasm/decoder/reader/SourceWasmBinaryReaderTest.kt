@@ -2,12 +2,12 @@ package io.github.charlietap.chasm.decoder.reader
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.fake.decoder.FakeByteArraySourceReader
-import io.github.charlietap.chasm.fake.decoder.FakeByteSourceReader
-import io.github.charlietap.chasm.fake.decoder.FakeExhaustedSourceReader
 import io.github.charlietap.chasm.decoder.const.Leb128
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.ioError
+import io.github.charlietap.chasm.fake.decoder.FakeByteArraySourceReader
+import io.github.charlietap.chasm.fake.decoder.FakeByteSourceReader
+import io.github.charlietap.chasm.fake.decoder.FakeExhaustedSourceReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

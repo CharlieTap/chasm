@@ -2,10 +2,10 @@ package io.github.charlietap.chasm.decoder.integration
 
 import com.github.michaelbull.result.Ok
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.fixture.config.moduleConfig
-import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.config.moduleConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
