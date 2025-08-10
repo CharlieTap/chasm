@@ -1,0 +1,7 @@
+public abstract interface class io/github/charlietap/chasm/stream/SourceReader {
+	public abstract fun byte ()B
+	public abstract fun bytes (I)[B
+	public abstract fun exhausted ()Z
+	public abstract fun peek ()Lio/github/charlietap/chasm/stream/SourceReader;
+}
+

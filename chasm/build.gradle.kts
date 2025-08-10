@@ -1,8 +1,8 @@
-
 import io.github.charlietap.sweet.lib.SemanticPhase
 import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
@@ -38,6 +38,11 @@ sweet {
 }
 
 kotlin {
+
+    @OptIn(ExperimentalAbiValidation::class)
+    abiValidation {
+        enabled.set(true)
+    }
 
     sourceSets {
        commonMain {

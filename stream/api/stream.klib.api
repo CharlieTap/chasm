@@ -1,0 +1,14 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:stream>
+abstract interface io.github.charlietap.chasm.stream/SourceReader { // io.github.charlietap.chasm.stream/SourceReader|null[0]
+    abstract fun byte(): kotlin/Byte // io.github.charlietap.chasm.stream/SourceReader.byte|byte(){}[0]
+    abstract fun bytes(kotlin/Int): kotlin/ByteArray // io.github.charlietap.chasm.stream/SourceReader.bytes|bytes(kotlin.Int){}[0]
+    abstract fun exhausted(): kotlin/Boolean // io.github.charlietap.chasm.stream/SourceReader.exhausted|exhausted(){}[0]
+    abstract fun peek(): io.github.charlietap.chasm.stream/SourceReader // io.github.charlietap.chasm.stream/SourceReader.peek|peek(){}[0]
+}

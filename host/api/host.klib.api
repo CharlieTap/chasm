@@ -1,0 +1,14 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:host>
+final class io.github.charlietap.chasm.host/HostFunctionException : kotlin/Exception { // io.github.charlietap.chasm.host/HostFunctionException|null[0]
+    constructor <init>(kotlin/String) // io.github.charlietap.chasm.host/HostFunctionException.<init>|<init>(kotlin.String){}[0]
+
+    final val reason // io.github.charlietap.chasm.host/HostFunctionException.reason|{}reason[0]
+        final fun <get-reason>(): kotlin/String // io.github.charlietap.chasm.host/HostFunctionException.reason.<get-reason>|<get-reason>(){}[0]
+}

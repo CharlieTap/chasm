@@ -1,0 +1,811 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:type-system>
+final enum class io.github.charlietap.chasm.type/InitializationStatus : kotlin/Enum<io.github.charlietap.chasm.type/InitializationStatus> { // io.github.charlietap.chasm.type/InitializationStatus|null[0]
+    enum entry SET // io.github.charlietap.chasm.type/InitializationStatus.SET|null[0]
+    enum entry UNSET // io.github.charlietap.chasm.type/InitializationStatus.UNSET|null[0]
+
+    final val entries // io.github.charlietap.chasm.type/InitializationStatus.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.type/InitializationStatus> // io.github.charlietap.chasm.type/InitializationStatus.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.charlietap.chasm.type/InitializationStatus // io.github.charlietap.chasm.type/InitializationStatus.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.charlietap.chasm.type/InitializationStatus> // io.github.charlietap.chasm.type/InitializationStatus.values|values#static(){}[0]
+}
+
+final enum class io.github.charlietap.chasm.type/Mutability : kotlin/Enum<io.github.charlietap.chasm.type/Mutability> { // io.github.charlietap.chasm.type/Mutability|null[0]
+    enum entry Const // io.github.charlietap.chasm.type/Mutability.Const|null[0]
+    enum entry Var // io.github.charlietap.chasm.type/Mutability.Var|null[0]
+
+    final val entries // io.github.charlietap.chasm.type/Mutability.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.type/Mutability> // io.github.charlietap.chasm.type/Mutability.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.charlietap.chasm.type/Mutability // io.github.charlietap.chasm.type/Mutability.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.charlietap.chasm.type/Mutability> // io.github.charlietap.chasm.type/Mutability.values|values#static(){}[0]
+}
+
+final enum class io.github.charlietap.chasm.type/NumberType : io.github.charlietap.chasm.type/Type, kotlin/Enum<io.github.charlietap.chasm.type/NumberType> { // io.github.charlietap.chasm.type/NumberType|null[0]
+    enum entry F32 // io.github.charlietap.chasm.type/NumberType.F32|null[0]
+    enum entry F64 // io.github.charlietap.chasm.type/NumberType.F64|null[0]
+    enum entry I32 // io.github.charlietap.chasm.type/NumberType.I32|null[0]
+    enum entry I64 // io.github.charlietap.chasm.type/NumberType.I64|null[0]
+
+    final val entries // io.github.charlietap.chasm.type/NumberType.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.type/NumberType> // io.github.charlietap.chasm.type/NumberType.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.charlietap.chasm.type/NumberType // io.github.charlietap.chasm.type/NumberType.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.charlietap.chasm.type/NumberType> // io.github.charlietap.chasm.type/NumberType.values|values#static(){}[0]
+}
+
+final enum class io.github.charlietap.chasm.type/SharedStatus : kotlin/Enum<io.github.charlietap.chasm.type/SharedStatus> { // io.github.charlietap.chasm.type/SharedStatus|null[0]
+    enum entry Shared // io.github.charlietap.chasm.type/SharedStatus.Shared|null[0]
+    enum entry Unshared // io.github.charlietap.chasm.type/SharedStatus.Unshared|null[0]
+
+    final val entries // io.github.charlietap.chasm.type/SharedStatus.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.type/SharedStatus> // io.github.charlietap.chasm.type/SharedStatus.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.charlietap.chasm.type/SharedStatus // io.github.charlietap.chasm.type/SharedStatus.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.charlietap.chasm.type/SharedStatus> // io.github.charlietap.chasm.type/SharedStatus.values|values#static(){}[0]
+}
+
+final enum class io.github.charlietap.chasm.type/VectorType : io.github.charlietap.chasm.type/Type, kotlin/Enum<io.github.charlietap.chasm.type/VectorType> { // io.github.charlietap.chasm.type/VectorType|null[0]
+    enum entry V128 // io.github.charlietap.chasm.type/VectorType.V128|null[0]
+
+    final val entries // io.github.charlietap.chasm.type/VectorType.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.type/VectorType> // io.github.charlietap.chasm.type/VectorType.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.charlietap.chasm.type/VectorType // io.github.charlietap.chasm.type/VectorType.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.charlietap.chasm.type/VectorType> // io.github.charlietap.chasm.type/VectorType.values|values#static(){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.type.matching/TypeMatcherContext { // io.github.charlietap.chasm.type.matching/TypeMatcherContext|null[0]
+    abstract val lookup // io.github.charlietap.chasm.type.matching/TypeMatcherContext.lookup|{}lookup[0]
+        abstract fun <get-lookup>(): kotlin/Function1<kotlin/Int, io.github.charlietap.chasm.type/DefinedType?> // io.github.charlietap.chasm.type.matching/TypeMatcherContext.lookup.<get-lookup>|<get-lookup>(){}[0]
+}
+
+sealed interface io.github.charlietap.chasm.type.rolling.substitution/Substitution { // io.github.charlietap.chasm.type.rolling.substitution/Substitution|null[0]
+    abstract val concreteHeapTypeSubstitutor // io.github.charlietap.chasm.type.rolling.substitution/Substitution.concreteHeapTypeSubstitutor|{}concreteHeapTypeSubstitutor[0]
+        abstract fun <get-concreteHeapTypeSubstitutor>(): kotlin/Function1<io.github.charlietap.chasm.type/ConcreteHeapType, io.github.charlietap.chasm.type/ConcreteHeapType> // io.github.charlietap.chasm.type.rolling.substitution/Substitution.concreteHeapTypeSubstitutor.<get-concreteHeapTypeSubstitutor>|<get-concreteHeapTypeSubstitutor>(){}[0]
+    abstract val outputState // io.github.charlietap.chasm.type.rolling.substitution/Substitution.outputState|{}outputState[0]
+        abstract fun <get-outputState>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type.rolling.substitution/Substitution.outputState.<get-outputState>|<get-outputState>(){}[0]
+
+    final class RecursiveTypeIndexToDefinedType : io.github.charlietap.chasm.type.rolling.substitution/Substitution { // io.github.charlietap.chasm.type.rolling.substitution/Substitution.RecursiveTypeIndexToDefinedType|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/RecursiveType) // io.github.charlietap.chasm.type.rolling.substitution/Substitution.RecursiveTypeIndexToDefinedType.<init>|<init>(io.github.charlietap.chasm.type.RecursiveType){}[0]
+
+        final val concreteHeapTypeSubstitutor // io.github.charlietap.chasm.type.rolling.substitution/Substitution.RecursiveTypeIndexToDefinedType.concreteHeapTypeSubstitutor|{}concreteHeapTypeSubstitutor[0]
+            final fun <get-concreteHeapTypeSubstitutor>(): kotlin/Function1<io.github.charlietap.chasm.type/ConcreteHeapType, io.github.charlietap.chasm.type/ConcreteHeapType> // io.github.charlietap.chasm.type.rolling.substitution/Substitution.RecursiveTypeIndexToDefinedType.concreteHeapTypeSubstitutor.<get-concreteHeapTypeSubstitutor>|<get-concreteHeapTypeSubstitutor>(){}[0]
+        final val outputState // io.github.charlietap.chasm.type.rolling.substitution/Substitution.RecursiveTypeIndexToDefinedType.outputState|{}outputState[0]
+            final fun <get-outputState>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type.rolling.substitution/Substitution.RecursiveTypeIndexToDefinedType.outputState.<get-outputState>|<get-outputState>(){}[0]
+    }
+
+    final class TypeIndexToDefinedType : io.github.charlietap.chasm.type.rolling.substitution/Substitution { // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToDefinedType|null[0]
+        constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>) // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToDefinedType.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>){}[0]
+
+        final val concreteHeapTypeSubstitutor // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToDefinedType.concreteHeapTypeSubstitutor|{}concreteHeapTypeSubstitutor[0]
+            final fun <get-concreteHeapTypeSubstitutor>(): kotlin/Function1<io.github.charlietap.chasm.type/ConcreteHeapType, io.github.charlietap.chasm.type/ConcreteHeapType> // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToDefinedType.concreteHeapTypeSubstitutor.<get-concreteHeapTypeSubstitutor>|<get-concreteHeapTypeSubstitutor>(){}[0]
+        final val outputState // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToDefinedType.outputState|{}outputState[0]
+            final fun <get-outputState>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToDefinedType.outputState.<get-outputState>|<get-outputState>(){}[0]
+        final val types // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToDefinedType.types|{}types[0]
+            final fun <get-types>(): kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType> // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToDefinedType.types.<get-types>|<get-types>(){}[0]
+    }
+
+    final class TypeIndexToRecursiveTypeIndex : io.github.charlietap.chasm.type.rolling.substitution/Substitution { // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToRecursiveTypeIndex|null[0]
+        constructor <init>(kotlin/Int, kotlin/Int) // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToRecursiveTypeIndex.<init>|<init>(kotlin.Int;kotlin.Int){}[0]
+
+        final val concreteHeapTypeSubstitutor // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToRecursiveTypeIndex.concreteHeapTypeSubstitutor|{}concreteHeapTypeSubstitutor[0]
+            final fun <get-concreteHeapTypeSubstitutor>(): kotlin/Function1<io.github.charlietap.chasm.type/ConcreteHeapType, io.github.charlietap.chasm.type/ConcreteHeapType> // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToRecursiveTypeIndex.concreteHeapTypeSubstitutor.<get-concreteHeapTypeSubstitutor>|<get-concreteHeapTypeSubstitutor>(){}[0]
+        final val outputState // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToRecursiveTypeIndex.outputState|{}outputState[0]
+            final fun <get-outputState>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type.rolling.substitution/Substitution.TypeIndexToRecursiveTypeIndex.outputState.<get-outputState>|<get-outputState>(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/AbstractHeapType : io.github.charlietap.chasm.type/HeapType { // io.github.charlietap.chasm.type/AbstractHeapType|null[0]
+    final value class Bottom : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.Bottom|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/BottomType) // io.github.charlietap.chasm.type/AbstractHeapType.Bottom.<init>|<init>(io.github.charlietap.chasm.type.BottomType){}[0]
+
+        final val bottomType // io.github.charlietap.chasm.type/AbstractHeapType.Bottom.bottomType|{}bottomType[0]
+            final fun <get-bottomType>(): io.github.charlietap.chasm.type/BottomType // io.github.charlietap.chasm.type/AbstractHeapType.Bottom.bottomType.<get-bottomType>|<get-bottomType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.Bottom.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.Bottom.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.Bottom.toString|toString(){}[0]
+    }
+
+    final object Any : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.Any|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.Any.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.Any.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.Any.toString|toString(){}[0]
+    }
+
+    final object Array : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.Array|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.Array.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.Array.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.Array.toString|toString(){}[0]
+    }
+
+    final object Eq : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.Eq|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.Eq.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.Eq.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.Eq.toString|toString(){}[0]
+    }
+
+    final object Exception : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.Exception|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.Exception.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.Exception.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.Exception.toString|toString(){}[0]
+    }
+
+    final object Extern : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.Extern|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.Extern.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.Extern.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.Extern.toString|toString(){}[0]
+    }
+
+    final object Func : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.Func|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.Func.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.Func.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.Func.toString|toString(){}[0]
+    }
+
+    final object I31 : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.I31|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.I31.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.I31.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.I31.toString|toString(){}[0]
+    }
+
+    final object NoException : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.NoException|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.NoException.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.NoException.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.NoException.toString|toString(){}[0]
+    }
+
+    final object NoExtern : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.NoExtern|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.NoExtern.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.NoExtern.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.NoExtern.toString|toString(){}[0]
+    }
+
+    final object NoFunc : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.NoFunc|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.NoFunc.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.NoFunc.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.NoFunc.toString|toString(){}[0]
+    }
+
+    final object None : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.None|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.None.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.None.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.None.toString|toString(){}[0]
+    }
+
+    final object Struct : io.github.charlietap.chasm.type/AbstractHeapType { // io.github.charlietap.chasm.type/AbstractHeapType.Struct|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AbstractHeapType.Struct.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AbstractHeapType.Struct.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AbstractHeapType.Struct.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/AddressType { // io.github.charlietap.chasm.type/AddressType|null[0]
+    final object I32 : io.github.charlietap.chasm.type/AddressType { // io.github.charlietap.chasm.type/AddressType.I32|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AddressType.I32.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AddressType.I32.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AddressType.I32.toString|toString(){}[0]
+    }
+
+    final object I64 : io.github.charlietap.chasm.type/AddressType { // io.github.charlietap.chasm.type/AddressType.I64|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/AddressType.I64.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/AddressType.I64.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/AddressType.I64.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/BlockType { // io.github.charlietap.chasm.type/BlockType|null[0]
+    final value class SignedTypeIndex : io.github.charlietap.chasm.type/BlockType { // io.github.charlietap.chasm.type/BlockType.SignedTypeIndex|null[0]
+        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.type/BlockType.SignedTypeIndex.<init>|<init>(kotlin.Int){}[0]
+
+        final val typeIndex // io.github.charlietap.chasm.type/BlockType.SignedTypeIndex.typeIndex|{}typeIndex[0]
+            final fun <get-typeIndex>(): kotlin/Int // io.github.charlietap.chasm.type/BlockType.SignedTypeIndex.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/BlockType.SignedTypeIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/BlockType.SignedTypeIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/BlockType.SignedTypeIndex.toString|toString(){}[0]
+    }
+
+    final value class ValType : io.github.charlietap.chasm.type/BlockType { // io.github.charlietap.chasm.type/BlockType.ValType|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/ValueType) // io.github.charlietap.chasm.type/BlockType.ValType.<init>|<init>(io.github.charlietap.chasm.type.ValueType){}[0]
+
+        final val valueType // io.github.charlietap.chasm.type/BlockType.ValType.valueType|{}valueType[0]
+            final fun <get-valueType>(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type/BlockType.ValType.valueType.<get-valueType>|<get-valueType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/BlockType.ValType.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/BlockType.ValType.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/BlockType.ValType.toString|toString(){}[0]
+    }
+
+    final object Empty : io.github.charlietap.chasm.type/BlockType { // io.github.charlietap.chasm.type/BlockType.Empty|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/BlockType.Empty.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/BlockType.Empty.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/BlockType.Empty.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/CompositeType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/CompositeType|null[0]
+    final value class Array : io.github.charlietap.chasm.type/CompositeType { // io.github.charlietap.chasm.type/CompositeType.Array|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/ArrayType) // io.github.charlietap.chasm.type/CompositeType.Array.<init>|<init>(io.github.charlietap.chasm.type.ArrayType){}[0]
+
+        final val arrayType // io.github.charlietap.chasm.type/CompositeType.Array.arrayType|{}arrayType[0]
+            final fun <get-arrayType>(): io.github.charlietap.chasm.type/ArrayType // io.github.charlietap.chasm.type/CompositeType.Array.arrayType.<get-arrayType>|<get-arrayType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/CompositeType.Array.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/CompositeType.Array.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/CompositeType.Array.toString|toString(){}[0]
+    }
+
+    final value class Function : io.github.charlietap.chasm.type/CompositeType { // io.github.charlietap.chasm.type/CompositeType.Function|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/FunctionType) // io.github.charlietap.chasm.type/CompositeType.Function.<init>|<init>(io.github.charlietap.chasm.type.FunctionType){}[0]
+
+        final val functionType // io.github.charlietap.chasm.type/CompositeType.Function.functionType|{}functionType[0]
+            final fun <get-functionType>(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type/CompositeType.Function.functionType.<get-functionType>|<get-functionType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/CompositeType.Function.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/CompositeType.Function.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/CompositeType.Function.toString|toString(){}[0]
+    }
+
+    final value class Struct : io.github.charlietap.chasm.type/CompositeType { // io.github.charlietap.chasm.type/CompositeType.Struct|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/StructType) // io.github.charlietap.chasm.type/CompositeType.Struct.<init>|<init>(io.github.charlietap.chasm.type.StructType){}[0]
+
+        final val structType // io.github.charlietap.chasm.type/CompositeType.Struct.structType|{}structType[0]
+            final fun <get-structType>(): io.github.charlietap.chasm.type/StructType // io.github.charlietap.chasm.type/CompositeType.Struct.structType.<get-structType>|<get-structType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/CompositeType.Struct.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/CompositeType.Struct.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/CompositeType.Struct.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/ConcreteHeapType : io.github.charlietap.chasm.type/HeapType { // io.github.charlietap.chasm.type/ConcreteHeapType|null[0]
+    final value class Defined : io.github.charlietap.chasm.type/ConcreteHeapType { // io.github.charlietap.chasm.type/ConcreteHeapType.Defined|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/DefinedType) // io.github.charlietap.chasm.type/ConcreteHeapType.Defined.<init>|<init>(io.github.charlietap.chasm.type.DefinedType){}[0]
+
+        final val definedType // io.github.charlietap.chasm.type/ConcreteHeapType.Defined.definedType|{}definedType[0]
+            final fun <get-definedType>(): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.type/ConcreteHeapType.Defined.definedType.<get-definedType>|<get-definedType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ConcreteHeapType.Defined.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ConcreteHeapType.Defined.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ConcreteHeapType.Defined.toString|toString(){}[0]
+    }
+
+    final value class RecursiveTypeIndex : io.github.charlietap.chasm.type/ConcreteHeapType { // io.github.charlietap.chasm.type/ConcreteHeapType.RecursiveTypeIndex|null[0]
+        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.type/ConcreteHeapType.RecursiveTypeIndex.<init>|<init>(kotlin.Int){}[0]
+
+        final val index // io.github.charlietap.chasm.type/ConcreteHeapType.RecursiveTypeIndex.index|{}index[0]
+            final fun <get-index>(): kotlin/Int // io.github.charlietap.chasm.type/ConcreteHeapType.RecursiveTypeIndex.index.<get-index>|<get-index>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ConcreteHeapType.RecursiveTypeIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ConcreteHeapType.RecursiveTypeIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ConcreteHeapType.RecursiveTypeIndex.toString|toString(){}[0]
+    }
+
+    final value class TypeIndex : io.github.charlietap.chasm.type/ConcreteHeapType { // io.github.charlietap.chasm.type/ConcreteHeapType.TypeIndex|null[0]
+        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.type/ConcreteHeapType.TypeIndex.<init>|<init>(kotlin.Int){}[0]
+
+        final val index // io.github.charlietap.chasm.type/ConcreteHeapType.TypeIndex.index|{}index[0]
+            final fun <get-index>(): kotlin/Int // io.github.charlietap.chasm.type/ConcreteHeapType.TypeIndex.index.<get-index>|<get-index>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ConcreteHeapType.TypeIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ConcreteHeapType.TypeIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ConcreteHeapType.TypeIndex.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/HeapType : io.github.charlietap.chasm.type/Type // io.github.charlietap.chasm.type/HeapType|null[0]
+
+sealed interface io.github.charlietap.chasm.type/PackedType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/PackedType|null[0]
+    final object I16 : io.github.charlietap.chasm.type/PackedType { // io.github.charlietap.chasm.type/PackedType.I16|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/PackedType.I16.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/PackedType.I16.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/PackedType.I16.toString|toString(){}[0]
+    }
+
+    final object I8 : io.github.charlietap.chasm.type/PackedType { // io.github.charlietap.chasm.type/PackedType.I8|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/PackedType.I8.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/PackedType.I8.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/PackedType.I8.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/ReferenceType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/ReferenceType|null[0]
+    abstract val heapType // io.github.charlietap.chasm.type/ReferenceType.heapType|{}heapType[0]
+        abstract fun <get-heapType>(): io.github.charlietap.chasm.type/HeapType // io.github.charlietap.chasm.type/ReferenceType.heapType.<get-heapType>|<get-heapType>(){}[0]
+
+    final value class Ref : io.github.charlietap.chasm.type/ReferenceType { // io.github.charlietap.chasm.type/ReferenceType.Ref|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/HeapType) // io.github.charlietap.chasm.type/ReferenceType.Ref.<init>|<init>(io.github.charlietap.chasm.type.HeapType){}[0]
+
+        final val heapType // io.github.charlietap.chasm.type/ReferenceType.Ref.heapType|{}heapType[0]
+            final fun <get-heapType>(): io.github.charlietap.chasm.type/HeapType // io.github.charlietap.chasm.type/ReferenceType.Ref.heapType.<get-heapType>|<get-heapType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ReferenceType.Ref.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ReferenceType.Ref.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ReferenceType.Ref.toString|toString(){}[0]
+    }
+
+    final value class RefNull : io.github.charlietap.chasm.type/ReferenceType { // io.github.charlietap.chasm.type/ReferenceType.RefNull|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/HeapType) // io.github.charlietap.chasm.type/ReferenceType.RefNull.<init>|<init>(io.github.charlietap.chasm.type.HeapType){}[0]
+
+        final val heapType // io.github.charlietap.chasm.type/ReferenceType.RefNull.heapType|{}heapType[0]
+            final fun <get-heapType>(): io.github.charlietap.chasm.type/HeapType // io.github.charlietap.chasm.type/ReferenceType.RefNull.heapType.<get-heapType>|<get-heapType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ReferenceType.RefNull.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ReferenceType.RefNull.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ReferenceType.RefNull.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/StorageType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/StorageType|null[0]
+    final value class Packed : io.github.charlietap.chasm.type/StorageType { // io.github.charlietap.chasm.type/StorageType.Packed|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/PackedType) // io.github.charlietap.chasm.type/StorageType.Packed.<init>|<init>(io.github.charlietap.chasm.type.PackedType){}[0]
+
+        final val type // io.github.charlietap.chasm.type/StorageType.Packed.type|{}type[0]
+            final fun <get-type>(): io.github.charlietap.chasm.type/PackedType // io.github.charlietap.chasm.type/StorageType.Packed.type.<get-type>|<get-type>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/StorageType.Packed.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/StorageType.Packed.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/StorageType.Packed.toString|toString(){}[0]
+    }
+
+    final value class Value : io.github.charlietap.chasm.type/StorageType { // io.github.charlietap.chasm.type/StorageType.Value|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/ValueType) // io.github.charlietap.chasm.type/StorageType.Value.<init>|<init>(io.github.charlietap.chasm.type.ValueType){}[0]
+
+        final val type // io.github.charlietap.chasm.type/StorageType.Value.type|{}type[0]
+            final fun <get-type>(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type/StorageType.Value.type.<get-type>|<get-type>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/StorageType.Value.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/StorageType.Value.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/StorageType.Value.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/SubType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/SubType|null[0]
+    abstract var compositeType // io.github.charlietap.chasm.type/SubType.compositeType|{}compositeType[0]
+        abstract fun <get-compositeType>(): io.github.charlietap.chasm.type/CompositeType // io.github.charlietap.chasm.type/SubType.compositeType.<get-compositeType>|<get-compositeType>(){}[0]
+        abstract fun <set-compositeType>(io.github.charlietap.chasm.type/CompositeType) // io.github.charlietap.chasm.type/SubType.compositeType.<set-compositeType>|<set-compositeType>(io.github.charlietap.chasm.type.CompositeType){}[0]
+    abstract var superTypes // io.github.charlietap.chasm.type/SubType.superTypes|{}superTypes[0]
+        abstract fun <get-superTypes>(): kotlin.collections/List<io.github.charlietap.chasm.type/HeapType> // io.github.charlietap.chasm.type/SubType.superTypes.<get-superTypes>|<get-superTypes>(){}[0]
+        abstract fun <set-superTypes>(kotlin.collections/List<io.github.charlietap.chasm.type/HeapType>) // io.github.charlietap.chasm.type/SubType.superTypes.<set-superTypes>|<set-superTypes>(kotlin.collections.List<io.github.charlietap.chasm.type.HeapType>){}[0]
+
+    final class Final : io.github.charlietap.chasm.type/SubType { // io.github.charlietap.chasm.type/SubType.Final|null[0]
+        constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/HeapType>, io.github.charlietap.chasm.type/CompositeType) // io.github.charlietap.chasm.type/SubType.Final.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.HeapType>;io.github.charlietap.chasm.type.CompositeType){}[0]
+
+        final var compositeType // io.github.charlietap.chasm.type/SubType.Final.compositeType|{}compositeType[0]
+            final fun <get-compositeType>(): io.github.charlietap.chasm.type/CompositeType // io.github.charlietap.chasm.type/SubType.Final.compositeType.<get-compositeType>|<get-compositeType>(){}[0]
+            final fun <set-compositeType>(io.github.charlietap.chasm.type/CompositeType) // io.github.charlietap.chasm.type/SubType.Final.compositeType.<set-compositeType>|<set-compositeType>(io.github.charlietap.chasm.type.CompositeType){}[0]
+        final var superTypes // io.github.charlietap.chasm.type/SubType.Final.superTypes|{}superTypes[0]
+            final fun <get-superTypes>(): kotlin.collections/List<io.github.charlietap.chasm.type/HeapType> // io.github.charlietap.chasm.type/SubType.Final.superTypes.<get-superTypes>|<get-superTypes>(){}[0]
+            final fun <set-superTypes>(kotlin.collections/List<io.github.charlietap.chasm.type/HeapType>) // io.github.charlietap.chasm.type/SubType.Final.superTypes.<set-superTypes>|<set-superTypes>(kotlin.collections.List<io.github.charlietap.chasm.type.HeapType>){}[0]
+
+        final fun component1(): kotlin.collections/List<io.github.charlietap.chasm.type/HeapType> // io.github.charlietap.chasm.type/SubType.Final.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.type/CompositeType // io.github.charlietap.chasm.type/SubType.Final.component2|component2(){}[0]
+        final fun copy(kotlin.collections/List<io.github.charlietap.chasm.type/HeapType> = ..., io.github.charlietap.chasm.type/CompositeType = ...): io.github.charlietap.chasm.type/SubType.Final // io.github.charlietap.chasm.type/SubType.Final.copy|copy(kotlin.collections.List<io.github.charlietap.chasm.type.HeapType>;io.github.charlietap.chasm.type.CompositeType){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/SubType.Final.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/SubType.Final.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/SubType.Final.toString|toString(){}[0]
+    }
+
+    final class Open : io.github.charlietap.chasm.type/SubType { // io.github.charlietap.chasm.type/SubType.Open|null[0]
+        constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/HeapType>, io.github.charlietap.chasm.type/CompositeType) // io.github.charlietap.chasm.type/SubType.Open.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.HeapType>;io.github.charlietap.chasm.type.CompositeType){}[0]
+
+        final var compositeType // io.github.charlietap.chasm.type/SubType.Open.compositeType|{}compositeType[0]
+            final fun <get-compositeType>(): io.github.charlietap.chasm.type/CompositeType // io.github.charlietap.chasm.type/SubType.Open.compositeType.<get-compositeType>|<get-compositeType>(){}[0]
+            final fun <set-compositeType>(io.github.charlietap.chasm.type/CompositeType) // io.github.charlietap.chasm.type/SubType.Open.compositeType.<set-compositeType>|<set-compositeType>(io.github.charlietap.chasm.type.CompositeType){}[0]
+        final var superTypes // io.github.charlietap.chasm.type/SubType.Open.superTypes|{}superTypes[0]
+            final fun <get-superTypes>(): kotlin.collections/List<io.github.charlietap.chasm.type/HeapType> // io.github.charlietap.chasm.type/SubType.Open.superTypes.<get-superTypes>|<get-superTypes>(){}[0]
+            final fun <set-superTypes>(kotlin.collections/List<io.github.charlietap.chasm.type/HeapType>) // io.github.charlietap.chasm.type/SubType.Open.superTypes.<set-superTypes>|<set-superTypes>(kotlin.collections.List<io.github.charlietap.chasm.type.HeapType>){}[0]
+
+        final fun component1(): kotlin.collections/List<io.github.charlietap.chasm.type/HeapType> // io.github.charlietap.chasm.type/SubType.Open.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.type/CompositeType // io.github.charlietap.chasm.type/SubType.Open.component2|component2(){}[0]
+        final fun copy(kotlin.collections/List<io.github.charlietap.chasm.type/HeapType> = ..., io.github.charlietap.chasm.type/CompositeType = ...): io.github.charlietap.chasm.type/SubType.Open // io.github.charlietap.chasm.type/SubType.Open.copy|copy(kotlin.collections.List<io.github.charlietap.chasm.type.HeapType>;io.github.charlietap.chasm.type.CompositeType){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/SubType.Open.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/SubType.Open.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/SubType.Open.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.type/Type // io.github.charlietap.chasm.type/Type|null[0]
+
+sealed interface io.github.charlietap.chasm.type/ValueType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/ValueType|null[0]
+    final value class Bottom : io.github.charlietap.chasm.type/ValueType { // io.github.charlietap.chasm.type/ValueType.Bottom|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/BottomType) // io.github.charlietap.chasm.type/ValueType.Bottom.<init>|<init>(io.github.charlietap.chasm.type.BottomType){}[0]
+
+        final val bottomType // io.github.charlietap.chasm.type/ValueType.Bottom.bottomType|{}bottomType[0]
+            final fun <get-bottomType>(): io.github.charlietap.chasm.type/BottomType // io.github.charlietap.chasm.type/ValueType.Bottom.bottomType.<get-bottomType>|<get-bottomType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ValueType.Bottom.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ValueType.Bottom.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ValueType.Bottom.toString|toString(){}[0]
+    }
+
+    final value class Number : io.github.charlietap.chasm.type/ValueType { // io.github.charlietap.chasm.type/ValueType.Number|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/NumberType) // io.github.charlietap.chasm.type/ValueType.Number.<init>|<init>(io.github.charlietap.chasm.type.NumberType){}[0]
+
+        final val numberType // io.github.charlietap.chasm.type/ValueType.Number.numberType|{}numberType[0]
+            final fun <get-numberType>(): io.github.charlietap.chasm.type/NumberType // io.github.charlietap.chasm.type/ValueType.Number.numberType.<get-numberType>|<get-numberType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ValueType.Number.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ValueType.Number.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ValueType.Number.toString|toString(){}[0]
+    }
+
+    final value class Reference : io.github.charlietap.chasm.type/ValueType { // io.github.charlietap.chasm.type/ValueType.Reference|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/ReferenceType) // io.github.charlietap.chasm.type/ValueType.Reference.<init>|<init>(io.github.charlietap.chasm.type.ReferenceType){}[0]
+
+        final val referenceType // io.github.charlietap.chasm.type/ValueType.Reference.referenceType|{}referenceType[0]
+            final fun <get-referenceType>(): io.github.charlietap.chasm.type/ReferenceType // io.github.charlietap.chasm.type/ValueType.Reference.referenceType.<get-referenceType>|<get-referenceType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ValueType.Reference.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ValueType.Reference.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ValueType.Reference.toString|toString(){}[0]
+    }
+
+    final value class Vector : io.github.charlietap.chasm.type/ValueType { // io.github.charlietap.chasm.type/ValueType.Vector|null[0]
+        constructor <init>(io.github.charlietap.chasm.type/VectorType) // io.github.charlietap.chasm.type/ValueType.Vector.<init>|<init>(io.github.charlietap.chasm.type.VectorType){}[0]
+
+        final val vectorType // io.github.charlietap.chasm.type/ValueType.Vector.vectorType|{}vectorType[0]
+            final fun <get-vectorType>(): io.github.charlietap.chasm.type/VectorType // io.github.charlietap.chasm.type/ValueType.Vector.vectorType.<get-vectorType>|<get-vectorType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ValueType.Vector.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ValueType.Vector.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ValueType.Vector.toString|toString(){}[0]
+    }
+}
+
+final class io.github.charlietap.chasm.type/DefinedType { // io.github.charlietap.chasm.type/DefinedType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/RecursiveType, kotlin/Int, kotlin/Int = ...) // io.github.charlietap.chasm.type/DefinedType.<init>|<init>(io.github.charlietap.chasm.type.RecursiveType;kotlin.Int;kotlin.Int){}[0]
+
+    final val asSubType // io.github.charlietap.chasm.type/DefinedType.asSubType|{}asSubType[0]
+        final fun <get-asSubType>(): io.github.charlietap.chasm.type/SubType // io.github.charlietap.chasm.type/DefinedType.asSubType.<get-asSubType>|<get-asSubType>(){}[0]
+    final val parent // io.github.charlietap.chasm.type/DefinedType.parent|{}parent[0]
+        final fun <get-parent>(): io.github.charlietap.chasm.type/DefinedType? // io.github.charlietap.chasm.type/DefinedType.parent.<get-parent>|<get-parent>(){}[0]
+    final val recursiveType // io.github.charlietap.chasm.type/DefinedType.recursiveType|{}recursiveType[0]
+        final fun <get-recursiveType>(): io.github.charlietap.chasm.type/RecursiveType // io.github.charlietap.chasm.type/DefinedType.recursiveType.<get-recursiveType>|<get-recursiveType>(){}[0]
+    final val recursiveTypeIndex // io.github.charlietap.chasm.type/DefinedType.recursiveTypeIndex|{}recursiveTypeIndex[0]
+        final fun <get-recursiveTypeIndex>(): kotlin/Int // io.github.charlietap.chasm.type/DefinedType.recursiveTypeIndex.<get-recursiveTypeIndex>|<get-recursiveTypeIndex>(){}[0]
+    final val typeIndex // io.github.charlietap.chasm.type/DefinedType.typeIndex|{}typeIndex[0]
+        final fun <get-typeIndex>(): kotlin/Int // io.github.charlietap.chasm.type/DefinedType.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/RecursiveType // io.github.charlietap.chasm.type/DefinedType.component1|component1(){}[0]
+    final fun component2(): kotlin/Int // io.github.charlietap.chasm.type/DefinedType.component2|component2(){}[0]
+    final fun component3(): kotlin/Int // io.github.charlietap.chasm.type/DefinedType.component3|component3(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/RecursiveType = ..., kotlin/Int = ..., kotlin/Int = ...): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.type/DefinedType.copy|copy(io.github.charlietap.chasm.type.RecursiveType;kotlin.Int;kotlin.Int){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/DefinedType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/DefinedType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/DefinedType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/FieldType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/FieldType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/StorageType, io.github.charlietap.chasm.type/Mutability) // io.github.charlietap.chasm.type/FieldType.<init>|<init>(io.github.charlietap.chasm.type.StorageType;io.github.charlietap.chasm.type.Mutability){}[0]
+
+    final var mutability // io.github.charlietap.chasm.type/FieldType.mutability|{}mutability[0]
+        final fun <get-mutability>(): io.github.charlietap.chasm.type/Mutability // io.github.charlietap.chasm.type/FieldType.mutability.<get-mutability>|<get-mutability>(){}[0]
+        final fun <set-mutability>(io.github.charlietap.chasm.type/Mutability) // io.github.charlietap.chasm.type/FieldType.mutability.<set-mutability>|<set-mutability>(io.github.charlietap.chasm.type.Mutability){}[0]
+    final var storageType // io.github.charlietap.chasm.type/FieldType.storageType|{}storageType[0]
+        final fun <get-storageType>(): io.github.charlietap.chasm.type/StorageType // io.github.charlietap.chasm.type/FieldType.storageType.<get-storageType>|<get-storageType>(){}[0]
+        final fun <set-storageType>(io.github.charlietap.chasm.type/StorageType) // io.github.charlietap.chasm.type/FieldType.storageType.<set-storageType>|<set-storageType>(io.github.charlietap.chasm.type.StorageType){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/StorageType // io.github.charlietap.chasm.type/FieldType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/Mutability // io.github.charlietap.chasm.type/FieldType.component2|component2(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/StorageType = ..., io.github.charlietap.chasm.type/Mutability = ...): io.github.charlietap.chasm.type/FieldType // io.github.charlietap.chasm.type/FieldType.copy|copy(io.github.charlietap.chasm.type.StorageType;io.github.charlietap.chasm.type.Mutability){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/FieldType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/FieldType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/FieldType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/FunctionType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/FunctionType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/ResultType, io.github.charlietap.chasm.type/ResultType) // io.github.charlietap.chasm.type/FunctionType.<init>|<init>(io.github.charlietap.chasm.type.ResultType;io.github.charlietap.chasm.type.ResultType){}[0]
+
+    final var params // io.github.charlietap.chasm.type/FunctionType.params|{}params[0]
+        final fun <get-params>(): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type/FunctionType.params.<get-params>|<get-params>(){}[0]
+        final fun <set-params>(io.github.charlietap.chasm.type/ResultType) // io.github.charlietap.chasm.type/FunctionType.params.<set-params>|<set-params>(io.github.charlietap.chasm.type.ResultType){}[0]
+    final var results // io.github.charlietap.chasm.type/FunctionType.results|{}results[0]
+        final fun <get-results>(): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type/FunctionType.results.<get-results>|<get-results>(){}[0]
+        final fun <set-results>(io.github.charlietap.chasm.type/ResultType) // io.github.charlietap.chasm.type/FunctionType.results.<set-results>|<set-results>(io.github.charlietap.chasm.type.ResultType){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type/FunctionType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type/FunctionType.component2|component2(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/ResultType = ..., io.github.charlietap.chasm.type/ResultType = ...): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type/FunctionType.copy|copy(io.github.charlietap.chasm.type.ResultType;io.github.charlietap.chasm.type.ResultType){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/FunctionType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/FunctionType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/FunctionType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/GlobalType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/GlobalType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/ValueType, io.github.charlietap.chasm.type/Mutability) // io.github.charlietap.chasm.type/GlobalType.<init>|<init>(io.github.charlietap.chasm.type.ValueType;io.github.charlietap.chasm.type.Mutability){}[0]
+
+    final val mutability // io.github.charlietap.chasm.type/GlobalType.mutability|{}mutability[0]
+        final fun <get-mutability>(): io.github.charlietap.chasm.type/Mutability // io.github.charlietap.chasm.type/GlobalType.mutability.<get-mutability>|<get-mutability>(){}[0]
+    final val valueType // io.github.charlietap.chasm.type/GlobalType.valueType|{}valueType[0]
+        final fun <get-valueType>(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type/GlobalType.valueType.<get-valueType>|<get-valueType>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type/GlobalType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/Mutability // io.github.charlietap.chasm.type/GlobalType.component2|component2(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/ValueType = ..., io.github.charlietap.chasm.type/Mutability = ...): io.github.charlietap.chasm.type/GlobalType // io.github.charlietap.chasm.type/GlobalType.copy|copy(io.github.charlietap.chasm.type.ValueType;io.github.charlietap.chasm.type.Mutability){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/GlobalType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/GlobalType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/GlobalType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/InstructionType { // io.github.charlietap.chasm.type/InstructionType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/ResultType, io.github.charlietap.chasm.type/ResultType) // io.github.charlietap.chasm.type/InstructionType.<init>|<init>(io.github.charlietap.chasm.type.ResultType;io.github.charlietap.chasm.type.ResultType){}[0]
+
+    final val inputs // io.github.charlietap.chasm.type/InstructionType.inputs|{}inputs[0]
+        final fun <get-inputs>(): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type/InstructionType.inputs.<get-inputs>|<get-inputs>(){}[0]
+    final val outputs // io.github.charlietap.chasm.type/InstructionType.outputs|{}outputs[0]
+        final fun <get-outputs>(): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type/InstructionType.outputs.<get-outputs>|<get-outputs>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type/InstructionType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type/InstructionType.component2|component2(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/ResultType = ..., io.github.charlietap.chasm.type/ResultType = ...): io.github.charlietap.chasm.type/InstructionType // io.github.charlietap.chasm.type/InstructionType.copy|copy(io.github.charlietap.chasm.type.ResultType;io.github.charlietap.chasm.type.ResultType){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/InstructionType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/InstructionType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/InstructionType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/Limits : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/Limits|null[0]
+    constructor <init>(kotlin/ULong, kotlin/ULong? = ...) // io.github.charlietap.chasm.type/Limits.<init>|<init>(kotlin.ULong;kotlin.ULong?){}[0]
+
+    final val max // io.github.charlietap.chasm.type/Limits.max|{}max[0]
+        final fun <get-max>(): kotlin/ULong? // io.github.charlietap.chasm.type/Limits.max.<get-max>|<get-max>(){}[0]
+
+    final var min // io.github.charlietap.chasm.type/Limits.min|{}min[0]
+        final fun <get-min>(): kotlin/ULong // io.github.charlietap.chasm.type/Limits.min.<get-min>|<get-min>(){}[0]
+        final fun <set-min>(kotlin/ULong) // io.github.charlietap.chasm.type/Limits.min.<set-min>|<set-min>(kotlin.ULong){}[0]
+
+    final fun component1(): kotlin/ULong // io.github.charlietap.chasm.type/Limits.component1|component1(){}[0]
+    final fun component2(): kotlin/ULong? // io.github.charlietap.chasm.type/Limits.component2|component2(){}[0]
+    final fun copy(kotlin/ULong = ..., kotlin/ULong? = ...): io.github.charlietap.chasm.type/Limits // io.github.charlietap.chasm.type/Limits.copy|copy(kotlin.ULong;kotlin.ULong?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/Limits.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/Limits.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/Limits.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/LocalType { // io.github.charlietap.chasm.type/LocalType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/InitializationStatus, io.github.charlietap.chasm.type/ValueType) // io.github.charlietap.chasm.type/LocalType.<init>|<init>(io.github.charlietap.chasm.type.InitializationStatus;io.github.charlietap.chasm.type.ValueType){}[0]
+
+    final val status // io.github.charlietap.chasm.type/LocalType.status|{}status[0]
+        final fun <get-status>(): io.github.charlietap.chasm.type/InitializationStatus // io.github.charlietap.chasm.type/LocalType.status.<get-status>|<get-status>(){}[0]
+    final val type // io.github.charlietap.chasm.type/LocalType.type|{}type[0]
+        final fun <get-type>(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type/LocalType.type.<get-type>|<get-type>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/InitializationStatus // io.github.charlietap.chasm.type/LocalType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type/LocalType.component2|component2(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/InitializationStatus = ..., io.github.charlietap.chasm.type/ValueType = ...): io.github.charlietap.chasm.type/LocalType // io.github.charlietap.chasm.type/LocalType.copy|copy(io.github.charlietap.chasm.type.InitializationStatus;io.github.charlietap.chasm.type.ValueType){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/LocalType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/LocalType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/LocalType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/MemoryType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/MemoryType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/AddressType, io.github.charlietap.chasm.type/Limits, io.github.charlietap.chasm.type/SharedStatus) // io.github.charlietap.chasm.type/MemoryType.<init>|<init>(io.github.charlietap.chasm.type.AddressType;io.github.charlietap.chasm.type.Limits;io.github.charlietap.chasm.type.SharedStatus){}[0]
+
+    final val addressType // io.github.charlietap.chasm.type/MemoryType.addressType|{}addressType[0]
+        final fun <get-addressType>(): io.github.charlietap.chasm.type/AddressType // io.github.charlietap.chasm.type/MemoryType.addressType.<get-addressType>|<get-addressType>(){}[0]
+    final val limits // io.github.charlietap.chasm.type/MemoryType.limits|{}limits[0]
+        final fun <get-limits>(): io.github.charlietap.chasm.type/Limits // io.github.charlietap.chasm.type/MemoryType.limits.<get-limits>|<get-limits>(){}[0]
+    final val shared // io.github.charlietap.chasm.type/MemoryType.shared|{}shared[0]
+        final fun <get-shared>(): io.github.charlietap.chasm.type/SharedStatus // io.github.charlietap.chasm.type/MemoryType.shared.<get-shared>|<get-shared>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/AddressType // io.github.charlietap.chasm.type/MemoryType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/Limits // io.github.charlietap.chasm.type/MemoryType.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.type/SharedStatus // io.github.charlietap.chasm.type/MemoryType.component3|component3(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/AddressType = ..., io.github.charlietap.chasm.type/Limits = ..., io.github.charlietap.chasm.type/SharedStatus = ...): io.github.charlietap.chasm.type/MemoryType // io.github.charlietap.chasm.type/MemoryType.copy|copy(io.github.charlietap.chasm.type.AddressType;io.github.charlietap.chasm.type.Limits;io.github.charlietap.chasm.type.SharedStatus){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/MemoryType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/MemoryType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/MemoryType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/RTT { // io.github.charlietap.chasm.type/RTT|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/DefinedType, kotlin.collections/Map<io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type/RTT>) // io.github.charlietap.chasm.type/RTT.<init>|<init>(io.github.charlietap.chasm.type.DefinedType;kotlin.collections.Map<io.github.charlietap.chasm.type.DefinedType,io.github.charlietap.chasm.type.RTT>){}[0]
+
+    final val cache // io.github.charlietap.chasm.type/RTT.cache|{}cache[0]
+        final fun <get-cache>(): kotlin.collections/Map<io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type/RTT> // io.github.charlietap.chasm.type/RTT.cache.<get-cache>|<get-cache>(){}[0]
+    final val superTypes // io.github.charlietap.chasm.type/RTT.superTypes|{}superTypes[0]
+        final fun <get-superTypes>(): kotlin.collections/List<io.github.charlietap.chasm.type/RTT> // io.github.charlietap.chasm.type/RTT.superTypes.<get-superTypes>|<get-superTypes>(){}[0]
+    final val type // io.github.charlietap.chasm.type/RTT.type|{}type[0]
+        final fun <get-type>(): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.type/RTT.type.<get-type>|<get-type>(){}[0]
+
+    final fun hydrate() // io.github.charlietap.chasm.type/RTT.hydrate|hydrate(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/RecursiveType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/RecursiveType|null[0]
+    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/SubType>, io.github.charlietap.chasm.type/RecursiveType.State) // io.github.charlietap.chasm.type/RecursiveType.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.SubType>;io.github.charlietap.chasm.type.RecursiveType.State){}[0]
+
+    final var state // io.github.charlietap.chasm.type/RecursiveType.state|{}state[0]
+        final fun <get-state>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type/RecursiveType.state.<get-state>|<get-state>(){}[0]
+        final fun <set-state>(io.github.charlietap.chasm.type/RecursiveType.State) // io.github.charlietap.chasm.type/RecursiveType.state.<set-state>|<set-state>(io.github.charlietap.chasm.type.RecursiveType.State){}[0]
+    final var subTypes // io.github.charlietap.chasm.type/RecursiveType.subTypes|{}subTypes[0]
+        final fun <get-subTypes>(): kotlin.collections/List<io.github.charlietap.chasm.type/SubType> // io.github.charlietap.chasm.type/RecursiveType.subTypes.<get-subTypes>|<get-subTypes>(){}[0]
+        final fun <set-subTypes>(kotlin.collections/List<io.github.charlietap.chasm.type/SubType>) // io.github.charlietap.chasm.type/RecursiveType.subTypes.<set-subTypes>|<set-subTypes>(kotlin.collections.List<io.github.charlietap.chasm.type.SubType>){}[0]
+
+    final fun component1(): kotlin.collections/List<io.github.charlietap.chasm.type/SubType> // io.github.charlietap.chasm.type/RecursiveType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type/RecursiveType.component2|component2(){}[0]
+    final fun copy(kotlin.collections/List<io.github.charlietap.chasm.type/SubType> = ..., io.github.charlietap.chasm.type/RecursiveType.State = ...): io.github.charlietap.chasm.type/RecursiveType // io.github.charlietap.chasm.type/RecursiveType.copy|copy(kotlin.collections.List<io.github.charlietap.chasm.type.SubType>;io.github.charlietap.chasm.type.RecursiveType.State){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/RecursiveType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/RecursiveType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/RecursiveType.toString|toString(){}[0]
+
+    final value class State { // io.github.charlietap.chasm.type/RecursiveType.State|null[0]
+        constructor <init>(kotlin/Byte) // io.github.charlietap.chasm.type/RecursiveType.State.<init>|<init>(kotlin.Byte){}[0]
+
+        final val value // io.github.charlietap.chasm.type/RecursiveType.State.value|{}value[0]
+            final fun <get-value>(): kotlin/Byte // io.github.charlietap.chasm.type/RecursiveType.State.value.<get-value>|<get-value>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/RecursiveType.State.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/RecursiveType.State.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.type/RecursiveType.State.toString|toString(){}[0]
+
+        final object Companion { // io.github.charlietap.chasm.type/RecursiveType.State.Companion|null[0]
+            final val CLOSED // io.github.charlietap.chasm.type/RecursiveType.State.Companion.CLOSED|{}CLOSED[0]
+                final fun <get-CLOSED>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type/RecursiveType.State.Companion.CLOSED.<get-CLOSED>|<get-CLOSED>(){}[0]
+            final val EXTERNAL_SUBSTITUTED // io.github.charlietap.chasm.type/RecursiveType.State.Companion.EXTERNAL_SUBSTITUTED|{}EXTERNAL_SUBSTITUTED[0]
+                final fun <get-EXTERNAL_SUBSTITUTED>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type/RecursiveType.State.Companion.EXTERNAL_SUBSTITUTED.<get-EXTERNAL_SUBSTITUTED>|<get-EXTERNAL_SUBSTITUTED>(){}[0]
+            final val INTERNAL_SUBSTITUTED // io.github.charlietap.chasm.type/RecursiveType.State.Companion.INTERNAL_SUBSTITUTED|{}INTERNAL_SUBSTITUTED[0]
+                final fun <get-INTERNAL_SUBSTITUTED>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type/RecursiveType.State.Companion.INTERNAL_SUBSTITUTED.<get-INTERNAL_SUBSTITUTED>|<get-INTERNAL_SUBSTITUTED>(){}[0]
+            final val SYNTAX // io.github.charlietap.chasm.type/RecursiveType.State.Companion.SYNTAX|{}SYNTAX[0]
+                final fun <get-SYNTAX>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type/RecursiveType.State.Companion.SYNTAX.<get-SYNTAX>|<get-SYNTAX>(){}[0]
+            final val UNROLLED // io.github.charlietap.chasm.type/RecursiveType.State.Companion.UNROLLED|{}UNROLLED[0]
+                final fun <get-UNROLLED>(): io.github.charlietap.chasm.type/RecursiveType.State // io.github.charlietap.chasm.type/RecursiveType.State.Companion.UNROLLED.<get-UNROLLED>|<get-UNROLLED>(){}[0]
+        }
+    }
+}
+
+final class io.github.charlietap.chasm.type/TableType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/TableType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/AddressType, io.github.charlietap.chasm.type/ReferenceType, io.github.charlietap.chasm.type/Limits) // io.github.charlietap.chasm.type/TableType.<init>|<init>(io.github.charlietap.chasm.type.AddressType;io.github.charlietap.chasm.type.ReferenceType;io.github.charlietap.chasm.type.Limits){}[0]
+
+    final val addressType // io.github.charlietap.chasm.type/TableType.addressType|{}addressType[0]
+        final fun <get-addressType>(): io.github.charlietap.chasm.type/AddressType // io.github.charlietap.chasm.type/TableType.addressType.<get-addressType>|<get-addressType>(){}[0]
+    final val limits // io.github.charlietap.chasm.type/TableType.limits|{}limits[0]
+        final fun <get-limits>(): io.github.charlietap.chasm.type/Limits // io.github.charlietap.chasm.type/TableType.limits.<get-limits>|<get-limits>(){}[0]
+    final val referenceType // io.github.charlietap.chasm.type/TableType.referenceType|{}referenceType[0]
+        final fun <get-referenceType>(): io.github.charlietap.chasm.type/ReferenceType // io.github.charlietap.chasm.type/TableType.referenceType.<get-referenceType>|<get-referenceType>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/AddressType // io.github.charlietap.chasm.type/TableType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/ReferenceType // io.github.charlietap.chasm.type/TableType.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.type/Limits // io.github.charlietap.chasm.type/TableType.component3|component3(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/AddressType = ..., io.github.charlietap.chasm.type/ReferenceType = ..., io.github.charlietap.chasm.type/Limits = ...): io.github.charlietap.chasm.type/TableType // io.github.charlietap.chasm.type/TableType.copy|copy(io.github.charlietap.chasm.type.AddressType;io.github.charlietap.chasm.type.ReferenceType;io.github.charlietap.chasm.type.Limits){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/TableType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/TableType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/TableType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type/TagType { // io.github.charlietap.chasm.type/TagType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/TagType.Attribute, io.github.charlietap.chasm.type/FunctionType) // io.github.charlietap.chasm.type/TagType.<init>|<init>(io.github.charlietap.chasm.type.TagType.Attribute;io.github.charlietap.chasm.type.FunctionType){}[0]
+
+    final val attribute // io.github.charlietap.chasm.type/TagType.attribute|{}attribute[0]
+        final fun <get-attribute>(): io.github.charlietap.chasm.type/TagType.Attribute // io.github.charlietap.chasm.type/TagType.attribute.<get-attribute>|<get-attribute>(){}[0]
+    final val type // io.github.charlietap.chasm.type/TagType.type|{}type[0]
+        final fun <get-type>(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type/TagType.type.<get-type>|<get-type>(){}[0]
+
+    final fun component1(): io.github.charlietap.chasm.type/TagType.Attribute // io.github.charlietap.chasm.type/TagType.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type/TagType.component2|component2(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/TagType.Attribute = ..., io.github.charlietap.chasm.type/FunctionType = ...): io.github.charlietap.chasm.type/TagType // io.github.charlietap.chasm.type/TagType.copy|copy(io.github.charlietap.chasm.type.TagType.Attribute;io.github.charlietap.chasm.type.FunctionType){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/TagType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/TagType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/TagType.toString|toString(){}[0]
+
+    sealed interface Attribute { // io.github.charlietap.chasm.type/TagType.Attribute|null[0]
+        final object Exception : io.github.charlietap.chasm.type/TagType.Attribute { // io.github.charlietap.chasm.type/TagType.Attribute.Exception|null[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/TagType.Attribute.Exception.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/TagType.Attribute.Exception.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.type/TagType.Attribute.Exception.toString|toString(){}[0]
+        }
+    }
+}
+
+final value class io.github.charlietap.chasm.type/ArrayType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/ArrayType|null[0]
+    constructor <init>(io.github.charlietap.chasm.type/FieldType) // io.github.charlietap.chasm.type/ArrayType.<init>|<init>(io.github.charlietap.chasm.type.FieldType){}[0]
+
+    final val fieldType // io.github.charlietap.chasm.type/ArrayType.fieldType|{}fieldType[0]
+        final fun <get-fieldType>(): io.github.charlietap.chasm.type/FieldType // io.github.charlietap.chasm.type/ArrayType.fieldType.<get-fieldType>|<get-fieldType>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ArrayType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ArrayType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ArrayType.toString|toString(){}[0]
+}
+
+final value class io.github.charlietap.chasm.type/ResultType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/ResultType|null[0]
+    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/ValueType>) // io.github.charlietap.chasm.type/ResultType.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.ValueType>){}[0]
+
+    final val types // io.github.charlietap.chasm.type/ResultType.types|{}types[0]
+        final fun <get-types>(): kotlin.collections/List<io.github.charlietap.chasm.type/ValueType> // io.github.charlietap.chasm.type/ResultType.types.<get-types>|<get-types>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/ResultType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/ResultType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/ResultType.toString|toString(){}[0]
+}
+
+final value class io.github.charlietap.chasm.type/StructType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/StructType|null[0]
+    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/FieldType>) // io.github.charlietap.chasm.type/StructType.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.FieldType>){}[0]
+
+    final val fields // io.github.charlietap.chasm.type/StructType.fields|{}fields[0]
+        final fun <get-fields>(): kotlin.collections/List<io.github.charlietap.chasm.type/FieldType> // io.github.charlietap.chasm.type/StructType.fields.<get-fields>|<get-fields>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/StructType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/StructType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/StructType.toString|toString(){}[0]
+}
+
+final object io.github.charlietap.chasm.type/BottomType : io.github.charlietap.chasm.type/Type { // io.github.charlietap.chasm.type/BottomType|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/BottomType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/BottomType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type/BottomType.toString|toString(){}[0]
+}
+
+final fun io.github.charlietap.chasm.type.copy/ArrayTypeDeepCopier(io.github.charlietap.chasm.type/ArrayType): io.github.charlietap.chasm.type/ArrayType // io.github.charlietap.chasm.type.copy/ArrayTypeDeepCopier|ArrayTypeDeepCopier(io.github.charlietap.chasm.type.ArrayType){}[0]
+final fun io.github.charlietap.chasm.type.copy/CompositeTypeDeepCopier(io.github.charlietap.chasm.type/CompositeType): io.github.charlietap.chasm.type/CompositeType // io.github.charlietap.chasm.type.copy/CompositeTypeDeepCopier|CompositeTypeDeepCopier(io.github.charlietap.chasm.type.CompositeType){}[0]
+final fun io.github.charlietap.chasm.type.copy/FieldTypeDeepCopier(io.github.charlietap.chasm.type/FieldType): io.github.charlietap.chasm.type/FieldType // io.github.charlietap.chasm.type.copy/FieldTypeDeepCopier|FieldTypeDeepCopier(io.github.charlietap.chasm.type.FieldType){}[0]
+final fun io.github.charlietap.chasm.type.copy/FunctionTypeDeepCopier(io.github.charlietap.chasm.type/FunctionType): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type.copy/FunctionTypeDeepCopier|FunctionTypeDeepCopier(io.github.charlietap.chasm.type.FunctionType){}[0]
+final fun io.github.charlietap.chasm.type.copy/RecursiveTypeDeepCopier(io.github.charlietap.chasm.type/RecursiveType): io.github.charlietap.chasm.type/RecursiveType // io.github.charlietap.chasm.type.copy/RecursiveTypeDeepCopier|RecursiveTypeDeepCopier(io.github.charlietap.chasm.type.RecursiveType){}[0]
+final fun io.github.charlietap.chasm.type.copy/ReferenceTypeDeepCopier(io.github.charlietap.chasm.type/ReferenceType): io.github.charlietap.chasm.type/ReferenceType // io.github.charlietap.chasm.type.copy/ReferenceTypeDeepCopier|ReferenceTypeDeepCopier(io.github.charlietap.chasm.type.ReferenceType){}[0]
+final fun io.github.charlietap.chasm.type.copy/ResultTypeDeepCopier(io.github.charlietap.chasm.type/ResultType): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type.copy/ResultTypeDeepCopier|ResultTypeDeepCopier(io.github.charlietap.chasm.type.ResultType){}[0]
+final fun io.github.charlietap.chasm.type.copy/StorageTypeDeepCopier(io.github.charlietap.chasm.type/StorageType): io.github.charlietap.chasm.type/StorageType // io.github.charlietap.chasm.type.copy/StorageTypeDeepCopier|StorageTypeDeepCopier(io.github.charlietap.chasm.type.StorageType){}[0]
+final fun io.github.charlietap.chasm.type.copy/StructTypeDeepCopier(io.github.charlietap.chasm.type/StructType): io.github.charlietap.chasm.type/StructType // io.github.charlietap.chasm.type.copy/StructTypeDeepCopier|StructTypeDeepCopier(io.github.charlietap.chasm.type.StructType){}[0]
+final fun io.github.charlietap.chasm.type.copy/SubTypeDeepCopier(io.github.charlietap.chasm.type/SubType): io.github.charlietap.chasm.type/SubType // io.github.charlietap.chasm.type.copy/SubTypeDeepCopier|SubTypeDeepCopier(io.github.charlietap.chasm.type.SubType){}[0]
+final fun io.github.charlietap.chasm.type.copy/ValueTypeDeepCopier(io.github.charlietap.chasm.type/ValueType): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type.copy/ValueTypeDeepCopier|ValueTypeDeepCopier(io.github.charlietap.chasm.type.ValueType){}[0]
+final fun io.github.charlietap.chasm.type.differ/ReferenceTypeDiffer(io.github.charlietap.chasm.type/ReferenceType, io.github.charlietap.chasm.type/ReferenceType): io.github.charlietap.chasm.type/ReferenceType // io.github.charlietap.chasm.type.differ/ReferenceTypeDiffer|ReferenceTypeDiffer(io.github.charlietap.chasm.type.ReferenceType;io.github.charlietap.chasm.type.ReferenceType){}[0]
+final fun io.github.charlietap.chasm.type.expansion/DefinedTypeExpander(io.github.charlietap.chasm.type/DefinedType): io.github.charlietap.chasm.type/CompositeType // io.github.charlietap.chasm.type.expansion/DefinedTypeExpander|DefinedTypeExpander(io.github.charlietap.chasm.type.DefinedType){}[0]
+final fun io.github.charlietap.chasm.type.extremas/BottomOfHeapType(io.github.charlietap.chasm.type/HeapType, kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>): io.github.charlietap.chasm.type/HeapType? // io.github.charlietap.chasm.type.extremas/BottomOfHeapType|BottomOfHeapType(io.github.charlietap.chasm.type.HeapType;kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>){}[0]
+final fun io.github.charlietap.chasm.type.extremas/TopOfHeapType(io.github.charlietap.chasm.type/HeapType, kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>): io.github.charlietap.chasm.type/HeapType? // io.github.charlietap.chasm.type.extremas/TopOfHeapType|TopOfHeapType(io.github.charlietap.chasm.type.HeapType;kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>){}[0]
+final fun io.github.charlietap.chasm.type.factory/DefinedTypeFactory(kotlin.collections/List<io.github.charlietap.chasm.type/RecursiveType>): kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType> // io.github.charlietap.chasm.type.factory/DefinedTypeFactory|DefinedTypeFactory(kotlin.collections.List<io.github.charlietap.chasm.type.RecursiveType>){}[0]
+final fun io.github.charlietap.chasm.type.matching/CompositeTypeMatcher(io.github.charlietap.chasm.type/CompositeType, io.github.charlietap.chasm.type/CompositeType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/CompositeTypeMatcher|CompositeTypeMatcher(io.github.charlietap.chasm.type.CompositeType;io.github.charlietap.chasm.type.CompositeType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/DefinedTypeMatcher(io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/DefinedTypeMatcher|DefinedTypeMatcher(io.github.charlietap.chasm.type.DefinedType;io.github.charlietap.chasm.type.DefinedType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/FunctionTypeMatcher(io.github.charlietap.chasm.type/FunctionType, io.github.charlietap.chasm.type/FunctionType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/FunctionTypeMatcher|FunctionTypeMatcher(io.github.charlietap.chasm.type.FunctionType;io.github.charlietap.chasm.type.FunctionType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/GlobalTypeMatcher(io.github.charlietap.chasm.type/GlobalType, io.github.charlietap.chasm.type/GlobalType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/GlobalTypeMatcher|GlobalTypeMatcher(io.github.charlietap.chasm.type.GlobalType;io.github.charlietap.chasm.type.GlobalType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/HeapTypeMatcher(io.github.charlietap.chasm.type/HeapType, io.github.charlietap.chasm.type/HeapType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/HeapTypeMatcher|HeapTypeMatcher(io.github.charlietap.chasm.type.HeapType;io.github.charlietap.chasm.type.HeapType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/LimitsMatcher(io.github.charlietap.chasm.type/Limits, io.github.charlietap.chasm.type/Limits, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/LimitsMatcher|LimitsMatcher(io.github.charlietap.chasm.type.Limits;io.github.charlietap.chasm.type.Limits;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/MemoryTypeMatcher(io.github.charlietap.chasm.type/MemoryType, io.github.charlietap.chasm.type/MemoryType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/MemoryTypeMatcher|MemoryTypeMatcher(io.github.charlietap.chasm.type.MemoryType;io.github.charlietap.chasm.type.MemoryType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/ReferenceTypeMatcher(io.github.charlietap.chasm.type/ReferenceType, io.github.charlietap.chasm.type/ReferenceType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/ReferenceTypeMatcher|ReferenceTypeMatcher(io.github.charlietap.chasm.type.ReferenceType;io.github.charlietap.chasm.type.ReferenceType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/ResultTypeMatcher(io.github.charlietap.chasm.type/ResultType, io.github.charlietap.chasm.type/ResultType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/ResultTypeMatcher|ResultTypeMatcher(io.github.charlietap.chasm.type.ResultType;io.github.charlietap.chasm.type.ResultType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/StorageTypeMatcher(io.github.charlietap.chasm.type/StorageType, io.github.charlietap.chasm.type/StorageType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/StorageTypeMatcher|StorageTypeMatcher(io.github.charlietap.chasm.type.StorageType;io.github.charlietap.chasm.type.StorageType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/TableTypeMatcher(io.github.charlietap.chasm.type/TableType, io.github.charlietap.chasm.type/TableType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/TableTypeMatcher|TableTypeMatcher(io.github.charlietap.chasm.type.TableType;io.github.charlietap.chasm.type.TableType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/TagTypeMatcher(io.github.charlietap.chasm.type/TagType, io.github.charlietap.chasm.type/TagType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/TagTypeMatcher|TagTypeMatcher(io.github.charlietap.chasm.type.TagType;io.github.charlietap.chasm.type.TagType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.matching/ValueTypeMatcher(io.github.charlietap.chasm.type/ValueType, io.github.charlietap.chasm.type/ValueType, io.github.charlietap.chasm.type.matching/TypeMatcherContext): kotlin/Boolean // io.github.charlietap.chasm.type.matching/ValueTypeMatcher|ValueTypeMatcher(io.github.charlietap.chasm.type.ValueType;io.github.charlietap.chasm.type.ValueType;io.github.charlietap.chasm.type.matching.TypeMatcherContext){}[0]
+final fun io.github.charlietap.chasm.type.rolling.substitution/RecursiveTypeIndexToDefinedTypeSubstitutor(io.github.charlietap.chasm.type/RecursiveType): kotlin/Function1<io.github.charlietap.chasm.type/ConcreteHeapType, io.github.charlietap.chasm.type/ConcreteHeapType> // io.github.charlietap.chasm.type.rolling.substitution/RecursiveTypeIndexToDefinedTypeSubstitutor|RecursiveTypeIndexToDefinedTypeSubstitutor(io.github.charlietap.chasm.type.RecursiveType){}[0]
+final fun io.github.charlietap.chasm.type.rolling.substitution/RecursiveTypeSubstitutor(io.github.charlietap.chasm.type/RecursiveType, io.github.charlietap.chasm.type.rolling.substitution/Substitution): io.github.charlietap.chasm.type/RecursiveType // io.github.charlietap.chasm.type.rolling.substitution/RecursiveTypeSubstitutor|RecursiveTypeSubstitutor(io.github.charlietap.chasm.type.RecursiveType;io.github.charlietap.chasm.type.rolling.substitution.Substitution){}[0]
+final fun io.github.charlietap.chasm.type.rolling.substitution/ReferenceTypeSubstitutor(io.github.charlietap.chasm.type/ReferenceType, io.github.charlietap.chasm.type.rolling.substitution/Substitution): io.github.charlietap.chasm.type/ReferenceType // io.github.charlietap.chasm.type.rolling.substitution/ReferenceTypeSubstitutor|ReferenceTypeSubstitutor(io.github.charlietap.chasm.type.ReferenceType;io.github.charlietap.chasm.type.rolling.substitution.Substitution){}[0]
+final fun io.github.charlietap.chasm.type.rolling.substitution/TypeIndexToDefinedTypeSubstitutor(kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>): kotlin/Function1<io.github.charlietap.chasm.type/ConcreteHeapType, io.github.charlietap.chasm.type/ConcreteHeapType> // io.github.charlietap.chasm.type.rolling.substitution/TypeIndexToDefinedTypeSubstitutor|TypeIndexToDefinedTypeSubstitutor(kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>){}[0]
+final fun io.github.charlietap.chasm.type.rolling.substitution/TypeIndexToRecursiveTypeIndexSubsitutor(kotlin/Int, kotlin/Int): kotlin/Function1<io.github.charlietap.chasm.type/ConcreteHeapType, io.github.charlietap.chasm.type/ConcreteHeapType> // io.github.charlietap.chasm.type.rolling.substitution/TypeIndexToRecursiveTypeIndexSubsitutor|TypeIndexToRecursiveTypeIndexSubsitutor(kotlin.Int;kotlin.Int){}[0]
+final fun io.github.charlietap.chasm.type.rolling/DefinedTypeRoller(kotlin/Int, io.github.charlietap.chasm.type/RecursiveType): kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType> // io.github.charlietap.chasm.type.rolling/DefinedTypeRoller|DefinedTypeRoller(kotlin.Int;io.github.charlietap.chasm.type.RecursiveType){}[0]
+final fun io.github.charlietap.chasm.type.rolling/DefinedTypeUnroller(io.github.charlietap.chasm.type/DefinedType): io.github.charlietap.chasm.type/SubType // io.github.charlietap.chasm.type.rolling/DefinedTypeUnroller|DefinedTypeUnroller(io.github.charlietap.chasm.type.DefinedType){}[0]
+final fun io.github.charlietap.chasm.type.rolling/RecursiveTypeUnroller(io.github.charlietap.chasm.type/RecursiveType): io.github.charlietap.chasm.type/RecursiveType // io.github.charlietap.chasm.type.rolling/RecursiveTypeUnroller|RecursiveTypeUnroller(io.github.charlietap.chasm.type.RecursiveType){}[0]
+final inline fun (io.github.charlietap.chasm.type/CompositeType).io.github.charlietap.chasm.type.ext/arrayType(): io.github.charlietap.chasm.type/ArrayType? // io.github.charlietap.chasm.type.ext/arrayType|arrayType@io.github.charlietap.chasm.type.CompositeType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/CompositeType).io.github.charlietap.chasm.type.ext/asArrayType(): io.github.charlietap.chasm.type/ArrayType // io.github.charlietap.chasm.type.ext/asArrayType|asArrayType@io.github.charlietap.chasm.type.CompositeType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/CompositeType).io.github.charlietap.chasm.type.ext/asFunctionType(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type.ext/asFunctionType|asFunctionType@io.github.charlietap.chasm.type.CompositeType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/CompositeType).io.github.charlietap.chasm.type.ext/asStructType(): io.github.charlietap.chasm.type/StructType // io.github.charlietap.chasm.type.ext/asStructType|asStructType@io.github.charlietap.chasm.type.CompositeType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/CompositeType).io.github.charlietap.chasm.type.ext/functionType(): io.github.charlietap.chasm.type/FunctionType? // io.github.charlietap.chasm.type.ext/functionType|functionType@io.github.charlietap.chasm.type.CompositeType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/CompositeType).io.github.charlietap.chasm.type.ext/structType(): io.github.charlietap.chasm.type/StructType? // io.github.charlietap.chasm.type.ext/structType|structType@io.github.charlietap.chasm.type.CompositeType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/DefinedType).io.github.charlietap.chasm.type.ext/arrayType(kotlin/Function1<io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type/CompositeType> = ...): io.github.charlietap.chasm.type/ArrayType? // io.github.charlietap.chasm.type.ext/arrayType|arrayType@io.github.charlietap.chasm.type.DefinedType(kotlin.Function1<io.github.charlietap.chasm.type.DefinedType,io.github.charlietap.chasm.type.CompositeType>){}[0]
+final inline fun (io.github.charlietap.chasm.type/DefinedType).io.github.charlietap.chasm.type.ext/functionType(kotlin/Function1<io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type/CompositeType> = ...): io.github.charlietap.chasm.type/FunctionType? // io.github.charlietap.chasm.type.ext/functionType|functionType@io.github.charlietap.chasm.type.DefinedType(kotlin.Function1<io.github.charlietap.chasm.type.DefinedType,io.github.charlietap.chasm.type.CompositeType>){}[0]
+final inline fun (io.github.charlietap.chasm.type/DefinedType).io.github.charlietap.chasm.type.ext/structType(kotlin/Function1<io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type/CompositeType> = ...): io.github.charlietap.chasm.type/StructType? // io.github.charlietap.chasm.type.ext/structType|structType@io.github.charlietap.chasm.type.DefinedType(kotlin.Function1<io.github.charlietap.chasm.type.DefinedType,io.github.charlietap.chasm.type.CompositeType>){}[0]
+final inline fun (io.github.charlietap.chasm.type/FieldType).io.github.charlietap.chasm.type.ext/bitWidth(): kotlin/Int? // io.github.charlietap.chasm.type.ext/bitWidth|bitWidth@io.github.charlietap.chasm.type.FieldType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/FunctionType).io.github.charlietap.chasm.type.ext/definedType(): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.type.ext/definedType|definedType@io.github.charlietap.chasm.type.FunctionType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/FunctionType).io.github.charlietap.chasm.type.ext/recursiveType(): io.github.charlietap.chasm.type/RecursiveType // io.github.charlietap.chasm.type.ext/recursiveType|recursiveType@io.github.charlietap.chasm.type.FunctionType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/RecursiveType).io.github.charlietap.chasm.type.ext/definedType(): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.type.ext/definedType|definedType@io.github.charlietap.chasm.type.RecursiveType(){}[0]
+final inline fun (io.github.charlietap.chasm.type/ValueType).io.github.charlietap.chasm.type.ext/bitWidth(): kotlin/Int? // io.github.charlietap.chasm.type.ext/bitWidth|bitWidth@io.github.charlietap.chasm.type.ValueType(){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/ArrayTypeDeepCopier(io.github.charlietap.chasm.type/ArrayType, kotlin/Function1<io.github.charlietap.chasm.type/FieldType, io.github.charlietap.chasm.type/FieldType>): io.github.charlietap.chasm.type/ArrayType // io.github.charlietap.chasm.type.copy/ArrayTypeDeepCopier|ArrayTypeDeepCopier(io.github.charlietap.chasm.type.ArrayType;kotlin.Function1<io.github.charlietap.chasm.type.FieldType,io.github.charlietap.chasm.type.FieldType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/CompositeTypeDeepCopier(io.github.charlietap.chasm.type/CompositeType, kotlin/Function1<io.github.charlietap.chasm.type/ArrayType, io.github.charlietap.chasm.type/ArrayType>, kotlin/Function1<io.github.charlietap.chasm.type/FunctionType, io.github.charlietap.chasm.type/FunctionType>, kotlin/Function1<io.github.charlietap.chasm.type/StructType, io.github.charlietap.chasm.type/StructType>): io.github.charlietap.chasm.type/CompositeType // io.github.charlietap.chasm.type.copy/CompositeTypeDeepCopier|CompositeTypeDeepCopier(io.github.charlietap.chasm.type.CompositeType;kotlin.Function1<io.github.charlietap.chasm.type.ArrayType,io.github.charlietap.chasm.type.ArrayType>;kotlin.Function1<io.github.charlietap.chasm.type.FunctionType,io.github.charlietap.chasm.type.FunctionType>;kotlin.Function1<io.github.charlietap.chasm.type.StructType,io.github.charlietap.chasm.type.StructType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/FieldTypeDeepCopier(io.github.charlietap.chasm.type/FieldType, kotlin/Function1<io.github.charlietap.chasm.type/StorageType, io.github.charlietap.chasm.type/StorageType>): io.github.charlietap.chasm.type/FieldType // io.github.charlietap.chasm.type.copy/FieldTypeDeepCopier|FieldTypeDeepCopier(io.github.charlietap.chasm.type.FieldType;kotlin.Function1<io.github.charlietap.chasm.type.StorageType,io.github.charlietap.chasm.type.StorageType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/FunctionTypeDeepCopier(io.github.charlietap.chasm.type/FunctionType, kotlin/Function1<io.github.charlietap.chasm.type/ResultType, io.github.charlietap.chasm.type/ResultType>): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type.copy/FunctionTypeDeepCopier|FunctionTypeDeepCopier(io.github.charlietap.chasm.type.FunctionType;kotlin.Function1<io.github.charlietap.chasm.type.ResultType,io.github.charlietap.chasm.type.ResultType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/HeapTypeDeepCopier(io.github.charlietap.chasm.type/HeapType): io.github.charlietap.chasm.type/HeapType // io.github.charlietap.chasm.type.copy/HeapTypeDeepCopier|HeapTypeDeepCopier(io.github.charlietap.chasm.type.HeapType){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/PackedTypeDeepCopier(io.github.charlietap.chasm.type/PackedType): io.github.charlietap.chasm.type/PackedType // io.github.charlietap.chasm.type.copy/PackedTypeDeepCopier|PackedTypeDeepCopier(io.github.charlietap.chasm.type.PackedType){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/RecursiveTypeDeepCopier(io.github.charlietap.chasm.type/RecursiveType, kotlin/Function1<io.github.charlietap.chasm.type/SubType, io.github.charlietap.chasm.type/SubType>): io.github.charlietap.chasm.type/RecursiveType // io.github.charlietap.chasm.type.copy/RecursiveTypeDeepCopier|RecursiveTypeDeepCopier(io.github.charlietap.chasm.type.RecursiveType;kotlin.Function1<io.github.charlietap.chasm.type.SubType,io.github.charlietap.chasm.type.SubType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/ReferenceTypeDeepCopier(io.github.charlietap.chasm.type/ReferenceType, kotlin/Function1<io.github.charlietap.chasm.type/HeapType, io.github.charlietap.chasm.type/HeapType>): io.github.charlietap.chasm.type/ReferenceType // io.github.charlietap.chasm.type.copy/ReferenceTypeDeepCopier|ReferenceTypeDeepCopier(io.github.charlietap.chasm.type.ReferenceType;kotlin.Function1<io.github.charlietap.chasm.type.HeapType,io.github.charlietap.chasm.type.HeapType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/ResultTypeDeepCopier(io.github.charlietap.chasm.type/ResultType, kotlin/Function1<io.github.charlietap.chasm.type/ValueType, io.github.charlietap.chasm.type/ValueType>): io.github.charlietap.chasm.type/ResultType // io.github.charlietap.chasm.type.copy/ResultTypeDeepCopier|ResultTypeDeepCopier(io.github.charlietap.chasm.type.ResultType;kotlin.Function1<io.github.charlietap.chasm.type.ValueType,io.github.charlietap.chasm.type.ValueType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/StorageTypeDeepCopier(io.github.charlietap.chasm.type/StorageType, kotlin/Function1<io.github.charlietap.chasm.type/PackedType, io.github.charlietap.chasm.type/PackedType>, kotlin/Function1<io.github.charlietap.chasm.type/ValueType, io.github.charlietap.chasm.type/ValueType>): io.github.charlietap.chasm.type/StorageType // io.github.charlietap.chasm.type.copy/StorageTypeDeepCopier|StorageTypeDeepCopier(io.github.charlietap.chasm.type.StorageType;kotlin.Function1<io.github.charlietap.chasm.type.PackedType,io.github.charlietap.chasm.type.PackedType>;kotlin.Function1<io.github.charlietap.chasm.type.ValueType,io.github.charlietap.chasm.type.ValueType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/StructTypeDeepCopier(io.github.charlietap.chasm.type/StructType, kotlin/Function1<io.github.charlietap.chasm.type/FieldType, io.github.charlietap.chasm.type/FieldType>): io.github.charlietap.chasm.type/StructType // io.github.charlietap.chasm.type.copy/StructTypeDeepCopier|StructTypeDeepCopier(io.github.charlietap.chasm.type.StructType;kotlin.Function1<io.github.charlietap.chasm.type.FieldType,io.github.charlietap.chasm.type.FieldType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/SubTypeDeepCopier(io.github.charlietap.chasm.type/SubType, kotlin/Function1<io.github.charlietap.chasm.type/CompositeType, io.github.charlietap.chasm.type/CompositeType>, kotlin/Function1<io.github.charlietap.chasm.type/HeapType, io.github.charlietap.chasm.type/HeapType>): io.github.charlietap.chasm.type/SubType // io.github.charlietap.chasm.type.copy/SubTypeDeepCopier|SubTypeDeepCopier(io.github.charlietap.chasm.type.SubType;kotlin.Function1<io.github.charlietap.chasm.type.CompositeType,io.github.charlietap.chasm.type.CompositeType>;kotlin.Function1<io.github.charlietap.chasm.type.HeapType,io.github.charlietap.chasm.type.HeapType>){}[0]
+final inline fun io.github.charlietap.chasm.type.copy/ValueTypeDeepCopier(io.github.charlietap.chasm.type/ValueType, kotlin/Function1<io.github.charlietap.chasm.type/ReferenceType, io.github.charlietap.chasm.type/ReferenceType>): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type.copy/ValueTypeDeepCopier|ValueTypeDeepCopier(io.github.charlietap.chasm.type.ValueType;kotlin.Function1<io.github.charlietap.chasm.type.ReferenceType,io.github.charlietap.chasm.type.ReferenceType>){}[0]
+final inline fun io.github.charlietap.chasm.type.expansion/BlockTypeExpander(kotlin.collections/List<io.github.charlietap.chasm.type/DefinedType>, io.github.charlietap.chasm.type/BlockType): io.github.charlietap.chasm.type/FunctionType? // io.github.charlietap.chasm.type.expansion/BlockTypeExpander|BlockTypeExpander(kotlin.collections.List<io.github.charlietap.chasm.type.DefinedType>;io.github.charlietap.chasm.type.BlockType){}[0]
+final inline fun io.github.charlietap.chasm.type.factory/RTTFactory(io.github.charlietap.chasm.type/DefinedType, kotlin.collections/Map<io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type/RTT>): io.github.charlietap.chasm.type/RTT // io.github.charlietap.chasm.type.factory/RTTFactory|RTTFactory(io.github.charlietap.chasm.type.DefinedType;kotlin.collections.Map<io.github.charlietap.chasm.type.DefinedType,io.github.charlietap.chasm.type.RTT>){}[0]

@@ -1,0 +1,951 @@
+public abstract interface class io/github/charlietap/chasm/type/AbstractHeapType : io/github/charlietap/chasm/type/HeapType {
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$Any : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$Any;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$Array : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$Array;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$Bottom : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/BottomType;)Lio/github/charlietap/chasm/type/AbstractHeapType$Bottom;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/BottomType;)Lio/github/charlietap/chasm/type/BottomType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/BottomType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/BottomType;Lio/github/charlietap/chasm/type/BottomType;)Z
+	public final fun getBottomType ()Lio/github/charlietap/chasm/type/BottomType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/BottomType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/BottomType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/BottomType;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$Eq : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$Eq;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$Exception : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$Exception;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$Extern : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$Extern;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$Func : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$Func;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$I31 : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$I31;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$NoException : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$NoException;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$NoExtern : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$NoExtern;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$NoFunc : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$NoFunc;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$None : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$None;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AbstractHeapType$Struct : io/github/charlietap/chasm/type/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AbstractHeapType$Struct;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/AddressType {
+}
+
+public final class io/github/charlietap/chasm/type/AddressType$I32 : io/github/charlietap/chasm/type/AddressType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AddressType$I32;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/AddressType$I64 : io/github/charlietap/chasm/type/AddressType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/AddressType$I64;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/ArrayType : io/github/charlietap/chasm/type/Type {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/FieldType;)Lio/github/charlietap/chasm/type/ArrayType;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/FieldType;)Lio/github/charlietap/chasm/type/FieldType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/FieldType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/FieldType;Lio/github/charlietap/chasm/type/FieldType;)Z
+	public final fun getFieldType ()Lio/github/charlietap/chasm/type/FieldType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/FieldType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/FieldType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/FieldType;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/BlockType {
+}
+
+public final class io/github/charlietap/chasm/type/BlockType$Empty : io/github/charlietap/chasm/type/BlockType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/BlockType$Empty;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/BlockType$SignedTypeIndex : io/github/charlietap/chasm/type/BlockType {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/type/BlockType$SignedTypeIndex;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getTypeIndex ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/type/BlockType$ValType : io/github/charlietap/chasm/type/BlockType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/ValueType;)Lio/github/charlietap/chasm/type/BlockType$ValType;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/ValueType;)Lio/github/charlietap/chasm/type/ValueType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/ValueType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/ValueType;Lio/github/charlietap/chasm/type/ValueType;)Z
+	public final fun getValueType ()Lio/github/charlietap/chasm/type/ValueType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/ValueType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/ValueType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/ValueType;
+}
+
+public final class io/github/charlietap/chasm/type/BottomType : io/github/charlietap/chasm/type/Type {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/BottomType;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/CompositeType : io/github/charlietap/chasm/type/Type {
+}
+
+public final class io/github/charlietap/chasm/type/CompositeType$Array : io/github/charlietap/chasm/type/CompositeType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/FieldType;)Lio/github/charlietap/chasm/type/CompositeType$Array;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/FieldType;)Lio/github/charlietap/chasm/type/FieldType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/FieldType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/FieldType;Lio/github/charlietap/chasm/type/FieldType;)Z
+	public final fun getArrayType-Z-vP9Jw ()Lio/github/charlietap/chasm/type/FieldType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/FieldType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/FieldType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/FieldType;
+}
+
+public final class io/github/charlietap/chasm/type/CompositeType$Function : io/github/charlietap/chasm/type/CompositeType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/CompositeType$Function;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/FunctionType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/FunctionType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/type/FunctionType;)Z
+	public final fun getFunctionType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/FunctionType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/FunctionType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/FunctionType;
+}
+
+public final class io/github/charlietap/chasm/type/CompositeType$Struct : io/github/charlietap/chasm/type/CompositeType {
+	public static final synthetic fun box-impl (Ljava/util/List;)Lio/github/charlietap/chasm/type/CompositeType$Struct;
+	public static fun constructor-impl (Ljava/util/List;)Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/List;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/List;Ljava/util/List;)Z
+	public final fun getStructType-bbS8bz4 ()Ljava/util/List;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/List;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/List;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/List;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/ConcreteHeapType : io/github/charlietap/chasm/type/HeapType {
+}
+
+public final class io/github/charlietap/chasm/type/ConcreteHeapType$Defined : io/github/charlietap/chasm/type/ConcreteHeapType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/DefinedType;)Lio/github/charlietap/chasm/type/ConcreteHeapType$Defined;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/DefinedType;)Lio/github/charlietap/chasm/type/DefinedType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/DefinedType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/DefinedType;)Z
+	public final fun getDefinedType ()Lio/github/charlietap/chasm/type/DefinedType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/DefinedType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/DefinedType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/DefinedType;
+}
+
+public final class io/github/charlietap/chasm/type/ConcreteHeapType$RecursiveTypeIndex : io/github/charlietap/chasm/type/ConcreteHeapType {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/type/ConcreteHeapType$RecursiveTypeIndex;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getIndex ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/type/ConcreteHeapType$TypeIndex : io/github/charlietap/chasm/type/ConcreteHeapType {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/type/ConcreteHeapType$TypeIndex;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getIndex ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/type/DefinedType {
+	public fun <init> (Lio/github/charlietap/chasm/type/RecursiveType;II)V
+	public synthetic fun <init> (Lio/github/charlietap/chasm/type/RecursiveType;IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/type/RecursiveType;
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun copy (Lio/github/charlietap/chasm/type/RecursiveType;II)Lio/github/charlietap/chasm/type/DefinedType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/RecursiveType;IIILjava/lang/Object;)Lio/github/charlietap/chasm/type/DefinedType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAsSubType ()Lio/github/charlietap/chasm/type/SubType;
+	public final fun getParent ()Lio/github/charlietap/chasm/type/DefinedType;
+	public final fun getRecursiveType ()Lio/github/charlietap/chasm/type/RecursiveType;
+	public final fun getRecursiveTypeIndex ()I
+	public final fun getTypeIndex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/FieldType : io/github/charlietap/chasm/type/Type {
+	public fun <init> (Lio/github/charlietap/chasm/type/StorageType;Lio/github/charlietap/chasm/type/Mutability;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/type/StorageType;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/Mutability;
+	public final fun copy (Lio/github/charlietap/chasm/type/StorageType;Lio/github/charlietap/chasm/type/Mutability;)Lio/github/charlietap/chasm/type/FieldType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/FieldType;Lio/github/charlietap/chasm/type/StorageType;Lio/github/charlietap/chasm/type/Mutability;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/FieldType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMutability ()Lio/github/charlietap/chasm/type/Mutability;
+	public final fun getStorageType ()Lio/github/charlietap/chasm/type/StorageType;
+	public fun hashCode ()I
+	public final fun setMutability (Lio/github/charlietap/chasm/type/Mutability;)V
+	public final fun setStorageType (Lio/github/charlietap/chasm/type/StorageType;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/FunctionType : io/github/charlietap/chasm/type/Type {
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-JvZOk2I ()Ljava/util/List;
+	public final fun component2-JvZOk2I ()Ljava/util/List;
+	public final fun copy-p-zb30w (Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/type/FunctionType;
+	public static synthetic fun copy-p-zb30w$default (Lio/github/charlietap/chasm/type/FunctionType;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/FunctionType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getParams-JvZOk2I ()Ljava/util/List;
+	public final fun getResults-JvZOk2I ()Ljava/util/List;
+	public fun hashCode ()I
+	public final fun setParams-ahte0nc (Ljava/util/List;)V
+	public final fun setResults-ahte0nc (Ljava/util/List;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/GlobalType : io/github/charlietap/chasm/type/Type {
+	public fun <init> (Lio/github/charlietap/chasm/type/ValueType;Lio/github/charlietap/chasm/type/Mutability;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/type/ValueType;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/Mutability;
+	public final fun copy (Lio/github/charlietap/chasm/type/ValueType;Lio/github/charlietap/chasm/type/Mutability;)Lio/github/charlietap/chasm/type/GlobalType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/type/ValueType;Lio/github/charlietap/chasm/type/Mutability;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/GlobalType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMutability ()Lio/github/charlietap/chasm/type/Mutability;
+	public final fun getValueType ()Lio/github/charlietap/chasm/type/ValueType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/HeapType : io/github/charlietap/chasm/type/Type {
+}
+
+public final class io/github/charlietap/chasm/type/InitializationStatus : java/lang/Enum {
+	public static final field SET Lio/github/charlietap/chasm/type/InitializationStatus;
+	public static final field UNSET Lio/github/charlietap/chasm/type/InitializationStatus;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/type/InitializationStatus;
+	public static fun values ()[Lio/github/charlietap/chasm/type/InitializationStatus;
+}
+
+public final class io/github/charlietap/chasm/type/InstructionType {
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-JvZOk2I ()Ljava/util/List;
+	public final fun component2-JvZOk2I ()Ljava/util/List;
+	public final fun copy-p-zb30w (Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/type/InstructionType;
+	public static synthetic fun copy-p-zb30w$default (Lio/github/charlietap/chasm/type/InstructionType;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/InstructionType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getInputs-JvZOk2I ()Ljava/util/List;
+	public final fun getOutputs-JvZOk2I ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/Limits : io/github/charlietap/chasm/type/Type {
+	public synthetic fun <init> (JLkotlin/ULong;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLkotlin/ULong;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-s-VKNKU ()J
+	public final fun component2-6VbMDqA ()Lkotlin/ULong;
+	public final fun copy-y8-82ps (JLkotlin/ULong;)Lio/github/charlietap/chasm/type/Limits;
+	public static synthetic fun copy-y8-82ps$default (Lio/github/charlietap/chasm/type/Limits;JLkotlin/ULong;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/Limits;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMax-6VbMDqA ()Lkotlin/ULong;
+	public final fun getMin-s-VKNKU ()J
+	public fun hashCode ()I
+	public final fun setMin-VKZWuLQ (J)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/LocalType {
+	public fun <init> (Lio/github/charlietap/chasm/type/InitializationStatus;Lio/github/charlietap/chasm/type/ValueType;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/type/InitializationStatus;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/ValueType;
+	public final fun copy (Lio/github/charlietap/chasm/type/InitializationStatus;Lio/github/charlietap/chasm/type/ValueType;)Lio/github/charlietap/chasm/type/LocalType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/LocalType;Lio/github/charlietap/chasm/type/InitializationStatus;Lio/github/charlietap/chasm/type/ValueType;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/LocalType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getStatus ()Lio/github/charlietap/chasm/type/InitializationStatus;
+	public final fun getType ()Lio/github/charlietap/chasm/type/ValueType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/MemoryType : io/github/charlietap/chasm/type/Type {
+	public fun <init> (Lio/github/charlietap/chasm/type/AddressType;Lio/github/charlietap/chasm/type/Limits;Lio/github/charlietap/chasm/type/SharedStatus;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/type/AddressType;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/Limits;
+	public final fun component3 ()Lio/github/charlietap/chasm/type/SharedStatus;
+	public final fun copy (Lio/github/charlietap/chasm/type/AddressType;Lio/github/charlietap/chasm/type/Limits;Lio/github/charlietap/chasm/type/SharedStatus;)Lio/github/charlietap/chasm/type/MemoryType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/type/AddressType;Lio/github/charlietap/chasm/type/Limits;Lio/github/charlietap/chasm/type/SharedStatus;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/MemoryType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAddressType ()Lio/github/charlietap/chasm/type/AddressType;
+	public final fun getLimits ()Lio/github/charlietap/chasm/type/Limits;
+	public final fun getShared ()Lio/github/charlietap/chasm/type/SharedStatus;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/Mutability : java/lang/Enum {
+	public static final field Const Lio/github/charlietap/chasm/type/Mutability;
+	public static final field Var Lio/github/charlietap/chasm/type/Mutability;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/type/Mutability;
+	public static fun values ()[Lio/github/charlietap/chasm/type/Mutability;
+}
+
+public final class io/github/charlietap/chasm/type/NumberType : java/lang/Enum, io/github/charlietap/chasm/type/Type {
+	public static final field F32 Lio/github/charlietap/chasm/type/NumberType;
+	public static final field F64 Lio/github/charlietap/chasm/type/NumberType;
+	public static final field I32 Lio/github/charlietap/chasm/type/NumberType;
+	public static final field I64 Lio/github/charlietap/chasm/type/NumberType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/type/NumberType;
+	public static fun values ()[Lio/github/charlietap/chasm/type/NumberType;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/PackedType : io/github/charlietap/chasm/type/Type {
+}
+
+public final class io/github/charlietap/chasm/type/PackedType$I16 : io/github/charlietap/chasm/type/PackedType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/PackedType$I16;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/PackedType$I8 : io/github/charlietap/chasm/type/PackedType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/PackedType$I8;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/RTT {
+	public fun <init> (Lio/github/charlietap/chasm/type/DefinedType;Ljava/util/Map;)V
+	public final fun getCache ()Ljava/util/Map;
+	public final fun getSuperTypes ()Ljava/util/List;
+	public final fun getType ()Lio/github/charlietap/chasm/type/DefinedType;
+	public final fun hydrate ()V
+}
+
+public final class io/github/charlietap/chasm/type/RecursiveType : io/github/charlietap/chasm/type/Type {
+	public synthetic fun <init> (Ljava/util/List;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2-qG_ZTqg ()B
+	public final fun copy-RH3S_1o (Ljava/util/List;B)Lio/github/charlietap/chasm/type/RecursiveType;
+	public static synthetic fun copy-RH3S_1o$default (Lio/github/charlietap/chasm/type/RecursiveType;Ljava/util/List;BILjava/lang/Object;)Lio/github/charlietap/chasm/type/RecursiveType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getState-qG_ZTqg ()B
+	public final fun getSubTypes ()Ljava/util/List;
+	public fun hashCode ()I
+	public final fun setState-Z5-6vJo (B)V
+	public final fun setSubTypes (Ljava/util/List;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/RecursiveType$State {
+	public static final field Companion Lio/github/charlietap/chasm/type/RecursiveType$State$Companion;
+	public static final synthetic fun box-impl (B)Lio/github/charlietap/chasm/type/RecursiveType$State;
+	public static fun constructor-impl (B)B
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (BLjava/lang/Object;)Z
+	public static final fun equals-impl0 (BB)Z
+	public final fun getValue ()B
+	public fun hashCode ()I
+	public static fun hashCode-impl (B)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (B)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()B
+}
+
+public final class io/github/charlietap/chasm/type/RecursiveType$State$Companion {
+	public final fun getCLOSED-qG_ZTqg ()B
+	public final fun getEXTERNAL_SUBSTITUTED-qG_ZTqg ()B
+	public final fun getINTERNAL_SUBSTITUTED-qG_ZTqg ()B
+	public final fun getSYNTAX-qG_ZTqg ()B
+	public final fun getUNROLLED-qG_ZTqg ()B
+}
+
+public abstract interface class io/github/charlietap/chasm/type/ReferenceType : io/github/charlietap/chasm/type/Type {
+	public abstract fun getHeapType ()Lio/github/charlietap/chasm/type/HeapType;
+}
+
+public final class io/github/charlietap/chasm/type/ReferenceType$Ref : io/github/charlietap/chasm/type/ReferenceType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/HeapType;)Lio/github/charlietap/chasm/type/ReferenceType$Ref;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/HeapType;)Lio/github/charlietap/chasm/type/HeapType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/HeapType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/HeapType;Lio/github/charlietap/chasm/type/HeapType;)Z
+	public fun getHeapType ()Lio/github/charlietap/chasm/type/HeapType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/HeapType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/HeapType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/HeapType;
+}
+
+public final class io/github/charlietap/chasm/type/ReferenceType$RefNull : io/github/charlietap/chasm/type/ReferenceType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/HeapType;)Lio/github/charlietap/chasm/type/ReferenceType$RefNull;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/HeapType;)Lio/github/charlietap/chasm/type/HeapType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/HeapType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/HeapType;Lio/github/charlietap/chasm/type/HeapType;)Z
+	public fun getHeapType ()Lio/github/charlietap/chasm/type/HeapType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/HeapType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/HeapType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/HeapType;
+}
+
+public final class io/github/charlietap/chasm/type/ResultType : io/github/charlietap/chasm/type/Type {
+	public static final synthetic fun box-impl (Ljava/util/List;)Lio/github/charlietap/chasm/type/ResultType;
+	public static fun constructor-impl (Ljava/util/List;)Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/List;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/List;Ljava/util/List;)Z
+	public final fun getTypes ()Ljava/util/List;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/List;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/List;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/type/SharedStatus : java/lang/Enum {
+	public static final field Shared Lio/github/charlietap/chasm/type/SharedStatus;
+	public static final field Unshared Lio/github/charlietap/chasm/type/SharedStatus;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/type/SharedStatus;
+	public static fun values ()[Lio/github/charlietap/chasm/type/SharedStatus;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/StorageType : io/github/charlietap/chasm/type/Type {
+}
+
+public final class io/github/charlietap/chasm/type/StorageType$Packed : io/github/charlietap/chasm/type/StorageType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/PackedType;)Lio/github/charlietap/chasm/type/StorageType$Packed;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/PackedType;)Lio/github/charlietap/chasm/type/PackedType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/PackedType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/PackedType;Lio/github/charlietap/chasm/type/PackedType;)Z
+	public final fun getType ()Lio/github/charlietap/chasm/type/PackedType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/PackedType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/PackedType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/PackedType;
+}
+
+public final class io/github/charlietap/chasm/type/StorageType$Value : io/github/charlietap/chasm/type/StorageType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/ValueType;)Lio/github/charlietap/chasm/type/StorageType$Value;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/ValueType;)Lio/github/charlietap/chasm/type/ValueType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/ValueType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/ValueType;Lio/github/charlietap/chasm/type/ValueType;)Z
+	public final fun getType ()Lio/github/charlietap/chasm/type/ValueType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/ValueType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/ValueType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/ValueType;
+}
+
+public final class io/github/charlietap/chasm/type/StructType : io/github/charlietap/chasm/type/Type {
+	public static final synthetic fun box-impl (Ljava/util/List;)Lio/github/charlietap/chasm/type/StructType;
+	public static fun constructor-impl (Ljava/util/List;)Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/List;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/List;Ljava/util/List;)Z
+	public final fun getFields ()Ljava/util/List;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/List;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/List;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/List;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/SubType : io/github/charlietap/chasm/type/Type {
+	public abstract fun getCompositeType ()Lio/github/charlietap/chasm/type/CompositeType;
+	public abstract fun getSuperTypes ()Ljava/util/List;
+	public abstract fun setCompositeType (Lio/github/charlietap/chasm/type/CompositeType;)V
+	public abstract fun setSuperTypes (Ljava/util/List;)V
+}
+
+public final class io/github/charlietap/chasm/type/SubType$Final : io/github/charlietap/chasm/type/SubType {
+	public fun <init> (Ljava/util/List;Lio/github/charlietap/chasm/type/CompositeType;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/CompositeType;
+	public final fun copy (Ljava/util/List;Lio/github/charlietap/chasm/type/CompositeType;)Lio/github/charlietap/chasm/type/SubType$Final;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/SubType$Final;Ljava/util/List;Lio/github/charlietap/chasm/type/CompositeType;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/SubType$Final;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getCompositeType ()Lio/github/charlietap/chasm/type/CompositeType;
+	public fun getSuperTypes ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun setCompositeType (Lio/github/charlietap/chasm/type/CompositeType;)V
+	public fun setSuperTypes (Ljava/util/List;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/SubType$Open : io/github/charlietap/chasm/type/SubType {
+	public fun <init> (Ljava/util/List;Lio/github/charlietap/chasm/type/CompositeType;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/CompositeType;
+	public final fun copy (Ljava/util/List;Lio/github/charlietap/chasm/type/CompositeType;)Lio/github/charlietap/chasm/type/SubType$Open;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/SubType$Open;Ljava/util/List;Lio/github/charlietap/chasm/type/CompositeType;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/SubType$Open;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getCompositeType ()Lio/github/charlietap/chasm/type/CompositeType;
+	public fun getSuperTypes ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun setCompositeType (Lio/github/charlietap/chasm/type/CompositeType;)V
+	public fun setSuperTypes (Ljava/util/List;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/TableType : io/github/charlietap/chasm/type/Type {
+	public fun <init> (Lio/github/charlietap/chasm/type/AddressType;Lio/github/charlietap/chasm/type/ReferenceType;Lio/github/charlietap/chasm/type/Limits;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/type/AddressType;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/ReferenceType;
+	public final fun component3 ()Lio/github/charlietap/chasm/type/Limits;
+	public final fun copy (Lio/github/charlietap/chasm/type/AddressType;Lio/github/charlietap/chasm/type/ReferenceType;Lio/github/charlietap/chasm/type/Limits;)Lio/github/charlietap/chasm/type/TableType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/type/AddressType;Lio/github/charlietap/chasm/type/ReferenceType;Lio/github/charlietap/chasm/type/Limits;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/TableType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAddressType ()Lio/github/charlietap/chasm/type/AddressType;
+	public final fun getLimits ()Lio/github/charlietap/chasm/type/Limits;
+	public final fun getReferenceType ()Lio/github/charlietap/chasm/type/ReferenceType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/TagType {
+	public fun <init> (Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/FunctionType;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/type/TagType$Attribute;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun copy (Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/TagType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/FunctionType;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/TagType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAttribute ()Lio/github/charlietap/chasm/type/TagType$Attribute;
+	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/TagType$Attribute {
+}
+
+public final class io/github/charlietap/chasm/type/TagType$Attribute$Exception : io/github/charlietap/chasm/type/TagType$Attribute {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/TagType$Attribute$Exception;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/Type {
+}
+
+public abstract interface class io/github/charlietap/chasm/type/ValueType : io/github/charlietap/chasm/type/Type {
+}
+
+public final class io/github/charlietap/chasm/type/ValueType$Bottom : io/github/charlietap/chasm/type/ValueType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/BottomType;)Lio/github/charlietap/chasm/type/ValueType$Bottom;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/BottomType;)Lio/github/charlietap/chasm/type/BottomType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/BottomType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/BottomType;Lio/github/charlietap/chasm/type/BottomType;)Z
+	public final fun getBottomType ()Lio/github/charlietap/chasm/type/BottomType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/BottomType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/BottomType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/BottomType;
+}
+
+public final class io/github/charlietap/chasm/type/ValueType$Number : io/github/charlietap/chasm/type/ValueType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/NumberType;)Lio/github/charlietap/chasm/type/ValueType$Number;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/NumberType;)Lio/github/charlietap/chasm/type/NumberType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/NumberType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/NumberType;Lio/github/charlietap/chasm/type/NumberType;)Z
+	public final fun getNumberType ()Lio/github/charlietap/chasm/type/NumberType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/NumberType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/NumberType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/NumberType;
+}
+
+public final class io/github/charlietap/chasm/type/ValueType$Reference : io/github/charlietap/chasm/type/ValueType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/ReferenceType;)Lio/github/charlietap/chasm/type/ValueType$Reference;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/ReferenceType;)Lio/github/charlietap/chasm/type/ReferenceType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/ReferenceType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/ReferenceType;Lio/github/charlietap/chasm/type/ReferenceType;)Z
+	public final fun getReferenceType ()Lio/github/charlietap/chasm/type/ReferenceType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/ReferenceType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/ReferenceType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/ReferenceType;
+}
+
+public final class io/github/charlietap/chasm/type/ValueType$Vector : io/github/charlietap/chasm/type/ValueType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/VectorType;)Lio/github/charlietap/chasm/type/ValueType$Vector;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/VectorType;)Lio/github/charlietap/chasm/type/VectorType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/VectorType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/VectorType;Lio/github/charlietap/chasm/type/VectorType;)Z
+	public final fun getVectorType ()Lio/github/charlietap/chasm/type/VectorType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/VectorType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/VectorType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/VectorType;
+}
+
+public final class io/github/charlietap/chasm/type/VectorType : java/lang/Enum, io/github/charlietap/chasm/type/Type {
+	public static final field V128 Lio/github/charlietap/chasm/type/VectorType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/type/VectorType;
+	public static fun values ()[Lio/github/charlietap/chasm/type/VectorType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/ArrayTypeDeepCopierKt {
+	public static final fun ArrayTypeDeepCopier-9jzuwY4 (Lio/github/charlietap/chasm/type/FieldType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/FieldType;
+	public static final fun ArrayTypeDeepCopier-Kgwk01M (Lio/github/charlietap/chasm/type/FieldType;)Lio/github/charlietap/chasm/type/FieldType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/CompositeTypeDeepCopierKt {
+	public static final fun CompositeTypeDeepCopier (Lio/github/charlietap/chasm/type/CompositeType;)Lio/github/charlietap/chasm/type/CompositeType;
+	public static final fun CompositeTypeDeepCopier (Lio/github/charlietap/chasm/type/CompositeType;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/CompositeType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/FieldTypeDeepCopierKt {
+	public static final fun FieldTypeDeepCopier (Lio/github/charlietap/chasm/type/FieldType;)Lio/github/charlietap/chasm/type/FieldType;
+	public static final fun FieldTypeDeepCopier (Lio/github/charlietap/chasm/type/FieldType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/FieldType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/FunctionTypeDeepCopierKt {
+	public static final fun FunctionTypeDeepCopier (Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/FunctionType;
+	public static final fun FunctionTypeDeepCopier (Lio/github/charlietap/chasm/type/FunctionType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/FunctionType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/HeapTypeDeepCopierKt {
+	public static final fun HeapTypeDeepCopier (Lio/github/charlietap/chasm/type/HeapType;)Lio/github/charlietap/chasm/type/HeapType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/PackedTypeDeepCopierKt {
+	public static final fun PackedTypeDeepCopier (Lio/github/charlietap/chasm/type/PackedType;)Lio/github/charlietap/chasm/type/PackedType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/RecursiveTypeDeepCopierKt {
+	public static final fun RecursiveTypeDeepCopier (Lio/github/charlietap/chasm/type/RecursiveType;)Lio/github/charlietap/chasm/type/RecursiveType;
+	public static final fun RecursiveTypeDeepCopier (Lio/github/charlietap/chasm/type/RecursiveType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/RecursiveType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/ReferenceTypeDeepCopierKt {
+	public static final fun ReferenceTypeDeepCopier (Lio/github/charlietap/chasm/type/ReferenceType;)Lio/github/charlietap/chasm/type/ReferenceType;
+	public static final fun ReferenceTypeDeepCopier (Lio/github/charlietap/chasm/type/ReferenceType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/ReferenceType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/ResultTypeDeepCopierKt {
+	public static final fun ResultTypeDeepCopier--gLIJY4 (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun ResultTypeDeepCopier-ahte0nc (Ljava/util/List;)Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/type/copy/StorageTypeDeepCopierKt {
+	public static final fun StorageTypeDeepCopier (Lio/github/charlietap/chasm/type/StorageType;)Lio/github/charlietap/chasm/type/StorageType;
+	public static final fun StorageTypeDeepCopier (Lio/github/charlietap/chasm/type/StorageType;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/StorageType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/StructTypeDeepCopierKt {
+	public static final fun StructTypeDeepCopier-IZlBR9w (Ljava/util/List;)Ljava/util/List;
+	public static final fun StructTypeDeepCopier-Ssq-r9s (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/type/copy/SubTypeDeepCopierKt {
+	public static final fun SubTypeDeepCopier (Lio/github/charlietap/chasm/type/SubType;)Lio/github/charlietap/chasm/type/SubType;
+	public static final fun SubTypeDeepCopier (Lio/github/charlietap/chasm/type/SubType;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/SubType;
+}
+
+public final class io/github/charlietap/chasm/type/copy/ValueTypeDeepCopierKt {
+	public static final fun ValueTypeDeepCopier (Lio/github/charlietap/chasm/type/ValueType;)Lio/github/charlietap/chasm/type/ValueType;
+	public static final fun ValueTypeDeepCopier (Lio/github/charlietap/chasm/type/ValueType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/ValueType;
+}
+
+public final class io/github/charlietap/chasm/type/differ/ReferenceTypeDifferKt {
+	public static final fun ReferenceTypeDiffer (Lio/github/charlietap/chasm/type/ReferenceType;Lio/github/charlietap/chasm/type/ReferenceType;)Lio/github/charlietap/chasm/type/ReferenceType;
+}
+
+public final class io/github/charlietap/chasm/type/expansion/BlockTypeExpanderKt {
+	public static final fun BlockTypeExpander (Ljava/util/List;Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/FunctionType;
+}
+
+public final class io/github/charlietap/chasm/type/expansion/DefinedTypeExpanderKt {
+	public static final fun DefinedTypeExpander (Lio/github/charlietap/chasm/type/DefinedType;)Lio/github/charlietap/chasm/type/CompositeType;
+}
+
+public final class io/github/charlietap/chasm/type/ext/CompositeTypeExtKt {
+	public static final fun arrayType (Lio/github/charlietap/chasm/type/CompositeType;)Lio/github/charlietap/chasm/type/FieldType;
+	public static final fun asArrayType (Lio/github/charlietap/chasm/type/CompositeType;)Lio/github/charlietap/chasm/type/FieldType;
+	public static final fun asFunctionType (Lio/github/charlietap/chasm/type/CompositeType;)Lio/github/charlietap/chasm/type/FunctionType;
+	public static final fun asStructType (Lio/github/charlietap/chasm/type/CompositeType;)Ljava/util/List;
+	public static final fun functionType (Lio/github/charlietap/chasm/type/CompositeType;)Lio/github/charlietap/chasm/type/FunctionType;
+	public static final fun structType (Lio/github/charlietap/chasm/type/CompositeType;)Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/type/ext/DefinedTypeExtKt {
+	public static final fun arrayType (Lio/github/charlietap/chasm/type/DefinedType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/FieldType;
+	public static synthetic fun arrayType$default (Lio/github/charlietap/chasm/type/DefinedType;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/FieldType;
+	public static final fun functionType (Lio/github/charlietap/chasm/type/DefinedType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/type/FunctionType;
+	public static synthetic fun functionType$default (Lio/github/charlietap/chasm/type/DefinedType;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/FunctionType;
+	public static final fun structType (Lio/github/charlietap/chasm/type/DefinedType;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static synthetic fun structType$default (Lio/github/charlietap/chasm/type/DefinedType;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/type/ext/FieldTypeExtKt {
+	public static final fun bitWidth (Lio/github/charlietap/chasm/type/FieldType;)Ljava/lang/Integer;
+}
+
+public final class io/github/charlietap/chasm/type/ext/FunctionTypeExtKt {
+	public static final fun definedType (Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/DefinedType;
+	public static final fun recursiveType (Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/RecursiveType;
+}
+
+public final class io/github/charlietap/chasm/type/ext/RecursiveTypeExtKt {
+	public static final fun definedType (Lio/github/charlietap/chasm/type/RecursiveType;)Lio/github/charlietap/chasm/type/DefinedType;
+}
+
+public final class io/github/charlietap/chasm/type/ext/ValueTypeExtKt {
+	public static final fun bitWidth (Lio/github/charlietap/chasm/type/ValueType;)Ljava/lang/Integer;
+}
+
+public final class io/github/charlietap/chasm/type/extremas/BottomOfHeapTypeKt {
+	public static final fun BottomOfHeapType (Lio/github/charlietap/chasm/type/HeapType;Ljava/util/List;)Lio/github/charlietap/chasm/type/HeapType;
+}
+
+public final class io/github/charlietap/chasm/type/extremas/TopOfHeapTypeKt {
+	public static final fun TopOfHeapType (Lio/github/charlietap/chasm/type/HeapType;Ljava/util/List;)Lio/github/charlietap/chasm/type/HeapType;
+}
+
+public final class io/github/charlietap/chasm/type/factory/DefinedTypeFactoryKt {
+	public static final fun DefinedTypeFactory (Ljava/util/List;)Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/type/factory/RTTFactoryKt {
+	public static final fun RTTFactory (Lio/github/charlietap/chasm/type/DefinedType;Ljava/util/Map;)Lio/github/charlietap/chasm/type/RTT;
+}
+
+public final class io/github/charlietap/chasm/type/matching/CompositeTypeMatcherKt {
+	public static final fun CompositeTypeMatcher (Lio/github/charlietap/chasm/type/CompositeType;Lio/github/charlietap/chasm/type/CompositeType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/DefinedTypeMatcherKt {
+	public static final fun DefinedTypeMatcher (Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/FunctionTypeMatcherKt {
+	public static final fun FunctionTypeMatcher (Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/GlobalTypeMatcherKt {
+	public static final fun GlobalTypeMatcher (Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/HeapTypeMatcherKt {
+	public static final fun HeapTypeMatcher (Lio/github/charlietap/chasm/type/HeapType;Lio/github/charlietap/chasm/type/HeapType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/LimitsMatcherKt {
+	public static final fun LimitsMatcher (Lio/github/charlietap/chasm/type/Limits;Lio/github/charlietap/chasm/type/Limits;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/MemoryTypeMatcherKt {
+	public static final fun MemoryTypeMatcher (Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/ReferenceTypeMatcherKt {
+	public static final fun ReferenceTypeMatcher (Lio/github/charlietap/chasm/type/ReferenceType;Lio/github/charlietap/chasm/type/ReferenceType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/ResultTypeMatcherKt {
+	public static final fun ResultTypeMatcher-g0Mq-KI (Ljava/util/List;Ljava/util/List;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/StorageTypeMatcherKt {
+	public static final fun StorageTypeMatcher (Lio/github/charlietap/chasm/type/StorageType;Lio/github/charlietap/chasm/type/StorageType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/TableTypeMatcherKt {
+	public static final fun TableTypeMatcher (Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/matching/TagTypeMatcherKt {
+	public static final fun TagTypeMatcher (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public abstract interface class io/github/charlietap/chasm/type/matching/TypeMatcherContext {
+	public abstract fun getLookup ()Lkotlin/jvm/functions/Function1;
+}
+
+public final class io/github/charlietap/chasm/type/matching/ValueTypeMatcherKt {
+	public static final fun ValueTypeMatcher (Lio/github/charlietap/chasm/type/ValueType;Lio/github/charlietap/chasm/type/ValueType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
+}
+
+public final class io/github/charlietap/chasm/type/rolling/DefinedTypeRollerKt {
+	public static final fun DefinedTypeRoller (ILio/github/charlietap/chasm/type/RecursiveType;)Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/type/rolling/DefinedTypeUnrollerKt {
+	public static final fun DefinedTypeUnroller (Lio/github/charlietap/chasm/type/DefinedType;)Lio/github/charlietap/chasm/type/SubType;
+}
+
+public final class io/github/charlietap/chasm/type/rolling/RecursiveTypeUnrollerKt {
+	public static final fun RecursiveTypeUnroller (Lio/github/charlietap/chasm/type/RecursiveType;)Lio/github/charlietap/chasm/type/RecursiveType;
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/ConcreteHeapTypeSubstitutorKt {
+	public static final fun RecursiveTypeIndexToDefinedTypeSubstitutor (Lio/github/charlietap/chasm/type/RecursiveType;)Lkotlin/jvm/functions/Function1;
+	public static final fun TypeIndexToDefinedTypeSubstitutor (Ljava/util/List;)Lkotlin/jvm/functions/Function1;
+	public static final fun TypeIndexToRecursiveTypeIndexSubsitutor (II)Lkotlin/jvm/functions/Function1;
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/RecursiveTypeSubstitutorKt {
+	public static final fun RecursiveTypeSubstitutor (Lio/github/charlietap/chasm/type/RecursiveType;Lio/github/charlietap/chasm/type/rolling/substitution/Substitution;)Lio/github/charlietap/chasm/type/RecursiveType;
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/ReferenceTypeSubstitutorKt {
+	public static final fun ReferenceTypeSubstitutor (Lio/github/charlietap/chasm/type/ReferenceType;Lio/github/charlietap/chasm/type/rolling/substitution/Substitution;)Lio/github/charlietap/chasm/type/ReferenceType;
+}
+
+public abstract interface class io/github/charlietap/chasm/type/rolling/substitution/Substitution {
+	public abstract fun getConcreteHeapTypeSubstitutor ()Lkotlin/jvm/functions/Function1;
+	public abstract fun getOutputState-qG_ZTqg ()B
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/Substitution$RecursiveTypeIndexToDefinedType : io/github/charlietap/chasm/type/rolling/substitution/Substitution {
+	public fun <init> (Lio/github/charlietap/chasm/type/RecursiveType;)V
+	public fun getConcreteHeapTypeSubstitutor ()Lkotlin/jvm/functions/Function1;
+	public fun getOutputState-qG_ZTqg ()B
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/Substitution$TypeIndexToDefinedType : io/github/charlietap/chasm/type/rolling/substitution/Substitution {
+	public fun <init> (Ljava/util/List;)V
+	public fun getConcreteHeapTypeSubstitutor ()Lkotlin/jvm/functions/Function1;
+	public fun getOutputState-qG_ZTqg ()B
+	public final fun getTypes ()Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/Substitution$TypeIndexToRecursiveTypeIndex : io/github/charlietap/chasm/type/rolling/substitution/Substitution {
+	public fun <init> (II)V
+	public fun getConcreteHeapTypeSubstitutor ()Lkotlin/jvm/functions/Function1;
+	public fun getOutputState-qG_ZTqg ()B
+}
+

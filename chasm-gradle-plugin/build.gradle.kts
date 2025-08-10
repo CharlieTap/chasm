@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.build.config)
@@ -30,6 +32,12 @@ gradlePlugin {
 }
 
 kotlin {
+
+    @OptIn(ExperimentalAbiValidation::class)
+    abiValidation {
+        enabled.set(true)
+    }
+
     compilerOptions {
         freeCompilerArgs.add("-Xwhen-guards")
     }

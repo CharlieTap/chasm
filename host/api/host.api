@@ -1,0 +1,5 @@
+public final class io/github/charlietap/chasm/host/HostFunctionException : java/lang/Exception {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun getReason ()Ljava/lang/String;
+}
+
