@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.decoder
+package io.github.charlietap.chasm.fake.decoder
 
 import io.github.charlietap.chasm.stream.SourceReader
 

@@ -7,8 +7,8 @@ import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.module.Global
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.config.moduleConfig
-import io.github.charlietap.chasm.decoder.FakeSourceReader
+import io.github.charlietap.chasm.fixture.config.moduleConfig
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.decoder.WasmModuleDecoder
 import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.type.i32ValueType

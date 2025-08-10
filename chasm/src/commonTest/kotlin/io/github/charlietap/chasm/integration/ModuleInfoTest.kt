@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.config.moduleConfig
-import io.github.charlietap.chasm.decoder.FakeSourceReader
+import io.github.charlietap.chasm.fixture.config.moduleConfig
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo

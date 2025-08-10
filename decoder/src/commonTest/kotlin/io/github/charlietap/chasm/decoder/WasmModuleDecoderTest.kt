@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.decoder
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.config.moduleConfig
+import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.decoder.context.scope.Scope
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.factory.BinaryReaderFactory
@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.decoder.section.ImportSection
 import io.github.charlietap.chasm.decoder.section.Section
 import io.github.charlietap.chasm.decoder.section.SectionSize
 import io.github.charlietap.chasm.decoder.section.SectionType
+import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.fixture.ast.module.module
 import kotlin.test.Test
 import kotlin.test.assertEquals

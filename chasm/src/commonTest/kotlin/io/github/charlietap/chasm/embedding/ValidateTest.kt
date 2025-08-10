@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.embedding
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.config.moduleConfig
+import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicModule
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult

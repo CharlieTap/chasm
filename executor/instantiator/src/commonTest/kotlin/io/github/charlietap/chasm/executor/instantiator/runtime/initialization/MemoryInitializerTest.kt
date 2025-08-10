@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext

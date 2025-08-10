@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.fixture.executor.instantiator
 
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.runtime.store

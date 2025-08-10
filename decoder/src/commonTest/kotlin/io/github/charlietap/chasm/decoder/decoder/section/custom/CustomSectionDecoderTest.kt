@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.decoder.decoder.section.custom
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.module.NameData
 import io.github.charlietap.chasm.ast.value.NameValue
-import io.github.charlietap.chasm.config.moduleConfig
+import io.github.charlietap.chasm.fixture.config.moduleConfig
 import io.github.charlietap.chasm.decoder.context.scope.Scope
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.customSection

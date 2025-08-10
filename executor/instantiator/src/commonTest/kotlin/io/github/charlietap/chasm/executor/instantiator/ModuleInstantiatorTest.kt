@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker

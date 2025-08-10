@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.fixture.runtime.execution
 
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
