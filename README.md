@@ -38,15 +38,13 @@ To use the plugin you need to:
 
 * Add the plugin to your build script.
 * Declare your wasm module(s) in the `chasm` extension.
-* Add the appropriate chasm runtime dependency (`chasm‑jvm` on JVM and
-  Android).
 
 A minimal example using the plugin looks like this:
 
 ```kotlin
 plugins {
-    id("org.jetbrains.kotlin.jvm")
-    id("io.github.charlietap.chasm.gradle") version "0.2.2"
+    ...
+    id("io.github.charlietap.chasm.gradle") version "1.0.0"
 }
 
 chasm {
@@ -57,16 +55,12 @@ chasm {
         }
     }
 }
-
-dependencies {
-    implementation("io.github.charlietap.chasm:chasm-jvm:0.9.81")
-}
 ```
 
 With this configuration a Kotlin class called `ExampleService` will be
 generated in the specified package. Each exported function in
 `example.wasm` will be exposed as a Kotlin function. The plugin runs on JVM,
-Kotlin Multiplatform and Android module.
+Kotlin Multiplatform and Android modules.
 
 For more information please see the plugin documentation [here](./docs/plugin.md) and for
 a working example please see the example project in `example/` for Android, JVM and
@@ -81,7 +75,7 @@ APIs without the plugin.
 
 ```kotlin
 dependencies {
-    implementation("io.github.charlietap.chasm:chasm:0.9.81")
+    implementation("io.github.charlietap.chasm:chasm:1.0.0")
 }
 ```
 
