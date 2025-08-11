@@ -18,7 +18,7 @@ inline fun ByteArray.toUShortLittleEndian(): UShort =
             ((this[1].toUByte().toUInt() and 0xFFu) shl 8)
     ).toUShort()
 
-internal inline fun ByteArray.toUShortLittleEndian(offset: Int = 0): UShort =
+inline fun ByteArray.toUShortLittleEndian(offset: Int = 0): UShort =
     (
         (this[offset].toUByte().toUInt() and 0xFFu) or
             ((this[offset + 1].toUByte().toUInt() and 0xFFu) shl 8)
@@ -57,7 +57,7 @@ inline fun ByteArray.toUIntLittleEndian(): UInt {
         ((this[3].toUInt() and 0xFFu) shl 24)
 }
 
-internal inline fun ByteArray.toUIntLittleEndian(offset: Int = 0): UInt {
+inline fun ByteArray.toUIntLittleEndian(offset: Int = 0): UInt {
     return (this[offset].toUInt() and 0xFFu) or
         ((this[offset + 1].toUInt() and 0xFFu) shl 8) or
         ((this[offset + 2].toUInt() and 0xFFu) shl 16) or

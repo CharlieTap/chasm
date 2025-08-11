@@ -1,15 +1,9 @@
 package io.github.charlietap.chasm.memory.init
 
-import io.github.charlietap.chasm.memory.NativeLinearMemory
+import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
-import kotlinx.cinterop.CValuesRef
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.reinterpret
-import kotlinx.cinterop.usePinned
-import liblinmem.write_bytes
-import platform.posix.uint8_tVar
 
 actual inline fun LinearMemoryInitialiser(
     src: UByteArray,
@@ -20,21 +14,12 @@ actual inline fun LinearMemoryInitialiser(
     srcUpperBound: Int,
     dstUpperBound: Int,
 ) {
-    if (
-        bytesToInit < 0 ||
-        srcOffset < 0 ||
-        dstOffset < 0 ||
-        (srcOffset + bytesToInit) > srcUpperBound ||
-        (dstOffset + bytesToInit) > dstUpperBound
-    ) {
+    val byteArray = (dst as ByteArrayLinearMemory).memory
+    try {
+        src.asByteArray().copyInto(byteArray, dstOffset, srcOffset, srcOffset + bytesToInit)
+    } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
-    }
-
-    if (bytesToInit == 0) return
-
-    val nativeMemory = dst as NativeLinearMemory
-    src.usePinned { pinned ->
-        val cValuesRef: CValuesRef<uint8_tVar>? = pinned.addressOf(srcOffset).reinterpret()
-        write_bytes(nativeMemory.pointer, dstOffset, cValuesRef, bytesToInit)
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
     }
 }
