@@ -164,6 +164,41 @@ val hostFunction = HostFunction { params ->
 val result = function(store, functionType, hostFunction)
 ```
 
+# Working with modules that contain syscalls
+
+Wasm is a specification of an abstract virtual machine, it does not define an operating system ... for that
+there is a separate specification known as [WASI](https://wasi.dev/). Wasm instead defines a system for importing
+functions and an operating system is that, a set of well-defined functions.
+
+It works like this, WASI describes the functions and compilers can then produce wasm modules that expect function imports
+that match those functions defined in the WASI spec. For example heres a module that uses WASI to get the time:
+
+```wat
+(module
+  (import "wasi_snapshot_preview1" "clock_time_get" (func $clock_time_get (param i32 i64 i32) (result i32)))
+
+  (memory (export "memory") 1)
+
+  (func (export "get_time")
+    i32.const 0
+    i64.const 0
+    i32.const 0
+    call $clock_time_get
+    drop
+  )
+)
+```
+
+WASI is an evolving spec (far more nascent than WASM) and we have the following support:
+
+- WASI Preview 1
+
+Full support through the library [WASI Emscripten Host](https://github.com/illarionov/wasi-emscripten-host)
+
+- WASI Preview 2/3
+
+No support as it requires a Phase 1 Wasm proposal called the [Component Model](https://github.com/WebAssembly/component-model)
+
 ## License
 
 This project is dual-licensed under both the MIT and Apache 2.0 licenses. You can choose which one you want to use the software under.
