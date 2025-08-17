@@ -37,9 +37,3 @@ internal fun ValueType.asType(): Type {
         -> throw IllegalStateException("Cannot convert $this to Type")
     }
 }
-
-internal fun ValueType.isI32() = this == ValueType.Number(NumberType.I32)
-
-internal fun List<ValueType>.matchesStringReturnType() = all { valueType ->
-    valueType.isI32()
-}
