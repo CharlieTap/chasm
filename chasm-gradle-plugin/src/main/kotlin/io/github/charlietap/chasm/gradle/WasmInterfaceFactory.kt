@@ -216,6 +216,7 @@ internal class WasmInterfaceFactory(
         info: ModuleInfo,
         initializers: Set<String>,
         wasmFunctions: List<WasmFunction>,
+        ignoredExports: Set<String>,
         logger: (String) -> Unit,
     ): WasmInterface {
 
@@ -224,6 +225,11 @@ internal class WasmInterfaceFactory(
         val types = mutableListOf<GeneratedType>()
 
         info.exports.forEach { export ->
+
+            if (ignoredExports.contains(export.name)) {
+                return@forEach
+            }
+
             when (val type = export.type) {
                 is ExternalType.Function -> {
                     try {

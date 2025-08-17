@@ -50,6 +50,9 @@ abstract class CodegenTask
         @get:Input
         abstract val functions: ListProperty<WasmFunction>
 
+        @get:Input
+        abstract val ignoredExports: SetProperty<String>
+
         @get:OutputDirectory
         abstract val outputDirectory: DirectoryProperty
 
@@ -77,6 +80,7 @@ abstract class CodegenTask
                 info = info,
                 initializers = initializers.get(),
                 wasmFunctions = functions.get(),
+                ignoredExports = ignoredExports.get(),
                 logger = logger,
             )
             val specs = generator(interfaceVisibility.get(), implementationVisibility.get(), data)

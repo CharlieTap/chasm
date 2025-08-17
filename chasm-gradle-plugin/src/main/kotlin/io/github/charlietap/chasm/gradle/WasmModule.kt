@@ -21,6 +21,7 @@ abstract class WasmModule
         abstract val functions: ListProperty<WasmFunction>
         abstract val interfaceVisibility: Property<TypeVisibility>
         abstract val implementationVisibility: Property<TypeVisibility>
+        abstract val ignoredExports: SetProperty<String>
 
         init {
             binary.convention(project.layout.projectDirectory.file(DEFAULT_MODULE_FILE_PATH))

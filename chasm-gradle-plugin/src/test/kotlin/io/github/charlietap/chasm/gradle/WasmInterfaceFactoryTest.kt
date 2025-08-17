@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.gradle.fixture.doubleScalarType
 import io.github.charlietap.chasm.gradle.fixture.field
 import io.github.charlietap.chasm.gradle.fixture.floatScalarType
 import io.github.charlietap.chasm.gradle.fixture.function
+import io.github.charlietap.chasm.gradle.fixture.functionImplementation
 import io.github.charlietap.chasm.gradle.fixture.functionParameter
 import io.github.charlietap.chasm.gradle.fixture.functionParameterDefinition
 import io.github.charlietap.chasm.gradle.fixture.functionProxy
@@ -69,6 +70,7 @@ class WasmInterfaceFactoryTest {
             info = info,
             initializers = initializers,
             wasmFunctions = emptyList(),
+            ignoredExports = emptySet(),
             logger = LOGGER,
         )
 
@@ -172,6 +174,7 @@ class WasmInterfaceFactoryTest {
             info = info,
             initializers = emptySet(),
             wasmFunctions = listOf(function),
+            ignoredExports = emptySet(),
             logger = LOGGER,
         )
 
@@ -198,6 +201,54 @@ class WasmInterfaceFactoryTest {
                     ),
                     implementation = functionProxy(
                         name = "foo",
+                    ),
+                ),
+            ),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `can ignore an export`() {
+
+        val packageName = "package name"
+        val interfaceName = "interface name"
+        val config = codegenConfig()
+        val info = moduleInfo(
+            exports = listOf(
+                exportDefinition(
+                    name = "not_ignored",
+                    type = functionExternalType(),
+                ),
+                exportDefinition(
+                    name = "ignored",
+                    type = functionExternalType(),
+                ),
+            ),
+        )
+
+        val factory = WasmInterfaceFactory()
+        val actual = factory(
+            interfaceName = interfaceName,
+            packageName = packageName,
+            config = config,
+            info = info,
+            initializers = emptySet(),
+            wasmFunctions = emptyList(),
+            ignoredExports = setOf("ignored"),
+            logger = LOGGER,
+        )
+
+        val expected = wasmInterface(
+            interfaceName = interfaceName,
+            packageName = packageName,
+            initializers = emptySet(),
+            types = emptyList(),
+            functions = listOf(
+                function(
+                    name = "notIgnored",
+                    implementation = functionProxy(
+                        name = "not_ignored",
                     ),
                 ),
             ),

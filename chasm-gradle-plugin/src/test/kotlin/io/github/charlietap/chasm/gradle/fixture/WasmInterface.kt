@@ -29,7 +29,7 @@ internal fun stringScalarType() = Scalar.String
 
 internal fun unitScalarType() = Scalar.Unit
 
-internal fun scalarType(): Scalar = integerScalarType()
+internal fun scalarType(): Scalar = unitScalarType()
 
 internal fun type(): Type = scalarType()
 

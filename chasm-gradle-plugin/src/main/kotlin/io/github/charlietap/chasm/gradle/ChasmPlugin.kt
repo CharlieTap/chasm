@@ -159,6 +159,7 @@ class ChasmPlugin : Plugin<Project> {
             implementationVisibility.set(module.implementationVisibility)
             initializers.set(module.initializers)
             functions.set(module.functions)
+            ignoredExports.set(module.ignoredExports)
             outputDirectory.set(project.layout.buildDirectory.dir("generated/kotlin/$sourceSetName"))
         }
     }
