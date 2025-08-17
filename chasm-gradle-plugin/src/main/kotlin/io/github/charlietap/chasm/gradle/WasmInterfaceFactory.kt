@@ -217,7 +217,7 @@ internal class WasmInterfaceFactory(
         initializers: Set<String>,
         wasmFunctions: List<WasmFunction>,
         ignoredExports: Set<String>,
-        logger: (String) -> Unit,
+        logger: Logger,
     ): WasmInterface {
 
         val functions = mutableListOf<Function>()
@@ -244,7 +244,7 @@ internal class WasmInterfaceFactory(
                         )
                         functions.add(function)
                     } catch (exception: Exception) {
-                        logger("Failed to generate function ${export.name} because ${exception.message}")
+                        logger.error("Failed to generate function ${export.name} because ${exception.message}")
                     }
                 }
                 is ExternalType.Global -> {
@@ -257,7 +257,7 @@ internal class WasmInterfaceFactory(
                             properties.add(property)
                         }
                     } catch (exception: Exception) {
-                        logger("Failed to generate global ${export.name} because ${exception.message}")
+                        logger.error("Failed to generate global ${export.name} because ${exception.message}")
                     }
                 }
                 is ExternalType.Memory,

@@ -9,6 +9,9 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.gradle.StringEncodingStrategy
+import io.github.charlietap.chasm.gradle.fixture.FakeLogger
+import io.github.charlietap.chasm.gradle.fixture.NeverLogger
 import io.github.charlietap.chasm.gradle.fixture.aggregateType
 import io.github.charlietap.chasm.gradle.fixture.codegenConfig
 import io.github.charlietap.chasm.gradle.fixture.doubleScalarType
@@ -24,6 +27,8 @@ import io.github.charlietap.chasm.gradle.fixture.generatedType
 import io.github.charlietap.chasm.gradle.fixture.integerScalarType
 import io.github.charlietap.chasm.gradle.fixture.longScalarType
 import io.github.charlietap.chasm.gradle.fixture.returnTypeDefinition
+import io.github.charlietap.chasm.gradle.fixture.stringScalarType
+import io.github.charlietap.chasm.gradle.fixture.unitScalarType
 import io.github.charlietap.chasm.gradle.fixture.wasmFunction
 import io.github.charlietap.chasm.gradle.fixture.wasmInterface
 import kotlin.test.Test
@@ -71,7 +76,7 @@ class WasmInterfaceFactoryTest {
             initializers = initializers,
             wasmFunctions = emptyList(),
             ignoredExports = emptySet(),
-            logger = LOGGER,
+            logger = NeverLogger,
         )
 
         val type = generatedType(
@@ -175,7 +180,7 @@ class WasmInterfaceFactoryTest {
             initializers = emptySet(),
             wasmFunctions = listOf(function),
             ignoredExports = emptySet(),
-            logger = LOGGER,
+            logger = NeverLogger,
         )
 
         val expected = wasmInterface(
@@ -236,7 +241,7 @@ class WasmInterfaceFactoryTest {
             initializers = emptySet(),
             wasmFunctions = emptyList(),
             ignoredExports = setOf("ignored"),
-            logger = LOGGER,
+            logger = NeverLogger,
         )
 
         val expected = wasmInterface(
@@ -256,9 +261,59 @@ class WasmInterfaceFactoryTest {
         assertEquals(expected, actual)
     }
 
-    private companion object {
-        val LOGGER: (String) -> Unit = {
-            fail("Logger should never be called but was with message: $it")
-        }
+    @Test
+    fun `logs error and excludes function when string param spec mismatches wasm signature`() {
+
+        val packageName = "package name"
+        val interfaceName = "interface name"
+        val config = codegenConfig()
+        val info = moduleInfo(
+            exports = listOf(
+                exportDefinition(
+                    name = "foo",
+                ),
+            ),
+        )
+
+        val function = wasmFunction(
+            name = "foo",
+            parameters = listOf(
+                functionParameterDefinition(
+                    name = "s",
+                    type = stringScalarType(),
+                    stringEncodingStrategy = StringEncodingStrategy.POINTER_AND_LENGTH,
+                ),
+            ),
+            returnType = returnTypeDefinition(
+                type = unitScalarType(),
+            ),
+        )
+
+        val logger = FakeLogger()
+
+        val factory = WasmInterfaceFactory()
+        val actual = factory(
+            interfaceName = interfaceName,
+            packageName = packageName,
+            config = config,
+            info = info,
+            initializers = emptySet(),
+            wasmFunctions = listOf(function),
+            ignoredExports = emptySet(),
+            logger = logger,
+        )
+
+        val expected = wasmInterface(
+            interfaceName = interfaceName,
+            packageName = packageName,
+            initializers = emptySet(),
+            types = emptyList(),
+            functions = emptyList(),
+        )
+        assertEquals(expected, actual)
+
+        logger.expectExactlyOneErrorLog(
+            "Failed to generate function foo because Function definition defines parameters [Number(numberType=I32), Number(numberType=I32)] but actual wasm function expects []",
+        )
     }
 }
