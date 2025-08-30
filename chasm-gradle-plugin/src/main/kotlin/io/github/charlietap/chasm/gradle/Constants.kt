@@ -20,5 +20,7 @@ internal val READ_STRING_FUNCTION = MemberName("io.github.charlietap.chasm.embed
 internal val READ_NULL_STRING_FUNCTION = MemberName("io.github.charlietap.chasm.embedding.memory", "readNullTerminatedUtf8String")
 internal val READ_INT_FUNCTION = MemberName("io.github.charlietap.chasm.embedding.memory", "readInt")
 internal val WRITE_INT_FUNCTION = MemberName("io.github.charlietap.chasm.embedding.memory", "writeInt")
+internal val WRITE_BYTES_FUNCTION = MemberName("io.github.charlietap.chasm.embedding.memory", "writeBytes")
+internal val WRITE_BYTE_FUNCTION = MemberName("io.github.charlietap.chasm.embedding.memory", "writeByte")
 internal val MAP_RESULT_FUNCTION = MemberName("io.github.charlietap.chasm.embedding.shapes", "map")
 internal val FLATMAP_RESULT_FUNCTION = MemberName("io.github.charlietap.chasm.embedding.shapes", "flatMap")

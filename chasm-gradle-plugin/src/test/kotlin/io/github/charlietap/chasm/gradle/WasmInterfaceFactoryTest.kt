@@ -73,6 +73,7 @@ class WasmInterfaceFactoryTest {
             packageName = packageName,
             config = config,
             info = info,
+            allocator = null,
             initializers = initializers,
             wasmFunctions = emptyList(),
             ignoredExports = emptySet(),
@@ -122,6 +123,77 @@ class WasmInterfaceFactoryTest {
                 ),
             ),
         )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `excludes allocator exports from interface`() {
+
+        val packageName = "package name"
+        val interfaceName = "interface name"
+        val config = codegenConfig()
+
+        val info = moduleInfo(
+            exports = listOf(
+                exportDefinition(
+                    name = "_malloc",
+                    type = functionExternalType(
+                        functionType = functionType(
+                            params = resultType(listOf(i32ValueType())),
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+                exportDefinition(
+                    name = "_free",
+                    type = functionExternalType(
+                        functionType = functionType(
+                            params = resultType(listOf(i32ValueType())),
+                            results = resultType(emptyList()),
+                        ),
+                    ),
+                ),
+                exportDefinition(
+                    name = "regular_export",
+                    type = functionExternalType(),
+                ),
+            ),
+        )
+
+        val allocator = ExportedAllocator(
+            allocationFunction = "_malloc",
+            deallocationFunction = "_free",
+        )
+
+        val factory = WasmInterfaceFactory()
+        val actual = factory(
+            interfaceName = interfaceName,
+            packageName = packageName,
+            config = config,
+            info = info,
+            allocator = allocator,
+            initializers = emptySet(),
+            wasmFunctions = emptyList(),
+            ignoredExports = emptySet(),
+            logger = NeverLogger,
+        )
+
+        val expected = wasmInterface(
+            interfaceName = interfaceName,
+            packageName = packageName,
+            initializers = emptySet(),
+            types = emptyList(),
+            functions = listOf(
+                function(
+                    name = "regularExport",
+                    implementation = functionProxy(
+                        name = "regular_export",
+                    ),
+                ),
+            ),
+            allocator = allocator,
+        )
+
         assertEquals(expected, actual)
     }
 
@@ -177,6 +249,7 @@ class WasmInterfaceFactoryTest {
             packageName = packageName,
             config = config,
             info = info,
+            allocator = null,
             initializers = emptySet(),
             wasmFunctions = listOf(function),
             ignoredExports = emptySet(),
@@ -238,6 +311,7 @@ class WasmInterfaceFactoryTest {
             packageName = packageName,
             config = config,
             info = info,
+            allocator = null,
             initializers = emptySet(),
             wasmFunctions = emptyList(),
             ignoredExports = setOf("ignored"),
@@ -297,6 +371,7 @@ class WasmInterfaceFactoryTest {
             packageName = packageName,
             config = config,
             info = info,
+            allocator = null,
             initializers = emptySet(),
             wasmFunctions = listOf(function),
             ignoredExports = emptySet(),

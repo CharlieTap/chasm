@@ -6,6 +6,7 @@ data class FunctionParameterDefinition(
     val name: String,
     val type: Type,
     val stringEncodingStrategy: StringEncodingStrategy? = null,
+    val stringAllocationStrategy: StringAllocationStrategy? = null,
 ) : Serializable
 
 data class ReturnTypeDefinition(
@@ -39,6 +40,21 @@ class WasmFunctionBuilder(
 
     fun doubleParam(name: String) {
         parameters.add(FunctionParameterDefinition(name, Scalar.Double))
+    }
+
+    fun stringParam(
+        name: String,
+        encodingStrategy: StringEncodingStrategy = StringEncodingStrategy.POINTER_AND_LENGTH,
+        freeAfterCall: Boolean = false,
+    ) {
+        parameters.add(
+            FunctionParameterDefinition(
+                name,
+                Scalar.String,
+                encodingStrategy,
+                StringAllocationStrategy(freeAfterCall),
+            ),
+        )
     }
 
     fun intReturnType() {

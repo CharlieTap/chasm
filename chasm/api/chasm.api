@@ -369,6 +369,11 @@ public final class io/github/charlietap/chasm/embedding/memory/WriteUtf8StringKt
 	public static final fun writeUtf8String (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public abstract interface class io/github/charlietap/chasm/embedding/shapes/Allocator {
+	public abstract fun alloc (Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun free (Ljava/lang/Object;)V
+}
+
 public abstract interface class io/github/charlietap/chasm/embedding/shapes/ChasmResult {
 }
 
@@ -551,6 +556,14 @@ public final class io/github/charlietap/chasm/embedding/shapes/Table : io/github
 public final class io/github/charlietap/chasm/embedding/shapes/Tag : io/github/charlietap/chasm/embedding/shapes/Importable {
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/Wasm32Allocator : io/github/charlietap/chasm/embedding/shapes/Allocator {
+	public fun <init> (Lio/github/charlietap/chasm/embedding/shapes/Instance;Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/String;Ljava/lang/String;)V
+	public fun alloc (I)Ljava/lang/Integer;
+	public synthetic fun alloc (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun free (I)V
+	public synthetic fun free (Ljava/lang/Object;)V
 }
 
 public final class io/github/charlietap/chasm/embedding/table/ReadTableKt {

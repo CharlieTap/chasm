@@ -14,13 +14,9 @@ internal class PointerAndLengthStringFunctionReturnGenerator {
         proxy: FunctionProxy,
     ) = CodeBlock.builder().apply {
         add(
-            """
-        val memory = instance.exports.firstNotNullOf { it.value as? %T }
-        return %M(store, instance, %S, args).%M { (pointer, length) ->
-            %M(store, memory, (pointer as %T).value, (length as %T).value)
-        }.expect(%S)
-            """.trimIndent(),
-            Memory::class,
+            "%M(store, instance, %S, args).%M { (pointer, length) ->\n" +
+                "    %M(store, memory, (pointer as %T).value, (length as %T).value)\n" +
+                "}.expect(%S)",
             INVOKE_FUNCTION,
             proxy.name,
             FLATMAP_RESULT_FUNCTION,
@@ -38,13 +34,9 @@ internal class NullTerminatedStringFunctionReturnGenerator {
         proxy: FunctionProxy,
     ) = CodeBlock.builder().apply {
         add(
-            """
-        val memory = instance.exports.firstNotNullOf { it.value as? %T }
-        return %M(store, instance, %S, args).%M { (pointer) ->
-            %M(store, memory, (pointer as %T).value)
-        }.expect(%S)
-            """.trimIndent(),
-            Memory::class,
+            "%M(store, instance, %S, args).%M { (pointer) ->\n" +
+                "    %M(store, memory, (pointer as %T).value)\n" +
+                "}.expect(%S)",
             INVOKE_FUNCTION,
             proxy.name,
             FLATMAP_RESULT_FUNCTION,
@@ -61,14 +53,10 @@ internal class LengthPrefixedStringFunctionReturnGenerator {
         proxy: FunctionProxy,
     ) = CodeBlock.builder().apply {
         add(
-            """
-        val memory = instance.exports.firstNotNullOf { it.value as? %T }
-        return %M(store, instance, %S, args).%M { (pointer) ->
-            val length = %M(store, memory, (pointer as %T).value).%M(%S)
-            %M(store, memory, (pointer as %T).value + 4, length)
-        }.expect(%S)
-            """.trimIndent(),
-            Memory::class,
+            "%M(store, instance, %S, args).%M { (pointer) ->\n" +
+                "    val length = %M(store, memory, (pointer as %T).value).%M(%S)\n" +
+                "    %M(store, memory, (pointer as %T).value + 4, length)\n" +
+                "}.expect(%S)",
             INVOKE_FUNCTION,
             proxy.name,
             FLATMAP_RESULT_FUNCTION,
@@ -89,16 +77,12 @@ internal class PackedStringFunctionReturnGenerator {
         proxy: FunctionProxy,
     ) = CodeBlock.builder().apply {
         add(
-            """
-        val memory = instance.exports.firstNotNullOf { it.value as? %T }
-        return %M(store, instance, %S, args).%M { (pointerAndLength) ->
-            val packed = (pointerAndLength as %T).value
-            val pointer = (packed ushr 32).toInt()
-            val length = packed.toInt()
-            %M(store, memory, pointer, length)
-        }.expect(%S)
-            """.trimIndent(),
-            Memory::class,
+            "%M(store, instance, %S, args).%M { (pointerAndLength) ->\n" +
+                "    val packed = (pointerAndLength as %T).value\n" +
+                "    val pointer = (packed ushr 32).toInt()\n" +
+                "    val length = packed.toInt()\n" +
+                "    %M(store, memory, pointer, length)\n" +
+                "}.expect(%S)",
             INVOKE_FUNCTION,
             proxy.name,
             FLATMAP_RESULT_FUNCTION,
@@ -134,6 +118,7 @@ internal class FunctionReturnImplementationGenerator(
         function: Function,
         proxy: FunctionProxy,
         returnType: TypeName,
+        freeAllocs: List<String>,
     ) = builder.apply {
         when (val type = function.returns.type) {
             Scalar.Integer,
@@ -142,9 +127,7 @@ internal class FunctionReturnImplementationGenerator(
             Scalar.Double,
             -> {
                 addStatement(
-                    "return %M(store, instance, %S, args)" +
-                        ".%M { (it.first() as %T).value }" +
-                        ".%M(%S)",
+                    "val result = %M(store, instance, %S, args).%M { (it.first() as %T).value }.%M(%S)",
                     INVOKE_FUNCTION,
                     proxy.name,
                     MAP_RESULT_FUNCTION,
@@ -152,6 +135,8 @@ internal class FunctionReturnImplementationGenerator(
                     EXPECT_RESULT_FUNCTION,
                     "Failed to invoke function ${function.name}",
                 )
+                freeAllocs.forEach { allocVar -> addStatement("allocator.free(%L)", allocVar) }
+                addStatement("return result")
             }
 
             Scalar.Unit -> {
@@ -162,38 +147,39 @@ internal class FunctionReturnImplementationGenerator(
                     EXPECT_RESULT_FUNCTION,
                     "Failed to invoke function ${function.name}",
                 )
+                freeAllocs.forEach { allocVar -> addStatement("allocator.free(%L)", allocVar) }
             }
 
             Scalar.String -> {
-                val code = stringReturnGenerator(function, proxy)
-                addCode(code)
+                val expr = stringReturnGenerator(function, proxy)
+                addStatement("val result = %L", expr)
+                freeAllocs.forEach { allocVar -> addStatement("allocator.free(%L)", allocVar) }
+                addStatement("return result")
             }
 
             is Aggregate -> {
-
                 val generatedType = type.generated.fields.mapIndexed { idx, field ->
                     CodeBlock.of("r%L = (it[%L] as %T).value", idx, idx, field.type.asExecutionValue())
                 }.joinToCode(",\n")
 
-                addCode(
-                    CodeBlock.builder()
-                        .addStatement(
-                            """
-                            return %M(store, instance, %S, args).%M {
-                                %T(
-                                    %L
-                                )
-                            }.expect(%S)
-                            """.trimIndent(),
-                            INVOKE_FUNCTION,
-                            proxy.name,
-                            MAP_RESULT_FUNCTION,
-                            returnType,
-                            generatedType,
-                            "Failed to invoke function ${function.name}",
+                addStatement(
+                    """
+                    val result = %M(store, instance, %S, args).%M {
+                        %T(
+                            %L
                         )
-                        .build(),
+                    }.%M(%S)
+                    """.trimIndent(),
+                    INVOKE_FUNCTION,
+                    proxy.name,
+                    MAP_RESULT_FUNCTION,
+                    returnType,
+                    generatedType,
+                    EXPECT_RESULT_FUNCTION,
+                    "Failed to invoke function ${function.name}",
                 )
+                freeAllocs.forEach { allocVar -> addStatement("allocator.free(%L)", allocVar) }
+                addStatement("return result")
             }
         }
     }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.test.chasm.FactorialService
 import com.test.chasm.FibonacciService
+import com.test.chasm.StringService
 import com.test.chasm.TestService
 import com.test.chasm.producer.ProducerService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ class ChasmViewModel @Inject constructor(
     private val factorialService: FactorialService,
     private val fibonacciService: FibonacciService,
     private val producerService: ProducerService,
+    private val stringService: StringService,
     private val testService: TestService,
 ) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>() {
 
@@ -122,5 +124,17 @@ class ChasmViewModel @Inject constructor(
 
         val packedI64StringFunction = testService.packedI64StringFunction()
         Log.d("ChasmViewModel", "packed i64 string function: $packedI64StringFunction")
+
+        val truncated = stringService.truncate("abcde")
+        Log.d("ChasmViewModel", "truncate function: $truncated")
+
+        val truncateNullTerminated = stringService.truncateNullTerminated("foobar")
+        Log.d("ChasmViewModel", "truncate null terminated function: $truncateNullTerminated")
+
+        val truncateLenPrefixed = stringService.truncateLenPrefixed("hijkl")
+        Log.d("ChasmViewModel", "truncate len prefixed function: $truncateLenPrefixed")
+
+        val truncatePacked = stringService.truncatePacked("packed")
+        Log.d("ChasmViewModel", "truncate packed function: $truncatePacked")
     }
 }

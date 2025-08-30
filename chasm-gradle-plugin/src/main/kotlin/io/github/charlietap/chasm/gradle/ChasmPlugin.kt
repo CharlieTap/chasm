@@ -152,6 +152,7 @@ class ChasmPlugin : Plugin<Project> {
             moduleBinary?.let {
                 binary.set(moduleBinary)
             } ?: binary.set(module.binary)
+            allocator.set(module.allocator)
             config.set(module.codegenConfig)
             interfaceName.set(module.name)
             packageName.set(module.packageName)

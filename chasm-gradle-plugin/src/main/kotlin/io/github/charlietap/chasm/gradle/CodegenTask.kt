@@ -14,6 +14,7 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -28,6 +29,10 @@ abstract class CodegenTask
         @get:InputFile
         @get:PathSensitive(PathSensitivity.RELATIVE)
         abstract val binary: RegularFileProperty
+
+        @get:Optional
+        @get:Input
+        abstract val allocator: Property<ExportedAllocator>
 
         @get:Input
         abstract val config: Property<CodegenConfig>
@@ -69,13 +74,14 @@ abstract class CodegenTask
 
             val factory = WasmInterfaceFactory()
             val generator = WasmInterfaceGenerator()
-
             val logger = PluginLogger(project.logger)
+
             val data = factory(
                 interfaceName = interfaceName.get(),
                 packageName = packageName.get(),
                 config = config.get(),
                 info = info,
+                allocator = allocator.orNull,
                 initializers = initializers.get(),
                 wasmFunctions = functions.get(),
                 ignoredExports = ignoredExports.get(),

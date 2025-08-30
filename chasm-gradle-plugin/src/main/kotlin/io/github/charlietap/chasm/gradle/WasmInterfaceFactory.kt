@@ -84,6 +84,55 @@ internal class ClassNameFormatter(
     }
 }
 
+internal class AllocatorValidator() {
+    operator fun invoke(
+        allocator: ExportedAllocator?,
+        functions: List<Function>,
+        info: ModuleInfo,
+    ) {
+        if (allocator == null) {
+            val functionsWithStringParams = functions.filter { fn ->
+                fn.params.any { it.type == Scalar.String }
+            }
+            if (functionsWithStringParams.isNotEmpty()) {
+                val names = functionsWithStringParams.joinToString { it.name }
+                throw IllegalStateException(
+                    "String parameter(s) specified for function(s) $names but no allocator configured. " +
+                        "Configure an allocator in the module extension.",
+                )
+            }
+        } else {
+            val allocName = allocator.allocationFunction
+            val freeName = allocator.deallocationFunction
+
+            val allocExport = info.exports.firstOrNull { it.name == allocName }
+                ?: throw IllegalStateException("Allocator function '$allocName' not found in module exports")
+            val freeExport = info.exports.firstOrNull { it.name == freeName }
+                ?: throw IllegalStateException("Deallocator function '$freeName' not found in module exports")
+
+            val i32 = ValueType.Number(NumberType.I32)
+
+            val allocType = (allocExport.type as? ExternalType.Function)?.functionType
+                ?: throw IllegalStateException("Export '$allocName' is not a function")
+            val freeType = (freeExport.type as? ExternalType.Function)?.functionType
+                ?: throw IllegalStateException("Export '$freeName' is not a function")
+
+            if (allocType.params.types != listOf(i32) || allocType.results.types != listOf(i32)) {
+                throw IllegalStateException(
+                    "Allocator '$allocName' has wrong signature. Expected (i32) -> i32, " +
+                        "found params=${allocType.params.types}, results=${allocType.results.types}",
+                )
+            }
+            if (freeType.params.types != listOf(i32) || freeType.results.types.isNotEmpty()) {
+                throw IllegalStateException(
+                    "Deallocator '$freeName' has wrong signature. Expected (i32) -> Unit, " +
+                        "found params=${freeType.params.types}, results=${freeType.results.types}",
+                )
+            }
+        }
+    }
+}
+
 internal class ParameterFactory {
     operator fun invoke(
         params: List<ValueType>,
@@ -162,10 +211,12 @@ internal class FunctionFactory(
             functionValidator(function, type)
         }
 
-        val params = function?.parameters?.map { (name, type) ->
+        val params = function?.parameters?.map { parameter ->
             FunctionParameter(
-                name = name,
-                type = type,
+                name = parameter.name,
+                type = parameter.type,
+                stringAllocationStrategy = parameter.stringAllocationStrategy,
+                stringEncodingStrategy = parameter.stringEncodingStrategy,
             )
         } ?: parameterFactory(type.params.types, nameData?.localNames)
 
@@ -205,15 +256,34 @@ internal class GlobalPropertyFactory(
     }
 }
 
+internal class ExportExcluder() {
+    operator fun invoke(
+        name: String,
+        allocator: ExportedAllocator?,
+        ignoredExports: Set<String>,
+    ): Boolean {
+
+        val allocatorFunctions = allocator?.let {
+            setOf(it.allocationFunction, it.deallocationFunction)
+        } ?: emptySet()
+        val ignored = ignoredExports + allocatorFunctions
+
+        return ignored.contains(name)
+    }
+}
+
 internal class WasmInterfaceFactory(
     private val functionFactory: FunctionFactory = FunctionFactory(),
     private val globalPropertyFactory: GlobalPropertyFactory = GlobalPropertyFactory(),
+    private val allocatorValidator: AllocatorValidator = AllocatorValidator(),
+    private val exportExcluder: ExportExcluder = ExportExcluder(),
 ) {
     operator fun invoke(
         interfaceName: String,
         packageName: String,
         config: CodegenConfig,
         info: ModuleInfo,
+        allocator: ExportedAllocator?,
         initializers: Set<String>,
         wasmFunctions: List<WasmFunction>,
         ignoredExports: Set<String>,
@@ -226,7 +296,7 @@ internal class WasmInterfaceFactory(
 
         info.exports.forEach { export ->
 
-            if (ignoredExports.contains(export.name)) {
+            if (exportExcluder(export.name, allocator, ignoredExports)) {
                 return@forEach
             }
 
@@ -267,9 +337,12 @@ internal class WasmInterfaceFactory(
             }
         }
 
+        allocatorValidator(allocator, functions, info)
+
         return WasmInterface(
             interfaceName = interfaceName,
             packageName = packageName,
+            allocator = allocator,
             initializers = initializers,
             functions = functions,
             properties = properties,

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.gradle.fixture
 
 import io.github.charlietap.chasm.gradle.Aggregate
+import io.github.charlietap.chasm.gradle.ExportedAllocator
 import io.github.charlietap.chasm.gradle.Field
 import io.github.charlietap.chasm.gradle.Function
 import io.github.charlietap.chasm.gradle.FunctionImplementation
@@ -122,9 +123,11 @@ internal fun wasmInterface(
     types: List<GeneratedType> = emptyList(),
     functions: List<Function> = emptyList(),
     properties: List<Property> = emptyList(),
+    allocator: ExportedAllocator? = null,
 ) = WasmInterface(
     interfaceName = interfaceName,
     packageName = packageName,
+    allocator = allocator,
     initializers = initializers,
     types = types,
     functions = functions,

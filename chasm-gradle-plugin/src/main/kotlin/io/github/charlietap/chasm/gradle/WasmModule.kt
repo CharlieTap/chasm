@@ -17,6 +17,7 @@ abstract class WasmModule
         abstract val binary: RegularFileProperty
         abstract val codegenConfig: Property<CodegenConfig>
         abstract val packageName: Property<String>
+        abstract val allocator: Property<ExportedAllocator>
         abstract val initializers: SetProperty<String>
         abstract val functions: ListProperty<WasmFunction>
         abstract val interfaceVisibility: Property<TypeVisibility>

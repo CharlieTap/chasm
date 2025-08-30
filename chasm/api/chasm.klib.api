@@ -6,6 +6,11 @@
 // - Show declarations: true
 
 // Library unique name: <io.github.charlietap.chasm:chasm>
+abstract interface <#A: kotlin/Any?> io.github.charlietap.chasm.embedding.shapes/Allocator { // io.github.charlietap.chasm.embedding.shapes/Allocator|null[0]
+    abstract fun alloc(#A): #A // io.github.charlietap.chasm.embedding.shapes/Allocator.alloc|alloc(1:0){}[0]
+    abstract fun free(#A) // io.github.charlietap.chasm.embedding.shapes/Allocator.free|free(1:0){}[0]
+}
+
 sealed interface <#A: out kotlin/Any?, #B: out io.github.charlietap.chasm.embedding.error/ChasmError> io.github.charlietap.chasm.embedding.shapes/ChasmResult { // io.github.charlietap.chasm.embedding.shapes/ChasmResult|null[0]
     final value class <#A1: out io.github.charlietap.chasm.embedding.error/ChasmError> Error : io.github.charlietap.chasm.embedding.shapes/ChasmResult<kotlin/Nothing, #A1> { // io.github.charlietap.chasm.embedding.shapes/ChasmResult.Error|null[0]
         constructor <init>(#A1) // io.github.charlietap.chasm.embedding.shapes/ChasmResult.Error.<init>|<init>(1:0){}[0]
@@ -392,6 +397,13 @@ final class io.github.charlietap.chasm.embedding.shapes/Table : io.github.charli
 final class io.github.charlietap.chasm.embedding.shapes/Tag : io.github.charlietap.chasm.embedding.shapes/Importable { // io.github.charlietap.chasm.embedding.shapes/Tag|null[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/Tag.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Tag.hashCode|hashCode(){}[0]
+}
+
+final class io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator : io.github.charlietap.chasm.embedding.shapes/Allocator<kotlin/Int> { // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator|null[0]
+    constructor <init>(io.github.charlietap.chasm.embedding.shapes/Instance, io.github.charlietap.chasm.embedding.shapes/Store, kotlin/String, kotlin/String) // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.<init>|<init>(io.github.charlietap.chasm.embedding.shapes.Instance;io.github.charlietap.chasm.embedding.shapes.Store;kotlin.String;kotlin.String){}[0]
+
+    final fun alloc(kotlin/Int): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.alloc|alloc(kotlin.Int){}[0]
+    final fun free(kotlin/Int) // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.free|free(kotlin.Int){}[0]
 }
 
 final object io.github.charlietap.chasm.embedding.transform/ImportableMapper : io.github.charlietap.chasm.embedding.transform/BidirectionalMapper<io.github.charlietap.chasm.embedding.shapes/Importable, io.github.charlietap.chasm.runtime.instance/ExternalValue> { // io.github.charlietap.chasm.embedding.transform/ImportableMapper|null[0]

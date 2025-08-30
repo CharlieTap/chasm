@@ -35,6 +35,7 @@ public final class io/github/charlietap/chasm/gradle/CodegenConfig : java/io/Ser
 public abstract class io/github/charlietap/chasm/gradle/CodegenTask : org/gradle/api/DefaultTask {
 	public fun <init> ()V
 	public final fun generate ()V
+	public abstract fun getAllocator ()Lorg/gradle/api/provider/Property;
 	public abstract fun getBinary ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getConfig ()Lorg/gradle/api/provider/Property;
 	public abstract fun getFunctions ()Lorg/gradle/api/provider/ListProperty;
@@ -47,16 +48,31 @@ public abstract class io/github/charlietap/chasm/gradle/CodegenTask : org/gradle
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 }
 
+public final class io/github/charlietap/chasm/gradle/ExportedAllocator : java/io/Serializable {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/ExportedAllocator;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/gradle/ExportedAllocator;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/gradle/ExportedAllocator;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAllocationFunction ()Ljava/lang/String;
+	public final fun getDeallocationFunction ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/charlietap/chasm/gradle/FunctionParameterDefinition : java/io/Serializable {
-	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;)V
-	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Lio/github/charlietap/chasm/gradle/Type;
 	public final fun component3 ()Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;
-	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;)Lio/github/charlietap/chasm/gradle/FunctionParameterDefinition;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/gradle/FunctionParameterDefinition;Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;ILjava/lang/Object;)Lio/github/charlietap/chasm/gradle/FunctionParameterDefinition;
+	public final fun component4 ()Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;
+	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;)Lio/github/charlietap/chasm/gradle/FunctionParameterDefinition;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/gradle/FunctionParameterDefinition;Ljava/lang/String;Lio/github/charlietap/chasm/gradle/Type;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;ILjava/lang/Object;)Lio/github/charlietap/chasm/gradle/FunctionParameterDefinition;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getName ()Ljava/lang/String;
+	public final fun getStringAllocationStrategy ()Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;
 	public final fun getStringEncodingStrategy ()Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;
 	public final fun getType ()Lio/github/charlietap/chasm/gradle/Type;
 	public fun hashCode ()I
@@ -103,6 +119,17 @@ public final class io/github/charlietap/chasm/gradle/Scalar : java/lang/Enum, io
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/Scalar;
 	public static fun values ()[Lio/github/charlietap/chasm/gradle/Scalar;
+}
+
+public final class io/github/charlietap/chasm/gradle/StringAllocationStrategy : java/io/Serializable {
+	public fun <init> (Z)V
+	public final fun component1 ()Z
+	public final fun copy (Z)Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;ZILjava/lang/Object;)Lio/github/charlietap/chasm/gradle/StringAllocationStrategy;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFreeAfterCall ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/gradle/StringEncodingStrategy : java/lang/Enum {
@@ -153,6 +180,8 @@ public final class io/github/charlietap/chasm/gradle/WasmFunctionBuilder {
 	public final fun intReturnType ()V
 	public final fun longParam (Ljava/lang/String;)V
 	public final fun longReturnType ()V
+	public final fun stringParam (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;Z)V
+	public static synthetic fun stringParam$default (Lio/github/charlietap/chasm/gradle/WasmFunctionBuilder;Ljava/lang/String;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;ZILjava/lang/Object;)V
 	public final fun stringReturnType (Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;)V
 	public static synthetic fun stringReturnType$default (Lio/github/charlietap/chasm/gradle/WasmFunctionBuilder;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;ILjava/lang/Object;)V
 }
@@ -161,6 +190,7 @@ public abstract class io/github/charlietap/chasm/gradle/WasmModule {
 	public static final field DEFAULT_MODULE_FILE_PATH Ljava/lang/String;
 	public fun <init> (Lorg/gradle/api/Project;Ljava/lang/String;)V
 	public final fun function (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun getAllocator ()Lorg/gradle/api/provider/Property;
 	public abstract fun getBinary ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getCodegenConfig ()Lorg/gradle/api/provider/Property;
 	public abstract fun getFunctions ()Lorg/gradle/api/provider/ListProperty;

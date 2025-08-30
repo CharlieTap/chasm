@@ -21,6 +21,7 @@ internal data class Aggregate(
 internal data class FunctionParameter(
     val name: String,
     val type: Type,
+    val stringAllocationStrategy: StringAllocationStrategy? = null,
     val stringEncodingStrategy: StringEncodingStrategy? = null,
 )
 
@@ -69,6 +70,7 @@ internal data class Property(
 internal data class WasmInterface(
     val interfaceName: String,
     val packageName: String,
+    val allocator: ExportedAllocator?,
     val initializers: Set<String>,
     val types: List<GeneratedType>,
     val functions: List<Function>,

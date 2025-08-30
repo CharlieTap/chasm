@@ -14,15 +14,17 @@ import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.UNIT
-import com.squareup.kotlinpoet.joinToCode
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Instance
+import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
+import io.github.charlietap.chasm.embedding.shapes.Wasm32Allocator
 import io.github.charlietap.chasm.gradle.ext.asExecutionValue
 import io.github.charlietap.chasm.gradle.ext.asTypeName
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.stream.SourceReader
 import kotlin.reflect.KClass
 
@@ -185,7 +187,8 @@ private fun FunSpec.Builder.addReturn(
     proxy: FunctionProxy,
     returnType: TypeName,
     returnGenerator: FunctionReturnImplementationGenerator,
-) = returnGenerator(this, function, proxy, returnType)
+    freeAllocs: List<String> = emptyList(),
+) = returnGenerator(this, function, proxy, returnType, freeAllocs)
 
 internal class FunctionProxyImplementationGenerator(
     private val returnImplementationGenerator: FunctionReturnImplementationGenerator = FunctionReturnImplementationGenerator(),
@@ -196,21 +199,73 @@ internal class FunctionProxyImplementationGenerator(
         proxy: FunctionProxy,
         returnType: ClassName,
     ) = builder.apply {
+        val stringParams = function.params.filter { it.type == Scalar.String }
+        val allocationsToFree = mutableListOf<String>()
+        stringParams.forEach { param ->
+            val bytesVar = param.name + "Bytes"
+            val allocVar = param.name + "Alloc"
+            addStatement("val %L = %L.encodeToByteArray()", bytesVar, param.name)
+            when (requireNotNull(param.stringEncodingStrategy)) {
+                StringEncodingStrategy.POINTER_AND_LENGTH -> {
+                    addStatement("val %L = allocator.alloc(%L.size)", allocVar, bytesVar)
+                    addStatement("%M(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                }
+                StringEncodingStrategy.NULL_TERMINATED -> {
+                    addStatement("val %L = allocator.alloc(%L.size + 1)", allocVar, bytesVar)
+                    addStatement("%M(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement("%M(store, memory, %L + %L.size, 0)", WRITE_BYTE_FUNCTION, allocVar, bytesVar)
+                }
+                StringEncodingStrategy.LENGTH_PREFIXED -> {
+                    addStatement("val %L = allocator.alloc(%L.size + 4)", allocVar, bytesVar)
+                    addStatement("%M(store, memory, %L, %L.size)", WRITE_INT_FUNCTION, allocVar, bytesVar)
+                    addStatement("%M(store, memory, %L + 4, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                }
+                StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
+                    addStatement("val %L = allocator.alloc(%L.size)", allocVar, bytesVar)
+                    addStatement("%M(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                }
+            }
+            if (param.stringAllocationStrategy?.freeAfterCall == true) {
+                allocationsToFree.add(allocVar)
+            }
+        }
+
         if (function.params.isEmpty()) {
             addStatement("val args = emptyList<%T>()", ExecutionValue::class)
         } else {
             beginControlFlow("val args = buildList")
             function.params.forEach { param ->
-                addStatement(
-                    "add(%T(%L))",
-                    param.type.asExecutionValue(),
-                    param.name,
-                )
+                if (param.type == Scalar.String) {
+                    val bytesVar = param.name + "Bytes"
+                    val allocVar = param.name + "Alloc"
+                    when (requireNotNull(param.stringEncodingStrategy)) {
+                        StringEncodingStrategy.POINTER_AND_LENGTH -> {
+                            addStatement("add(%T(%L))", NumberValue.I32::class, allocVar)
+                            addStatement("add(%T(%L.size))", NumberValue.I32::class, bytesVar)
+                        }
+                        StringEncodingStrategy.NULL_TERMINATED -> {
+                            addStatement("add(%T(%L))", NumberValue.I32::class, allocVar)
+                        }
+                        StringEncodingStrategy.LENGTH_PREFIXED -> {
+                            addStatement("add(%T(%L))", NumberValue.I32::class, allocVar)
+                        }
+                        StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
+                            addStatement(
+                                "add(%T((%L.toLong() shl 32) or (%L.size.toLong() and 0xFFFFFFFFL)))",
+                                NumberValue.I64::class,
+                                allocVar,
+                                bytesVar,
+                            )
+                        }
+                    }
+                } else {
+                    addStatement("add(%T(%L))", param.type.asExecutionValue(), param.name)
+                }
             }
             endControlFlow()
         }
 
-        addReturn(function, proxy, returnType, returnImplementationGenerator)
+        addReturn(function, proxy, returnType, returnImplementationGenerator, allocationsToFree)
     }
 }
 
@@ -275,6 +330,36 @@ internal class ClassPropertiesGenerator(
 
         add(storeProperty)
         add(instanceProperty)
+
+        val requiresMemory = wasmInterface.functions.any { fn ->
+            fn.params.any { it.type == Scalar.String } || fn.returns.type == Scalar.String
+        }
+        if (requiresMemory) {
+            val memoryProperty = PropertySpec.builder("memory", Memory::class)
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    CodeBlock.of(
+                        "instance.exports.firstNotNullOf { it.value as? %T }",
+                        Memory::class,
+                    ),
+                ).build()
+            add(memoryProperty)
+        }
+
+        wasmInterface.allocator?.let { allocator ->
+            val allocationProperty = PropertySpec.builder("allocator", Wasm32Allocator::class)
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    CodeBlock.of(
+                        "%T(instance, store, %S, %S)",
+                        Wasm32Allocator::class,
+                        allocator.allocationFunction,
+                        allocator.deallocationFunction,
+                    ),
+                ).build()
+            add(allocationProperty)
+        }
+
         wasmInterface.properties.forEach { property ->
             add(propertyImplementationGenerator(property))
         }
