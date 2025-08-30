@@ -187,8 +187,35 @@ private fun FunSpec.Builder.addReturn(
     returnGenerator: FunctionReturnImplementationGenerator,
 ) = returnGenerator(this, function, proxy, returnType)
 
-internal class FunctionImplementationGenerator(
+internal class FunctionProxyImplementationGenerator(
     private val returnImplementationGenerator: FunctionReturnImplementationGenerator = FunctionReturnImplementationGenerator(),
+) {
+    operator fun invoke(
+        builder: FunSpec.Builder,
+        function: Function,
+        proxy: FunctionProxy,
+        returnType: ClassName,
+    ) = builder.apply {
+        if (function.params.isEmpty()) {
+            addStatement("val args = emptyList<%T>()", ExecutionValue::class)
+        } else {
+            beginControlFlow("val args = buildList")
+            function.params.forEach { param ->
+                addStatement(
+                    "add(%T(%L))",
+                    param.type.asExecutionValue(),
+                    param.name,
+                )
+            }
+            endControlFlow()
+        }
+
+        addReturn(function, proxy, returnType, returnImplementationGenerator)
+    }
+}
+
+internal class FunctionImplementationGenerator(
+    private val proxyImplementationGenerator: FunctionProxyImplementationGenerator = FunctionProxyImplementationGenerator(),
 ) {
     operator fun invoke(
         packageName: String,
@@ -212,27 +239,12 @@ internal class FunctionImplementationGenerator(
 
         when (val implementation = function.implementation) {
             is FunctionProxy -> {
-
-                if (function.params.isEmpty()) {
-                    addStatement("val args = emptyList<%T>()", ExecutionValue::class)
-                } else {
-                    val argBlocks = function.params.map { param ->
-                        CodeBlock.of(
-                            "%T(%L)",
-                            param.type.asExecutionValue(),
-                            param.name,
-                        )
-                    }
-                    addCode(
-                        argBlocks.joinToCode(
-                            separator = ", ",
-                            prefix = "val args = listOf(",
-                            suffix = ")\n",
-                        ),
-                    )
-                }
-
-                addReturn(function, implementation, returnType, returnImplementationGenerator)
+                proxyImplementationGenerator(
+                    this,
+                    function,
+                    implementation,
+                    returnType,
+                )
             }
         }
     }.build()
