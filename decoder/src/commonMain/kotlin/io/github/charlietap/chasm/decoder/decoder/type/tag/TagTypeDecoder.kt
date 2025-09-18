@@ -33,5 +33,5 @@ internal inline fun TagTypeDecoder(
     val type = context.definedTypes[index.idx.toInt()]
     val functionType = type.functionType() ?: Err(TypeDecodeError.InvalidTagType).bind()
 
-    TagType(attribute, functionType)
+    TagType(attribute, type, functionType)
 }

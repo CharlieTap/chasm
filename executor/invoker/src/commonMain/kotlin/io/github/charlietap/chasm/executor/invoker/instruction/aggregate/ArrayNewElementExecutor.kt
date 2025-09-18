@@ -26,7 +26,7 @@ internal inline fun ArrayNewElementExecutor(
     val arrayStartOffsetInSegment = vstack.popI32()
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + arrayLength
 
-    if (arrayEndOffsetInSegment > elementInstance.elements.size) {
+    if (arrayLength < 0 || arrayEndOffsetInSegment > elementInstance.elements.size) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 

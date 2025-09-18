@@ -23,17 +23,19 @@ class TagTypeDecoderTest {
         val functionRecursiveType = functionRecursiveType(
             functionType = functionType,
         )
+        val definedType = definedType(functionRecursiveType)
         val context = decoderContext(
             types = mutableListOf(
                 type(recursiveType = functionRecursiveType),
             ),
             definedTypes = mutableListOf(
-                definedType(functionRecursiveType),
+                definedType,
             ),
         )
 
         val attribute = attribute()
         val attributeDecoder: Decoder<TagType.Attribute> = { _context ->
+            assertEquals(context, _context)
             Ok(attribute)
         }
 
@@ -42,7 +44,7 @@ class TagTypeDecoderTest {
             Ok(index)
         }
 
-        val expected = Ok(TagType(attribute, functionType))
+        val expected = Ok(TagType(attribute, definedType, functionType))
 
         val actual = TagTypeDecoder(
             context,

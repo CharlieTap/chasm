@@ -18,7 +18,9 @@ import io.github.charlietap.chasm.fixture.runtime.type.memoryExternalType
 import io.github.charlietap.chasm.fixture.runtime.type.tableExternalType
 import io.github.charlietap.chasm.fixture.runtime.type.tagExternalType
 import io.github.charlietap.chasm.fixture.type.constMutability
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
+import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.fixture.type.i32AddressType
@@ -32,6 +34,7 @@ import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.fixture.type.varMutability
 import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.RecursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -68,11 +71,13 @@ class ModuleInfoTest {
         val importedTagFunctionType = functionType(
             params = resultType(listOf(i32ValueType())),
         )
-        val importedTagType = tagType(exceptionAttribute(), importedTagFunctionType)
+        val importedTagDefinedType = definedType(functionRecursiveType(importedTagFunctionType, RecursiveType.State.CLOSED))
+        val importedTagType = tagType(exceptionAttribute(), importedTagDefinedType, importedTagFunctionType)
         val exportedTagFunctionType = functionType(
             params = resultType(listOf(i64ValueType())),
         )
-        val exportedTagType = tagType(exceptionAttribute(), exportedTagFunctionType)
+        val exportedTagDefinedType = definedType(functionRecursiveType(exportedTagFunctionType, RecursiveType.State.CLOSED), typeIndex = 2)
+        val exportedTagType = tagType(exceptionAttribute(), exportedTagDefinedType, exportedTagFunctionType)
 
         val byteStream = Resource(FILE_DIR + "module_info.wasm").readBytes()
         val reader = FakeSourceReader(byteStream)

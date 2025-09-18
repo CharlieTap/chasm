@@ -29,7 +29,7 @@ internal inline fun ArrayNewDataExecutor(
     val arrayStartOffsetInSegment = vstack.popI32()
 
     val arrayEndOffsetInSegment = arrayStartOffsetInSegment + (arrayLength * fieldWidthInBytes)
-    if (arrayEndOffsetInSegment > byteArray.size) {
+    if (arrayLength < 0 || arrayEndOffsetInSegment > byteArray.size) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 

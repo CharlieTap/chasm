@@ -11,7 +11,9 @@ import io.github.charlietap.chasm.embedding.table
 import io.github.charlietap.chasm.embedding.tag
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.constMutability
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
+import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.fixture.type.i32AddressType
@@ -26,6 +28,7 @@ import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.RecursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -43,6 +46,7 @@ class ImportTest {
                 ),
             ),
         )
+        val definedType = definedType(functionRecursiveType(functionType, RecursiveType.State.CLOSED))
         val hostFunction: HostFunction = {
             emptyList()
         }
@@ -81,7 +85,7 @@ class ImportTest {
         val tagFunctionType = functionType(
             params = resultType(listOf(i32ValueType())),
         )
-        val tagType = tagType(exceptionAttribute(), tagFunctionType)
+        val tagType = tagType(exceptionAttribute(), definedType, tagFunctionType)
         val tagExternal = tag(store, tagType)
         val tagImport = Import(
             "env",

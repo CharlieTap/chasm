@@ -681,16 +681,19 @@ final class io.github.charlietap.chasm.type/TableType : io.github.charlietap.cha
 }
 
 final class io.github.charlietap.chasm.type/TagType { // io.github.charlietap.chasm.type/TagType|null[0]
-    constructor <init>(io.github.charlietap.chasm.type/TagType.Attribute, io.github.charlietap.chasm.type/FunctionType) // io.github.charlietap.chasm.type/TagType.<init>|<init>(io.github.charlietap.chasm.type.TagType.Attribute;io.github.charlietap.chasm.type.FunctionType){}[0]
+    constructor <init>(io.github.charlietap.chasm.type/TagType.Attribute, io.github.charlietap.chasm.type/DefinedType, io.github.charlietap.chasm.type/FunctionType) // io.github.charlietap.chasm.type/TagType.<init>|<init>(io.github.charlietap.chasm.type.TagType.Attribute;io.github.charlietap.chasm.type.DefinedType;io.github.charlietap.chasm.type.FunctionType){}[0]
 
     final val attribute // io.github.charlietap.chasm.type/TagType.attribute|{}attribute[0]
         final fun <get-attribute>(): io.github.charlietap.chasm.type/TagType.Attribute // io.github.charlietap.chasm.type/TagType.attribute.<get-attribute>|<get-attribute>(){}[0]
-    final val type // io.github.charlietap.chasm.type/TagType.type|{}type[0]
-        final fun <get-type>(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type/TagType.type.<get-type>|<get-type>(){}[0]
+    final val definedType // io.github.charlietap.chasm.type/TagType.definedType|{}definedType[0]
+        final fun <get-definedType>(): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.type/TagType.definedType.<get-definedType>|<get-definedType>(){}[0]
+    final val functionType // io.github.charlietap.chasm.type/TagType.functionType|{}functionType[0]
+        final fun <get-functionType>(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type/TagType.functionType.<get-functionType>|<get-functionType>(){}[0]
 
     final fun component1(): io.github.charlietap.chasm.type/TagType.Attribute // io.github.charlietap.chasm.type/TagType.component1|component1(){}[0]
-    final fun component2(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type/TagType.component2|component2(){}[0]
-    final fun copy(io.github.charlietap.chasm.type/TagType.Attribute = ..., io.github.charlietap.chasm.type/FunctionType = ...): io.github.charlietap.chasm.type/TagType // io.github.charlietap.chasm.type/TagType.copy|copy(io.github.charlietap.chasm.type.TagType.Attribute;io.github.charlietap.chasm.type.FunctionType){}[0]
+    final fun component2(): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.type/TagType.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.type/FunctionType // io.github.charlietap.chasm.type/TagType.component3|component3(){}[0]
+    final fun copy(io.github.charlietap.chasm.type/TagType.Attribute = ..., io.github.charlietap.chasm.type/DefinedType = ..., io.github.charlietap.chasm.type/FunctionType = ...): io.github.charlietap.chasm.type/TagType // io.github.charlietap.chasm.type/TagType.copy|copy(io.github.charlietap.chasm.type.TagType.Attribute;io.github.charlietap.chasm.type.DefinedType;io.github.charlietap.chasm.type.FunctionType){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type/TagType.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type/TagType.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.github.charlietap.chasm.type/TagType.toString|toString(){}[0]

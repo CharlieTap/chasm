@@ -17,7 +17,7 @@ internal fun ThrowInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val tagType = context.tagType(instruction.tagIndex).bind()
-    val functionType = tagType.type
+    val functionType = tagType.functionType
 
     if (functionType.results.types.isNotEmpty()) {
         Err(TagValidatorError.InvalidTagType).bind()

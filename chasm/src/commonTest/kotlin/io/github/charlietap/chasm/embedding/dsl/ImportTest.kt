@@ -21,8 +21,10 @@ import io.github.charlietap.chasm.fixture.runtime.instance.tagExternalValue
 import io.github.charlietap.chasm.fixture.runtime.value.functionReferenceValue
 import io.github.charlietap.chasm.fixture.runtime.value.i32
 import io.github.charlietap.chasm.fixture.type.constMutability
+import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.exceptionAttribute
 import io.github.charlietap.chasm.fixture.type.functionHeapType
+import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.globalType
 import io.github.charlietap.chasm.fixture.type.i32AddressType
@@ -205,15 +207,17 @@ class ImportTest {
             }
         }
 
+        val expectedFunctionType = functionType(
+            params = resultType(listOf(i32ValueType())),
+            results = resultType(listOf(i32ValueType())),
+        )
         val expectedTagType = tagType(
             attribute = exceptionAttribute(),
-            type = functionType(
-                params = resultType(listOf(i32ValueType())),
-                results = resultType(listOf(i32ValueType())),
-            ),
+            definedType = definedType(functionRecursiveType(expectedFunctionType)),
+            functionType = expectedFunctionType,
         )
 
-        val expected = listOf<Import>(
+        val expected = listOf(
             publicImport(
                 moduleName = "err",
                 entityName = "exception",

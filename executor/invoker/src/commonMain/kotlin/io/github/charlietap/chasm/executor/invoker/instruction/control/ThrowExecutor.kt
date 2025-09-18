@@ -42,7 +42,7 @@ internal inline fun ThrowExecutor(
         .tagAddress(instruction.tagIndex)
 
     val instance = store.tag(address)
-    val functionType = instance.type.type
+    val functionType = instance.type.functionType
 
     val params = LongArray(functionType.params.types.size) {
         vstack.pop()

@@ -626,14 +626,16 @@ public final class io/github/charlietap/chasm/type/TableType : io/github/charlie
 }
 
 public final class io/github/charlietap/chasm/type/TagType {
-	public fun <init> (Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/FunctionType;)V
+	public fun <init> (Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/FunctionType;)V
 	public final fun component1 ()Lio/github/charlietap/chasm/type/TagType$Attribute;
-	public final fun component2 ()Lio/github/charlietap/chasm/type/FunctionType;
-	public final fun copy (Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/TagType;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/FunctionType;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/TagType;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/DefinedType;
+	public final fun component3 ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun copy (Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/TagType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/FunctionType;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/TagType;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAttribute ()Lio/github/charlietap/chasm/type/TagType$Attribute;
-	public final fun getType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun getDefinedType ()Lio/github/charlietap/chasm/type/DefinedType;
+	public final fun getFunctionType ()Lio/github/charlietap/chasm/type/FunctionType;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

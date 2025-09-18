@@ -52,17 +52,17 @@ internal inline fun TryTableInstructionValidator(
             is ControlInstruction.CatchHandler.Catch -> {
                 val tagType = context.tagType(handler.tagIndex).bind()
 
-                if (tagType.type.results.types
+                if (tagType.functionType.results.types
                         .isNotEmpty()
                 ) {
                     Err(TypeValidatorError.TypeMismatch).bind()
                 }
 
-                val tagTypeArity = tagType.type.params.types.size
+                val tagTypeArity = tagType.functionType.params.types.size
                 val labelResultArity = label.outputs.types.size
 
                 for (idx in 0 until max(tagTypeArity, labelResultArity)) {
-                    val tagValue = tagType.type.params.types
+                    val tagValue = tagType.functionType.params.types
                         .getOrNull(idx)
                     val labelValue = label.outputs.types.getOrNull(idx)
 
@@ -74,14 +74,14 @@ internal inline fun TryTableInstructionValidator(
             is ControlInstruction.CatchHandler.CatchRef -> {
                 val tagType = context.tagType(handler.tagIndex).bind()
 
-                if (tagType.type.results.types
+                if (tagType.functionType.results.types
                         .isNotEmpty()
                 ) {
                     Err(TypeValidatorError.TypeMismatch).bind()
                 }
 
                 val exnRef = ValueType.Reference(ReferenceType.Ref(AbstractHeapType.Exception))
-                val tagValues = tagType.type.params.types + exnRef
+                val tagValues = tagType.functionType.params.types + exnRef
                 val labelValues = label.outputs.types
 
                 val tagTypeArity = tagValues.size

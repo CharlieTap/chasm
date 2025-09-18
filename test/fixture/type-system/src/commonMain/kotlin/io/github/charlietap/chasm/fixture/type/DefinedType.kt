@@ -6,7 +6,9 @@ import io.github.charlietap.chasm.type.RecursiveType
 fun definedType(
     recursiveType: RecursiveType = recursiveType(),
     recursiveTypeIndex: Int = 0,
+    typeIndex: Int = 0,
 ) = DefinedType(
     recursiveType = recursiveType,
     recursiveTypeIndex = recursiveTypeIndex,
+    typeIndex = typeIndex,
 )

@@ -12,7 +12,7 @@ internal fun TagTypeValidator(
     context: ValidationContext,
     type: TagType,
 ): Result<Unit, ModuleValidatorError> = binding {
-    if (type.type.results.types
+    if (type.functionType.results.types
             .isNotEmpty()
     ) {
         Err(TagValidatorError.InvalidTagType).bind()
