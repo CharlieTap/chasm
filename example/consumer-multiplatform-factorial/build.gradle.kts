@@ -24,19 +24,19 @@ chasm {
             packageName = "com.test.chasm"
             allocator = ExportedAllocator("malloc", "free")
             function("truncate") {
-                stringParam("input", false)
+                stringParam("input")
                 stringReturnType()
             }
             function("truncate_null_terminated") {
-                stringParam("input", false, encodingStrategy = StringEncodingStrategy.NULL_TERMINATED)
+                stringParam("input", StringEncodingStrategy.NULL_TERMINATED)
                 stringReturnType()
             }
             function("truncate_len_prefixed") {
-                stringParam("input", false, encodingStrategy = StringEncodingStrategy.LENGTH_PREFIXED)
+                stringParam("input", StringEncodingStrategy.LENGTH_PREFIXED)
                 stringReturnType()
             }
             function("truncate_packed") {
-                stringParam("input", true, encodingStrategy = StringEncodingStrategy.PACKED_POINTER_AND_LENGTH)
+                stringParam("input", StringEncodingStrategy.PACKED_POINTER_AND_LENGTH)
                 stringReturnType()
             }
         }
