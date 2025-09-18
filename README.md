@@ -14,17 +14,20 @@
 
 Chasm is a WebAssembly runtime built on Kotlin Multiplatform.
 
-The runtime targets the latest wasm [specification](https://webassembly.github.io/spec/core/index.html) and supports all instructions with the exception of VectorInstructions.
+The runtime targets the latest wasm specification [Wasm 3.0](https://webassembly.github.io/spec/core/index.html) and supports all instructions with the exception of Memory64 and Vector Instructions.
 
 Additionally, the runtime supports the following proposals
 
-- [x] Tail Call
-- [x] Extended Constant Expressions
-- [x] Typed Function References
-- [x] Wasm GC
-- [x] Multiple Memories
-- [x] Exception Handling
-- [x] Extended Name Sections
+| Proposal                   | Supported |
+|-----------------------------|-----------|
+| Tail Call                   | ✅        |
+| Extended Constant Expressions | ✅        |
+| Typed Function References   | ✅        |
+| Wasm GC                     | ✅        |
+| Multiple Memories           | ✅        |
+| Exception Handling          | ✅        |
+| Extended Name Sections      | ✅        |
+
 
 # Usage with the Gradle plugin
 
