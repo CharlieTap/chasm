@@ -28,7 +28,9 @@ public final class io/github/charlietap/chasm/embedding/InstanceKt {
 }
 
 public final class io/github/charlietap/chasm/embedding/InvokeKt {
+	public static final fun invoke (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Lio/github/charlietap/chasm/embedding/shapes/Function;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun invoke (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun invoke$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Lio/github/charlietap/chasm/embedding/shapes/Function;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun invoke$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
@@ -238,6 +240,7 @@ public final class io/github/charlietap/chasm/embedding/dsl/ValueTypeListKt {
 }
 
 public abstract interface class io/github/charlietap/chasm/embedding/error/ChasmError {
+	public abstract fun getError ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/embedding/error/ChasmError$DecodeError : io/github/charlietap/chasm/embedding/error/ChasmError {
@@ -246,7 +249,7 @@ public final class io/github/charlietap/chasm/embedding/error/ChasmError$DecodeE
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
 	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
-	public final fun getError ()Ljava/lang/String;
+	public fun getError ()Ljava/lang/String;
 	public fun hashCode ()I
 	public static fun hashCode-impl (Ljava/lang/String;)I
 	public fun toString ()Ljava/lang/String;
@@ -260,7 +263,7 @@ public final class io/github/charlietap/chasm/embedding/error/ChasmError$Executi
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
 	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
-	public final fun getError ()Ljava/lang/String;
+	public fun getError ()Ljava/lang/String;
 	public fun hashCode ()I
 	public static fun hashCode-impl (Ljava/lang/String;)I
 	public fun toString ()Ljava/lang/String;
@@ -274,7 +277,7 @@ public final class io/github/charlietap/chasm/embedding/error/ChasmError$Validat
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
 	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
-	public final fun getError ()Ljava/lang/String;
+	public fun getError ()Ljava/lang/String;
 	public fun hashCode ()I
 	public static fun hashCode-impl (Ljava/lang/String;)I
 	public fun toString ()Ljava/lang/String;
