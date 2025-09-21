@@ -3,12 +3,15 @@ package io.github.charlietap.chasm.embedding.error
 import kotlin.jvm.JvmInline
 
 sealed interface ChasmError {
-    @JvmInline
-    value class DecodeError(val error: String) : ChasmError
+
+    val error: String
 
     @JvmInline
-    value class ValidationError(val error: String) : ChasmError
+    value class DecodeError(override val error: String) : ChasmError
 
     @JvmInline
-    value class ExecutionError(val error: String) : ChasmError
+    value class ValidationError(override val error: String) : ChasmError
+
+    @JvmInline
+    value class ExecutionError(override val error: String) : ChasmError
 }
