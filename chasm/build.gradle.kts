@@ -16,22 +16,17 @@ plugins {
 
 sweet {
     wasmToolsVersion = "1.239.0"
-    testSuiteCommit = "a8101597d3c3c660086c3cd1eedee608ff18d3c3"
+    testSuiteCommit = "4b24564c844e3d34bf46dfcb3c774ee5163e31cc"
     scriptRunner = "io.github.charlietap.chasm.script.ChasmScriptRunner"
     testPackageName = "io.github.charlietap.chasm.testsuite"
     proposals = listOf(
         Proposal("threads", SemanticPhase.DECODING),
-        Proposal("wasm-3.0", SemanticPhase.EXECUTION),
     )
     excludes = listOf(
-        "**/relaxed_*", "**/*_relaxed_*",
-        "simd_*/**", "**/simd_*",
-        "**/*64.wast", "**/memory64*",
-        "align.wast", "binary.wast", "data.wast", "elem.wast", "global.wast", "imports.wast", "memory.wast",
-        "proposals/wasm-3.0/binary-leb128.wast", // Features memory64 opcodes
-        "proposals/wasm-3.0/table.wast", // Features memory64 opcodes
-        "proposals/wasm-3.0/table_copy_mixed.wast", // Features memory64 opcodes
-        "proposals/wasm-3.0/table_grow.wast", // Features memory64 opcodes
+        "**/relaxed_*", "**/*_relaxed_*", // Features relaxed simd opcodes
+        "simd_*/**", "**/simd_*", // Features simd opcodes
+        "**/*64.wast", "**/memory64*", // Features memory64 opcodes
+        "table_copy_mixed.wast", // Features memory64 opcodes
     )
 }
 
