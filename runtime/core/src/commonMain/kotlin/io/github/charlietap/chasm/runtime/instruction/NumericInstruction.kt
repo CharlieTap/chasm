@@ -287,4 +287,12 @@ sealed interface NumericInstruction : LinkedInstruction {
     data object I64TruncSatF64S : NumericInstruction
 
     data object I64TruncSatF64U : NumericInstruction
+
+    data object I64Add128 : NumericInstruction
+
+    data object I64Sub128 : NumericInstruction
+
+    data object I64MulWideS : NumericInstruction
+
+    data object I64MulWideU : NumericInstruction
 }

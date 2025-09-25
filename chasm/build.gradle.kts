@@ -21,7 +21,7 @@ sweet {
     testPackageName = "io.github.charlietap.chasm.testsuite"
     proposals = listOf(
         Proposal("threads", SemanticPhase.DECODING),
-        Proposal("wide-arithmetic", SemanticPhase.VALIDATION)
+        Proposal("wide-arithmetic", SemanticPhase.EXECUTION)
     )
     excludes = listOf(
         "**/relaxed_*", "**/*_relaxed_*", // Features relaxed simd opcodes
