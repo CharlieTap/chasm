@@ -18,15 +18,16 @@ The runtime targets the latest wasm specification [Wasm 3.0](https://webassembly
 
 Additionally, the runtime supports the following proposals
 
-| Proposal                   | Supported |
-|-----------------------------|-----------|
-| Tail Call                   | ✅        |
+| Proposal                      | Supported |
+|-------------------------------|-----------|
+| Tail Call                     | ✅        |
 | Extended Constant Expressions | ✅        |
-| Typed Function References   | ✅        |
-| Wasm GC                     | ✅        |
-| Multiple Memories           | ✅        |
-| Exception Handling          | ✅        |
-| Extended Name Sections      | ✅        |
+| Typed Function References     | ✅        |
+| Wasm GC                       | ✅        |
+| Multiple Memories             | ✅        |
+| Exception Handling            | ✅        |
+| Extended Name Sections        | ✅        |
+| Wide Arithmetic               | ✅        |
 
 
 # Usage with the Gradle plugin
