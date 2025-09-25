@@ -2844,6 +2844,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/NumericInstruction :
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Add.toString|toString(){}[0]
     }
 
+    final object I64Add128 : io.github.charlietap.chasm.ast.instruction/NumericInstruction { // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Add128|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Add128.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Add128.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Add128.toString|toString(){}[0]
+    }
+
     final object I64And : io.github.charlietap.chasm.ast.instruction/NumericInstruction { // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64And|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64And.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64And.hashCode|hashCode(){}[0]
@@ -2970,6 +2976,18 @@ sealed interface io.github.charlietap.chasm.ast.instruction/NumericInstruction :
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Mul.toString|toString(){}[0]
     }
 
+    final object I64MulWideS : io.github.charlietap.chasm.ast.instruction/NumericInstruction { // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64MulWideS|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64MulWideS.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64MulWideS.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64MulWideS.toString|toString(){}[0]
+    }
+
+    final object I64MulWideU : io.github.charlietap.chasm.ast.instruction/NumericInstruction { // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64MulWideU|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64MulWideU.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64MulWideU.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64MulWideU.toString|toString(){}[0]
+    }
+
     final object I64Ne : io.github.charlietap.chasm.ast.instruction/NumericInstruction { // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Ne|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Ne.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Ne.hashCode|hashCode(){}[0]
@@ -3040,6 +3058,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/NumericInstruction :
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Sub.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Sub.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Sub.toString|toString(){}[0]
+    }
+
+    final object I64Sub128 : io.github.charlietap.chasm.ast.instruction/NumericInstruction { // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Sub128|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Sub128.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Sub128.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64Sub128.toString|toString(){}[0]
     }
 
     final object I64TruncF32S : io.github.charlietap.chasm.ast.instruction/NumericInstruction { // io.github.charlietap.chasm.ast.instruction/NumericInstruction.I64TruncF32S|null[0]
