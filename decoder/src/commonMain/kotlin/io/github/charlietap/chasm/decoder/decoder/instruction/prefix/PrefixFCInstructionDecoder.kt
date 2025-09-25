@@ -95,6 +95,10 @@ internal inline fun PrefixFCInstructionDecoder(
             val tableIdx = tableIndexDecoder(context).bind()
             TableInstruction.TableFill(tableIdx)
         }
+        I64_ADD_128 -> NumericInstruction.I64Add128
+        I64_SUB_128 -> NumericInstruction.I64Sub128
+        I64_MUL_WIDE_S -> NumericInstruction.I64MulWideS
+        I64_MUL_WIDE_U -> NumericInstruction.I64MulWideU
 
         else -> Err(InstructionDecodeError.InvalidPrefixInstruction(PREFIX_FC, opcode)).bind<Instruction>()
     }
@@ -120,3 +124,8 @@ internal const val TABLE_COPY: UInt = 14u
 internal const val TABLE_GROW: UInt = 15u
 internal const val TABLE_SIZE: UInt = 16u
 internal const val TABLE_FILL: UInt = 17u
+
+internal const val I64_ADD_128: UInt = 19u
+internal const val I64_SUB_128: UInt = 20u
+internal const val I64_MUL_WIDE_S: UInt = 21u
+internal const val I64_MUL_WIDE_U: UInt = 22u

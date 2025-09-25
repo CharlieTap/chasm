@@ -165,5 +165,9 @@ internal fun NumericInstructionFactory(
         NumericInstruction.I64TruncSatF32U -> IRNumericInstruction.I64TruncSatF32U
         NumericInstruction.I64TruncSatF64S -> IRNumericInstruction.I64TruncSatF64S
         NumericInstruction.I64TruncSatF64U -> IRNumericInstruction.I64TruncSatF64U
+        NumericInstruction.I64Add128 -> TODO()
+        NumericInstruction.I64MulWideS -> TODO()
+        NumericInstruction.I64MulWideU -> TODO()
+        NumericInstruction.I64Sub128 -> TODO()
     }
 }
