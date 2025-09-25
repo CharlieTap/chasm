@@ -4,9 +4,8 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.joinToCode
-import io.github.charlietap.chasm.embedding.shapes.Memory
-import io.github.charlietap.chasm.gradle.ext.asExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.gradle.ext.asValue
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
 
 internal class PointerAndLengthStringFunctionReturnGenerator {
     operator fun invoke(
@@ -14,15 +13,15 @@ internal class PointerAndLengthStringFunctionReturnGenerator {
         proxy: FunctionProxy,
     ) = CodeBlock.builder().apply {
         add(
-            "%M(store, instance, %S, args).%M { (pointer, length) ->\n" +
-                "    %M(store, memory, (pointer as %T).value, (length as %T).value)\n" +
+            "virtualMachine.%L(store, instance, %S, args).%M { (pointer, length) ->\n" +
+                "    virtualMachine.%L(store, memory, (pointer as %T).value, (length as %T).value)\n" +
                 "}.expect(%S)",
             INVOKE_FUNCTION,
             proxy.name,
             FLATMAP_RESULT_FUNCTION,
             READ_STRING_FUNCTION,
-            NumberValue.I32::class,
-            NumberValue.I32::class,
+            WasmVirtualMachine.Value.I32::class,
+            WasmVirtualMachine.Value.I32::class,
             "Failed to invoke function ${function.name}",
         )
     }.build()
@@ -34,14 +33,14 @@ internal class NullTerminatedStringFunctionReturnGenerator {
         proxy: FunctionProxy,
     ) = CodeBlock.builder().apply {
         add(
-            "%M(store, instance, %S, args).%M { (pointer) ->\n" +
-                "    %M(store, memory, (pointer as %T).value)\n" +
+            "virtualMachine.%L(store, instance, %S, args).%M { (pointer) ->\n" +
+                "    virtualMachine.%L(store, memory, (pointer as %T).value)\n" +
                 "}.expect(%S)",
             INVOKE_FUNCTION,
             proxy.name,
             FLATMAP_RESULT_FUNCTION,
             READ_NULL_STRING_FUNCTION,
-            NumberValue.I32::class,
+            WasmVirtualMachine.Value.I32::class,
             "Failed to invoke function ${function.name}",
         )
     }.build()
@@ -53,19 +52,19 @@ internal class LengthPrefixedStringFunctionReturnGenerator {
         proxy: FunctionProxy,
     ) = CodeBlock.builder().apply {
         add(
-            "%M(store, instance, %S, args).%M { (pointer) ->\n" +
-                "    val length = %M(store, memory, (pointer as %T).value).%M(%S)\n" +
-                "    %M(store, memory, (pointer as %T).value + 4, length)\n" +
+            "virtualMachine.%L(store, instance, %S, args).%M { (pointer) ->\n" +
+                "    val length = virtualMachine.%L(store, memory, (pointer as %T).value).%M(%S)\n" +
+                "    virtualMachine.%L(store, memory, (pointer as %T).value + 4, length)\n" +
                 "}.expect(%S)",
             INVOKE_FUNCTION,
             proxy.name,
             FLATMAP_RESULT_FUNCTION,
             READ_INT_FUNCTION,
-            NumberValue.I32::class,
+            WasmVirtualMachine.Value.I32::class,
             EXPECT_RESULT_FUNCTION,
             "Failed to read string length",
             READ_STRING_FUNCTION,
-            NumberValue.I32::class,
+            WasmVirtualMachine.Value.I32::class,
             "Failed to invoke function ${function.name}",
         )
     }.build()
@@ -77,16 +76,16 @@ internal class PackedStringFunctionReturnGenerator {
         proxy: FunctionProxy,
     ) = CodeBlock.builder().apply {
         add(
-            "%M(store, instance, %S, args).%M { (pointerAndLength) ->\n" +
+            "virtualMachine.%L(store, instance, %S, args).%M { (pointerAndLength) ->\n" +
                 "    val packed = (pointerAndLength as %T).value\n" +
                 "    val pointer = (packed ushr 32).toInt()\n" +
                 "    val length = packed.toInt()\n" +
-                "    %M(store, memory, pointer, length)\n" +
+                "    virtualMachine.%L(store, memory, pointer, length)\n" +
                 "}.expect(%S)",
             INVOKE_FUNCTION,
             proxy.name,
             FLATMAP_RESULT_FUNCTION,
-            NumberValue.I64::class,
+            WasmVirtualMachine.Value.I64::class,
             READ_STRING_FUNCTION,
             "Failed to invoke function ${function.name}",
         )
@@ -127,11 +126,11 @@ internal class FunctionReturnImplementationGenerator(
             Scalar.Double,
             -> {
                 addStatement(
-                    "val result = %M(store, instance, %S, args).%M { (it.first() as %T).value }.%M(%S)",
+                    "val result = virtualMachine.%L(store, instance, %S, args).%M { (it.first() as %T).value }.%M(%S)",
                     INVOKE_FUNCTION,
                     proxy.name,
                     MAP_RESULT_FUNCTION,
-                    function.returns.type.asExecutionValue(),
+                    function.returns.type.asValue(),
                     EXPECT_RESULT_FUNCTION,
                     "Failed to invoke function ${function.name}",
                 )
@@ -141,7 +140,7 @@ internal class FunctionReturnImplementationGenerator(
 
             Scalar.Unit -> {
                 addStatement(
-                    "%M(store, instance, %S, args).%M(%S)",
+                    "virtualMachine.%L(store, instance, %S, args).%M(%S)",
                     INVOKE_FUNCTION,
                     proxy.name,
                     EXPECT_RESULT_FUNCTION,
@@ -159,12 +158,12 @@ internal class FunctionReturnImplementationGenerator(
 
             is Aggregate -> {
                 val generatedType = type.generated.fields.mapIndexed { idx, field ->
-                    CodeBlock.of("r%L = (it[%L] as %T).value", idx, idx, field.type.asExecutionValue())
+                    CodeBlock.of("r%L = (it[%L] as %T).value", idx, idx, field.type.asValue())
                 }.joinToCode(",\n")
 
                 addStatement(
                     """
-                    val result = %M(store, instance, %S, args).%M {
+                    val result = virtualMachine.%L(store, instance, %S, args).%M {
                         %T(
                             %L
                         )

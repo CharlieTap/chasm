@@ -3,8 +3,8 @@ import io.github.charlietap.chasm.gradle.StringEncodingStrategy
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.symbol.processing)
     alias(libs.plugins.chasm)
+    alias(libs.plugins.metro)
 
     alias(libs.plugins.conventions.linting)
 }
@@ -32,11 +32,3 @@ chasm {
         }
     }
 }
-
-dependencies {
-    implementation(libs.hilt.core)
-
-    ksp(libs.hilt.compiler)
-}
-
-

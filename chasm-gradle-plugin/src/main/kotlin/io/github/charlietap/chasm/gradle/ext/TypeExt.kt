@@ -9,13 +9,13 @@ import com.squareup.kotlinpoet.UNIT
 import io.github.charlietap.chasm.gradle.Aggregate
 import io.github.charlietap.chasm.gradle.Scalar
 import io.github.charlietap.chasm.gradle.Type
-import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
 
-internal fun Type.asExecutionValue() = when (this) {
-    Scalar.Integer -> NumberValue.I32::class
-    Scalar.Long -> NumberValue.I64::class
-    Scalar.Float -> NumberValue.F32::class
-    Scalar.Double -> NumberValue.F64::class
+internal fun Type.asValue() = when (this) {
+    Scalar.Integer -> WasmVirtualMachine.Value.I32::class
+    Scalar.Long -> WasmVirtualMachine.Value.I64::class
+    Scalar.Float -> WasmVirtualMachine.Value.F32::class
+    Scalar.Double -> WasmVirtualMachine.Value.F64::class
     Scalar.String,
     Scalar.Unit,
     is Aggregate,

@@ -1,12 +1,13 @@
 [versions]
 
-version-name = "1.1.0"
+version-name = "1.2.0"
+plugin-version-name = "2.0.0-1.2.0"
 
 application-id = "com.tap.chasm"
 application-namespace = "com.tap.chasm"
 compile-sdk = "35"
 target-sdk = "35"
-min-sdk = "24"
+min-sdk = "28"
 
 java-compiler-version = "21"
 java-bytecode-version = "11"
@@ -39,7 +40,7 @@ idea-ext-plugin = "1.1.10"
 
 junit = "4.13.2"
 
-kotlin = "2.2.10"
+kotlin = "2.2.20"
 k-poet = "2.2.0"
 kotlinter = "5.2.0"
 
@@ -49,9 +50,11 @@ kotlinx-coroutines = "1.8.0"
 kotlinx-datetime = "0.5.0"
 kotlinx-io = "0.6.0"
 kotlinx-serialization = "1.9.0"
-kotlinx-test-resources = "0.10.0"
+kotlinx-test-resources = "0.10.1"
 
-ksp = "2.2.10-2.0.2"
+ksp = "2.2.20-2.0.3"
+
+metro = "0.6.9"
 
 result = "2.0.1"
 
@@ -63,7 +66,7 @@ android-library = { id = "com.android.library", version.ref = "android-build-too
 android-test = { id = "com.android.test", version.ref = "android-build-tools-plugin" }
 bolt = { id = "io.github.charlietap.bolt.plugin" }
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config-plugin" }
-chasm = { id = "io.github.charlietap.chasm.gradle", version.ref = "version-name" }
+chasm = { id = "io.github.charlietap.chasm.gradle", version.ref = "plugin-version-name" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref="dependency-analysis" }
 dokka = { id = "org.jetbrains.dokka", version.ref="dokka" }
@@ -81,6 +84,7 @@ kotlin-atomic-fu = { id = "org.jetbrains.kotlin.plugin.atomicfu", version.ref = 
 kotlinx-test-resources = { id = "com.goncalossilva.resources", version.ref = "kotlinx-test-resources"}
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 maven-publish = { id = "maven-publish" }
+metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 wasm-testsuite = { id = "io.github.charlietap.sweet.plugin" }
 
 conventions-kmp  = { id = "kmp-conventions" }

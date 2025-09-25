@@ -2,19 +2,18 @@ package io.github.charlietap.chasm.gradle.ext
 
 import io.github.charlietap.chasm.gradle.Scalar
 import io.github.charlietap.chasm.gradle.Type
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import kotlin.reflect.KClass
 
-internal fun ValueType.asExecutionValue(): KClass<out ExecutionValue> {
+internal fun ValueType.asValue(): KClass<out WasmVirtualMachine.Value> {
     return when (this) {
         is ValueType.Number -> when (this.numberType) {
-            NumberType.I32 -> NumberValue.I32::class
-            NumberType.I64 -> NumberValue.I64::class
-            NumberType.F32 -> NumberValue.F32::class
-            NumberType.F64 -> NumberValue.F64::class
+            NumberType.I32 -> WasmVirtualMachine.Value.I32::class
+            NumberType.I64 -> WasmVirtualMachine.Value.I64::class
+            NumberType.F32 -> WasmVirtualMachine.Value.F32::class
+            NumberType.F64 -> WasmVirtualMachine.Value.F64::class
         }
         is ValueType.Bottom,
         is ValueType.Reference,

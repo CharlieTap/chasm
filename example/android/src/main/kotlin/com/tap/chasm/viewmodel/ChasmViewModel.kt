@@ -1,23 +1,29 @@
 package com.tap.chasm.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tap.chasm.di.ViewModelKey
 import com.test.chasm.FactorialService
 import com.test.chasm.FibonacciService
 import com.test.chasm.StringService
 import com.test.chasm.TestService
 import com.test.chasm.producer.ProducerService
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ChasmViewModel @Inject constructor(
+@ContributesIntoMap(AppScope::class, binding<ViewModel>())
+@ViewModelKey(ChasmViewModel::class)
+@Inject
+class ChasmViewModel(
     private val factorialService: FactorialService,
     private val fibonacciService: FibonacciService,
     private val producerService: ProducerService,

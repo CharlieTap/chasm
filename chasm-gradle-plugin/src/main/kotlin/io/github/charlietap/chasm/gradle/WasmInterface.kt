@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import java.io.Serializable
 import kotlin.reflect.KClass
 
@@ -57,7 +58,7 @@ internal sealed interface PropertyImplementation
 
 internal data class GlobalProxy(
     val name: String,
-    val source: KClass<*>,
+    val source: KClass<out WasmVirtualMachine.Value>,
 ) : PropertyImplementation
 
 internal data class Property(

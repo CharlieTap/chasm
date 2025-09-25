@@ -2,8 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.symbol.processing)
+    alias(libs.plugins.metro)
 
 
     alias(libs.plugins.conventions.linting)
@@ -55,11 +54,8 @@ dependencies {
     implementation(projects.consumerMultiplatformFactorial)
     implementation(projects.producer)
 
-    implementation(libs.hilt.android)
     implementation(libs.bundles.androidx)
     implementation(libs.bundles.compose.ui)
 
     runtimeOnly(libs.kotlinx.coroutines.android)
-
-    ksp(libs.bundles.hilt.compilers)
 }

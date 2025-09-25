@@ -32,7 +32,7 @@ class ChasmPlugin : Plugin<Project> {
             val mpp = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
             mpp.targets.configureEach {
-                addChasmRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
+                addVMRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
             }
 
             project.afterEvaluate {
@@ -95,7 +95,7 @@ class ChasmPlugin : Plugin<Project> {
             val jvmExtension = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
             val mainCompilation = jvmExtension.target.compilations.getByName(MAIN_COMPILATION_NAME)
 
-            addChasmRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
+            addVMRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
 
             extension.modules.configureEach {
                 if (extension.mode.get() == Mode.PRODUCER) {
@@ -114,7 +114,7 @@ class ChasmPlugin : Plugin<Project> {
             val androidExtension = project.extensions.getByType(BaseExtension::class.java)
             val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
 
-            addChasmRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
+            addVMRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
 
             androidComponents.onVariants { variant: Variant ->
                 extension.modules.configureEach {
@@ -177,11 +177,11 @@ class ChasmPlugin : Plugin<Project> {
         else -> null
     }
 
-    private fun KotlinTarget.addChasmRuntimeToKmpTarget(
+    private fun KotlinTarget.addVMRuntimeToKmpTarget(
         configuration: RuntimeDependencyConfiguration,
     ) {
         val suffix = artifactSuffixFor(this) ?: return
-        val notation = resolveChasmRuntimeNotation(suffix)
+        val notation = resolveVMRuntimeNotation(suffix)
 
         val compilation = compilations.getByName("main")
         val configurationName = when (configuration) {
@@ -190,29 +190,29 @@ class ChasmPlugin : Plugin<Project> {
         }
 
         val exists = project.configurations.getByName(configurationName).dependencies.any {
-            it.group == CHASM_RUNTIME_GROUP && it.name == "$CHASM_RUNTIME_ARTIFACT-$suffix"
+            it.group == RUNTIME_GROUP && it.name == "$RUNTIME_ARTIFACT-$suffix"
         }
         if (!exists) {
             project.dependencies.add(configurationName, notation)
         }
     }
 
-    private fun addChasmRuntimeForJvmOrAndroid(
+    private fun addVMRuntimeForJvmOrAndroid(
         project: Project,
         configuration: RuntimeDependencyConfiguration,
     ) {
         val configurationName = configuration.name.lowercase()
-        val notation = resolveChasmRuntimeNotation(CHASM_RUNTIME_JVM_ARTIFACT_SUFFIX)
+        val notation = resolveVMRuntimeNotation(RUNTIME_JVM_ARTIFACT_SUFFIX)
         if (!runtimeDependencyExists(project, configurationName)) {
             project.dependencies.add(configurationName, notation)
         }
     }
 
-    private fun resolveChasmRuntimeNotation(
+    private fun resolveVMRuntimeNotation(
         suffix: String,
     ): Any {
-        val group = CHASM_RUNTIME_GROUP
-        val artifact = "$CHASM_RUNTIME_ARTIFACT-$suffix"
+        val group = RUNTIME_GROUP
+        val artifact = "$RUNTIME_ARTIFACT-$suffix"
         val version = BuildConfig.RUNTIME_VERSION
         return "$group:$artifact:$version"
     }
@@ -223,13 +223,13 @@ class ChasmPlugin : Plugin<Project> {
     ): Boolean {
         val dependencies = project.configurations.findByName(configurationName)?.allDependencies.orEmpty()
         return dependencies.any { dep ->
-            dep.group == CHASM_RUNTIME_GROUP && (dep.name == CHASM_RUNTIME_ARTIFACT || dep.name == "$CHASM_RUNTIME_ARTIFACT-$CHASM_RUNTIME_JVM_ARTIFACT_SUFFIX")
+            dep.group == RUNTIME_GROUP && (dep.name == RUNTIME_ARTIFACT || dep.name == "$RUNTIME_ARTIFACT-$RUNTIME_JVM_ARTIFACT_SUFFIX")
         }
     }
 
     private companion object {
-        private const val CHASM_RUNTIME_GROUP = "io.github.charlietap.chasm"
-        private const val CHASM_RUNTIME_ARTIFACT = "chasm"
-        private const val CHASM_RUNTIME_JVM_ARTIFACT_SUFFIX = "jvm"
+        private const val RUNTIME_GROUP = "io.github.charlietap.chasm"
+        private const val RUNTIME_ARTIFACT = "vm"
+        private const val RUNTIME_JVM_ARTIFACT_SUFFIX = "jvm"
     }
 }

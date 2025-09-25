@@ -78,6 +78,7 @@ include(":test:fixture:type-system")
 
 include(":type-system")
 include(":validator")
+include(":vm")
 
 includeBuild("bolt")
 //includeBuild("example")

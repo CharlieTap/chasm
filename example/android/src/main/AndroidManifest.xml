@@ -8,14 +8,18 @@
 
     <application
         android:name=".app.ChasmApplication"
+        android:appComponentFactory="com.tap.chasm.di.MetroAppComponentFactory"
         android:theme="@style/Theme.AppCompat"
         android:allowBackup="false"
         android:label="Chasm"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        tools:replace="android:appComponentFactory"
+        >
 
         <activity
             android:name=".view.ChasmActivity"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />

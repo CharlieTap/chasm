@@ -25,6 +25,8 @@ jobs:
         include:
           - os: ubuntu-24.04-arm
             task: jvmTest
+          - os: ubuntu-24.04-arm
+            task: jsTest --no-configuration-cache
           - os: macos-latest
             task: macosArm64Test
           - os: macos-latest

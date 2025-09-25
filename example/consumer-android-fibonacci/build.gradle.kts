@@ -3,9 +3,8 @@ import io.github.charlietap.chasm.gradle.CodegenConfig
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.symbol.processing)
     alias(libs.plugins.chasm)
+    alias(libs.plugins.metro)
 
     alias(libs.plugins.conventions.linting)
 }
@@ -35,11 +34,3 @@ android {
         jvmTarget = libs.versions.java.bytecode.version.get()
     }
 }
-
-dependencies {
-    implementation(libs.hilt.android)
-
-    ksp(libs.bundles.hilt.compilers)
-}
-
-

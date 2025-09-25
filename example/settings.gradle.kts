@@ -24,10 +24,12 @@ dependencyResolutionManagement {
 
 include(":android")
 include(":benchmark")
+include(":binary")
 include(":consumer-android-fibonacci")
 include(":consumer-jvm-test")
 include(":consumer-multiplatform-factorial")
 include(":producer")
+include(":web")
 
 
 rootProject.name = "chasm-example"

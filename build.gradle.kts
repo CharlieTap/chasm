@@ -18,10 +18,6 @@ plugins {
     alias(libs.plugins.conventions.versions)
 }
 
-tasks.register("clean",Delete::class){
-    delete(rootProject.layout.buildDirectory)
-}
-
 tasks.register("fmt") {
     group = "formatting"
     description = "Format sources"

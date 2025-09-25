@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.gradle.Scalar
 import io.github.charlietap.chasm.gradle.StringEncodingStrategy
 import io.github.charlietap.chasm.gradle.Type
 import io.github.charlietap.chasm.gradle.WasmInterface
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import kotlin.reflect.KClass
 
 internal fun integerScalarType() = Scalar.Integer
@@ -96,7 +97,7 @@ internal fun function(
 
 internal fun globalProxy(
     name: String = "",
-    source: KClass<*> = Int::class,
+    source: KClass<WasmVirtualMachine.Value> = WasmVirtualMachine.Value::class,
 ) = GlobalProxy(
     name = name,
     source = source,

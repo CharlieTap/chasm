@@ -7,8 +7,11 @@
   )
 
   (func $fac-aux (param $x i64) (param $r i64) (result i64)
-    (if (i64.eqz (local.get $x))
-      (then (return (local.get $r)))
+    (if (result i64)
+        (i64.eqz (local.get $x))
+      (then
+        (local.get $r)
+      )
       (else
         (return_call $fac-aux
           (i64.sub (local.get $x) (i64.const 1))
