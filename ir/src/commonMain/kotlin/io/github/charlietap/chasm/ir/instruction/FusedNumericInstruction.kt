@@ -110,6 +110,38 @@ sealed interface FusedNumericInstruction : Instruction {
         val destination: FusedDestination,
     ) : FusedNumericInstruction
 
+    data class I64Add128(
+        val leftLow: FusedOperand,
+        val leftHigh: FusedOperand,
+        val rightLow: FusedOperand,
+        val rightHigh: FusedOperand,
+        val destinationLow: FusedDestination,
+        val destinationHigh: FusedDestination,
+    ) : FusedNumericInstruction
+
+    data class I64Sub128(
+        val leftLow: FusedOperand,
+        val leftHigh: FusedOperand,
+        val rightLow: FusedOperand,
+        val rightHigh: FusedOperand,
+        val destinationLow: FusedDestination,
+        val destinationHigh: FusedDestination,
+    ) : FusedNumericInstruction
+
+    data class I64MulWideS(
+        val left: FusedOperand,
+        val right: FusedOperand,
+        val destinationLow: FusedDestination,
+        val destinationHigh: FusedDestination,
+    ) : FusedNumericInstruction
+
+    data class I64MulWideU(
+        val left: FusedOperand,
+        val right: FusedOperand,
+        val destinationLow: FusedDestination,
+        val destinationHigh: FusedDestination,
+    ) : FusedNumericInstruction
+
     data class I64DivS(
         val left: FusedOperand,
         val right: FusedOperand,

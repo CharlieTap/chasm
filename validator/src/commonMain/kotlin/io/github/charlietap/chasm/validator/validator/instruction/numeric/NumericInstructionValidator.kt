@@ -250,5 +250,19 @@ internal fun NumericInstructionValidator(
             context.popF64().bind()
             context.pushI64()
         }
+        NumericInstruction.I64Add128, NumericInstruction.I64Sub128 -> {
+            context.popI64().bind()
+            context.popI64().bind()
+            context.popI64().bind()
+            context.popI64().bind()
+            context.pushI64()
+            context.pushI64()
+        }
+        NumericInstruction.I64MulWideS, NumericInstruction.I64MulWideU -> {
+            context.popI64().bind()
+            context.popI64().bind()
+            context.pushI64()
+            context.pushI64()
+        }
     }
 }

@@ -99,6 +99,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32TruncSatF
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32TruncSatF64UDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32WrapI64Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32XorDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64Add128Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64AddDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64AndDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64ClzDispatcher
@@ -122,6 +123,8 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64LeUDispat
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64LtSDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64LtUDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64MulDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64MulWideSDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64MulWideUDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64NeDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64OrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64PopcntDispatcher
@@ -133,6 +136,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64RotrDispa
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64ShlDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64ShrSDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64ShrUDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64Sub128Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64SubDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64TruncF32SDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64TruncF32UDispatcher
@@ -244,6 +248,7 @@ import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I32Trun
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I32WrapI64
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I32Xor
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Add
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Add128
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64And
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Clz
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Const
@@ -266,6 +271,8 @@ import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64LeU
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64LtS
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64LtU
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Mul
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64MulWideS
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64MulWideU
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Ne
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Or
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Popcnt
@@ -278,6 +285,7 @@ import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Shl
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64ShrS
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64ShrU
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Sub
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64Sub128
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64TruncF32S
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64TruncF32U
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction.I64TruncF64S
@@ -387,6 +395,10 @@ internal fun NumericInstructionPredecoder(
         i64TruncSatF32UDispatcher = ::I64TruncSatF32UDispatcher,
         i64TruncSatF64SDispatcher = ::I64TruncSatF64SDispatcher,
         i64TruncSatF64UDispatcher = ::I64TruncSatF64UDispatcher,
+        i64Add128Dispatcher = ::I64Add128Dispatcher,
+        i64Sub128Dispatcher = ::I64Sub128Dispatcher,
+        i64MulWideSDispatcher = ::I64MulWideSDispatcher,
+        i64MulWideUDispatcher = ::I64MulWideUDispatcher,
         f32ConvertI32SDispatcher = ::F32ConvertI32SDispatcher,
         f32ConvertI32UDispatcher = ::F32ConvertI32UDispatcher,
         f32ConvertI64SDispatcher = ::F32ConvertI64SDispatcher,
@@ -532,6 +544,10 @@ internal inline fun NumericInstructionPredecoder(
     crossinline i64TruncSatF32UDispatcher: Dispatcher<I64TruncSatF32U>,
     crossinline i64TruncSatF64SDispatcher: Dispatcher<I64TruncSatF64S>,
     crossinline i64TruncSatF64UDispatcher: Dispatcher<I64TruncSatF64U>,
+    crossinline i64Add128Dispatcher: Dispatcher<I64Add128>,
+    crossinline i64Sub128Dispatcher: Dispatcher<I64Sub128>,
+    crossinline i64MulWideSDispatcher: Dispatcher<I64MulWideS>,
+    crossinline i64MulWideUDispatcher: Dispatcher<I64MulWideU>,
     crossinline f32ConvertI32SDispatcher: Dispatcher<F32ConvertI32S>,
     crossinline f32ConvertI32UDispatcher: Dispatcher<F32ConvertI32U>,
     crossinline f32ConvertI64SDispatcher: Dispatcher<F32ConvertI64S>,
@@ -674,6 +690,10 @@ internal inline fun NumericInstructionPredecoder(
         is NumericInstruction.I64TruncSatF32U -> i64TruncSatF32UDispatcher(I64TruncSatF32U)
         is NumericInstruction.I64TruncSatF64S -> i64TruncSatF64SDispatcher(I64TruncSatF64S)
         is NumericInstruction.I64TruncSatF64U -> i64TruncSatF64UDispatcher(I64TruncSatF64U)
+        is NumericInstruction.I64Add128 -> i64Add128Dispatcher(I64Add128)
+        is NumericInstruction.I64Sub128 -> i64Sub128Dispatcher(I64Sub128)
+        is NumericInstruction.I64MulWideS -> i64MulWideSDispatcher(I64MulWideS)
+        is NumericInstruction.I64MulWideU -> i64MulWideUDispatcher(I64MulWideU)
         is NumericInstruction.F32ConvertI32S -> f32ConvertI32SDispatcher(F32ConvertI32S)
         is NumericInstruction.F32ConvertI32U -> f32ConvertI32UDispatcher(F32ConvertI32U)
         is NumericInstruction.F32ConvertI64S -> f32ConvertI64SDispatcher(F32ConvertI64S)

@@ -110,6 +110,38 @@ sealed interface FusedNumericInstruction : LinkedInstruction {
         val destination: StoreOp,
     ) : FusedNumericInstruction
 
+    data class I64Add128(
+        val leftLow: LoadOp,
+        val leftHigh: LoadOp,
+        val rightLow: LoadOp,
+        val rightHigh: LoadOp,
+        val destinationLow: StoreOp,
+        val destinationHigh: StoreOp,
+    ) : FusedNumericInstruction
+
+    data class I64Sub128(
+        val leftLow: LoadOp,
+        val leftHigh: LoadOp,
+        val rightLow: LoadOp,
+        val rightHigh: LoadOp,
+        val destinationLow: StoreOp,
+        val destinationHigh: StoreOp,
+    ) : FusedNumericInstruction
+
+    data class I64MulWideS(
+        val left: LoadOp,
+        val right: LoadOp,
+        val destinationLow: StoreOp,
+        val destinationHigh: StoreOp,
+    ) : FusedNumericInstruction
+
+    data class I64MulWideU(
+        val left: LoadOp,
+        val right: LoadOp,
+        val destinationLow: StoreOp,
+        val destinationHigh: StoreOp,
+    ) : FusedNumericInstruction
+
     data class I64DivS(
         val left: LoadOp,
         val right: LoadOp,
