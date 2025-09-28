@@ -1,0 +1,38 @@
+plugins {
+    alias(libs.plugins.conventions.kmp)
+    alias(libs.plugins.conventions.linting)
+    alias(libs.plugins.conventions.publishing)
+}
+
+kotlin {
+
+    sourceSets {
+
+        all {
+            languageSettings {
+
+            }
+        }
+
+       commonMain {
+            dependencies {
+                api(projects.config)
+                api(projects.ir)
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation(projects.test.fixture.config)
+                implementation(projects.test.fixture.ir)
+
+                implementation(libs.kotlin.test)
+            }
+        }
+    }
+}
+
+configure<PublishingConventionsExtension> {
+    name = "compiler"
+    description = "bytecode compiler passes for chasm ir"
+}

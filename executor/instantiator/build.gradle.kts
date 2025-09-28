@@ -16,7 +16,7 @@ kotlin {
                 api(libs.result)
 
                 implementation(projects.irFactory)
-                implementation(projects.optimiser)
+                implementation(projects.compiler)
                 implementation(projects.predecoder)
                 implementation(projects.memory)
             }

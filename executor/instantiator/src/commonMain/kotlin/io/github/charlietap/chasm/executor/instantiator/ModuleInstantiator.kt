@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.compiler.Compiler
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
@@ -14,7 +15,6 @@ import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.ir.factory.ModuleFactory
 import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.optimiser.Optimiser
 import io.github.charlietap.chasm.predecoder.ExpressionPredecoder
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.runtime.Arity
@@ -40,7 +40,7 @@ fun ModuleInstantiator(
         imports = imports,
         compatibilityChecker = ::CompatibilityChecker,
         moduleFactory = ::ModuleFactory,
-        optimiser = ::Optimiser,
+        compiler = ::Compiler,
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
         invoker = ::FunctionInvoker,
@@ -57,7 +57,7 @@ internal inline fun ModuleInstantiator(
     imports: List<Import>,
     crossinline compatibilityChecker: CompatibilityChecker,
     crossinline moduleFactory: ModuleFactory,
-    crossinline optimiser: Optimiser,
+    crossinline compiler: Compiler,
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline allocator: ModuleAllocator,
     crossinline invoker: FunctionInvoker,
@@ -69,7 +69,7 @@ internal inline fun ModuleInstantiator(
 
     compatibilityChecker(module).bind()
 
-    val irModule = optimiser(config, moduleFactory(module))
+    val irModule = compiler(config, moduleFactory(module))
     val context = InstantiationContext(config, store, irModule)
     val partialInstance = partialAllocator(context, imports).bind()
 

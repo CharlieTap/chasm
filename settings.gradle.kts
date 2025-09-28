@@ -57,7 +57,7 @@ include(":memory")
 
 include(":predecoder")
 
-include(":optimiser")
+include(":compiler")
 
 include(":runtime:address")
 include(":runtime:core")

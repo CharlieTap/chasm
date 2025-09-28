@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.compiler.Compiler
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
@@ -28,7 +29,6 @@ import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.ir.factory.ModuleFactory
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.optimiser.Optimiser
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
@@ -86,7 +86,7 @@ class ModuleInstantiatorTest {
             module
         }
 
-        val optimiser: Optimiser = { _config, _module ->
+        val compiler: Compiler = { _config, _module ->
             assertEquals(config, _config)
             assertEquals(module, _module)
             module
@@ -156,7 +156,7 @@ class ModuleInstantiatorTest {
             imports = imports,
             compatibilityChecker = compatibilityChecker,
             moduleFactory = moduleFactory,
-            optimiser = optimiser,
+            compiler = compiler,
             partialAllocator = pallocator,
             allocator = allocator,
             invoker = invoker,
