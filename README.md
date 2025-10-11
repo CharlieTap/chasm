@@ -63,11 +63,12 @@ chasm {
 
 With this configuration a Kotlin class called `ExampleService` will be
 generated in the specified package. Each exported function in
-`example.wasm` will be exposed as a Kotlin function. The plugin runs on JVM,
-Kotlin Multiplatform and Android modules.
+`example.wasm` will be exposed as a Kotlin function. The gradle plugin abstracts over a
+generic wasm virtual machine which uses Chasm for JVM and native targets whilst leveraging
+the embedded wasm vm (V8, Spidermonkey, JavascriptCore etc) on JS targets.
 
 For more information please see the plugin documentation [here](./docs/plugin.md) and for
-a working example please see the example project in `example/` for Android, JVM and
+a working example please see the example project in `example/` for Android, Web, JVM and
 Multiplatform demonstrations of the plugin.
 
 # Usage without the Gradle plugin
