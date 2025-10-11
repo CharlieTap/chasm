@@ -14,11 +14,6 @@ public final class io/github/charlietap/chasm/gradle/ChasmPlugin : org/gradle/ap
 	public fun apply (Lorg/gradle/api/Project;)V
 }
 
-public final class io/github/charlietap/chasm/gradle/ChasmPlugin$inlined$sam$i$org_gradle_api_Action$0 : org/gradle/api/Action {
-	public fun <init> (Lkotlin/jvm/functions/Function1;)V
-	public final synthetic fun execute (Ljava/lang/Object;)V
-}
-
 public final class io/github/charlietap/chasm/gradle/CodegenConfig : java/io/Serializable {
 	public fun <init> ()V
 	public fun <init> (Z)V
