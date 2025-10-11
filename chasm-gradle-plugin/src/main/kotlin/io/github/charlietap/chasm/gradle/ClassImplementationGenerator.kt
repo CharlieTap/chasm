@@ -14,122 +14,87 @@ import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.UNIT
-import io.github.charlietap.chasm.config.Config
-import io.github.charlietap.chasm.embedding.shapes.Global
-import io.github.charlietap.chasm.embedding.shapes.Instance
-import io.github.charlietap.chasm.embedding.shapes.Memory
-import io.github.charlietap.chasm.embedding.shapes.Module
-import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.embedding.shapes.Wasm32Allocator
-import io.github.charlietap.chasm.gradle.ext.asExecutionValue
 import io.github.charlietap.chasm.gradle.ext.asTypeName
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
-import io.github.charlietap.chasm.runtime.value.NumberValue
-import io.github.charlietap.chasm.stream.SourceReader
-import kotlin.reflect.KClass
+import io.github.charlietap.chasm.gradle.ext.asValue
+import io.github.charlietap.chasm.vm.Wasm32Allocator
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
 
 internal class PrimaryConstructorGenerator {
     operator fun invoke(
         builder: TypeSpec.Builder,
-        importsParameter: ParameterSpec,
-        configParameter: ParameterSpec,
     ) = builder.apply {
         primaryConstructor(
             FunSpec.constructorBuilder().apply {
-                addParameter("module", Module::class)
-                addParameter(importsParameter)
-                addParameter(configParameter)
+                addParameter("binary", ByteArray::class)
+                addParameter(
+                    ParameterSpec.builder(
+                        "imports",
+                        CODEGEN_IMPORT_LIST_CLASS_NAME,
+                    ).defaultValue(CodeBlock.of("emptyList()")).build(),
+                )
+                addParameter(
+                    ParameterSpec.builder(
+                        "virtualMachine",
+                        WASM_VIRTUAL_MACHINE_CLASS_NAME,
+                    ).defaultValue(CodeBlock.of("%M()", VM_FACTORY_CLASS_NAME)).build(),
+                )
+                addParameter(
+                    ParameterSpec.builder(
+                        "moduleFactory",
+                        MODULE_FACTORY_CLASS_NAME.copy(true),
+                    ).defaultValue("null").build(),
+                )
+                addParameter(
+                    ParameterSpec.builder(
+                        "instanceFactory",
+                        INSTANCE_FACTORY_CLASS_NAME.copy(true),
+                    ).defaultValue("null").build(),
+                )
             }.build(),
         )
 
         addProperty(
-            PropertySpec.builder("module", Module::class)
-                .initializer("module")
+            PropertySpec.builder("binary", ByteArray::class)
+                .initializer("binary")
                 .addModifiers(KModifier.PRIVATE)
                 .build(),
         )
         addProperty(
-            PropertySpec.builder(
-                "imports",
-                LIST_IMPORTS_CLASS_NAME,
-            )
+            PropertySpec.builder("imports", CODEGEN_IMPORT_LIST_CLASS_NAME)
                 .initializer("imports")
                 .addModifiers(KModifier.PRIVATE)
                 .build(),
         )
         addProperty(
-            PropertySpec.builder("config", Config::class)
-                .initializer("config")
-                .addModifiers(KModifier.PRIVATE)
-                .build(),
+            PropertySpec.builder(
+                "virtualMachine",
+                WASM_VIRTUAL_MACHINE_CLASS_NAME,
+            ).initializer("virtualMachine").addModifiers(KModifier.PRIVATE).build(),
+        )
+        addProperty(
+            PropertySpec.builder(
+                "moduleFactory",
+                MODULE_FACTORY_CLASS_NAME.copy(true),
+            ).initializer("moduleFactory").addModifiers(KModifier.PRIVATE).build(),
+        )
+        addProperty(
+            PropertySpec.builder(
+                "instanceFactory",
+                INSTANCE_FACTORY_CLASS_NAME.copy(true),
+            ).initializer("instanceFactory").addModifiers(KModifier.PRIVATE).build(),
         )
     }
-}
-
-internal class AlternateConstructorGenerator {
-    operator fun invoke(
-        parameterName: String,
-        parameterType: KClass<*>,
-        importsParameter: ParameterSpec,
-        configParameter: ParameterSpec,
-    ) = FunSpec.constructorBuilder().apply {
-        addParameter(parameterName, parameterType)
-        addParameter(importsParameter)
-        addParameter(configParameter)
-        callThisConstructor(
-            CodeBlock.of(
-                "module = %M(%L, config.moduleConfig).%M(%S), imports = imports, config = config",
-                CREATE_MODULE_FUNCTION,
-                parameterName,
-                EXPECT_RESULT_FUNCTION,
-                "Failed to instantiate module",
-            ),
-        )
-    }.build()
 }
 
 internal class ConstructorGenerator(
     private val primaryConstructorGenerator: PrimaryConstructorGenerator = PrimaryConstructorGenerator(),
-    private val alternateConstructorGenerator: AlternateConstructorGenerator = AlternateConstructorGenerator(),
 ) {
     operator fun invoke(builder: TypeSpec.Builder) = builder.apply {
-
-        val importsParameter = ParameterSpec.builder("imports", LIST_IMPORTS_CLASS_NAME).apply {
-            defaultValue(CodeBlock.of("emptyList()"))
-        }.build()
-
-        val configParameter = ParameterSpec.builder("config", Config::class).apply {
-            defaultValue(CodeBlock.of("%T()", Config::class))
-        }.build()
-
-        primaryConstructorGenerator(builder, importsParameter, configParameter)
-
-        addFunction(alternateConstructorGenerator("binary", ByteArray::class, importsParameter, configParameter))
-        addFunction(alternateConstructorGenerator("reader", SourceReader::class, importsParameter, configParameter))
+        primaryConstructorGenerator(builder)
     }
 }
 
 private fun TypeSpec.Builder.addConstructor(generator: ConstructorGenerator) = generator(this)
-
-internal class GlobalPropertyGetterImplementationGenerator {
-    operator fun invoke(
-        proxy: GlobalProxy,
-    ) = FunSpec.getterBuilder().apply {
-        addStatement(
-            """val global = instance.exports.first { it.name == %S }.value as %T""",
-            proxy.name,
-            Global::class,
-        )
-        addStatement(
-            "return %M(store, global).%M { (it as %T).value }.%M(%S)",
-            READ_GLOBAL_FUNCTION,
-            MAP_RESULT_FUNCTION,
-            proxy.source,
-            EXPECT_RESULT_FUNCTION,
-            "Failed to read global ${proxy.name}",
-        )
-    }.build()
-}
 
 internal class InitializerBlockGenerator() {
     operator fun invoke(
@@ -137,13 +102,35 @@ internal class InitializerBlockGenerator() {
     ): CodeBlock = CodeBlock.builder().apply {
         initializers.forEach { name ->
             addStatement(
-                "%M(store, instance, %S, emptyList()).%M(%S)",
+                "virtualMachine.%L(store, instance, %S, emptyList()).%M(%S)",
                 INVOKE_FUNCTION,
                 name,
                 EXPECT_RESULT_FUNCTION,
                 "Initializer function $name failed",
             )
         }
+    }.build()
+}
+
+internal class GlobalPropertyGetterImplementationGenerator {
+    operator fun invoke(
+        proxy: GlobalProxy,
+    ) = FunSpec.getterBuilder().apply {
+        addStatement(
+            """val global = virtualMachine.%L(instance, %S).%M(%S)""",
+            EXPORT_GLOBAL,
+            proxy.name,
+            EXPECT_RESULT_FUNCTION,
+            "Failed to find global export with name ${proxy.name}",
+        )
+        addStatement(
+            "return virtualMachine.%L(store, global).%M { (it as %T).value }.%M(%S)",
+            READ_GLOBAL_FUNCTION,
+            MAP_RESULT_FUNCTION,
+            proxy.source,
+            EXPECT_RESULT_FUNCTION,
+            "Failed to read global ${proxy.name}",
+        )
     }.build()
 }
 
@@ -154,11 +141,13 @@ internal class GlobalPropertySetterImplementationGenerator {
     ) = FunSpec.setterBuilder().apply {
         addParameter("newValue", type.asTypeName())
         addStatement(
-            """val global = instance.exports.first { it.name == %S }.value as %T""",
+            """val global = virtualMachine.%L(instance, %S).%M(%S)""",
+            EXPORT_GLOBAL,
             proxy.name,
-            Global::class,
+            EXPECT_RESULT_FUNCTION,
+            "Failed to find global export with name ${proxy.name}",
         )
-        addStatement("%M(store, global, %T(newValue))", WRITE_GLOBAL_FUNCTION, proxy.source)
+        addStatement("virtualMachine.%L(store, global, %T(newValue))", WRITE_GLOBAL_FUNCTION, proxy.source)
     }.build()
 }
 
@@ -208,21 +197,24 @@ internal class FunctionProxyImplementationGenerator(
             when (requireNotNull(param.stringEncodingStrategy)) {
                 StringEncodingStrategy.POINTER_AND_LENGTH -> {
                     addStatement("val %L = allocator.alloc(%L.size)", allocVar, bytesVar)
-                    addStatement("%M(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement("virtualMachine.%L(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
                 }
+
                 StringEncodingStrategy.NULL_TERMINATED -> {
                     addStatement("val %L = allocator.alloc(%L.size + 1)", allocVar, bytesVar)
-                    addStatement("%M(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
-                    addStatement("%M(store, memory, %L + %L.size, 0)", WRITE_BYTE_FUNCTION, allocVar, bytesVar)
+                    addStatement("virtualMachine.%L(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement("virtualMachine.%L(store, memory, %L + %L.size, byteArrayOf(0))", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
                 }
+
                 StringEncodingStrategy.LENGTH_PREFIXED -> {
                     addStatement("val %L = allocator.alloc(%L.size + 4)", allocVar, bytesVar)
-                    addStatement("%M(store, memory, %L, %L.size)", WRITE_INT_FUNCTION, allocVar, bytesVar)
-                    addStatement("%M(store, memory, %L + 4, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement("virtualMachine.%L(store, memory, %L, %L.size)", WRITE_INT_FUNCTION, allocVar, bytesVar)
+                    addStatement("virtualMachine.%L(store, memory, %L + 4, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
                 }
+
                 StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
                     addStatement("val %L = allocator.alloc(%L.size)", allocVar, bytesVar)
-                    addStatement("%M(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement("virtualMachine.%L(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
                 }
             }
             if (param.stringAllocationStrategy?.freeAfterCall == true) {
@@ -231,7 +223,7 @@ internal class FunctionProxyImplementationGenerator(
         }
 
         if (function.params.isEmpty()) {
-            addStatement("val args = emptyList<%T>()", ExecutionValue::class)
+            addStatement("val args = emptyList<%T>()", WasmVirtualMachine.Value::class)
         } else {
             beginControlFlow("val args = buildList")
             function.params.forEach { param ->
@@ -240,26 +232,29 @@ internal class FunctionProxyImplementationGenerator(
                     val allocVar = param.name + "Alloc"
                     when (requireNotNull(param.stringEncodingStrategy)) {
                         StringEncodingStrategy.POINTER_AND_LENGTH -> {
-                            addStatement("add(%T(%L))", NumberValue.I32::class, allocVar)
-                            addStatement("add(%T(%L.size))", NumberValue.I32::class, bytesVar)
+                            addStatement("add(%T(%L))", WasmVirtualMachine.Value.I32::class, allocVar)
+                            addStatement("add(%T(%L.size))", WasmVirtualMachine.Value.I32::class, bytesVar)
                         }
+
                         StringEncodingStrategy.NULL_TERMINATED -> {
-                            addStatement("add(%T(%L))", NumberValue.I32::class, allocVar)
+                            addStatement("add(%T(%L))", WasmVirtualMachine.Value.I32::class, allocVar)
                         }
+
                         StringEncodingStrategy.LENGTH_PREFIXED -> {
-                            addStatement("add(%T(%L))", NumberValue.I32::class, allocVar)
+                            addStatement("add(%T(%L))", WasmVirtualMachine.Value.I32::class, allocVar)
                         }
+
                         StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
                             addStatement(
                                 "add(%T((%L.toLong() shl 32) or (%L.size.toLong() and 0xFFFFFFFFL)))",
-                                NumberValue.I64::class,
+                                WasmVirtualMachine.Value.I64::class,
                                 allocVar,
                                 bytesVar,
                             )
                         }
                     }
                 } else {
-                    addStatement("add(%T(%L))", param.type.asExecutionValue(), param.name)
+                    addStatement("add(%T(%L))", param.type.asValue(), param.name)
                 }
             }
             endControlFlow()
@@ -313,34 +308,58 @@ internal class ClassPropertiesGenerator(
         wasmInterface: WasmInterface,
     ) = buildList {
 
-        val storeProperty = PropertySpec.builder("store", Store::class)
+        val storeProperty = PropertySpec.builder("store", STORE_CLASS_NAME)
             .addModifiers(KModifier.PRIVATE)
-            .initializer(CodeBlock.of("%M()", CREATE_STORE_FUNCTION))
+            .initializer(CodeBlock.of("virtualMachine.%L()", CREATE_STORE_FUNCTION))
             .build()
-        val instanceProperty = PropertySpec.builder("instance", Instance::class)
+        val moduleProperty = PropertySpec.builder("module", MODULE_CLASS_NAME)
             .addModifiers(KModifier.PRIVATE)
             .initializer(
                 CodeBlock.of(
-                    "%M(store, module, imports, config.runtimeConfig).%M(%S)",
-                    CREATE_INSTANCE_FUNCTION,
-                    EXPECT_RESULT_FUNCTION,
-                    "Failed to instantiate module $name",
+                    "moduleFactory?.invoke(binary) ?: virtualMachine.%L(binary).expect(%S)",
+                    CREATE_MODULE_FUNCTION,
+                    "Failed to decode binary",
                 ),
-            ).build()
+            )
+            .build()
+        val allocatedImportsProperty = PropertySpec.builder("allocatedImports", IMPORT_LIST_CLASS_NAME)
+            .addModifiers(KModifier.PRIVATE)
+            .initializer(
+                CodeBlock.of(
+                    "virtualMachine.%M(store, imports)",
+                    IMPORT_FACTORY_CLASS_NAME,
+                ),
+            )
+            .build()
+        val instanceProperty = PropertySpec.builder("instance", INSTANCE_CLASS_NAME)
+            .addModifiers(KModifier.PRIVATE)
+            .initializer(
+                CodeBlock.of(
+                    "instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.%L(store, module, allocatedImports).expect(%S)",
+                    CREATE_INSTANCE_FUNCTION,
+                    "Failed to instantiate module",
+                ),
+            )
+            .build()
 
         add(storeProperty)
+        add(moduleProperty)
+        add(allocatedImportsProperty)
         add(instanceProperty)
 
         val requiresMemory = wasmInterface.functions.any { fn ->
             fn.params.any { it.type == Scalar.String } || fn.returns.type == Scalar.String
         }
         if (requiresMemory) {
-            val memoryProperty = PropertySpec.builder("memory", Memory::class)
+            val memoryProperty = PropertySpec.builder("memory", MEMORY_CLASS_NAME)
                 .addModifiers(KModifier.PRIVATE)
                 .initializer(
                     CodeBlock.of(
-                        "instance.exports.firstNotNullOf { it.value as? %T }",
-                        Memory::class,
+                        "virtualMachine.%L(instance, %S).%M(%S)",
+                        EXPORT_MEMORY,
+                        "memory",
+                        EXPECT_RESULT_FUNCTION,
+                        "Failed to find memory export",
                     ),
                 ).build()
             add(memoryProperty)
@@ -351,7 +370,7 @@ internal class ClassPropertiesGenerator(
                 .addModifiers(KModifier.PRIVATE)
                 .initializer(
                     CodeBlock.of(
-                        "%T(instance, store, %S, %S)",
+                        "%T(virtualMachine, store, instance, %S, %S)",
                         Wasm32Allocator::class,
                         allocator.allocationFunction,
                         allocator.deallocationFunction,

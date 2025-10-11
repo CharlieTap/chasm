@@ -1,0 +1,598 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64]
+// Alias: native => [iosArm64, iosSimulatorArm64, iosX64, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:vm>
+final enum class io.github.charlietap.chasm.vm/NumberType : kotlin/Enum<io.github.charlietap.chasm.vm/NumberType> { // io.github.charlietap.chasm.vm/NumberType|null[0]
+    enum entry F32 // io.github.charlietap.chasm.vm/NumberType.F32|null[0]
+    enum entry F64 // io.github.charlietap.chasm.vm/NumberType.F64|null[0]
+    enum entry I32 // io.github.charlietap.chasm.vm/NumberType.I32|null[0]
+    enum entry I64 // io.github.charlietap.chasm.vm/NumberType.I64|null[0]
+
+    final val entries // io.github.charlietap.chasm.vm/NumberType.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.vm/NumberType> // io.github.charlietap.chasm.vm/NumberType.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.charlietap.chasm.vm/NumberType // io.github.charlietap.chasm.vm/NumberType.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.charlietap.chasm.vm/NumberType> // io.github.charlietap.chasm.vm/NumberType.values|values#static(){}[0]
+}
+
+final enum class io.github.charlietap.chasm.vm/VectorType : kotlin/Enum<io.github.charlietap.chasm.vm/VectorType> { // io.github.charlietap.chasm.vm/VectorType|null[0]
+    enum entry V128 // io.github.charlietap.chasm.vm/VectorType.V128|null[0]
+
+    final val entries // io.github.charlietap.chasm.vm/VectorType.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.vm/VectorType> // io.github.charlietap.chasm.vm/VectorType.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.charlietap.chasm.vm/VectorType // io.github.charlietap.chasm.vm/VectorType.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.charlietap.chasm.vm/VectorType> // io.github.charlietap.chasm.vm/VectorType.values|values#static(){}[0]
+}
+
+abstract interface <#A: kotlin/Any?> io.github.charlietap.chasm.vm/Allocator { // io.github.charlietap.chasm.vm/Allocator|null[0]
+    abstract fun alloc(#A): #A // io.github.charlietap.chasm.vm/Allocator.alloc|alloc(1:0){}[0]
+    abstract fun free(#A) // io.github.charlietap.chasm.vm/Allocator.free|free(1:0){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.vm/WasmVirtualMachine { // io.github.charlietap.chasm.vm/WasmVirtualMachine|null[0]
+    abstract fun allocateFunction(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/FunctionType, kotlin/Function1<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/ExternalAddress.Function> // io.github.charlietap.chasm.vm/WasmVirtualMachine.allocateFunction|allocateFunction(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.FunctionType;kotlin.Function1<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>,kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>){}[0]
+    abstract fun exportFunction(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Function> // io.github.charlietap.chasm.vm/WasmVirtualMachine.exportFunction|exportFunction(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    abstract fun exportGlobal(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Global> // io.github.charlietap.chasm.vm/WasmVirtualMachine.exportGlobal|exportGlobal(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    abstract fun exportMemory(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Memory> // io.github.charlietap.chasm.vm/WasmVirtualMachine.exportMemory|exportMemory(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    abstract fun exportTable(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Table> // io.github.charlietap.chasm.vm/WasmVirtualMachine.exportTable|exportTable(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    abstract fun functionInvoke(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Instance, kotlin/String, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>> // io.github.charlietap.chasm.vm/WasmVirtualMachine.functionInvoke|functionInvoke(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Instance;kotlin.String;kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>){}[0]
+    abstract fun globalRead(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Global): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value> // io.github.charlietap.chasm.vm/WasmVirtualMachine.globalRead|globalRead(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Global){}[0]
+    abstract fun globalWrite(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Global, io.github.charlietap.chasm.vm/WasmVirtualMachine.Value): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/WasmVirtualMachine.globalWrite|globalWrite(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Global;io.github.charlietap.chasm.vm.WasmVirtualMachine.Value){}[0]
+    abstract fun memoryReadBytes(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/Int, kotlin/ByteArray, kotlin/Int = ...): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/ByteArray> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryReadBytes|memoryReadBytes(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.Int;kotlin.ByteArray;kotlin.Int){}[0]
+    abstract fun memoryReadUtf8NullTerminatedUtf8String(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/String> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryReadUtf8NullTerminatedUtf8String|memoryReadUtf8NullTerminatedUtf8String(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int){}[0]
+    abstract fun memoryWriteBytes(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/ByteArray): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryWriteBytes|memoryWriteBytes(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.ByteArray){}[0]
+    abstract fun moduleDecode(kotlin/ByteArray): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Module> // io.github.charlietap.chasm.vm/WasmVirtualMachine.moduleDecode|moduleDecode(kotlin.ByteArray){}[0]
+    abstract fun moduleInstantiate(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Module, kotlin.collections/List<io.github.charlietap.chasm.vm/Import>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Instance> // io.github.charlietap.chasm.vm/WasmVirtualMachine.moduleInstantiate|moduleInstantiate(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Module;kotlin.collections.List<io.github.charlietap.chasm.vm.Import>){}[0]
+    abstract fun storeInit(): io.github.charlietap.chasm.vm/Store // io.github.charlietap.chasm.vm/WasmVirtualMachine.storeInit|storeInit(){}[0]
+    open fun memoryReadDouble(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Double> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryReadDouble|memoryReadDouble(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int){}[0]
+    open fun memoryReadFloat(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Float> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryReadFloat|memoryReadFloat(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int){}[0]
+    open fun memoryReadInt(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Int> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryReadInt|memoryReadInt(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int){}[0]
+    open fun memoryReadLong(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Long> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryReadLong|memoryReadLong(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int){}[0]
+    open fun memoryReadUtf8String(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/String> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryReadUtf8String|memoryReadUtf8String(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.Int){}[0]
+    open fun memoryWriteDouble(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/Double): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryWriteDouble|memoryWriteDouble(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.Double){}[0]
+    open fun memoryWriteFloat(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/Float): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryWriteFloat|memoryWriteFloat(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.Float){}[0]
+    open fun memoryWriteInt(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryWriteInt|memoryWriteInt(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.Int){}[0]
+    open fun memoryWriteLong(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/Long): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryWriteLong|memoryWriteLong(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.Long){}[0]
+    open fun memoryWriteNullTerminatedUtf8String(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryWriteNullTerminatedUtf8String|memoryWriteNullTerminatedUtf8String(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.String){}[0]
+    open fun memoryWriteUtf8String(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/WasmVirtualMachine.memoryWriteUtf8String|memoryWriteUtf8String(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.String){}[0]
+
+    sealed interface Value { // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value|null[0]
+        final value class F32 : io.github.charlietap.chasm.vm/WasmVirtualMachine.Value { // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F32|null[0]
+            constructor <init>(kotlin/Float) // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F32.<init>|<init>(kotlin.Float){}[0]
+
+            final val value // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F32.value|{}value[0]
+                final fun <get-value>(): kotlin/Float // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F32.value.<get-value>|<get-value>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F32.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F32.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F32.toString|toString(){}[0]
+        }
+
+        final value class F64 : io.github.charlietap.chasm.vm/WasmVirtualMachine.Value { // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F64|null[0]
+            constructor <init>(kotlin/Double) // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F64.<init>|<init>(kotlin.Double){}[0]
+
+            final val value // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F64.value|{}value[0]
+                final fun <get-value>(): kotlin/Double // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F64.value.<get-value>|<get-value>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F64.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F64.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.F64.toString|toString(){}[0]
+        }
+
+        final value class I32 : io.github.charlietap.chasm.vm/WasmVirtualMachine.Value { // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I32|null[0]
+            constructor <init>(kotlin/Int) // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I32.<init>|<init>(kotlin.Int){}[0]
+
+            final val value // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I32.value|{}value[0]
+                final fun <get-value>(): kotlin/Int // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I32.value.<get-value>|<get-value>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I32.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I32.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I32.toString|toString(){}[0]
+        }
+
+        final value class I64 : io.github.charlietap.chasm.vm/WasmVirtualMachine.Value { // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I64|null[0]
+            constructor <init>(kotlin/Long) // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I64.<init>|<init>(kotlin.Long){}[0]
+
+            final val value // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I64.value|{}value[0]
+                final fun <get-value>(): kotlin/Long // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I64.value.<get-value>|<get-value>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I64.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I64.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/WasmVirtualMachine.Value.I64.toString|toString(){}[0]
+        }
+    }
+
+    sealed class <#A1: out kotlin/Any?> Result { // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result|null[0]
+        final class <#A2: kotlin/Any?> Ok : io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A2> { // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok|null[0]
+            constructor <init>(#A2) // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok.<init>|<init>(1:0){}[0]
+
+            final val value // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok.value|{}value[0]
+                final fun <get-value>(): #A2 // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok.value.<get-value>|<get-value>(){}[0]
+
+            final fun component1(): #A2 // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok.component1|component1(){}[0]
+            final fun copy(#A2 = ...): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok<#A2> // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok.copy|copy(1:0){}[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Ok.toString|toString(){}[0]
+        }
+
+        final class Error : io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Nothing> { // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error|null[0]
+            constructor <init>(kotlin/String) // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error.<init>|<init>(kotlin.String){}[0]
+
+            final val message // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error.message|{}message[0]
+                final fun <get-message>(): kotlin/String // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error.message.<get-message>|<get-message>(){}[0]
+
+            final fun component1(): kotlin/String // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error.component1|component1(){}[0]
+            final fun copy(kotlin/String = ...): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error.copy|copy(kotlin.String){}[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/WasmVirtualMachine.Result.Error.toString|toString(){}[0]
+        }
+    }
+}
+
+sealed interface io.github.charlietap.chasm.vm.codegen/CodegenImport { // io.github.charlietap.chasm.vm.codegen/CodegenImport|null[0]
+    abstract val entityName // io.github.charlietap.chasm.vm.codegen/CodegenImport.entityName|{}entityName[0]
+        abstract fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.vm.codegen/CodegenImport.entityName.<get-entityName>|<get-entityName>(){}[0]
+    abstract val moduleName // io.github.charlietap.chasm.vm.codegen/CodegenImport.moduleName|{}moduleName[0]
+        abstract fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.vm.codegen/CodegenImport.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+}
+
+sealed interface io.github.charlietap.chasm.vm/AbstractHeapType : io.github.charlietap.chasm.vm/HeapType { // io.github.charlietap.chasm.vm/AbstractHeapType|null[0]
+    final object Any : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.Any|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.Any.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.Any.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.Any.toString|toString(){}[0]
+    }
+
+    final object Array : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.Array|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.Array.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.Array.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.Array.toString|toString(){}[0]
+    }
+
+    final object Bottom : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.Bottom|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.Bottom.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.Bottom.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.Bottom.toString|toString(){}[0]
+    }
+
+    final object Eq : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.Eq|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.Eq.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.Eq.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.Eq.toString|toString(){}[0]
+    }
+
+    final object Exception : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.Exception|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.Exception.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.Exception.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.Exception.toString|toString(){}[0]
+    }
+
+    final object Extern : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.Extern|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.Extern.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.Extern.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.Extern.toString|toString(){}[0]
+    }
+
+    final object Func : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.Func|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.Func.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.Func.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.Func.toString|toString(){}[0]
+    }
+
+    final object I31 : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.I31|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.I31.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.I31.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.I31.toString|toString(){}[0]
+    }
+
+    final object NoException : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.NoException|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.NoException.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.NoException.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.NoException.toString|toString(){}[0]
+    }
+
+    final object NoExtern : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.NoExtern|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.NoExtern.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.NoExtern.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.NoExtern.toString|toString(){}[0]
+    }
+
+    final object NoFunc : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.NoFunc|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.NoFunc.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.NoFunc.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.NoFunc.toString|toString(){}[0]
+    }
+
+    final object None : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.None|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.None.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.None.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.None.toString|toString(){}[0]
+    }
+
+    final object Struct : io.github.charlietap.chasm.vm/AbstractHeapType { // io.github.charlietap.chasm.vm/AbstractHeapType.Struct|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/AbstractHeapType.Struct.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/AbstractHeapType.Struct.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/AbstractHeapType.Struct.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.vm/ExternalAddress { // io.github.charlietap.chasm.vm/ExternalAddress|null[0]
+    final class Function : io.github.charlietap.chasm.vm/ExternalAddress // io.github.charlietap.chasm.vm/ExternalAddress.Function|null[0]
+
+    final class Global : io.github.charlietap.chasm.vm/ExternalAddress // io.github.charlietap.chasm.vm/ExternalAddress.Global|null[0]
+
+    final class Memory : io.github.charlietap.chasm.vm/ExternalAddress // io.github.charlietap.chasm.vm/ExternalAddress.Memory|null[0]
+
+    final class Table : io.github.charlietap.chasm.vm/ExternalAddress // io.github.charlietap.chasm.vm/ExternalAddress.Table|null[0]
+
+    final class Tag : io.github.charlietap.chasm.vm/ExternalAddress // io.github.charlietap.chasm.vm/ExternalAddress.Tag|null[0]
+}
+
+sealed interface io.github.charlietap.chasm.vm/HeapType // io.github.charlietap.chasm.vm/HeapType|null[0]
+
+sealed interface io.github.charlietap.chasm.vm/ReferenceType { // io.github.charlietap.chasm.vm/ReferenceType|null[0]
+    abstract val heapType // io.github.charlietap.chasm.vm/ReferenceType.heapType|{}heapType[0]
+        abstract fun <get-heapType>(): io.github.charlietap.chasm.vm/HeapType // io.github.charlietap.chasm.vm/ReferenceType.heapType.<get-heapType>|<get-heapType>(){}[0]
+
+    final value class Ref : io.github.charlietap.chasm.vm/ReferenceType { // io.github.charlietap.chasm.vm/ReferenceType.Ref|null[0]
+        constructor <init>(io.github.charlietap.chasm.vm/HeapType) // io.github.charlietap.chasm.vm/ReferenceType.Ref.<init>|<init>(io.github.charlietap.chasm.vm.HeapType){}[0]
+
+        final val heapType // io.github.charlietap.chasm.vm/ReferenceType.Ref.heapType|{}heapType[0]
+            final fun <get-heapType>(): io.github.charlietap.chasm.vm/HeapType // io.github.charlietap.chasm.vm/ReferenceType.Ref.heapType.<get-heapType>|<get-heapType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/ReferenceType.Ref.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/ReferenceType.Ref.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/ReferenceType.Ref.toString|toString(){}[0]
+    }
+
+    final value class RefNull : io.github.charlietap.chasm.vm/ReferenceType { // io.github.charlietap.chasm.vm/ReferenceType.RefNull|null[0]
+        constructor <init>(io.github.charlietap.chasm.vm/HeapType) // io.github.charlietap.chasm.vm/ReferenceType.RefNull.<init>|<init>(io.github.charlietap.chasm.vm.HeapType){}[0]
+
+        final val heapType // io.github.charlietap.chasm.vm/ReferenceType.RefNull.heapType|{}heapType[0]
+            final fun <get-heapType>(): io.github.charlietap.chasm.vm/HeapType // io.github.charlietap.chasm.vm/ReferenceType.RefNull.heapType.<get-heapType>|<get-heapType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/ReferenceType.RefNull.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/ReferenceType.RefNull.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/ReferenceType.RefNull.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.charlietap.chasm.vm/ValueType { // io.github.charlietap.chasm.vm/ValueType|null[0]
+    final value class Number : io.github.charlietap.chasm.vm/ValueType { // io.github.charlietap.chasm.vm/ValueType.Number|null[0]
+        constructor <init>(io.github.charlietap.chasm.vm/NumberType) // io.github.charlietap.chasm.vm/ValueType.Number.<init>|<init>(io.github.charlietap.chasm.vm.NumberType){}[0]
+
+        final val numberType // io.github.charlietap.chasm.vm/ValueType.Number.numberType|{}numberType[0]
+            final fun <get-numberType>(): io.github.charlietap.chasm.vm/NumberType // io.github.charlietap.chasm.vm/ValueType.Number.numberType.<get-numberType>|<get-numberType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/ValueType.Number.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/ValueType.Number.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/ValueType.Number.toString|toString(){}[0]
+    }
+
+    final value class Reference : io.github.charlietap.chasm.vm/ValueType { // io.github.charlietap.chasm.vm/ValueType.Reference|null[0]
+        constructor <init>(io.github.charlietap.chasm.vm/ReferenceType) // io.github.charlietap.chasm.vm/ValueType.Reference.<init>|<init>(io.github.charlietap.chasm.vm.ReferenceType){}[0]
+
+        final val referenceType // io.github.charlietap.chasm.vm/ValueType.Reference.referenceType|{}referenceType[0]
+            final fun <get-referenceType>(): io.github.charlietap.chasm.vm/ReferenceType // io.github.charlietap.chasm.vm/ValueType.Reference.referenceType.<get-referenceType>|<get-referenceType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/ValueType.Reference.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/ValueType.Reference.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/ValueType.Reference.toString|toString(){}[0]
+    }
+
+    final value class Vector : io.github.charlietap.chasm.vm/ValueType { // io.github.charlietap.chasm.vm/ValueType.Vector|null[0]
+        constructor <init>(io.github.charlietap.chasm.vm/VectorType) // io.github.charlietap.chasm.vm/ValueType.Vector.<init>|<init>(io.github.charlietap.chasm.vm.VectorType){}[0]
+
+        final val vectorType // io.github.charlietap.chasm.vm/ValueType.Vector.vectorType|{}vectorType[0]
+            final fun <get-vectorType>(): io.github.charlietap.chasm.vm/VectorType // io.github.charlietap.chasm.vm/ValueType.Vector.vectorType.<get-vectorType>|<get-vectorType>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/ValueType.Vector.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/ValueType.Vector.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/ValueType.Vector.toString|toString(){}[0]
+    }
+}
+
+final class io.github.charlietap.chasm.vm.codegen/FunctionImport : io.github.charlietap.chasm.vm.codegen/CodegenImport { // io.github.charlietap.chasm.vm.codegen/FunctionImport|null[0]
+    constructor <init>(kotlin/String, kotlin/String, io.github.charlietap.chasm.vm/FunctionType, kotlin/Function1<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>) // io.github.charlietap.chasm.vm.codegen/FunctionImport.<init>|<init>(kotlin.String;kotlin.String;io.github.charlietap.chasm.vm.FunctionType;kotlin.Function1<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>,kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>){}[0]
+
+    final val entityName // io.github.charlietap.chasm.vm.codegen/FunctionImport.entityName|{}entityName[0]
+        final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.vm.codegen/FunctionImport.entityName.<get-entityName>|<get-entityName>(){}[0]
+    final val function // io.github.charlietap.chasm.vm.codegen/FunctionImport.function|{}function[0]
+        final fun <get-function>(): kotlin/Function1<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>> // io.github.charlietap.chasm.vm.codegen/FunctionImport.function.<get-function>|<get-function>(){}[0]
+    final val moduleName // io.github.charlietap.chasm.vm.codegen/FunctionImport.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.vm.codegen/FunctionImport.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+    final val type // io.github.charlietap.chasm.vm.codegen/FunctionImport.type|{}type[0]
+        final fun <get-type>(): io.github.charlietap.chasm.vm/FunctionType // io.github.charlietap.chasm.vm.codegen/FunctionImport.type.<get-type>|<get-type>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.charlietap.chasm.vm.codegen/FunctionImport.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.charlietap.chasm.vm.codegen/FunctionImport.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.vm/FunctionType // io.github.charlietap.chasm.vm.codegen/FunctionImport.component3|component3(){}[0]
+    final fun component4(): kotlin/Function1<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>> // io.github.charlietap.chasm.vm.codegen/FunctionImport.component4|component4(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., io.github.charlietap.chasm.vm/FunctionType = ..., kotlin/Function1<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>> = ...): io.github.charlietap.chasm.vm.codegen/FunctionImport // io.github.charlietap.chasm.vm.codegen/FunctionImport.copy|copy(kotlin.String;kotlin.String;io.github.charlietap.chasm.vm.FunctionType;kotlin.Function1<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>,kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm.codegen/FunctionImport.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm.codegen/FunctionImport.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.vm.codegen/FunctionImport.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.vm/Function // io.github.charlietap.chasm.vm/Function|null[0]
+
+final class io.github.charlietap.chasm.vm/FunctionType { // io.github.charlietap.chasm.vm/FunctionType|null[0]
+    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.vm/ValueType>, kotlin.collections/List<io.github.charlietap.chasm.vm/ValueType>) // io.github.charlietap.chasm.vm/FunctionType.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.vm.ValueType>;kotlin.collections.List<io.github.charlietap.chasm.vm.ValueType>){}[0]
+
+    final val params // io.github.charlietap.chasm.vm/FunctionType.params|{}params[0]
+        final fun <get-params>(): kotlin.collections/List<io.github.charlietap.chasm.vm/ValueType> // io.github.charlietap.chasm.vm/FunctionType.params.<get-params>|<get-params>(){}[0]
+    final val results // io.github.charlietap.chasm.vm/FunctionType.results|{}results[0]
+        final fun <get-results>(): kotlin.collections/List<io.github.charlietap.chasm.vm/ValueType> // io.github.charlietap.chasm.vm/FunctionType.results.<get-results>|<get-results>(){}[0]
+
+    final fun component1(): kotlin.collections/List<io.github.charlietap.chasm.vm/ValueType> // io.github.charlietap.chasm.vm/FunctionType.component1|component1(){}[0]
+    final fun component2(): kotlin.collections/List<io.github.charlietap.chasm.vm/ValueType> // io.github.charlietap.chasm.vm/FunctionType.component2|component2(){}[0]
+    final fun copy(kotlin.collections/List<io.github.charlietap.chasm.vm/ValueType> = ..., kotlin.collections/List<io.github.charlietap.chasm.vm/ValueType> = ...): io.github.charlietap.chasm.vm/FunctionType // io.github.charlietap.chasm.vm/FunctionType.copy|copy(kotlin.collections.List<io.github.charlietap.chasm.vm.ValueType>;kotlin.collections.List<io.github.charlietap.chasm.vm.ValueType>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/FunctionType.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/FunctionType.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/FunctionType.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.vm/Global // io.github.charlietap.chasm.vm/Global|null[0]
+
+final class io.github.charlietap.chasm.vm/Import { // io.github.charlietap.chasm.vm/Import|null[0]
+    constructor <init>(kotlin/String, kotlin/String, io.github.charlietap.chasm.vm/ExternalAddress) // io.github.charlietap.chasm.vm/Import.<init>|<init>(kotlin.String;kotlin.String;io.github.charlietap.chasm.vm.ExternalAddress){}[0]
+
+    final val address // io.github.charlietap.chasm.vm/Import.address|{}address[0]
+        final fun <get-address>(): io.github.charlietap.chasm.vm/ExternalAddress // io.github.charlietap.chasm.vm/Import.address.<get-address>|<get-address>(){}[0]
+    final val entityName // io.github.charlietap.chasm.vm/Import.entityName|{}entityName[0]
+        final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.vm/Import.entityName.<get-entityName>|<get-entityName>(){}[0]
+    final val moduleName // io.github.charlietap.chasm.vm/Import.moduleName|{}moduleName[0]
+        final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.vm/Import.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.charlietap.chasm.vm/Import.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.charlietap.chasm.vm/Import.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.vm/ExternalAddress // io.github.charlietap.chasm.vm/Import.component3|component3(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., io.github.charlietap.chasm.vm/ExternalAddress = ...): io.github.charlietap.chasm.vm/Import // io.github.charlietap.chasm.vm/Import.copy|copy(kotlin.String;kotlin.String;io.github.charlietap.chasm.vm.ExternalAddress){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.vm/Import.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.vm/Import.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.vm/Import.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.vm/Instance // io.github.charlietap.chasm.vm/Instance|null[0]
+
+final class io.github.charlietap.chasm.vm/Memory // io.github.charlietap.chasm.vm/Memory|null[0]
+
+final class io.github.charlietap.chasm.vm/Module // io.github.charlietap.chasm.vm/Module|null[0]
+
+final class io.github.charlietap.chasm.vm/Store // io.github.charlietap.chasm.vm/Store|null[0]
+
+final class io.github.charlietap.chasm.vm/Table // io.github.charlietap.chasm.vm/Table|null[0]
+
+final class io.github.charlietap.chasm.vm/Wasm32Allocator : io.github.charlietap.chasm.vm/Allocator<kotlin/Int> { // io.github.charlietap.chasm.vm/Wasm32Allocator|null[0]
+    constructor <init>(io.github.charlietap.chasm.vm/WasmVirtualMachine, io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Instance, kotlin/String, kotlin/String) // io.github.charlietap.chasm.vm/Wasm32Allocator.<init>|<init>(io.github.charlietap.chasm.vm.WasmVirtualMachine;io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Instance;kotlin.String;kotlin.String){}[0]
+
+    final fun alloc(kotlin/Int): kotlin/Int // io.github.charlietap.chasm.vm/Wasm32Allocator.alloc|alloc(kotlin.Int){}[0]
+    final fun free(kotlin/Int) // io.github.charlietap.chasm.vm/Wasm32Allocator.free|free(kotlin.Int){}[0]
+}
+
+final fun io.github.charlietap.chasm.vm/virtualMachineFactory(): io.github.charlietap.chasm.vm/WasmVirtualMachine // io.github.charlietap.chasm.vm/virtualMachineFactory|virtualMachineFactory(){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine).io.github.charlietap.chasm.vm/importFactory(io.github.charlietap.chasm.vm/Store, kotlin.collections/List<io.github.charlietap.chasm.vm.codegen/CodegenImport>): kotlin.collections/List<io.github.charlietap.chasm.vm/Import> // io.github.charlietap.chasm.vm/importFactory|importFactory@io.github.charlietap.chasm.vm.WasmVirtualMachine(io.github.charlietap.chasm.vm.Store;kotlin.collections.List<io.github.charlietap.chasm.vm.codegen.CodegenImport>){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>).io.github.charlietap.chasm.vm/expectDouble(kotlin/String = ...): kotlin/Double // io.github.charlietap.chasm.vm/expectDouble|expectDouble@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>).io.github.charlietap.chasm.vm/expectFloat(kotlin/String = ...): kotlin/Float // io.github.charlietap.chasm.vm/expectFloat|expectFloat@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>).io.github.charlietap.chasm.vm/expectInt(kotlin/String = ...): kotlin/Int // io.github.charlietap.chasm.vm/expectInt|expectInt@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>).io.github.charlietap.chasm.vm/expectLong(kotlin/String = ...): kotlin/Long // io.github.charlietap.chasm.vm/expectLong|expectLong@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>).io.github.charlietap.chasm.vm/expectValue(kotlin/String = ...): io.github.charlietap.chasm.vm/WasmVirtualMachine.Value // io.github.charlietap.chasm.vm/expectValue|expectValue@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>).io.github.charlietap.chasm.vm/expectFirstDouble(kotlin/String = ...): kotlin/Double // io.github.charlietap.chasm.vm/expectFirstDouble|expectFirstDouble@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>).io.github.charlietap.chasm.vm/expectFirstFloat(kotlin/String = ...): kotlin/Float // io.github.charlietap.chasm.vm/expectFirstFloat|expectFirstFloat@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>).io.github.charlietap.chasm.vm/expectFirstInt(kotlin/String = ...): kotlin/Int // io.github.charlietap.chasm.vm/expectFirstInt|expectFirstInt@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>).io.github.charlietap.chasm.vm/expectFirstLong(kotlin/String = ...): kotlin/Long // io.github.charlietap.chasm.vm/expectFirstLong|expectFirstLong@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>(kotlin.String){}[0]
+final inline fun (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>).io.github.charlietap.chasm.vm/expectFirstValue(kotlin/String = ...): io.github.charlietap.chasm.vm/WasmVirtualMachine.Value // io.github.charlietap.chasm.vm/expectFirstValue|expectFirstValue@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>(kotlin.String){}[0]
+final inline fun <#A: kotlin/Any?, #B: kotlin/Any?> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A>).io.github.charlietap.chasm.vm/flatMap(kotlin/Function1<#A, io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#B>>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#B> // io.github.charlietap.chasm.vm/flatMap|flatMap@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:0>(kotlin.Function1<0:0,io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:1>>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?, #B: kotlin/Any?> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A>).io.github.charlietap.chasm.vm/fold(kotlin/Function1<#A, #B>, kotlin/Function1<kotlin/String, #B>): #B // io.github.charlietap.chasm.vm/fold|fold@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:0>(kotlin.Function1<0:0,0:1>;kotlin.Function1<kotlin.String,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?, #B: kotlin/Any?> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A>).io.github.charlietap.chasm.vm/map(kotlin/Function1<#A, #B>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#B> // io.github.charlietap.chasm.vm/map|map@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:0>(kotlin.Function1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A>).io.github.charlietap.chasm.vm/expect(kotlin/String = ...): #A // io.github.charlietap.chasm.vm/expect|expect@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:0>(kotlin.String){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A>).io.github.charlietap.chasm.vm/getOrElse(#A): #A // io.github.charlietap.chasm.vm/getOrElse|getOrElse@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:0>(0:0){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A>).io.github.charlietap.chasm.vm/getOrNull(): #A? // io.github.charlietap.chasm.vm/getOrNull|getOrNull@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:0>(){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A>).io.github.charlietap.chasm.vm/onError(kotlin/Function1<kotlin/String, kotlin/Unit>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A> // io.github.charlietap.chasm.vm/onError|onError@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:0>(kotlin.Function1<kotlin.String,kotlin.Unit>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A>).io.github.charlietap.chasm.vm/onSuccess(kotlin/Function1<#A, kotlin/Unit>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A> // io.github.charlietap.chasm.vm/onSuccess|onSuccess@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<0:0>(kotlin.Function1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
+final inline fun <#A: reified io.github.charlietap.chasm.vm/WasmVirtualMachine.Value> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>).io.github.charlietap.chasm.vm/expectValueAs(kotlin/String = ...): #A // io.github.charlietap.chasm.vm/expectValueAs|expectValueAs@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>(kotlin.String){0§<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>}[0]
+final inline fun <#A: reified io.github.charlietap.chasm.vm/WasmVirtualMachine.Value> (io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>).io.github.charlietap.chasm.vm/expectFirstValueAs(kotlin/String = ...): #A // io.github.charlietap.chasm.vm/expectFirstValueAs|expectFirstValueAs@io.github.charlietap.chasm.vm.WasmVirtualMachine.Result<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>(kotlin.String){0§<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>}[0]
+
+// Targets: [native]
+final object io.github.charlietap.chasm.vm/NonJsVirtualMachine : io.github.charlietap.chasm.vm/WasmVirtualMachine { // io.github.charlietap.chasm.vm/NonJsVirtualMachine|null[0]
+    final fun allocateFunction(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/FunctionType, kotlin/Function1<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/ExternalAddress.Function> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.allocateFunction|allocateFunction(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.FunctionType;kotlin.Function1<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>,kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>){}[0]
+    final fun exportFunction(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Function> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.exportFunction|exportFunction(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    final fun exportGlobal(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Global> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.exportGlobal|exportGlobal(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    final fun exportMemory(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Memory> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.exportMemory|exportMemory(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    final fun exportTable(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Table> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.exportTable|exportTable(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    final fun functionInvoke(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Instance, kotlin/String, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.functionInvoke|functionInvoke(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Instance;kotlin.String;kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>){}[0]
+    final fun globalRead(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Global): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.globalRead|globalRead(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Global){}[0]
+    final fun globalWrite(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Global, io.github.charlietap.chasm.vm/WasmVirtualMachine.Value): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.globalWrite|globalWrite(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Global;io.github.charlietap.chasm.vm.WasmVirtualMachine.Value){}[0]
+    final fun memoryReadBytes(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/Int, kotlin/ByteArray, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/ByteArray> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.memoryReadBytes|memoryReadBytes(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.Int;kotlin.ByteArray;kotlin.Int){}[0]
+    final fun memoryReadUtf8NullTerminatedUtf8String(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/String> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.memoryReadUtf8NullTerminatedUtf8String|memoryReadUtf8NullTerminatedUtf8String(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int){}[0]
+    final fun memoryWriteBytes(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/ByteArray): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.memoryWriteBytes|memoryWriteBytes(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.ByteArray){}[0]
+    final fun moduleDecode(kotlin/ByteArray): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Module> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.moduleDecode|moduleDecode(kotlin.ByteArray){}[0]
+    final fun moduleInstantiate(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Module, kotlin.collections/List<io.github.charlietap.chasm.vm/Import>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Instance> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.moduleInstantiate|moduleInstantiate(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Module;kotlin.collections.List<io.github.charlietap.chasm.vm.Import>){}[0]
+    final fun storeInit(): io.github.charlietap.chasm.vm/Store // io.github.charlietap.chasm.vm/NonJsVirtualMachine.storeInit|storeInit(){}[0]
+
+    final object ResultFactory { // io.github.charlietap.chasm.vm/NonJsVirtualMachine.ResultFactory|null[0]
+        final fun <#A2: kotlin/Any?, #B2: io.github.charlietap.chasm.embedding.error/ChasmError> new(io.github.charlietap.chasm.embedding.shapes/ChasmResult<#A2, #B2>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<#A2> // io.github.charlietap.chasm.vm/NonJsVirtualMachine.ResultFactory.new|new(io.github.charlietap.chasm.embedding.shapes.ChasmResult<0:0,0:1>){0§<kotlin.Any?>;1§<io.github.charlietap.chasm.embedding.error.ChasmError>}[0]
+    }
+}
+
+// Targets: [native]
+final object io.github.charlietap.chasm.vm/ValueMapper { // io.github.charlietap.chasm.vm/ValueMapper|null[0]
+    final fun from(io.github.charlietap.chasm.vm/WasmVirtualMachine.Value): io.github.charlietap.chasm.runtime.value/ExecutionValue // io.github.charlietap.chasm.vm/ValueMapper.from|from(io.github.charlietap.chasm.vm.WasmVirtualMachine.Value){}[0]
+    final fun to(io.github.charlietap.chasm.runtime.value/ExecutionValue): io.github.charlietap.chasm.vm/WasmVirtualMachine.Value // io.github.charlietap.chasm.vm/ValueMapper.to|to(io.github.charlietap.chasm.runtime.value.ExecutionValue){}[0]
+}
+
+// Targets: [js]
+abstract interface io.github.charlietap.chasm.vm/WasmFunctionType { // io.github.charlietap.chasm.vm/WasmFunctionType|null[0]
+    abstract val parameters // io.github.charlietap.chasm.vm/WasmFunctionType.parameters|{}parameters[0]
+        abstract fun <get-parameters>(): kotlin/Array<kotlin/String>? // io.github.charlietap.chasm.vm/WasmFunctionType.parameters.<get-parameters>|<get-parameters>(){}[0]
+    abstract val results // io.github.charlietap.chasm.vm/WasmFunctionType.results|{}results[0]
+        abstract fun <get-results>(): kotlin/Array<kotlin/String>? // io.github.charlietap.chasm.vm/WasmFunctionType.results.<get-results>|<get-results>(){}[0]
+}
+
+// Targets: [js]
+abstract interface io.github.charlietap.chasm.vm/WasmGlobalType { // io.github.charlietap.chasm.vm/WasmGlobalType|null[0]
+    abstract val mutable // io.github.charlietap.chasm.vm/WasmGlobalType.mutable|{}mutable[0]
+        abstract fun <get-mutable>(): kotlin/Boolean // io.github.charlietap.chasm.vm/WasmGlobalType.mutable.<get-mutable>|<get-mutable>(){}[0]
+    abstract val value // io.github.charlietap.chasm.vm/WasmGlobalType.value|{}value[0]
+        abstract fun <get-value>(): kotlin/String // io.github.charlietap.chasm.vm/WasmGlobalType.value.<get-value>|<get-value>(){}[0]
+}
+
+// Targets: [js]
+abstract interface io.github.charlietap.chasm.vm/WasmMemoryType { // io.github.charlietap.chasm.vm/WasmMemoryType|null[0]
+    abstract val maximum // io.github.charlietap.chasm.vm/WasmMemoryType.maximum|{}maximum[0]
+        abstract fun <get-maximum>(): kotlin/Int? // io.github.charlietap.chasm.vm/WasmMemoryType.maximum.<get-maximum>|<get-maximum>(){}[0]
+    abstract val minimum // io.github.charlietap.chasm.vm/WasmMemoryType.minimum|{}minimum[0]
+        abstract fun <get-minimum>(): kotlin/Int // io.github.charlietap.chasm.vm/WasmMemoryType.minimum.<get-minimum>|<get-minimum>(){}[0]
+    abstract val shared // io.github.charlietap.chasm.vm/WasmMemoryType.shared|{}shared[0]
+        abstract fun <get-shared>(): kotlin/Boolean? // io.github.charlietap.chasm.vm/WasmMemoryType.shared.<get-shared>|<get-shared>(){}[0]
+}
+
+// Targets: [js]
+abstract interface io.github.charlietap.chasm.vm/WasmTableType { // io.github.charlietap.chasm.vm/WasmTableType|null[0]
+    abstract val element // io.github.charlietap.chasm.vm/WasmTableType.element|{}element[0]
+        abstract fun <get-element>(): kotlin/String // io.github.charlietap.chasm.vm/WasmTableType.element.<get-element>|<get-element>(){}[0]
+    abstract val maximum // io.github.charlietap.chasm.vm/WasmTableType.maximum|{}maximum[0]
+        abstract fun <get-maximum>(): kotlin/Int? // io.github.charlietap.chasm.vm/WasmTableType.maximum.<get-maximum>|<get-maximum>(){}[0]
+    abstract val minimum // io.github.charlietap.chasm.vm/WasmTableType.minimum|{}minimum[0]
+        abstract fun <get-minimum>(): kotlin/Int // io.github.charlietap.chasm.vm/WasmTableType.minimum.<get-minimum>|<get-minimum>(){}[0]
+}
+
+// Targets: [js]
+abstract interface io.github.charlietap.chasm.vm/WasmTagType { // io.github.charlietap.chasm.vm/WasmTagType|null[0]
+    abstract val parameters // io.github.charlietap.chasm.vm/WasmTagType.parameters|{}parameters[0]
+        abstract fun <get-parameters>(): kotlin/Array<kotlin/String>? // io.github.charlietap.chasm.vm/WasmTagType.parameters.<get-parameters>|<get-parameters>(){}[0]
+}
+
+// Targets: [js]
+final class io.github.charlietap.chasm.vm/WasmFunction { // io.github.charlietap.chasm.vm/WasmFunction|null[0]
+    constructor <init>(kotlin/Any? = ..., kotlin/Any? = ...) // io.github.charlietap.chasm.vm/WasmFunction.<init>|<init>(kotlin.Any?;kotlin.Any?){}[0]
+
+    final object Companion { // io.github.charlietap.chasm.vm/WasmFunction.Companion|null[0]
+        final fun type(dynamic): io.github.charlietap.chasm.vm/WasmFunctionType // io.github.charlietap.chasm.vm/WasmFunction.Companion.type|type(<dynamic>){}[0]
+    }
+}
+
+// Targets: [js]
+final class io.github.charlietap.chasm.vm/WasmGlobal { // io.github.charlietap.chasm.vm/WasmGlobal|null[0]
+    constructor <init>() // io.github.charlietap.chasm.vm/WasmGlobal.<init>|<init>(){}[0]
+
+    final var value // io.github.charlietap.chasm.vm/WasmGlobal.value|{}value[0]
+        final fun <get-value>(): dynamic // io.github.charlietap.chasm.vm/WasmGlobal.value.<get-value>|<get-value>(){}[0]
+        final fun <set-value>(dynamic) // io.github.charlietap.chasm.vm/WasmGlobal.value.<set-value>|<set-value>(<dynamic>){}[0]
+
+    final object Companion { // io.github.charlietap.chasm.vm/WasmGlobal.Companion|null[0]
+        final fun type(io.github.charlietap.chasm.vm/WasmGlobal): io.github.charlietap.chasm.vm/WasmGlobalType // io.github.charlietap.chasm.vm/WasmGlobal.Companion.type|type(io.github.charlietap.chasm.vm.WasmGlobal){}[0]
+    }
+}
+
+// Targets: [js]
+final class io.github.charlietap.chasm.vm/WasmInstance { // io.github.charlietap.chasm.vm/WasmInstance|null[0]
+    constructor <init>(io.github.charlietap.chasm.vm/WasmModule, dynamic = ...) // io.github.charlietap.chasm.vm/WasmInstance.<init>|<init>(io.github.charlietap.chasm.vm.WasmModule;<dynamic>){}[0]
+
+    final val exports // io.github.charlietap.chasm.vm/WasmInstance.exports|{}exports[0]
+        final fun <get-exports>(): dynamic // io.github.charlietap.chasm.vm/WasmInstance.exports.<get-exports>|<get-exports>(){}[0]
+}
+
+// Targets: [js]
+final class io.github.charlietap.chasm.vm/WasmMemory { // io.github.charlietap.chasm.vm/WasmMemory|null[0]
+    constructor <init>() // io.github.charlietap.chasm.vm/WasmMemory.<init>|<init>(){}[0]
+
+    final val buffer // io.github.charlietap.chasm.vm/WasmMemory.buffer|{}buffer[0]
+        final fun <get-buffer>(): org.khronos.webgl/ArrayBuffer // io.github.charlietap.chasm.vm/WasmMemory.buffer.<get-buffer>|<get-buffer>(){}[0]
+
+    final object Companion { // io.github.charlietap.chasm.vm/WasmMemory.Companion|null[0]
+        final fun type(io.github.charlietap.chasm.vm/WasmMemory): io.github.charlietap.chasm.vm/WasmMemoryType // io.github.charlietap.chasm.vm/WasmMemory.Companion.type|type(io.github.charlietap.chasm.vm.WasmMemory){}[0]
+    }
+}
+
+// Targets: [js]
+final class io.github.charlietap.chasm.vm/WasmModule { // io.github.charlietap.chasm.vm/WasmModule|null[0]
+    constructor <init>(org.khronos.webgl/ArrayBuffer) // io.github.charlietap.chasm.vm/WasmModule.<init>|<init>(org.khronos.webgl.ArrayBuffer){}[0]
+}
+
+// Targets: [js]
+final class io.github.charlietap.chasm.vm/WasmTable { // io.github.charlietap.chasm.vm/WasmTable|null[0]
+    constructor <init>() // io.github.charlietap.chasm.vm/WasmTable.<init>|<init>(){}[0]
+
+    final object Companion { // io.github.charlietap.chasm.vm/WasmTable.Companion|null[0]
+        final fun type(io.github.charlietap.chasm.vm/WasmTable): io.github.charlietap.chasm.vm/WasmTableType // io.github.charlietap.chasm.vm/WasmTable.Companion.type|type(io.github.charlietap.chasm.vm.WasmTable){}[0]
+    }
+}
+
+// Targets: [js]
+final class io.github.charlietap.chasm.vm/WasmTag { // io.github.charlietap.chasm.vm/WasmTag|null[0]
+    constructor <init>(kotlin/Any? = ...) // io.github.charlietap.chasm.vm/WasmTag.<init>|<init>(kotlin.Any?){}[0]
+
+    final object Companion { // io.github.charlietap.chasm.vm/WasmTag.Companion|null[0]
+        final fun type(io.github.charlietap.chasm.vm/WasmTag): io.github.charlietap.chasm.vm/WasmTagType // io.github.charlietap.chasm.vm/WasmTag.Companion.type|type(io.github.charlietap.chasm.vm.WasmTag){}[0]
+    }
+}
+
+// Targets: [js]
+final object io.github.charlietap.chasm.vm/ArrayNamespace { // io.github.charlietap.chasm.vm/ArrayNamespace|null[0]
+    final fun isArray(dynamic): kotlin/Boolean // io.github.charlietap.chasm.vm/ArrayNamespace.isArray|isArray(<dynamic>){}[0]
+}
+
+// Targets: [js]
+final object io.github.charlietap.chasm.vm/JsVirtualMachine : io.github.charlietap.chasm.vm/WasmVirtualMachine { // io.github.charlietap.chasm.vm/JsVirtualMachine|null[0]
+    final fun allocateFunction(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/FunctionType, kotlin/Function1<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/ExternalAddress.Function> // io.github.charlietap.chasm.vm/JsVirtualMachine.allocateFunction|allocateFunction(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.FunctionType;kotlin.Function1<kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>,kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>>){}[0]
+    final fun exportFunction(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Function> // io.github.charlietap.chasm.vm/JsVirtualMachine.exportFunction|exportFunction(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    final fun exportGlobal(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Global> // io.github.charlietap.chasm.vm/JsVirtualMachine.exportGlobal|exportGlobal(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    final fun exportMemory(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Memory> // io.github.charlietap.chasm.vm/JsVirtualMachine.exportMemory|exportMemory(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    final fun exportTable(io.github.charlietap.chasm.vm/Instance, kotlin/String): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Table> // io.github.charlietap.chasm.vm/JsVirtualMachine.exportTable|exportTable(io.github.charlietap.chasm.vm.Instance;kotlin.String){}[0]
+    final fun functionInvoke(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Instance, kotlin/String, kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin.collections/List<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value>> // io.github.charlietap.chasm.vm/JsVirtualMachine.functionInvoke|functionInvoke(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Instance;kotlin.String;kotlin.collections.List<io.github.charlietap.chasm.vm.WasmVirtualMachine.Value>){}[0]
+    final fun globalRead(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Global): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/WasmVirtualMachine.Value> // io.github.charlietap.chasm.vm/JsVirtualMachine.globalRead|globalRead(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Global){}[0]
+    final fun globalWrite(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Global, io.github.charlietap.chasm.vm/WasmVirtualMachine.Value): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/JsVirtualMachine.globalWrite|globalWrite(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Global;io.github.charlietap.chasm.vm.WasmVirtualMachine.Value){}[0]
+    final fun memoryReadBytes(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/Int, kotlin/ByteArray, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/ByteArray> // io.github.charlietap.chasm.vm/JsVirtualMachine.memoryReadBytes|memoryReadBytes(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.Int;kotlin.ByteArray;kotlin.Int){}[0]
+    final fun memoryReadUtf8NullTerminatedUtf8String(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/String> // io.github.charlietap.chasm.vm/JsVirtualMachine.memoryReadUtf8NullTerminatedUtf8String|memoryReadUtf8NullTerminatedUtf8String(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int){}[0]
+    final fun memoryWriteBytes(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Memory, kotlin/Int, kotlin/ByteArray): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<kotlin/Unit> // io.github.charlietap.chasm.vm/JsVirtualMachine.memoryWriteBytes|memoryWriteBytes(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Memory;kotlin.Int;kotlin.ByteArray){}[0]
+    final fun moduleDecode(kotlin/ByteArray): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Module> // io.github.charlietap.chasm.vm/JsVirtualMachine.moduleDecode|moduleDecode(kotlin.ByteArray){}[0]
+    final fun moduleInstantiate(io.github.charlietap.chasm.vm/Store, io.github.charlietap.chasm.vm/Module, kotlin.collections/List<io.github.charlietap.chasm.vm/Import>): io.github.charlietap.chasm.vm/WasmVirtualMachine.Result<io.github.charlietap.chasm.vm/Instance> // io.github.charlietap.chasm.vm/JsVirtualMachine.moduleInstantiate|moduleInstantiate(io.github.charlietap.chasm.vm.Store;io.github.charlietap.chasm.vm.Module;kotlin.collections.List<io.github.charlietap.chasm.vm.Import>){}[0]
+    final fun storeInit(): io.github.charlietap.chasm.vm/Store // io.github.charlietap.chasm.vm/JsVirtualMachine.storeInit|storeInit(){}[0]
+}
+
+// Targets: [js]
+final object io.github.charlietap.chasm.vm/MathNamespace { // io.github.charlietap.chasm.vm/MathNamespace|null[0]
+    final fun fround(dynamic): kotlin/Double // io.github.charlietap.chasm.vm/MathNamespace.fround|fround(<dynamic>){}[0]
+}
+
+// Targets: [js]
+final object io.github.charlietap.chasm.vm/NumberNamespace { // io.github.charlietap.chasm.vm/NumberNamespace|null[0]
+    final fun isInteger(dynamic): kotlin/Boolean // io.github.charlietap.chasm.vm/NumberNamespace.isInteger|isInteger(<dynamic>){}[0]
+}
+
+// Targets: [js]
+final val io.github.charlietap.chasm.vm/UNDEFINED // io.github.charlietap.chasm.vm/UNDEFINED|{}UNDEFINED[0]
+    final fun <get-UNDEFINED>(): dynamic // io.github.charlietap.chasm.vm/UNDEFINED.<get-UNDEFINED>|<get-UNDEFINED>(){}[0]
+
+// Targets: [js]
+final fun io.github.charlietap.chasm.vm/BigInt(kotlin/String): dynamic // io.github.charlietap.chasm.vm/BigInt|BigInt(kotlin.String){}[0]
+
+// Targets: [js]
+final inline fun io.github.charlietap.chasm.vm/bigIntToLong(dynamic): kotlin/Long // io.github.charlietap.chasm.vm/bigIntToLong|bigIntToLong(<dynamic>){}[0]
+
+// Targets: [js]
+final inline fun io.github.charlietap.chasm.vm/fround(dynamic): kotlin/Double // io.github.charlietap.chasm.vm/fround|fround(<dynamic>){}[0]
+
+// Targets: [js]
+final inline fun io.github.charlietap.chasm.vm/isArray(dynamic): kotlin/Boolean // io.github.charlietap.chasm.vm/isArray|isArray(<dynamic>){}[0]
+
+// Targets: [js]
+final inline fun io.github.charlietap.chasm.vm/isInteger(dynamic): kotlin/Boolean // io.github.charlietap.chasm.vm/isInteger|isInteger(<dynamic>){}[0]
+
+// Targets: [js]
+final inline fun io.github.charlietap.chasm.vm/longToBigInt(kotlin/Long): dynamic // io.github.charlietap.chasm.vm/longToBigInt|longToBigInt(kotlin.Long){}[0]
+
+// Targets: [js]
+final inline fun io.github.charlietap.chasm.vm/newObj(): dynamic // io.github.charlietap.chasm.vm/newObj|newObj(){}[0]
+
+// Targets: [js]
+final inline fun io.github.charlietap.chasm.vm/typeOf(dynamic): kotlin/String // io.github.charlietap.chasm.vm/typeOf|typeOf(<dynamic>){}[0]

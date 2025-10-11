@@ -1,0 +1,498 @@
+public abstract interface class io/github/charlietap/chasm/vm/AbstractHeapType : io/github/charlietap/chasm/vm/HeapType {
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$Any : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$Any;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$Array : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$Array;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$Bottom : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$Bottom;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$Eq : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$Eq;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$Exception : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$Exception;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$Extern : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$Extern;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$Func : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$Func;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$I31 : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$I31;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$NoException : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$NoException;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$NoExtern : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$NoExtern;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$NoFunc : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$NoFunc;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$None : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$None;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/AbstractHeapType$Struct : io/github/charlietap/chasm/vm/AbstractHeapType {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/AbstractHeapType$Struct;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/Allocator {
+	public abstract fun alloc (Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun free (Ljava/lang/Object;)V
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/ExternalAddress {
+}
+
+public final class io/github/charlietap/chasm/vm/ExternalAddress$Function : io/github/charlietap/chasm/vm/ExternalAddress {
+}
+
+public final class io/github/charlietap/chasm/vm/ExternalAddress$Global : io/github/charlietap/chasm/vm/ExternalAddress {
+}
+
+public final class io/github/charlietap/chasm/vm/ExternalAddress$Memory : io/github/charlietap/chasm/vm/ExternalAddress {
+}
+
+public final class io/github/charlietap/chasm/vm/ExternalAddress$Table : io/github/charlietap/chasm/vm/ExternalAddress {
+}
+
+public final class io/github/charlietap/chasm/vm/ExternalAddress$Tag : io/github/charlietap/chasm/vm/ExternalAddress {
+}
+
+public final class io/github/charlietap/chasm/vm/Function {
+}
+
+public final class io/github/charlietap/chasm/vm/FunctionType {
+	public fun <init> (Ljava/util/List;Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/vm/FunctionType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/vm/FunctionType;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/FunctionType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getParams ()Ljava/util/List;
+	public final fun getResults ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/Global {
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/HeapType {
+}
+
+public final class io/github/charlietap/chasm/vm/Import {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/vm/ExternalAddress;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/charlietap/chasm/vm/ExternalAddress;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/vm/ExternalAddress;)Lio/github/charlietap/chasm/vm/Import;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/vm/Import;Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/vm/ExternalAddress;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/Import;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAddress ()Lio/github/charlietap/chasm/vm/ExternalAddress;
+	public final fun getEntityName ()Ljava/lang/String;
+	public final fun getModuleName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/Instance {
+}
+
+public final class io/github/charlietap/chasm/vm/Memory {
+}
+
+public final class io/github/charlietap/chasm/vm/Module {
+}
+
+public final class io/github/charlietap/chasm/vm/NonJsVirtualMachine : io/github/charlietap/chasm/vm/WasmVirtualMachine {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/NonJsVirtualMachine;
+	public fun allocateFunction (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/FunctionType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun exportFunction (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun exportGlobal (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun exportMemory (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun exportTable (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun functionInvoke (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun globalRead (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun globalWrite (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II[BI)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadDouble (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadFloat (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadInt (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadLong (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadUtf8NullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteInt (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteLong (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IJ)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteNullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun moduleDecode ([B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun moduleInstantiate (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Module;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun storeInit ()Lio/github/charlietap/chasm/vm/Store;
+}
+
+public final class io/github/charlietap/chasm/vm/NonJsVirtualMachine$ResultFactory {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/NonJsVirtualMachine$ResultFactory;
+	public final fun new (Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+}
+
+public final class io/github/charlietap/chasm/vm/NumberType : java/lang/Enum {
+	public static final field F32 Lio/github/charlietap/chasm/vm/NumberType;
+	public static final field F64 Lio/github/charlietap/chasm/vm/NumberType;
+	public static final field I32 Lio/github/charlietap/chasm/vm/NumberType;
+	public static final field I64 Lio/github/charlietap/chasm/vm/NumberType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/vm/NumberType;
+	public static fun values ()[Lio/github/charlietap/chasm/vm/NumberType;
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/ReferenceType {
+	public abstract fun getHeapType ()Lio/github/charlietap/chasm/vm/HeapType;
+}
+
+public final class io/github/charlietap/chasm/vm/ReferenceType$Ref : io/github/charlietap/chasm/vm/ReferenceType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/vm/HeapType;)Lio/github/charlietap/chasm/vm/ReferenceType$Ref;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/vm/HeapType;)Lio/github/charlietap/chasm/vm/HeapType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/vm/HeapType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/vm/HeapType;Lio/github/charlietap/chasm/vm/HeapType;)Z
+	public fun getHeapType ()Lio/github/charlietap/chasm/vm/HeapType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/vm/HeapType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/vm/HeapType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/vm/HeapType;
+}
+
+public final class io/github/charlietap/chasm/vm/ReferenceType$RefNull : io/github/charlietap/chasm/vm/ReferenceType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/vm/HeapType;)Lio/github/charlietap/chasm/vm/ReferenceType$RefNull;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/vm/HeapType;)Lio/github/charlietap/chasm/vm/HeapType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/vm/HeapType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/vm/HeapType;Lio/github/charlietap/chasm/vm/HeapType;)Z
+	public fun getHeapType ()Lio/github/charlietap/chasm/vm/HeapType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/vm/HeapType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/vm/HeapType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/vm/HeapType;
+}
+
+public final class io/github/charlietap/chasm/vm/Store {
+}
+
+public final class io/github/charlietap/chasm/vm/Table {
+}
+
+public final class io/github/charlietap/chasm/vm/ValueMapper {
+	public static final field INSTANCE Lio/github/charlietap/chasm/vm/ValueMapper;
+	public final fun from (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/runtime/value/ExecutionValue;
+	public final fun to (Lio/github/charlietap/chasm/runtime/value/ExecutionValue;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/ValueType {
+}
+
+public final class io/github/charlietap/chasm/vm/ValueType$Number : io/github/charlietap/chasm/vm/ValueType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/vm/NumberType;)Lio/github/charlietap/chasm/vm/ValueType$Number;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/vm/NumberType;)Lio/github/charlietap/chasm/vm/NumberType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/vm/NumberType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/vm/NumberType;Lio/github/charlietap/chasm/vm/NumberType;)Z
+	public final fun getNumberType ()Lio/github/charlietap/chasm/vm/NumberType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/vm/NumberType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/vm/NumberType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/vm/NumberType;
+}
+
+public final class io/github/charlietap/chasm/vm/ValueType$Reference : io/github/charlietap/chasm/vm/ValueType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/vm/ReferenceType;)Lio/github/charlietap/chasm/vm/ValueType$Reference;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/vm/ReferenceType;)Lio/github/charlietap/chasm/vm/ReferenceType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/vm/ReferenceType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/vm/ReferenceType;Lio/github/charlietap/chasm/vm/ReferenceType;)Z
+	public final fun getReferenceType ()Lio/github/charlietap/chasm/vm/ReferenceType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/vm/ReferenceType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/vm/ReferenceType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/vm/ReferenceType;
+}
+
+public final class io/github/charlietap/chasm/vm/ValueType$Vector : io/github/charlietap/chasm/vm/ValueType {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/vm/VectorType;)Lio/github/charlietap/chasm/vm/ValueType$Vector;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/vm/VectorType;)Lio/github/charlietap/chasm/vm/VectorType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/vm/VectorType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/vm/VectorType;Lio/github/charlietap/chasm/vm/VectorType;)Z
+	public final fun getVectorType ()Lio/github/charlietap/chasm/vm/VectorType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/vm/VectorType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/vm/VectorType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/vm/VectorType;
+}
+
+public final class io/github/charlietap/chasm/vm/VectorType : java/lang/Enum {
+	public static final field V128 Lio/github/charlietap/chasm/vm/VectorType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/vm/VectorType;
+	public static fun values ()[Lio/github/charlietap/chasm/vm/VectorType;
+}
+
+public final class io/github/charlietap/chasm/vm/VirtualMachineFactoryKt {
+	public static final fun virtualMachineFactory ()Lio/github/charlietap/chasm/vm/WasmVirtualMachine;
+}
+
+public final class io/github/charlietap/chasm/vm/Wasm32Allocator : io/github/charlietap/chasm/vm/Allocator {
+	public fun <init> (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/lang/String;)V
+	public fun alloc (I)Ljava/lang/Integer;
+	public synthetic fun alloc (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun free (I)V
+	public synthetic fun free (Ljava/lang/Object;)V
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/WasmVirtualMachine {
+	public abstract fun allocateFunction (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/FunctionType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun exportFunction (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun exportGlobal (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun exportMemory (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun exportTable (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun functionInvoke (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun globalRead (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun globalWrite (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun memoryReadBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II[BI)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static synthetic fun memoryReadBytes$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II[BIILjava/lang/Object;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadDouble (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadFloat (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadInt (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadLong (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun memoryReadUtf8NullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteInt (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteLong (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IJ)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteNullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun moduleDecode ([B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun moduleInstantiate (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Module;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun storeInit ()Lio/github/charlietap/chasm/vm/Store;
+}
+
+public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$DefaultImpls {
+	public static synthetic fun memoryReadBytes$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II[BIILjava/lang/Object;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadDouble (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadFloat (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadInt (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadLong (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteInt (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteLong (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IJ)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteNullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteUtf8String (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+}
+
+public abstract class io/github/charlietap/chasm/vm/WasmVirtualMachine$Result {
+}
+
+public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$Result$Error : io/github/charlietap/chasm/vm/WasmVirtualMachine$Result {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result$Error;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result$Error;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result$Error;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMessage ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$Result$Ok : io/github/charlietap/chasm/vm/WasmVirtualMachine$Result {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result$Ok;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result$Ok;Ljava/lang/Object;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result$Ok;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/WasmVirtualMachine$Value {
+}
+
+public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$Value$F32 : io/github/charlietap/chasm/vm/WasmVirtualMachine$Value {
+	public static final synthetic fun box-impl (F)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value$F32;
+	public static fun constructor-impl (F)F
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (FLjava/lang/Object;)Z
+	public static final fun equals-impl0 (FF)Z
+	public final fun getValue ()F
+	public fun hashCode ()I
+	public static fun hashCode-impl (F)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (F)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()F
+}
+
+public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$Value$F64 : io/github/charlietap/chasm/vm/WasmVirtualMachine$Value {
+	public static final synthetic fun box-impl (D)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value$F64;
+	public static fun constructor-impl (D)D
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (DLjava/lang/Object;)Z
+	public static final fun equals-impl0 (DD)Z
+	public final fun getValue ()D
+	public fun hashCode ()I
+	public static fun hashCode-impl (D)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (D)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()D
+}
+
+public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$Value$I32 : io/github/charlietap/chasm/vm/WasmVirtualMachine$Value {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value$I32;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getValue ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$Value$I64 : io/github/charlietap/chasm/vm/WasmVirtualMachine$Value {
+	public static final synthetic fun box-impl (J)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value$I64;
+	public static fun constructor-impl (J)J
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (JLjava/lang/Object;)Z
+	public static final fun equals-impl0 (JJ)Z
+	public final fun getValue ()J
+	public fun hashCode ()I
+	public static fun hashCode-impl (J)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (J)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()J
+}
+
+public final class io/github/charlietap/chasm/vm/WasmVirtualMachineExtKt {
+	public static final fun expect (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)Ljava/lang/Object;
+	public static synthetic fun expect$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun expectDouble (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)D
+	public static synthetic fun expectDouble$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)D
+	public static final fun expectFirstDouble (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)D
+	public static synthetic fun expectFirstDouble$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)D
+	public static final fun expectFirstFloat (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)F
+	public static synthetic fun expectFirstFloat$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)F
+	public static final fun expectFirstInt (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)I
+	public static synthetic fun expectFirstInt$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)I
+	public static final fun expectFirstLong (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)J
+	public static synthetic fun expectFirstLong$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)J
+	public static final fun expectFirstValue (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;
+	public static synthetic fun expectFirstValue$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;
+	public static final fun expectFloat (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)F
+	public static synthetic fun expectFloat$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)F
+	public static final fun expectInt (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)I
+	public static synthetic fun expectInt$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)I
+	public static final fun expectLong (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)J
+	public static synthetic fun expectLong$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)J
+	public static final fun expectValue (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;
+	public static synthetic fun expectValue$default (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;
+	public static final fun flatMap (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static final fun fold (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun getOrElse (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun getOrNull (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;)Ljava/lang/Object;
+	public static final fun importFactory (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Ljava/util/List;)Ljava/util/List;
+	public static final fun map (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static final fun onError (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static final fun onSuccess (Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/codegen/CodegenImport {
+	public abstract fun getEntityName ()Ljava/lang/String;
+	public abstract fun getModuleName ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/vm/codegen/FunctionImport : io/github/charlietap/chasm/vm/codegen/CodegenImport {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/vm/FunctionType;Lkotlin/jvm/functions/Function1;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/charlietap/chasm/vm/FunctionType;
+	public final fun component4 ()Lkotlin/jvm/functions/Function1;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/vm/FunctionType;Lkotlin/jvm/functions/Function1;)Lio/github/charlietap/chasm/vm/codegen/FunctionImport;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/vm/codegen/FunctionImport;Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/vm/FunctionType;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/codegen/FunctionImport;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getEntityName ()Ljava/lang/String;
+	public final fun getFunction ()Lkotlin/jvm/functions/Function1;
+	public fun getModuleName ()Ljava/lang/String;
+	public final fun getType ()Lio/github/charlietap/chasm/vm/FunctionType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

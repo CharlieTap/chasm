@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.gradle
 
 import io.github.charlietap.chasm.embedding.shapes.FunctionNameData
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
-import io.github.charlietap.chasm.gradle.ext.asExecutionValue
 import io.github.charlietap.chasm.gradle.ext.asType
+import io.github.charlietap.chasm.gradle.ext.asValue
 import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.GlobalType
@@ -251,7 +251,7 @@ internal class GlobalPropertyFactory(
             name = formatter(name),
             type = type.valueType.asType(),
             const = type.mutability == Mutability.Const,
-            implementation = GlobalProxy(name, type.valueType.asExecutionValue()),
+            implementation = GlobalProxy(name, type.valueType.asValue()),
         )
     }
 }

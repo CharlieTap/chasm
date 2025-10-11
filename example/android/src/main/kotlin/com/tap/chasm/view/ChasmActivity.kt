@@ -1,5 +1,6 @@
 package com.tap.chasm.view
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -17,14 +18,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.tap.chasm.di.ActivityKey
 import com.tap.chasm.viewmodel.ChasmEvent
 import com.tap.chasm.viewmodel.ChasmViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
-class ChasmActivity : AppCompatActivity() {
+@ContributesIntoMap(AppScope::class, binding<Activity>())
+@ActivityKey(ChasmActivity::class)
+@Inject
+class ChasmActivity(
+    private val viewModelFactory: ViewModelProvider.Factory
+) : AppCompatActivity() {
+
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() = viewModelFactory
+
     private val viewModel by viewModels<ChasmViewModel>()
 
     private fun eventHandler(event: ChasmEvent) {

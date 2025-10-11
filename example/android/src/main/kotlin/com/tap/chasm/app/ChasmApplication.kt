@@ -1,7 +1,9 @@
 package com.tap.chasm.app
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import com.tap.chasm.di.AndroidAppGraph
+import dev.zacsweers.metro.createGraphFactory
 
-@HiltAndroidApp
-class ChasmApplication : Application()
+class ChasmApplication : Application() {
+    val appGraph by lazy { createGraphFactory<AndroidAppGraph.Factory>().create(this) }
+}

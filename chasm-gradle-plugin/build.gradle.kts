@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "io.github.charlietap.chasm"
-version = libs.versions.version.name.get()
+version = libs.versions.plugin.version.name.get()
 
 buildConfig {
     buildConfigField("RUNTIME_VERSION", libs.versions.version.name.get())
@@ -47,7 +47,8 @@ kotlin {
     }
 
     dependencies {
-        implementation(projects.chasm)
+        implementation(projects.chasm)?.because("We use the module and moduleInfo calls during codegen")
+        implementation(projects.vm)
 
         implementation(libs.kotlin.gradle.plugin)
         implementation(libs.android.gradle.plugin)

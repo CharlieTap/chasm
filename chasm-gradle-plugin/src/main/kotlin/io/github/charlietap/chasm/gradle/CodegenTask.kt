@@ -74,7 +74,7 @@ abstract class CodegenTask
 
             val factory = WasmInterfaceFactory()
             val generator = WasmInterfaceGenerator()
-            val logger = PluginLogger(project.logger)
+            val logger = PluginLogger(logger)
 
             val data = factory(
                 interfaceName = interfaceName.get(),

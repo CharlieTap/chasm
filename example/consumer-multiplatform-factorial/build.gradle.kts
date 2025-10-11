@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.gradle.StringEncodingStrategy
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.symbol.processing)
     alias(libs.plugins.chasm)
+    alias(libs.plugins.metro)
 
     alias(libs.plugins.conventions.linting)
 }
@@ -45,16 +45,16 @@ chasm {
 
 kotlin {
     jvm()
+    js {
+        nodejs()
+        browser()
+    }
 
     sourceSets {
-        jvmMain.dependencies {
-            implementation(libs.hilt.core)
+        commonMain {
+            dependencies {
+                implementation(projects.binary)
+            }
         }
     }
-
-    dependencies {
-        add("kspJvm", libs.hilt.compiler)
-    }
 }
-
-
