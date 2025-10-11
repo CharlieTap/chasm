@@ -27,7 +27,13 @@ kotlin {
 
     js {
         nodejs()
-        browser()
+        browser{
+            testTask {
+                useKarma {
+                    useFirefoxHeadless()
+                }
+            }
+        }
     }
 
     sourceSets {
