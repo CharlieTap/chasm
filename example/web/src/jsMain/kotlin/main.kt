@@ -3,7 +3,7 @@ import kotlinx.browser.document
 
 fun main() {
 
-    val appGraph = createGraph<JsAppGraph>()
+    val appGraph = createGraph<AppGraph>()
     val factorialService = appGraph.factorial
     val stringService = appGraph.strings
 

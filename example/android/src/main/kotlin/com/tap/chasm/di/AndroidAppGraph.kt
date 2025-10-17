@@ -11,26 +11,17 @@ import dev.zacsweers.metro.Provider
 import dev.zacsweers.metro.Provides
 import kotlin.reflect.KClass
 
-interface AppGraph:
-    FactorialProvider,
-    FibonacciProvider,
-    TestProvider
-
 @DependencyGraph(AppScope::class)
-interface AndroidAppGraph : AppGraph {
+interface AppGraph {
     @DependencyGraph.Factory
     fun interface Factory {
-        fun create(@Provides application: Application): AndroidAppGraph
+        fun create(@Provides application: Application): AppGraph
     }
 
     @Provides fun provideContext(application: Application): Context = application
 
     @Multibinds
     val activityProviders: Map<KClass<out Activity>, Provider<Activity>>
-
-    // Metro plugin currently prevents applying on a k/wasm project
-    @Provides
-    fun provideProducerService(): ProducerService = ProducerProvider.provideProducerService()
 }
 
 

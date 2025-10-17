@@ -5,8 +5,11 @@ import com.test.chasm.FactorialService
 import com.test.chasm.FactorialServiceImpl
 import com.test.chasm.StringService
 import com.test.chasm.StringServiceImpl
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 
+@ContributesTo(AppScope::class)
 interface FactorialProvider {
     @Provides
     fun factorialService(): FactorialService {

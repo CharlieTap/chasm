@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.chasm)
+    alias(libs.plugins.metro)
 
     alias(libs.plugins.conventions.linting)
 }

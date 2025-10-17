@@ -2,6 +2,9 @@ package com.tap.chasm.di
 
 import com.test.chasm.producer.ProducerService
 import com.test.chasm.producer.ProducerServiceImpl
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import io.github.charlietap.chasm.vm.FunctionType
 import io.github.charlietap.chasm.vm.NumberType
 import io.github.charlietap.chasm.vm.ValueType
@@ -11,7 +14,10 @@ import io.github.charlietap.chasm.vm.codegen.FunctionImport
 import java.io.FileNotFoundException
 import kotlin.random.Random
 
-object ProducerProvider {
+@ContributesTo(AppScope::class)
+interface ProducerProvider {
+
+    @Provides
     fun provideProducerService(): ProducerService {
         val bytes = ProducerProvider::class.java.classLoader.getResourceAsStream("producer.wasm")?.use {
             it.readBytes()

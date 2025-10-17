@@ -54,7 +54,7 @@ kotlinx-test-resources = "0.10.1"
 
 ksp = "2.2.20-2.0.3"
 
-metro = "0.6.9"
+metro = "0.7.0"
 
 result = "2.0.1"
 
