@@ -210,7 +210,7 @@ class ChasmPlugin : Plugin<Project> {
         commonMain: KotlinSourceSet,
     ) {
         val notation = resolveVMRuntimeNotation()
-        val configurationName = when(configuration) {
+        val configurationName = when (configuration) {
             RuntimeDependencyConfiguration.API -> commonMain.apiConfigurationName
             RuntimeDependencyConfiguration.IMPLEMENTATION -> commonMain.implementationConfigurationName
         }
