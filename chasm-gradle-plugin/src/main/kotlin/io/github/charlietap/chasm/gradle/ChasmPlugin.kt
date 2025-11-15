@@ -9,6 +9,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
@@ -31,18 +33,23 @@ class ChasmPlugin : Plugin<Project> {
         project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
             val mpp = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
-            mpp.targets.configureEach {
-                addVMRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
-            }
-
             project.afterEvaluate {
                 extension.modules.configureEach {
                     when (extension.mode.get()) {
                         Mode.CONSUMER -> {
+                            val commonMainSourceSet = mpp.sourceSets.getByName("commonMain")
+                            addVMRuntimeForKmp(project, extension.runtimeDependencyConfiguration.get(), commonMainSourceSet)
+
                             val task = registerCodegenTask(project, this, "commonMain")
-                            mpp.sourceSets.getByName("commonMain").kotlin.srcDir(task.flatMap { it.outputDirectory })
+                            commonMainSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
                         }
                         Mode.PRODUCER -> {
+                            // For producers, we can't add the common target as it lacks support for wasm
+                            // instead we configure every target other than wasm individually
+                            mpp.targets.configureEach {
+                                addVMRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
+                            }
+
                             val wasmTargets = mpp.targets.filter { target ->
                                 target.name.startsWith("wasmJs") || target.name.startsWith("wasmWasi")
                             }
@@ -197,6 +204,24 @@ class ChasmPlugin : Plugin<Project> {
         }
     }
 
+    private fun addVMRuntimeForKmp(
+        project: Project,
+        configuration: RuntimeDependencyConfiguration,
+        commonMain: KotlinSourceSet,
+    ) {
+        val notation = resolveVMRuntimeNotation()
+        val configurationName = when(configuration) {
+            RuntimeDependencyConfiguration.API -> commonMain.apiConfigurationName
+            RuntimeDependencyConfiguration.IMPLEMENTATION -> commonMain.implementationConfigurationName
+        }
+        val exists = project.configurations.getByName(configurationName).dependencies.any {
+            it.group == RUNTIME_GROUP && it.name == RUNTIME_ARTIFACT
+        }
+        if (!exists) {
+            project.dependencies.add(configurationName, notation)
+        }
+    }
+
     private fun addVMRuntimeForJvmOrAndroid(
         project: Project,
         configuration: RuntimeDependencyConfiguration,
@@ -209,10 +234,12 @@ class ChasmPlugin : Plugin<Project> {
     }
 
     private fun resolveVMRuntimeNotation(
-        suffix: String,
+        suffix: String? = null,
     ): Any {
         val group = RUNTIME_GROUP
-        val artifact = "$RUNTIME_ARTIFACT-$suffix"
+        val artifact = suffix?.let {
+            "$RUNTIME_ARTIFACT-$suffix"
+        } ?: RUNTIME_ARTIFACT
         val version = BuildConfig.RUNTIME_VERSION
         return "$group:$artifact:$version"
     }
