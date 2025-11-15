@@ -37,3 +37,15 @@ jobs:
     with:
       runner: ${{ matrix.os }}
       task: ${{ matrix.task }}
+
+  lint-example:
+    uses: ./.github/workflows/task-runner.yml
+    with:
+      runner: ubuntu-24.04-arm
+      task: -p example lintKotlin
+
+  compile-example:
+    uses: ./.github/workflows/task-runner.yml
+    with:
+      runner: macos-latest
+      task: -p example :android:assembleDebug
