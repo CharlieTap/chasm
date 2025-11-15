@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 @ActivityKey(ChasmActivity::class)
 @Inject
 class ChasmActivity(
-    private val viewModelFactory: ViewModelProvider.Factory
+    private val viewModelFactory: ViewModelProvider.Factory,
 ) : AppCompatActivity() {
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory

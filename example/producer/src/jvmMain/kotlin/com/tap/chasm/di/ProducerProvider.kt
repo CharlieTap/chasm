@@ -42,8 +42,8 @@ interface ProducerProvider {
                 { params ->
                     val random = Random(117).nextInt()
                     listOf(WasmVirtualMachine.Value.I32(random))
-                }
-            )
+                },
+            ),
         )
     }
 }

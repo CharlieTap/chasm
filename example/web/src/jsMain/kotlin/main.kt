@@ -28,5 +28,3 @@ fun main() {
 
     root?.textContent = output.joinToString()
 }
-
-

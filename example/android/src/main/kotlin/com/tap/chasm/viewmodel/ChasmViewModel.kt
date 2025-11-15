@@ -66,7 +66,7 @@ class ChasmViewModel(
 
             is ChasmEvent.CalculateFibonacci -> {
                 viewModelScope.launch {
-                    val fib = runCatching {  calculateFibonacci(nth.value.toInt()) }
+                    val fib = runCatching { calculateFibonacci(nth.value.toInt()) }
                     Log.d("ChasmViewModel", fib.toString())
                     fibonacci.emit(calculateFibonacci(nth.value.toInt()))
                 }

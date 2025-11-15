@@ -15,7 +15,9 @@ import kotlin.reflect.KClass
 interface AppGraph {
     @DependencyGraph.Factory
     fun interface Factory {
-        fun create(@Provides application: Application): AppGraph
+        fun create(
+            @Provides application: Application,
+        ): AppGraph
     }
 
     @Provides fun provideContext(application: Application): Context = application
@@ -23,5 +25,3 @@ interface AppGraph {
     @Multibinds
     val activityProviders: Map<KClass<out Activity>, Provider<Activity>>
 }
-
-

@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
 @ContributesBinding(AppScope::class)
 @Inject
 class MetroViewModelFactory(
-    private val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>
+    private val viewModelProviders: Map<KClass<out ViewModel>, Provider<ViewModel>>,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

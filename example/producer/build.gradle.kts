@@ -1,7 +1,10 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
+import io.github.charlietap.chasm.gradle.CodegenTask
 import io.github.charlietap.chasm.gradle.Mode
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -26,4 +29,8 @@ chasm {
             initializers = setOf("_initialize")
         }
     }
+}
+
+tasks.withType<ConfigurableKtLintTask>().configureEach {
+    dependsOn(tasks.withType<CodegenTask>())
 }

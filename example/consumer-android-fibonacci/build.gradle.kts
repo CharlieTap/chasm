@@ -1,4 +1,6 @@
 import io.github.charlietap.chasm.gradle.CodegenConfig
+import io.github.charlietap.chasm.gradle.CodegenTask
+import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
     alias(libs.plugins.android.library)
@@ -33,4 +35,8 @@ android {
     kotlinOptions {
         jvmTarget = libs.versions.java.bytecode.version.get()
     }
+}
+
+tasks.withType<ConfigurableKtLintTask>().configureEach {
+    dependsOn(tasks.withType<CodegenTask>())
 }

@@ -3,7 +3,7 @@ package com.tap.chasm.binary
 import kotlinx.browser.window
 import org.w3c.dom.url.URL
 
-internal object JsBinaryLoader: BinaryLoader {
+internal object JsBinaryLoader : BinaryLoader {
     override fun load(path: String): ByteArray {
         val base = window.location.href
         val url = URL(path, base).toString()
