@@ -125,13 +125,18 @@ internal class FunctionReturnImplementationGenerator(
             Scalar.Float,
             Scalar.Double,
             -> {
+                val expectFirstMember = when (type) {
+                    Scalar.Integer -> EXPECT_FIRST_INT_FUNCTION
+                    Scalar.Long -> EXPECT_FIRST_LONG_FUNCTION
+                    Scalar.Float -> EXPECT_FIRST_FLOAT_FUNCTION
+                    Scalar.Double -> EXPECT_FIRST_DOUBLE_FUNCTION
+                    else -> EXPECT_RESULT_FUNCTION
+                }
                 addStatement(
-                    "val result = virtualMachine.%L(store, instance, %S, args).%M { (it.first() as %T).value }.%M(%S)",
+                    "val result = virtualMachine.%L(store, instance, %S, args).%M(%S)",
                     INVOKE_FUNCTION,
                     proxy.name,
-                    MAP_RESULT_FUNCTION,
-                    function.returns.type.asValue(),
-                    EXPECT_RESULT_FUNCTION,
+                    expectFirstMember,
                     "Failed to invoke function ${function.name}",
                 )
                 freeAllocs.forEach { allocVar -> addStatement("allocator.free(%L)", allocVar) }

@@ -316,8 +316,9 @@ internal class ClassPropertiesGenerator(
             .addModifiers(KModifier.PRIVATE)
             .initializer(
                 CodeBlock.of(
-                    "moduleFactory?.invoke(binary) ?: virtualMachine.%L(binary).expect(%S)",
+                    "moduleFactory?.invoke(binary) ?: virtualMachine.%L(binary).%M(%S)",
                     CREATE_MODULE_FUNCTION,
+                    EXPECT_RESULT_FUNCTION,
                     "Failed to decode binary",
                 ),
             )
@@ -335,8 +336,9 @@ internal class ClassPropertiesGenerator(
             .addModifiers(KModifier.PRIVATE)
             .initializer(
                 CodeBlock.of(
-                    "instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.%L(store, module, allocatedImports).expect(%S)",
+                    "instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.%L(store, module, allocatedImports).%M(%S)",
                     CREATE_INSTANCE_FUNCTION,
+                    EXPECT_RESULT_FUNCTION,
                     "Failed to instantiate module",
                 ),
             )
