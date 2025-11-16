@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.type
 
 data class LocalType(
-    val status: InitializationStatus,
+    var status: InitializationStatus,
     val type: ValueType,
 )

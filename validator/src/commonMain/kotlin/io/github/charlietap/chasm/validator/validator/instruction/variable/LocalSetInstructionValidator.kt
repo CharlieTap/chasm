@@ -15,9 +15,7 @@ internal fun LocalSetInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = binding {
 
     val localType = context.localType(instruction.localIdx).bind()
-    context.locals[instruction.localIdx.idx.toInt()] = localType.copy(
-        status = InitializationStatus.SET,
-    )
+    localType.status = InitializationStatus.SET
 
     context.pop(localType.type).bind()
 }

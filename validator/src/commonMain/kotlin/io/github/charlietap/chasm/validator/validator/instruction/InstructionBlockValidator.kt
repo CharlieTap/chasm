@@ -44,9 +44,7 @@ internal inline fun InstructionBlockValidator(
     }
 
     locals.forEachIndexed { idx, status ->
-        context.locals[idx] = context.locals[idx].copy(
-            status = status,
-        )
+        context.locals[idx].status = status
     }
 
     context.pushValues(label.outputs.types)
