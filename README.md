@@ -204,6 +204,10 @@ Full support through the library [WASI Emscripten Host](https://github.com/illar
 
 No support as it requires a Phase 1 Wasm proposal called the [Component Model](https://github.com/WebAssembly/component-model)
 
+## Additional Reading
+
+- [Interfacing with Wasm from Kotlin](https://dev.to/charlietap/interfacing-with-wasm-from-kotlin-2k2c)
+
 ## License
 
 This project is dual-licensed under both the MIT and Apache 2.0 licenses. You can choose which one you want to use the software under.
