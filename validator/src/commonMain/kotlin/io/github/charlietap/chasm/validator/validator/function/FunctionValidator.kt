@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.validator.validator.function
 
 import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.Instruction
@@ -9,6 +10,7 @@ import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
 import io.github.charlietap.chasm.validator.context.scope.FunctionScope
+import io.github.charlietap.chasm.validator.context.scope.NewScope
 import io.github.charlietap.chasm.validator.context.scope.Scope
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
@@ -33,25 +35,26 @@ internal fun FunctionValidator(
 internal inline fun FunctionValidator(
     context: ValidationContext,
     function: Function,
-    crossinline scope: Scope<Function>,
+    crossinline scope: NewScope<Function>,
     crossinline instructionBlockValidator: Validator<List<Instruction>>,
     crossinline valueTypeValidator: Validator<ValueType>,
 ): Result<Unit, ModuleValidatorError> = binding {
+    scope(context, function) { scopedContext ->
+        function.locals.forEach { local ->
+            valueTypeValidator(scopedContext, local.type).bind()
+        }
 
-    val scopedContext = scope(context, function).bind()
+        instructionBlockValidator(scopedContext, function.body.instructions).bind()
 
-    function.locals.forEach { local ->
-        valueTypeValidator(scopedContext, local.type).bind()
-    }
+        val resultType = scopedContext.resultType().bind()
+        scopedContext.popValues(resultType.types).bind()
 
-    instructionBlockValidator(scopedContext, function.body.instructions).bind()
+        if (scopedContext.operands.depth() > 0) {
+            Err(TypeValidatorError.TypeMismatch).bind<Unit>()
+        }
 
-    val resultType = scopedContext.resultType().bind()
-    scopedContext.popValues(resultType.types).bind()
+        scopedContext.labels.pop().bind()
 
-    if (scopedContext.operands.depth() > 0) {
-        Err(TypeValidatorError.TypeMismatch).bind<Unit>()
-    }
-
-    scopedContext.labels.pop().bind()
+        Ok(Unit)
+    }.bind()
 }

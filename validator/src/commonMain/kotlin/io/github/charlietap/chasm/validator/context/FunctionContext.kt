@@ -7,15 +7,15 @@ import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.ValueType
 
 internal interface FunctionContext {
-    val locals: MutableList<LocalType>
-    val labels: Stack<Label>
-    val result: ResultType?
-    val operands: Stack<ValueType>
+    var locals: MutableList<LocalType>
+    var labels: Stack<Label>
+    var result: ResultType?
+    var operands: Stack<ValueType>
 }
 
 internal data class FunctionContextImpl(
-    override val locals: MutableList<LocalType> = mutableListOf(),
-    override val labels: Stack<Label> = stackOf(),
-    override val result: ResultType? = null,
-    override val operands: Stack<ValueType> = stackOf(),
+    override var locals: MutableList<LocalType> = mutableListOf(),
+    override var labels: Stack<Label> = stackOf(),
+    override var result: ResultType? = null,
+    override var operands: Stack<ValueType> = stackOf(),
 ) : FunctionContext

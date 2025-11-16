@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.validator.context.scope
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import com.github.michaelbull.result.getOrElse
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.stack.stackOf
 import io.github.charlietap.chasm.type.InitializationStatus
@@ -17,9 +19,12 @@ import io.github.charlietap.chasm.validator.ext.functionType
 internal fun FunctionScope(
     context: ValidationContext,
     function: Function,
-): Result<ValidationContext, ModuleValidatorError> = binding {
+    block: (ValidationContext) -> Result<Unit, ModuleValidatorError>,
+): Result<Unit, ModuleValidatorError> {
 
-    val functionType = context.functionType(function.typeIndex).bind()
+    val functionType = context.functionType(function.typeIndex).getOrElse { error ->
+        return Err(error)
+    }
     val label = Label(
         instruction = null,
         inputs = functionType.params,
@@ -44,12 +49,18 @@ internal fun FunctionScope(
         }
         LocalType(status, local.type)
     }
+    val resultType = context.functionContext.result
 
-    context.copy(
-        functionContext = FunctionContextImpl(
-            labels = stackOf(label),
-            locals = (params + locals).toMutableList(),
-            result = functionType.results,
-        ),
-    )
+    context.functionContext.labels.push(label)
+    context.functionContext.locals.addAll(params)
+    context.functionContext.locals.addAll(locals)
+    context.functionContext.result = functionType.results
+
+    val result = block(context)
+
+    context.functionContext.labels.clear()
+    context.functionContext.locals.clear()
+    context.functionContext.result = resultType
+
+    return result
 }
