@@ -9,19 +9,26 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 
+interface MetroIssue
+
+data object MetroIssueImpl: MetroIssue
+
 @ContributesTo(AppScope::class)
 interface FactorialProvider {
-    @Provides
-    fun factorialService(): FactorialService {
-        val loader = binaryLoaderFactory()
-        val bytes = loader.load("factorial.wasm")
-        return FactorialServiceImpl(bytes)
-    }
+//    @Provides
+//    fun factorialService(): FactorialService {
+//        val loader = binaryLoaderFactory()
+//        val bytes = loader.load("factorial.wasm")
+//        return FactorialServiceImpl(bytes)
+//    }
+//
+//    @Provides
+//    fun stringService(): StringService {
+//        val loader = binaryLoaderFactory()
+//        val bytes = loader.load("truncate.wasm")
+//        return StringServiceImpl(bytes)
+//    }
 
     @Provides
-    fun stringService(): StringService {
-        val loader = binaryLoaderFactory()
-        val bytes = loader.load("truncate.wasm")
-        return StringServiceImpl(bytes)
-    }
+    fun issue(): MetroIssue = MetroIssueImpl
 }
