@@ -46,6 +46,11 @@ private fun ValidationContext.instructionMemoryType(): Result<MemoryType, Module
         is MemoryInstruction.Store -> memoryType(instruction.memoryIndex)
         is AtomicMemoryInstruction.Load -> memoryType(instruction.memoryIndex)
         is AtomicMemoryInstruction.Store -> memoryType(instruction.memoryIndex)
+        is AtomicMemoryInstruction.ReadModifyWrite -> memoryType(instruction.memoryIndex)
+        is AtomicMemoryInstruction.CompareExchange -> memoryType(instruction.memoryIndex)
+        is AtomicMemoryInstruction.Notify -> memoryType(instruction.memoryIndex)
+        is AtomicMemoryInstruction.I32Wait -> memoryType(instruction.memoryIndex)
+        is AtomicMemoryInstruction.I64Wait -> memoryType(instruction.memoryIndex)
         else -> Err(InstructionValidatorError.UnknownMemory)
     }
 }
