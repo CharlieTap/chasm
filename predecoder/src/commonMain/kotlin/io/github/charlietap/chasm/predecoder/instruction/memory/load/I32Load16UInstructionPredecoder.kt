@@ -17,7 +17,7 @@ import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction.I32Load1
 
 internal fun I32Load16UInstructionPredecoder(
     context: PredecodingContext,
-    instruction: MemoryInstruction.Load.I32Load16U,
+    instruction: MemoryInstruction.Load.I32.I32Load16U,
 ): Result<DispatchableInstruction, ModuleTrapError> =
     I32Load16UInstructionPredecoder(
         context = context,
@@ -28,7 +28,7 @@ internal fun I32Load16UInstructionPredecoder(
 
 internal inline fun I32Load16UInstructionPredecoder(
     context: PredecodingContext,
-    instruction: MemoryInstruction.Load.I32Load16U,
+    instruction: MemoryInstruction.Load.I32.I32Load16U,
     crossinline dispatcher: Dispatcher<I32Load16U>,
     crossinline memArgPredecoder: MemArgPredecoder,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {

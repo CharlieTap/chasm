@@ -72,29 +72,29 @@ internal fun MemoryInstructionPredecoder(
 internal inline fun MemoryInstructionPredecoder(
     context: PredecodingContext,
     instruction: MemoryInstruction,
-    crossinline i32LoadPredecoder: Predecoder<MemoryInstruction.Load.I32Load, DispatchableInstruction>,
-    crossinline i64LoadPredecoder: Predecoder<MemoryInstruction.Load.I64Load, DispatchableInstruction>,
-    crossinline f32LoadPredecoder: Predecoder<MemoryInstruction.Load.F32Load, DispatchableInstruction>,
-    crossinline f64LoadPredecoder: Predecoder<MemoryInstruction.Load.F64Load, DispatchableInstruction>,
-    crossinline i32Load8SPredecoder: Predecoder<MemoryInstruction.Load.I32Load8S, DispatchableInstruction>,
-    crossinline i32Load8UPredecoder: Predecoder<MemoryInstruction.Load.I32Load8U, DispatchableInstruction>,
-    crossinline i32Load16SPredecoder: Predecoder<MemoryInstruction.Load.I32Load16S, DispatchableInstruction>,
-    crossinline i32Load16UPredecoder: Predecoder<MemoryInstruction.Load.I32Load16U, DispatchableInstruction>,
-    crossinline i64Load8SPredecoder: Predecoder<MemoryInstruction.Load.I64Load8S, DispatchableInstruction>,
-    crossinline i64Load8UPredecoder: Predecoder<MemoryInstruction.Load.I64Load8U, DispatchableInstruction>,
-    crossinline i64Load16SPredecoder: Predecoder<MemoryInstruction.Load.I64Load16S, DispatchableInstruction>,
-    crossinline i64Load16UPredecoder: Predecoder<MemoryInstruction.Load.I64Load16U, DispatchableInstruction>,
-    crossinline i64Load32SPredecoder: Predecoder<MemoryInstruction.Load.I64Load32S, DispatchableInstruction>,
-    crossinline i64Load32UPredecoder: Predecoder<MemoryInstruction.Load.I64Load32U, DispatchableInstruction>,
-    crossinline i32StorePredecoder: Predecoder<MemoryInstruction.Store.I32Store, DispatchableInstruction>,
-    crossinline i64StorePredecoder: Predecoder<MemoryInstruction.Store.I64Store, DispatchableInstruction>,
-    crossinline f32StorePredecoder: Predecoder<MemoryInstruction.Store.F32Store, DispatchableInstruction>,
-    crossinline f64StorePredecoder: Predecoder<MemoryInstruction.Store.F64Store, DispatchableInstruction>,
-    crossinline i32Store8Predecoder: Predecoder<MemoryInstruction.Store.I32Store8, DispatchableInstruction>,
-    crossinline i32Store16Predecoder: Predecoder<MemoryInstruction.Store.I32Store16, DispatchableInstruction>,
-    crossinline i64Store8Predecoder: Predecoder<MemoryInstruction.Store.I64Store8, DispatchableInstruction>,
-    crossinline i64Store16Predecoder: Predecoder<MemoryInstruction.Store.I64Store16, DispatchableInstruction>,
-    crossinline i64Store32Predecoder: Predecoder<MemoryInstruction.Store.I64Store32, DispatchableInstruction>,
+    crossinline i32LoadPredecoder: Predecoder<MemoryInstruction.Load.I32.I32Load, DispatchableInstruction>,
+    crossinline i64LoadPredecoder: Predecoder<MemoryInstruction.Load.I64.I64Load, DispatchableInstruction>,
+    crossinline f32LoadPredecoder: Predecoder<MemoryInstruction.Load.F32.F32Load, DispatchableInstruction>,
+    crossinline f64LoadPredecoder: Predecoder<MemoryInstruction.Load.F64.F64Load, DispatchableInstruction>,
+    crossinline i32Load8SPredecoder: Predecoder<MemoryInstruction.Load.I32.I32Load8S, DispatchableInstruction>,
+    crossinline i32Load8UPredecoder: Predecoder<MemoryInstruction.Load.I32.I32Load8U, DispatchableInstruction>,
+    crossinline i32Load16SPredecoder: Predecoder<MemoryInstruction.Load.I32.I32Load16S, DispatchableInstruction>,
+    crossinline i32Load16UPredecoder: Predecoder<MemoryInstruction.Load.I32.I32Load16U, DispatchableInstruction>,
+    crossinline i64Load8SPredecoder: Predecoder<MemoryInstruction.Load.I64.I64Load8S, DispatchableInstruction>,
+    crossinline i64Load8UPredecoder: Predecoder<MemoryInstruction.Load.I64.I64Load8U, DispatchableInstruction>,
+    crossinline i64Load16SPredecoder: Predecoder<MemoryInstruction.Load.I64.I64Load16S, DispatchableInstruction>,
+    crossinline i64Load16UPredecoder: Predecoder<MemoryInstruction.Load.I64.I64Load16U, DispatchableInstruction>,
+    crossinline i64Load32SPredecoder: Predecoder<MemoryInstruction.Load.I64.I64Load32S, DispatchableInstruction>,
+    crossinline i64Load32UPredecoder: Predecoder<MemoryInstruction.Load.I64.I64Load32U, DispatchableInstruction>,
+    crossinline i32StorePredecoder: Predecoder<MemoryInstruction.Store.I32.I32Store, DispatchableInstruction>,
+    crossinline i64StorePredecoder: Predecoder<MemoryInstruction.Store.I64.I64Store, DispatchableInstruction>,
+    crossinline f32StorePredecoder: Predecoder<MemoryInstruction.Store.F32.F32Store, DispatchableInstruction>,
+    crossinline f64StorePredecoder: Predecoder<MemoryInstruction.Store.F64.F64Store, DispatchableInstruction>,
+    crossinline i32Store8Predecoder: Predecoder<MemoryInstruction.Store.I32.I32Store8, DispatchableInstruction>,
+    crossinline i32Store16Predecoder: Predecoder<MemoryInstruction.Store.I32.I32Store16, DispatchableInstruction>,
+    crossinline i64Store8Predecoder: Predecoder<MemoryInstruction.Store.I64.I64Store8, DispatchableInstruction>,
+    crossinline i64Store16Predecoder: Predecoder<MemoryInstruction.Store.I64.I64Store16, DispatchableInstruction>,
+    crossinline i64Store32Predecoder: Predecoder<MemoryInstruction.Store.I64.I64Store32, DispatchableInstruction>,
     crossinline memorySizePredecoder: Predecoder<MemoryInstruction.MemorySize, DispatchableInstruction>,
     crossinline memoryGrowPredecoder: Predecoder<MemoryInstruction.MemoryGrow, DispatchableInstruction>,
     crossinline memoryInitPredecoder: Predecoder<MemoryInstruction.MemoryInit, DispatchableInstruction>,
@@ -103,29 +103,29 @@ internal inline fun MemoryInstructionPredecoder(
     crossinline memoryFillPredecoder: Predecoder<MemoryInstruction.MemoryFill, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
-        is MemoryInstruction.Load.I32Load -> i32LoadPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I64Load -> i64LoadPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.F32Load -> f32LoadPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.F64Load -> f64LoadPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I32Load8S -> i32Load8SPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I32Load8U -> i32Load8UPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I32Load16S -> i32Load16SPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I32Load16U -> i32Load16UPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I64Load8S -> i64Load8SPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I64Load8U -> i64Load8UPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I64Load16S -> i64Load16SPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I64Load16U -> i64Load16UPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I64Load32S -> i64Load32SPredecoder(context, instruction).bind()
-        is MemoryInstruction.Load.I64Load32U -> i64Load32UPredecoder(context, instruction).bind()
-        is MemoryInstruction.Store.I32Store -> i32StorePredecoder(context, instruction).bind()
-        is MemoryInstruction.Store.I64Store -> i64StorePredecoder(context, instruction).bind()
-        is MemoryInstruction.Store.F32Store -> f32StorePredecoder(context, instruction).bind()
-        is MemoryInstruction.Store.F64Store -> f64StorePredecoder(context, instruction).bind()
-        is MemoryInstruction.Store.I32Store8 -> i32Store8Predecoder(context, instruction).bind()
-        is MemoryInstruction.Store.I32Store16 -> i32Store16Predecoder(context, instruction).bind()
-        is MemoryInstruction.Store.I64Store8 -> i64Store8Predecoder(context, instruction).bind()
-        is MemoryInstruction.Store.I64Store16 -> i64Store16Predecoder(context, instruction).bind()
-        is MemoryInstruction.Store.I64Store32 -> i64Store32Predecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I32.I32Load -> i32LoadPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I64.I64Load -> i64LoadPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.F32.F32Load -> f32LoadPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.F64.F64Load -> f64LoadPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I32.I32Load8S -> i32Load8SPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I32.I32Load8U -> i32Load8UPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I32.I32Load16S -> i32Load16SPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I32.I32Load16U -> i32Load16UPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I64.I64Load8S -> i64Load8SPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I64.I64Load8U -> i64Load8UPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I64.I64Load16S -> i64Load16SPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I64.I64Load16U -> i64Load16UPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I64.I64Load32S -> i64Load32SPredecoder(context, instruction).bind()
+        is MemoryInstruction.Load.I64.I64Load32U -> i64Load32UPredecoder(context, instruction).bind()
+        is MemoryInstruction.Store.I32.I32Store -> i32StorePredecoder(context, instruction).bind()
+        is MemoryInstruction.Store.I64.I64Store -> i64StorePredecoder(context, instruction).bind()
+        is MemoryInstruction.Store.F32.F32Store -> f32StorePredecoder(context, instruction).bind()
+        is MemoryInstruction.Store.F64.F64Store -> f64StorePredecoder(context, instruction).bind()
+        is MemoryInstruction.Store.I32.I32Store8 -> i32Store8Predecoder(context, instruction).bind()
+        is MemoryInstruction.Store.I32.I32Store16 -> i32Store16Predecoder(context, instruction).bind()
+        is MemoryInstruction.Store.I64.I64Store8 -> i64Store8Predecoder(context, instruction).bind()
+        is MemoryInstruction.Store.I64.I64Store16 -> i64Store16Predecoder(context, instruction).bind()
+        is MemoryInstruction.Store.I64.I64Store32 -> i64Store32Predecoder(context, instruction).bind()
         is MemoryInstruction.MemorySize -> memorySizePredecoder(context, instruction).bind()
         is MemoryInstruction.MemoryGrow -> memoryGrowPredecoder(context, instruction).bind()
         is MemoryInstruction.MemoryInit -> memoryInitPredecoder(context, instruction).bind()

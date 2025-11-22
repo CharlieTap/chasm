@@ -17,7 +17,7 @@ import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction.F64Store
 
 internal fun F64StoreInstructionPredecoder(
     context: PredecodingContext,
-    instruction: MemoryInstruction.Store.F64Store,
+    instruction: MemoryInstruction.Store.F64.F64Store,
 ): Result<DispatchableInstruction, ModuleTrapError> =
     F64StoreInstructionPredecoder(
         context = context,
@@ -28,7 +28,7 @@ internal fun F64StoreInstructionPredecoder(
 
 internal inline fun F64StoreInstructionPredecoder(
     context: PredecodingContext,
-    instruction: MemoryInstruction.Store.F64Store,
+    instruction: MemoryInstruction.Store.F64.F64Store,
     crossinline dispatcher: Dispatcher<F64Store>,
     crossinline memArgPredecoder: MemArgPredecoder,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {

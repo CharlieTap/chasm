@@ -10,33 +10,31 @@ sealed interface MemoryInstruction : Instruction {
         val memoryIndex: Index.MemoryIndex
         val memArg: MemArg
 
-        data class I32Load(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
+        sealed interface I32 : Load {
+            data class I32Load(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I32
+            data class I32Load8S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I32
+            data class I32Load8U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I32
+            data class I32Load16S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I32
+            data class I32Load16U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I32
+        }
 
-        data class I64Load(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
+        sealed interface I64 : Load {
+            data class I64Load(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Load8S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Load8U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Load16S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Load16U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Load32S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Load32U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+        }
 
-        data class F32Load(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
+        sealed interface F32 : Load {
+            data class F32Load(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : F32
+        }
 
-        data class F64Load(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I32Load8S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I32Load8U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I32Load16S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I32Load16U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I64Load8S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I64Load8U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I64Load16S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I64Load16U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I64Load32S(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
-
-        data class I64Load32U(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Load
+        sealed interface F64 : Load {
+            data class F64Load(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : F64
+        }
     }
 
     sealed interface Store : MemoryInstruction {
@@ -44,23 +42,26 @@ sealed interface MemoryInstruction : Instruction {
         val memoryIndex: Index.MemoryIndex
         val memArg: MemArg
 
-        data class I32Store(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
+        sealed interface I32 : Store {
+            data class I32Store(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I32
+            data class I32Store8(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I32
+            data class I32Store16(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I32
+        }
 
-        data class I64Store(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
+        sealed interface I64 : Store {
+            data class I64Store(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Store8(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Store16(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+            data class I64Store32(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : I64
+        }
 
-        data class F32Store(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
+        sealed interface F32 : Store {
+            data class F32Store(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : F32
+        }
 
-        data class F64Store(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
-
-        data class I32Store8(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
-
-        data class I32Store16(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
-
-        data class I64Store8(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
-
-        data class I64Store16(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
-
-        data class I64Store32(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : Store
+        sealed interface F64 : Store {
+            data class F64Store(override val memoryIndex: Index.MemoryIndex, override val memArg: MemArg) : F64
+        }
     }
 
     @JvmInline
