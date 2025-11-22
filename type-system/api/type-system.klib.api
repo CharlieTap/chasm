@@ -574,10 +574,12 @@ final class io.github.charlietap.chasm.type/Limits : io.github.charlietap.chasm.
 final class io.github.charlietap.chasm.type/LocalType { // io.github.charlietap.chasm.type/LocalType|null[0]
     constructor <init>(io.github.charlietap.chasm.type/InitializationStatus, io.github.charlietap.chasm.type/ValueType) // io.github.charlietap.chasm.type/LocalType.<init>|<init>(io.github.charlietap.chasm.type.InitializationStatus;io.github.charlietap.chasm.type.ValueType){}[0]
 
-    final val status // io.github.charlietap.chasm.type/LocalType.status|{}status[0]
-        final fun <get-status>(): io.github.charlietap.chasm.type/InitializationStatus // io.github.charlietap.chasm.type/LocalType.status.<get-status>|<get-status>(){}[0]
     final val type // io.github.charlietap.chasm.type/LocalType.type|{}type[0]
         final fun <get-type>(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type/LocalType.type.<get-type>|<get-type>(){}[0]
+
+    final var status // io.github.charlietap.chasm.type/LocalType.status|{}status[0]
+        final fun <get-status>(): io.github.charlietap.chasm.type/InitializationStatus // io.github.charlietap.chasm.type/LocalType.status.<get-status>|<get-status>(){}[0]
+        final fun <set-status>(io.github.charlietap.chasm.type/InitializationStatus) // io.github.charlietap.chasm.type/LocalType.status.<set-status>|<set-status>(io.github.charlietap.chasm.type.InitializationStatus){}[0]
 
     final fun component1(): io.github.charlietap.chasm.type/InitializationStatus // io.github.charlietap.chasm.type/LocalType.component1|component1(){}[0]
     final fun component2(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type/LocalType.component2|component2(){}[0]

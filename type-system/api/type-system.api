@@ -375,6 +375,7 @@ public final class io/github/charlietap/chasm/type/LocalType {
 	public final fun getStatus ()Lio/github/charlietap/chasm/type/InitializationStatus;
 	public final fun getType ()Lio/github/charlietap/chasm/type/ValueType;
 	public fun hashCode ()I
+	public final fun setStatus (Lio/github/charlietap/chasm/type/InitializationStatus;)V
 	public fun toString ()Ljava/lang/String;
 }
 

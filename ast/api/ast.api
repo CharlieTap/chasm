@@ -1609,12 +1609,15 @@ public abstract interface class io/github/charlietap/chasm/ast/instruction/Memor
 	public abstract fun getMemoryIndex-j5_GAr0 ()I
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32Load : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public abstract interface class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32$F32Load : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32Load;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32Load;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32$F32Load;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32$F32Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F32$F32Load;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1622,12 +1625,15 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64Load : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public abstract interface class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64$F64Load : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64Load;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64Load;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64$F64Load;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64$F64Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$F64$F64Load;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1635,12 +1641,15 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public abstract interface class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1648,12 +1657,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load16S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load16S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load16S;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load16S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load16S;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load16S;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load16S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load16S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1661,12 +1670,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load16U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load16U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load16U;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load16U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load16U;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load16U;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load16U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load16U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1674,12 +1683,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load8S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load8S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load8S;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load8S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load8S;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load8S;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load8S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load8S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1687,12 +1696,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load8U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load8U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load8U;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load8U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32Load8U;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load8U;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load8U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I32$I32Load8U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1700,12 +1709,15 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public abstract interface class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1713,12 +1725,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load16S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load16S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load16S;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load16S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load16S;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load16S;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load16S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load16S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1726,12 +1738,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load16U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load16U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load16U;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load16U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load16U;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load16U;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load16U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load16U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1739,12 +1751,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load32S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load32S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load32S;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load32S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load32S;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load32S;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load32S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1752,12 +1764,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load32U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load32U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load32U;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load32U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load32U;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load32U;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load32U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load32U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1765,12 +1777,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load8S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load8S : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load8S;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load8S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load8S;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load8S;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load8S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load8S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1778,12 +1790,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load8U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load8U : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load8U;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load8U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64Load8U;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load8U;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load8U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Load$I64$I64Load8U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1864,12 +1876,15 @@ public abstract interface class io/github/charlietap/chasm/ast/instruction/Memor
 	public abstract fun getMemoryIndex-j5_GAr0 ()I
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32Store : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public abstract interface class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32$F32Store : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32Store;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32Store;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32$F32Store;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32$F32Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F32$F32Store;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1877,12 +1892,15 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64Store : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public abstract interface class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64$F64Store : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64Store;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64Store;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64$F64Store;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64$F64Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$F64$F64Store;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1890,12 +1908,15 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public abstract interface class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1903,12 +1924,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store16 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store16 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store16;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store16;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store16;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store16;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store16;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store16;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1916,12 +1937,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store8 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store8 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store8;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store8;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32Store8;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store8;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store8;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I32$I32Store8;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1929,12 +1950,15 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public abstract interface class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1942,12 +1966,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store16 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store16 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store16;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store16;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store16;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store16;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store16;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store16;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1955,12 +1979,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store32 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store32 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store32;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store32;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store32;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store32;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store32;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store32;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
@@ -1968,12 +1992,12 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store8 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store {
+public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store8 : io/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64 {
 	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-j5_GAr0 ()I
 	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store8;
-	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store8;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64Store8;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store8;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store8;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/MemoryInstruction$Store$I64$I64Store8;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 	public fun getMemoryIndex-j5_GAr0 ()I
