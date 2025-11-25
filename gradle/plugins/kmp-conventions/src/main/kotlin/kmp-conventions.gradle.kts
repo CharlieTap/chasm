@@ -62,6 +62,10 @@ kotlin {
     }
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(libs.versions.java.bytecode.version.get().toInt())
+}
+
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
         jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
