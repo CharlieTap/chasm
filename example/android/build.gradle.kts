@@ -56,6 +56,8 @@ dependencies {
 
     implementation(libs.bundles.androidx)
     implementation(libs.bundles.compose.ui)
+    implementation(libs.metrox.android)
+    implementation(libs.metrox.viewmodel)
 
     runtimeOnly(libs.kotlinx.coroutines.android)
 }

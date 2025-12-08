@@ -20,20 +20,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.tap.chasm.di.ActivityKey
 import com.tap.chasm.viewmodel.ChasmEvent
 import com.tap.chasm.viewmodel.ChasmViewModel
+import com.tap.chasm.viewmodel.ChasmViewModelFactory
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
+import dev.zacsweers.metrox.android.ActivityKey
 import kotlinx.coroutines.launch
 
 @ContributesIntoMap(AppScope::class, binding<Activity>())
 @ActivityKey(ChasmActivity::class)
 @Inject
 class ChasmActivity(
-    private val viewModelFactory: ViewModelProvider.Factory,
+    private val viewModelFactory: ChasmViewModelFactory,
 ) : AppCompatActivity() {
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
