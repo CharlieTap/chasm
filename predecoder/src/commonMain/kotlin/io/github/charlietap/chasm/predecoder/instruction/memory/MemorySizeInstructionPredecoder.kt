@@ -29,8 +29,7 @@ internal inline fun MemorySizeInstructionPredecoder(
     instruction: MemoryInstruction.MemorySize,
     crossinline dispatcher: Dispatcher<MemorySize>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex).bind()
     val memory = context.store.memory(memoryAddress)
 
     dispatcher(MemorySize(memory))

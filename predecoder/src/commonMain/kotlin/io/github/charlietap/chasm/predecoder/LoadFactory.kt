@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.predecoder
 
+import com.github.michaelbull.result.annotation.UnsafeResultValueAccess
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.predecoder.ext.globalAddress
 import io.github.charlietap.chasm.runtime.ext.global
@@ -7,6 +8,7 @@ import io.github.charlietap.chasm.runtime.instruction.LoadOp
 
 internal typealias LoadFactory = (PredecodingContext, FusedOperand) -> LoadOp
 
+@OptIn(UnsafeResultValueAccess::class)
 internal inline fun LoadFactory(
     context: PredecodingContext,
     operand: FusedOperand,

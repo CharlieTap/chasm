@@ -65,6 +65,7 @@ internal inline fun FusedReferenceInstructionPredecoder(
                 ),
             )
         }
+
         is FusedReferenceInstruction.RefIsNull -> {
             val value = loadFactory(context, instruction.value)
             val destination = storeFactory(context, instruction.destination)
@@ -76,11 +77,13 @@ internal inline fun FusedReferenceInstructionPredecoder(
                 ),
             )
         }
+
         is FusedReferenceInstruction.RefNull -> {
             val destination = storeFactory(context, instruction.destination)
             val reference = ReferenceValue.Null(instruction.type).toLong()
             refNullDispatcher(RefNull(destination, reference))
         }
+
         is FusedReferenceInstruction.RefTest -> {
             val reference = loadFactory(context, instruction.reference)
             val destination = storeFactory(context, instruction.destination)
@@ -99,6 +102,7 @@ internal inline fun FusedReferenceInstructionPredecoder(
                 ),
             )
         }
+
         is FusedReferenceInstruction.RefCast -> {
             val reference = loadFactory(context, instruction.reference)
             val destination = storeFactory(context, instruction.destination)

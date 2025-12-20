@@ -29,8 +29,7 @@ internal inline fun TableSizeInstructionPredecoder(
     instruction: TableInstruction.TableSize,
     crossinline dispatcher: Dispatcher<TableSize>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val address = context.instance.tableAddress(instruction.tableIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val address = context.instance.tableAddress(instruction.tableIdx).bind()
     val table = context.store.table(address)
 
     dispatcher(TableSize(table))

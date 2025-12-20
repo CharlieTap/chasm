@@ -32,8 +32,7 @@ internal inline fun I32Load8UInstructionPredecoder(
     crossinline dispatcher: Dispatcher<I32Load8U>,
     crossinline memArgPredecoder: MemArgPredecoder,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex).bind()
     val memory = context.store.memory(memoryAddress)
     val memArg = memArgPredecoder(instruction.memArg)
 

@@ -32,6 +32,12 @@ ktlint_standard_property-naming = disabled
 ktlint_standard_string-template-indent = disabled
 ktlint_standard_value-argument-comment = disabled
 ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_then-spacing = disabled
+ktlint_standard_blank-line-between-when-conditions = disabled
+ktlint_standard_kdoc = disabled
+ktlint_standard_mixed-condition-operators = disabled
+ktlint_standard_square-brackets-spacing = disabled
+ktlint_standard_when-entry-bracing = disabled
 
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true

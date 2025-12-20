@@ -32,8 +32,7 @@ internal inline fun FusedCallInstructionPredecoder(
     crossinline loadFactory: LoadFactory,
     crossinline callDispatcher: Dispatcher<WasmFunctionCall>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val address = context.instance.functionAddress(instruction.functionIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val address = context.instance.functionAddress(instruction.functionIndex).bind()
     val inst = context.store.instruction(address)
 
     val operands = instruction.operands.map { operand ->

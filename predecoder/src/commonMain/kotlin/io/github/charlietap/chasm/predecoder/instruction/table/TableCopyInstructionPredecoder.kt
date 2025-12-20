@@ -29,11 +29,9 @@ internal inline fun TableCopyInstructionPredecoder(
     instruction: TableInstruction.TableCopy,
     crossinline dispatcher: Dispatcher<TableCopy>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val srcTableAddress = context.instance.tableAddress(instruction.srcTableIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val srcTableAddress = context.instance.tableAddress(instruction.srcTableIdx).bind()
     val srcTable = context.store.table(srcTableAddress)
-    val dstTableAddress = context.instance.tableAddress(instruction.destTableIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val dstTableAddress = context.instance.tableAddress(instruction.destTableIdx).bind()
     val dstTable = context.store.table(dstTableAddress)
 
     dispatcher(TableCopy(srcTable, dstTable))

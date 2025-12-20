@@ -38,8 +38,7 @@ internal inline fun I64Load8UInstructionPredecoder(
     crossinline loadFactory: LoadFactory,
     crossinline storeFactory: StoreFactory,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex).bind()
     val memory = context.store.memory(memoryAddress)
     val memArg = memArgPredecoder(instruction.memArg)
     val address = loadFactory(context, instruction.addressOperand)

@@ -34,13 +34,12 @@ internal inline fun ReturnCallInstructionPredecoder(
     crossinline returnWasmFunctionCallDispatcher: Dispatcher<ReturnWasmFunctionCall>,
     crossinline returnHostFunctionCallDispatcher: Dispatcher<ReturnHostFunctionCall>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val address = context.instance.functionAddress(instruction.functionIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
-    val instance = context.store.function(address)
-    when (instance) {
+    val address = context.instance.functionAddress(instruction.functionIndex).bind()
+    when (val instance = context.store.function(address)) {
         is FunctionInstance.HostFunction -> {
             returnHostFunctionCallDispatcher(ReturnHostFunctionCall(instance))
         }
+
         is FunctionInstance.WasmFunction -> {
             returnWasmFunctionCallDispatcher(ReturnWasmFunctionCall(instance))
         }

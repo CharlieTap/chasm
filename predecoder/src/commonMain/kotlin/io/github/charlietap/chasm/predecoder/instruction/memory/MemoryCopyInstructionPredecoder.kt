@@ -29,12 +29,10 @@ internal inline fun MemoryCopyInstructionPredecoder(
     instruction: MemoryInstruction.MemoryCopy,
     crossinline dispatcher: Dispatcher<MemoryCopy>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val srcMemoryAddress = context.instance.memoryAddress(instruction.srcIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val srcMemoryAddress = context.instance.memoryAddress(instruction.srcIndex).bind()
     val srcMemory = context.store.memory(srcMemoryAddress)
 
-    val destMemoryAddress = context.instance.memoryAddress(instruction.dstIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val destMemoryAddress = context.instance.memoryAddress(instruction.dstIndex).bind()
     val destMemory = context.store.memory(destMemoryAddress)
 
     dispatcher(MemoryCopy(srcMemory, destMemory))

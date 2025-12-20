@@ -16,7 +16,6 @@ internal inline fun CallInstructionPredecoder(
     instruction: ControlInstruction.Call,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     // Functions are predecoded into control instructions on instance allocation
-    val address = context.instance.functionAddress(instruction.functionIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val address = context.instance.functionAddress(instruction.functionIndex).bind()
     context.store.instruction(address)
 }

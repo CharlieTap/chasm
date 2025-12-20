@@ -31,12 +31,10 @@ internal inline fun TableInitInstructionPredecoder(
     instruction: TableInstruction.TableInit,
     crossinline dispatcher: Dispatcher<TableInit>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val tableAddress = context.instance.tableAddress(instruction.tableIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val tableAddress = context.instance.tableAddress(instruction.tableIdx).bind()
     val table = context.store.table(tableAddress)
 
-    val elementAddress = context.instance.elementAddress(instruction.elemIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val elementAddress = context.instance.elementAddress(instruction.elemIdx).bind()
     val element = context.store.element(elementAddress)
 
     dispatcher(TableInit(element, table))

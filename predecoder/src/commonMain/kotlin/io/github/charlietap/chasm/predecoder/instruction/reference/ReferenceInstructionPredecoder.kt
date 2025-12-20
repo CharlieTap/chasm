@@ -58,14 +58,25 @@ internal inline fun ReferenceInstructionPredecoder(
             val reference = ReferenceValue.Null(instruction.type).toLong()
             refNullDispatcher(RefNull(reference))
         }
-        is ReferenceInstruction.RefIsNull -> refIsNullDispatcher(RefIsNull)
-        is ReferenceInstruction.RefAsNonNull -> refAsNonNullDispatcher(RefAsNonNull)
+
+        is ReferenceInstruction.RefIsNull -> {
+            refIsNullDispatcher(RefIsNull)
+        }
+
+        is ReferenceInstruction.RefAsNonNull -> {
+            refAsNonNullDispatcher(RefAsNonNull)
+        }
+
         is ReferenceInstruction.RefFunc -> {
             val address = context.instance.functionAddress(instruction.funcIdx).bind()
             val reference = ReferenceValue.Function(address).toLong()
             refFuncDispatcher(RefFunc(reference))
         }
-        is ReferenceInstruction.RefEq -> refEqDispatcher(RefEq)
+
+        is ReferenceInstruction.RefEq -> {
+            refEqDispatcher(RefEq)
+        }
+
         is ReferenceInstruction.RefTest -> {
             // Pre resolve supertypes
             when (val heapType = instruction.referenceType.heapType) {
@@ -75,6 +86,7 @@ internal inline fun ReferenceInstructionPredecoder(
 
             refTestDispatcher(RefTest(instruction.referenceType))
         }
+
         is ReferenceInstruction.RefCast -> {
             // Pre resolve supertypes
             when (val heapType = instruction.referenceType.heapType) {

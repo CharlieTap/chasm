@@ -42,8 +42,7 @@ internal inline fun FusedVariableInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is FusedVariableInstruction.GlobalSet -> {
-            val address = context.instance.globalAddress(instruction.globalIdx)?.bind()
-                ?: Err(InstantiationError.PredecodingError).bind()
+            val address = context.instance.globalAddress(instruction.globalIdx).bind()
             val global = context.store.global(address)
             val operand = loadFactory(context, instruction.operand)
 

@@ -35,7 +35,9 @@ internal inline fun ParametricInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is ParametricInstruction.Drop -> dropDispatcher(Drop)
+
         is ParametricInstruction.Select -> selectDispatcher(Select)
+
         is ParametricInstruction.SelectWithType -> selectWithTypeDispatcher(
             SelectWithType(instruction.types),
         )

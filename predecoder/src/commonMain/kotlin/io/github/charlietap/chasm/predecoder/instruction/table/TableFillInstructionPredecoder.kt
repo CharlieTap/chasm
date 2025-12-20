@@ -29,8 +29,7 @@ internal inline fun TableFillInstructionPredecoder(
     instruction: TableInstruction.TableFill,
     crossinline dispatcher: Dispatcher<TableFill>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val address = context.instance.tableAddress(instruction.tableIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val address = context.instance.tableAddress(instruction.tableIdx).bind()
     val table = context.store.table(address)
 
     dispatcher(TableFill(table))

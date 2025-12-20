@@ -9,7 +9,7 @@ import dev.zacsweers.metrox.android.MetroAppComponentProviders
 import dev.zacsweers.metrox.viewmodel.ViewModelGraph
 
 @DependencyGraph(AppScope::class)
-interface AppGraph: ViewModelGraph, MetroAppComponentProviders {
+interface AppGraph : ViewModelGraph, MetroAppComponentProviders {
     @DependencyGraph.Factory
     fun interface Factory {
         fun create(

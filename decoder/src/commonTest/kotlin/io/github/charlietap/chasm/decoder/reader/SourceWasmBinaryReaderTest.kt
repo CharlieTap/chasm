@@ -1,7 +1,11 @@
+@file:OptIn(UnsafeResultValueAccess::class, UnsafeResultErrorAccess::class)
+
 package io.github.charlietap.chasm.decoder.reader
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.annotation.UnsafeResultErrorAccess
+import com.github.michaelbull.result.annotation.UnsafeResultValueAccess
 import io.github.charlietap.chasm.decoder.const.Leb128
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.ioError

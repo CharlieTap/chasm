@@ -1,5 +1,6 @@
 import io.github.charlietap.chasm.gradle.CodegenConfig
 import io.github.charlietap.chasm.gradle.CodegenTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
@@ -31,9 +32,11 @@ android {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.java.bytecode.version.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.java.bytecode.version.get())
     }
+}
 
-    kotlinOptions {
-        jvmTarget = libs.versions.java.bytecode.version.get()
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.bytecode.version.get()))
     }
 }
 

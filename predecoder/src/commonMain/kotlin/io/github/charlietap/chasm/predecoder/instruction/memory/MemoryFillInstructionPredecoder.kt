@@ -29,8 +29,7 @@ internal inline fun MemoryFillInstructionPredecoder(
     instruction: MemoryInstruction.MemoryFill,
     crossinline dispatcher: Dispatcher<MemoryFill>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex).bind()
     val memory = context.store.memory(memoryAddress)
 
     dispatcher(MemoryFill(memory))

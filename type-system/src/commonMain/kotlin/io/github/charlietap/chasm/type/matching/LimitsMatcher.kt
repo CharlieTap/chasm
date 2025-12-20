@@ -10,7 +10,7 @@ fun LimitsMatcher(
     if (type2.max == null) {
         true
     } else {
-        type1.max != null && type1.max!! <= type2.max!!
+        type1.max != null && type1.max <= type2.max
     }
 } else {
     false

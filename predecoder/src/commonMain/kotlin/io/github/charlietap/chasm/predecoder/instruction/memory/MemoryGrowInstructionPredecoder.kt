@@ -30,8 +30,7 @@ internal inline fun MemoryGrowInstructionPredecoder(
     instruction: MemoryInstruction.MemoryGrow,
     crossinline dispatcher: Dispatcher<MemoryGrow>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex).bind()
     val memory = context.store.memory(memoryAddress)
     val max = memory.type.limits.max
         ?.toInt() ?: LinearMemory.MAX_PAGES

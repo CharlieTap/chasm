@@ -32,8 +32,7 @@ internal inline fun F64LoadInstructionPredecoder(
     crossinline dispatcher: Dispatcher<F64Load>,
     crossinline memArgPredecoder: MemArgPredecoder,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex).bind()
     val memory = context.store.memory(memoryAddress)
     val memArg = memArgPredecoder(instruction.memArg)
 

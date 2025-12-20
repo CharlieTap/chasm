@@ -29,8 +29,7 @@ internal inline fun TableGrowInstructionPredecoder(
     instruction: TableInstruction.TableGrow,
     crossinline dispatcher: Dispatcher<TableGrow>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val address = context.instance.tableAddress(instruction.tableIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val address = context.instance.tableAddress(instruction.tableIdx).bind()
     val table = context.store.table(address)
     val max = table.type.limits.max
         ?.toInt() ?: Int.MAX_VALUE

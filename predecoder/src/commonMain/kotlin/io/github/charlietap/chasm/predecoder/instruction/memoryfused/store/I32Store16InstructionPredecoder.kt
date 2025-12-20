@@ -35,8 +35,7 @@ internal inline fun I32Store16InstructionPredecoder(
     crossinline memArgPredecoder: MemArgPredecoder,
     crossinline loadFactory: LoadFactory,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val memoryAddress = context.instance.memoryAddress(instruction.memoryIndex).bind()
     val memory = context.store.memory(memoryAddress)
     val memArg = memArgPredecoder(instruction.memArg)
     val address = loadFactory(context, instruction.addressOperand)

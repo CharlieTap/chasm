@@ -29,8 +29,7 @@ internal inline fun CallIndirectInstructionPredecoder(
     instruction: ControlInstruction.CallIndirect,
     crossinline dispatcher: Dispatcher<CallIndirect>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val address = context.instance.tableAddress(instruction.tableIndex)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val address = context.instance.tableAddress(instruction.tableIndex).bind()
     val table = context.store.table(address)
 
     dispatcher(

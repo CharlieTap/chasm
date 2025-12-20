@@ -29,8 +29,7 @@ internal inline fun ElementDropInstructionPredecoder(
     instruction: TableInstruction.ElemDrop,
     crossinline dispatcher: Dispatcher<ElemDrop>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val elementAddress = context.instance.elementAddress(instruction.elemIdx)?.bind()
-        ?: Err(InstantiationError.PredecodingError).bind()
+    val elementAddress = context.instance.elementAddress(instruction.elemIdx).bind()
     val element = context.store.element(elementAddress)
 
     dispatcher(ElemDrop(element))
