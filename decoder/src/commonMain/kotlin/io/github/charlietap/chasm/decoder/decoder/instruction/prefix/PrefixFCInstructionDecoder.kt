@@ -48,12 +48,14 @@ internal inline fun PrefixFCInstructionDecoder(
         I64_TRUNC_SAT_F64_U -> NumericInstruction.I64TruncSatF64U
 
         MEMORY_INIT -> {
+            context.requiresDataCount = true
             val dataIndex = dataIndexDecoder(context).bind()
             val memoryIndex = memoryIndexDecoder(context).bind()
             MemoryInstruction.MemoryInit(memoryIndex, dataIndex)
         }
 
         DATA_DROP -> {
+            context.requiresDataCount = true
             val dataIndex = dataIndexDecoder(context).bind()
             MemoryInstruction.DataDrop(dataIndex)
         }

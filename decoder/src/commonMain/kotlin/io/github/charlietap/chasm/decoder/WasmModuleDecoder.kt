@@ -76,5 +76,5 @@ internal fun WasmModuleDecoder(
         previousSectionType = sectionType
     }
 
-    builder.build().bind()
+    builder.build(context).bind()
 }

@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.decoder.builder
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.module.Custom
 import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.ast.module.ElementSegment
@@ -19,6 +18,7 @@ import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.decoder.context.DecoderContext
 import io.github.charlietap.chasm.decoder.decoder.section.code.FunctionBody
 import io.github.charlietap.chasm.decoder.decoder.section.function.FunctionHeader
 import io.github.charlietap.chasm.decoder.error.ModuleDecodeError
@@ -77,7 +77,7 @@ internal class ModuleBuilder(private val version: Version) {
 
     fun dataCount(count: UInt) = apply { dataCount = count }
 
-    fun build(): Result<Module, ModuleDecoderError> = binding {
+    fun build(context: DecoderContext): Result<Module, ModuleDecoderError> = binding {
 
         if (functionHeaders.size != functionBodies.size) {
             Err(ModuleDecodeError.ModuleMalformed).bind<Unit>()
@@ -87,14 +87,7 @@ internal class ModuleBuilder(private val version: Version) {
             Err(SectionDecodeError.MultipleStartFunctions).bind<Unit>()
         }
 
-        val requiresDataCount = functionBodies.any { functionBody ->
-            functionBody.body.instructions.any { instruction ->
-                instruction is MemoryInstruction.MemoryInit ||
-                    instruction is MemoryInstruction.DataDrop
-            }
-        }
-
-        if (requiresDataCount && dataCount == null) {
+        if (context.requiresDataCount && dataCount == null) {
             Err(SectionDecodeError.DataCountRequired).bind<Unit>()
         }
 
