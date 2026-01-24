@@ -1,5 +1,6 @@
 package io.github.charlietap.sweet.plugin.task
 
+import io.github.charlietap.sweet.plugin.LimitedSupport
 import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.action.GenerateTestAction
 import io.github.charlietap.sweet.plugin.ext.backtrackCollectingDirectoriesUntil
@@ -39,6 +40,9 @@ abstract class GenerateTestsTask : DefaultTask() {
 
     @get:Input
     abstract val proposals: ListProperty<Proposal>
+
+    @get:Input
+    abstract val limitedSupport: ListProperty<LimitedSupport>
 
     @get:Input
     abstract val scriptRunner: Property<String>
@@ -100,6 +104,7 @@ abstract class GenerateTestsTask : DefaultTask() {
         val queue = workerExecutor.noIsolation()
         queue.submit(GenerateTestAction::class.java) {
             proposal = proposals
+            limited = limitedSupport
             runner = scriptRunner
             scriptFile = change.file
             testPackage = testPackageName

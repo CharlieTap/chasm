@@ -1,4 +1,5 @@
 import io.github.charlietap.sweet.lib.SemanticPhase
+import io.github.charlietap.sweet.plugin.LimitedSupport
 import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import org.gradle.kotlin.dsl.withType
@@ -23,11 +24,18 @@ sweet {
         Proposal("threads", SemanticPhase.DECODING),
         Proposal("wide-arithmetic", SemanticPhase.EXECUTION)
     )
+    limitedSupport = listOf(
+        LimitedSupport(
+            setOf("simd_*/**", "**/simd_*"),
+            SemanticPhase.DECODING,
+        ),
+        LimitedSupport(
+            setOf("**/*64.wast", "**/memory64*", "table_copy_mixed.wast"),
+            SemanticPhase.VALIDATION,
+        ),
+    )
     excludes = listOf(
         "**/relaxed_*", "**/*_relaxed_*", // Features relaxed simd opcodes
-        "simd_*/**", "**/simd_*", // Features simd opcodes
-        "**/*64.wast", "**/memory64*", // Features memory64 opcodes
-        "table_copy_mixed.wast", // Features memory64 opcodes
     )
 }
 

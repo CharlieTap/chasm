@@ -64,12 +64,18 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
                 extension.proposals.get().forEach { proposal ->
                     include("proposals/${proposal.name}/*.wast")
                 }
+                extension.limitedSupport.get().forEach { limited ->
+                    limited.patterns.forEach { pattern ->
+                        include(pattern)
+                    }
+                }
                 exclude(extension.excludes.get())
                 builtBy(syncRepositoryTask)
             }
 
             excludes.set(extension.excludes)
             proposals.set(extension.proposals)
+            limitedSupport.set(extension.limitedSupport)
             wast2Json.set(resolveWasmToolsTask.flatMap { it.outputFile })
             outputDirectory.set(extension.testSuiteIntermediateDirectory)
         }
@@ -88,6 +94,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
 
             excludes.set(extension.excludes)
             proposals.set(extension.proposals)
+            limitedSupport.set(extension.limitedSupport)
             scriptRunner.set(extension.scriptRunner)
             testPackageName.set(extension.testPackageName)
             outputDirectory.set(extension.testSuiteTestsDirectory)

@@ -1,5 +1,6 @@
 package io.github.charlietap.sweet.plugin.task
 
+import io.github.charlietap.sweet.plugin.LimitedSupport
 import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.action.WasmToolsAction
 import javax.inject.Inject
@@ -41,6 +42,9 @@ abstract class PrepareTestSuiteTask : DefaultTask() {
 
     @get:Input
     abstract val proposals: ListProperty<Proposal>
+
+    @get:Input
+    abstract val limitedSupport: ListProperty<LimitedSupport>
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty

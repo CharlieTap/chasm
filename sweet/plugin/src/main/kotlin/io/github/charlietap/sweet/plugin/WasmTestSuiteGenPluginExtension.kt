@@ -14,6 +14,11 @@ data class Proposal(
     val phaseSupport: SemanticPhase = SemanticPhase.EXECUTION,
 ): Serializable
 
+data class LimitedSupport(
+    val patterns: Set<String>,
+    val phaseSupport: SemanticPhase,
+): Serializable
+
 open class WasmTestSuiteGenPluginExtension @Inject constructor(
     layout: ProjectLayout,
     objects: ObjectFactory,
@@ -39,6 +44,8 @@ open class WasmTestSuiteGenPluginExtension @Inject constructor(
     ))
 
     val proposals: ListProperty<Proposal> = objects.listProperty(Proposal::class.java).convention(emptyList())
+
+    val limitedSupport: ListProperty<LimitedSupport> = objects.listProperty(LimitedSupport::class.java).convention(emptyList())
 
     val excludes: ListProperty<String> = objects.listProperty(String::class.java).convention(emptyList())
 

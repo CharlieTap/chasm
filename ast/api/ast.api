@@ -3518,17 +3518,10 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$F32x4Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (F)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$F32x4Splat;
-	public static fun constructor-impl (F)F
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$F32x4Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (FLjava/lang/Object;)Z
-	public static final fun equals-impl0 (FF)Z
-	public final fun getValue ()F
 	public fun hashCode ()I
-	public static fun hashCode-impl (F)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (F)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()F
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$F32x4Sqrt : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
@@ -3728,17 +3721,10 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$F64x2Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (D)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$F64x2Splat;
-	public static fun constructor-impl (D)D
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$F64x2Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (DLjava/lang/Object;)Z
-	public static final fun equals-impl0 (DD)Z
-	public final fun getValue ()D
 	public fun hashCode ()I
-	public static fun hashCode-impl (D)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (D)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()D
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$F64x2Sqrt : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
@@ -3818,6 +3804,20 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtaddPairwiseI8x16S : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtaddPairwiseI8x16S;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtaddPairwiseI8x16U : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtaddPairwiseI8x16U;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtendHighI8x16S : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtendHighI8x16S;
 	public fun equals (Ljava/lang/Object;)Z
@@ -3841,6 +3841,34 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtendLowI8x16U : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtendLowI8x16U;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtmulHighI8x16S : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtmulHighI8x16S;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtmulHighI8x16U : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtmulHighI8x16U;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtmulLowI8x16S : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtmulLowI8x16S;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtmulLowI8x16U : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8ExtmulLowI8x16U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4036,17 +4064,10 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (S)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8Splat;
-	public static fun constructor-impl (S)S
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (SLjava/lang/Object;)Z
-	public static final fun equals-impl0 (SS)Z
-	public final fun getValue ()S
 	public fun hashCode ()I
-	public static fun hashCode-impl (S)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (S)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()S
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I16x8Sub : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
@@ -4337,17 +4358,10 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I32x4Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I32x4Splat;
-	public static fun constructor-impl (I)I
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I32x4Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (ILjava/lang/Object;)Z
-	public static final fun equals-impl0 (II)Z
-	public final fun getValue ()I
 	public fun hashCode ()I
-	public static fun hashCode-impl (I)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (I)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()I
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I32x4Sub : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
@@ -4575,17 +4589,10 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I64x2Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (J)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I64x2Splat;
-	public static fun constructor-impl (J)J
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I64x2Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (JLjava/lang/Object;)Z
-	public static final fun equals-impl0 (JJ)Z
-	public final fun getValue ()J
 	public fun hashCode ()I
-	public static fun hashCode-impl (J)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (J)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()J
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I64x2Sub : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
@@ -4848,17 +4855,10 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I8x16Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I8x16Splat;
-	public static fun constructor-impl (B)B
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I8x16Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (BLjava/lang/Object;)Z
-	public static final fun equals-impl0 (BB)Z
-	public final fun getValue ()B
 	public fun hashCode ()I
-	public static fun hashCode-impl (B)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (B)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()B
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I8x16Sub : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
@@ -4877,6 +4877,13 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I8x16SubSatU : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I8x16SubSatU;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$I8x16Swizzle : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$I8x16Swizzle;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -4925,125 +4932,232 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load;
-	public static fun constructor-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Lio/github/charlietap/chasm/ast/instruction/MemArg;Lio/github/charlietap/chasm/ast/instruction/MemArg;)Z
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
-	public static fun hashCode-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Lane : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)V
-	public final fun component1 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun component2 ()B
-	public final fun copy (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Lane;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Lane;Lio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Lane;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun component3 ()B
+	public final fun copy-xsdMfPQ (ILio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Lane;
+	public static synthetic fun copy-xsdMfPQ$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Lane;ILio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Lane;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLaneIdx ()B
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Splat;
-	public static fun constructor-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Splat;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Splat;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Lio/github/charlietap/chasm/ast/instruction/MemArg;Lio/github/charlietap/chasm/ast/instruction/MemArg;)Z
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
-	public static fun hashCode-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16x4S : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16x4S;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16x4S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16x4S;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16x4U : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16x4U;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16x4U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load16x4U;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Lane : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)V
-	public final fun component1 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun component2 ()B
-	public final fun copy (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Lane;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Lane;Lio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Lane;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun component3 ()B
+	public final fun copy-xsdMfPQ (ILio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Lane;
+	public static synthetic fun copy-xsdMfPQ$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Lane;ILio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Lane;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLaneIdx ()B
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Splat;
-	public static fun constructor-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Splat;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Splat;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Lio/github/charlietap/chasm/ast/instruction/MemArg;Lio/github/charlietap/chasm/ast/instruction/MemArg;)Z
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
-	public static fun hashCode-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Zero : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Zero;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Zero;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32Zero;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32x2S : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32x2S;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32x2S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32x2S;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32x2U : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32x2U;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32x2U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load32x2U;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Lane : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)V
-	public final fun component1 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun component2 ()B
-	public final fun copy (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Lane;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Lane;Lio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Lane;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun component3 ()B
+	public final fun copy-xsdMfPQ (ILio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Lane;
+	public static synthetic fun copy-xsdMfPQ$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Lane;ILio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Lane;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLaneIdx ()B
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Splat;
-	public static fun constructor-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Splat;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Splat;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Lio/github/charlietap/chasm/ast/instruction/MemArg;Lio/github/charlietap/chasm/ast/instruction/MemArg;)Z
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
-	public static fun hashCode-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Zero : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Zero;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Zero;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load64Zero;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Lane : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)V
-	public final fun component1 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun component2 ()B
-	public final fun copy (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Lane;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Lane;Lio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Lane;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun component3 ()B
+	public final fun copy-xsdMfPQ (ILio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Lane;
+	public static synthetic fun copy-xsdMfPQ$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Lane;ILio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Lane;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLaneIdx ()B
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Splat : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Splat;
-	public static fun constructor-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Splat;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Splat;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8Splat;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Lio/github/charlietap/chasm/ast/instruction/MemArg;Lio/github/charlietap/chasm/ast/instruction/MemArg;)Z
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
-	public static fun hashCode-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8x8S : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8x8S;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8x8S;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8x8S;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8x8U : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8x8U;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8x8U;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Load8x8U;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Not : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
@@ -5061,67 +5175,74 @@ public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store;
-	public static fun constructor-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun copy-gYnP_GY (ILio/github/charlietap/chasm/ast/instruction/MemArg;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store;
+	public static synthetic fun copy-gYnP_GY$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store;ILio/github/charlietap/chasm/ast/instruction/MemArg;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Lio/github/charlietap/chasm/ast/instruction/MemArg;Lio/github/charlietap/chasm/ast/instruction/MemArg;)Z
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
-	public static fun hashCode-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Lio/github/charlietap/chasm/ast/instruction/MemArg;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store16Lane : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)V
-	public final fun component1 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun component2 ()B
-	public final fun copy (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store16Lane;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store16Lane;Lio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store16Lane;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun component3 ()B
+	public final fun copy-xsdMfPQ (ILio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store16Lane;
+	public static synthetic fun copy-xsdMfPQ$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store16Lane;ILio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store16Lane;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLaneIdx ()B
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store32Lane : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)V
-	public final fun component1 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun component2 ()B
-	public final fun copy (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store32Lane;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store32Lane;Lio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store32Lane;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun component3 ()B
+	public final fun copy-xsdMfPQ (ILio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store32Lane;
+	public static synthetic fun copy-xsdMfPQ$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store32Lane;ILio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store32Lane;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLaneIdx ()B
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store64Lane : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)V
-	public final fun component1 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun component2 ()B
-	public final fun copy (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store64Lane;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store64Lane;Lio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store64Lane;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun component3 ()B
+	public final fun copy-xsdMfPQ (ILio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store64Lane;
+	public static synthetic fun copy-xsdMfPQ$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store64Lane;ILio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store64Lane;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLaneIdx ()B
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store8Lane : io/github/charlietap/chasm/ast/instruction/VectorInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)V
-	public final fun component1 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
-	public final fun component2 ()B
-	public final fun copy (Lio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store8Lane;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store8Lane;Lio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store8Lane;
+	public synthetic fun <init> (ILio/github/charlietap/chasm/ast/instruction/MemArg;BLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-j5_GAr0 ()I
+	public final fun component2 ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun component3 ()B
+	public final fun copy-xsdMfPQ (ILio/github/charlietap/chasm/ast/instruction/MemArg;B)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store8Lane;
+	public static synthetic fun copy-xsdMfPQ$default (Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store8Lane;ILio/github/charlietap/chasm/ast/instruction/MemArg;BILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/VectorInstruction$V128Store8Lane;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLaneIdx ()B
 	public final fun getMemArg ()Lio/github/charlietap/chasm/ast/instruction/MemArg;
+	public final fun getMemoryIndex-j5_GAr0 ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

@@ -3384,129 +3384,377 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VariableInstruction 
 }
 
 sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : io.github.charlietap.chasm.ast.instruction/Instruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction|null[0]
+    final class V128Load : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.toString|toString(){}[0]
+    }
+
     final class V128Load16Lane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
 
         final val laneIdx // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.laneIdx|{}laneIdx[0]
             final fun <get-laneIdx>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.laneIdx.<get-laneIdx>|<get-laneIdx>(){}[0]
         final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.memArg|{}memArg[0]
             final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
 
-        final fun component1(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.component1|component1(){}[0]
-        final fun component2(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.component2|component2(){}[0]
-        final fun copy(io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.copy|copy(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.component2|component2(){}[0]
+        final fun component3(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.component3|component3(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Lane.toString|toString(){}[0]
     }
 
+    final class V128Load16Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.toString|toString(){}[0]
+    }
+
+    final class V128Load16x4S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4S.toString|toString(){}[0]
+    }
+
+    final class V128Load16x4U : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16x4U.toString|toString(){}[0]
+    }
+
     final class V128Load32Lane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
 
         final val laneIdx // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.laneIdx|{}laneIdx[0]
             final fun <get-laneIdx>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.laneIdx.<get-laneIdx>|<get-laneIdx>(){}[0]
         final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.memArg|{}memArg[0]
             final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
 
-        final fun component1(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.component1|component1(){}[0]
-        final fun component2(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.component2|component2(){}[0]
-        final fun copy(io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.copy|copy(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.component2|component2(){}[0]
+        final fun component3(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.component3|component3(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Lane.toString|toString(){}[0]
     }
 
+    final class V128Load32Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.toString|toString(){}[0]
+    }
+
+    final class V128Load32Zero : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Zero.toString|toString(){}[0]
+    }
+
+    final class V128Load32x2S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2S.toString|toString(){}[0]
+    }
+
+    final class V128Load32x2U : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32x2U.toString|toString(){}[0]
+    }
+
     final class V128Load64Lane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
 
         final val laneIdx // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.laneIdx|{}laneIdx[0]
             final fun <get-laneIdx>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.laneIdx.<get-laneIdx>|<get-laneIdx>(){}[0]
         final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.memArg|{}memArg[0]
             final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
 
-        final fun component1(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.component1|component1(){}[0]
-        final fun component2(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.component2|component2(){}[0]
-        final fun copy(io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.copy|copy(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.component2|component2(){}[0]
+        final fun component3(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.component3|component3(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Lane.toString|toString(){}[0]
     }
 
+    final class V128Load64Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.toString|toString(){}[0]
+    }
+
+    final class V128Load64Zero : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Zero.toString|toString(){}[0]
+    }
+
     final class V128Load8Lane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
 
         final val laneIdx // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.laneIdx|{}laneIdx[0]
             final fun <get-laneIdx>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.laneIdx.<get-laneIdx>|<get-laneIdx>(){}[0]
         final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.memArg|{}memArg[0]
             final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
 
-        final fun component1(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.component1|component1(){}[0]
-        final fun component2(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.component2|component2(){}[0]
-        final fun copy(io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.copy|copy(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.component2|component2(){}[0]
+        final fun component3(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.component3|component3(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Lane.toString|toString(){}[0]
     }
 
+    final class V128Load8Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.toString|toString(){}[0]
+    }
+
+    final class V128Load8x8S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8S.toString|toString(){}[0]
+    }
+
+    final class V128Load8x8U : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8x8U.toString|toString(){}[0]
+    }
+
+    final class V128Store : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store|null[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+
+        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.memArg|{}memArg[0]
+            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
+
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.component2|component2(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.toString|toString(){}[0]
+    }
+
     final class V128Store16Lane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
 
         final val laneIdx // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.laneIdx|{}laneIdx[0]
             final fun <get-laneIdx>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.laneIdx.<get-laneIdx>|<get-laneIdx>(){}[0]
         final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.memArg|{}memArg[0]
             final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
 
-        final fun component1(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.component1|component1(){}[0]
-        final fun component2(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.component2|component2(){}[0]
-        final fun copy(io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.copy|copy(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.component2|component2(){}[0]
+        final fun component3(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.component3|component3(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store16Lane.toString|toString(){}[0]
     }
 
     final class V128Store32Lane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
 
         final val laneIdx // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.laneIdx|{}laneIdx[0]
             final fun <get-laneIdx>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.laneIdx.<get-laneIdx>|<get-laneIdx>(){}[0]
         final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.memArg|{}memArg[0]
             final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
 
-        final fun component1(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.component1|component1(){}[0]
-        final fun component2(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.component2|component2(){}[0]
-        final fun copy(io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.copy|copy(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.component2|component2(){}[0]
+        final fun component3(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.component3|component3(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store32Lane.toString|toString(){}[0]
     }
 
     final class V128Store64Lane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
 
         final val laneIdx // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.laneIdx|{}laneIdx[0]
             final fun <get-laneIdx>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.laneIdx.<get-laneIdx>|<get-laneIdx>(){}[0]
         final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.memArg|{}memArg[0]
             final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
 
-        final fun component1(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.component1|component1(){}[0]
-        final fun component2(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.component2|component2(){}[0]
-        final fun copy(io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.copy|copy(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.component2|component2(){}[0]
+        final fun component3(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.component3|component3(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store64Lane.toString|toString(){}[0]
     }
 
     final class V128Store8Lane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        constructor <init>(io.github.charlietap.chasm.ast.module/Index.MemoryIndex, io.github.charlietap.chasm.ast.instruction/MemArg, kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
 
         final val laneIdx // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.laneIdx|{}laneIdx[0]
             final fun <get-laneIdx>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.laneIdx.<get-laneIdx>|<get-laneIdx>(){}[0]
         final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.memArg|{}memArg[0]
             final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.memArg.<get-memArg>|<get-memArg>(){}[0]
+        final val memoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.memoryIndex|{}memoryIndex[0]
+            final fun <get-memoryIndex>(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.memoryIndex.<get-memoryIndex>|<get-memoryIndex>(){}[0]
 
-        final fun component1(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.component1|component1(){}[0]
-        final fun component2(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.component2|component2(){}[0]
-        final fun copy(io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.copy|copy(io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
+        final fun component1(): io.github.charlietap.chasm.ast.module/Index.MemoryIndex // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.component1|component1(){}[0]
+        final fun component2(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.component2|component2(){}[0]
+        final fun component3(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.component3|component3(){}[0]
+        final fun copy(io.github.charlietap.chasm.ast.module/Index.MemoryIndex = ..., io.github.charlietap.chasm.ast.instruction/MemArg = ..., kotlin/Byte = ...): io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.copy|copy(io.github.charlietap.chasm.ast.module.Index.MemoryIndex;io.github.charlietap.chasm.ast.instruction.MemArg;kotlin.Byte){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store8Lane.toString|toString(){}[0]
@@ -3534,17 +3782,6 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4ReplaceLane.toString|toString(){}[0]
     }
 
-    final value class F32x4Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat|null[0]
-        constructor <init>(kotlin/Float) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.<init>|<init>(kotlin.Float){}[0]
-
-        final val value // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.value|{}value[0]
-            final fun <get-value>(): kotlin/Float // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.value.<get-value>|<get-value>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.toString|toString(){}[0]
-    }
-
     final value class F64x2ExtractLane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2ExtractLane|null[0]
         constructor <init>(kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2ExtractLane.<init>|<init>(kotlin.Byte){}[0]
 
@@ -3565,17 +3802,6 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2ReplaceLane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2ReplaceLane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2ReplaceLane.toString|toString(){}[0]
-    }
-
-    final value class F64x2Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat|null[0]
-        constructor <init>(kotlin/Double) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.<init>|<init>(kotlin.Double){}[0]
-
-        final val value // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.value|{}value[0]
-            final fun <get-value>(): kotlin/Double // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.value.<get-value>|<get-value>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.toString|toString(){}[0]
     }
 
     final value class I16x8ExtractLaneS : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtractLaneS|null[0]
@@ -3611,17 +3837,6 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ReplaceLane.toString|toString(){}[0]
     }
 
-    final value class I16x8Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat|null[0]
-        constructor <init>(kotlin/Short) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.<init>|<init>(kotlin.Short){}[0]
-
-        final val value // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.value|{}value[0]
-            final fun <get-value>(): kotlin/Short // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.value.<get-value>|<get-value>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.toString|toString(){}[0]
-    }
-
     final value class I32x4ExtractLane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4ExtractLane|null[0]
         constructor <init>(kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4ExtractLane.<init>|<init>(kotlin.Byte){}[0]
 
@@ -3644,17 +3859,6 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4ReplaceLane.toString|toString(){}[0]
     }
 
-    final value class I32x4Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat|null[0]
-        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.<init>|<init>(kotlin.Int){}[0]
-
-        final val value // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.value|{}value[0]
-            final fun <get-value>(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.value.<get-value>|<get-value>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.toString|toString(){}[0]
-    }
-
     final value class I64x2ExtractLane : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2ExtractLane|null[0]
         constructor <init>(kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2ExtractLane.<init>|<init>(kotlin.Byte){}[0]
 
@@ -3675,17 +3879,6 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2ReplaceLane.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2ReplaceLane.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2ReplaceLane.toString|toString(){}[0]
-    }
-
-    final value class I64x2Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat|null[0]
-        constructor <init>(kotlin/Long) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.<init>|<init>(kotlin.Long){}[0]
-
-        final val value // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.value|{}value[0]
-            final fun <get-value>(): kotlin/Long // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.value.<get-value>|<get-value>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.toString|toString(){}[0]
     }
 
     final value class I8x16ExtractLaneS : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16ExtractLaneS|null[0]
@@ -3732,17 +3925,6 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Shuffle.toString|toString(){}[0]
     }
 
-    final value class I8x16Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat|null[0]
-        constructor <init>(kotlin/Byte) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.<init>|<init>(kotlin.Byte){}[0]
-
-        final val value // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.value|{}value[0]
-            final fun <get-value>(): kotlin/Byte // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.value.<get-value>|<get-value>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.toString|toString(){}[0]
-    }
-
     final value class V128Const : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Const|null[0]
         constructor <init>(kotlin/ByteArray) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Const.<init>|<init>(kotlin.ByteArray){}[0]
 
@@ -3752,72 +3934,6 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Const.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Const.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Const.toString|toString(){}[0]
-    }
-
-    final value class V128Load : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
-
-        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.memArg|{}memArg[0]
-            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.memArg.<get-memArg>|<get-memArg>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load.toString|toString(){}[0]
-    }
-
-    final value class V128Load16Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
-
-        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.memArg|{}memArg[0]
-            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.memArg.<get-memArg>|<get-memArg>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load16Splat.toString|toString(){}[0]
-    }
-
-    final value class V128Load32Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
-
-        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.memArg|{}memArg[0]
-            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.memArg.<get-memArg>|<get-memArg>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load32Splat.toString|toString(){}[0]
-    }
-
-    final value class V128Load64Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
-
-        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.memArg|{}memArg[0]
-            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.memArg.<get-memArg>|<get-memArg>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load64Splat.toString|toString(){}[0]
-    }
-
-    final value class V128Load8Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
-
-        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.memArg|{}memArg[0]
-            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.memArg.<get-memArg>|<get-memArg>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Load8Splat.toString|toString(){}[0]
-    }
-
-    final value class V128Store : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store|null[0]
-        constructor <init>(io.github.charlietap.chasm.ast.instruction/MemArg) // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.<init>|<init>(io.github.charlietap.chasm.ast.instruction.MemArg){}[0]
-
-        final val memArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.memArg|{}memArg[0]
-            final fun <get-memArg>(): io.github.charlietap.chasm.ast.instruction/MemArg // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.memArg.<get-memArg>|<get-memArg>(){}[0]
-
-        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128Store.toString|toString(){}[0]
     }
 
     final object F32x4Abs : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Abs|null[0]
@@ -3944,6 +4060,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4PMin.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4PMin.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4PMin.toString|toString(){}[0]
+    }
+
+    final object F32x4Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.toString|toString(){}[0]
     }
 
     final object F32x4Sqrt : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Sqrt|null[0]
@@ -4090,6 +4212,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2PromoteLowF32x4.toString|toString(){}[0]
     }
 
+    final object F64x2Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat.toString|toString(){}[0]
+    }
+
     final object F64x2Sqrt : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Sqrt|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Sqrt.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Sqrt.hashCode|hashCode(){}[0]
@@ -4156,6 +4284,18 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Eq.toString|toString(){}[0]
     }
 
+    final object I16x8ExtaddPairwiseI8x16S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtaddPairwiseI8x16S|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtaddPairwiseI8x16S.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtaddPairwiseI8x16S.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtaddPairwiseI8x16S.toString|toString(){}[0]
+    }
+
+    final object I16x8ExtaddPairwiseI8x16U : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtaddPairwiseI8x16U|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtaddPairwiseI8x16U.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtaddPairwiseI8x16U.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtaddPairwiseI8x16U.toString|toString(){}[0]
+    }
+
     final object I16x8ExtendHighI8x16S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtendHighI8x16S|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtendHighI8x16S.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtendHighI8x16S.hashCode|hashCode(){}[0]
@@ -4178,6 +4318,30 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtendLowI8x16U.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtendLowI8x16U.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtendLowI8x16U.toString|toString(){}[0]
+    }
+
+    final object I16x8ExtmulHighI8x16S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulHighI8x16S|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulHighI8x16S.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulHighI8x16S.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulHighI8x16S.toString|toString(){}[0]
+    }
+
+    final object I16x8ExtmulHighI8x16U : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulHighI8x16U|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulHighI8x16U.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulHighI8x16U.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulHighI8x16U.toString|toString(){}[0]
+    }
+
+    final object I16x8ExtmulLowI8x16S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulLowI8x16S|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulLowI8x16S.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulLowI8x16S.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulLowI8x16S.toString|toString(){}[0]
+    }
+
+    final object I16x8ExtmulLowI8x16U : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulLowI8x16U|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulLowI8x16U.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulLowI8x16U.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ExtmulLowI8x16U.toString|toString(){}[0]
     }
 
     final object I16x8GeS : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8GeS|null[0]
@@ -4304,6 +4468,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ShrU.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ShrU.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8ShrU.toString|toString(){}[0]
+    }
+
+    final object I16x8Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Splat.toString|toString(){}[0]
     }
 
     final object I16x8Sub : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Sub|null[0]
@@ -4528,6 +4698,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4ShrU.toString|toString(){}[0]
     }
 
+    final object I32x4Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Splat.toString|toString(){}[0]
+    }
+
     final object I32x4Sub : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Sub|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Sub.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Sub.hashCode|hashCode(){}[0]
@@ -4694,6 +4870,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2ShrU.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2ShrU.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2ShrU.toString|toString(){}[0]
+    }
+
+    final object I64x2Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Splat.toString|toString(){}[0]
     }
 
     final object I64x2Sub : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Sub|null[0]
@@ -4870,6 +5052,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16ShrU.toString|toString(){}[0]
     }
 
+    final object I8x16Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Splat.toString|toString(){}[0]
+    }
+
     final object I8x16Sub : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Sub|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Sub.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Sub.hashCode|hashCode(){}[0]
@@ -4886,6 +5074,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16SubSatU.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16SubSatU.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16SubSatU.toString|toString(){}[0]
+    }
+
+    final object I8x16Swizzle : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Swizzle|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Swizzle.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Swizzle.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Swizzle.toString|toString(){}[0]
     }
 
     final object V128And : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.V128And|null[0]
