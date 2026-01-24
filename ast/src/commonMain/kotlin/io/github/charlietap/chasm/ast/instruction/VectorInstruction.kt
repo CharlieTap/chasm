@@ -492,4 +492,44 @@ sealed interface VectorInstruction : Instruction {
     data object F32x4DemoteF64x2Zero : VectorInstruction
 
     data object F64x2PromoteLowF32x4 : VectorInstruction
+
+    data object I8x16RelaxedSwizzle : VectorInstruction
+
+    data object I32x4RelaxedTruncF32x4S : VectorInstruction
+
+    data object I32x4RelaxedTruncF32x4U : VectorInstruction
+
+    data object I32x4RelaxedTruncF64x2SZero : VectorInstruction
+
+    data object I32x4RelaxedTruncF64x2UZero : VectorInstruction
+
+    data object F32x4RelaxedMadd : VectorInstruction
+
+    data object F32x4RelaxedNmadd : VectorInstruction
+
+    data object F64x2RelaxedMadd : VectorInstruction
+
+    data object F64x2RelaxedNmadd : VectorInstruction
+
+    data object I8x16RelaxedLaneselect : VectorInstruction
+
+    data object I16x8RelaxedLaneselect : VectorInstruction
+
+    data object I32x4RelaxedLaneselect : VectorInstruction
+
+    data object I64x2RelaxedLaneselect : VectorInstruction
+
+    data object F32x4RelaxedMin : VectorInstruction
+
+    data object F32x4RelaxedMax : VectorInstruction
+
+    data object F64x2RelaxedMin : VectorInstruction
+
+    data object F64x2RelaxedMax : VectorInstruction
+
+    data object I16x8RelaxedQ15mulrS : VectorInstruction
+
+    data object I16x8RelaxedDotI8x16I7x16S : VectorInstruction
+
+    data object I32x4RelaxedDotI8x16I7x16AddS : VectorInstruction
 }

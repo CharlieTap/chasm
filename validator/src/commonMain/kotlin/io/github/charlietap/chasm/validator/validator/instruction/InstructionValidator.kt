@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.validator.validator.instruction
 
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
@@ -29,6 +28,7 @@ import io.github.charlietap.chasm.validator.validator.instruction.parametric.Par
 import io.github.charlietap.chasm.validator.validator.instruction.reference.ReferenceInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.table.TableInstructionValidator
 import io.github.charlietap.chasm.validator.validator.instruction.variable.VariableInstructionValidator
+import io.github.charlietap.chasm.validator.validator.instruction.vector.VectorInstructionValidator
 
 internal fun InstructionValidator(
     context: ValidationContext,
@@ -47,6 +47,7 @@ internal fun InstructionValidator(
         referenceInstructionValidator = ::ReferenceInstructionValidator,
         tableInstructionValidator = ::TableInstructionValidator,
         variableInstructionValidator = ::VariableInstructionValidator,
+        vectorInstructionValidator = ::VectorInstructionValidator,
     )
 
 internal inline fun InstructionValidator(
@@ -62,6 +63,7 @@ internal inline fun InstructionValidator(
     crossinline referenceInstructionValidator: Validator<ReferenceInstruction>,
     crossinline tableInstructionValidator: Validator<TableInstruction>,
     crossinline variableInstructionValidator: Validator<VariableInstruction>,
+    crossinline vectorInstructionValidator: Validator<VectorInstruction>,
 ): Result<Unit, ModuleValidatorError> = binding {
     scope(context, instruction) { scopedContext ->
         when (instruction) {
@@ -74,7 +76,7 @@ internal inline fun InstructionValidator(
             is ReferenceInstruction -> referenceInstructionValidator(scopedContext, instruction)
             is TableInstruction -> tableInstructionValidator(scopedContext, instruction)
             is VariableInstruction -> variableInstructionValidator(scopedContext, instruction)
-            is VectorInstruction -> Ok(Unit)
+            is VectorInstruction -> vectorInstructionValidator(scopedContext, instruction)
         }
     }.bind()
 }

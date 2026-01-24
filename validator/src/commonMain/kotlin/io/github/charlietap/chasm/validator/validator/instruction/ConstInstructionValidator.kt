@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.validator.Validator
 import io.github.charlietap.chasm.validator.context.ValidationContext
@@ -51,6 +52,7 @@ internal inline fun ConstInstructionValidator(
         is NumericInstruction.I64Mul,
         is ReferenceInstruction.RefNull,
         is ReferenceInstruction.RefFunc,
+        is VectorInstruction.V128Const,
         -> instructionValidator(context, instruction).bind()
         is VariableInstruction.GlobalGet -> {
             val globalType = context.globalType(instruction.globalIdx).bind()

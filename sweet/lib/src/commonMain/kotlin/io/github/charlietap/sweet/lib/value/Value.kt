@@ -81,4 +81,8 @@ sealed interface Value {
         val laneType: String,
         val value: List<String>
     ): Value
+
+    @Serializable
+    @SerialName("either")
+    data class Either(val values: List<Value>): Value
 }

@@ -17,6 +17,7 @@ import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.chasm.type.VectorType
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.matching.ValueTypeMatcher
 import io.github.charlietap.chasm.validator.context.Label
@@ -85,6 +86,10 @@ internal inline fun ValidationContext.pushI64() = operands.push(ValueType.Number
 internal inline fun ValidationContext.pushF32() = operands.push(ValueType.Number(NumberType.F32))
 
 internal inline fun ValidationContext.pushF64() = operands.push(ValueType.Number(NumberType.F64))
+
+internal inline fun ValidationContext.popV128(): Result<ValueType, ModuleValidatorError> = pop(ValueType.Vector(VectorType.V128))
+
+internal inline fun ValidationContext.pushV128() = operands.push(ValueType.Vector(VectorType.V128))
 
 internal inline fun ValidationContext.pushRef(
     heapType: HeapType,

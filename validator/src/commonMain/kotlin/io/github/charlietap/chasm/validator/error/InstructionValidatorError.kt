@@ -34,4 +34,6 @@ sealed interface InstructionValidatorError : ModuleValidatorError {
     data object CallIndirectOnNonFunction : InstructionValidatorError
 
     data object UninitialisedLocal : InstructionValidatorError
+
+    data object InvalidLaneIndex : InstructionValidatorError
 }

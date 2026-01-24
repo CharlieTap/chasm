@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.validator.ext
 import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
+import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 
 fun Instruction?.size(): Int = when (this) {
 
@@ -115,6 +116,29 @@ fun Instruction?.size(): Int = when (this) {
     is MemoryInstruction.Load.F64.F64Load -> 8
     is MemoryInstruction.Store.F32.F32Store -> 4
     is MemoryInstruction.Store.F64.F64Store -> 8
+
+    is VectorInstruction.V128Load -> 16
+    is VectorInstruction.V128Store -> 16
+    is VectorInstruction.V128Load8x8S -> 8
+    is VectorInstruction.V128Load8x8U -> 8
+    is VectorInstruction.V128Load16x4S -> 8
+    is VectorInstruction.V128Load16x4U -> 8
+    is VectorInstruction.V128Load32x2S -> 8
+    is VectorInstruction.V128Load32x2U -> 8
+    is VectorInstruction.V128Load8Splat -> 1
+    is VectorInstruction.V128Load16Splat -> 2
+    is VectorInstruction.V128Load32Splat -> 4
+    is VectorInstruction.V128Load64Splat -> 8
+    is VectorInstruction.V128Load32Zero -> 4
+    is VectorInstruction.V128Load64Zero -> 8
+    is VectorInstruction.V128Load8Lane -> 1
+    is VectorInstruction.V128Load16Lane -> 2
+    is VectorInstruction.V128Load32Lane -> 4
+    is VectorInstruction.V128Load64Lane -> 8
+    is VectorInstruction.V128Store8Lane -> 1
+    is VectorInstruction.V128Store16Lane -> 2
+    is VectorInstruction.V128Store32Lane -> 4
+    is VectorInstruction.V128Store64Lane -> 8
 
     else -> 0
 }

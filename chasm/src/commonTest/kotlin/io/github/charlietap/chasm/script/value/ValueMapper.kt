@@ -32,6 +32,7 @@ fun ValueMapper(
     is Value.NullRef -> nullRefValueMapper(value)
     is Value.StructRef -> structRefValueMapper(value)
     is Value.V128 -> v128ValueMapper(value)
+    is Value.Either -> null
 }
 
 private fun i32ValueMapper(

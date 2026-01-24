@@ -384,6 +384,26 @@ internal inline fun VectorInstructionDecoder(
         I32X4_TRUNC_SAT_F64X2_U_ZERO -> VectorInstruction.I32x4TruncSatF64x2UZero
         F64X2_CONVERT_LOW_I32X4_S -> VectorInstruction.F64x2ConvertLowI32x4S
         F64X2_CONVERT_LOW_I32X4_U -> VectorInstruction.F64x2ConvertLowI32x4U
+        I8X16_RELAXED_SWIZZLE -> VectorInstruction.I8x16RelaxedSwizzle
+        I32X4_RELAXED_TRUNC_F32X4_S -> VectorInstruction.I32x4RelaxedTruncF32x4S
+        I32X4_RELAXED_TRUNC_F32X4_U -> VectorInstruction.I32x4RelaxedTruncF32x4U
+        I32X4_RELAXED_TRUNC_F64X2_S_ZERO -> VectorInstruction.I32x4RelaxedTruncF64x2SZero
+        I32X4_RELAXED_TRUNC_F64X2_U_ZERO -> VectorInstruction.I32x4RelaxedTruncF64x2UZero
+        F32X4_RELAXED_MADD -> VectorInstruction.F32x4RelaxedMadd
+        F32X4_RELAXED_NMADD -> VectorInstruction.F32x4RelaxedNmadd
+        F64X2_RELAXED_MADD -> VectorInstruction.F64x2RelaxedMadd
+        F64X2_RELAXED_NMADD -> VectorInstruction.F64x2RelaxedNmadd
+        I8X16_RELAXED_LANESELECT -> VectorInstruction.I8x16RelaxedLaneselect
+        I16X8_RELAXED_LANESELECT -> VectorInstruction.I16x8RelaxedLaneselect
+        I32X4_RELAXED_LANESELECT -> VectorInstruction.I32x4RelaxedLaneselect
+        I64X2_RELAXED_LANESELECT -> VectorInstruction.I64x2RelaxedLaneselect
+        F32X4_RELAXED_MIN -> VectorInstruction.F32x4RelaxedMin
+        F32X4_RELAXED_MAX -> VectorInstruction.F32x4RelaxedMax
+        F64X2_RELAXED_MIN -> VectorInstruction.F64x2RelaxedMin
+        F64X2_RELAXED_MAX -> VectorInstruction.F64x2RelaxedMax
+        I16X8_RELAXED_Q15MULR_S -> VectorInstruction.I16x8RelaxedQ15mulrS
+        I16X8_RELAXED_DOT_I8X16_I7X16_S -> VectorInstruction.I16x8RelaxedDotI8x16I7x16S
+        I32X4_RELAXED_DOT_I8X16_I7X16_ADD_S -> VectorInstruction.I32x4RelaxedDotI8x16I7x16AddS
         else -> Err(InstructionDecodeError.UnknownInstruction(opcode.toUByte())).bind<VectorInstruction>()
     }
 }
@@ -624,3 +644,23 @@ private const val I32X4_TRUNC_SAT_F64X2_S_ZERO: UInt = 252u
 private const val I32X4_TRUNC_SAT_F64X2_U_ZERO: UInt = 253u
 private const val F64X2_CONVERT_LOW_I32X4_S: UInt = 254u
 private const val F64X2_CONVERT_LOW_I32X4_U: UInt = 255u
+private const val I8X16_RELAXED_SWIZZLE: UInt = 256u
+private const val I32X4_RELAXED_TRUNC_F32X4_S: UInt = 257u
+private const val I32X4_RELAXED_TRUNC_F32X4_U: UInt = 258u
+private const val I32X4_RELAXED_TRUNC_F64X2_S_ZERO: UInt = 259u
+private const val I32X4_RELAXED_TRUNC_F64X2_U_ZERO: UInt = 260u
+private const val F32X4_RELAXED_MADD: UInt = 261u
+private const val F32X4_RELAXED_NMADD: UInt = 262u
+private const val F64X2_RELAXED_MADD: UInt = 263u
+private const val F64X2_RELAXED_NMADD: UInt = 264u
+private const val I8X16_RELAXED_LANESELECT: UInt = 265u
+private const val I16X8_RELAXED_LANESELECT: UInt = 266u
+private const val I32X4_RELAXED_LANESELECT: UInt = 267u
+private const val I64X2_RELAXED_LANESELECT: UInt = 268u
+private const val F32X4_RELAXED_MIN: UInt = 269u
+private const val F32X4_RELAXED_MAX: UInt = 270u
+private const val F64X2_RELAXED_MIN: UInt = 271u
+private const val F64X2_RELAXED_MAX: UInt = 272u
+private const val I16X8_RELAXED_Q15MULR_S: UInt = 273u
+private const val I16X8_RELAXED_DOT_I8X16_I7X16_S: UInt = 274u
+private const val I32X4_RELAXED_DOT_I8X16_I7X16_ADD_S: UInt = 275u

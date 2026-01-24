@@ -4062,6 +4062,30 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4PMin.toString|toString(){}[0]
     }
 
+    final object F32x4RelaxedMadd : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMadd|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMadd.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMadd.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMadd.toString|toString(){}[0]
+    }
+
+    final object F32x4RelaxedMax : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMax|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMax.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMax.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMax.toString|toString(){}[0]
+    }
+
+    final object F32x4RelaxedMin : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMin|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMin.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMin.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedMin.toString|toString(){}[0]
+    }
+
+    final object F32x4RelaxedNmadd : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedNmadd|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedNmadd.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedNmadd.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4RelaxedNmadd.toString|toString(){}[0]
+    }
+
     final object F32x4Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F32x4Splat.hashCode|hashCode(){}[0]
@@ -4210,6 +4234,30 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2PromoteLowF32x4.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2PromoteLowF32x4.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2PromoteLowF32x4.toString|toString(){}[0]
+    }
+
+    final object F64x2RelaxedMadd : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMadd|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMadd.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMadd.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMadd.toString|toString(){}[0]
+    }
+
+    final object F64x2RelaxedMax : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMax|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMax.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMax.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMax.toString|toString(){}[0]
+    }
+
+    final object F64x2RelaxedMin : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMin|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMin.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMin.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedMin.toString|toString(){}[0]
+    }
+
+    final object F64x2RelaxedNmadd : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedNmadd|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedNmadd.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedNmadd.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2RelaxedNmadd.toString|toString(){}[0]
     }
 
     final object F64x2Splat : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.F64x2Splat|null[0]
@@ -4452,6 +4500,24 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Q15mulrSatS.toString|toString(){}[0]
     }
 
+    final object I16x8RelaxedDotI8x16I7x16S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedDotI8x16I7x16S|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedDotI8x16I7x16S.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedDotI8x16I7x16S.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedDotI8x16I7x16S.toString|toString(){}[0]
+    }
+
+    final object I16x8RelaxedLaneselect : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedLaneselect|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedLaneselect.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedLaneselect.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedLaneselect.toString|toString(){}[0]
+    }
+
+    final object I16x8RelaxedQ15mulrS : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedQ15mulrS|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedQ15mulrS.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedQ15mulrS.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8RelaxedQ15mulrS.toString|toString(){}[0]
+    }
+
     final object I16x8Shl : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Shl|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Shl.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I16x8Shl.hashCode|hashCode(){}[0]
@@ -4680,6 +4746,42 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Neg.toString|toString(){}[0]
     }
 
+    final object I32x4RelaxedDotI8x16I7x16AddS : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedDotI8x16I7x16AddS|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedDotI8x16I7x16AddS.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedDotI8x16I7x16AddS.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedDotI8x16I7x16AddS.toString|toString(){}[0]
+    }
+
+    final object I32x4RelaxedLaneselect : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedLaneselect|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedLaneselect.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedLaneselect.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedLaneselect.toString|toString(){}[0]
+    }
+
+    final object I32x4RelaxedTruncF32x4S : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF32x4S|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF32x4S.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF32x4S.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF32x4S.toString|toString(){}[0]
+    }
+
+    final object I32x4RelaxedTruncF32x4U : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF32x4U|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF32x4U.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF32x4U.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF32x4U.toString|toString(){}[0]
+    }
+
+    final object I32x4RelaxedTruncF64x2SZero : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF64x2SZero|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF64x2SZero.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF64x2SZero.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF64x2SZero.toString|toString(){}[0]
+    }
+
+    final object I32x4RelaxedTruncF64x2UZero : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF64x2UZero|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF64x2UZero.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF64x2UZero.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4RelaxedTruncF64x2UZero.toString|toString(){}[0]
+    }
+
     final object I32x4Shl : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Shl|null[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Shl.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I32x4Shl.hashCode|hashCode(){}[0]
@@ -4852,6 +4954,12 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Neg.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Neg.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Neg.toString|toString(){}[0]
+    }
+
+    final object I64x2RelaxedLaneselect : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2RelaxedLaneselect|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2RelaxedLaneselect.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2RelaxedLaneselect.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2RelaxedLaneselect.toString|toString(){}[0]
     }
 
     final object I64x2Shl : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I64x2Shl|null[0]
@@ -5032,6 +5140,18 @@ sealed interface io.github.charlietap.chasm.ast.instruction/VectorInstruction : 
         final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Popcnt.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Popcnt.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Popcnt.toString|toString(){}[0]
+    }
+
+    final object I8x16RelaxedLaneselect : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16RelaxedLaneselect|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16RelaxedLaneselect.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16RelaxedLaneselect.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16RelaxedLaneselect.toString|toString(){}[0]
+    }
+
+    final object I8x16RelaxedSwizzle : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16RelaxedSwizzle|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16RelaxedSwizzle.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16RelaxedSwizzle.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16RelaxedSwizzle.toString|toString(){}[0]
     }
 
     final object I8x16Shl : io.github.charlietap.chasm.ast.instruction/VectorInstruction { // io.github.charlietap.chasm.ast.instruction/VectorInstruction.I8x16Shl|null[0]

@@ -26,16 +26,13 @@ sweet {
     )
     limitedSupport = listOf(
         LimitedSupport(
-            setOf("simd_*/**", "**/simd_*"),
-            SemanticPhase.DECODING,
+            setOf("simd_*/**", "**/simd_*", "**/relaxed_*", "**/*_relaxed_*"),
+            SemanticPhase.VALIDATION,
         ),
         LimitedSupport(
             setOf("**/*64.wast", "**/memory64*", "table_copy_mixed.wast"),
             SemanticPhase.VALIDATION,
         ),
-    )
-    excludes = listOf(
-        "**/relaxed_*", "**/*_relaxed_*", // Features relaxed simd opcodes
     )
 }
 
