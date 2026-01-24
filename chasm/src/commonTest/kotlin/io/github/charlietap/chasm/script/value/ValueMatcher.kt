@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.script.value
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
+import io.github.charlietap.chasm.runtime.value.VectorValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 
 typealias ValueMatcher = (ExecutionValue, ExecutionValue) -> Boolean
@@ -13,6 +14,7 @@ fun ValueMatcher(
 ): Boolean = when {
     first is NumberValue.F32 && second is NumberValue.F32 -> compareFloats(first.value, second.value)
     first is NumberValue.F64 && second is NumberValue.F64 -> compareDoubles(first.value, second.value)
+    first is VectorValue.V128 && second is VectorValue.V128 -> first.v128.contentEquals(second.v128)
     first is ReferenceValue.Null -> {
         when (first.heapType) {
             is AbstractHeapType.Any ->

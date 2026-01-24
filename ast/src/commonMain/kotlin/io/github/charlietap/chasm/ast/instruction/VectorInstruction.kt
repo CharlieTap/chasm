@@ -1,47 +1,73 @@
 package io.github.charlietap.chasm.ast.instruction
 
+import io.github.charlietap.chasm.ast.module.Index
 import kotlin.jvm.JvmInline
 
 sealed interface VectorInstruction : Instruction {
-    @JvmInline
-    value class V128Load(val memArg: MemArg) : VectorInstruction
 
-    @JvmInline
-    value class V128Load8Splat(val memArg: MemArg) : VectorInstruction
+    data class V128Load(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    @JvmInline
-    value class V128Load16Splat(val memArg: MemArg) : VectorInstruction
+    data class V128Load8x8S(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    @JvmInline
-    value class V128Load32Splat(val memArg: MemArg) : VectorInstruction
+    data class V128Load8x8U(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    @JvmInline
-    value class V128Load64Splat(val memArg: MemArg) : VectorInstruction
+    data class V128Load16x4S(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    data class V128Load8Lane(val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+    data class V128Load16x4U(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    data class V128Load16Lane(val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+    data class V128Load32x2S(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    data class V128Load32Lane(val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+    data class V128Load32x2U(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    data class V128Load64Lane(val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+    data class V128Load8Splat(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    @JvmInline
-    value class V128Store(val memArg: MemArg) : VectorInstruction
+    data class V128Load16Splat(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    data class V128Store8Lane(val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+    data class V128Load32Splat(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    data class V128Store16Lane(val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+    data class V128Load64Splat(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    data class V128Store32Lane(val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+    data class V128Load32Zero(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
 
-    data class V128Store64Lane(val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+    data class V128Load64Zero(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
+
+    data class V128Store(val memoryIndex: Index.MemoryIndex, val memArg: MemArg) : VectorInstruction
+
+    data class V128Load8Lane(val memoryIndex: Index.MemoryIndex, val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+
+    data class V128Load16Lane(val memoryIndex: Index.MemoryIndex, val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+
+    data class V128Load32Lane(val memoryIndex: Index.MemoryIndex, val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+
+    data class V128Load64Lane(val memoryIndex: Index.MemoryIndex, val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+
+    data class V128Store8Lane(val memoryIndex: Index.MemoryIndex, val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+
+    data class V128Store16Lane(val memoryIndex: Index.MemoryIndex, val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+
+    data class V128Store32Lane(val memoryIndex: Index.MemoryIndex, val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
+
+    data class V128Store64Lane(val memoryIndex: Index.MemoryIndex, val memArg: MemArg, val laneIdx: Byte) : VectorInstruction
 
     @JvmInline
     value class V128Const(val bytes: ByteArray) : VectorInstruction
 
     @JvmInline
     value class I8x16Shuffle(val laneIndices: ByteArray) : VectorInstruction
+
+    data object I8x16Swizzle : VectorInstruction
+
+    data object I8x16Splat : VectorInstruction
+
+    data object I16x8Splat : VectorInstruction
+
+    data object I32x4Splat : VectorInstruction
+
+    data object I64x2Splat : VectorInstruction
+
+    data object F32x4Splat : VectorInstruction
+
+    data object F64x2Splat : VectorInstruction
 
     @JvmInline
     value class I8x16ExtractLaneS(val laneIdx: Byte) : VectorInstruction
@@ -84,24 +110,6 @@ sealed interface VectorInstruction : Instruction {
 
     @JvmInline
     value class F64x2ReplaceLane(val laneIdx: Byte) : VectorInstruction
-
-    @JvmInline
-    value class I8x16Splat(val value: Byte) : VectorInstruction
-
-    @JvmInline
-    value class I16x8Splat(val value: Short) : VectorInstruction
-
-    @JvmInline
-    value class I32x4Splat(val value: Int) : VectorInstruction
-
-    @JvmInline
-    value class I64x2Splat(val value: Long) : VectorInstruction
-
-    @JvmInline
-    value class F32x4Splat(val value: Float) : VectorInstruction
-
-    @JvmInline
-    value class F64x2Splat(val value: Double) : VectorInstruction
 
     data object I8x16Eq : VectorInstruction
 
@@ -255,6 +263,10 @@ sealed interface VectorInstruction : Instruction {
 
     data object I8x16AvgrU : VectorInstruction
 
+    data object I16x8ExtaddPairwiseI8x16S : VectorInstruction
+
+    data object I16x8ExtaddPairwiseI8x16U : VectorInstruction
+
     data object I16x8Abs : VectorInstruction
 
     data object I16x8Neg : VectorInstruction
@@ -306,6 +318,14 @@ sealed interface VectorInstruction : Instruction {
     data object I16x8MaxU : VectorInstruction
 
     data object I16x8AvgrU : VectorInstruction
+
+    data object I16x8ExtmulLowI8x16S : VectorInstruction
+
+    data object I16x8ExtmulHighI8x16S : VectorInstruction
+
+    data object I16x8ExtmulLowI8x16U : VectorInstruction
+
+    data object I16x8ExtmulHighI8x16U : VectorInstruction
 
     data object I32x4ExtaddPairwiseI16x8S : VectorInstruction
 

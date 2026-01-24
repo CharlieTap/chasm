@@ -73,4 +73,12 @@ sealed interface Value {
     @Serializable
     @SerialName("structref")
     data class StructRef(val value: String? = null): Value
+
+    @Serializable
+    @SerialName("v128")
+    data class V128(
+        @SerialName("lane_type")
+        val laneType: String,
+        val value: List<String>
+    ): Value
 }
