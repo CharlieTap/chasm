@@ -5,7 +5,6 @@ import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.chasm)
     alias(libs.plugins.metro)
 
@@ -26,7 +25,7 @@ chasm {
 
 android {
     compileSdk = libs.versions.compile.sdk.get().toInt()
-    namespace = libs.versions.application.namespace.get()
+    namespace = "com.tap.chasm.consumer.fibonacci"
 
     compileOptions {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.java.bytecode.version.get())

@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.gradle
 
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
-import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import io.github.charlietap.chasm.chasm_gradle_plugin.BuildConfig
 import org.gradle.api.Plugin
@@ -127,7 +126,6 @@ class ChasmPlugin : Plugin<Project> {
         }
 
         project.plugins.withId("com.android.base") {
-            val androidExtension = project.extensions.getByType(BaseExtension::class.java)
             val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
 
             addVMRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
@@ -141,7 +139,7 @@ class ChasmPlugin : Plugin<Project> {
 
                     val task = registerCodegenTask(project, this, variant.name, workerClasspath)
                     variant.sources.java?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
-                    androidExtension.sourceSets.getByName(variant.name).kotlin.srcDir(project.layout.buildDirectory.dir("generated/java/${task.name}"))
+                    variant.sources.kotlin?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
                 }
             }
         }
