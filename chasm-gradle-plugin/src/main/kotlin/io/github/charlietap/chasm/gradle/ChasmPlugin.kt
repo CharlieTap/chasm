@@ -7,9 +7,11 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 import io.github.charlietap.chasm.chasm_gradle_plugin.BuildConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.Usage
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
@@ -26,9 +28,12 @@ import kotlin.jvm.java
 
 class ChasmPlugin : Plugin<Project> {
 
+    @Suppress("DEPRECATION")
     override fun apply(project: Project) {
 
         val extension = project.extensions.create<ChasmExtension>("chasm")
+
+        val workerClasspath = createWorkerClasspathConfiguration(project)
 
         project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
             val mpp = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
@@ -40,10 +45,14 @@ class ChasmPlugin : Plugin<Project> {
                             val commonMainSourceSet = mpp.sourceSets.getByName("commonMain")
                             addVMRuntimeForKmp(project, extension.runtimeDependencyConfiguration.get(), commonMainSourceSet)
 
-                            val task = registerCodegenTask(project, this, "commonMain")
+                            val task = registerCodegenTask(project, this, "commonMain", workerClasspath)
                             commonMainSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
                         }
                         Mode.PRODUCER -> {
+                            project.logger.warn(
+                                "Producer mode is deprecated and will be removed in a future release. " +
+                                    "For a more robust solution, see https://github.com/CharlieTap/glueball",
+                            )
                             // For producers, we can't add the common target as it lacks support for wasm
                             // instead we configure every target other than wasm individually
                             mpp.targets.configureEach {
@@ -75,7 +84,7 @@ class ChasmPlugin : Plugin<Project> {
                                 val mjsFile = executable.binaries.first().mainFile.get().asFile
                                 val binary = File(mjsFile.parentFile, mjsFile.nameWithoutExtension + ".wasm")
 
-                                val task = registerCodegenTask(project, this, target.name, binary)
+                                val task = registerCodegenTask(project, this, target.name, workerClasspath, binary)
                                 task.dependsOn(executable.binaries.first().linkTask)
 
                                 nonWasmSourceSets.forEach { nonWasmSourceSet ->
@@ -110,7 +119,7 @@ class ChasmPlugin : Plugin<Project> {
                     return@configureEach
                 }
 
-                val task = registerCodegenTask(project, this, MAIN_COMPILATION_NAME)
+                val task = registerCodegenTask(project, this, MAIN_COMPILATION_NAME, workerClasspath)
                 mainCompilation.defaultSourceSet {
                     kotlin.srcDir(task.flatMap { it.outputDirectory })
                 }
@@ -130,7 +139,7 @@ class ChasmPlugin : Plugin<Project> {
                         return@configureEach
                     }
 
-                    val task = registerCodegenTask(project, this, variant.name)
+                    val task = registerCodegenTask(project, this, variant.name, workerClasspath)
                     variant.sources.java?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
                     androidExtension.sourceSets.getByName(variant.name).kotlin.srcDir(project.layout.buildDirectory.dir("generated/java/${task.name}"))
                 }
@@ -146,16 +155,45 @@ class ChasmPlugin : Plugin<Project> {
         }
     }
 
+    private fun createWorkerClasspathConfiguration(project: Project): Configuration {
+        return project.configurations.create(WORKER_CLASSPATH_CONFIGURATION_NAME) {
+            isCanBeConsumed = false
+            isCanBeResolved = true
+            isTransitive = true
+            description = "Classpath for the chasm codegen worker"
+
+            attributes {
+                attribute(
+                    Usage.USAGE_ATTRIBUTE,
+                    project.objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
+                )
+                attribute(
+                    Category.CATEGORY_ATTRIBUTE,
+                    project.objects.named(Category::class.java, Category.LIBRARY),
+                )
+            }
+        }.also { config ->
+            val chasmDep = resolveChasmRuntimeNotation()
+            val vmDep = resolveVMRuntimeNotation()
+            project.dependencies.add(config.name, chasmDep)
+            project.dependencies.add(config.name, vmDep)
+        }
+    }
+
     private fun registerCodegenTask(
         project: Project,
         module: WasmModule,
         sourceSetName: String,
+        classpath: Configuration,
         moduleBinary: File? = null,
     ): TaskProvider<CodegenTask> {
         val capitalizedSourceName = sourceSetName.replaceFirstChar { it.uppercase() }
         return project.tasks.register<CodegenTask>("codegenModule$capitalizedSourceName${module.name}") {
             group = "chasm"
             description = "Generates a typesafe Kotlin interface from a wasm binary"
+
+            workerClasspath.from(classpath)
+
             moduleBinary?.let {
                 binary.set(moduleBinary)
             } ?: binary.set(module.binary)
@@ -244,6 +282,13 @@ class ChasmPlugin : Plugin<Project> {
         return "$group:$artifact:$version"
     }
 
+    private fun resolveChasmRuntimeNotation(): Any {
+        val group = RUNTIME_GROUP
+        val artifact = CHASM_ARTIFACT
+        val version = BuildConfig.RUNTIME_VERSION
+        return "$group:$artifact:$version"
+    }
+
     private fun runtimeDependencyExists(
         project: Project,
         configurationName: String,
@@ -258,5 +303,7 @@ class ChasmPlugin : Plugin<Project> {
         private const val RUNTIME_GROUP = "io.github.charlietap.chasm"
         private const val RUNTIME_ARTIFACT = "vm"
         private const val RUNTIME_JVM_ARTIFACT_SUFFIX = "jvm"
+        private const val CHASM_ARTIFACT = "chasm"
+        private const val WORKER_CLASSPATH_CONFIGURATION_NAME = "chasmCodegenWorkerClasspath"
     }
 }

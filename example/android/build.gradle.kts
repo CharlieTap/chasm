@@ -56,7 +56,6 @@ dependencies {
     implementation(projects.consumerAndroidFibonacci)
     implementation(projects.consumerJvmTest)
     implementation(projects.consumerMultiplatformFactorial)
-    implementation(projects.producer)
 
     implementation(libs.bundles.androidx)
     implementation(libs.bundles.compose.ui)

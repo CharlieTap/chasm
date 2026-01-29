@@ -66,7 +66,7 @@ android-library = { id = "com.android.library", version.ref = "android-build-too
 android-test = { id = "com.android.test", version.ref = "android-build-tools-plugin" }
 bolt = { id = "io.github.charlietap.bolt.plugin" }
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config-plugin" }
-chasm = { id = "io.github.charlietap.chasm.gradle", version.ref = "plugin-version-name" }
+chasm = { id = "io.github.charlietap.chasm.gradle" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref="dependency-analysis" }
 dokka = { id = "org.jetbrains.dokka", version.ref="dokka" }

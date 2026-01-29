@@ -1,17 +1,15 @@
 package io.github.charlietap.chasm.gradle
 
-import io.github.charlietap.chasm.config.ModuleConfig
-import io.github.charlietap.chasm.embedding.module
-import io.github.charlietap.chasm.embedding.moduleInfo
-import io.github.charlietap.chasm.embedding.shapes.expect
-import io.github.charlietap.chasm.embedding.shapes.map
+import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
@@ -19,12 +17,19 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.ClassLoaderWorkerSpec
+import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
 @CacheableTask
 abstract class CodegenTask
     @Inject
-    constructor() : DefaultTask() {
+    constructor(
+        private val workerExecutor: WorkerExecutor,
+    ) : DefaultTask() {
+
+        @get:Classpath
+        abstract val workerClasspath: ConfigurableFileCollection
 
         @get:InputFile
         @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -63,35 +68,42 @@ abstract class CodegenTask
 
         @TaskAction
         fun generate() {
-
-            val moduleConfig = ModuleConfig(
-                decodeNameSection = true,
-            )
-            val info = module(binary.get().asFile.readBytes(), moduleConfig)
-                .map { module ->
-                    moduleInfo(module)
-                }.expect("Failed to find module at path: ${binary.get().asFile.absolutePath}")
-
-            val factory = WasmInterfaceFactory()
-            val generator = WasmInterfaceGenerator()
-            val logger = PluginLogger(logger)
-
-            val data = factory(
-                interfaceName = interfaceName.get(),
-                packageName = packageName.get(),
-                config = config.get(),
-                info = info,
-                allocator = allocator.orNull,
-                initializers = initializers.get(),
-                wasmFunctions = functions.get(),
-                ignoredExports = ignoredExports.get(),
-                logger = logger,
-            )
-            val specs = generator(interfaceVisibility.get(), implementationVisibility.get(), data)
-
+            val binaryFile = binary.get().asFile
             val outputDir = outputDirectory.get().asFile
-            specs.forEach { spec ->
-                spec.writeTo(outputDir)
+            val interfaceNameValue = interfaceName.get()
+            val packageNameValue = packageName.get()
+            val interfaceVisibilityValue = interfaceVisibility.get()
+            val implementationVisibilityValue = implementationVisibility.get()
+            val codegenConfigValue = config.get()
+            val allocatorValue = allocator.orNull
+            val initializerNames = initializers.get()
+            val wasmFunctions = functions.get()
+            val ignoredExportNames = ignoredExports.get()
+
+            val workQueue = workerExecutor.classLoaderIsolation {
+                classpath.from(workerClasspath)
+            }
+
+            workQueue.submit(CodegenWorkAction::class.java) {
+
+                binaryPath.set(binaryFile.absolutePath)
+                outputDirectoryPath.set(outputDir.absolutePath)
+                interfaceName.set(interfaceNameValue)
+                packageName.set(packageNameValue)
+                interfaceVisibility.set(interfaceVisibilityValue.name)
+                implementationVisibility.set(implementationVisibilityValue.name)
+
+                configGenerateTypesafeGlobalProperties.set(codegenConfigValue.generateTypesafeGlobalProperties)
+
+                hasAllocator.set(allocatorValue != null)
+                allocatorValue?.let {
+                    allocatorAllocationFunction.set(it.allocationFunction)
+                    allocatorDeallocationFunction.set(it.deallocationFunction)
+                }
+
+                initializers.set(initializerNames)
+                functions.set(wasmFunctions.map { it.toWorkData() })
+                ignoredExports.set(ignoredExportNames)
             }
         }
     }

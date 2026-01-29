@@ -7,7 +7,6 @@ import com.test.chasm.FactorialService
 import com.test.chasm.FibonacciService
 import com.test.chasm.StringService
 import com.test.chasm.TestService
-import com.test.chasm.producer.ProducerService
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
@@ -26,14 +25,12 @@ import kotlinx.coroutines.launch
 class ChasmViewModel(
     private val factorialService: FactorialService,
     private val fibonacciService: FibonacciService,
-    private val producerService: ProducerService,
     private val stringService: StringService,
     private val testService: TestService,
 ) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>() {
 
     init {
         factorialPrinter()
-        producerPrinter()
         testPrinter()
     }
 
@@ -81,11 +78,6 @@ class ChasmViewModel(
     private fun factorialPrinter() {
         val factorial = factorialService.factorial(5)
         Log.d("ChasmViewModel", "factorial: $factorial")
-    }
-
-    private fun producerPrinter() {
-        val gcd = producerService.gcd(48, 18)
-        Log.d("ChasmViewModel", "greatest common divisor: $gcd")
     }
 
     private fun testPrinter() {
