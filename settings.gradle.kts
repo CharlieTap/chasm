@@ -5,6 +5,8 @@ pluginManagement {
         mavenCentral()
     }
 
+    includeBuild("bolt")
+    includeBuild("sweet")
     includeBuild("gradle/plugins/kmp-conventions")
     includeBuild("gradle/plugins/linting-conventions")
     includeBuild("gradle/plugins/publishing-conventions")
@@ -12,7 +14,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.develocity") version ("4.1")
+    id("com.gradle.develocity") version ("4.3.2")
     id("org.gradle.toolchains.foojay-resolver-convention") version("1.0.0")
 }
 
@@ -80,8 +82,6 @@ include(":type-system")
 include(":validator")
 include(":vm")
 
-includeBuild("bolt")
-//includeBuild("example")
 includeBuild("sweet")
 
 rootProject.name = "chasm-multiplatform"

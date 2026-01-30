@@ -8,6 +8,19 @@ pluginManagement {
     includeBuild("../gradle/plugins/linting-conventions")
 }
 
+plugins {
+    id("com.gradle.develocity") version ("4.3.2")
+}
+
+develocity {
+    buildScan {
+        termsOfUseUrl = "https://gradle.com/terms-of-service"
+        termsOfUseAgree = "yes"
+
+        publishing.onlyIf { _ -> !System.getenv("GITHUB_ACTIONS").isNullOrEmpty() }
+    }
+}
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {

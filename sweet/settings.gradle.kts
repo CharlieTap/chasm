@@ -32,4 +32,6 @@ dependencyResolutionManagement {
 include("lib")
 include("plugin")
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "sweet-gradle-plugin"
