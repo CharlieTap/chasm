@@ -40,7 +40,7 @@ class ElementModuleTest {
     @Test
     fun `can decode an element module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/element.wasm").readBytes()
+        val byteStream = Resource("element.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

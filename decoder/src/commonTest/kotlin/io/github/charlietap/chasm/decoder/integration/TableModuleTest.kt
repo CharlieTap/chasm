@@ -24,7 +24,7 @@ class TableModuleTest {
     @Test
     fun `can decode a table module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/table.wasm").readBytes()
+        val byteStream = Resource("table.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

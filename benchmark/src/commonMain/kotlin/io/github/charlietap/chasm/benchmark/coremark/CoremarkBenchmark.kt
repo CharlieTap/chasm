@@ -54,6 +54,6 @@ class CoremarkBenchmark {
     }
 
     companion object {
-        private const val FILE_DIR = "src/commonMain/resources/benchmark/"
+        private const val FILE_DIR = "benchmark/"
     }
 }

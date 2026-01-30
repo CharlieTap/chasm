@@ -22,7 +22,7 @@ class GlobalModuleTest {
     @Test
     fun `can decode a global module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/global.wasm").readBytes()
+        val byteStream = Resource("global.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

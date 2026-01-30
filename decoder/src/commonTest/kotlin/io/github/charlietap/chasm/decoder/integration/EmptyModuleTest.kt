@@ -14,7 +14,7 @@ class EmptyModuleTest {
     @Test
     fun `can decode an empty module`() {
 
-        val byteStream = Resource("src/commonTest/resources/empty.wasm").readBytes()
+        val byteStream = Resource("empty.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

@@ -58,6 +58,6 @@ class HostFunctionExceptionTest {
     }
 
     companion object {
-        private const val FILE_DIR = "src/commonTest/resources/integration/"
+        private const val FILE_DIR = "integration/"
     }
 }

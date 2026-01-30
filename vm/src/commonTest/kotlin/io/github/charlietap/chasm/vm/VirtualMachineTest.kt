@@ -405,6 +405,6 @@ class VirtualMachineTest {
     }
 
     companion object {
-        private const val FILE_DIR = "src/commonTest/resources/"
+        private const val FILE_DIR = ""
     }
 }

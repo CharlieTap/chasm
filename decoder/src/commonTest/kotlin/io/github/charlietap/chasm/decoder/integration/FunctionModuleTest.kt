@@ -31,7 +31,7 @@ class FunctionModuleTest {
     @Test
     fun `can decode a function module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/function.wasm").readBytes()
+        val byteStream = Resource("function.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

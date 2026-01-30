@@ -32,7 +32,7 @@ class TypeModuleTest {
     @Test
     fun `can decode a type module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/type.wasm").readBytes()
+        val byteStream = Resource("type.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

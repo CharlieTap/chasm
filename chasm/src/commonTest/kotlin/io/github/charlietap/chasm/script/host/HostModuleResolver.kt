@@ -20,4 +20,4 @@ fun HostModuleResolver(store: Store): Instance {
         }.expect("Failed to instantiate script host module")
 }
 
-private const val FILE_HOST_MODULE = "src/commonTest/resources/script/spectest-host.wasm"
+private const val FILE_HOST_MODULE = "script/spectest-host.wasm"

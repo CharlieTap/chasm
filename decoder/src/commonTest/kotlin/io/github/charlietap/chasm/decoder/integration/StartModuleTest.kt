@@ -27,7 +27,7 @@ class StartModuleTest {
     @Test
     fun `can decode a start module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/start.wasm").readBytes()
+        val byteStream = Resource("start.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

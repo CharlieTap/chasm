@@ -31,6 +31,6 @@ class ModuleTest {
     }
 
     private companion object {
-        const val FILE_DIR = "src/commonTest/resources/embedding/"
+        const val FILE_DIR = "embedding/"
     }
 }

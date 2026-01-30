@@ -36,7 +36,7 @@ class ImportModuleTest {
     @Test
     fun `can decode an import module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/import.wasm").readBytes()
+        val byteStream = Resource("import.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

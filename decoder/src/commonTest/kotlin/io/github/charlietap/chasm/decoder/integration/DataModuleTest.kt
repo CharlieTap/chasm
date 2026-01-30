@@ -22,7 +22,7 @@ class DataModuleTest {
     @Test
     fun `can decode a data module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/data.wasm").readBytes()
+        val byteStream = Resource("data.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

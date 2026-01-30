@@ -8,6 +8,7 @@ plugins {
 
     alias(libs.plugins.conventions.kmp)
     alias(libs.plugins.conventions.linting)
+    alias(libs.plugins.kotlinx.test.resources)
 }
 
 allOpen {

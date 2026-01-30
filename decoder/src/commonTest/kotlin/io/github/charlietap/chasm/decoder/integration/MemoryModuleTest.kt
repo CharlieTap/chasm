@@ -19,7 +19,7 @@ class MemoryModuleTest {
     @Test
     fun `can decode a memory module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/memory.wasm").readBytes()
+        val byteStream = Resource("memory.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)

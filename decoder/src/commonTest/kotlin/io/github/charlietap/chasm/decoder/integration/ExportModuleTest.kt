@@ -43,7 +43,7 @@ class ExportModuleTest {
     @Test
     fun `can decode an export module section`() {
 
-        val byteStream = Resource("src/commonTest/resources/export.wasm").readBytes()
+        val byteStream = Resource("export.wasm").readBytes()
 
         val config = moduleConfig()
         val reader = FakeSourceReader(byteStream)
