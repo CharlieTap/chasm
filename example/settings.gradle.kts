@@ -4,7 +4,13 @@ pluginManagement {
         google()
         mavenCentral()
     }
-    includeBuild("..")
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "io.github.charlietap.chasm.gradle") {
+                useModule("io.github.charlietap.chasm:chasm-gradle-plugin:${requested.version}")
+            }
+        }
+    }
     includeBuild("../gradle/plugins/linting-conventions")
 }
 
@@ -35,6 +41,7 @@ dependencyResolutionManagement {
 
 includeBuild("..") {
     dependencySubstitution {
+        substitute(module("io.github.charlietap.chasm:chasm-gradle-plugin")).using(project(":chasm-gradle-plugin"))
         substitute(module("io.github.charlietap.chasm:vm")).using(project(":vm"))
         substitute(module("io.github.charlietap.chasm:vm-jvm")).using(project(":vm"))
         substitute(module("io.github.charlietap.chasm:chasm")).using(project(":chasm"))
