@@ -47,15 +47,13 @@ kotlin {
     }
 
     dependencies {
-        implementation(projects.chasm)?.because("We use the module and moduleInfo calls during codegen")
-        implementation(projects.vm)
+        api(projects.chasmGradlePluginApi)
+        api(projects.chasmGradlePluginCodegen)
+        implementation(projects.chasmGradlePluginCompat)
+        implementation(projects.chasmGradlePluginAgp8)
+        implementation(projects.chasmGradlePluginAgp9)
 
         implementation(libs.kotlin.gradle.plugin)
-        implementation(libs.android.gradle.plugin)
-        implementation(libs.kotlin.poet)
-
-        testImplementation(libs.kotlin.test)
-        testImplementation(projects.test.fixture.chasm)
     }
 }
 

@@ -150,6 +150,7 @@ internal fun Type.toSerializedTypeName(): String {
         Scalar.String -> "String"
         Scalar.Unit -> "Unit"
         is Aggregate -> throw IllegalArgumentException("Aggregate types not supported in WasmFunction definitions")
+        else -> throw IllegalArgumentException("Unknown type: $this")
     }
 }
 

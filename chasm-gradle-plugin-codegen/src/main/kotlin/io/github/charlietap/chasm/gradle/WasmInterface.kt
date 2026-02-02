@@ -1,19 +1,7 @@
 package io.github.charlietap.chasm.gradle
 
 import io.github.charlietap.chasm.vm.WasmVirtualMachine
-import java.io.Serializable
 import kotlin.reflect.KClass
-
-sealed interface Type : Serializable
-
-enum class Scalar : Type {
-    Integer,
-    Long,
-    Float,
-    Double,
-    String,
-    Unit,
-}
 
 internal data class Aggregate(
     val generated: GeneratedType,

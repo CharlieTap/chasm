@@ -30,6 +30,7 @@ internal class FunctionGenerator {
             Scalar.String -> STRING
             Scalar.Unit -> UNIT
             is Aggregate -> ClassName(packageName, type.generated.name)
+            else -> throw IllegalArgumentException("Unsupported return type: $type")
         }
         returns(type)
     }.build()
