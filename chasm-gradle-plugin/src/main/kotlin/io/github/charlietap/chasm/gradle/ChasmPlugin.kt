@@ -1,18 +1,14 @@
 package io.github.charlietap.chasm.gradle
 
-import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.api.variant.Variant
-import com.android.build.gradle.internal.tasks.factory.dependsOn
 import io.github.charlietap.chasm.chasm_gradle_plugin.BuildConfig
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -84,7 +80,9 @@ class ChasmPlugin : Plugin<Project> {
                                 val binary = File(mjsFile.parentFile, mjsFile.nameWithoutExtension + ".wasm")
 
                                 val task = registerCodegenTask(project, this, target.name, workerClasspath, binary)
-                                task.dependsOn(executable.binaries.first().linkTask)
+                                task.configure {
+                                    dependsOn(executable.binaries.first().linkTask)
+                                }
 
                                 nonWasmSourceSets.forEach { nonWasmSourceSet ->
                                     nonWasmSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
@@ -126,22 +124,21 @@ class ChasmPlugin : Plugin<Project> {
         }
 
         project.plugins.withId("com.android.base") {
-            val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
+            val agpVersion = AgpVersion.detect()
+                ?: throw GradleException("Chasm Gradle plugin requires Android Gradle Plugin on the classpath.")
+            val configurer = loadAndroidConfigurer(agpVersion)
 
             addVMRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
 
-            androidComponents.onVariants { variant: Variant ->
-                extension.modules.configureEach {
-                    if (extension.mode.get() == Mode.PRODUCER) {
-                        project.logger.error("Producer mode is only supported for Kotlin Multiplatform projects with WASM targets")
-                        return@configureEach
-                    }
-
-                    val task = registerCodegenTask(project, this, variant.name, workerClasspath)
-                    variant.sources.java?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
-                    variant.sources.kotlin?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
-                }
-            }
+            val androidComponents = project.extensions.getByName("androidComponents")
+            configurer.configure(
+                androidComponents = androidComponents,
+                context = AndroidConfigContext(
+                    project = project,
+                    extension = extension,
+                    workerClasspath = workerClasspath,
+                ),
+            )
         }
 
         project.gradle.projectsEvaluated {
@@ -178,33 +175,26 @@ class ChasmPlugin : Plugin<Project> {
         }
     }
 
-    private fun registerCodegenTask(
-        project: Project,
-        module: WasmModule,
-        sourceSetName: String,
-        classpath: Configuration,
-        moduleBinary: File? = null,
-    ): TaskProvider<CodegenTask> {
-        val capitalizedSourceName = sourceSetName.replaceFirstChar { it.uppercase() }
-        return project.tasks.register<CodegenTask>("codegenModule$capitalizedSourceName${module.name}") {
-            group = "chasm"
-            description = "Generates a typesafe Kotlin interface from a wasm binary"
+    private fun loadAndroidConfigurer(agpVersion: AgpVersion): AndroidConfigurer {
+        if (agpVersion.major < 8) {
+            throw GradleException("Chasm Gradle plugin requires AGP 8.x or newer. Found $agpVersion.")
+        }
 
-            workerClasspath.from(classpath)
+        val implementationClass = when (agpVersion.major) {
+            8 -> "io.github.charlietap.chasm.gradle.agp.Agp8AndroidConfigurer"
+            9 -> "io.github.charlietap.chasm.gradle.agp.Agp9AndroidConfigurer"
+            else -> null
+        } ?: throw GradleException("Chasm Gradle plugin does not support AGP $agpVersion.")
 
-            moduleBinary?.let {
-                binary.set(moduleBinary)
-            } ?: binary.set(module.binary)
-            allocator.set(module.allocator)
-            config.set(module.codegenConfig)
-            interfaceName.set(module.name)
-            packageName.set(module.packageName)
-            interfaceVisibility.set(module.interfaceVisibility)
-            implementationVisibility.set(module.implementationVisibility)
-            initializers.set(module.initializers)
-            functions.set(module.functions)
-            ignoredExports.set(module.ignoredExports)
-            outputDirectory.set(project.layout.buildDirectory.dir("generated/kotlin/$sourceSetName"))
+        return runCatching {
+            val implClass = Class.forName(implementationClass, true, javaClass.classLoader)
+            implClass.getDeclaredConstructor().newInstance() as AndroidConfigurer
+        }.getOrElse { error ->
+            throw GradleException(
+                "Failed to load Android integration for AGP $agpVersion. " +
+                    "Ensure the chasm Gradle plugin artifacts are on the classpath.",
+                error,
+            )
         }
     }
 

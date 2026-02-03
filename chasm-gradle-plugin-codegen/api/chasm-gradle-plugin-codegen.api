@@ -1,0 +1,88 @@
+public abstract class io/github/charlietap/chasm/gradle/CodegenTask : org/gradle/api/DefaultTask {
+	public fun <init> (Lorg/gradle/workers/WorkerExecutor;)V
+	public final fun generate ()V
+	public abstract fun getAllocator ()Lorg/gradle/api/provider/Property;
+	public abstract fun getBinary ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getConfig ()Lorg/gradle/api/provider/Property;
+	public abstract fun getFunctions ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getIgnoredExports ()Lorg/gradle/api/provider/SetProperty;
+	public abstract fun getImplementationVisibility ()Lorg/gradle/api/provider/Property;
+	public abstract fun getInitializers ()Lorg/gradle/api/provider/SetProperty;
+	public abstract fun getInterfaceName ()Lorg/gradle/api/provider/Property;
+	public abstract fun getInterfaceVisibility ()Lorg/gradle/api/provider/Property;
+	public abstract fun getOutputDirectory ()Lorg/gradle/api/file/DirectoryProperty;
+	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
+	public abstract fun getWorkerClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
+}
+
+public final class io/github/charlietap/chasm/gradle/CodegenTasksKt {
+	public static final fun registerCodegenTask (Lorg/gradle/api/Project;Lio/github/charlietap/chasm/gradle/WasmModule;Ljava/lang/String;Lorg/gradle/api/artifacts/Configuration;Ljava/io/File;)Lorg/gradle/api/tasks/TaskProvider;
+	public static synthetic fun registerCodegenTask$default (Lorg/gradle/api/Project;Lio/github/charlietap/chasm/gradle/WasmModule;Ljava/lang/String;Lorg/gradle/api/artifacts/Configuration;Ljava/io/File;ILjava/lang/Object;)Lorg/gradle/api/tasks/TaskProvider;
+}
+
+public abstract class io/github/charlietap/chasm/gradle/CodegenWorkAction : org/gradle/workers/WorkAction {
+	public fun <init> ()V
+	public fun execute ()V
+}
+
+public abstract interface class io/github/charlietap/chasm/gradle/CodegenWorkParameters : org/gradle/workers/WorkParameters {
+	public abstract fun getAllocatorAllocationFunction ()Lorg/gradle/api/provider/Property;
+	public abstract fun getAllocatorDeallocationFunction ()Lorg/gradle/api/provider/Property;
+	public abstract fun getBinaryPath ()Lorg/gradle/api/provider/Property;
+	public abstract fun getConfigGenerateTypesafeGlobalProperties ()Lorg/gradle/api/provider/Property;
+	public abstract fun getFunctions ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getHasAllocator ()Lorg/gradle/api/provider/Property;
+	public abstract fun getIgnoredExports ()Lorg/gradle/api/provider/SetProperty;
+	public abstract fun getImplementationVisibility ()Lorg/gradle/api/provider/Property;
+	public abstract fun getInitializers ()Lorg/gradle/api/provider/SetProperty;
+	public abstract fun getInterfaceName ()Lorg/gradle/api/provider/Property;
+	public abstract fun getInterfaceVisibility ()Lorg/gradle/api/provider/Property;
+	public abstract fun getOutputDirectoryPath ()Lorg/gradle/api/provider/Property;
+	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
+}
+
+public final class io/github/charlietap/chasm/gradle/WasmFunctionData : java/io/Serializable {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;Lio/github/charlietap/chasm/gradle/WasmReturnTypeData;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Lio/github/charlietap/chasm/gradle/WasmReturnTypeData;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;Lio/github/charlietap/chasm/gradle/WasmReturnTypeData;)Lio/github/charlietap/chasm/gradle/WasmFunctionData;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/gradle/WasmFunctionData;Ljava/lang/String;Ljava/util/List;Lio/github/charlietap/chasm/gradle/WasmReturnTypeData;ILjava/lang/Object;)Lio/github/charlietap/chasm/gradle/WasmFunctionData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getParameters ()Ljava/util/List;
+	public final fun getReturnType ()Lio/github/charlietap/chasm/gradle/WasmReturnTypeData;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/gradle/WasmParameterData : java/io/Serializable {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/Boolean;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/WasmParameterData;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/gradle/WasmParameterData;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/gradle/WasmParameterData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getStringAllocationStrategyFreeAfterCall ()Ljava/lang/Boolean;
+	public final fun getStringEncodingStrategy ()Ljava/lang/String;
+	public final fun getTypeName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/gradle/WasmReturnTypeData : java/io/Serializable {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/WasmReturnTypeData;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/gradle/WasmReturnTypeData;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/charlietap/chasm/gradle/WasmReturnTypeData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getStringEncodingStrategy ()Ljava/lang/String;
+	public final fun getTypeName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

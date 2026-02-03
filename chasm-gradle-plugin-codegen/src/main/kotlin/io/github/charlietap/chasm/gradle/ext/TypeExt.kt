@@ -20,6 +20,7 @@ internal fun Type.asValue() = when (this) {
     Scalar.Unit,
     is Aggregate,
     -> throw UnsupportedOperationException("Can't convert $this to ExecutionValue")
+    else -> throw UnsupportedOperationException("Unknown type: $this")
 }
 
 internal fun Type.asTypeName() = when (this) {
@@ -30,4 +31,5 @@ internal fun Type.asTypeName() = when (this) {
     Scalar.String -> STRING
     Scalar.Unit -> UNIT
     is Aggregate -> throw UnsupportedOperationException("Can't convert $this to ExecutionValue")
+    else -> throw UnsupportedOperationException("Unknown type: $this")
 }

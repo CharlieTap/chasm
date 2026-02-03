@@ -61,6 +61,7 @@ internal class WasmFunctionValidator {
                 }
             }
             Scalar.Unit -> emptyList()
+            else -> throw IllegalArgumentException("Unknown type: $input")
         }
     }
 }
