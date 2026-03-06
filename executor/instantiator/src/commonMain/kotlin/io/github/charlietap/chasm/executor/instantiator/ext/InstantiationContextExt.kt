@@ -8,6 +8,4 @@ internal inline fun InstantiationContext.asPredecodingContext() = PredecodingCon
     store = store,
     instructionCache = instructionCache,
     types = types,
-    loadCache = loadCache,
-    storeCache = storeCache,
 )

@@ -57,6 +57,7 @@ private fun compileInstructions(
                             blockType = instruction.blockType,
                             handlers = instruction.handlers,
                             instructions = compileInstructions(instruction.instructions),
+                            payloadDestinationSlots = instruction.payloadDestinationSlots,
                         )
                     }
                     is FusedControlInstruction.If -> {

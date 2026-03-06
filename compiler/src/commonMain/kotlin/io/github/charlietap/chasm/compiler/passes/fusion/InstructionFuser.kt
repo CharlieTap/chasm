@@ -69,7 +69,6 @@ internal inline fun InstructionFuser(
     is VariableInstruction.LocalGet,
     is AdminInstruction,
     is AtomicMemoryInstruction,
-    is ReferenceInstruction,
     is VectorInstruction,
     is FusedAggregateInstruction,
     is FusedControlInstruction,

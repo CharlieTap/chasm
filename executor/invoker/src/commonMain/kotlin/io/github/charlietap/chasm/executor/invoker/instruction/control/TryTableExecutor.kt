@@ -46,6 +46,8 @@ internal inline fun TryTableExecutor(
 
     val handler = ExceptionHandler(
         instructions = instruction.handlers,
+        payloadDestinationSlots = instruction.payloadDestinationSlots,
+        continuations = emptyList(),
         framesDepth = cstack.framesDepth(),
         labelsDepth = cstack.labelsDepth(),
         instructionsDepth = cstack.instructionsDepth(),

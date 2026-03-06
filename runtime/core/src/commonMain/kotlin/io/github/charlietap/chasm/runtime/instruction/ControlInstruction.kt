@@ -95,6 +95,7 @@ sealed interface ControlInstruction : LinkedInstruction {
         val results: Int,
         val handlers: List<CatchHandler>,
         val instructions: Array<DispatchableInstruction>,
+        val payloadDestinationSlots: List<List<Int>> = emptyList(),
     ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -106,6 +107,7 @@ sealed interface ControlInstruction : LinkedInstruction {
             if (results != other.results) return false
             if (handlers != other.handlers) return false
             if (!instructions.contentEquals(other.instructions)) return false
+            if (payloadDestinationSlots != other.payloadDestinationSlots) return false
 
             return true
         }
@@ -115,6 +117,7 @@ sealed interface ControlInstruction : LinkedInstruction {
             result = 31 * result + results
             result = 31 * result + handlers.hashCode()
             result = 31 * result + instructions.contentHashCode()
+            result = 31 * result + payloadDestinationSlots.hashCode()
             return result
         }
     }

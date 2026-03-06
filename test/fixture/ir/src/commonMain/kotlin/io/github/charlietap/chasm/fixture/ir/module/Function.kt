@@ -11,9 +11,15 @@ fun function(
     typeIndex: Index.TypeIndex = typeIndex(),
     locals: List<Local> = emptyList(),
     body: Expression = expression(),
+    frameSlots: Int = 0,
+    frameSlotMode: Boolean = false,
+    returnSlots: List<Int> = emptyList(),
 ) = Function(
     idx = idx,
     typeIndex = typeIndex,
     locals = locals,
     body = body,
+    frameSlots = frameSlots,
+    frameSlotMode = frameSlotMode,
+    returnSlots = returnSlots,
 )

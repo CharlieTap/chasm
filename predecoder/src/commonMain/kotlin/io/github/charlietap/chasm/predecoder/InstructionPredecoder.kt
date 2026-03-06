@@ -95,8 +95,9 @@ internal inline fun InstructionPredecoder(
     crossinline variableInstructionPredecoder: Predecoder<VariableInstruction, DispatchableInstruction>,
     crossinline vectorInstructionPredecoder: Predecoder<VectorInstruction, DispatchableInstruction>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
+    val cacheKey = context.instructionCacheKey(instruction)
 
-    var dispatchable = context.instructionCache[instruction]
+    var dispatchable = context.instructionCache[cacheKey]
 
     if (dispatchable == null) {
         dispatchable = when (instruction) {
@@ -120,7 +121,7 @@ internal inline fun InstructionPredecoder(
             is VariableInstruction -> variableInstructionPredecoder(context, instruction).bind()
             is VectorInstruction -> vectorInstructionPredecoder(context, instruction).bind()
         }
-        context.instructionCache[instruction] = dispatchable
+        context.instructionCache[cacheKey] = dispatchable
     }
 
     dispatchable

@@ -10,6 +10,8 @@ import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedIf
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedLocalSet
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedSelect
+import io.github.charlietap.chasm.fixture.ir.instruction.globalGetInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.globalSetInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32AddInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstOperand
@@ -24,6 +26,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.valueStackDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.valueStackOperand
 import io.github.charlietap.chasm.fixture.ir.module.function
 import io.github.charlietap.chasm.fixture.ir.module.functionIndex
+import io.github.charlietap.chasm.fixture.ir.module.globalIndex
 import io.github.charlietap.chasm.fixture.ir.module.localIndex
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.module.type
@@ -446,6 +449,65 @@ class FusionPassTest {
                 val2 = localGetOperand(localIndex(2)),
                 destination = localSetDestination(localIndex(1)),
             ),
+        )
+        val actual = FusionPass(context, module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `does not fuse global get as a producer operand`() {
+        val instructions = listOf(
+            globalGetInstruction(globalIndex(0)),
+            localGetInstruction(localIndex(0)),
+            i32AddInstruction(),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(instructions),
+                ),
+            ),
+        )
+        val context = passContext(module = module)
+
+        val expected = listOf(
+            globalGetInstruction(globalIndex(0)),
+            fusedI32Add(
+                left = valueStackOperand(),
+                right = localGetOperand(localIndex(0)),
+                destination = valueStackDestination(),
+            ),
+        )
+        val actual = FusionPass(context, module).functions[0].body.instructions
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `does not fuse global set as a numeric destination`() {
+        val instructions = listOf(
+            localGetInstruction(localIndex(0)),
+            localGetInstruction(localIndex(1)),
+            i32AddInstruction(),
+            globalSetInstruction(globalIndex(0)),
+        )
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(instructions),
+                ),
+            ),
+        )
+        val context = passContext(module = module)
+
+        val expected = listOf(
+            fusedI32Add(
+                left = localGetOperand(localIndex(0)),
+                right = localGetOperand(localIndex(1)),
+                destination = valueStackDestination(),
+            ),
+            globalSetInstruction(globalIndex(0)),
         )
         val actual = FusionPass(context, module).functions[0].body.instructions
 

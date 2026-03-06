@@ -25,15 +25,20 @@ internal inline fun InstructionRewriter(
     output: MutableList<Instruction>,
     expressionRewriter: ExpressionRewriter,
 ) {
+    val preserveStructuredEndBlocks = !context.config.bytecodeFusion
     when (instruction) {
         is ControlInstruction.Block -> {
 
             val expression = expressionRewriter(context, Expression(instruction.instructions))
 
             val rewritten = instruction.copy(
-                instructions = buildList {
-                    addAll(expression.instructions)
-                    add(AdminInstruction.EndBlock)
+                instructions = if (preserveStructuredEndBlocks) {
+                    buildList {
+                        addAll(expression.instructions)
+                        add(AdminInstruction.EndBlock)
+                    }
+                } else {
+                    expression.instructions
                 },
             )
             output.add(rewritten)
@@ -43,16 +48,28 @@ internal inline fun InstructionRewriter(
             val expression = expressionRewriter(context, Expression(instruction.thenInstructions))
 
             val rewritten = instruction.copy(
-                thenInstructions = buildList {
-                    addAll(expression.instructions)
-                    add(AdminInstruction.EndBlock)
-                },
-                elseInstructions = buildList {
-                    instruction.elseInstructions?.let {
-                        val elseExpression = expressionRewriter(context, Expression(it))
-                        addAll(elseExpression.instructions)
+                thenInstructions = if (preserveStructuredEndBlocks) {
+                    buildList {
+                        addAll(expression.instructions)
+                        add(AdminInstruction.EndBlock)
                     }
-                    add(AdminInstruction.EndBlock)
+                } else {
+                    expression.instructions
+                },
+                elseInstructions = if (preserveStructuredEndBlocks) {
+                    buildList {
+                        instruction.elseInstructions?.let {
+                            val elseExpression = expressionRewriter(context, Expression(it))
+                            addAll(elseExpression.instructions)
+                        }
+                        add(AdminInstruction.EndBlock)
+                    }
+                } else {
+                    buildList {
+                        instruction.elseInstructions?.let { elseInstructions ->
+                            addAll(expressionRewriter(context, Expression(elseInstructions)).instructions)
+                        }
+                    }
                 },
             )
             output.add(rewritten)
@@ -61,9 +78,13 @@ internal inline fun InstructionRewriter(
             val expression = expressionRewriter(context, Expression(instruction.instructions))
 
             val rewritten = instruction.copy(
-                instructions = buildList {
-                    addAll(expression.instructions)
-                    add(AdminInstruction.EndBlock)
+                instructions = if (preserveStructuredEndBlocks) {
+                    buildList {
+                        addAll(expression.instructions)
+                        add(AdminInstruction.EndBlock)
+                    }
+                } else {
+                    expression.instructions
                 },
             )
             output.add(rewritten)
@@ -72,9 +93,13 @@ internal inline fun InstructionRewriter(
             val expression = expressionRewriter(context, Expression(instruction.instructions))
 
             val rewritten = instruction.copy(
-                instructions = buildList {
-                    addAll(expression.instructions)
-                    add(AdminInstruction.EndBlock)
+                instructions = if (preserveStructuredEndBlocks) {
+                    buildList {
+                        addAll(expression.instructions)
+                        add(AdminInstruction.EndBlock)
+                    }
+                } else {
+                    expression.instructions
                 },
             )
             output.add(rewritten)

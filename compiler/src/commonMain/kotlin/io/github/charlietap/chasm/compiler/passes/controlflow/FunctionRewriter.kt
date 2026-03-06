@@ -27,7 +27,9 @@ internal inline fun FunctionRewriter(
         body = Expression(
             instructions = buildList {
                 addAll(expression.instructions)
-                add(AdminInstruction.EndBlock)
+                if (!context.config.bytecodeFusion) {
+                    add(AdminInstruction.EndBlock)
+                }
                 add(AdminInstruction.EndFunction)
             },
         ),

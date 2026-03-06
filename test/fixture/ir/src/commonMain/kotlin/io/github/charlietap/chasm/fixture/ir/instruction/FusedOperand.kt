@@ -43,4 +43,10 @@ fun globalGetOperand(
     index = index,
 )
 
+fun frameSlotOperand(
+    offset: Int = 0,
+): FusedOperand = FusedOperand.FrameSlot(
+    offset = offset,
+)
+
 fun valueStackOperand() = FusedOperand.ValueStack

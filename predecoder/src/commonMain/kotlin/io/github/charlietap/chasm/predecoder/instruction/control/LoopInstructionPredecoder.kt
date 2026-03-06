@@ -6,8 +6,7 @@ import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.LoopDispatcher
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
-import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.predecoder.InstructionPredecoder
+import io.github.charlietap.chasm.predecoder.InstructionSequencePredecoder
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
@@ -23,7 +22,7 @@ internal fun LoopInstructionPredecoder(
     LoopInstructionPredecoder(
         context = context,
         instruction = instruction,
-        instructionPredecoder = ::InstructionPredecoder,
+        instructionSequencePredecoder = ::InstructionSequencePredecoder,
         blockTypeExpander = ::BlockTypeExpander,
         loopDispatcher = ::LoopDispatcher,
     )
@@ -31,7 +30,7 @@ internal fun LoopInstructionPredecoder(
 internal inline fun LoopInstructionPredecoder(
     context: PredecodingContext,
     instruction: ControlInstruction.Loop,
-    crossinline instructionPredecoder: Predecoder<Instruction, DispatchableInstruction>,
+    crossinline instructionSequencePredecoder: Predecoder<List<io.github.charlietap.chasm.ir.instruction.Instruction>, Array<DispatchableInstruction>>,
     crossinline blockTypeExpander: BlockTypeExpander,
     crossinline loopDispatcher: Dispatcher<Loop>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
@@ -41,16 +40,10 @@ internal inline fun LoopInstructionPredecoder(
             InstantiationError.PredecodingError
         }.bind()
 
-    val instructions: Array<DispatchableInstruction> = Array(instruction.instructions.size) { idx ->
-        val reversedIndex = instruction.instructions.size - 1 - idx
-        val predispatch = instruction.instructions[reversedIndex]
-        instructionPredecoder(context, predispatch).bind()
-    }
-
     loopDispatcher(
         Loop(
             params = functionType.params.types.size,
-            instructions = instructions,
+            instructions = instructionSequencePredecoder(context, instruction.instructions).bind(),
         ),
     )
 }

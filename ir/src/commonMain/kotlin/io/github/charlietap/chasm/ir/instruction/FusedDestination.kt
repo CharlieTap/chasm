@@ -10,5 +10,8 @@ sealed interface FusedDestination {
     @JvmInline
     value class GlobalSet(val index: Index.GlobalIndex) : FusedDestination
 
+    @JvmInline
+    value class FrameSlot(val offset: Int) : FusedDestination
+
     data object ValueStack : FusedDestination
 }

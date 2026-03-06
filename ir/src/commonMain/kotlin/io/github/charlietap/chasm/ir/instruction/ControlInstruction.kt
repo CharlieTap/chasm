@@ -32,7 +32,12 @@ sealed interface ControlInstruction : Instruction {
 
     data class If(val blockType: BlockType, val thenInstructions: List<Instruction>, val elseInstructions: List<Instruction>?) : ControlInstruction
 
-    data class TryTable(val blockType: BlockType, val handlers: List<CatchHandler>, val instructions: List<Instruction>) : ControlInstruction
+    data class TryTable(
+        val blockType: BlockType,
+        val handlers: List<CatchHandler>,
+        val instructions: List<Instruction>,
+        val payloadDestinationSlots: List<List<Int>> = emptyList(),
+    ) : ControlInstruction
 
     @JvmInline
     value class Throw(val tagIndex: Index.TagIndex) : ControlInstruction

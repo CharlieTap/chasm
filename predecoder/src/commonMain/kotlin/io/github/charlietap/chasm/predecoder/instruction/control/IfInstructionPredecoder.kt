@@ -6,8 +6,7 @@ import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.IfDispatcher
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
-import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.predecoder.InstructionPredecoder
+import io.github.charlietap.chasm.predecoder.InstructionSequencePredecoder
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
@@ -23,7 +22,7 @@ internal fun IfInstructionPredecoder(
     IfInstructionPredecoder(
         context = context,
         instruction = instruction,
-        instructionPredecoder = ::InstructionPredecoder,
+        instructionSequencePredecoder = ::InstructionSequencePredecoder,
         blockTypeExpander = ::BlockTypeExpander,
         ifDispatcher = ::IfDispatcher,
     )
@@ -31,7 +30,7 @@ internal fun IfInstructionPredecoder(
 internal inline fun IfInstructionPredecoder(
     context: PredecodingContext,
     instruction: ControlInstruction.If,
-    crossinline instructionPredecoder: Predecoder<Instruction, DispatchableInstruction>,
+    crossinline instructionSequencePredecoder: Predecoder<List<io.github.charlietap.chasm.ir.instruction.Instruction>, Array<DispatchableInstruction>>,
     crossinline blockTypeExpander: BlockTypeExpander,
     crossinline ifDispatcher: Dispatcher<If>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
@@ -40,17 +39,9 @@ internal inline fun IfInstructionPredecoder(
         .toResultOr {
             InstantiationError.PredecodingError
         }.bind()
-    val thenInstructions: Array<DispatchableInstruction> = Array(instruction.thenInstructions.size) { idx ->
-        val reversedIndex = instruction.thenInstructions.size - 1 - idx
-        val predispatch = instruction.thenInstructions[reversedIndex]
-        instructionPredecoder(context, predispatch).bind()
-    }
-    val elseInstructions: Array<DispatchableInstruction> = instruction.elseInstructions?.let { instructions ->
-        Array(instructions.size) { idx ->
-            val reversedIndex = instructions.size - 1 - idx
-            val predispatch = instructions[reversedIndex]
-            instructionPredecoder(context, predispatch).bind()
-        }
+    val thenInstructions = instructionSequencePredecoder(context, instruction.thenInstructions).bind()
+    val elseInstructions = instruction.elseInstructions?.let { instructions ->
+        instructionSequencePredecoder(context, instructions).bind()
     } ?: emptyArray()
     val instructions = arrayOf(elseInstructions, thenInstructions)
 

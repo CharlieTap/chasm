@@ -28,12 +28,16 @@ internal inline fun BreakExecutor(
     labelIndex: Index.LabelIndex,
 ) {
     val breakLabel = controlStack.peekNthLabel(labelIndex.index())
+    val frame = controlStack.peekFrame()
 
     val depths = breakLabel.depths
     controlStack.shrinkHandlers(depths.handlers)
     controlStack.shrinkInstructions(depths.instructions)
     controlStack.shrinkLabels(depths.labels)
-    valueStack.shrink(breakLabel.arity, depths.values)
+
+    if (!frame.frameSlotMode) {
+        valueStack.shrink(breakLabel.arity, depths.values)
+    }
 
     breakLabel.continuation?.let { continuation ->
         controlStack.push(continuation)

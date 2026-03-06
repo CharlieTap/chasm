@@ -102,6 +102,40 @@ sealed interface FusedMemoryInstruction : Instruction {
         val memArg: MemArg,
     ) : FusedMemoryInstruction
 
+    data class MemorySize(
+        val destination: FusedDestination,
+        val memoryIndex: Index.MemoryIndex,
+    ) : FusedMemoryInstruction
+
+    data class MemoryGrow(
+        val pagesToAdd: FusedOperand,
+        val destination: FusedDestination,
+        val memoryIndex: Index.MemoryIndex,
+    ) : FusedMemoryInstruction
+
+    data class MemoryInit(
+        val bytesToCopy: FusedOperand,
+        val sourceOffset: FusedOperand,
+        val destinationOffset: FusedOperand,
+        val memoryIndex: Index.MemoryIndex,
+        val dataIndex: Index.DataIndex,
+    ) : FusedMemoryInstruction
+
+    data class MemoryCopy(
+        val bytesToCopy: FusedOperand,
+        val sourceOffset: FusedOperand,
+        val destinationOffset: FusedOperand,
+        val srcIndex: Index.MemoryIndex,
+        val dstIndex: Index.MemoryIndex,
+    ) : FusedMemoryInstruction
+
+    data class MemoryFill(
+        val bytesToFill: FusedOperand,
+        val fillValue: FusedOperand,
+        val offset: FusedOperand,
+        val memoryIndex: Index.MemoryIndex,
+    ) : FusedMemoryInstruction
+
     data class I32Store(
         val valueOperand: FusedOperand,
         val addressOperand: FusedOperand,

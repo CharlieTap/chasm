@@ -22,5 +22,8 @@ sealed interface FusedOperand {
     @JvmInline
     value class GlobalGet(val index: Index.GlobalIndex) : FusedOperand
 
+    @JvmInline
+    value class FrameSlot(val offset: Int) : FusedOperand
+
     data object ValueStack : FusedOperand
 }
