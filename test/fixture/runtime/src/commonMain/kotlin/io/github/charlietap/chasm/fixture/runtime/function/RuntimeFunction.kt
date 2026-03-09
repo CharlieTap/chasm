@@ -9,9 +9,15 @@ fun runtimeFunction(
     typeIndex: Index.TypeIndex = Index.TypeIndex(0),
     locals: LongArray = longArrayOf(),
     body: Expression = runtimeExpression(),
+    frameSlots: Int = 0,
+    frameSlotMode: Boolean = false,
+    returnSlots: List<Int> = emptyList(),
 ) = Function(
     idx = idx,
     typeIndex = typeIndex,
     locals = locals,
     body = body,
+    frameSlots = frameSlots,
+    frameSlotMode = frameSlotMode,
+    returnSlots = returnSlots,
 )

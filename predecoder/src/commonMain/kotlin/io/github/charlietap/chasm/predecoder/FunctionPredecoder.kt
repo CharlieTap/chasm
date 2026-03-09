@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.default
+import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
 import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
@@ -24,12 +25,27 @@ internal inline fun FunctionPredecoder(
     function: Function,
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<RuntimeFunction, ModuleTrapError> = binding {
+    val type = context.types
+        .getOrNull(function.typeIndex.idx)
+        ?.functionType()
+    val params = type?.params?.types?.size ?: 0
+    val results = type?.results?.types?.size ?: 0
+
     RuntimeFunction(
         idx = function.idx,
         typeIndex = function.typeIndex,
         locals = LongArray(function.locals.size) { index ->
             function.locals[index].type.default()
         },
-        body = expressionPredecoder(context, function.body).bind(),
+        body = expressionPredecoder(
+            context.copy(
+                functionParamCount = params,
+                functionResultCount = results,
+            ),
+            function.body,
+        ).bind(),
+        frameSlots = maxOf(function.frameSlots, params + function.locals.size),
+        frameSlotMode = function.frameSlotMode,
+        returnSlots = function.returnSlots,
     )
 }

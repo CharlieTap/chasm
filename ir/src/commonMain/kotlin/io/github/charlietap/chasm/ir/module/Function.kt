@@ -7,4 +7,7 @@ data class Function(
     val typeIndex: Index.TypeIndex,
     val locals: List<Local>,
     val body: Expression,
+    val frameSlots: Int = 0,
+    val frameSlotMode: Boolean = false,
+    val returnSlots: List<Int> = emptyList(),
 )

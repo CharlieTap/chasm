@@ -5,6 +5,11 @@ import io.github.charlietap.chasm.ir.module.Index.LocalIndex
 
 sealed interface FusedVariableInstruction : Instruction {
 
+    data class GlobalGet(
+        val globalIdx: GlobalIndex,
+        val destination: FusedDestination,
+    ) : FusedVariableInstruction
+
     data class LocalSet(
         val operand: FusedOperand,
         val localIdx: LocalIndex,

@@ -15,6 +15,9 @@ internal fun Instruction.isAllocating(): Boolean = when (this) {
     is FusedAggregateInstruction.StructNew,
     is FusedAggregateInstruction.StructNewDefault,
     is FusedAggregateInstruction.ArrayNew,
+    is FusedAggregateInstruction.ArrayNewData,
+    is FusedAggregateInstruction.ArrayNewDefault,
+    is FusedAggregateInstruction.ArrayNewElement,
     is FusedAggregateInstruction.ArrayNewFixed,
     -> true
     else -> false

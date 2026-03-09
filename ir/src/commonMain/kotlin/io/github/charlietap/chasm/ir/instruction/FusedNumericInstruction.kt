@@ -2,6 +2,26 @@ package io.github.charlietap.chasm.ir.instruction
 
 sealed interface FusedNumericInstruction : Instruction {
 
+    data class I32Const(
+        val value: Int,
+        val destination: FusedDestination,
+    ) : FusedNumericInstruction
+
+    data class I64Const(
+        val value: Long,
+        val destination: FusedDestination,
+    ) : FusedNumericInstruction
+
+    data class F32Const(
+        val bits: Int,
+        val destination: FusedDestination,
+    ) : FusedNumericInstruction
+
+    data class F64Const(
+        val bits: Long,
+        val destination: FusedDestination,
+    ) : FusedNumericInstruction
+
     data class I32Add(
         val left: FusedOperand,
         val right: FusedOperand,

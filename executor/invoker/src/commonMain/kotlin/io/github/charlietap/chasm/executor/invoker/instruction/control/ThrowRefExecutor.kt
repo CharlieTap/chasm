@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.admin.HandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
@@ -26,15 +25,18 @@ internal fun ThrowRefExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.ThrowRef,
-) = ThrowRefExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    instruction = instruction,
-    breakDispatcher = ::BrDispatcher,
-    handlerDispatcher = ::HandlerDispatcher,
-)
+) {
+    val throwRefDispatcher: Dispatcher<ControlInstruction.ThrowRef> = ::ThrowRefDispatcher
+    ThrowRefExecutor(
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
+        context = context,
+        instruction = instruction,
+        breakDispatcher = ::BrDispatcher,
+        throwRefDispatcher = throwRefDispatcher,
+    )
+}
 
 internal inline fun ThrowRefExecutor(
     vstack: ValueStack,
@@ -43,10 +45,28 @@ internal inline fun ThrowRefExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.ThrowRef,
     crossinline breakDispatcher: Dispatcher<ControlInstruction.Br>,
-    crossinline handlerDispatcher: Dispatcher<ExceptionHandler>,
+    crossinline throwRefDispatcher: Dispatcher<ControlInstruction.ThrowRef>,
 ) {
-    val ref = vstack.pop()
+    ThrowRefValueExecutor(
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
+        context = context,
+        ref = vstack.pop(),
+        breakDispatcher = breakDispatcher,
+        throwRefDispatcher = throwRefDispatcher,
+    )
+}
 
+internal inline fun ThrowRefValueExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
+    context: ExecutionContext,
+    ref: Long,
+    crossinline breakDispatcher: Dispatcher<ControlInstruction.Br>,
+    crossinline throwRefDispatcher: Dispatcher<ControlInstruction.ThrowRef>,
+) {
     val exceptionAddress = if (ref.isNullableReference()) {
         throw InvocationException(InvocationError.UnexpectedReferenceValue)
     } else {
@@ -67,6 +87,8 @@ internal inline fun ThrowRefExecutor(
 
         val catchHandler = handler.instructions.first()
         val otherHandlers = handler.instructions.drop(1)
+        val payloadDestinationSlots = handler.payloadDestinationSlots.firstOrNull() ?: emptyList()
+        val continuation = handler.continuations.firstOrNull()
 
         val tagMatches = when (catchHandler) {
             is CatchHandler.Catch -> {
@@ -83,36 +105,40 @@ internal inline fun ThrowRefExecutor(
         when {
             catchHandler is CatchHandler.Catch && tagMatches -> {
                 instance.fields.reverse()
-                vstack.push(instance.fields)
-                cstack.push(
-                    breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
-                )
+                if (frame.frameSlotMode) {
+                    writeCatchPayloadToSlots(vstack, instance.fields, payloadDestinationSlots)
+                } else {
+                    vstack.push(instance.fields)
+                }
+                routeExceptionHandlerMatch(cstack, continuation, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchRef && tagMatches -> {
                 instance.fields.reverse()
-                vstack.push(instance.fields)
-                vstack.push(ref)
-                cstack.push(
-                    breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
-                )
+                if (frame.frameSlotMode) {
+                    writeCatchRefPayloadToSlots(vstack, instance.fields, ref, payloadDestinationSlots)
+                } else {
+                    vstack.push(instance.fields)
+                    vstack.push(ref)
+                }
+                routeExceptionHandlerMatch(cstack, continuation, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchAll -> {
-                cstack.push(
-                    breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
-                )
+                routeExceptionHandlerMatch(cstack, continuation, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchAllRef -> {
-                vstack.push(ref)
-                cstack.push(
-                    breakDispatcher(ControlInstruction.Br(catchHandler.labelIndex)),
-                )
+                if (frame.frameSlotMode) {
+                    vstack.setFrameSlot(payloadDestinationSlots.single(), ref)
+                } else {
+                    vstack.push(ref)
+                }
+                routeExceptionHandlerMatch(cstack, continuation, breakDispatcher, catchHandler.labelIndex)
             }
             else -> {
 
                 handler.instructions = otherHandlers
+                handler.payloadDestinationSlots = handler.payloadDestinationSlots.drop(1)
+                handler.continuations = handler.continuations.drop(1)
                 cstack.push(handler)
-                val instruction = handlerDispatcher(handler)
-                cstack.push(instruction)
                 vstack.push(ref)
                 cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
             }
@@ -133,4 +159,41 @@ private inline fun jumpToHandlerInstruction(
     valueStack.framePointer = handler.framePointer
 
     return handler
+}
+
+private fun writeCatchPayloadToSlots(
+    vstack: ValueStack,
+    fields: LongArray,
+    payloadDestinationSlots: List<Int>,
+) {
+    fields.forEachIndexed { index, value ->
+        vstack.setFrameSlot(payloadDestinationSlots[index], value)
+    }
+}
+
+private fun writeCatchRefPayloadToSlots(
+    vstack: ValueStack,
+    fields: LongArray,
+    ref: Long,
+    payloadDestinationSlots: List<Int>,
+) {
+    writeCatchPayloadToSlots(vstack, fields, payloadDestinationSlots)
+    vstack.setFrameSlot(payloadDestinationSlots[fields.size], ref)
+}
+
+private inline fun routeExceptionHandlerMatch(
+    cstack: ControlStack,
+    continuation: Array<io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction>?,
+    breakDispatcher: Dispatcher<ControlInstruction.Br>,
+    labelIndex: io.github.charlietap.chasm.ir.module.Index.LabelIndex,
+) {
+    if (continuation != null) {
+        if (continuation.isNotEmpty()) {
+            cstack.push(continuation)
+        }
+    } else {
+        cstack.push(
+            breakDispatcher(ControlInstruction.Br(labelIndex)),
+        )
+    }
 }

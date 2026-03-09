@@ -20,3 +20,9 @@ fun globalSetDestination(
 ): FusedDestination = FusedDestination.GlobalSet(
     index = index,
 )
+
+fun frameSlotDestination(
+    offset: Int = 0,
+): FusedDestination = FusedDestination.FrameSlot(
+    offset = offset,
+)

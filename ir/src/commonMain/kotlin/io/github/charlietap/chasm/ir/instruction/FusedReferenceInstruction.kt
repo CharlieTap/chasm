@@ -22,9 +22,19 @@ sealed interface FusedReferenceInstruction : Instruction {
         val destination: FusedDestination,
     ) : FusedReferenceInstruction
 
+    data class RefAsNonNull(
+        val value: FusedOperand,
+        val destination: FusedDestination,
+    ) : FusedReferenceInstruction
+
     data class RefNull(
         val destination: FusedDestination,
         val type: HeapType,
+    ) : FusedReferenceInstruction
+
+    data class RefFunc(
+        val destination: FusedDestination,
+        val funcIdx: io.github.charlietap.chasm.ir.module.Index.FunctionIndex,
     ) : FusedReferenceInstruction
 
     data class RefTest(

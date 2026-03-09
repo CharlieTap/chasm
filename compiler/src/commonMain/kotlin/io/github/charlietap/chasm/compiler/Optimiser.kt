@@ -1,8 +1,10 @@
 package io.github.charlietap.chasm.compiler
 
 import io.github.charlietap.chasm.compiler.passes.ControlFlowPass
+import io.github.charlietap.chasm.compiler.passes.FrameSlotPass
 import io.github.charlietap.chasm.compiler.passes.FusionPass
 import io.github.charlietap.chasm.compiler.passes.GCPass
+import io.github.charlietap.chasm.compiler.passes.JumpPass
 import io.github.charlietap.chasm.compiler.passes.Pass
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.config.GCStrategy
@@ -24,6 +26,8 @@ fun Compiler(
         module = module,
         control = ::ControlFlowPass,
         fusion = ::FusionPass,
+        frameSlot = ::FrameSlotPass,
+        jump = ::JumpPass,
         gc = ::GCPass,
     )
 
@@ -32,12 +36,18 @@ internal inline fun Compiler(
     module: Module,
     noinline control: Pass,
     noinline fusion: Pass,
+    noinline frameSlot: Pass,
+    noinline jump: Pass,
     noinline gc: Pass,
 ): Module {
     val context = PassContext(config, module)
     val passes = buildList {
         add(control)
-        if (config.bytecodeFusion) add(fusion)
+        if (config.bytecodeFusion) {
+            add(fusion)
+            add(frameSlot)
+            add(jump)
+        }
         if (config.gcStrategy != GCStrategy.MANUAL) add(gc)
     }
 

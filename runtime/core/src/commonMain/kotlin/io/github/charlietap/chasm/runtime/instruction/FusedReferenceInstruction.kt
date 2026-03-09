@@ -4,31 +4,41 @@ import io.github.charlietap.chasm.type.ReferenceType
 
 sealed interface FusedReferenceInstruction : LinkedInstruction {
 
-    data class RefCast(
-        val reference: LoadOp,
-        val destination: StoreOp,
+    data class RefCastS(
+        val referenceSlot: Int,
+        val destinationSlot: Int,
         val referenceType: ReferenceType,
     ) : FusedReferenceInstruction
 
-    data class RefEq(
-        val reference1: LoadOp,
-        val reference2: LoadOp,
-        val destination: StoreOp,
+    data class RefEqSs(
+        val reference1Slot: Int,
+        val reference2Slot: Int,
+        val destinationSlot: Int,
     ) : FusedReferenceInstruction
 
-    data class RefIsNull(
-        val value: LoadOp,
-        val destination: StoreOp,
+    data class RefIsNullS(
+        val valueSlot: Int,
+        val destinationSlot: Int,
     ) : FusedReferenceInstruction
 
-    data class RefNull(
-        val destination: StoreOp,
+    data class RefAsNonNullS(
+        val valueSlot: Int,
+        val destinationSlot: Int,
+    ) : FusedReferenceInstruction
+
+    data class RefNullS(
         val reference: Long,
+        val destinationSlot: Int,
     ) : FusedReferenceInstruction
 
-    data class RefTest(
-        val reference: LoadOp,
-        val destination: StoreOp,
+    data class RefFuncS(
+        val reference: Long,
+        val destinationSlot: Int,
+    ) : FusedReferenceInstruction
+
+    data class RefTestS(
+        val referenceSlot: Int,
+        val destinationSlot: Int,
         val referenceType: ReferenceType,
     ) : FusedReferenceInstruction
 }

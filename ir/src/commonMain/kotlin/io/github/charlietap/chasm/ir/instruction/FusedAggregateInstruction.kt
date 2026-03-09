@@ -55,10 +55,33 @@ sealed interface FusedAggregateInstruction : Instruction {
         val typeIndex: Index.TypeIndex,
     ) : FusedAggregateInstruction
 
+    data class ArrayNewDefault(
+        val size: FusedOperand,
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
+    data class ArrayNewData(
+        val sourceOffset: FusedOperand,
+        val arrayLength: FusedOperand,
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+        val dataIndex: Index.DataIndex,
+    ) : FusedAggregateInstruction
+
+    data class ArrayNewElement(
+        val sourceOffset: FusedOperand,
+        val arrayLength: FusedOperand,
+        val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+        val elementIndex: Index.ElementIndex,
+    ) : FusedAggregateInstruction
+
     data class ArrayNewFixed(
         val destination: FusedDestination,
         val typeIndex: Index.TypeIndex,
         val size: Int,
+        val valueSlots: List<Int> = emptyList(),
     ) : FusedAggregateInstruction
 
     data class ArraySet(
@@ -66,6 +89,49 @@ sealed interface FusedAggregateInstruction : Instruction {
         val field: FusedOperand,
         val address: FusedOperand,
         val typeIndex: Index.TypeIndex,
+    ) : FusedAggregateInstruction
+
+    data class ArrayInitData(
+        val elementsToCopy: FusedOperand,
+        val sourceOffset: FusedOperand,
+        val destinationOffset: FusedOperand,
+        val address: FusedOperand,
+        val typeIndex: Index.TypeIndex,
+        val dataIndex: Index.DataIndex,
+    ) : FusedAggregateInstruction
+
+    data class ArrayInitElement(
+        val elementsToCopy: FusedOperand,
+        val sourceOffset: FusedOperand,
+        val destinationOffset: FusedOperand,
+        val address: FusedOperand,
+        val typeIndex: Index.TypeIndex,
+        val elementIndex: Index.ElementIndex,
+    ) : FusedAggregateInstruction
+
+    data class RefI31(
+        val value: FusedOperand,
+        val destination: FusedDestination,
+    ) : FusedAggregateInstruction
+
+    data class I31GetSigned(
+        val value: FusedOperand,
+        val destination: FusedDestination,
+    ) : FusedAggregateInstruction
+
+    data class I31GetUnsigned(
+        val value: FusedOperand,
+        val destination: FusedDestination,
+    ) : FusedAggregateInstruction
+
+    data class AnyConvertExtern(
+        val value: FusedOperand,
+        val destination: FusedDestination,
+    ) : FusedAggregateInstruction
+
+    data class ExternConvertAny(
+        val value: FusedOperand,
+        val destination: FusedDestination,
     ) : FusedAggregateInstruction
 
     data class StructGet(
@@ -92,6 +158,7 @@ sealed interface FusedAggregateInstruction : Instruction {
     data class StructNew(
         val destination: FusedDestination,
         val typeIndex: Index.TypeIndex,
+        val fieldSlots: List<Int> = emptyList(),
     ) : FusedAggregateInstruction
 
     data class StructNewDefault(

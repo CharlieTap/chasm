@@ -15,6 +15,5 @@ internal fun FusedOperandFactory(
     is NumericInstruction.F32Const -> FusedOperand.F32Const(instruction.value)
     is NumericInstruction.F64Const -> FusedOperand.F64Const(instruction.value)
     is VariableInstruction.LocalGet -> FusedOperand.LocalGet(instruction.localIdx)
-    is VariableInstruction.GlobalGet -> FusedOperand.GlobalGet(instruction.globalIdx)
     else -> null
 }

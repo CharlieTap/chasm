@@ -19,13 +19,35 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         elements = LongArray(arrayCapacity)
     }
 
-    fun getLocal(localIndex: Int): Long = elements[framePointer + localIndex]
+    fun getLocal(localIndex: Int): Long = getFrameSlot(localIndex)
 
     fun setLocal(
         localIndex: Int,
         value: Long,
     ) {
-        elements[framePointer + localIndex] = value
+        setFrameSlot(localIndex, value)
+    }
+
+    fun getFrameSlot(slot: Int): Long = elements[framePointer + slot]
+
+    fun getFrameSlot(
+        framePointer: Int,
+        slot: Int,
+    ): Long = elements[framePointer + slot]
+
+    fun setFrameSlot(
+        slot: Int,
+        value: Long,
+    ) {
+        elements[framePointer + slot] = value
+    }
+
+    fun setFrameSlot(
+        framePointer: Int,
+        slot: Int,
+        value: Long,
+    ) {
+        elements[framePointer + slot] = value
     }
 
     fun peek(): Long = try {
@@ -148,6 +170,47 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
             endIndex = top,
         )
         top = depth + preserveTopN
+    }
+
+    fun shrinkFromFrameSlots(
+        slots: List<Int>,
+        depth: Int,
+    ) {
+        val values = LongArray(slots.size) { index ->
+            getFrameSlot(slots[index])
+        }
+        values.copyInto(
+            destination = elements,
+            destinationOffset = depth,
+        )
+        top = depth + values.size
+    }
+
+    fun spillTopToFrameSlots(
+        slots: List<Int>,
+    ) {
+        val start = top - slots.size
+        slots.forEachIndexed { index, slot ->
+            setFrameSlot(slot, elements[start + index])
+        }
+        top = start
+    }
+
+    fun reserveFrame(frameSlots: Int) {
+        val requiredTop = framePointer + frameSlots
+        while (requiredTop > elements.size) {
+            doubleCapacity()
+        }
+        top = requiredTop
+    }
+
+    fun reserveDepth(depth: Int) {
+        while (depth > elements.size) {
+            doubleCapacity()
+        }
+        if (top < depth) {
+            top = depth
+        }
     }
 
     fun depth(): Int = top

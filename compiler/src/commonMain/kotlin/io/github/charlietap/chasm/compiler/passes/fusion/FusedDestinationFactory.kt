@@ -10,6 +10,5 @@ internal fun FusedDestinationFactory(
     instruction: Instruction?,
 ): FusedDestination = when (instruction) {
     is VariableInstruction.LocalSet -> FusedDestination.LocalSet(instruction.localIdx)
-    is VariableInstruction.GlobalSet -> FusedDestination.GlobalSet(instruction.globalIdx)
     else -> FusedDestination.ValueStack
 }
