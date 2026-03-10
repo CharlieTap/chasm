@@ -8,9 +8,6 @@ sealed interface FusedDestination {
     value class LocalSet(val index: Index.LocalIndex) : FusedDestination
 
     @JvmInline
-    value class GlobalSet(val index: Index.GlobalIndex) : FusedDestination
-
-    @JvmInline
     value class FrameSlot(val offset: Int) : FusedDestination
 
     data object ValueStack : FusedDestination

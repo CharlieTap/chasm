@@ -20,9 +20,6 @@ sealed interface FusedOperand {
     value class LocalGet(val index: Index.LocalIndex) : FusedOperand
 
     @JvmInline
-    value class GlobalGet(val index: Index.GlobalIndex) : FusedOperand
-
-    @JvmInline
     value class FrameSlot(val offset: Int) : FusedOperand
 
     data object ValueStack : FusedOperand

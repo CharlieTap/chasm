@@ -1811,12 +1811,6 @@ private fun FrameSlotBitcastLowerer(
         is FusedOperand.F32Const,
         is FusedOperand.F64Const,
         -> listOf(FrameSlotImmediateInstruction(lowered, destinationSlot))
-        is FusedOperand.GlobalGet -> listOf(
-            FusedVariableInstruction.GlobalGet(
-                globalIdx = lowered.index,
-                destination = FusedDestination.FrameSlot(destinationSlot),
-            ),
-        )
         is FusedOperand.LocalGet,
         FusedOperand.ValueStack,
         -> error("unexpected lowered bitcast operand: $lowered")
@@ -1928,7 +1922,6 @@ private fun FrameSlotMultiDestinationLowerer(
     state: FrameSlotState,
 ): List<FusedDestination>? = destinations.map { destination ->
     when (destination) {
-        is FusedDestination.GlobalSet,
         is FusedDestination.FrameSlot,
         -> destination
         is FusedDestination.LocalSet -> FusedDestination.FrameSlot(state.localSlot(destination.index.idx))
@@ -3449,7 +3442,6 @@ private fun FrameSlotOperandLowerer(
     is FusedOperand.I64Const,
     is FusedOperand.F32Const,
     is FusedOperand.F64Const,
-    is FusedOperand.GlobalGet,
     is FusedOperand.FrameSlot,
     -> LoweredOperand(operand, emptyList())
     is FusedOperand.LocalGet -> LoweredOperand(
@@ -3663,7 +3655,6 @@ private fun FrameSlotDestinationLowerer(
     state: FrameSlotState,
     valueType: ValueType? = null,
 ): LoweredDestination? = when (destination) {
-    is FusedDestination.GlobalSet,
     is FusedDestination.FrameSlot,
     -> LoweredDestination { destination }
     is FusedDestination.LocalSet -> LoweredDestination {

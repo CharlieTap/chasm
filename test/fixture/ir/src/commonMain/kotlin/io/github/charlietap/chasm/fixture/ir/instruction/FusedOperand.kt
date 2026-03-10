@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.fixture.ir.instruction
 
-import io.github.charlietap.chasm.fixture.ir.module.globalIndex
 import io.github.charlietap.chasm.fixture.ir.module.localIndex
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.module.Index
@@ -34,12 +33,6 @@ fun f64ConstOperand(
 fun localGetOperand(
     index: Index.LocalIndex = localIndex(),
 ): FusedOperand = FusedOperand.LocalGet(
-    index = index,
-)
-
-fun globalGetOperand(
-    index: Index.GlobalIndex = globalIndex(),
-): FusedOperand = FusedOperand.GlobalGet(
     index = index,
 )
 
