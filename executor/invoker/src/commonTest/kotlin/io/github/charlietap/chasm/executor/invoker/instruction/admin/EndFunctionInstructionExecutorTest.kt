@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.fixture.runtime.stack.label
 import io.github.charlietap.chasm.fixture.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import kotlin.test.Test
@@ -158,7 +159,7 @@ class EndFunctionInstructionExecutorTest {
                     framePointer = 0,
                 ),
             ),
-            instructions = listOf({ _, _, _, _ -> }),
+            instructions = listOf(DispatchableInstruction { _, _, _, _ -> }),
             labels = listOf(label()),
         )
         val vstack = vstack()

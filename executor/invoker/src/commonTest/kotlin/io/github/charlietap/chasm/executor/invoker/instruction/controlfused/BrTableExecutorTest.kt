@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.fixture.runtime.stack.label
 import io.github.charlietap.chasm.fixture.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedControlInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -51,13 +52,13 @@ class BrTableExecutorTest {
                 defaultLabelIndex = labelIndex(0),
                 takenInstructions = listOf(
                     listOf(
-                        { valueStack, _, _, _ ->
+                        DispatchableInstruction { valueStack, _, _, _ ->
                             valueStack.setFrameSlot(1, valueStack.getFrameSlot(3))
                         },
                     ),
                 ),
                 defaultTakenInstructions = listOf(
-                    { valueStack, _, _, _ ->
+                    DispatchableInstruction { valueStack, _, _, _ ->
                         valueStack.setFrameSlot(2, valueStack.getFrameSlot(3))
                     },
                 ),

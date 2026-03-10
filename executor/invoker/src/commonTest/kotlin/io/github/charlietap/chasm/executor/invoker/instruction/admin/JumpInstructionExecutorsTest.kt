@@ -58,7 +58,7 @@ class JumpInstructionExecutorsTest {
                 thread = thread(
                     frame = frame(
                         arity = 1,
-                        depths = stackDepths(instructions = 1, values = 0),
+                        depths = stackDepths(instructions = 0, values = 0),
                         instance = moduleInstance(),
                         frameSlotMode = true,
                     ),
@@ -118,7 +118,7 @@ class JumpInstructionExecutorsTest {
                 thread = thread(
                     frame = frame(
                         arity = 1,
-                        depths = stackDepths(instructions = 1, values = 0),
+                        depths = stackDepths(instructions = 0, values = 0),
                         instance = moduleInstance(),
                         frameSlotMode = true,
                     ),

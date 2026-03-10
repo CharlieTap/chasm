@@ -11,13 +11,13 @@ import io.github.charlietap.chasm.runtime.store.Store
 fun dispatchableInstruction(
     executor: ((ValueStack, ControlStack, Store, ExecutionContext) -> Result<Unit, InvocationError>)? = null,
 ): DispatchableInstruction = executor?.let {
-    { vstack, cstack, store, context ->
+    DispatchableInstruction { vstack, cstack, store, context ->
         executor(vstack, cstack, store, context)
     }
 } ?: NoOpDispatchableInstruction
 
 private object NoOpDispatchableInstruction : DispatchableInstruction {
-    override fun invoke(vstack: ValueStack, cstack: ControlStack, store: Store, ctx: ExecutionContext) {
+    override fun invoke(vstack: ValueStack, cstack: ControlStack, store: Store, context: ExecutionContext) {
         return
     }
 }

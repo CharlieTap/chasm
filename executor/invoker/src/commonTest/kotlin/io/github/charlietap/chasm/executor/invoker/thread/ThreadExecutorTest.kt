@@ -24,7 +24,7 @@ class ThreadExecutorTest {
 
         val instructionDispatchable = dispatchableInstruction { vstack, cstack, store, context ->
             assertEquals(2, vstack.depth())
-            assertEquals(1, cstack.instructionsDepth())
+            assertEquals(0, cstack.instructionsDepth())
             vstack.clear()
             vstack.pushI32(0)
             Ok(Unit)

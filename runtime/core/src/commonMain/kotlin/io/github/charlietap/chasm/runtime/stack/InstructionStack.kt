@@ -1,13 +1,15 @@
 package io.github.charlietap.chasm.runtime.stack
 
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.store.Store
 import kotlin.jvm.JvmOverloads
 
 class InstructionStack
     @JvmOverloads
     constructor(minCapacity: Int = MIN_CAPACITY) {
 
-        private var elements: Array<DispatchableInstruction?>
+        private var elements: Array<DispatchableInstruction>
         private var top = 0
 
         init {
@@ -17,7 +19,7 @@ class InstructionStack
                 } else {
                     minCapacity
                 }
-            elements = arrayOfNulls<DispatchableInstruction?>(arrayCapacity)
+            elements = dispatchableArray(arrayCapacity)
         }
 
         fun push(value: DispatchableInstruction) {
@@ -43,9 +45,20 @@ class InstructionStack
         // and we benefit from the performance not setting it on each loop
         fun pop(): DispatchableInstruction {
             top--
-            val value = elements[top]
             // elements[top] = null
-            return value!!
+            return elements[top]
+        }
+
+        fun execute(
+            vstack: ValueStack,
+            cstack: ControlStack,
+            store: Store,
+            context: ExecutionContext,
+        ) {
+            while (top != 0) {
+                top--
+                elements[top](vstack, cstack, store, context)
+            }
         }
 
         fun peekOrNull(): DispatchableInstruction? = try {
@@ -67,23 +80,29 @@ class InstructionStack
         fun depth(): Int = top
 
         fun clear() {
+            @Suppress("UNCHECKED_CAST")
+            val nullableElements = elements as Array<DispatchableInstruction?>
             for (i in 0 until top) {
-                elements[i] = null
+                nullableElements[i] = null
             }
             top = 0
         }
 
         fun entries() = buildList {
             for (i in 0 until top) {
-                @Suppress("UNCHECKED_CAST")
-                add(elements[i] as DispatchableInstruction)
+                add(elements[i])
             }
         }
 
         private fun doubleCapacity() {
             val newCapacity = elements.size * 2
-            elements = elements.copyOf(newCapacity)
+            @Suppress("UNCHECKED_CAST")
+            elements = elements.copyOf(newCapacity) as Array<DispatchableInstruction>
         }
     }
 
 private const val MIN_CAPACITY = 256
+
+@Suppress("UNCHECKED_CAST")
+private fun dispatchableArray(capacity: Int): Array<DispatchableInstruction> =
+    arrayOfNulls<DispatchableInstruction>(capacity) as Array<DispatchableInstruction>

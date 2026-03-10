@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.InstructionStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
 internal typealias ThreadExecutor = (Configuration, List<ExecutionValue>) -> Result<List<Long>, InvocationError>
@@ -42,25 +41,11 @@ internal fun ThreadExecutor(
         vstack.push(param.toLongFromBoxed())
     }
 
-    var loop = true
-
-    @Suppress("UNUSED_PARAMETER")
-    fun exitLoop(
-        vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
-        ctx: ExecutionContext,
-    ) {
-        loop = false
-    }
-
-    istack.push(::exitLoop)
+    
     istack.pushAll(thread.instructions)
 
     try {
-        while (loop) {
-            istack.pop()(vstack, cstack, store, context)
-        }
+        istack.execute(vstack, cstack, store, context)
     } catch (exception: InvocationException) {
         Err(exception.error).bind()
     }
