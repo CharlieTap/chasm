@@ -9,4 +9,5 @@ data class ActivationFrame(
     val previousFramePointer: Int = 0,
     val frameSlotMode: Boolean = false,
     val visibleResultBase: Int? = null,
+    val returnIp: Int = -1,
 )

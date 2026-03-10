@@ -14,9 +14,9 @@ import io.github.charlietap.chasm.runtime.stack.InstructionStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
-internal typealias ThreadExecutor = (Configuration, List<ExecutionValue>) -> Result<List<Long>, InvocationError>
+internal typealias ThreadStackExecutor = (Configuration, List<ExecutionValue>) -> Result<List<Long>, InvocationError>
 
-internal fun ThreadExecutor(
+internal fun ThreadStackExecutor(
     configuration: Configuration,
     params: List<ExecutionValue>,
 ): Result<List<Long>, InvocationError> = binding {

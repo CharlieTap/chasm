@@ -23,7 +23,7 @@ fun FunctionPredecoder(
 internal inline fun FunctionPredecoder(
     context: PredecodingContext,
     function: Function,
-    crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
+    crossinline expressionPredecoder: (PredecodingContext, Expression, Boolean) -> Result<RuntimeExpression, ModuleTrapError>,
 ): Result<RuntimeFunction, ModuleTrapError> = binding {
     val type = context.types
         .getOrNull(function.typeIndex.idx)
@@ -43,6 +43,7 @@ internal inline fun FunctionPredecoder(
                 functionResultCount = results,
             ),
             function.body,
+            function.frameSlotMode,
         ).bind(),
         frameSlots = maxOf(function.frameSlots, params + function.locals.size),
         frameSlotMode = function.frameSlotMode,

@@ -137,6 +137,8 @@ data class ControlStack(
             val arity: Int,
             val depths: StackDepths,
             val continuation: DispatchableInstruction?,
+            val branchIp: Int = -1,
+            val loopIp: Int = -1,
         ) : Entry
     }
 

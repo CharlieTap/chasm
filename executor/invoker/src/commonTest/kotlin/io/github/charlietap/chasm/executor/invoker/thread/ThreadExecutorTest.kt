@@ -43,7 +43,7 @@ class ThreadExecutorTest {
 
         val params = mutableListOf<ExecutionValue>(i32(2), i32(3))
 
-        val actual = ThreadExecutor(
+        val actual = ThreadStackExecutor(
             configuration = configuration,
             params = params,
         )

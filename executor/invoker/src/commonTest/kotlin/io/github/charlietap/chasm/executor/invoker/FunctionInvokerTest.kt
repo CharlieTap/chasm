@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
+import io.github.charlietap.chasm.executor.invoker.thread.ThreadStackExecutor
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
@@ -42,7 +42,7 @@ class FunctionInvokerTest {
             instructions = mutableListOf(functionInstruction),
         )
 
-        val threadExecutor: ThreadExecutor = { _config, _params ->
+        val threadStackExecutor: ThreadStackExecutor = { _config, _params ->
             assertEquals(config, _config.config)
             assertEquals(params, _params)
             Ok(listOf(117L))
@@ -53,7 +53,7 @@ class FunctionInvokerTest {
             store = store,
             address = address,
             values = params,
-            threadExecutor = threadExecutor,
+            threadStackExecutor = threadStackExecutor,
         )
 
         assertEquals(Ok(listOf(i32(117))), actual)

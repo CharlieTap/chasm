@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 // Legacy stack-mode functions still return through the value stack directly.
-internal fun RestoreLegacyCallResult(
+fun RestoreLegacyCallResult(
     vstack: ValueStack,
     frame: ActivationFrame,
 ) {
@@ -16,7 +16,7 @@ internal fun RestoreLegacyCallResult(
     )
 }
 
-internal fun FinishStrictFrameSlotCallResult(
+fun FinishStrictFrameSlotCallResult(
     vstack: ValueStack,
     frame: ActivationFrame,
 ): Boolean {

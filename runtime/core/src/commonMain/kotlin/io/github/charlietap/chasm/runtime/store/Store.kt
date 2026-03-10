@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.runtime.store
 
 import io.github.charlietap.chasm.runtime.Heap
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.dispatch.FusedIpDispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
@@ -25,8 +26,31 @@ data class Store(
     val data: MutableList<DataInstance> = mutableListOf(),
     val exceptions: MutableList<ExceptionInstance> = mutableListOf(),
     val instructions: MutableList<DispatchableInstruction> = mutableListOf(),
+    val codeArena: MutableList<FusedIpDispatchableInstruction> = mutableListOf(),
     val structs: MutableList<StructInstance?> = mutableListOf(),
     val arrays: MutableList<ArrayInstance?> = mutableListOf(),
     val rttCache: MutableMap<DefinedType, RTT> = mutableMapOf(),
     val heap: Heap = Heap(),
-)
+) {
+    var codeArenaArray: Array<FusedIpDispatchableInstruction> = codeArena.toTypedArray()
+        private set
+
+    fun appendCodeArena(
+        values: List<FusedIpDispatchableInstruction>,
+    ) {
+        if (values.isEmpty()) return
+
+        codeArena.addAll(values)
+
+        val currentSize = codeArenaArray.size
+        @Suppress("UNCHECKED_CAST")
+        val grown = arrayOfNulls<FusedIpDispatchableInstruction>(
+            currentSize + values.size,
+        ) as Array<FusedIpDispatchableInstruction>
+        codeArenaArray.copyInto(grown)
+        values.forEachIndexed { index, instruction ->
+            grown[currentSize + index] = instruction
+        }
+        codeArenaArray = grown
+    }
+}

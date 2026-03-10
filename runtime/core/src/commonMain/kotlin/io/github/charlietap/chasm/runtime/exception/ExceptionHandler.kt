@@ -11,4 +11,6 @@ data class ExceptionHandler(
     val instructionsDepth: Int,
     val labelsDepth: Int,
     val framePointer: Int,
+    val handlerIp: Int = -1,
+    var continuationIps: List<Int> = emptyList(),
 )

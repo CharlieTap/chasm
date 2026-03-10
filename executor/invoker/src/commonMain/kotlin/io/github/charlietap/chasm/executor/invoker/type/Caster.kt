@@ -21,7 +21,7 @@ import io.github.charlietap.chasm.type.ReferenceType
 
 typealias Caster = (Long, ReferenceType, ModuleInstance, Store) -> Boolean
 
-internal inline fun Caster(
+fun Caster(
     referenceValue: Long,
     referenceType: ReferenceType,
     moduleInstance: ModuleInstance,

@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotsDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpDispatcher
-import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
+import io.github.charlietap.chasm.executor.invoker.thread.ThreadStackExecutor
 import io.github.charlietap.chasm.fixture.runtime.configuration
 import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
@@ -52,7 +52,7 @@ class JumpInstructionExecutorsTest {
             },
         )
 
-        val actual = ThreadExecutor(
+        val actual = ThreadStackExecutor(
             configuration = configuration(
                 store = store(),
                 thread = thread(
@@ -112,7 +112,7 @@ class JumpInstructionExecutorsTest {
             },
         )
 
-        val actual = ThreadExecutor(
+        val actual = ThreadStackExecutor(
             configuration = configuration(
                 store = store(),
                 thread = thread(
