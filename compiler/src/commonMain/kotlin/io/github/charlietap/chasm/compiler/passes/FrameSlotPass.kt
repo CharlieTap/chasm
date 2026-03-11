@@ -2,25 +2,25 @@ package io.github.charlietap.chasm.compiler.passes
 
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
+import io.github.charlietap.chasm.ir.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
+import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
-import io.github.charlietap.chasm.ir.instruction.FusedParametricInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedReferenceInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedTableInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
+import io.github.charlietap.chasm.ir.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.ParametricInstruction
+import io.github.charlietap.chasm.ir.instruction.ParametricSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ir.instruction.ReferenceSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
+import io.github.charlietap.chasm.ir.instruction.TableSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
+import io.github.charlietap.chasm.ir.instruction.VariableSuperInstruction
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.ir.module.Import
 import io.github.charlietap.chasm.ir.module.Index
@@ -350,8 +350,8 @@ private fun FrameSlotUnreachableInstructionLowerer(
     instruction: Instruction,
     state: FrameSlotState,
 ): List<Instruction> = when (instruction) {
-    is FusedNumericInstruction -> FrameSlotNumericInstructionLowerer(instruction, state) ?: listOf(instruction)
-    is FusedMemoryInstruction -> FrameSlotMemoryInstructionLowerer(instruction, state) ?: listOf(instruction)
+    is NumericSuperInstruction -> FrameSlotNumericInstructionLowerer(instruction, state) ?: listOf(instruction)
+    is MemorySuperInstruction -> FrameSlotMemoryInstructionLowerer(instruction, state) ?: listOf(instruction)
     is ParametricInstruction.Select,
     is ParametricInstruction.SelectWithType,
     -> FrameSlotRawSelectLowerer(state) ?: listOf(instruction)
@@ -372,7 +372,7 @@ private fun FrameSlotUnreachableInstructionLowerer(
         val operand = FrameSlotOperandLowerer(FusedOperand.ValueStack, state)
         operand?.let {
             listOf(
-                FusedVariableInstruction.GlobalSet(
+                VariableSuperInstruction.GlobalSet(
                     operand = it.lowered,
                     globalIdx = instruction.globalIdx,
                 ),
@@ -384,10 +384,10 @@ private fun FrameSlotUnreachableInstructionLowerer(
         localIdx = instruction.localIdx,
         state = state,
     ) ?: listOf(instruction)
-    is FusedVariableInstruction.GlobalGet -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
+    is VariableSuperInstruction.GlobalGet -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     } ?: listOf(instruction)
-    is FusedVariableInstruction.GlobalSet -> {
+    is VariableSuperInstruction.GlobalSet -> {
         val operand = FrameSlotOperandLowerer(instruction.operand, state)
         operand?.let {
             listOf(
@@ -397,29 +397,29 @@ private fun FrameSlotUnreachableInstructionLowerer(
             )
         } ?: listOf(instruction)
     }
-    is FusedVariableInstruction.LocalSet -> FrameSlotLocalSetLowerer(
+    is VariableSuperInstruction.LocalSet -> FrameSlotLocalSetLowerer(
         operand = instruction.operand,
         localIdx = instruction.localIdx,
         state = state,
     ) ?: listOf(instruction)
-    is FusedVariableInstruction.LocalTee -> FrameSlotLocalTeeLowerer(
+    is VariableSuperInstruction.LocalTee -> FrameSlotLocalTeeLowerer(
         operand = instruction.operand,
         localIdx = instruction.localIdx,
         state = state,
     ) ?: listOf(instruction)
-    is FusedParametricInstruction.Select -> FrameSlotSelectLowerer(
+    is ParametricSuperInstruction.Select -> FrameSlotSelectLowerer(
         instruction = instruction,
         state = state,
     ) ?: listOf(instruction)
     is ReferenceInstruction -> FrameSlotRawReferenceInstructionLowerer(instruction, state) ?: listOf(instruction)
-    is FusedReferenceInstruction -> FrameSlotReferenceInstructionLowerer(
+    is ReferenceSuperInstruction -> FrameSlotReferenceInstructionLowerer(
         instruction = instruction,
         state = state,
     ) ?: listOf(instruction)
     is TableInstruction -> FrameSlotRawTableInstructionLowerer(instruction, state) ?: listOf(instruction)
-    is FusedTableInstruction -> FrameSlotTableInstructionLowerer(instruction, state) ?: listOf(instruction)
+    is TableSuperInstruction -> FrameSlotTableInstructionLowerer(instruction, state) ?: listOf(instruction)
     is AggregateInstruction -> FrameSlotRawAggregateInstructionLowerer(context, instruction, state) ?: listOf(instruction)
-    is FusedAggregateInstruction -> FrameSlotAggregateInstructionLowerer(
+    is AggregateSuperInstruction -> FrameSlotAggregateInstructionLowerer(
         context = context,
         instruction = instruction,
         state = state,
@@ -467,7 +467,7 @@ private fun FrameSlotUnreachableInstructionLowerer(
             ),
         ),
     )
-    is FusedControlInstruction.If -> listOf(
+    is ControlSuperInstruction.If -> listOf(
         instruction.copy(
             thenInstructions = FrameSlotUnreachableInstructionsLowerer(
                 context = context,
@@ -483,13 +483,13 @@ private fun FrameSlotUnreachableInstructionLowerer(
             },
         ),
     )
-    is FusedControlInstruction.Call -> FrameSlotCallLowerer(
+    is ControlSuperInstruction.Call -> FrameSlotCallLowerer(
         context = context,
         operands = instruction.operands,
         functionIndex = instruction.functionIndex,
         state = state,
     ) ?: listOf(instruction)
-    is FusedControlInstruction.CallIndirect -> FrameSlotCallIndirectLowerer(
+    is ControlSuperInstruction.CallIndirect -> FrameSlotCallIndirectLowerer(
         context = context,
         elementIndex = instruction.elementIndex,
         operands = instruction.operands,
@@ -497,20 +497,20 @@ private fun FrameSlotUnreachableInstructionLowerer(
         tableIndex = instruction.tableIndex,
         state = state,
     ) ?: listOf(instruction)
-    is FusedControlInstruction.CallRef -> FrameSlotCallRefLowerer(
+    is ControlSuperInstruction.CallRef -> FrameSlotCallRefLowerer(
         context = context,
         functionReference = instruction.functionReference,
         operands = instruction.operands,
         typeIndex = instruction.typeIndex,
         state = state,
     ) ?: listOf(instruction)
-    is FusedControlInstruction.ReturnCall -> FrameSlotReturnCallLowerer(
+    is ControlSuperInstruction.ReturnCall -> FrameSlotReturnCallLowerer(
         context = context,
         operands = instruction.operands,
         functionIndex = instruction.functionIndex,
         state = state,
     ) ?: listOf(instruction)
-    is FusedControlInstruction.ReturnCallIndirect -> FrameSlotReturnCallIndirectLowerer(
+    is ControlSuperInstruction.ReturnCallIndirect -> FrameSlotReturnCallIndirectLowerer(
         context = context,
         elementIndex = instruction.elementIndex,
         operands = instruction.operands,
@@ -518,7 +518,7 @@ private fun FrameSlotUnreachableInstructionLowerer(
         tableIndex = instruction.tableIndex,
         state = state,
     ) ?: listOf(instruction)
-    is FusedControlInstruction.ReturnCallRef -> FrameSlotReturnCallRefLowerer(
+    is ControlSuperInstruction.ReturnCallRef -> FrameSlotReturnCallRefLowerer(
         context = context,
         functionReference = instruction.functionReference,
         operands = instruction.operands,
@@ -669,7 +669,7 @@ private fun FrameSlotInstructionLowerer(
     is VariableInstruction.GlobalSet -> {
         val operand = FrameSlotOperandLowerer(FusedOperand.ValueStack, state) ?: return null
         listOf(
-            FusedVariableInstruction.GlobalSet(
+            VariableSuperInstruction.GlobalSet(
                 operand = operand.lowered,
                 globalIdx = instruction.globalIdx,
             ),
@@ -684,13 +684,13 @@ private fun FrameSlotInstructionLowerer(
     is NumericInstruction -> FrameSlotRawNumericInstructionLowerer(instruction, state)
     is TableInstruction -> FrameSlotRawTableInstructionLowerer(instruction, state)
     is AggregateInstruction -> FrameSlotRawAggregateInstructionLowerer(context, instruction, state)
-    is FusedNumericInstruction -> FrameSlotNumericInstructionLowerer(instruction, state)
+    is NumericSuperInstruction -> FrameSlotNumericInstructionLowerer(instruction, state)
     is MemoryInstruction -> FrameSlotRawMemoryInstructionLowerer(instruction, state)
-    is FusedMemoryInstruction -> FrameSlotMemoryInstructionLowerer(instruction, state)
-    is FusedVariableInstruction.GlobalGet -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
+    is MemorySuperInstruction -> FrameSlotMemoryInstructionLowerer(instruction, state)
+    is VariableSuperInstruction.GlobalGet -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedVariableInstruction.GlobalSet -> {
+    is VariableSuperInstruction.GlobalSet -> {
         val operand = FrameSlotOperandLowerer(instruction.operand, state) ?: return null
         listOf(
             instruction.copy(
@@ -698,29 +698,29 @@ private fun FrameSlotInstructionLowerer(
             ),
         )
     }
-    is FusedVariableInstruction.LocalSet -> FrameSlotLocalSetLowerer(
+    is VariableSuperInstruction.LocalSet -> FrameSlotLocalSetLowerer(
         operand = instruction.operand,
         localIdx = instruction.localIdx,
         state = state,
     )
-    is FusedVariableInstruction.LocalTee -> FrameSlotLocalTeeLowerer(
+    is VariableSuperInstruction.LocalTee -> FrameSlotLocalTeeLowerer(
         operand = instruction.operand,
         localIdx = instruction.localIdx,
         state = state,
     )
-    is FusedParametricInstruction.Select -> FrameSlotSelectLowerer(
+    is ParametricSuperInstruction.Select -> FrameSlotSelectLowerer(
         instruction = instruction,
         state = state,
     )
-    is FusedReferenceInstruction -> FrameSlotReferenceInstructionLowerer(
+    is ReferenceSuperInstruction -> FrameSlotReferenceInstructionLowerer(
         instruction = instruction,
         state = state,
     )
-    is FusedTableInstruction -> FrameSlotTableInstructionLowerer(
+    is TableSuperInstruction -> FrameSlotTableInstructionLowerer(
         instruction = instruction,
         state = state,
     )
-    is FusedAggregateInstruction -> FrameSlotAggregateInstructionLowerer(
+    is AggregateSuperInstruction -> FrameSlotAggregateInstructionLowerer(
         context = context,
         instruction = instruction,
         state = state,
@@ -755,19 +755,19 @@ private fun FrameSlotInstructionLowerer(
             )
         }
     }
-    is FusedControlInstruction.BrIf -> FrameSlotBrIfLowerer(
+    is ControlSuperInstruction.BrIf -> FrameSlotBrIfLowerer(
         operand = instruction.operand,
         labelIndex = instruction.labelIndex,
         state = state,
         labels = labels,
     )
-    is FusedControlInstruction.Call -> FrameSlotCallLowerer(
+    is ControlSuperInstruction.Call -> FrameSlotCallLowerer(
         context = context,
         operands = instruction.operands,
         functionIndex = instruction.functionIndex,
         state = state,
     )
-    is FusedControlInstruction.CallIndirect -> FrameSlotCallIndirectLowerer(
+    is ControlSuperInstruction.CallIndirect -> FrameSlotCallIndirectLowerer(
         context = context,
         elementIndex = instruction.elementIndex,
         operands = instruction.operands,
@@ -775,20 +775,20 @@ private fun FrameSlotInstructionLowerer(
         tableIndex = instruction.tableIndex,
         state = state,
     )
-    is FusedControlInstruction.CallRef -> FrameSlotCallRefLowerer(
+    is ControlSuperInstruction.CallRef -> FrameSlotCallRefLowerer(
         context = context,
         functionReference = instruction.functionReference,
         operands = instruction.operands,
         typeIndex = instruction.typeIndex,
         state = state,
     )
-    is FusedControlInstruction.ReturnCall -> FrameSlotReturnCallLowerer(
+    is ControlSuperInstruction.ReturnCall -> FrameSlotReturnCallLowerer(
         context = context,
         operands = instruction.operands,
         functionIndex = instruction.functionIndex,
         state = state,
     )
-    is FusedControlInstruction.ReturnCallIndirect -> FrameSlotReturnCallIndirectLowerer(
+    is ControlSuperInstruction.ReturnCallIndirect -> FrameSlotReturnCallIndirectLowerer(
         context = context,
         elementIndex = instruction.elementIndex,
         operands = instruction.operands,
@@ -796,14 +796,14 @@ private fun FrameSlotInstructionLowerer(
         tableIndex = instruction.tableIndex,
         state = state,
     )
-    is FusedControlInstruction.ReturnCallRef -> FrameSlotReturnCallRefLowerer(
+    is ControlSuperInstruction.ReturnCallRef -> FrameSlotReturnCallRefLowerer(
         context = context,
         functionReference = instruction.functionReference,
         operands = instruction.operands,
         typeIndex = instruction.typeIndex,
         state = state,
     )
-    is FusedControlInstruction.If -> {
+    is ControlSuperInstruction.If -> {
         FrameSlotIfLowerer(
             context = context,
             operand = instruction.operand,
@@ -984,7 +984,7 @@ private fun FrameSlotIfLowerer(
     state.rewindTemporaryAllocator(labels)
 
     return listOf(
-        FusedControlInstruction.If(
+        ControlSuperInstruction.If(
             operand = loweredOperand.lowered,
             blockType = blockType,
             thenInstructions = finalizedThenInstructions,
@@ -1160,7 +1160,7 @@ private fun FrameSlotBrIfLowerer(
     target.reachedByBranch = true
 
     return listOf(
-        FusedControlInstruction.BrIf(
+        ControlSuperInstruction.BrIf(
             operand = loweredOperand.lowered,
             labelIndex = labelIndex,
             takenInstructions = materializeResults + FrameSlotCopyInstructions(sourceSlots, target.branchSlots),
@@ -1194,7 +1194,7 @@ private fun FrameSlotBrTableLowerer(
     state.reachable = false
 
     return listOf(
-        FusedControlInstruction.BrTable(
+        ControlSuperInstruction.BrTable(
             operand = loweredOperand.lowered,
             labelIndices = labelIndices,
             defaultLabelIndex = defaultLabelIndex,
@@ -1217,7 +1217,7 @@ private fun FrameSlotBrOnNullLowerer(
     target.reachedByBranch = true
 
     return operandMaterialization + listOf(
-        FusedControlInstruction.BrOnNull(
+        ControlSuperInstruction.BrOnNull(
             operand = FusedOperand.FrameSlot(operandSlot),
             labelIndex = labelIndex,
             takenInstructions = materializeResults + FrameSlotCopyInstructions(sourceSlots, target.branchSlots),
@@ -1239,7 +1239,7 @@ private fun FrameSlotBrOnNonNullLowerer(
     target.reachedByBranch = true
 
     return operandMaterialization + listOf(
-        FusedControlInstruction.BrOnNonNull(
+        ControlSuperInstruction.BrOnNonNull(
             operand = FusedOperand.FrameSlot(operandSlot),
             labelIndex = labelIndex,
             takenInstructions = materializeResults + FrameSlotCopyInstructions(sourceSlots, target.branchSlots),
@@ -1260,7 +1260,7 @@ private fun FrameSlotBrOnCastLowerer(
     target.reachedByBranch = true
 
     return operandMaterialization + listOf(
-        FusedControlInstruction.BrOnCast(
+        ControlSuperInstruction.BrOnCast(
             operand = FusedOperand.FrameSlot(operandSlot),
             labelIndex = instruction.labelIndex,
             srcReferenceType = instruction.srcReferenceType,
@@ -1283,7 +1283,7 @@ private fun FrameSlotBrOnCastFailLowerer(
     target.reachedByBranch = true
 
     return operandMaterialization + listOf(
-        FusedControlInstruction.BrOnCastFail(
+        ControlSuperInstruction.BrOnCastFail(
             operand = FusedOperand.FrameSlot(operandSlot),
             labelIndex = instruction.labelIndex,
             srcReferenceType = instruction.srcReferenceType,
@@ -1326,7 +1326,7 @@ private fun FrameSlotThrowLowerer(
     return buildList {
         addAll(payloadMaterialization)
         add(
-            FusedControlInstruction.Throw(
+            ControlSuperInstruction.Throw(
                 tagIndex = instruction.tagIndex,
                 payloads = payloadSlots.map { slot -> FusedOperand.FrameSlot(slot) },
             ),
@@ -1341,7 +1341,7 @@ private fun FrameSlotThrowRefLowerer(
     state.reachable = false
 
     return listOf(
-        FusedControlInstruction.ThrowRef(
+        ControlSuperInstruction.ThrowRef(
             exceptionReference = loweredOperand.lowered,
         ),
     )
@@ -1382,7 +1382,7 @@ private fun FrameSlotCallLowerer(
     return buildList {
         addAll(preparedOperands.instructions)
         add(
-            FusedControlInstruction.Call(
+            ControlSuperInstruction.Call(
                 operands = emptyList(),
                 functionIndex = functionIndex,
                 resultSlots = resultSlots,
@@ -1444,7 +1444,7 @@ private fun FrameSlotCallIndirectLowerer(
         addAll(prepareElementIndex)
         addAll(preparedOperands.instructions)
         add(
-            FusedControlInstruction.CallIndirect(
+            ControlSuperInstruction.CallIndirect(
                 elementIndex = preparedElementIndex,
                 operands = emptyList(),
                 typeIndex = typeIndex,
@@ -1507,7 +1507,7 @@ private fun FrameSlotCallRefLowerer(
         addAll(prepareFunctionReference)
         addAll(preparedOperands.instructions)
         add(
-            FusedControlInstruction.CallRef(
+            ControlSuperInstruction.CallRef(
                 functionReference = preparedFunctionReference,
                 operands = emptyList(),
                 typeIndex = typeIndex,
@@ -1532,7 +1532,7 @@ private fun FrameSlotReturnCallLowerer(
     state.reachable = false
 
     return listOf(
-        FusedControlInstruction.ReturnCall(
+        ControlSuperInstruction.ReturnCall(
             operands = loweredOperands.lowered,
             functionIndex = functionIndex,
         ),
@@ -1564,7 +1564,7 @@ private fun FrameSlotReturnCallIndirectLowerer(
     state.reachable = false
 
     return listOf(
-        FusedControlInstruction.ReturnCallIndirect(
+        ControlSuperInstruction.ReturnCallIndirect(
             elementIndex = loweredElementIndex.lowered,
             operands = loweredOperands.lowered,
             typeIndex = typeIndex,
@@ -1597,7 +1597,7 @@ private fun FrameSlotReturnCallRefLowerer(
     state.reachable = false
 
     return listOf(
-        FusedControlInstruction.ReturnCallRef(
+        ControlSuperInstruction.ReturnCallRef(
             functionReference = loweredFunctionReference.lowered,
             operands = loweredOperands.lowered,
             typeIndex = typeIndex,
@@ -1634,7 +1634,7 @@ private fun FrameSlotLocalSetLowerer(
     return buildList {
         addAll(preserveAliases)
         add(
-            FusedVariableInstruction.LocalSet(
+            VariableSuperInstruction.LocalSet(
                 operand = loweredOperand.lowered,
                 localIdx = localIdx,
             ),
@@ -1665,7 +1665,7 @@ private fun FrameSlotLocalTeeLowerer(
     return buildList {
         addAll(preserveAliases)
         add(
-            FusedVariableInstruction.LocalSet(
+            VariableSuperInstruction.LocalSet(
                 operand = loweredOperand.lowered,
                 localIdx = localIdx,
             ),
@@ -1674,7 +1674,7 @@ private fun FrameSlotLocalTeeLowerer(
 }
 
 private fun FrameSlotSelectLowerer(
-    instruction: FusedParametricInstruction.Select,
+    instruction: ParametricSuperInstruction.Select,
     state: FrameSlotState,
 ): List<Instruction>? {
     val const = FrameSlotOperandLowerer(instruction.const, state) ?: return null
@@ -1695,7 +1695,7 @@ private fun FrameSlotSelectLowerer(
 private fun FrameSlotRawSelectLowerer(
     state: FrameSlotState,
 ): List<Instruction>? = FrameSlotSelectLowerer(
-    instruction = FusedParametricInstruction.Select(
+    instruction = ParametricSuperInstruction.Select(
         const = FusedOperand.ValueStack,
         val1 = FusedOperand.ValueStack,
         val2 = FusedOperand.ValueStack,
@@ -1717,7 +1717,7 @@ private fun FrameSlotGlobalGetLowerer(
     )
 
     return listOf(
-        FusedVariableInstruction.GlobalGet(
+        VariableSuperInstruction.GlobalGet(
             globalIdx = globalIdx,
             destination = FusedDestination.FrameSlot(slot),
         ),
@@ -1939,43 +1939,43 @@ private fun FrameSlotMultiDestinationLowerer(
 }
 
 private fun FrameSlotReferenceInstructionLowerer(
-    instruction: FusedReferenceInstruction,
+    instruction: ReferenceSuperInstruction,
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
-    is FusedReferenceInstruction.RefCast -> FrameSlotUnaryLowerer(instruction.reference, instruction.destination, state) { reference, destination ->
+    is ReferenceSuperInstruction.RefCast -> FrameSlotUnaryLowerer(instruction.reference, instruction.destination, state) { reference, destination ->
         instruction.copy(reference = reference, destination = destination)
     }
-    is FusedReferenceInstruction.RefEq -> FrameSlotBinaryLowerer(instruction.reference1, instruction.reference2, instruction.destination, state) { reference1, reference2, destination ->
+    is ReferenceSuperInstruction.RefEq -> FrameSlotBinaryLowerer(instruction.reference1, instruction.reference2, instruction.destination, state) { reference1, reference2, destination ->
         instruction.copy(reference1 = reference1, reference2 = reference2, destination = destination)
     }
-    is FusedReferenceInstruction.RefIsNull -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
+    is ReferenceSuperInstruction.RefIsNull -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
         instruction.copy(value = value, destination = destination)
     }
-    is FusedReferenceInstruction.RefAsNonNull -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
+    is ReferenceSuperInstruction.RefAsNonNull -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
         instruction.copy(value = value, destination = destination)
     }
-    is FusedReferenceInstruction.RefFunc -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
+    is ReferenceSuperInstruction.RefFunc -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedReferenceInstruction.RefNull -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
+    is ReferenceSuperInstruction.RefNull -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedReferenceInstruction.RefTest -> FrameSlotUnaryLowerer(instruction.reference, instruction.destination, state) { reference, destination ->
+    is ReferenceSuperInstruction.RefTest -> FrameSlotUnaryLowerer(instruction.reference, instruction.destination, state) { reference, destination ->
         instruction.copy(reference = reference, destination = destination)
     }
 }
 
 private fun FrameSlotTableInstructionLowerer(
-    instruction: FusedTableInstruction,
+    instruction: TableSuperInstruction,
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
-    is FusedTableInstruction.TableGet -> FrameSlotUnaryLowerer(instruction.elementIndex, instruction.destination, state) { elementIndex, destination ->
+    is TableSuperInstruction.TableGet -> FrameSlotUnaryLowerer(instruction.elementIndex, instruction.destination, state) { elementIndex, destination ->
         instruction.copy(elementIndex = elementIndex, destination = destination)
     }
-    is FusedTableInstruction.TableSet -> FrameSlotBinaryOperandsLowerer(instruction.value, instruction.elementIdx, state) { value, elementIdx ->
+    is TableSuperInstruction.TableSet -> FrameSlotBinaryOperandsLowerer(instruction.value, instruction.elementIdx, state) { value, elementIdx ->
         instruction.copy(value = value, elementIdx = elementIdx)
     }
-    is FusedTableInstruction.TableCopy -> FrameSlotOperandListLowerer(
+    is TableSuperInstruction.TableCopy -> FrameSlotOperandListLowerer(
         operands = listOf(instruction.elementsToCopy, instruction.srcOffset, instruction.dstOffset),
         state = state,
     ) { operands, _ ->
@@ -1985,7 +1985,7 @@ private fun FrameSlotTableInstructionLowerer(
             dstOffset = operands[2],
         )
     }
-    is FusedTableInstruction.TableFill -> FrameSlotOperandListLowerer(
+    is TableSuperInstruction.TableFill -> FrameSlotOperandListLowerer(
         operands = listOf(instruction.elementsToFill, instruction.fillValue, instruction.tableOffset),
         state = state,
     ) { operands, _ ->
@@ -1995,10 +1995,10 @@ private fun FrameSlotTableInstructionLowerer(
             tableOffset = operands[2],
         )
     }
-    is FusedTableInstruction.TableGrow -> FrameSlotBinaryLowerer(instruction.elementsToAdd, instruction.referenceValue, instruction.destination, state) { elementsToAdd, referenceValue, destination ->
+    is TableSuperInstruction.TableGrow -> FrameSlotBinaryLowerer(instruction.elementsToAdd, instruction.referenceValue, instruction.destination, state) { elementsToAdd, referenceValue, destination ->
         instruction.copy(elementsToAdd = elementsToAdd, referenceValue = referenceValue, destination = destination)
     }
-    is FusedTableInstruction.TableInit -> FrameSlotOperandListLowerer(
+    is TableSuperInstruction.TableInit -> FrameSlotOperandListLowerer(
         operands = listOf(instruction.elementsToInitialise, instruction.segmentOffset, instruction.tableOffset),
         state = state,
     ) { operands, _ ->
@@ -2008,17 +2008,17 @@ private fun FrameSlotTableInstructionLowerer(
             tableOffset = operands[2],
         )
     }
-    is FusedTableInstruction.TableSize -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
+    is TableSuperInstruction.TableSize -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
 }
 
 private fun FrameSlotAggregateInstructionLowerer(
     context: PassContext,
-    instruction: FusedAggregateInstruction,
+    instruction: AggregateSuperInstruction,
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
-    is FusedAggregateInstruction.ArrayCopy -> FrameSlotOperandListLowerer(
+    is AggregateSuperInstruction.ArrayCopy -> FrameSlotOperandListLowerer(
         operands = listOf(
             instruction.elementsToCopy,
             instruction.sourceOffset,
@@ -2036,7 +2036,7 @@ private fun FrameSlotAggregateInstructionLowerer(
             destinationAddress = operands[4],
         )
     }
-    is FusedAggregateInstruction.ArrayFill -> FrameSlotOperandListLowerer(
+    is AggregateSuperInstruction.ArrayFill -> FrameSlotOperandListLowerer(
         operands = listOf(
             instruction.elementsToFill,
             instruction.fillValue,
@@ -2052,31 +2052,31 @@ private fun FrameSlotAggregateInstructionLowerer(
             address = operands[3],
         )
     }
-    is FusedAggregateInstruction.ArrayGet -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
+    is AggregateSuperInstruction.ArrayGet -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
         instruction.copy(address = address, field = field, destination = destination)
     }
-    is FusedAggregateInstruction.ArrayGetSigned -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
+    is AggregateSuperInstruction.ArrayGetSigned -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
         instruction.copy(address = address, field = field, destination = destination)
     }
-    is FusedAggregateInstruction.ArrayGetUnsigned -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
+    is AggregateSuperInstruction.ArrayGetUnsigned -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
         instruction.copy(address = address, field = field, destination = destination)
     }
-    is FusedAggregateInstruction.ArrayLen -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
+    is AggregateSuperInstruction.ArrayLen -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
         instruction.copy(address = address, destination = destination)
     }
-    is FusedAggregateInstruction.ArrayNew -> FrameSlotBinaryLowerer(instruction.size, instruction.value, instruction.destination, state) { size, value, destination ->
+    is AggregateSuperInstruction.ArrayNew -> FrameSlotBinaryLowerer(instruction.size, instruction.value, instruction.destination, state) { size, value, destination ->
         instruction.copy(size = size, value = value, destination = destination)
     }
-    is FusedAggregateInstruction.ArrayNewDefault -> FrameSlotUnaryLowerer(instruction.size, instruction.destination, state) { size, destination ->
+    is AggregateSuperInstruction.ArrayNewDefault -> FrameSlotUnaryLowerer(instruction.size, instruction.destination, state) { size, destination ->
         instruction.copy(size = size, destination = destination)
     }
-    is FusedAggregateInstruction.ArrayNewData -> FrameSlotBinaryLowerer(instruction.arrayLength, instruction.sourceOffset, instruction.destination, state) { arrayLength, sourceOffset, destination ->
+    is AggregateSuperInstruction.ArrayNewData -> FrameSlotBinaryLowerer(instruction.arrayLength, instruction.sourceOffset, instruction.destination, state) { arrayLength, sourceOffset, destination ->
         instruction.copy(sourceOffset = sourceOffset, arrayLength = arrayLength, destination = destination)
     }
-    is FusedAggregateInstruction.ArrayNewElement -> FrameSlotBinaryLowerer(instruction.arrayLength, instruction.sourceOffset, instruction.destination, state) { arrayLength, sourceOffset, destination ->
+    is AggregateSuperInstruction.ArrayNewElement -> FrameSlotBinaryLowerer(instruction.arrayLength, instruction.sourceOffset, instruction.destination, state) { arrayLength, sourceOffset, destination ->
         instruction.copy(sourceOffset = sourceOffset, arrayLength = arrayLength, destination = destination)
     }
-    is FusedAggregateInstruction.ArrayNewFixed -> {
+    is AggregateSuperInstruction.ArrayNewFixed -> {
         val values = FrameSlotStackOperands(instruction.size, state) ?: return null
         val destination = FrameSlotDestinationLowerer(instruction.destination, state) ?: return null
         val (materializeValues, valueSlots) = FrameSlotOperandSlots(values.lowered, values.sources, state) ?: return null
@@ -2088,7 +2088,7 @@ private fun FrameSlotAggregateInstructionLowerer(
             ),
         )
     }
-    is FusedAggregateInstruction.ArraySet -> FrameSlotOperandListLowerer(
+    is AggregateSuperInstruction.ArraySet -> FrameSlotOperandListLowerer(
         operands = listOf(instruction.value, instruction.field, instruction.address),
         state = state,
     ) { operands, _ ->
@@ -2098,7 +2098,7 @@ private fun FrameSlotAggregateInstructionLowerer(
             address = operands[2],
         )
     }
-    is FusedAggregateInstruction.ArrayInitData -> FrameSlotOperandListLowerer(
+    is AggregateSuperInstruction.ArrayInitData -> FrameSlotOperandListLowerer(
         operands = listOf(
             instruction.elementsToCopy,
             instruction.sourceOffset,
@@ -2114,7 +2114,7 @@ private fun FrameSlotAggregateInstructionLowerer(
             address = operands[3],
         )
     }
-    is FusedAggregateInstruction.ArrayInitElement -> FrameSlotOperandListLowerer(
+    is AggregateSuperInstruction.ArrayInitElement -> FrameSlotOperandListLowerer(
         operands = listOf(
             instruction.elementsToCopy,
             instruction.sourceOffset,
@@ -2130,31 +2130,31 @@ private fun FrameSlotAggregateInstructionLowerer(
             address = operands[3],
         )
     }
-    is FusedAggregateInstruction.RefI31 -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
+    is AggregateSuperInstruction.RefI31 -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
         instruction.copy(value = value, destination = destination)
     }
-    is FusedAggregateInstruction.I31GetSigned -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
+    is AggregateSuperInstruction.I31GetSigned -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
         instruction.copy(value = value, destination = destination)
     }
-    is FusedAggregateInstruction.I31GetUnsigned -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
+    is AggregateSuperInstruction.I31GetUnsigned -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
         instruction.copy(value = value, destination = destination)
     }
-    is FusedAggregateInstruction.AnyConvertExtern -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
+    is AggregateSuperInstruction.AnyConvertExtern -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
         instruction.copy(value = value, destination = destination)
     }
-    is FusedAggregateInstruction.ExternConvertAny -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
+    is AggregateSuperInstruction.ExternConvertAny -> FrameSlotUnaryLowerer(instruction.value, instruction.destination, state) { value, destination ->
         instruction.copy(value = value, destination = destination)
     }
-    is FusedAggregateInstruction.StructGet -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
+    is AggregateSuperInstruction.StructGet -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
         instruction.copy(address = address, destination = destination)
     }
-    is FusedAggregateInstruction.StructGetSigned -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
+    is AggregateSuperInstruction.StructGetSigned -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
         instruction.copy(address = address, destination = destination)
     }
-    is FusedAggregateInstruction.StructGetUnsigned -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
+    is AggregateSuperInstruction.StructGetUnsigned -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
         instruction.copy(address = address, destination = destination)
     }
-    is FusedAggregateInstruction.StructNew -> {
+    is AggregateSuperInstruction.StructNew -> {
         val fieldCount = context.structFieldCount(instruction.typeIndex) ?: return null
         val fields = FrameSlotStackOperands(fieldCount, state) ?: return null
         val destination = FrameSlotDestinationLowerer(instruction.destination, state) ?: return null
@@ -2167,10 +2167,10 @@ private fun FrameSlotAggregateInstructionLowerer(
             ),
         )
     }
-    is FusedAggregateInstruction.StructNewDefault -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
+    is AggregateSuperInstruction.StructNewDefault -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedAggregateInstruction.StructSet -> FrameSlotBinaryOperandsLowerer(instruction.value, instruction.address, state) { value, address ->
+    is AggregateSuperInstruction.StructSet -> FrameSlotBinaryOperandsLowerer(instruction.value, instruction.address, state) { value, address ->
         instruction.copy(value = value, address = address)
     }
 }
@@ -2182,20 +2182,20 @@ private fun FrameSlotRawAggregateInstructionLowerer(
 ): List<Instruction>? = when (instruction) {
     is AggregateInstruction.StructNew -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.StructNew(
+        instruction = AggregateSuperInstruction.StructNew(
             destination = FusedDestination.ValueStack,
             typeIndex = instruction.typeIndex,
         ),
         state = state,
     )
     is AggregateInstruction.StructNewDefault -> FrameSlotDestinationOnlyLowerer(FusedDestination.ValueStack, state) { destination ->
-        FusedAggregateInstruction.StructNewDefault(
+        AggregateSuperInstruction.StructNewDefault(
             destination = destination,
             typeIndex = instruction.typeIndex,
         )
     }
     is AggregateInstruction.StructGet -> FrameSlotRawUnaryLowerer(state) { address, destination ->
-        FusedAggregateInstruction.StructGet(
+        AggregateSuperInstruction.StructGet(
             address = address,
             destination = destination,
             typeIndex = instruction.typeIndex,
@@ -2203,7 +2203,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
         )
     }
     is AggregateInstruction.StructGetSigned -> FrameSlotRawUnaryLowerer(state) { address, destination ->
-        FusedAggregateInstruction.StructGetSigned(
+        AggregateSuperInstruction.StructGetSigned(
             address = address,
             destination = destination,
             typeIndex = instruction.typeIndex,
@@ -2211,7 +2211,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
         )
     }
     is AggregateInstruction.StructGetUnsigned -> FrameSlotRawUnaryLowerer(state) { address, destination ->
-        FusedAggregateInstruction.StructGetUnsigned(
+        AggregateSuperInstruction.StructGetUnsigned(
             address = address,
             destination = destination,
             typeIndex = instruction.typeIndex,
@@ -2220,7 +2220,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     }
     is AggregateInstruction.StructSet -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.StructSet(
+        instruction = AggregateSuperInstruction.StructSet(
             value = FusedOperand.ValueStack,
             address = FusedOperand.ValueStack,
             typeIndex = instruction.typeIndex,
@@ -2230,7 +2230,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     is AggregateInstruction.ArrayNew -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayNew(
+        instruction = AggregateSuperInstruction.ArrayNew(
             size = FusedOperand.ValueStack,
             value = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
@@ -2240,7 +2240,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     is AggregateInstruction.ArrayNewFixed -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayNewFixed(
+        instruction = AggregateSuperInstruction.ArrayNewFixed(
             destination = FusedDestination.ValueStack,
             typeIndex = instruction.typeIndex,
             size = instruction.size.toInt(),
@@ -2249,7 +2249,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     is AggregateInstruction.ArrayNewDefault -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayNewDefault(
+        instruction = AggregateSuperInstruction.ArrayNewDefault(
             size = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
             typeIndex = instruction.typeIndex,
@@ -2258,7 +2258,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     is AggregateInstruction.ArrayNewData -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayNewData(
+        instruction = AggregateSuperInstruction.ArrayNewData(
             sourceOffset = FusedOperand.ValueStack,
             arrayLength = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
@@ -2269,7 +2269,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     is AggregateInstruction.ArrayNewElement -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayNewElement(
+        instruction = AggregateSuperInstruction.ArrayNewElement(
             sourceOffset = FusedOperand.ValueStack,
             arrayLength = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
@@ -2279,7 +2279,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
         state = state,
     )
     is AggregateInstruction.ArrayGet -> FrameSlotRawBinaryLowerer(state) { address, field, destination ->
-        FusedAggregateInstruction.ArrayGet(
+        AggregateSuperInstruction.ArrayGet(
             address = address,
             field = field,
             destination = destination,
@@ -2287,7 +2287,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
         )
     }
     is AggregateInstruction.ArrayGetSigned -> FrameSlotRawBinaryLowerer(state) { address, field, destination ->
-        FusedAggregateInstruction.ArrayGetSigned(
+        AggregateSuperInstruction.ArrayGetSigned(
             address = address,
             field = field,
             destination = destination,
@@ -2295,7 +2295,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
         )
     }
     is AggregateInstruction.ArrayGetUnsigned -> FrameSlotRawBinaryLowerer(state) { address, field, destination ->
-        FusedAggregateInstruction.ArrayGetUnsigned(
+        AggregateSuperInstruction.ArrayGetUnsigned(
             address = address,
             field = field,
             destination = destination,
@@ -2304,7 +2304,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     }
     is AggregateInstruction.ArraySet -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArraySet(
+        instruction = AggregateSuperInstruction.ArraySet(
             value = FusedOperand.ValueStack,
             field = FusedOperand.ValueStack,
             address = FusedOperand.ValueStack,
@@ -2313,14 +2313,14 @@ private fun FrameSlotRawAggregateInstructionLowerer(
         state = state,
     )
     AggregateInstruction.ArrayLen -> FrameSlotRawUnaryLowerer(state) { address, destination ->
-        FusedAggregateInstruction.ArrayLen(
+        AggregateSuperInstruction.ArrayLen(
             address = address,
             destination = destination,
         )
     }
     is AggregateInstruction.ArrayFill -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayFill(
+        instruction = AggregateSuperInstruction.ArrayFill(
             elementsToFill = FusedOperand.ValueStack,
             fillValue = FusedOperand.ValueStack,
             arrayElementOffset = FusedOperand.ValueStack,
@@ -2331,7 +2331,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     is AggregateInstruction.ArrayCopy -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayCopy(
+        instruction = AggregateSuperInstruction.ArrayCopy(
             elementsToCopy = FusedOperand.ValueStack,
             sourceOffset = FusedOperand.ValueStack,
             sourceAddress = FusedOperand.ValueStack,
@@ -2344,7 +2344,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     is AggregateInstruction.ArrayInitData -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayInitData(
+        instruction = AggregateSuperInstruction.ArrayInitData(
             elementsToCopy = FusedOperand.ValueStack,
             sourceOffset = FusedOperand.ValueStack,
             destinationOffset = FusedOperand.ValueStack,
@@ -2356,7 +2356,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     is AggregateInstruction.ArrayInitElement -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ArrayInitElement(
+        instruction = AggregateSuperInstruction.ArrayInitElement(
             elementsToCopy = FusedOperand.ValueStack,
             sourceOffset = FusedOperand.ValueStack,
             destinationOffset = FusedOperand.ValueStack,
@@ -2368,7 +2368,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     AggregateInstruction.RefI31 -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.RefI31(
+        instruction = AggregateSuperInstruction.RefI31(
             value = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
         ),
@@ -2376,7 +2376,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     AggregateInstruction.I31GetSigned -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.I31GetSigned(
+        instruction = AggregateSuperInstruction.I31GetSigned(
             value = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
         ),
@@ -2384,7 +2384,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     AggregateInstruction.I31GetUnsigned -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.I31GetUnsigned(
+        instruction = AggregateSuperInstruction.I31GetUnsigned(
             value = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
         ),
@@ -2392,7 +2392,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     AggregateInstruction.AnyConvertExtern -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.AnyConvertExtern(
+        instruction = AggregateSuperInstruction.AnyConvertExtern(
             value = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
         ),
@@ -2400,7 +2400,7 @@ private fun FrameSlotRawAggregateInstructionLowerer(
     )
     AggregateInstruction.ExternConvertAny -> FrameSlotAggregateInstructionLowerer(
         context = context,
-        instruction = FusedAggregateInstruction.ExternConvertAny(
+        instruction = AggregateSuperInstruction.ExternConvertAny(
             value = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
         ),
@@ -2413,46 +2413,46 @@ private fun FrameSlotRawReferenceInstructionLowerer(
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
     is ReferenceInstruction.RefNull -> FrameSlotDestinationOnlyLowerer(FusedDestination.ValueStack, state) { destination ->
-        FusedReferenceInstruction.RefNull(
+        ReferenceSuperInstruction.RefNull(
             destination = destination,
             type = instruction.type,
         )
     }
     ReferenceInstruction.RefIsNull -> FrameSlotRawUnaryLowerer(state) { value, destination ->
-        FusedReferenceInstruction.RefIsNull(
+        ReferenceSuperInstruction.RefIsNull(
             value = value,
             destination = destination,
         )
     }
     ReferenceInstruction.RefAsNonNull -> FrameSlotReferenceInstructionLowerer(
-        instruction = FusedReferenceInstruction.RefAsNonNull(
+        instruction = ReferenceSuperInstruction.RefAsNonNull(
             value = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
         ),
         state = state,
     )
     is ReferenceInstruction.RefFunc -> FrameSlotDestinationOnlyLowerer(FusedDestination.ValueStack, state) { destination ->
-        FusedReferenceInstruction.RefFunc(
+        ReferenceSuperInstruction.RefFunc(
             destination = destination,
             funcIdx = instruction.funcIdx,
         )
     }
     ReferenceInstruction.RefEq -> FrameSlotRawBinaryLowerer(state) { reference1, reference2, destination ->
-        FusedReferenceInstruction.RefEq(
+        ReferenceSuperInstruction.RefEq(
             reference1 = reference1,
             reference2 = reference2,
             destination = destination,
         )
     }
     is ReferenceInstruction.RefTest -> FrameSlotRawUnaryLowerer(state) { reference, destination ->
-        FusedReferenceInstruction.RefTest(
+        ReferenceSuperInstruction.RefTest(
             reference = reference,
             destination = destination,
             referenceType = instruction.referenceType,
         )
     }
     is ReferenceInstruction.RefCast -> FrameSlotRawUnaryLowerer(state) { reference, destination ->
-        FusedReferenceInstruction.RefCast(
+        ReferenceSuperInstruction.RefCast(
             reference = reference,
             destination = destination,
             referenceType = instruction.referenceType,
@@ -2465,7 +2465,7 @@ private fun FrameSlotRawTableInstructionLowerer(
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
     is TableInstruction.TableGet -> FrameSlotTableInstructionLowerer(
-        instruction = FusedTableInstruction.TableGet(
+        instruction = TableSuperInstruction.TableGet(
             elementIndex = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
             tableIdx = instruction.tableIdx,
@@ -2473,7 +2473,7 @@ private fun FrameSlotRawTableInstructionLowerer(
         state = state,
     )
     is TableInstruction.TableSet -> FrameSlotTableInstructionLowerer(
-        instruction = FusedTableInstruction.TableSet(
+        instruction = TableSuperInstruction.TableSet(
             value = FusedOperand.ValueStack,
             elementIdx = FusedOperand.ValueStack,
             tableIdx = instruction.tableIdx,
@@ -2481,7 +2481,7 @@ private fun FrameSlotRawTableInstructionLowerer(
         state = state,
     )
     is TableInstruction.TableCopy -> FrameSlotTableInstructionLowerer(
-        instruction = FusedTableInstruction.TableCopy(
+        instruction = TableSuperInstruction.TableCopy(
             elementsToCopy = FusedOperand.ValueStack,
             srcOffset = FusedOperand.ValueStack,
             dstOffset = FusedOperand.ValueStack,
@@ -2491,7 +2491,7 @@ private fun FrameSlotRawTableInstructionLowerer(
         state = state,
     )
     is TableInstruction.TableFill -> FrameSlotTableInstructionLowerer(
-        instruction = FusedTableInstruction.TableFill(
+        instruction = TableSuperInstruction.TableFill(
             elementsToFill = FusedOperand.ValueStack,
             fillValue = FusedOperand.ValueStack,
             tableOffset = FusedOperand.ValueStack,
@@ -2500,7 +2500,7 @@ private fun FrameSlotRawTableInstructionLowerer(
         state = state,
     )
     is TableInstruction.TableGrow -> FrameSlotTableInstructionLowerer(
-        instruction = FusedTableInstruction.TableGrow(
+        instruction = TableSuperInstruction.TableGrow(
             elementsToAdd = FusedOperand.ValueStack,
             referenceValue = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
@@ -2509,7 +2509,7 @@ private fun FrameSlotRawTableInstructionLowerer(
         state = state,
     )
     is TableInstruction.TableInit -> FrameSlotTableInstructionLowerer(
-        instruction = FusedTableInstruction.TableInit(
+        instruction = TableSuperInstruction.TableInit(
             elementsToInitialise = FusedOperand.ValueStack,
             segmentOffset = FusedOperand.ValueStack,
             tableOffset = FusedOperand.ValueStack,
@@ -2519,7 +2519,7 @@ private fun FrameSlotRawTableInstructionLowerer(
         state = state,
     )
     is TableInstruction.TableSize -> FrameSlotDestinationOnlyLowerer(FusedDestination.ValueStack, state) { destination ->
-        FusedTableInstruction.TableSize(
+        TableSuperInstruction.TableSize(
             destination = destination,
             tableIdx = instruction.tableIdx,
         )
@@ -2528,76 +2528,76 @@ private fun FrameSlotRawTableInstructionLowerer(
 }
 
 private fun FrameSlotNumericInstructionLowerer(
-    instruction: FusedNumericInstruction,
+    instruction: NumericSuperInstruction,
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
-    is FusedNumericInstruction.I32Const -> FrameSlotConstantLowerer(FusedOperand.I32Const(instruction.value), instruction.destination, state) { destination ->
+    is NumericSuperInstruction.I32Const -> FrameSlotConstantLowerer(FusedOperand.I32Const(instruction.value), instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedNumericInstruction.I64Const -> FrameSlotConstantLowerer(FusedOperand.I64Const(instruction.value), instruction.destination, state) { destination ->
+    is NumericSuperInstruction.I64Const -> FrameSlotConstantLowerer(FusedOperand.I64Const(instruction.value), instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedNumericInstruction.F32Const -> FrameSlotConstantLowerer(FusedOperand.F32Const(Float.fromBits(instruction.bits)), instruction.destination, state) { destination ->
+    is NumericSuperInstruction.F32Const -> FrameSlotConstantLowerer(FusedOperand.F32Const(Float.fromBits(instruction.bits)), instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedNumericInstruction.F64Const -> FrameSlotConstantLowerer(FusedOperand.F64Const(Double.fromBits(instruction.bits)), instruction.destination, state) { destination ->
+    is NumericSuperInstruction.F64Const -> FrameSlotConstantLowerer(FusedOperand.F64Const(Double.fromBits(instruction.bits)), instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedNumericInstruction.I32Add -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32Add -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32Sub -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32Sub -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32Mul -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32Mul -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32DivS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32DivS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32DivU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32DivU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32RemS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32RemS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32RemU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32RemU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32And -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32And -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32Or -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32Or -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32Xor -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32Xor -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32Shl -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32Shl -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32ShrS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32ShrS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32ShrU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32ShrU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32Rotl -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32Rotl -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I32Rotr -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I32Rotr -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I64Add -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I64Add -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I64Sub -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I64Sub -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I64Mul -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
+    is NumericSuperInstruction.I64Mul -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination ->
         instruction.copy(left = left, right = right, destination = destination)
     }
-    is FusedNumericInstruction.I64Add128 -> FrameSlotQuadOperandDualDestinationLowerer(
+    is NumericSuperInstruction.I64Add128 -> FrameSlotQuadOperandDualDestinationLowerer(
         operand1 = instruction.leftLow,
         operand2 = instruction.leftHigh,
         operand3 = instruction.rightLow,
@@ -2615,7 +2615,7 @@ private fun FrameSlotNumericInstructionLowerer(
             destinationHigh = destinationHigh,
         )
     }
-    is FusedNumericInstruction.I64Sub128 -> FrameSlotQuadOperandDualDestinationLowerer(
+    is NumericSuperInstruction.I64Sub128 -> FrameSlotQuadOperandDualDestinationLowerer(
         operand1 = instruction.leftLow,
         operand2 = instruction.leftHigh,
         operand3 = instruction.rightLow,
@@ -2633,7 +2633,7 @@ private fun FrameSlotNumericInstructionLowerer(
             destinationHigh = destinationHigh,
         )
     }
-    is FusedNumericInstruction.I64MulWideS -> FrameSlotBinaryDualDestinationLowerer(
+    is NumericSuperInstruction.I64MulWideS -> FrameSlotBinaryDualDestinationLowerer(
         left = instruction.left,
         right = instruction.right,
         destinationLow = instruction.destinationLow,
@@ -2647,7 +2647,7 @@ private fun FrameSlotNumericInstructionLowerer(
             destinationHigh = destinationHigh,
         )
     }
-    is FusedNumericInstruction.I64MulWideU -> FrameSlotBinaryDualDestinationLowerer(
+    is NumericSuperInstruction.I64MulWideU -> FrameSlotBinaryDualDestinationLowerer(
         left = instruction.left,
         right = instruction.right,
         destinationLow = instruction.destinationLow,
@@ -2661,144 +2661,144 @@ private fun FrameSlotNumericInstructionLowerer(
             destinationHigh = destinationHigh,
         )
     }
-    is FusedNumericInstruction.I64DivS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64DivU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64RemS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64RemU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64And -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64Or -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64Xor -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64Shl -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64ShrS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64ShrU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64Rotl -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64Rotr -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Add -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Sub -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Mul -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Div -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Min -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Max -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Copysign -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Add -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Sub -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Mul -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Div -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Min -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Max -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Copysign -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32Eqz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64Eqz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32Abs -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32Neg -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32Ceil -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32Floor -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32Trunc -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32Nearest -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32Sqrt -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64Abs -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64Neg -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64Ceil -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64Floor -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64Trunc -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64Nearest -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64Sqrt -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32Clz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32Ctz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32Popcnt -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64Clz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64Ctz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64Popcnt -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32Eq -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32Ne -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32LtS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32LtU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32GtS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32GtU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32LeS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32LeU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32GeS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I32GeU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64Eq -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64Ne -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64LtS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64LtU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64GtS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64GtU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64LeS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64LeU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64GeS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.I64GeU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Eq -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Ne -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Lt -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Gt -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Le -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32Ge -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Eq -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Ne -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Lt -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Gt -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Le -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F64Ge -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
-    is FusedNumericInstruction.F32ConvertI32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32ConvertI32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32ConvertI64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32ConvertI64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32DemoteF64 -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F32ReinterpretI32 -> FrameSlotBitcastLowerer(
+    is NumericSuperInstruction.I64DivS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64DivU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64RemS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64RemU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64And -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64Or -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64Xor -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64Shl -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64ShrS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64ShrU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64Rotl -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64Rotr -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Add -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Sub -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Mul -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Div -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Min -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Max -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Copysign -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Add -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Sub -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Mul -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Div -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Min -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Max -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Copysign -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32Eqz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64Eqz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32Abs -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32Neg -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32Ceil -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32Floor -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32Trunc -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32Nearest -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32Sqrt -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64Abs -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64Neg -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64Ceil -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64Floor -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64Trunc -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64Nearest -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64Sqrt -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32Clz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32Ctz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32Popcnt -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64Clz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64Ctz -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64Popcnt -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32Eq -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32Ne -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32LtS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32LtU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32GtS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32GtU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32LeS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32LeU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32GeS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I32GeU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64Eq -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64Ne -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64LtS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64LtU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64GtS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64GtU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64LeS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64LeU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64GeS -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.I64GeU -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Eq -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Ne -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Lt -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Gt -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Le -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32Ge -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Eq -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Ne -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Lt -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Gt -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Le -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F64Ge -> FrameSlotBinaryLowerer(instruction.left, instruction.right, instruction.destination, state) { left, right, destination -> instruction.copy(left = left, right = right, destination = destination) }
+    is NumericSuperInstruction.F32ConvertI32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32ConvertI32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32ConvertI64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32ConvertI64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32DemoteF64 -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F32ReinterpretI32 -> FrameSlotBitcastLowerer(
         operand = instruction.operand,
         destination = instruction.destination,
         resultType = ValueType.Number(NumberType.F32),
         state = state,
     )
-    is FusedNumericInstruction.F64ConvertI32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64ConvertI32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64ConvertI64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64ConvertI64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64PromoteF32 -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.F64ReinterpretI64 -> FrameSlotBitcastLowerer(
+    is NumericSuperInstruction.F64ConvertI32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64ConvertI32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64ConvertI64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64ConvertI64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64PromoteF32 -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.F64ReinterpretI64 -> FrameSlotBitcastLowerer(
         operand = instruction.operand,
         destination = instruction.destination,
         resultType = ValueType.Number(NumberType.F64),
         state = state,
     )
-    is FusedNumericInstruction.I32Extend16S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32Extend8S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32ReinterpretF32 -> FrameSlotBitcastLowerer(
+    is NumericSuperInstruction.I32Extend16S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32Extend8S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32ReinterpretF32 -> FrameSlotBitcastLowerer(
         operand = instruction.operand,
         destination = instruction.destination,
         resultType = ValueType.Number(NumberType.I32),
         state = state,
     )
-    is FusedNumericInstruction.I32TruncF32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32TruncF32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32TruncF64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32TruncF64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32TruncSatF32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32TruncSatF32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32TruncSatF64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32TruncSatF64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I32WrapI64 -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64Extend16S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64Extend32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64Extend8S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64ExtendI32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64ExtendI32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64ReinterpretF64 -> FrameSlotBitcastLowerer(
+    is NumericSuperInstruction.I32TruncF32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32TruncF32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32TruncF64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32TruncF64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32TruncSatF32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32TruncSatF32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32TruncSatF64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32TruncSatF64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I32WrapI64 -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64Extend16S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64Extend32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64Extend8S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64ExtendI32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64ExtendI32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64ReinterpretF64 -> FrameSlotBitcastLowerer(
         operand = instruction.operand,
         destination = instruction.destination,
         resultType = ValueType.Number(NumberType.I64),
         state = state,
     )
-    is FusedNumericInstruction.I64TruncF32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64TruncF32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64TruncF64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64TruncF64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64TruncSatF32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64TruncSatF32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64TruncSatF64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
-    is FusedNumericInstruction.I64TruncSatF64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64TruncF32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64TruncF32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64TruncF64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64TruncF64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64TruncSatF32S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64TruncSatF32U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64TruncSatF64S -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
+    is NumericSuperInstruction.I64TruncSatF64U -> FrameSlotUnaryLowerer(instruction.operand, instruction.destination, state) { operand, destination -> instruction.copy(operand = operand, destination = destination) }
 }
 
 private fun FrameSlotRawNumericInstructionLowerer(
@@ -2806,61 +2806,61 @@ private fun FrameSlotRawNumericInstructionLowerer(
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
     is NumericInstruction.I32Const -> FrameSlotConstantLowerer(FusedOperand.I32Const(instruction.value), FusedDestination.ValueStack, state) { destination ->
-        FusedNumericInstruction.I32Const(instruction.value, destination)
+        NumericSuperInstruction.I32Const(instruction.value, destination)
     }
     is NumericInstruction.I64Const -> FrameSlotConstantLowerer(FusedOperand.I64Const(instruction.value), FusedDestination.ValueStack, state) { destination ->
-        FusedNumericInstruction.I64Const(instruction.value, destination)
+        NumericSuperInstruction.I64Const(instruction.value, destination)
     }
     is NumericInstruction.F32Const -> FrameSlotConstantLowerer(FusedOperand.F32Const(instruction.value), FusedDestination.ValueStack, state) { destination ->
-        FusedNumericInstruction.F32Const(instruction.bits, destination)
+        NumericSuperInstruction.F32Const(instruction.bits, destination)
     }
     is NumericInstruction.F64Const -> FrameSlotConstantLowerer(FusedOperand.F64Const(instruction.value), FusedDestination.ValueStack, state) { destination ->
-        FusedNumericInstruction.F64Const(instruction.bits, destination)
+        NumericSuperInstruction.F64Const(instruction.bits, destination)
     }
 
-    is NumericInstruction.I32Eqz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32Eqz(operand, destination) }
-    is NumericInstruction.I64Eqz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64Eqz(operand, destination) }
-    is NumericInstruction.I32Clz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32Clz(operand, destination) }
-    is NumericInstruction.I32Ctz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32Ctz(operand, destination) }
-    is NumericInstruction.I32Popcnt -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32Popcnt(operand, destination) }
-    is NumericInstruction.I64Clz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64Clz(operand, destination) }
-    is NumericInstruction.I64Ctz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64Ctz(operand, destination) }
-    is NumericInstruction.I64Popcnt -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64Popcnt(operand, destination) }
-    is NumericInstruction.F32Abs -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32Abs(operand, destination) }
-    is NumericInstruction.F32Neg -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32Neg(operand, destination) }
-    is NumericInstruction.F32Ceil -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32Ceil(operand, destination) }
-    is NumericInstruction.F32Floor -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32Floor(operand, destination) }
-    is NumericInstruction.F32Trunc -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32Trunc(operand, destination) }
-    is NumericInstruction.F32Nearest -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32Nearest(operand, destination) }
-    is NumericInstruction.F32Sqrt -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32Sqrt(operand, destination) }
-    is NumericInstruction.F64Abs -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64Abs(operand, destination) }
-    is NumericInstruction.F64Neg -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64Neg(operand, destination) }
-    is NumericInstruction.F64Ceil -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64Ceil(operand, destination) }
-    is NumericInstruction.F64Floor -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64Floor(operand, destination) }
-    is NumericInstruction.F64Trunc -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64Trunc(operand, destination) }
-    is NumericInstruction.F64Nearest -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64Nearest(operand, destination) }
-    is NumericInstruction.F64Sqrt -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64Sqrt(operand, destination) }
-    is NumericInstruction.I32WrapI64 -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32WrapI64(operand, destination) }
-    is NumericInstruction.I32TruncF32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32TruncF32S(operand, destination) }
-    is NumericInstruction.I32TruncF32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32TruncF32U(operand, destination) }
-    is NumericInstruction.I32TruncF64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32TruncF64S(operand, destination) }
-    is NumericInstruction.I32TruncF64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32TruncF64U(operand, destination) }
-    is NumericInstruction.I64ExtendI32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64ExtendI32S(operand, destination) }
-    is NumericInstruction.I64ExtendI32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64ExtendI32U(operand, destination) }
-    is NumericInstruction.I64TruncF32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64TruncF32S(operand, destination) }
-    is NumericInstruction.I64TruncF32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64TruncF32U(operand, destination) }
-    is NumericInstruction.I64TruncF64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64TruncF64S(operand, destination) }
-    is NumericInstruction.I64TruncF64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64TruncF64U(operand, destination) }
-    is NumericInstruction.F32ConvertI32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32ConvertI32S(operand, destination) }
-    is NumericInstruction.F32ConvertI32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32ConvertI32U(operand, destination) }
-    is NumericInstruction.F32ConvertI64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32ConvertI64S(operand, destination) }
-    is NumericInstruction.F32ConvertI64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32ConvertI64U(operand, destination) }
-    is NumericInstruction.F32DemoteF64 -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F32DemoteF64(operand, destination) }
-    is NumericInstruction.F64ConvertI32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64ConvertI32S(operand, destination) }
-    is NumericInstruction.F64ConvertI32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64ConvertI32U(operand, destination) }
-    is NumericInstruction.F64ConvertI64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64ConvertI64S(operand, destination) }
-    is NumericInstruction.F64ConvertI64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64ConvertI64U(operand, destination) }
-    is NumericInstruction.F64PromoteF32 -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.F64PromoteF32(operand, destination) }
+    is NumericInstruction.I32Eqz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32Eqz(operand, destination) }
+    is NumericInstruction.I64Eqz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64Eqz(operand, destination) }
+    is NumericInstruction.I32Clz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32Clz(operand, destination) }
+    is NumericInstruction.I32Ctz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32Ctz(operand, destination) }
+    is NumericInstruction.I32Popcnt -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32Popcnt(operand, destination) }
+    is NumericInstruction.I64Clz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64Clz(operand, destination) }
+    is NumericInstruction.I64Ctz -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64Ctz(operand, destination) }
+    is NumericInstruction.I64Popcnt -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64Popcnt(operand, destination) }
+    is NumericInstruction.F32Abs -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32Abs(operand, destination) }
+    is NumericInstruction.F32Neg -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32Neg(operand, destination) }
+    is NumericInstruction.F32Ceil -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32Ceil(operand, destination) }
+    is NumericInstruction.F32Floor -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32Floor(operand, destination) }
+    is NumericInstruction.F32Trunc -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32Trunc(operand, destination) }
+    is NumericInstruction.F32Nearest -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32Nearest(operand, destination) }
+    is NumericInstruction.F32Sqrt -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32Sqrt(operand, destination) }
+    is NumericInstruction.F64Abs -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64Abs(operand, destination) }
+    is NumericInstruction.F64Neg -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64Neg(operand, destination) }
+    is NumericInstruction.F64Ceil -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64Ceil(operand, destination) }
+    is NumericInstruction.F64Floor -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64Floor(operand, destination) }
+    is NumericInstruction.F64Trunc -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64Trunc(operand, destination) }
+    is NumericInstruction.F64Nearest -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64Nearest(operand, destination) }
+    is NumericInstruction.F64Sqrt -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64Sqrt(operand, destination) }
+    is NumericInstruction.I32WrapI64 -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32WrapI64(operand, destination) }
+    is NumericInstruction.I32TruncF32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32TruncF32S(operand, destination) }
+    is NumericInstruction.I32TruncF32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32TruncF32U(operand, destination) }
+    is NumericInstruction.I32TruncF64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32TruncF64S(operand, destination) }
+    is NumericInstruction.I32TruncF64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32TruncF64U(operand, destination) }
+    is NumericInstruction.I64ExtendI32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64ExtendI32S(operand, destination) }
+    is NumericInstruction.I64ExtendI32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64ExtendI32U(operand, destination) }
+    is NumericInstruction.I64TruncF32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64TruncF32S(operand, destination) }
+    is NumericInstruction.I64TruncF32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64TruncF32U(operand, destination) }
+    is NumericInstruction.I64TruncF64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64TruncF64S(operand, destination) }
+    is NumericInstruction.I64TruncF64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64TruncF64U(operand, destination) }
+    is NumericInstruction.F32ConvertI32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32ConvertI32S(operand, destination) }
+    is NumericInstruction.F32ConvertI32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32ConvertI32U(operand, destination) }
+    is NumericInstruction.F32ConvertI64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32ConvertI64S(operand, destination) }
+    is NumericInstruction.F32ConvertI64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32ConvertI64U(operand, destination) }
+    is NumericInstruction.F32DemoteF64 -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F32DemoteF64(operand, destination) }
+    is NumericInstruction.F64ConvertI32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64ConvertI32S(operand, destination) }
+    is NumericInstruction.F64ConvertI32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64ConvertI32U(operand, destination) }
+    is NumericInstruction.F64ConvertI64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64ConvertI64S(operand, destination) }
+    is NumericInstruction.F64ConvertI64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64ConvertI64U(operand, destination) }
+    is NumericInstruction.F64PromoteF32 -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.F64PromoteF32(operand, destination) }
     is NumericInstruction.I32ReinterpretF32 -> FrameSlotBitcastLowerer(
         operand = FusedOperand.ValueStack,
         destination = FusedDestination.ValueStack,
@@ -2885,108 +2885,108 @@ private fun FrameSlotRawNumericInstructionLowerer(
         resultType = ValueType.Number(NumberType.F64),
         state = state,
     )
-    is NumericInstruction.I32Extend8S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32Extend8S(operand, destination) }
-    is NumericInstruction.I32Extend16S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32Extend16S(operand, destination) }
-    is NumericInstruction.I64Extend8S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64Extend8S(operand, destination) }
-    is NumericInstruction.I64Extend16S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64Extend16S(operand, destination) }
-    is NumericInstruction.I64Extend32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64Extend32S(operand, destination) }
-    is NumericInstruction.I32TruncSatF32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32TruncSatF32S(operand, destination) }
-    is NumericInstruction.I32TruncSatF32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32TruncSatF32U(operand, destination) }
-    is NumericInstruction.I32TruncSatF64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32TruncSatF64S(operand, destination) }
-    is NumericInstruction.I32TruncSatF64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I32TruncSatF64U(operand, destination) }
-    is NumericInstruction.I64TruncSatF32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64TruncSatF32S(operand, destination) }
-    is NumericInstruction.I64TruncSatF32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64TruncSatF32U(operand, destination) }
-    is NumericInstruction.I64TruncSatF64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64TruncSatF64S(operand, destination) }
-    is NumericInstruction.I64TruncSatF64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> FusedNumericInstruction.I64TruncSatF64U(operand, destination) }
+    is NumericInstruction.I32Extend8S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32Extend8S(operand, destination) }
+    is NumericInstruction.I32Extend16S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32Extend16S(operand, destination) }
+    is NumericInstruction.I64Extend8S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64Extend8S(operand, destination) }
+    is NumericInstruction.I64Extend16S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64Extend16S(operand, destination) }
+    is NumericInstruction.I64Extend32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64Extend32S(operand, destination) }
+    is NumericInstruction.I32TruncSatF32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32TruncSatF32S(operand, destination) }
+    is NumericInstruction.I32TruncSatF32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32TruncSatF32U(operand, destination) }
+    is NumericInstruction.I32TruncSatF64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32TruncSatF64S(operand, destination) }
+    is NumericInstruction.I32TruncSatF64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I32TruncSatF64U(operand, destination) }
+    is NumericInstruction.I64TruncSatF32S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64TruncSatF32S(operand, destination) }
+    is NumericInstruction.I64TruncSatF32U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64TruncSatF32U(operand, destination) }
+    is NumericInstruction.I64TruncSatF64S -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64TruncSatF64S(operand, destination) }
+    is NumericInstruction.I64TruncSatF64U -> FrameSlotRawNumericUnaryLowerer(state) { operand, destination -> NumericSuperInstruction.I64TruncSatF64U(operand, destination) }
 
-    is NumericInstruction.I32Add -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Add(left, right, destination) }
-    is NumericInstruction.I32Sub -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Sub(left, right, destination) }
-    is NumericInstruction.I32Mul -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Mul(left, right, destination) }
-    is NumericInstruction.I32DivS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32DivS(left, right, destination) }
-    is NumericInstruction.I32DivU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32DivU(left, right, destination) }
-    is NumericInstruction.I32RemS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32RemS(left, right, destination) }
-    is NumericInstruction.I32RemU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32RemU(left, right, destination) }
-    is NumericInstruction.I32And -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32And(left, right, destination) }
-    is NumericInstruction.I32Or -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Or(left, right, destination) }
-    is NumericInstruction.I32Xor -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Xor(left, right, destination) }
-    is NumericInstruction.I32Shl -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Shl(left, right, destination) }
-    is NumericInstruction.I32ShrS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32ShrS(left, right, destination) }
-    is NumericInstruction.I32ShrU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32ShrU(left, right, destination) }
-    is NumericInstruction.I32Rotl -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Rotl(left, right, destination) }
-    is NumericInstruction.I32Rotr -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Rotr(left, right, destination) }
-    is NumericInstruction.I64Add -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Add(left, right, destination) }
-    is NumericInstruction.I64Sub -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Sub(left, right, destination) }
-    is NumericInstruction.I64Mul -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Mul(left, right, destination) }
-    is NumericInstruction.I64DivS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64DivS(left, right, destination) }
-    is NumericInstruction.I64DivU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64DivU(left, right, destination) }
-    is NumericInstruction.I64RemS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64RemS(left, right, destination) }
-    is NumericInstruction.I64RemU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64RemU(left, right, destination) }
-    is NumericInstruction.I64And -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64And(left, right, destination) }
-    is NumericInstruction.I64Or -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Or(left, right, destination) }
-    is NumericInstruction.I64Xor -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Xor(left, right, destination) }
-    is NumericInstruction.I64Shl -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Shl(left, right, destination) }
-    is NumericInstruction.I64ShrS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64ShrS(left, right, destination) }
-    is NumericInstruction.I64ShrU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64ShrU(left, right, destination) }
-    is NumericInstruction.I64Rotl -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Rotl(left, right, destination) }
-    is NumericInstruction.I64Rotr -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Rotr(left, right, destination) }
-    is NumericInstruction.F32Add -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Add(left, right, destination) }
-    is NumericInstruction.F32Sub -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Sub(left, right, destination) }
-    is NumericInstruction.F32Mul -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Mul(left, right, destination) }
-    is NumericInstruction.F32Div -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Div(left, right, destination) }
-    is NumericInstruction.F32Min -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Min(left, right, destination) }
-    is NumericInstruction.F32Max -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Max(left, right, destination) }
-    is NumericInstruction.F32Copysign -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Copysign(left, right, destination) }
-    is NumericInstruction.F64Add -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Add(left, right, destination) }
-    is NumericInstruction.F64Sub -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Sub(left, right, destination) }
-    is NumericInstruction.F64Mul -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Mul(left, right, destination) }
-    is NumericInstruction.F64Div -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Div(left, right, destination) }
-    is NumericInstruction.F64Min -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Min(left, right, destination) }
-    is NumericInstruction.F64Max -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Max(left, right, destination) }
-    is NumericInstruction.F64Copysign -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Copysign(left, right, destination) }
-    is NumericInstruction.I32Eq -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Eq(left, right, destination) }
-    is NumericInstruction.I32Ne -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32Ne(left, right, destination) }
-    is NumericInstruction.I32LtS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32LtS(left, right, destination) }
-    is NumericInstruction.I32LtU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32LtU(left, right, destination) }
-    is NumericInstruction.I32GtS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32GtS(left, right, destination) }
-    is NumericInstruction.I32GtU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32GtU(left, right, destination) }
-    is NumericInstruction.I32LeS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32LeS(left, right, destination) }
-    is NumericInstruction.I32LeU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32LeU(left, right, destination) }
-    is NumericInstruction.I32GeS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32GeS(left, right, destination) }
-    is NumericInstruction.I32GeU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I32GeU(left, right, destination) }
-    is NumericInstruction.I64Eq -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Eq(left, right, destination) }
-    is NumericInstruction.I64Ne -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64Ne(left, right, destination) }
-    is NumericInstruction.I64LtS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64LtS(left, right, destination) }
-    is NumericInstruction.I64LtU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64LtU(left, right, destination) }
-    is NumericInstruction.I64GtS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64GtS(left, right, destination) }
-    is NumericInstruction.I64GtU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64GtU(left, right, destination) }
-    is NumericInstruction.I64LeS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64LeS(left, right, destination) }
-    is NumericInstruction.I64LeU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64LeU(left, right, destination) }
-    is NumericInstruction.I64GeS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64GeS(left, right, destination) }
-    is NumericInstruction.I64GeU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.I64GeU(left, right, destination) }
-    is NumericInstruction.F32Eq -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Eq(left, right, destination) }
-    is NumericInstruction.F32Ne -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Ne(left, right, destination) }
-    is NumericInstruction.F32Lt -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Lt(left, right, destination) }
-    is NumericInstruction.F32Gt -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Gt(left, right, destination) }
-    is NumericInstruction.F32Le -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Le(left, right, destination) }
-    is NumericInstruction.F32Ge -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F32Ge(left, right, destination) }
-    is NumericInstruction.F64Eq -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Eq(left, right, destination) }
-    is NumericInstruction.F64Ne -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Ne(left, right, destination) }
-    is NumericInstruction.F64Lt -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Lt(left, right, destination) }
-    is NumericInstruction.F64Gt -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Gt(left, right, destination) }
-    is NumericInstruction.F64Le -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Le(left, right, destination) }
-    is NumericInstruction.F64Ge -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> FusedNumericInstruction.F64Ge(left, right, destination) }
+    is NumericInstruction.I32Add -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Add(left, right, destination) }
+    is NumericInstruction.I32Sub -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Sub(left, right, destination) }
+    is NumericInstruction.I32Mul -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Mul(left, right, destination) }
+    is NumericInstruction.I32DivS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32DivS(left, right, destination) }
+    is NumericInstruction.I32DivU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32DivU(left, right, destination) }
+    is NumericInstruction.I32RemS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32RemS(left, right, destination) }
+    is NumericInstruction.I32RemU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32RemU(left, right, destination) }
+    is NumericInstruction.I32And -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32And(left, right, destination) }
+    is NumericInstruction.I32Or -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Or(left, right, destination) }
+    is NumericInstruction.I32Xor -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Xor(left, right, destination) }
+    is NumericInstruction.I32Shl -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Shl(left, right, destination) }
+    is NumericInstruction.I32ShrS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32ShrS(left, right, destination) }
+    is NumericInstruction.I32ShrU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32ShrU(left, right, destination) }
+    is NumericInstruction.I32Rotl -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Rotl(left, right, destination) }
+    is NumericInstruction.I32Rotr -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Rotr(left, right, destination) }
+    is NumericInstruction.I64Add -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Add(left, right, destination) }
+    is NumericInstruction.I64Sub -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Sub(left, right, destination) }
+    is NumericInstruction.I64Mul -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Mul(left, right, destination) }
+    is NumericInstruction.I64DivS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64DivS(left, right, destination) }
+    is NumericInstruction.I64DivU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64DivU(left, right, destination) }
+    is NumericInstruction.I64RemS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64RemS(left, right, destination) }
+    is NumericInstruction.I64RemU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64RemU(left, right, destination) }
+    is NumericInstruction.I64And -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64And(left, right, destination) }
+    is NumericInstruction.I64Or -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Or(left, right, destination) }
+    is NumericInstruction.I64Xor -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Xor(left, right, destination) }
+    is NumericInstruction.I64Shl -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Shl(left, right, destination) }
+    is NumericInstruction.I64ShrS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64ShrS(left, right, destination) }
+    is NumericInstruction.I64ShrU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64ShrU(left, right, destination) }
+    is NumericInstruction.I64Rotl -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Rotl(left, right, destination) }
+    is NumericInstruction.I64Rotr -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Rotr(left, right, destination) }
+    is NumericInstruction.F32Add -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Add(left, right, destination) }
+    is NumericInstruction.F32Sub -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Sub(left, right, destination) }
+    is NumericInstruction.F32Mul -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Mul(left, right, destination) }
+    is NumericInstruction.F32Div -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Div(left, right, destination) }
+    is NumericInstruction.F32Min -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Min(left, right, destination) }
+    is NumericInstruction.F32Max -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Max(left, right, destination) }
+    is NumericInstruction.F32Copysign -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Copysign(left, right, destination) }
+    is NumericInstruction.F64Add -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Add(left, right, destination) }
+    is NumericInstruction.F64Sub -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Sub(left, right, destination) }
+    is NumericInstruction.F64Mul -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Mul(left, right, destination) }
+    is NumericInstruction.F64Div -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Div(left, right, destination) }
+    is NumericInstruction.F64Min -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Min(left, right, destination) }
+    is NumericInstruction.F64Max -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Max(left, right, destination) }
+    is NumericInstruction.F64Copysign -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Copysign(left, right, destination) }
+    is NumericInstruction.I32Eq -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Eq(left, right, destination) }
+    is NumericInstruction.I32Ne -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32Ne(left, right, destination) }
+    is NumericInstruction.I32LtS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32LtS(left, right, destination) }
+    is NumericInstruction.I32LtU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32LtU(left, right, destination) }
+    is NumericInstruction.I32GtS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32GtS(left, right, destination) }
+    is NumericInstruction.I32GtU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32GtU(left, right, destination) }
+    is NumericInstruction.I32LeS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32LeS(left, right, destination) }
+    is NumericInstruction.I32LeU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32LeU(left, right, destination) }
+    is NumericInstruction.I32GeS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32GeS(left, right, destination) }
+    is NumericInstruction.I32GeU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I32GeU(left, right, destination) }
+    is NumericInstruction.I64Eq -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Eq(left, right, destination) }
+    is NumericInstruction.I64Ne -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64Ne(left, right, destination) }
+    is NumericInstruction.I64LtS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64LtS(left, right, destination) }
+    is NumericInstruction.I64LtU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64LtU(left, right, destination) }
+    is NumericInstruction.I64GtS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64GtS(left, right, destination) }
+    is NumericInstruction.I64GtU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64GtU(left, right, destination) }
+    is NumericInstruction.I64LeS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64LeS(left, right, destination) }
+    is NumericInstruction.I64LeU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64LeU(left, right, destination) }
+    is NumericInstruction.I64GeS -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64GeS(left, right, destination) }
+    is NumericInstruction.I64GeU -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.I64GeU(left, right, destination) }
+    is NumericInstruction.F32Eq -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Eq(left, right, destination) }
+    is NumericInstruction.F32Ne -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Ne(left, right, destination) }
+    is NumericInstruction.F32Lt -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Lt(left, right, destination) }
+    is NumericInstruction.F32Gt -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Gt(left, right, destination) }
+    is NumericInstruction.F32Le -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Le(left, right, destination) }
+    is NumericInstruction.F32Ge -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F32Ge(left, right, destination) }
+    is NumericInstruction.F64Eq -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Eq(left, right, destination) }
+    is NumericInstruction.F64Ne -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Ne(left, right, destination) }
+    is NumericInstruction.F64Lt -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Lt(left, right, destination) }
+    is NumericInstruction.F64Gt -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Gt(left, right, destination) }
+    is NumericInstruction.F64Le -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Le(left, right, destination) }
+    is NumericInstruction.F64Ge -> FrameSlotRawNumericBinaryLowerer(state) { left, right, destination -> NumericSuperInstruction.F64Ge(left, right, destination) }
 
     is NumericInstruction.I64Add128 -> FrameSlotRawNumericQuadDualDestinationLowerer(state) { leftLow, leftHigh, rightLow, rightHigh, destinationLow, destinationHigh ->
-        FusedNumericInstruction.I64Add128(leftLow, leftHigh, rightLow, rightHigh, destinationLow, destinationHigh)
+        NumericSuperInstruction.I64Add128(leftLow, leftHigh, rightLow, rightHigh, destinationLow, destinationHigh)
     }
     is NumericInstruction.I64Sub128 -> FrameSlotRawNumericQuadDualDestinationLowerer(state) { leftLow, leftHigh, rightLow, rightHigh, destinationLow, destinationHigh ->
-        FusedNumericInstruction.I64Sub128(leftLow, leftHigh, rightLow, rightHigh, destinationLow, destinationHigh)
+        NumericSuperInstruction.I64Sub128(leftLow, leftHigh, rightLow, rightHigh, destinationLow, destinationHigh)
     }
     is NumericInstruction.I64MulWideS -> FrameSlotRawNumericBinaryDualDestinationLowerer(state) { left, right, destinationLow, destinationHigh ->
-        FusedNumericInstruction.I64MulWideS(left, right, destinationLow, destinationHigh)
+        NumericSuperInstruction.I64MulWideS(left, right, destinationLow, destinationHigh)
     }
     is NumericInstruction.I64MulWideU -> FrameSlotRawNumericBinaryDualDestinationLowerer(state) { left, right, destinationLow, destinationHigh ->
-        FusedNumericInstruction.I64MulWideU(left, right, destinationLow, destinationHigh)
+        NumericSuperInstruction.I64MulWideU(left, right, destinationLow, destinationHigh)
     }
 }
 
@@ -3077,13 +3077,13 @@ private fun FrameSlotRawMemoryInstructionLowerer(
     is MemoryInstruction.Load -> FrameSlotRawMemoryLoadLowerer(instruction, state)
     is MemoryInstruction.Store -> FrameSlotRawMemoryStoreLowerer(instruction, state)
     is MemoryInstruction.MemorySize -> FrameSlotDestinationOnlyLowerer(FusedDestination.ValueStack, state) { destination ->
-        FusedMemoryInstruction.MemorySize(
+        MemorySuperInstruction.MemorySize(
             destination = destination,
             memoryIndex = instruction.memoryIndex,
         )
     }
     is MemoryInstruction.MemoryGrow -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.MemoryGrow(
+        MemorySuperInstruction.MemoryGrow(
             pagesToAdd = FusedOperand.ValueStack,
             destination = FusedDestination.ValueStack,
             memoryIndex = instruction.memoryIndex,
@@ -3091,7 +3091,7 @@ private fun FrameSlotRawMemoryInstructionLowerer(
         state,
     )
     is MemoryInstruction.MemoryInit -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.MemoryInit(
+        MemorySuperInstruction.MemoryInit(
             bytesToCopy = FusedOperand.ValueStack,
             sourceOffset = FusedOperand.ValueStack,
             destinationOffset = FusedOperand.ValueStack,
@@ -3102,7 +3102,7 @@ private fun FrameSlotRawMemoryInstructionLowerer(
     )
     is MemoryInstruction.DataDrop -> listOf(instruction)
     is MemoryInstruction.MemoryCopy -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.MemoryCopy(
+        MemorySuperInstruction.MemoryCopy(
             bytesToCopy = FusedOperand.ValueStack,
             sourceOffset = FusedOperand.ValueStack,
             destinationOffset = FusedOperand.ValueStack,
@@ -3112,7 +3112,7 @@ private fun FrameSlotRawMemoryInstructionLowerer(
         state,
     )
     is MemoryInstruction.MemoryFill -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.MemoryFill(
+        MemorySuperInstruction.MemoryFill(
             bytesToFill = FusedOperand.ValueStack,
             fillValue = FusedOperand.ValueStack,
             offset = FusedOperand.ValueStack,
@@ -3123,16 +3123,16 @@ private fun FrameSlotRawMemoryInstructionLowerer(
 }
 
 private fun FrameSlotMemoryInstructionLowerer(
-    instruction: FusedMemoryInstruction,
+    instruction: MemorySuperInstruction,
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
-    is FusedMemoryInstruction.MemorySize -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
+    is MemorySuperInstruction.MemorySize -> FrameSlotDestinationOnlyLowerer(instruction.destination, state) { destination ->
         instruction.copy(destination = destination)
     }
-    is FusedMemoryInstruction.MemoryGrow -> FrameSlotUnaryLowerer(instruction.pagesToAdd, instruction.destination, state) { pagesToAdd, destination ->
+    is MemorySuperInstruction.MemoryGrow -> FrameSlotUnaryLowerer(instruction.pagesToAdd, instruction.destination, state) { pagesToAdd, destination ->
         instruction.copy(pagesToAdd = pagesToAdd, destination = destination)
     }
-    is FusedMemoryInstruction.MemoryInit -> FrameSlotOperandListLowerer(
+    is MemorySuperInstruction.MemoryInit -> FrameSlotOperandListLowerer(
         operands = listOf(
             instruction.bytesToCopy,
             instruction.sourceOffset,
@@ -3146,7 +3146,7 @@ private fun FrameSlotMemoryInstructionLowerer(
             destinationOffset = operands[2],
         )
     }
-    is FusedMemoryInstruction.MemoryCopy -> FrameSlotOperandListLowerer(
+    is MemorySuperInstruction.MemoryCopy -> FrameSlotOperandListLowerer(
         operands = listOf(
             instruction.bytesToCopy,
             instruction.sourceOffset,
@@ -3160,7 +3160,7 @@ private fun FrameSlotMemoryInstructionLowerer(
             destinationOffset = operands[2],
         )
     }
-    is FusedMemoryInstruction.MemoryFill -> FrameSlotOperandListLowerer(
+    is MemorySuperInstruction.MemoryFill -> FrameSlotOperandListLowerer(
         operands = listOf(
             instruction.bytesToFill,
             instruction.fillValue,
@@ -3174,73 +3174,73 @@ private fun FrameSlotMemoryInstructionLowerer(
             offset = operands[2],
         )
     }
-    is FusedMemoryInstruction.I32Load -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I32Load -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I64Load -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I64Load -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.F32Load -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.F32Load -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.F64Load -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.F64Load -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I32Load8S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I32Load8S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I32Load8U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I32Load8U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I32Load16S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I32Load16S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I32Load16U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I32Load16U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I64Load8S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I64Load8S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I64Load8U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I64Load8U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I64Load16S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I64Load16S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I64Load16U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I64Load16U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I64Load32S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I64Load32S -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I64Load32U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
+    is MemorySuperInstruction.I64Load32U -> FrameSlotUnaryLowerer(instruction.addressOperand, instruction.destination, state) { addressOperand, destination ->
         instruction.copy(addressOperand = addressOperand, destination = destination)
     }
-    is FusedMemoryInstruction.I32Store -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.I32Store -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
-    is FusedMemoryInstruction.I64Store -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.I64Store -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
-    is FusedMemoryInstruction.F32Store -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.F32Store -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
-    is FusedMemoryInstruction.F64Store -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.F64Store -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
-    is FusedMemoryInstruction.I32Store8 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.I32Store8 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
-    is FusedMemoryInstruction.I32Store16 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.I32Store16 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
-    is FusedMemoryInstruction.I64Store8 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.I64Store8 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
-    is FusedMemoryInstruction.I64Store16 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.I64Store16 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
-    is FusedMemoryInstruction.I64Store32 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
+    is MemorySuperInstruction.I64Store32 -> FrameSlotBinaryOperandsLowerer(instruction.valueOperand, instruction.addressOperand, state) { valueOperand, addressOperand ->
         instruction.copy(valueOperand = valueOperand, addressOperand = addressOperand)
     }
 }
@@ -3277,59 +3277,59 @@ private fun FrameSlotRawMemoryLoadLowerer(
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
     is MemoryInstruction.Load.I32.I32Load -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I32Load(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I32Load(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I32.I32Load8S -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I32Load8S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I32Load8S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I32.I32Load8U -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I32Load8U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I32Load8U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I32.I32Load16S -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I32Load16S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I32Load16S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I32.I32Load16U -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I32Load16U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I32Load16U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I64.I64Load -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Load(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Load(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I64.I64Load8S -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Load8S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Load8S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I64.I64Load8U -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Load8U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Load8U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I64.I64Load16S -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Load16S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Load16S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I64.I64Load16U -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Load16U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Load16U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I64.I64Load32S -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Load32S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Load32S(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.I64.I64Load32U -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Load32U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Load32U(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.F32.F32Load -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.F32Load(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.F32Load(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Load.F64.F64Load -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.F64Load(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.F64Load(FusedOperand.ValueStack, FusedDestination.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
 }
@@ -3339,39 +3339,39 @@ private fun FrameSlotRawMemoryStoreLowerer(
     state: FrameSlotState,
 ): List<Instruction>? = when (instruction) {
     is MemoryInstruction.Store.I32.I32Store -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I32Store(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I32Store(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Store.I32.I32Store8 -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I32Store8(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I32Store8(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Store.I32.I32Store16 -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I32Store16(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I32Store16(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Store.I64.I64Store -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Store(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Store(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Store.I64.I64Store8 -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Store8(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Store8(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Store.I64.I64Store16 -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Store16(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Store16(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Store.I64.I64Store32 -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.I64Store32(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.I64Store32(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Store.F32.F32Store -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.F32Store(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.F32Store(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
     is MemoryInstruction.Store.F64.F64Store -> FrameSlotMemoryInstructionLowerer(
-        FusedMemoryInstruction.F64Store(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
+        MemorySuperInstruction.F64Store(FusedOperand.ValueStack, FusedOperand.ValueStack, instruction.memoryIndex, instruction.memArg),
         state,
     )
 }
@@ -3799,19 +3799,19 @@ private fun FrameSlotImmediateInstruction(
     operand: FusedOperand,
     destinationSlot: Int,
 ): Instruction = when (operand) {
-    is FusedOperand.I32Const -> FusedNumericInstruction.I32Const(
+    is FusedOperand.I32Const -> NumericSuperInstruction.I32Const(
         value = operand.const,
         destination = FusedDestination.FrameSlot(destinationSlot),
     )
-    is FusedOperand.I64Const -> FusedNumericInstruction.I64Const(
+    is FusedOperand.I64Const -> NumericSuperInstruction.I64Const(
         value = operand.const,
         destination = FusedDestination.FrameSlot(destinationSlot),
     )
-    is FusedOperand.F32Const -> FusedNumericInstruction.F32Const(
+    is FusedOperand.F32Const -> NumericSuperInstruction.F32Const(
         bits = operand.const.toRawBits(),
         destination = FusedDestination.FrameSlot(destinationSlot),
     )
-    is FusedOperand.F64Const -> FusedNumericInstruction.F64Const(
+    is FusedOperand.F64Const -> NumericSuperInstruction.F64Const(
         bits = operand.const.toRawBits(),
         destination = FusedDestination.FrameSlot(destinationSlot),
     )

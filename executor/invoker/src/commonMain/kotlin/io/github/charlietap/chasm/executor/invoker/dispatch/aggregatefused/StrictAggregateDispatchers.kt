@@ -16,82 +16,82 @@ import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.St
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructNewDefaultExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructNewExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructSetExecutor
-import io.github.charlietap.chasm.runtime.instruction.FusedAggregateInstruction
+import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 
-fun ArrayCopyDispatcher(instruction: FusedAggregateInstruction.ArrayCopyIii) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIii) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
 
-fun ArrayCopyDispatcher(instruction: FusedAggregateInstruction.ArrayCopyIis) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIis) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
 
-fun ArrayCopyDispatcher(instruction: FusedAggregateInstruction.ArrayCopyIsi) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIsi) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
 
-fun ArrayCopyDispatcher(instruction: FusedAggregateInstruction.ArrayCopyIss) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIss) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
 
-fun ArrayCopyDispatcher(instruction: FusedAggregateInstruction.ArrayCopySii) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySii) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
 
-fun ArrayCopyDispatcher(instruction: FusedAggregateInstruction.ArrayCopySis) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySis) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
 
-fun ArrayCopyDispatcher(instruction: FusedAggregateInstruction.ArrayCopySsi) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySsi) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
 
-fun ArrayCopyDispatcher(instruction: FusedAggregateInstruction.ArrayCopySss) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySss) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
 
-fun ArrayFillDispatcher(instruction: FusedAggregateInstruction.ArrayFillIii) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIii) = dispatchInstruction(instruction, ::ArrayFillExecutor)
 
-fun ArrayFillDispatcher(instruction: FusedAggregateInstruction.ArrayFillIis) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIis) = dispatchInstruction(instruction, ::ArrayFillExecutor)
 
-fun ArrayFillDispatcher(instruction: FusedAggregateInstruction.ArrayFillIsi) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIsi) = dispatchInstruction(instruction, ::ArrayFillExecutor)
 
-fun ArrayFillDispatcher(instruction: FusedAggregateInstruction.ArrayFillIss) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIss) = dispatchInstruction(instruction, ::ArrayFillExecutor)
 
-fun ArrayFillDispatcher(instruction: FusedAggregateInstruction.ArrayFillSii) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSii) = dispatchInstruction(instruction, ::ArrayFillExecutor)
 
-fun ArrayFillDispatcher(instruction: FusedAggregateInstruction.ArrayFillSis) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSis) = dispatchInstruction(instruction, ::ArrayFillExecutor)
 
-fun ArrayFillDispatcher(instruction: FusedAggregateInstruction.ArrayFillSsi) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSsi) = dispatchInstruction(instruction, ::ArrayFillExecutor)
 
-fun ArrayFillDispatcher(instruction: FusedAggregateInstruction.ArrayFillSss) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSss) = dispatchInstruction(instruction, ::ArrayFillExecutor)
 
-fun ArrayGetDispatcher(instruction: FusedAggregateInstruction.ArrayGetI) = dispatchInstruction(instruction, ::ArrayGetExecutor)
+fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetI) = dispatchInstruction(instruction, ::ArrayGetExecutor)
 
-fun ArrayGetDispatcher(instruction: FusedAggregateInstruction.ArrayGetS) = dispatchInstruction(instruction, ::ArrayGetExecutor)
+fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetS) = dispatchInstruction(instruction, ::ArrayGetExecutor)
 
-fun ArrayGetSignedDispatcher(instruction: FusedAggregateInstruction.ArrayGetSignedI) = dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
+fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedI) = dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
 
-fun ArrayGetSignedDispatcher(instruction: FusedAggregateInstruction.ArrayGetSignedS) = dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
+fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedS) = dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
 
-fun ArrayGetUnsignedDispatcher(instruction: FusedAggregateInstruction.ArrayGetUnsignedI) = dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
+fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedI) = dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
 
-fun ArrayGetUnsignedDispatcher(instruction: FusedAggregateInstruction.ArrayGetUnsignedS) = dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
+fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedS) = dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
 
-fun ArrayLenDispatcher(instruction: FusedAggregateInstruction.ArrayLenS) = dispatchInstruction(instruction, ::ArrayLenExecutor)
+fun ArrayLenDispatcher(instruction: AggregateSuperInstruction.ArrayLenS) = dispatchInstruction(instruction, ::ArrayLenExecutor)
 
-fun ArrayNewDispatcher(instruction: FusedAggregateInstruction.ArrayNewIi) = dispatchInstruction(instruction, ::ArrayNewExecutor)
+fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewIi) = dispatchInstruction(instruction, ::ArrayNewExecutor)
 
-fun ArrayNewDispatcher(instruction: FusedAggregateInstruction.ArrayNewIs) = dispatchInstruction(instruction, ::ArrayNewExecutor)
+fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewIs) = dispatchInstruction(instruction, ::ArrayNewExecutor)
 
-fun ArrayNewDispatcher(instruction: FusedAggregateInstruction.ArrayNewSi) = dispatchInstruction(instruction, ::ArrayNewExecutor)
+fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewSi) = dispatchInstruction(instruction, ::ArrayNewExecutor)
 
-fun ArrayNewDispatcher(instruction: FusedAggregateInstruction.ArrayNewSs) = dispatchInstruction(instruction, ::ArrayNewExecutor)
+fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewSs) = dispatchInstruction(instruction, ::ArrayNewExecutor)
 
-fun ArrayNewFixedDispatcher(instruction: FusedAggregateInstruction.ArrayNewFixedS) = dispatchInstruction(instruction, ::ArrayNewFixedExecutor)
+fun ArrayNewFixedDispatcher(instruction: AggregateSuperInstruction.ArrayNewFixedS) = dispatchInstruction(instruction, ::ArrayNewFixedExecutor)
 
-fun ArraySetDispatcher(instruction: FusedAggregateInstruction.ArraySetIi) = dispatchInstruction(instruction, ::ArraySetExecutor)
+fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetIi) = dispatchInstruction(instruction, ::ArraySetExecutor)
 
-fun ArraySetDispatcher(instruction: FusedAggregateInstruction.ArraySetIs) = dispatchInstruction(instruction, ::ArraySetExecutor)
+fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetIs) = dispatchInstruction(instruction, ::ArraySetExecutor)
 
-fun ArraySetDispatcher(instruction: FusedAggregateInstruction.ArraySetSi) = dispatchInstruction(instruction, ::ArraySetExecutor)
+fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetSi) = dispatchInstruction(instruction, ::ArraySetExecutor)
 
-fun ArraySetDispatcher(instruction: FusedAggregateInstruction.ArraySetSs) = dispatchInstruction(instruction, ::ArraySetExecutor)
+fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetSs) = dispatchInstruction(instruction, ::ArraySetExecutor)
 
-fun StructGetDispatcher(instruction: FusedAggregateInstruction.StructGetS) = dispatchInstruction(instruction, ::StructGetExecutor)
+fun StructGetDispatcher(instruction: AggregateSuperInstruction.StructGetS) = dispatchInstruction(instruction, ::StructGetExecutor)
 
-fun StructGetSignedDispatcher(instruction: FusedAggregateInstruction.StructGetSignedS) = dispatchInstruction(instruction, ::StructGetSignedExecutor)
+fun StructGetSignedDispatcher(instruction: AggregateSuperInstruction.StructGetSignedS) = dispatchInstruction(instruction, ::StructGetSignedExecutor)
 
-fun StructGetUnsignedDispatcher(instruction: FusedAggregateInstruction.StructGetUnsignedS) = dispatchInstruction(instruction, ::StructGetUnsignedExecutor)
+fun StructGetUnsignedDispatcher(instruction: AggregateSuperInstruction.StructGetUnsignedS) = dispatchInstruction(instruction, ::StructGetUnsignedExecutor)
 
-fun StructNewDispatcher(instruction: FusedAggregateInstruction.StructNewS) = dispatchInstruction(instruction, ::StructNewExecutor)
+fun StructNewDispatcher(instruction: AggregateSuperInstruction.StructNewS) = dispatchInstruction(instruction, ::StructNewExecutor)
 
-fun StructNewDefaultDispatcher(instruction: FusedAggregateInstruction.StructNewDefaultS) = dispatchInstruction(instruction, ::StructNewDefaultExecutor)
+fun StructNewDefaultDispatcher(instruction: AggregateSuperInstruction.StructNewDefaultS) = dispatchInstruction(instruction, ::StructNewDefaultExecutor)
 
-fun StructSetDispatcher(instruction: FusedAggregateInstruction.StructSetI) = dispatchInstruction(instruction, ::StructSetExecutor)
+fun StructSetDispatcher(instruction: AggregateSuperInstruction.StructSetI) = dispatchInstruction(instruction, ::StructSetExecutor)
 
-fun StructSetDispatcher(instruction: FusedAggregateInstruction.StructSetS) = dispatchInstruction(instruction, ::StructSetExecutor)
+fun StructSetDispatcher(instruction: AggregateSuperInstruction.StructSetS) = dispatchInstruction(instruction, ::StructSetExecutor)

@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.compiler.passes.fusion
 
 import io.github.charlietap.chasm.compiler.passes.PassContext
-import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
+import io.github.charlietap.chasm.ir.instruction.VariableSuperInstruction
 
 internal typealias VariableInstructionFuser = (PassContext, Int, VariableInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
@@ -37,7 +37,7 @@ internal inline fun VariableInstructionFuser(
         } else {
             output.removeLast()
             output.add(
-                FusedVariableInstruction.GlobalSet(
+                VariableSuperInstruction.GlobalSet(
                     operand = operand,
                     globalIdx = instruction.globalIdx,
                 ),
@@ -53,7 +53,7 @@ internal inline fun VariableInstructionFuser(
         } else {
             output.removeLast()
             output.add(
-                FusedVariableInstruction.LocalSet(
+                VariableSuperInstruction.LocalSet(
                     operand = operand,
                     localIdx = instruction.localIdx,
                 ),
@@ -69,7 +69,7 @@ internal inline fun VariableInstructionFuser(
         } else {
             output.removeLast()
             output.add(
-                FusedVariableInstruction.LocalTee(
+                VariableSuperInstruction.LocalTee(
                     operand = operand,
                     localIdx = instruction.localIdx,
                 ),

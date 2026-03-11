@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.executor.invoker.ext.wrap
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -18,7 +18,7 @@ internal inline fun I32ReinterpretF32Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32ReinterpretF32I,
+    instruction: NumericSuperInstruction.I32ReinterpretF32I,
 ) = executeF32ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.toRawBits()
 }
@@ -28,7 +28,7 @@ internal inline fun I32ReinterpretF32Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32ReinterpretF32S,
+    instruction: NumericSuperInstruction.I32ReinterpretF32S,
 ) = executeF32ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.toRawBits()
 }
@@ -38,7 +38,7 @@ internal inline fun I32TruncF32SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncF32SI,
+    instruction: NumericSuperInstruction.I32TruncF32SI,
 ) = executeF32ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     try {
         operand.truncI32sTrapping()
@@ -52,7 +52,7 @@ internal inline fun I32TruncF32SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncF32SS,
+    instruction: NumericSuperInstruction.I32TruncF32SS,
 ) = executeF32ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     try {
         operand.truncI32sTrapping()
@@ -66,7 +66,7 @@ internal inline fun I32TruncF32UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncF32UI,
+    instruction: NumericSuperInstruction.I32TruncF32UI,
 ) = executeF32ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     try {
         operand.truncI32uTrapping()
@@ -80,7 +80,7 @@ internal inline fun I32TruncF32UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncF32US,
+    instruction: NumericSuperInstruction.I32TruncF32US,
 ) = executeF32ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     try {
         operand.truncI32uTrapping()
@@ -94,7 +94,7 @@ internal inline fun I32TruncF64SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncF64SI,
+    instruction: NumericSuperInstruction.I32TruncF64SI,
 ) = executeF64ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     try {
         operand.truncI32sTrapping()
@@ -108,7 +108,7 @@ internal inline fun I32TruncF64SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncF64SS,
+    instruction: NumericSuperInstruction.I32TruncF64SS,
 ) = executeF64ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     try {
         operand.truncI32sTrapping()
@@ -122,7 +122,7 @@ internal inline fun I32TruncF64UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncF64UI,
+    instruction: NumericSuperInstruction.I32TruncF64UI,
 ) = executeF64ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     try {
         operand.truncI32uTrapping()
@@ -136,7 +136,7 @@ internal inline fun I32TruncF64UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncF64US,
+    instruction: NumericSuperInstruction.I32TruncF64US,
 ) = executeF64ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     try {
         operand.truncI32uTrapping()
@@ -150,7 +150,7 @@ internal inline fun I32TruncSatF32SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncSatF32SI,
+    instruction: NumericSuperInstruction.I32TruncSatF32SI,
 ) = executeF32ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.truncI32s()
 }
@@ -160,7 +160,7 @@ internal inline fun I32TruncSatF32SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncSatF32SS,
+    instruction: NumericSuperInstruction.I32TruncSatF32SS,
 ) = executeF32ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.truncI32s()
 }
@@ -170,7 +170,7 @@ internal inline fun I32TruncSatF32UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncSatF32UI,
+    instruction: NumericSuperInstruction.I32TruncSatF32UI,
 ) = executeF32ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.truncI32u()
 }
@@ -180,7 +180,7 @@ internal inline fun I32TruncSatF32UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncSatF32US,
+    instruction: NumericSuperInstruction.I32TruncSatF32US,
 ) = executeF32ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.truncI32u()
 }
@@ -190,7 +190,7 @@ internal inline fun I32TruncSatF64SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncSatF64SI,
+    instruction: NumericSuperInstruction.I32TruncSatF64SI,
 ) = executeF64ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.truncI32s()
 }
@@ -200,7 +200,7 @@ internal inline fun I32TruncSatF64SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncSatF64SS,
+    instruction: NumericSuperInstruction.I32TruncSatF64SS,
 ) = executeF64ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.truncI32s()
 }
@@ -210,7 +210,7 @@ internal inline fun I32TruncSatF64UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncSatF64UI,
+    instruction: NumericSuperInstruction.I32TruncSatF64UI,
 ) = executeF64ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.truncI32u()
 }
@@ -220,7 +220,7 @@ internal inline fun I32TruncSatF64UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32TruncSatF64US,
+    instruction: NumericSuperInstruction.I32TruncSatF64US,
 ) = executeF64ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.truncI32u()
 }
@@ -230,7 +230,7 @@ internal inline fun I32WrapI64Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32WrapI64I,
+    instruction: NumericSuperInstruction.I32WrapI64I,
 ) = executeI64ToI32I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.wrap()
 }
@@ -240,7 +240,7 @@ internal inline fun I32WrapI64Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32WrapI64S,
+    instruction: NumericSuperInstruction.I32WrapI64S,
 ) = executeI64ToI32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.wrap()
 }

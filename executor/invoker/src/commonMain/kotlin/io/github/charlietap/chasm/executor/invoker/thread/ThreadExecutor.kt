@@ -41,7 +41,6 @@ internal fun ThreadExecutor(
         vstack.push(param.toLongFromBoxed())
     }
 
-    
     istack.pushAll(thread.instructions)
 
     try {

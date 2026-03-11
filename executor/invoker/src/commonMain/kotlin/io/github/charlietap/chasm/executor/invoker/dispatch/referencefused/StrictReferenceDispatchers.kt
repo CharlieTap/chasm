@@ -8,18 +8,18 @@ import io.github.charlietap.chasm.executor.invoker.instruction.referencefused.Re
 import io.github.charlietap.chasm.executor.invoker.instruction.referencefused.RefIsNullExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.referencefused.RefNullExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.referencefused.RefTestExecutor
-import io.github.charlietap.chasm.runtime.instruction.FusedReferenceInstruction
+import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
 
-fun RefCastDispatcher(instruction: FusedReferenceInstruction.RefCastS) = dispatchInstruction(instruction, ::RefCastExecutor)
+fun RefCastDispatcher(instruction: ReferenceSuperInstruction.RefCastS) = dispatchInstruction(instruction, ::RefCastExecutor)
 
-fun RefEqDispatcher(instruction: FusedReferenceInstruction.RefEqSs) = dispatchInstruction(instruction, ::RefEqExecutor)
+fun RefEqDispatcher(instruction: ReferenceSuperInstruction.RefEqSs) = dispatchInstruction(instruction, ::RefEqExecutor)
 
-fun RefIsNullDispatcher(instruction: FusedReferenceInstruction.RefIsNullS) = dispatchInstruction(instruction, ::RefIsNullExecutor)
+fun RefIsNullDispatcher(instruction: ReferenceSuperInstruction.RefIsNullS) = dispatchInstruction(instruction, ::RefIsNullExecutor)
 
-fun RefAsNonNullDispatcher(instruction: FusedReferenceInstruction.RefAsNonNullS) = dispatchInstruction(instruction, ::RefAsNonNullExecutor)
+fun RefAsNonNullDispatcher(instruction: ReferenceSuperInstruction.RefAsNonNullS) = dispatchInstruction(instruction, ::RefAsNonNullExecutor)
 
-fun RefNullDispatcher(instruction: FusedReferenceInstruction.RefNullS) = dispatchInstruction(instruction, ::RefNullExecutor)
+fun RefNullDispatcher(instruction: ReferenceSuperInstruction.RefNullS) = dispatchInstruction(instruction, ::RefNullExecutor)
 
-fun RefFuncDispatcher(instruction: FusedReferenceInstruction.RefFuncS) = dispatchInstruction(instruction, ::RefFuncExecutor)
+fun RefFuncDispatcher(instruction: ReferenceSuperInstruction.RefFuncS) = dispatchInstruction(instruction, ::RefFuncExecutor)
 
-fun RefTestDispatcher(instruction: FusedReferenceInstruction.RefTestS) = dispatchInstruction(instruction, ::RefTestExecutor)
+fun RefTestDispatcher(instruction: ReferenceSuperInstruction.RefTestS) = dispatchInstruction(instruction, ::RefTestExecutor)

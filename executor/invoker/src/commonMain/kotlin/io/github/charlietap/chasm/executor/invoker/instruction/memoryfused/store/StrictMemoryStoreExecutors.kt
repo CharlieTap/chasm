@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.memory.write.I64ToI8Writer
 import io.github.charlietap.chasm.memory.write.I64Writer
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.runtime.instruction.FusedMemoryInstruction
+import io.github.charlietap.chasm.runtime.instruction.MemorySuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -22,7 +22,7 @@ internal inline fun I32StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32StoreIi,
+    instruction: MemorySuperInstruction.I32StoreIi,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Int.SIZE_BYTES) { effectiveAddress ->
     I32Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -32,7 +32,7 @@ internal inline fun I32StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32StoreIs,
+    instruction: MemorySuperInstruction.I32StoreIs,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Int.SIZE_BYTES) { effectiveAddress ->
     I32Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -42,7 +42,7 @@ internal inline fun I32StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32StoreSi,
+    instruction: MemorySuperInstruction.I32StoreSi,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Int.SIZE_BYTES) { effectiveAddress ->
     I32Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot).toInt())
 }
@@ -52,7 +52,7 @@ internal inline fun I32StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32StoreSs,
+    instruction: MemorySuperInstruction.I32StoreSs,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Int.SIZE_BYTES) { effectiveAddress ->
     I32Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot).toInt())
 }
@@ -62,7 +62,7 @@ internal inline fun I64StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64StoreIi,
+    instruction: MemorySuperInstruction.I64StoreIi,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Long.SIZE_BYTES) { effectiveAddress ->
     I64Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -72,7 +72,7 @@ internal inline fun I64StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64StoreIs,
+    instruction: MemorySuperInstruction.I64StoreIs,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Long.SIZE_BYTES) { effectiveAddress ->
     I64Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -82,7 +82,7 @@ internal inline fun I64StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64StoreSi,
+    instruction: MemorySuperInstruction.I64StoreSi,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Long.SIZE_BYTES) { effectiveAddress ->
     I64Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot))
 }
@@ -92,7 +92,7 @@ internal inline fun I64StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64StoreSs,
+    instruction: MemorySuperInstruction.I64StoreSs,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Long.SIZE_BYTES) { effectiveAddress ->
     I64Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot))
 }
@@ -102,7 +102,7 @@ internal inline fun F32StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.F32StoreIi,
+    instruction: MemorySuperInstruction.F32StoreIi,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Float.SIZE_BYTES) { effectiveAddress ->
     F32Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -112,7 +112,7 @@ internal inline fun F32StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.F32StoreIs,
+    instruction: MemorySuperInstruction.F32StoreIs,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Float.SIZE_BYTES) { effectiveAddress ->
     F32Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -122,7 +122,7 @@ internal inline fun F32StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.F32StoreSi,
+    instruction: MemorySuperInstruction.F32StoreSi,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Float.SIZE_BYTES) { effectiveAddress ->
     F32Writer(instruction.memory.data, effectiveAddress, Float.fromBits(vstack.getFrameSlot(instruction.valueSlot).toInt()))
 }
@@ -132,7 +132,7 @@ internal inline fun F32StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.F32StoreSs,
+    instruction: MemorySuperInstruction.F32StoreSs,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Float.SIZE_BYTES) { effectiveAddress ->
     F32Writer(instruction.memory.data, effectiveAddress, Float.fromBits(vstack.getFrameSlot(instruction.valueSlot).toInt()))
 }
@@ -142,7 +142,7 @@ internal inline fun F64StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.F64StoreIi,
+    instruction: MemorySuperInstruction.F64StoreIi,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Double.SIZE_BYTES) { effectiveAddress ->
     F64Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -152,7 +152,7 @@ internal inline fun F64StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.F64StoreIs,
+    instruction: MemorySuperInstruction.F64StoreIs,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Double.SIZE_BYTES) { effectiveAddress ->
     F64Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -162,7 +162,7 @@ internal inline fun F64StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.F64StoreSi,
+    instruction: MemorySuperInstruction.F64StoreSi,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Double.SIZE_BYTES) { effectiveAddress ->
     F64Writer(instruction.memory.data, effectiveAddress, Double.fromBits(vstack.getFrameSlot(instruction.valueSlot)))
 }
@@ -172,7 +172,7 @@ internal inline fun F64StoreExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.F64StoreSs,
+    instruction: MemorySuperInstruction.F64StoreSs,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Double.SIZE_BYTES) { effectiveAddress ->
     F64Writer(instruction.memory.data, effectiveAddress, Double.fromBits(vstack.getFrameSlot(instruction.valueSlot)))
 }
@@ -182,7 +182,7 @@ internal inline fun I32Store8Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32Store8Ii,
+    instruction: MemorySuperInstruction.I32Store8Ii,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Byte.SIZE_BYTES) { effectiveAddress ->
     I32ToI8Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -192,7 +192,7 @@ internal inline fun I32Store8Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32Store8Is,
+    instruction: MemorySuperInstruction.I32Store8Is,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Byte.SIZE_BYTES) { effectiveAddress ->
     I32ToI8Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -202,7 +202,7 @@ internal inline fun I32Store8Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32Store8Si,
+    instruction: MemorySuperInstruction.I32Store8Si,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Byte.SIZE_BYTES) { effectiveAddress ->
     I32ToI8Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot).toInt())
 }
@@ -212,7 +212,7 @@ internal inline fun I32Store8Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32Store8Ss,
+    instruction: MemorySuperInstruction.I32Store8Ss,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Byte.SIZE_BYTES) { effectiveAddress ->
     I32ToI8Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot).toInt())
 }
@@ -222,7 +222,7 @@ internal inline fun I32Store16Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32Store16Ii,
+    instruction: MemorySuperInstruction.I32Store16Ii,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Short.SIZE_BYTES) { effectiveAddress ->
     I32ToI16Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -232,7 +232,7 @@ internal inline fun I32Store16Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32Store16Is,
+    instruction: MemorySuperInstruction.I32Store16Is,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Short.SIZE_BYTES) { effectiveAddress ->
     I32ToI16Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -242,7 +242,7 @@ internal inline fun I32Store16Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32Store16Si,
+    instruction: MemorySuperInstruction.I32Store16Si,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Short.SIZE_BYTES) { effectiveAddress ->
     I32ToI16Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot).toInt())
 }
@@ -252,7 +252,7 @@ internal inline fun I32Store16Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I32Store16Ss,
+    instruction: MemorySuperInstruction.I32Store16Ss,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Short.SIZE_BYTES) { effectiveAddress ->
     I32ToI16Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot).toInt())
 }
@@ -262,7 +262,7 @@ internal inline fun I64Store8Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store8Ii,
+    instruction: MemorySuperInstruction.I64Store8Ii,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Byte.SIZE_BYTES) { effectiveAddress ->
     I64ToI8Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -272,7 +272,7 @@ internal inline fun I64Store8Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store8Is,
+    instruction: MemorySuperInstruction.I64Store8Is,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Byte.SIZE_BYTES) { effectiveAddress ->
     I64ToI8Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -282,7 +282,7 @@ internal inline fun I64Store8Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store8Si,
+    instruction: MemorySuperInstruction.I64Store8Si,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Byte.SIZE_BYTES) { effectiveAddress ->
     I64ToI8Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot))
 }
@@ -292,7 +292,7 @@ internal inline fun I64Store8Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store8Ss,
+    instruction: MemorySuperInstruction.I64Store8Ss,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Byte.SIZE_BYTES) { effectiveAddress ->
     I64ToI8Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot))
 }
@@ -302,7 +302,7 @@ internal inline fun I64Store16Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store16Ii,
+    instruction: MemorySuperInstruction.I64Store16Ii,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Short.SIZE_BYTES) { effectiveAddress ->
     I64ToI16Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -312,7 +312,7 @@ internal inline fun I64Store16Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store16Is,
+    instruction: MemorySuperInstruction.I64Store16Is,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Short.SIZE_BYTES) { effectiveAddress ->
     I64ToI16Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -322,7 +322,7 @@ internal inline fun I64Store16Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store16Si,
+    instruction: MemorySuperInstruction.I64Store16Si,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Short.SIZE_BYTES) { effectiveAddress ->
     I64ToI16Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot))
 }
@@ -332,7 +332,7 @@ internal inline fun I64Store16Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store16Ss,
+    instruction: MemorySuperInstruction.I64Store16Ss,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Short.SIZE_BYTES) { effectiveAddress ->
     I64ToI16Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot))
 }
@@ -342,7 +342,7 @@ internal inline fun I64Store32Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store32Ii,
+    instruction: MemorySuperInstruction.I64Store32Ii,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Int.SIZE_BYTES) { effectiveAddress ->
     I64ToI32Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -352,7 +352,7 @@ internal inline fun I64Store32Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store32Is,
+    instruction: MemorySuperInstruction.I64Store32Is,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Int.SIZE_BYTES) { effectiveAddress ->
     I64ToI32Writer(instruction.memory.data, effectiveAddress, instruction.value)
 }
@@ -362,7 +362,7 @@ internal inline fun I64Store32Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store32Si,
+    instruction: MemorySuperInstruction.I64Store32Si,
 ) = executeMemoryStore(instruction.memory, instruction.address, instruction.memArg.offset, Int.SIZE_BYTES) { effectiveAddress ->
     I64ToI32Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot))
 }
@@ -372,7 +372,7 @@ internal inline fun I64Store32Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.I64Store32Ss,
+    instruction: MemorySuperInstruction.I64Store32Ss,
 ) = executeMemoryStore(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, Int.SIZE_BYTES) { effectiveAddress ->
     I64ToI32Writer(instruction.memory.data, effectiveAddress, vstack.getFrameSlot(instruction.valueSlot))
 }

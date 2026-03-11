@@ -1,14 +1,14 @@
 package io.github.charlietap.chasm.compiler.passes.fusion
 
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemArg
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction
 import io.github.charlietap.chasm.ir.module.Index
 
-internal typealias MemoryLoadInstructionFactory = (FusedOperand, FusedDestination, Index.MemoryIndex, MemArg) -> FusedMemoryInstruction
+internal typealias MemoryLoadInstructionFactory = (FusedOperand, FusedDestination, Index.MemoryIndex, MemArg) -> MemorySuperInstruction
 internal typealias MemoryLoadFuser = (Int, MemoryInstruction.Load, List<Instruction>, MutableList<Instruction>, MemoryLoadInstructionFactory) -> Int
 
 internal fun MemoryLoadFuser(

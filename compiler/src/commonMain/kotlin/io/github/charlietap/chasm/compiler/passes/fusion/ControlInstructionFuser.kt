@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.compiler.passes.fusion
 
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
+import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.type.ext.functionType
@@ -56,7 +56,7 @@ internal inline fun ControlInstructionFuser(
         } else {
             output.removeLast()
             output.add(
-                FusedControlInstruction.BrIf(
+                ControlSuperInstruction.BrIf(
                     operand = operand,
                     labelIndex = instruction.labelIndex,
                 ),
@@ -86,7 +86,7 @@ internal inline fun ControlInstructionFuser(
         } else {
             output.removeLast()
             output.add(
-                FusedControlInstruction.If(
+                ControlSuperInstruction.If(
                     operand = operand,
                     blockType = instruction.blockType,
                     thenInstructions = fusedThenExpression.instructions,
@@ -138,7 +138,7 @@ internal inline fun ControlInstructionFuser(
             if (operands.all { it != null }) {
                 repeat(type.params.types.size) { output.removeLast() }
                 output.add(
-                    FusedControlInstruction.Call(
+                    ControlSuperInstruction.Call(
                         operands = operands.map { it ?: FusedOperand.ValueStack },
                         functionIndex = instruction.functionIndex,
                     ),

@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.bino
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.executeF64RelopSi
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.executeF64RelopSs
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -21,7 +21,7 @@ internal inline fun F64EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64EqIi,
+    instruction: NumericSuperInstruction.F64EqIi,
 ) = executeF64RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::eq)
 
 internal inline fun F64EqExecutor(
@@ -29,7 +29,7 @@ internal inline fun F64EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64EqIs,
+    instruction: NumericSuperInstruction.F64EqIs,
 ) = executeF64RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::eq)
 
 internal inline fun F64EqExecutor(
@@ -37,7 +37,7 @@ internal inline fun F64EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64EqSi,
+    instruction: NumericSuperInstruction.F64EqSi,
 ) = executeF64RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::eq)
 
 internal inline fun F64EqExecutor(
@@ -45,7 +45,7 @@ internal inline fun F64EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64EqSs,
+    instruction: NumericSuperInstruction.F64EqSs,
 ) = executeF64RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::eq)
 
 internal inline fun F64NeExecutor(
@@ -53,7 +53,7 @@ internal inline fun F64NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64NeIi,
+    instruction: NumericSuperInstruction.F64NeIi,
 ) = executeF64RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::ne)
 
 internal inline fun F64NeExecutor(
@@ -61,7 +61,7 @@ internal inline fun F64NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64NeIs,
+    instruction: NumericSuperInstruction.F64NeIs,
 ) = executeF64RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::ne)
 
 internal inline fun F64NeExecutor(
@@ -69,7 +69,7 @@ internal inline fun F64NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64NeSi,
+    instruction: NumericSuperInstruction.F64NeSi,
 ) = executeF64RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::ne)
 
 internal inline fun F64NeExecutor(
@@ -77,7 +77,7 @@ internal inline fun F64NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64NeSs,
+    instruction: NumericSuperInstruction.F64NeSs,
 ) = executeF64RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::ne)
 
 internal inline fun F64LtExecutor(
@@ -85,7 +85,7 @@ internal inline fun F64LtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64LtIi,
+    instruction: NumericSuperInstruction.F64LtIi,
 ) = executeF64RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::lt)
 
 internal inline fun F64LtExecutor(
@@ -93,7 +93,7 @@ internal inline fun F64LtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64LtIs,
+    instruction: NumericSuperInstruction.F64LtIs,
 ) = executeF64RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::lt)
 
 internal inline fun F64LtExecutor(
@@ -101,7 +101,7 @@ internal inline fun F64LtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64LtSi,
+    instruction: NumericSuperInstruction.F64LtSi,
 ) = executeF64RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::lt)
 
 internal inline fun F64LtExecutor(
@@ -109,7 +109,7 @@ internal inline fun F64LtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64LtSs,
+    instruction: NumericSuperInstruction.F64LtSs,
 ) = executeF64RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::lt)
 
 internal inline fun F64GtExecutor(
@@ -117,7 +117,7 @@ internal inline fun F64GtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64GtIi,
+    instruction: NumericSuperInstruction.F64GtIi,
 ) = executeF64RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::gt)
 
 internal inline fun F64GtExecutor(
@@ -125,7 +125,7 @@ internal inline fun F64GtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64GtIs,
+    instruction: NumericSuperInstruction.F64GtIs,
 ) = executeF64RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::gt)
 
 internal inline fun F64GtExecutor(
@@ -133,7 +133,7 @@ internal inline fun F64GtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64GtSi,
+    instruction: NumericSuperInstruction.F64GtSi,
 ) = executeF64RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::gt)
 
 internal inline fun F64GtExecutor(
@@ -141,7 +141,7 @@ internal inline fun F64GtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64GtSs,
+    instruction: NumericSuperInstruction.F64GtSs,
 ) = executeF64RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::gt)
 
 internal inline fun F64LeExecutor(
@@ -149,7 +149,7 @@ internal inline fun F64LeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64LeIi,
+    instruction: NumericSuperInstruction.F64LeIi,
 ) = executeF64RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::le)
 
 internal inline fun F64LeExecutor(
@@ -157,7 +157,7 @@ internal inline fun F64LeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64LeIs,
+    instruction: NumericSuperInstruction.F64LeIs,
 ) = executeF64RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::le)
 
 internal inline fun F64LeExecutor(
@@ -165,7 +165,7 @@ internal inline fun F64LeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64LeSi,
+    instruction: NumericSuperInstruction.F64LeSi,
 ) = executeF64RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::le)
 
 internal inline fun F64LeExecutor(
@@ -173,7 +173,7 @@ internal inline fun F64LeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64LeSs,
+    instruction: NumericSuperInstruction.F64LeSs,
 ) = executeF64RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::le)
 
 internal inline fun F64GeExecutor(
@@ -181,7 +181,7 @@ internal inline fun F64GeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64GeIi,
+    instruction: NumericSuperInstruction.F64GeIi,
 ) = executeF64RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::ge)
 
 internal inline fun F64GeExecutor(
@@ -189,7 +189,7 @@ internal inline fun F64GeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64GeIs,
+    instruction: NumericSuperInstruction.F64GeIs,
 ) = executeF64RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::ge)
 
 internal inline fun F64GeExecutor(
@@ -197,7 +197,7 @@ internal inline fun F64GeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64GeSi,
+    instruction: NumericSuperInstruction.F64GeSi,
 ) = executeF64RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::ge)
 
 internal inline fun F64GeExecutor(
@@ -205,5 +205,5 @@ internal inline fun F64GeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64GeSs,
+    instruction: NumericSuperInstruction.F64GeSs,
 ) = executeF64RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::ge)

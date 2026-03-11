@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.runtime.instruction.FusedTableInstruction
+import io.github.charlietap.chasm.runtime.instruction.TableSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -16,7 +16,7 @@ internal fun TableCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableCopyIii,
+    instruction: TableSuperInstruction.TableCopyIii,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -30,7 +30,7 @@ internal fun TableCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableCopyIis,
+    instruction: TableSuperInstruction.TableCopyIis,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -44,7 +44,7 @@ internal fun TableCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableCopyIsi,
+    instruction: TableSuperInstruction.TableCopyIsi,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -58,7 +58,7 @@ internal fun TableCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableCopyIss,
+    instruction: TableSuperInstruction.TableCopyIss,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -72,7 +72,7 @@ internal fun TableCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableCopySii,
+    instruction: TableSuperInstruction.TableCopySii,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -86,7 +86,7 @@ internal fun TableCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableCopySis,
+    instruction: TableSuperInstruction.TableCopySis,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -100,7 +100,7 @@ internal fun TableCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableCopySsi,
+    instruction: TableSuperInstruction.TableCopySsi,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -114,7 +114,7 @@ internal fun TableCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableCopySss,
+    instruction: TableSuperInstruction.TableCopySss,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -128,7 +128,7 @@ internal fun TableFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableFillIii,
+    instruction: TableSuperInstruction.TableFillIii,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = instruction.elementsToFill,
@@ -141,7 +141,7 @@ internal fun TableFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableFillIis,
+    instruction: TableSuperInstruction.TableFillIis,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = instruction.elementsToFill,
@@ -154,7 +154,7 @@ internal fun TableFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableFillIsi,
+    instruction: TableSuperInstruction.TableFillIsi,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = instruction.elementsToFill,
@@ -167,7 +167,7 @@ internal fun TableFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableFillIss,
+    instruction: TableSuperInstruction.TableFillIss,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = instruction.elementsToFill,
@@ -180,7 +180,7 @@ internal fun TableFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableFillSii,
+    instruction: TableSuperInstruction.TableFillSii,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -193,7 +193,7 @@ internal fun TableFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableFillSis,
+    instruction: TableSuperInstruction.TableFillSis,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -206,7 +206,7 @@ internal fun TableFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableFillSsi,
+    instruction: TableSuperInstruction.TableFillSsi,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -219,7 +219,7 @@ internal fun TableFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableFillSss,
+    instruction: TableSuperInstruction.TableFillSss,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -232,7 +232,7 @@ internal fun TableGrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableGrowIi,
+    instruction: TableSuperInstruction.TableGrowIi,
 ) = executeTableGrow(
     vstack = vstack,
     table = instruction.table,
@@ -247,7 +247,7 @@ internal fun TableGrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableGrowIs,
+    instruction: TableSuperInstruction.TableGrowIs,
 ) = executeTableGrow(
     vstack = vstack,
     table = instruction.table,
@@ -262,7 +262,7 @@ internal fun TableGrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableGrowSi,
+    instruction: TableSuperInstruction.TableGrowSi,
 ) = executeTableGrow(
     vstack = vstack,
     table = instruction.table,
@@ -277,7 +277,7 @@ internal fun TableGrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableGrowSs,
+    instruction: TableSuperInstruction.TableGrowSs,
 ) = executeTableGrow(
     vstack = vstack,
     table = instruction.table,
@@ -292,7 +292,7 @@ internal fun TableInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableInitIii,
+    instruction: TableSuperInstruction.TableInitIii,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -306,7 +306,7 @@ internal fun TableInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableInitIis,
+    instruction: TableSuperInstruction.TableInitIis,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -320,7 +320,7 @@ internal fun TableInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableInitIsi,
+    instruction: TableSuperInstruction.TableInitIsi,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -334,7 +334,7 @@ internal fun TableInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableInitIss,
+    instruction: TableSuperInstruction.TableInitIss,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -348,7 +348,7 @@ internal fun TableInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableInitSii,
+    instruction: TableSuperInstruction.TableInitSii,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -362,7 +362,7 @@ internal fun TableInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableInitSis,
+    instruction: TableSuperInstruction.TableInitSis,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -376,7 +376,7 @@ internal fun TableInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableInitSsi,
+    instruction: TableSuperInstruction.TableInitSsi,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -390,7 +390,7 @@ internal fun TableInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableInitSss,
+    instruction: TableSuperInstruction.TableInitSss,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -404,7 +404,7 @@ internal inline fun TableGetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableGetI,
+    instruction: TableSuperInstruction.TableGetI,
 ) = executeTableGet(
     vstack = vstack,
     table = instruction.table,
@@ -417,7 +417,7 @@ internal inline fun TableGetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableGetS,
+    instruction: TableSuperInstruction.TableGetS,
 ) = executeTableGet(
     vstack = vstack,
     table = instruction.table,
@@ -430,7 +430,7 @@ internal inline fun TableSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableSetIi,
+    instruction: TableSuperInstruction.TableSetIi,
 ) = executeTableSet(
     table = instruction.table,
     elementIndex = instruction.elementIndex,
@@ -442,7 +442,7 @@ internal inline fun TableSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableSetIs,
+    instruction: TableSuperInstruction.TableSetIs,
 ) = executeTableSet(
     table = instruction.table,
     elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
@@ -454,7 +454,7 @@ internal inline fun TableSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableSetSi,
+    instruction: TableSuperInstruction.TableSetSi,
 ) = executeTableSet(
     table = instruction.table,
     elementIndex = instruction.elementIndex,
@@ -466,7 +466,7 @@ internal inline fun TableSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableSetSs,
+    instruction: TableSuperInstruction.TableSetSs,
 ) = executeTableSet(
     table = instruction.table,
     elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
@@ -478,7 +478,7 @@ internal inline fun TableSizeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedTableInstruction.TableSizeS,
+    instruction: TableSuperInstruction.TableSizeS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.table.elements.size.toLong())
 }

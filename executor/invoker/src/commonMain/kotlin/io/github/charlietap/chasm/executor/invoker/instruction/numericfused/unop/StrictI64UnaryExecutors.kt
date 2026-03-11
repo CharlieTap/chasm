@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numericfused.unop
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -11,7 +11,7 @@ internal inline fun I64ClzExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64ClzI,
+    instruction: NumericSuperInstruction.I64ClzI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.countLeadingZeroBits().toLong()
 }
@@ -21,7 +21,7 @@ internal inline fun I64ClzExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64ClzS,
+    instruction: NumericSuperInstruction.I64ClzS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.countLeadingZeroBits().toLong()
 }
@@ -31,7 +31,7 @@ internal inline fun I64CtzExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64CtzI,
+    instruction: NumericSuperInstruction.I64CtzI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.countTrailingZeroBits().toLong()
 }
@@ -41,7 +41,7 @@ internal inline fun I64CtzExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64CtzS,
+    instruction: NumericSuperInstruction.I64CtzS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.countTrailingZeroBits().toLong()
 }
@@ -51,7 +51,7 @@ internal inline fun I64PopcntExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64PopcntI,
+    instruction: NumericSuperInstruction.I64PopcntI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     operand.countOneBits().toLong()
 }
@@ -61,7 +61,7 @@ internal inline fun I64PopcntExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64PopcntS,
+    instruction: NumericSuperInstruction.I64PopcntS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     operand.countOneBits().toLong()
 }
@@ -71,7 +71,7 @@ internal inline fun I64Extend8SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64Extend8SI,
+    instruction: NumericSuperInstruction.I64Extend8SI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     (operand and 0xFF).toByte().toLong()
 }
@@ -81,7 +81,7 @@ internal inline fun I64Extend8SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64Extend8SS,
+    instruction: NumericSuperInstruction.I64Extend8SS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     (operand and 0xFF).toByte().toLong()
 }
@@ -91,7 +91,7 @@ internal inline fun I64Extend16SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64Extend16SI,
+    instruction: NumericSuperInstruction.I64Extend16SI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     (operand and 0xFFFF).toShort().toLong()
 }
@@ -101,7 +101,7 @@ internal inline fun I64Extend16SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64Extend16SS,
+    instruction: NumericSuperInstruction.I64Extend16SS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     (operand and 0xFFFF).toShort().toLong()
 }
@@ -111,7 +111,7 @@ internal inline fun I64Extend32SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64Extend32SI,
+    instruction: NumericSuperInstruction.I64Extend32SI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
     ((operand and 0xFFFFFFFFL) shl 32) shr 32
 }
@@ -121,7 +121,7 @@ internal inline fun I64Extend32SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64Extend32SS,
+    instruction: NumericSuperInstruction.I64Extend32SS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
     ((operand and 0xFFFFFFFFL) shl 32) shr 32
 }

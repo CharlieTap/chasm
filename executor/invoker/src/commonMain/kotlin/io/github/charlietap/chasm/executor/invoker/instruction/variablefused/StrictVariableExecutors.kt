@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.variablefused
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedVariableInstruction
+import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -11,7 +11,7 @@ internal inline fun GlobalGetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedVariableInstruction.GlobalGetS,
+    instruction: VariableSuperInstruction.GlobalGetS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.global.value)
 }
@@ -21,7 +21,7 @@ internal inline fun GlobalSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedVariableInstruction.GlobalSetI,
+    instruction: VariableSuperInstruction.GlobalSetI,
 ) {
     instruction.global.value = instruction.value
 }
@@ -31,7 +31,7 @@ internal inline fun GlobalSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedVariableInstruction.GlobalSetS,
+    instruction: VariableSuperInstruction.GlobalSetS,
 ) {
     instruction.global.value = vstack.getFrameSlot(instruction.sourceSlot)
 }
@@ -41,7 +41,7 @@ internal inline fun LocalSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedVariableInstruction.LocalSetI,
+    instruction: VariableSuperInstruction.LocalSetI,
 ) {
     vstack.setFrameSlot(instruction.localSlot, instruction.value)
 }
@@ -51,7 +51,7 @@ internal inline fun LocalSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedVariableInstruction.LocalSetS,
+    instruction: VariableSuperInstruction.LocalSetS,
 ) {
     vstack.setFrameSlot(instruction.localSlot, vstack.getFrameSlot(instruction.sourceSlot))
 }

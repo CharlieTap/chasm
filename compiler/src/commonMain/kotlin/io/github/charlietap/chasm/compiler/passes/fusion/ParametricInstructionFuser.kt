@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.compiler.passes.fusion
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
-import io.github.charlietap.chasm.ir.instruction.FusedParametricInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.ParametricInstruction
+import io.github.charlietap.chasm.ir.instruction.ParametricSuperInstruction
 
 internal typealias ParametricInstructionFuser = (PassContext, Int, ParametricInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
@@ -48,7 +48,7 @@ internal inline fun ParametricInstructionFuser(
             instruction
         } else {
             when {
-                const == null -> FusedParametricInstruction.Select(
+                const == null -> ParametricSuperInstruction.Select(
                     const = FusedOperand.ValueStack,
                     val1 = FusedOperand.ValueStack,
                     val2 = FusedOperand.ValueStack,
@@ -56,7 +56,7 @@ internal inline fun ParametricInstructionFuser(
                 )
                 val2 == null -> {
                     output.removeLast()
-                    FusedParametricInstruction.Select(
+                    ParametricSuperInstruction.Select(
                         const = const,
                         val1 = FusedOperand.ValueStack,
                         val2 = FusedOperand.ValueStack,
@@ -66,7 +66,7 @@ internal inline fun ParametricInstructionFuser(
                 val1 == null -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedParametricInstruction.Select(
+                    ParametricSuperInstruction.Select(
                         const = const,
                         val1 = FusedOperand.ValueStack,
                         val2 = val2,
@@ -77,7 +77,7 @@ internal inline fun ParametricInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedParametricInstruction.Select(
+                    ParametricSuperInstruction.Select(
                         const = const,
                         val1 = val1,
                         val2 = val2,

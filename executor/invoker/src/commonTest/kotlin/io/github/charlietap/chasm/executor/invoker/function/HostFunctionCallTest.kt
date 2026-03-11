@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.runtime.instance.HostFunction
-import io.github.charlietap.chasm.runtime.instruction.FusedControlInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -180,7 +180,7 @@ class HostFunctionCallTest {
             context = context,
             function = functionInstance,
             operands = listOf(
-                FusedControlInstruction.CallOperand.Slot(0),
+                ControlSuperInstruction.CallOperand.Slot(0),
             ),
         )
 

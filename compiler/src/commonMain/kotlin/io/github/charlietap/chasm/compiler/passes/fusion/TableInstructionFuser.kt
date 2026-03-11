@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.compiler.passes.fusion
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
-import io.github.charlietap.chasm.ir.instruction.FusedTableInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
+import io.github.charlietap.chasm.ir.instruction.TableSuperInstruction
 
 internal typealias TableInstructionFuser = (PassContext, Int, TableInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
@@ -44,14 +44,14 @@ internal inline fun TableInstructionFuser(
             instruction
         } else {
             when {
-                elementIndex == null -> FusedTableInstruction.TableGet(
+                elementIndex == null -> TableSuperInstruction.TableGet(
                     elementIndex = FusedOperand.ValueStack,
                     destination = destination,
                     tableIdx = instruction.tableIdx,
                 )
                 else -> {
                     output.removeLast()
-                    FusedTableInstruction.TableGet(
+                    TableSuperInstruction.TableGet(
                         elementIndex = elementIndex,
                         destination = destination,
                         tableIdx = instruction.tableIdx,
@@ -79,7 +79,7 @@ internal inline fun TableInstructionFuser(
             when {
                 elementIdx == null -> {
                     output.removeLast()
-                    FusedTableInstruction.TableSet(
+                    TableSuperInstruction.TableSet(
                         value = value,
                         elementIdx = FusedOperand.ValueStack,
                         tableIdx = instruction.tableIdx,
@@ -88,7 +88,7 @@ internal inline fun TableInstructionFuser(
                 else -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedTableInstruction.TableSet(
+                    TableSuperInstruction.TableSet(
                         value = value,
                         elementIdx = elementIdx,
                         tableIdx = instruction.tableIdx,
@@ -112,7 +112,7 @@ internal inline fun TableInstructionFuser(
             when {
                 srcOffset == null -> {
                     output.removeLast()
-                    FusedTableInstruction.TableCopy(
+                    TableSuperInstruction.TableCopy(
                         elementsToCopy = elementsToCopy,
                         srcOffset = FusedOperand.ValueStack,
                         dstOffset = FusedOperand.ValueStack,
@@ -123,7 +123,7 @@ internal inline fun TableInstructionFuser(
                 dstOffset == null -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedTableInstruction.TableCopy(
+                    TableSuperInstruction.TableCopy(
                         elementsToCopy = elementsToCopy,
                         srcOffset = srcOffset,
                         dstOffset = FusedOperand.ValueStack,
@@ -135,7 +135,7 @@ internal inline fun TableInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedTableInstruction.TableCopy(
+                    TableSuperInstruction.TableCopy(
                         elementsToCopy = elementsToCopy,
                         srcOffset = srcOffset,
                         dstOffset = dstOffset,
@@ -161,7 +161,7 @@ internal inline fun TableInstructionFuser(
             when {
                 fillValue == null -> {
                     output.removeLast()
-                    FusedTableInstruction.TableFill(
+                    TableSuperInstruction.TableFill(
                         elementsToFill = elementsToFill,
                         fillValue = FusedOperand.ValueStack,
                         tableOffset = FusedOperand.ValueStack,
@@ -171,7 +171,7 @@ internal inline fun TableInstructionFuser(
                 tableOffset == null -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedTableInstruction.TableFill(
+                    TableSuperInstruction.TableFill(
                         elementsToFill = elementsToFill,
                         fillValue = fillValue,
                         tableOffset = FusedOperand.ValueStack,
@@ -182,7 +182,7 @@ internal inline fun TableInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedTableInstruction.TableFill(
+                    TableSuperInstruction.TableFill(
                         elementsToFill = elementsToFill,
                         fillValue = fillValue,
                         tableOffset = tableOffset,
@@ -206,7 +206,7 @@ internal inline fun TableInstructionFuser(
             instruction
         } else {
             when {
-                elementsToAdd == null -> FusedTableInstruction.TableGrow(
+                elementsToAdd == null -> TableSuperInstruction.TableGrow(
                     elementsToAdd = FusedOperand.ValueStack,
                     referenceValue = FusedOperand.ValueStack,
                     destination = destination,
@@ -214,7 +214,7 @@ internal inline fun TableInstructionFuser(
                 )
                 referenceValue == null -> {
                     output.removeLast()
-                    FusedTableInstruction.TableGrow(
+                    TableSuperInstruction.TableGrow(
                         elementsToAdd = elementsToAdd,
                         referenceValue = FusedOperand.ValueStack,
                         destination = destination,
@@ -224,7 +224,7 @@ internal inline fun TableInstructionFuser(
                 else -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedTableInstruction.TableGrow(
+                    TableSuperInstruction.TableGrow(
                         elementsToAdd = elementsToAdd,
                         referenceValue = referenceValue,
                         destination = destination,
@@ -254,7 +254,7 @@ internal inline fun TableInstructionFuser(
             when {
                 segmentOffset == null -> {
                     output.removeLast()
-                    FusedTableInstruction.TableInit(
+                    TableSuperInstruction.TableInit(
                         elementsToInitialise = elementsToInit,
                         segmentOffset = FusedOperand.ValueStack,
                         tableOffset = FusedOperand.ValueStack,
@@ -265,7 +265,7 @@ internal inline fun TableInstructionFuser(
                 tableOffset == null -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedTableInstruction.TableInit(
+                    TableSuperInstruction.TableInit(
                         elementsToInitialise = elementsToInit,
                         segmentOffset = segmentOffset,
                         tableOffset = FusedOperand.ValueStack,
@@ -277,7 +277,7 @@ internal inline fun TableInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedTableInstruction.TableInit(
+                    TableSuperInstruction.TableInit(
                         elementsToInitialise = elementsToInit,
                         segmentOffset = segmentOffset,
                         tableOffset = tableOffset,
@@ -298,7 +298,7 @@ internal inline fun TableInstructionFuser(
         val instruction = if (destination == FusedDestination.ValueStack) {
             instruction
         } else {
-            FusedTableInstruction.TableSize(
+            TableSuperInstruction.TableSize(
                 destination = destination,
                 tableIdx = instruction.tableIdx,
             )

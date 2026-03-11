@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.instruction.FusedControlInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -53,13 +53,13 @@ internal inline fun ReturnWasmFunctionCall(
     store: Store,
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
-    operands: List<FusedControlInstruction.CallOperand>,
+    operands: List<ControlSuperInstruction.CallOperand>,
 ) {
     val currentFramePointer = vstack.framePointer
     val operandValues = LongArray(operands.size) { index ->
         when (val operand = operands[index]) {
-            is FusedControlInstruction.CallOperand.Immediate -> operand.value
-            is FusedControlInstruction.CallOperand.Slot -> vstack.getFrameSlot(currentFramePointer, operand.slot)
+            is ControlSuperInstruction.CallOperand.Immediate -> operand.value
+            is ControlSuperInstruction.CallOperand.Slot -> vstack.getFrameSlot(currentFramePointer, operand.slot)
         }
     }
 

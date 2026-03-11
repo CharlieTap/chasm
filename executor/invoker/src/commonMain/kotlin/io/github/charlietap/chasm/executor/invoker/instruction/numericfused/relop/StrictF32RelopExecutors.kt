@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.bino
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.executeF32RelopSi
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.executeF32RelopSs
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -21,7 +21,7 @@ internal inline fun F32EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32EqIi,
+    instruction: NumericSuperInstruction.F32EqIi,
 ) = executeF32RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::eq)
 
 internal inline fun F32EqExecutor(
@@ -29,7 +29,7 @@ internal inline fun F32EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32EqIs,
+    instruction: NumericSuperInstruction.F32EqIs,
 ) = executeF32RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::eq)
 
 internal inline fun F32EqExecutor(
@@ -37,7 +37,7 @@ internal inline fun F32EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32EqSi,
+    instruction: NumericSuperInstruction.F32EqSi,
 ) = executeF32RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::eq)
 
 internal inline fun F32EqExecutor(
@@ -45,7 +45,7 @@ internal inline fun F32EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32EqSs,
+    instruction: NumericSuperInstruction.F32EqSs,
 ) = executeF32RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::eq)
 
 internal inline fun F32NeExecutor(
@@ -53,7 +53,7 @@ internal inline fun F32NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32NeIi,
+    instruction: NumericSuperInstruction.F32NeIi,
 ) = executeF32RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::ne)
 
 internal inline fun F32NeExecutor(
@@ -61,7 +61,7 @@ internal inline fun F32NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32NeIs,
+    instruction: NumericSuperInstruction.F32NeIs,
 ) = executeF32RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::ne)
 
 internal inline fun F32NeExecutor(
@@ -69,7 +69,7 @@ internal inline fun F32NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32NeSi,
+    instruction: NumericSuperInstruction.F32NeSi,
 ) = executeF32RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::ne)
 
 internal inline fun F32NeExecutor(
@@ -77,7 +77,7 @@ internal inline fun F32NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32NeSs,
+    instruction: NumericSuperInstruction.F32NeSs,
 ) = executeF32RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::ne)
 
 internal inline fun F32LtExecutor(
@@ -85,7 +85,7 @@ internal inline fun F32LtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32LtIi,
+    instruction: NumericSuperInstruction.F32LtIi,
 ) = executeF32RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::lt)
 
 internal inline fun F32LtExecutor(
@@ -93,7 +93,7 @@ internal inline fun F32LtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32LtIs,
+    instruction: NumericSuperInstruction.F32LtIs,
 ) = executeF32RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::lt)
 
 internal inline fun F32LtExecutor(
@@ -101,7 +101,7 @@ internal inline fun F32LtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32LtSi,
+    instruction: NumericSuperInstruction.F32LtSi,
 ) = executeF32RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::lt)
 
 internal inline fun F32LtExecutor(
@@ -109,7 +109,7 @@ internal inline fun F32LtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32LtSs,
+    instruction: NumericSuperInstruction.F32LtSs,
 ) = executeF32RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::lt)
 
 internal inline fun F32GtExecutor(
@@ -117,7 +117,7 @@ internal inline fun F32GtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32GtIi,
+    instruction: NumericSuperInstruction.F32GtIi,
 ) = executeF32RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::gt)
 
 internal inline fun F32GtExecutor(
@@ -125,7 +125,7 @@ internal inline fun F32GtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32GtIs,
+    instruction: NumericSuperInstruction.F32GtIs,
 ) = executeF32RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::gt)
 
 internal inline fun F32GtExecutor(
@@ -133,7 +133,7 @@ internal inline fun F32GtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32GtSi,
+    instruction: NumericSuperInstruction.F32GtSi,
 ) = executeF32RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::gt)
 
 internal inline fun F32GtExecutor(
@@ -141,7 +141,7 @@ internal inline fun F32GtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32GtSs,
+    instruction: NumericSuperInstruction.F32GtSs,
 ) = executeF32RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::gt)
 
 internal inline fun F32LeExecutor(
@@ -149,7 +149,7 @@ internal inline fun F32LeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32LeIi,
+    instruction: NumericSuperInstruction.F32LeIi,
 ) = executeF32RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::le)
 
 internal inline fun F32LeExecutor(
@@ -157,7 +157,7 @@ internal inline fun F32LeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32LeIs,
+    instruction: NumericSuperInstruction.F32LeIs,
 ) = executeF32RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::le)
 
 internal inline fun F32LeExecutor(
@@ -165,7 +165,7 @@ internal inline fun F32LeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32LeSi,
+    instruction: NumericSuperInstruction.F32LeSi,
 ) = executeF32RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::le)
 
 internal inline fun F32LeExecutor(
@@ -173,7 +173,7 @@ internal inline fun F32LeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32LeSs,
+    instruction: NumericSuperInstruction.F32LeSs,
 ) = executeF32RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::le)
 
 internal inline fun F32GeExecutor(
@@ -181,7 +181,7 @@ internal inline fun F32GeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32GeIi,
+    instruction: NumericSuperInstruction.F32GeIi,
 ) = executeF32RelopIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::ge)
 
 internal inline fun F32GeExecutor(
@@ -189,7 +189,7 @@ internal inline fun F32GeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32GeIs,
+    instruction: NumericSuperInstruction.F32GeIs,
 ) = executeF32RelopIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::ge)
 
 internal inline fun F32GeExecutor(
@@ -197,7 +197,7 @@ internal inline fun F32GeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32GeSi,
+    instruction: NumericSuperInstruction.F32GeSi,
 ) = executeF32RelopSi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::ge)
 
 internal inline fun F32GeExecutor(
@@ -205,5 +205,5 @@ internal inline fun F32GeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32GeSs,
+    instruction: NumericSuperInstruction.F32GeSs,
 ) = executeF32RelopSs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::ge)

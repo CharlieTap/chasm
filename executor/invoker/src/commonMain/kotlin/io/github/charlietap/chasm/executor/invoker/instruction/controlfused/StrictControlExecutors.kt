@@ -22,7 +22,7 @@ import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.ExceptionInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.runtime.instruction.FusedControlInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -37,7 +37,7 @@ internal fun BrIfExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.BrIfI,
+    instruction: ControlSuperInstruction.BrIfI,
 ) = BrIfExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -54,7 +54,7 @@ internal fun BrIfExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.BrIfS,
+    instruction: ControlSuperInstruction.BrIfS,
 ) = BrIfExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -87,7 +87,7 @@ internal fun BrTableExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.BrTableI,
+    instruction: ControlSuperInstruction.BrTableI,
 ) = BrTableExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -106,7 +106,7 @@ internal fun BrTableExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.BrTableS,
+    instruction: ControlSuperInstruction.BrTableS,
 ) = BrTableExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -157,7 +157,7 @@ internal fun BrOnNullExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.BrOnNullS,
+    instruction: ControlSuperInstruction.BrOnNullS,
 ) = BrOnNullExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -190,7 +190,7 @@ internal fun BrOnNonNullExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.BrOnNonNullS,
+    instruction: ControlSuperInstruction.BrOnNonNullS,
 ) = BrOnNonNullExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -223,7 +223,7 @@ internal fun BrOnCastExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.BrOnCastS,
+    instruction: ControlSuperInstruction.BrOnCastS,
 ) = BrOnCastExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -243,7 +243,7 @@ internal fun BrOnCastFailExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.BrOnCastFailS,
+    instruction: ControlSuperInstruction.BrOnCastFailS,
 ) = BrOnCastExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -296,7 +296,7 @@ internal fun CallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.WasmCall,
+    instruction: ControlSuperInstruction.WasmCall,
 ) = WasmFunctionCall(
     vstack = vstack,
     cstack = cstack,
@@ -312,7 +312,7 @@ internal fun CallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.HostCall,
+    instruction: ControlSuperInstruction.HostCall,
 ) = HostFunctionCall(
     vstack = vstack,
     cstack = cstack,
@@ -328,7 +328,7 @@ internal fun CallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.CallIndirectI,
+    instruction: ControlSuperInstruction.CallIndirectI,
 ) = strictIndirectCall(
     vstack = vstack,
     cstack = cstack,
@@ -346,7 +346,7 @@ internal fun CallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.CallIndirectS,
+    instruction: ControlSuperInstruction.CallIndirectS,
 ) = strictIndirectCall(
     vstack = vstack,
     cstack = cstack,
@@ -364,7 +364,7 @@ internal fun CallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.CallRefS,
+    instruction: ControlSuperInstruction.CallRefS,
 ) = strictReferenceCall(
     vstack = vstack,
     cstack = cstack,
@@ -380,7 +380,7 @@ internal fun ReturnCallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.ReturnWasmCall,
+    instruction: ControlSuperInstruction.ReturnWasmCall,
 ) = ReturnWasmFunctionCall(
     vstack = vstack,
     cstack = cstack,
@@ -395,7 +395,7 @@ internal fun ReturnCallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.ReturnHostCall,
+    instruction: ControlSuperInstruction.ReturnHostCall,
 ) = ReturnHostFunctionCall(
     vstack = vstack,
     cstack = cstack,
@@ -410,7 +410,7 @@ internal fun ReturnCallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.ReturnCallIndirectI,
+    instruction: ControlSuperInstruction.ReturnCallIndirectI,
 ) = strictIndirectReturnCall(
     vstack = vstack,
     cstack = cstack,
@@ -427,7 +427,7 @@ internal fun ReturnCallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.ReturnCallIndirectS,
+    instruction: ControlSuperInstruction.ReturnCallIndirectS,
 ) = strictIndirectReturnCall(
     vstack = vstack,
     cstack = cstack,
@@ -444,7 +444,7 @@ internal fun ReturnCallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.ReturnCallRefS,
+    instruction: ControlSuperInstruction.ReturnCallRefS,
 ) = strictReferenceReturnCall(
     vstack = vstack,
     cstack = cstack,
@@ -459,7 +459,7 @@ internal fun ThrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.Throw,
+    instruction: ControlSuperInstruction.Throw,
 ) {
     val frame = cstack.peekFrame()
     val address = frame.instance.tagAddress(instruction.tagIndex)
@@ -490,7 +490,7 @@ internal fun ThrowRefExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.ThrowRefS,
+    instruction: ControlSuperInstruction.ThrowRefS,
 ) = LegacyThrowRefExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -551,7 +551,7 @@ private fun strictIndirectReturnCall(
     store: Store,
     context: ExecutionContext,
     elementIndex: Int,
-    operands: List<FusedControlInstruction.CallOperand>,
+    operands: List<ControlSuperInstruction.CallOperand>,
     type: RTT,
     table: TableInstance,
 ) {
@@ -572,7 +572,7 @@ private fun strictReferenceReturnCall(
     store: Store,
     context: ExecutionContext,
     functionSlot: Int,
-    operands: List<FusedControlInstruction.CallOperand>,
+    operands: List<ControlSuperInstruction.CallOperand>,
 ) {
     val address = vstack.getFrameSlot(functionSlot).toFunctionAddress()
     strictInvokeReturnFunction(
@@ -637,7 +637,7 @@ private fun strictInvokeReturnFunction(
     store: Store,
     context: ExecutionContext,
     functionInstance: FunctionInstance,
-    operands: List<FusedControlInstruction.CallOperand>,
+    operands: List<ControlSuperInstruction.CallOperand>,
 ) {
     when (functionInstance) {
         is FunctionInstance.HostFunction -> ReturnHostFunctionCall(
@@ -664,7 +664,7 @@ internal fun IfExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.IfI,
+    instruction: ControlSuperInstruction.IfI,
 ) = IfExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -682,7 +682,7 @@ internal fun IfExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedControlInstruction.IfS,
+    instruction: ControlSuperInstruction.IfS,
 ) = IfExecutor(
     vstack = vstack,
     cstack = cstack,

@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.invoker.ext.copySign
 import io.github.charlietap.chasm.executor.invoker.ext.max
 import io.github.charlietap.chasm.executor.invoker.ext.min
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -14,7 +14,7 @@ internal inline fun F64AddExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64AddIi,
+    instruction: NumericSuperInstruction.F64AddIi,
 ) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left + right }
 
 internal inline fun F64AddExecutor(
@@ -22,7 +22,7 @@ internal inline fun F64AddExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64AddIs,
+    instruction: NumericSuperInstruction.F64AddIs,
 ) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left + right }
 
 internal inline fun F64AddExecutor(
@@ -30,7 +30,7 @@ internal inline fun F64AddExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64AddSi,
+    instruction: NumericSuperInstruction.F64AddSi,
 ) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left + right }
 
 internal inline fun F64AddExecutor(
@@ -38,7 +38,7 @@ internal inline fun F64AddExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64AddSs,
+    instruction: NumericSuperInstruction.F64AddSs,
 ) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left + right }
 
 internal inline fun F64SubExecutor(
@@ -46,7 +46,7 @@ internal inline fun F64SubExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64SubIi,
+    instruction: NumericSuperInstruction.F64SubIi,
 ) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left - right }
 
 internal inline fun F64SubExecutor(
@@ -54,7 +54,7 @@ internal inline fun F64SubExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64SubIs,
+    instruction: NumericSuperInstruction.F64SubIs,
 ) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left - right }
 
 internal inline fun F64SubExecutor(
@@ -62,7 +62,7 @@ internal inline fun F64SubExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64SubSi,
+    instruction: NumericSuperInstruction.F64SubSi,
 ) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left - right }
 
 internal inline fun F64SubExecutor(
@@ -70,7 +70,7 @@ internal inline fun F64SubExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64SubSs,
+    instruction: NumericSuperInstruction.F64SubSs,
 ) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left - right }
 
 internal inline fun F64MulExecutor(
@@ -78,7 +78,7 @@ internal inline fun F64MulExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MulIi,
+    instruction: NumericSuperInstruction.F64MulIi,
 ) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left * right }
 
 internal inline fun F64MulExecutor(
@@ -86,7 +86,7 @@ internal inline fun F64MulExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MulIs,
+    instruction: NumericSuperInstruction.F64MulIs,
 ) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left * right }
 
 internal inline fun F64MulExecutor(
@@ -94,7 +94,7 @@ internal inline fun F64MulExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MulSi,
+    instruction: NumericSuperInstruction.F64MulSi,
 ) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left * right }
 
 internal inline fun F64MulExecutor(
@@ -102,7 +102,7 @@ internal inline fun F64MulExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MulSs,
+    instruction: NumericSuperInstruction.F64MulSs,
 ) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left * right }
 
 internal inline fun F64DivExecutor(
@@ -110,7 +110,7 @@ internal inline fun F64DivExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64DivIi,
+    instruction: NumericSuperInstruction.F64DivIi,
 ) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left / right }
 
 internal inline fun F64DivExecutor(
@@ -118,7 +118,7 @@ internal inline fun F64DivExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64DivIs,
+    instruction: NumericSuperInstruction.F64DivIs,
 ) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left / right }
 
 internal inline fun F64DivExecutor(
@@ -126,7 +126,7 @@ internal inline fun F64DivExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64DivSi,
+    instruction: NumericSuperInstruction.F64DivSi,
 ) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left / right }
 
 internal inline fun F64DivExecutor(
@@ -134,7 +134,7 @@ internal inline fun F64DivExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64DivSs,
+    instruction: NumericSuperInstruction.F64DivSs,
 ) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left / right }
 
 internal inline fun F64MinExecutor(
@@ -142,7 +142,7 @@ internal inline fun F64MinExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MinIi,
+    instruction: NumericSuperInstruction.F64MinIi,
 ) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::min)
 
 internal inline fun F64MinExecutor(
@@ -150,7 +150,7 @@ internal inline fun F64MinExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MinIs,
+    instruction: NumericSuperInstruction.F64MinIs,
 ) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::min)
 
 internal inline fun F64MinExecutor(
@@ -158,7 +158,7 @@ internal inline fun F64MinExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MinSi,
+    instruction: NumericSuperInstruction.F64MinSi,
 ) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::min)
 
 internal inline fun F64MinExecutor(
@@ -166,7 +166,7 @@ internal inline fun F64MinExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MinSs,
+    instruction: NumericSuperInstruction.F64MinSs,
 ) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::min)
 
 internal inline fun F64MaxExecutor(
@@ -174,7 +174,7 @@ internal inline fun F64MaxExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MaxIi,
+    instruction: NumericSuperInstruction.F64MaxIi,
 ) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::max)
 
 internal inline fun F64MaxExecutor(
@@ -182,7 +182,7 @@ internal inline fun F64MaxExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MaxIs,
+    instruction: NumericSuperInstruction.F64MaxIs,
 ) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::max)
 
 internal inline fun F64MaxExecutor(
@@ -190,7 +190,7 @@ internal inline fun F64MaxExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MaxSi,
+    instruction: NumericSuperInstruction.F64MaxSi,
 ) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::max)
 
 internal inline fun F64MaxExecutor(
@@ -198,7 +198,7 @@ internal inline fun F64MaxExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64MaxSs,
+    instruction: NumericSuperInstruction.F64MaxSs,
 ) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::max)
 
 internal inline fun F64CopysignExecutor(
@@ -206,7 +206,7 @@ internal inline fun F64CopysignExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64CopysignIi,
+    instruction: NumericSuperInstruction.F64CopysignIi,
 ) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Double::copySign)
 
 internal inline fun F64CopysignExecutor(
@@ -214,7 +214,7 @@ internal inline fun F64CopysignExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64CopysignIs,
+    instruction: NumericSuperInstruction.F64CopysignIs,
 ) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Double::copySign)
 
 internal inline fun F64CopysignExecutor(
@@ -222,7 +222,7 @@ internal inline fun F64CopysignExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64CopysignSi,
+    instruction: NumericSuperInstruction.F64CopysignSi,
 ) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Double::copySign)
 
 internal inline fun F64CopysignExecutor(
@@ -230,5 +230,5 @@ internal inline fun F64CopysignExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64CopysignSs,
+    instruction: NumericSuperInstruction.F64CopysignSs,
 ) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Double::copySign)

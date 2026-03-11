@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.executor.invoker.ext.copySign
 import io.github.charlietap.chasm.executor.invoker.ext.max
 import io.github.charlietap.chasm.executor.invoker.ext.min
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -14,7 +14,7 @@ internal inline fun F32AddExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32AddIi,
+    instruction: NumericSuperInstruction.F32AddIi,
 ) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left + right }
 
 internal inline fun F32AddExecutor(
@@ -22,7 +22,7 @@ internal inline fun F32AddExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32AddIs,
+    instruction: NumericSuperInstruction.F32AddIs,
 ) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left + right }
 
 internal inline fun F32AddExecutor(
@@ -30,7 +30,7 @@ internal inline fun F32AddExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32AddSi,
+    instruction: NumericSuperInstruction.F32AddSi,
 ) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left + right }
 
 internal inline fun F32AddExecutor(
@@ -38,7 +38,7 @@ internal inline fun F32AddExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32AddSs,
+    instruction: NumericSuperInstruction.F32AddSs,
 ) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left + right }
 
 internal inline fun F32SubExecutor(
@@ -46,7 +46,7 @@ internal inline fun F32SubExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32SubIi,
+    instruction: NumericSuperInstruction.F32SubIi,
 ) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left - right }
 
 internal inline fun F32SubExecutor(
@@ -54,7 +54,7 @@ internal inline fun F32SubExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32SubIs,
+    instruction: NumericSuperInstruction.F32SubIs,
 ) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left - right }
 
 internal inline fun F32SubExecutor(
@@ -62,7 +62,7 @@ internal inline fun F32SubExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32SubSi,
+    instruction: NumericSuperInstruction.F32SubSi,
 ) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left - right }
 
 internal inline fun F32SubExecutor(
@@ -70,7 +70,7 @@ internal inline fun F32SubExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32SubSs,
+    instruction: NumericSuperInstruction.F32SubSs,
 ) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left - right }
 
 internal inline fun F32MulExecutor(
@@ -78,7 +78,7 @@ internal inline fun F32MulExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MulIi,
+    instruction: NumericSuperInstruction.F32MulIi,
 ) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left * right }
 
 internal inline fun F32MulExecutor(
@@ -86,7 +86,7 @@ internal inline fun F32MulExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MulIs,
+    instruction: NumericSuperInstruction.F32MulIs,
 ) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left * right }
 
 internal inline fun F32MulExecutor(
@@ -94,7 +94,7 @@ internal inline fun F32MulExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MulSi,
+    instruction: NumericSuperInstruction.F32MulSi,
 ) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left * right }
 
 internal inline fun F32MulExecutor(
@@ -102,7 +102,7 @@ internal inline fun F32MulExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MulSs,
+    instruction: NumericSuperInstruction.F32MulSs,
 ) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left * right }
 
 internal inline fun F32DivExecutor(
@@ -110,7 +110,7 @@ internal inline fun F32DivExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32DivIi,
+    instruction: NumericSuperInstruction.F32DivIi,
 ) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left / right }
 
 internal inline fun F32DivExecutor(
@@ -118,7 +118,7 @@ internal inline fun F32DivExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32DivIs,
+    instruction: NumericSuperInstruction.F32DivIs,
 ) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left / right }
 
 internal inline fun F32DivExecutor(
@@ -126,7 +126,7 @@ internal inline fun F32DivExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32DivSi,
+    instruction: NumericSuperInstruction.F32DivSi,
 ) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left / right }
 
 internal inline fun F32DivExecutor(
@@ -134,7 +134,7 @@ internal inline fun F32DivExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32DivSs,
+    instruction: NumericSuperInstruction.F32DivSs,
 ) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left / right }
 
 internal inline fun F32MinExecutor(
@@ -142,7 +142,7 @@ internal inline fun F32MinExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MinIi,
+    instruction: NumericSuperInstruction.F32MinIi,
 ) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::min)
 
 internal inline fun F32MinExecutor(
@@ -150,7 +150,7 @@ internal inline fun F32MinExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MinIs,
+    instruction: NumericSuperInstruction.F32MinIs,
 ) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::min)
 
 internal inline fun F32MinExecutor(
@@ -158,7 +158,7 @@ internal inline fun F32MinExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MinSi,
+    instruction: NumericSuperInstruction.F32MinSi,
 ) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::min)
 
 internal inline fun F32MinExecutor(
@@ -166,7 +166,7 @@ internal inline fun F32MinExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MinSs,
+    instruction: NumericSuperInstruction.F32MinSs,
 ) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::min)
 
 internal inline fun F32MaxExecutor(
@@ -174,7 +174,7 @@ internal inline fun F32MaxExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MaxIi,
+    instruction: NumericSuperInstruction.F32MaxIi,
 ) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::max)
 
 internal inline fun F32MaxExecutor(
@@ -182,7 +182,7 @@ internal inline fun F32MaxExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MaxIs,
+    instruction: NumericSuperInstruction.F32MaxIs,
 ) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::max)
 
 internal inline fun F32MaxExecutor(
@@ -190,7 +190,7 @@ internal inline fun F32MaxExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MaxSi,
+    instruction: NumericSuperInstruction.F32MaxSi,
 ) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::max)
 
 internal inline fun F32MaxExecutor(
@@ -198,7 +198,7 @@ internal inline fun F32MaxExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32MaxSs,
+    instruction: NumericSuperInstruction.F32MaxSs,
 ) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::max)
 
 internal inline fun F32CopysignExecutor(
@@ -206,7 +206,7 @@ internal inline fun F32CopysignExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32CopysignIi,
+    instruction: NumericSuperInstruction.F32CopysignIi,
 ) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, Float::copySign)
 
 internal inline fun F32CopysignExecutor(
@@ -214,7 +214,7 @@ internal inline fun F32CopysignExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32CopysignIs,
+    instruction: NumericSuperInstruction.F32CopysignIs,
 ) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, Float::copySign)
 
 internal inline fun F32CopysignExecutor(
@@ -222,7 +222,7 @@ internal inline fun F32CopysignExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32CopysignSi,
+    instruction: NumericSuperInstruction.F32CopysignSi,
 ) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, Float::copySign)
 
 internal inline fun F32CopysignExecutor(
@@ -230,5 +230,5 @@ internal inline fun F32CopysignExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32CopysignSs,
+    instruction: NumericSuperInstruction.F32CopysignSs,
 ) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, Float::copySign)

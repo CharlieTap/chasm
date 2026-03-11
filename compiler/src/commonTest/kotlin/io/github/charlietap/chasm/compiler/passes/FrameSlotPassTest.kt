@@ -60,7 +60,6 @@ import io.github.charlietap.chasm.fixture.ir.instruction.returnInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.selectInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.signedTypeIndexBlockType
 import io.github.charlietap.chasm.fixture.ir.instruction.structGetInstruction
-import io.github.charlietap.chasm.fixture.ir.instruction.structNewDefaultInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.tableSizeInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.unreachableInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.valueBlockType
@@ -90,13 +89,13 @@ import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.referenceValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
+import io.github.charlietap.chasm.ir.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedReferenceInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedTableInstruction
+import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction
+import io.github.charlietap.chasm.ir.instruction.ReferenceSuperInstruction
+import io.github.charlietap.chasm.ir.instruction.TableSuperInstruction
 import io.github.charlietap.chasm.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -233,7 +232,7 @@ class FrameSlotPassTest {
                                 right = localGetOperand(localIndex(1)),
                                 destination = valueStackDestination(),
                             ),
-                            FusedMemoryInstruction.I32Load(
+                            MemorySuperInstruction.I32Load(
                                 addressOperand = valueStackOperand(),
                                 destination = localSetDestination(localIndex(2)),
                                 memoryIndex = memoryIndex(0),
@@ -257,7 +256,7 @@ class FrameSlotPassTest {
                     right = frameSlotOperand(1),
                     destination = frameSlotDestination(3),
                 ),
-                FusedMemoryInstruction.I32Load(
+                MemorySuperInstruction.I32Load(
                     addressOperand = frameSlotOperand(3),
                     destination = frameSlotDestination(2),
                     memoryIndex = memoryIndex(0),
@@ -1338,7 +1337,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedControlInstruction.ThrowRef(frameSlotOperand(0)),
+                ControlSuperInstruction.ThrowRef(frameSlotOperand(0)),
             ),
             actual.body.instructions,
         )
@@ -2487,7 +2486,7 @@ class FrameSlotPassTest {
                     body = expression(
                         instructions = listOf(
                             unreachableInstruction(),
-                            FusedTableInstruction.TableGet(
+                            TableSuperInstruction.TableGet(
                                 elementIndex = valueStackOperand(),
                                 destination = valueStackDestination(),
                                 tableIdx = tableIndex(0),
@@ -2506,7 +2505,7 @@ class FrameSlotPassTest {
         assertEquals(
             listOf(
                 unreachableInstruction(),
-                FusedTableInstruction.TableGet(
+                TableSuperInstruction.TableGet(
                     elementIndex = frameSlotOperand(0),
                     destination = frameSlotDestination(0),
                     tableIdx = tableIndex(0),
@@ -2528,7 +2527,7 @@ class FrameSlotPassTest {
                     body = expression(
                         instructions = listOf(
                             unreachableInstruction(),
-                            FusedReferenceInstruction.RefEq(
+                            ReferenceSuperInstruction.RefEq(
                                 reference1 = valueStackOperand(),
                                 reference2 = valueStackOperand(),
                                 destination = valueStackDestination(),
@@ -2547,7 +2546,7 @@ class FrameSlotPassTest {
         assertEquals(
             listOf(
                 unreachableInstruction(),
-                FusedReferenceInstruction.RefEq(
+                ReferenceSuperInstruction.RefEq(
                     reference1 = frameSlotOperand(0),
                     reference2 = frameSlotOperand(1),
                     destination = frameSlotDestination(1),
@@ -2569,7 +2568,7 @@ class FrameSlotPassTest {
                     body = expression(
                         instructions = listOf(
                             unreachableInstruction(),
-                            FusedAggregateInstruction.StructGet(
+                            AggregateSuperInstruction.StructGet(
                                 address = valueStackOperand(),
                                 destination = valueStackDestination(),
                                 typeIndex = typeIndex(0),
@@ -2589,7 +2588,7 @@ class FrameSlotPassTest {
         assertEquals(
             listOf(
                 unreachableInstruction(),
-                FusedAggregateInstruction.StructGet(
+                AggregateSuperInstruction.StructGet(
                     address = frameSlotOperand(0),
                     destination = frameSlotDestination(0),
                     typeIndex = typeIndex(0),
@@ -2663,7 +2662,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedReferenceInstruction.RefNull(
+                ReferenceSuperInstruction.RefNull(
                     destination = frameSlotDestination(0),
                     type = refNullReferenceType().heapType,
                 ),
@@ -2698,7 +2697,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedReferenceInstruction.RefFunc(
+                ReferenceSuperInstruction.RefFunc(
                     destination = frameSlotDestination(0),
                     funcIdx = functionIndex(0),
                 ),
@@ -2733,7 +2732,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedTableInstruction.TableSize(
+                TableSuperInstruction.TableSize(
                     destination = frameSlotDestination(0),
                     tableIdx = tableIndex(0),
                 ),
@@ -2768,7 +2767,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedMemoryInstruction.MemorySize(
+                MemorySuperInstruction.MemorySize(
                     destination = frameSlotDestination(0),
                     memoryIndex = memoryIndex(0),
                 ),
@@ -2860,7 +2859,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedMemoryInstruction.I32Load(
+                MemorySuperInstruction.I32Load(
                     addressOperand = frameSlotOperand(0),
                     destination = frameSlotDestination(1),
                     memoryIndex = memoryIndex(0),
@@ -2907,7 +2906,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedAggregateInstruction.StructGet(
+                AggregateSuperInstruction.StructGet(
                     address = frameSlotOperand(0),
                     destination = frameSlotDestination(1),
                     typeIndex = typeIndex(0),
@@ -2953,7 +2952,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedMemoryInstruction.MemoryGrow(
+                MemorySuperInstruction.MemoryGrow(
                     pagesToAdd = frameSlotOperand(0),
                     destination = frameSlotDestination(1),
                     memoryIndex = memoryIndex(0),
@@ -2998,7 +2997,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedReferenceInstruction.RefAsNonNull(
+                ReferenceSuperInstruction.RefAsNonNull(
                     value = frameSlotOperand(0),
                     destination = frameSlotDestination(1),
                 ),
@@ -3042,7 +3041,7 @@ class FrameSlotPassTest {
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                FusedAggregateInstruction.ArrayNewDefault(
+                AggregateSuperInstruction.ArrayNewDefault(
                     size = frameSlotOperand(0),
                     destination = frameSlotDestination(1),
                     typeIndex = typeIndex(0),

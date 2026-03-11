@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.compiler.passes
 
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
+import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.ir.module.Module
@@ -94,43 +94,43 @@ private fun lowerInstruction(
         is ControlInstruction.TryTable -> lowerTryTable(instruction, output, labels, handlers)
         is ControlInstruction.Block -> lowerBlock(instruction.instructions, output, labels, handlers)
         is ControlInstruction.Loop -> lowerLoop(instruction.instructions, output, labels, handlers)
-        is FusedControlInstruction.If -> lowerIf(instruction, output, labels, handlers)
+        is ControlSuperInstruction.If -> lowerIf(instruction, output, labels, handlers)
         is ControlInstruction.Br -> lowerJump(
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
         )
-        is FusedControlInstruction.BrIf -> lowerJumpIf(
+        is ControlSuperInstruction.BrIf -> lowerJumpIf(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
         )
-        is FusedControlInstruction.BrTable -> lowerJumpTable(
+        is ControlSuperInstruction.BrTable -> lowerJumpTable(
             instruction = instruction,
             labels = labels,
             currentHandlerDepth = handlers.size,
             output = output,
         )
-        is FusedControlInstruction.BrOnNull -> lowerJumpOnNull(
+        is ControlSuperInstruction.BrOnNull -> lowerJumpOnNull(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
         )
-        is FusedControlInstruction.BrOnNonNull -> lowerJumpOnNonNull(
+        is ControlSuperInstruction.BrOnNonNull -> lowerJumpOnNonNull(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
         )
-        is FusedControlInstruction.BrOnCast -> lowerJumpOnCast(
+        is ControlSuperInstruction.BrOnCast -> lowerJumpOnCast(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
         )
-        is FusedControlInstruction.BrOnCastFail -> lowerJumpOnCastFail(
+        is ControlSuperInstruction.BrOnCastFail -> lowerJumpOnCastFail(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
@@ -172,7 +172,7 @@ private fun lowerLoop(
 }
 
 private fun lowerIf(
-    instruction: FusedControlInstruction.If,
+    instruction: ControlSuperInstruction.If,
     output: MutableList<Instruction>,
     labels: ArrayDeque<JumpLabel>,
     handlers: ArrayDeque<ActiveTryHandler>,
@@ -269,7 +269,7 @@ private fun lowerJump(
 }
 
 private fun lowerJumpIf(
-    instruction: FusedControlInstruction.BrIf,
+    instruction: ControlSuperInstruction.BrIf,
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
@@ -288,7 +288,7 @@ private fun lowerJumpIf(
 }
 
 private fun lowerJumpTable(
-    instruction: FusedControlInstruction.BrTable,
+    instruction: ControlSuperInstruction.BrTable,
     labels: ArrayDeque<JumpLabel>,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
@@ -323,7 +323,7 @@ private fun lowerJumpTable(
 }
 
 private fun lowerJumpOnNull(
-    instruction: FusedControlInstruction.BrOnNull,
+    instruction: ControlSuperInstruction.BrOnNull,
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
@@ -342,7 +342,7 @@ private fun lowerJumpOnNull(
 }
 
 private fun lowerJumpOnNonNull(
-    instruction: FusedControlInstruction.BrOnNonNull,
+    instruction: ControlSuperInstruction.BrOnNonNull,
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
@@ -361,7 +361,7 @@ private fun lowerJumpOnNonNull(
 }
 
 private fun lowerJumpOnCast(
-    instruction: FusedControlInstruction.BrOnCast,
+    instruction: ControlSuperInstruction.BrOnCast,
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
@@ -382,7 +382,7 @@ private fun lowerJumpOnCast(
 }
 
 private fun lowerJumpOnCastFail(
-    instruction: FusedControlInstruction.BrOnCastFail,
+    instruction: ControlSuperInstruction.BrOnCastFail,
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,

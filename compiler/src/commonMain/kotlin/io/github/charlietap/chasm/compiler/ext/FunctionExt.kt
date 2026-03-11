@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.compiler.ext
 
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
+import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.module.Function
 
@@ -23,7 +23,7 @@ private suspend fun SequenceScope<Instruction>.function(
                 instruction.elseInstructions?.let { function(it) }
             }
             is ControlInstruction.TryTable -> function(instruction.instructions)
-            is FusedControlInstruction.If -> {
+            is ControlSuperInstruction.If -> {
                 function(instruction.thenInstructions)
                 instruction.elseInstructions?.let { function(it) }
             }

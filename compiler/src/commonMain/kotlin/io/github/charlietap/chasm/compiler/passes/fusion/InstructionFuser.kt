@@ -3,23 +3,23 @@ package io.github.charlietap.chasm.compiler.passes.fusion
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
+import io.github.charlietap.chasm.ir.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedNumericInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedParametricInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedReferenceInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedTableInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
+import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
+import io.github.charlietap.chasm.ir.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.ParametricInstruction
+import io.github.charlietap.chasm.ir.instruction.ParametricSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ir.instruction.ReferenceSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.TableInstruction
+import io.github.charlietap.chasm.ir.instruction.TableSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.VariableInstruction
+import io.github.charlietap.chasm.ir.instruction.VariableSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.VectorInstruction
 
 internal typealias InstructionFuser = (PassContext, Int, Instruction, List<Instruction>, MutableList<Instruction>) -> Int
@@ -70,14 +70,14 @@ internal inline fun InstructionFuser(
     is AdminInstruction,
     is AtomicMemoryInstruction,
     is VectorInstruction,
-    is FusedAggregateInstruction,
-    is FusedControlInstruction,
-    is FusedNumericInstruction,
-    is FusedMemoryInstruction,
-    is FusedParametricInstruction,
-    is FusedReferenceInstruction,
-    is FusedTableInstruction,
-    is FusedVariableInstruction,
+    is AggregateSuperInstruction,
+    is ControlSuperInstruction,
+    is NumericSuperInstruction,
+    is MemorySuperInstruction,
+    is ParametricSuperInstruction,
+    is ReferenceSuperInstruction,
+    is TableSuperInstruction,
+    is VariableSuperInstruction,
     -> {
         output.add(instruction)
         index

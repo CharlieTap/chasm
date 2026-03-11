@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
-import io.github.charlietap.chasm.ir.instruction.FusedVariableInstruction
+import io.github.charlietap.chasm.ir.instruction.VariableSuperInstruction
 import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -19,7 +19,7 @@ class InstructionPredecoderCacheTest {
 
     @Test
     fun `cache keys context-sensitive instructions by function interface layout`() {
-        val instruction = FusedVariableInstruction.LocalSet(
+        val instruction = VariableSuperInstruction.LocalSet(
             operand = FusedOperand.FrameSlot(19),
             localIdx = Index.LocalIndex(1),
         )

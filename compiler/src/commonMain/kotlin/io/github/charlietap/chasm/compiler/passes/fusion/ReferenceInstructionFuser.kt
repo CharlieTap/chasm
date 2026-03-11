@@ -3,9 +3,9 @@ package io.github.charlietap.chasm.compiler.passes.fusion
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
-import io.github.charlietap.chasm.ir.instruction.FusedReferenceInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ir.instruction.ReferenceSuperInstruction
 
 internal typealias ReferenceInstructionFuser = (PassContext, Int, ReferenceInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
@@ -44,14 +44,14 @@ internal inline fun ReferenceInstructionFuser(
             instruction
         } else {
             when {
-                reference == null -> FusedReferenceInstruction.RefCast(
+                reference == null -> ReferenceSuperInstruction.RefCast(
                     reference = FusedOperand.ValueStack,
                     destination = destination,
                     referenceType = instruction.referenceType,
                 )
                 else -> {
                     output.removeLast()
-                    FusedReferenceInstruction.RefCast(
+                    ReferenceSuperInstruction.RefCast(
                         reference = reference,
                         destination = destination,
                         referenceType = instruction.referenceType,
@@ -79,14 +79,14 @@ internal inline fun ReferenceInstructionFuser(
             instruction
         } else {
             when {
-                reference1 == null -> FusedReferenceInstruction.RefEq(
+                reference1 == null -> ReferenceSuperInstruction.RefEq(
                     reference1 = FusedOperand.ValueStack,
                     reference2 = FusedOperand.ValueStack,
                     destination = destination,
                 )
                 reference2 == null -> {
                     output.removeLast()
-                    FusedReferenceInstruction.RefEq(
+                    ReferenceSuperInstruction.RefEq(
                         reference1 = reference1,
                         reference2 = FusedOperand.ValueStack,
                         destination = destination,
@@ -95,7 +95,7 @@ internal inline fun ReferenceInstructionFuser(
                 else -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedReferenceInstruction.RefEq(
+                    ReferenceSuperInstruction.RefEq(
                         reference1 = reference1,
                         reference2 = reference2,
                         destination = destination,
@@ -122,13 +122,13 @@ internal inline fun ReferenceInstructionFuser(
             instruction
         } else {
             when {
-                value == null -> FusedReferenceInstruction.RefIsNull(
+                value == null -> ReferenceSuperInstruction.RefIsNull(
                     value = FusedOperand.ValueStack,
                     destination = destination,
                 )
                 else -> {
                     output.removeLast()
-                    FusedReferenceInstruction.RefIsNull(
+                    ReferenceSuperInstruction.RefIsNull(
                         value = value,
                         destination = destination,
                     )
@@ -152,7 +152,7 @@ internal inline fun ReferenceInstructionFuser(
         val instruction = if (destination == FusedDestination.ValueStack) {
             instruction
         } else {
-            FusedReferenceInstruction.RefNull(
+            ReferenceSuperInstruction.RefNull(
                 destination = destination,
                 type = instruction.type,
             )
@@ -176,14 +176,14 @@ internal inline fun ReferenceInstructionFuser(
             instruction
         } else {
             when {
-                reference == null -> FusedReferenceInstruction.RefTest(
+                reference == null -> ReferenceSuperInstruction.RefTest(
                     reference = FusedOperand.ValueStack,
                     destination = destination,
                     referenceType = instruction.referenceType,
                 )
                 else -> {
                     output.removeLast()
-                    FusedReferenceInstruction.RefTest(
+                    ReferenceSuperInstruction.RefTest(
                         reference = reference,
                         destination = destination,
                         referenceType = instruction.referenceType,

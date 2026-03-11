@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.compiler.ext.isAllocating
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
+import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.ir.instruction.FusedControlInstruction
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.module.Module
 
@@ -60,8 +60,8 @@ private fun compileInstructions(
                             payloadDestinationSlots = instruction.payloadDestinationSlots,
                         )
                     }
-                    is FusedControlInstruction.If -> {
-                        FusedControlInstruction.If(
+                    is ControlSuperInstruction.If -> {
+                        ControlSuperInstruction.If(
                             operand = instruction.operand,
                             blockType = instruction.blockType,
                             thenInstructions = compileInstructions(instruction.thenInstructions),

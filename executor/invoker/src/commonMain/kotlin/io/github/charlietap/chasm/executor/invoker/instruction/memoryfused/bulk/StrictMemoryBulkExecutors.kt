@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.memory.init.LinearMemoryInitialiser
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
-import io.github.charlietap.chasm.runtime.instruction.FusedMemoryInstruction
+import io.github.charlietap.chasm.runtime.instruction.MemorySuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -17,7 +17,7 @@ internal fun MemoryGrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryGrowI,
+    instruction: MemorySuperInstruction.MemoryGrowI,
 ) = MemoryGrowExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -32,7 +32,7 @@ internal inline fun MemoryGrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryGrowI,
+    instruction: MemorySuperInstruction.MemoryGrowI,
     crossinline grower: LinearMemoryGrower,
 ) = executeMemoryGrow(
     vstack = vstack,
@@ -48,7 +48,7 @@ internal fun MemoryGrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryGrowS,
+    instruction: MemorySuperInstruction.MemoryGrowS,
 ) = MemoryGrowExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -63,7 +63,7 @@ internal inline fun MemoryGrowExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryGrowS,
+    instruction: MemorySuperInstruction.MemoryGrowS,
     crossinline grower: LinearMemoryGrower,
 ) = executeMemoryGrow(
     vstack = vstack,
@@ -79,7 +79,7 @@ internal fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitIii,
+    instruction: MemorySuperInstruction.MemoryInitIii,
 ) = MemoryInitExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -94,7 +94,7 @@ internal inline fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitIii,
+    instruction: MemorySuperInstruction.MemoryInitIii,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) = executeMemoryInit(
     bytesToCopy = instruction.bytesToCopy,
@@ -110,7 +110,7 @@ internal fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitIis,
+    instruction: MemorySuperInstruction.MemoryInitIis,
 ) = MemoryInitExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -125,7 +125,7 @@ internal inline fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitIis,
+    instruction: MemorySuperInstruction.MemoryInitIis,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) = executeMemoryInit(
     bytesToCopy = instruction.bytesToCopy,
@@ -141,7 +141,7 @@ internal fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitIsi,
+    instruction: MemorySuperInstruction.MemoryInitIsi,
 ) = MemoryInitExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -156,7 +156,7 @@ internal inline fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitIsi,
+    instruction: MemorySuperInstruction.MemoryInitIsi,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) = executeMemoryInit(
     bytesToCopy = instruction.bytesToCopy,
@@ -172,7 +172,7 @@ internal fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitIss,
+    instruction: MemorySuperInstruction.MemoryInitIss,
 ) = MemoryInitExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -187,7 +187,7 @@ internal inline fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitIss,
+    instruction: MemorySuperInstruction.MemoryInitIss,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) = executeMemoryInit(
     bytesToCopy = instruction.bytesToCopy,
@@ -203,7 +203,7 @@ internal fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitSii,
+    instruction: MemorySuperInstruction.MemoryInitSii,
 ) = MemoryInitExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -218,7 +218,7 @@ internal inline fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitSii,
+    instruction: MemorySuperInstruction.MemoryInitSii,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) = executeMemoryInit(
     bytesToCopy = vstack.getFrameSlot(instruction.bytesToCopySlot).toInt(),
@@ -234,7 +234,7 @@ internal fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitSis,
+    instruction: MemorySuperInstruction.MemoryInitSis,
 ) = MemoryInitExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -249,7 +249,7 @@ internal inline fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitSis,
+    instruction: MemorySuperInstruction.MemoryInitSis,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) = executeMemoryInit(
     bytesToCopy = vstack.getFrameSlot(instruction.bytesToCopySlot).toInt(),
@@ -265,7 +265,7 @@ internal fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitSsi,
+    instruction: MemorySuperInstruction.MemoryInitSsi,
 ) = MemoryInitExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -280,7 +280,7 @@ internal inline fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitSsi,
+    instruction: MemorySuperInstruction.MemoryInitSsi,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) = executeMemoryInit(
     bytesToCopy = vstack.getFrameSlot(instruction.bytesToCopySlot).toInt(),
@@ -296,7 +296,7 @@ internal fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitSss,
+    instruction: MemorySuperInstruction.MemoryInitSss,
 ) = MemoryInitExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -311,7 +311,7 @@ internal inline fun MemoryInitExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryInitSss,
+    instruction: MemorySuperInstruction.MemoryInitSss,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
 ) = executeMemoryInit(
     bytesToCopy = vstack.getFrameSlot(instruction.bytesToCopySlot).toInt(),
@@ -327,7 +327,7 @@ internal fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopyIii,
+    instruction: MemorySuperInstruction.MemoryCopyIii,
 ) = MemoryCopyExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -342,7 +342,7 @@ internal inline fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopyIii,
+    instruction: MemorySuperInstruction.MemoryCopyIii,
     crossinline copier: LinearMemoryCopier,
 ) = executeMemoryCopy(
     bytesToCopy = instruction.bytesToCopy,
@@ -358,7 +358,7 @@ internal fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopyIis,
+    instruction: MemorySuperInstruction.MemoryCopyIis,
 ) = MemoryCopyExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -373,7 +373,7 @@ internal inline fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopyIis,
+    instruction: MemorySuperInstruction.MemoryCopyIis,
     crossinline copier: LinearMemoryCopier,
 ) = executeMemoryCopy(
     bytesToCopy = instruction.bytesToCopy,
@@ -389,7 +389,7 @@ internal fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopyIsi,
+    instruction: MemorySuperInstruction.MemoryCopyIsi,
 ) = MemoryCopyExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -404,7 +404,7 @@ internal inline fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopyIsi,
+    instruction: MemorySuperInstruction.MemoryCopyIsi,
     crossinline copier: LinearMemoryCopier,
 ) = executeMemoryCopy(
     bytesToCopy = instruction.bytesToCopy,
@@ -420,7 +420,7 @@ internal fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopyIss,
+    instruction: MemorySuperInstruction.MemoryCopyIss,
 ) = MemoryCopyExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -435,7 +435,7 @@ internal inline fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopyIss,
+    instruction: MemorySuperInstruction.MemoryCopyIss,
     crossinline copier: LinearMemoryCopier,
 ) = executeMemoryCopy(
     bytesToCopy = instruction.bytesToCopy,
@@ -451,7 +451,7 @@ internal fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopySii,
+    instruction: MemorySuperInstruction.MemoryCopySii,
 ) = MemoryCopyExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -466,7 +466,7 @@ internal inline fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopySii,
+    instruction: MemorySuperInstruction.MemoryCopySii,
     crossinline copier: LinearMemoryCopier,
 ) = executeMemoryCopy(
     bytesToCopy = vstack.getFrameSlot(instruction.bytesToCopySlot).toInt(),
@@ -482,7 +482,7 @@ internal fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopySis,
+    instruction: MemorySuperInstruction.MemoryCopySis,
 ) = MemoryCopyExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -497,7 +497,7 @@ internal inline fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopySis,
+    instruction: MemorySuperInstruction.MemoryCopySis,
     crossinline copier: LinearMemoryCopier,
 ) = executeMemoryCopy(
     bytesToCopy = vstack.getFrameSlot(instruction.bytesToCopySlot).toInt(),
@@ -513,7 +513,7 @@ internal fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopySsi,
+    instruction: MemorySuperInstruction.MemoryCopySsi,
 ) = MemoryCopyExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -528,7 +528,7 @@ internal inline fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopySsi,
+    instruction: MemorySuperInstruction.MemoryCopySsi,
     crossinline copier: LinearMemoryCopier,
 ) = executeMemoryCopy(
     bytesToCopy = vstack.getFrameSlot(instruction.bytesToCopySlot).toInt(),
@@ -544,7 +544,7 @@ internal fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopySss,
+    instruction: MemorySuperInstruction.MemoryCopySss,
 ) = MemoryCopyExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -559,7 +559,7 @@ internal inline fun MemoryCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryCopySss,
+    instruction: MemorySuperInstruction.MemoryCopySss,
     crossinline copier: LinearMemoryCopier,
 ) = executeMemoryCopy(
     bytesToCopy = vstack.getFrameSlot(instruction.bytesToCopySlot).toInt(),
@@ -575,7 +575,7 @@ internal fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillIii,
+    instruction: MemorySuperInstruction.MemoryFillIii,
 ) = MemoryFillExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -590,7 +590,7 @@ internal inline fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillIii,
+    instruction: MemorySuperInstruction.MemoryFillIii,
     crossinline filler: LinearMemoryFiller,
 ) = executeMemoryFill(
     bytesToFill = instruction.bytesToFill,
@@ -605,7 +605,7 @@ internal fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillIis,
+    instruction: MemorySuperInstruction.MemoryFillIis,
 ) = MemoryFillExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -620,7 +620,7 @@ internal inline fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillIis,
+    instruction: MemorySuperInstruction.MemoryFillIis,
     crossinline filler: LinearMemoryFiller,
 ) = executeMemoryFill(
     bytesToFill = instruction.bytesToFill,
@@ -635,7 +635,7 @@ internal fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillIsi,
+    instruction: MemorySuperInstruction.MemoryFillIsi,
 ) = MemoryFillExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -650,7 +650,7 @@ internal inline fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillIsi,
+    instruction: MemorySuperInstruction.MemoryFillIsi,
     crossinline filler: LinearMemoryFiller,
 ) = executeMemoryFill(
     bytesToFill = instruction.bytesToFill,
@@ -665,7 +665,7 @@ internal fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillIss,
+    instruction: MemorySuperInstruction.MemoryFillIss,
 ) = MemoryFillExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -680,7 +680,7 @@ internal inline fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillIss,
+    instruction: MemorySuperInstruction.MemoryFillIss,
     crossinline filler: LinearMemoryFiller,
 ) = executeMemoryFill(
     bytesToFill = instruction.bytesToFill,
@@ -695,7 +695,7 @@ internal fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillSii,
+    instruction: MemorySuperInstruction.MemoryFillSii,
 ) = MemoryFillExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -710,7 +710,7 @@ internal inline fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillSii,
+    instruction: MemorySuperInstruction.MemoryFillSii,
     crossinline filler: LinearMemoryFiller,
 ) = executeMemoryFill(
     bytesToFill = vstack.getFrameSlot(instruction.bytesToFillSlot).toInt(),
@@ -725,7 +725,7 @@ internal fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillSis,
+    instruction: MemorySuperInstruction.MemoryFillSis,
 ) = MemoryFillExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -740,7 +740,7 @@ internal inline fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillSis,
+    instruction: MemorySuperInstruction.MemoryFillSis,
     crossinline filler: LinearMemoryFiller,
 ) = executeMemoryFill(
     bytesToFill = vstack.getFrameSlot(instruction.bytesToFillSlot).toInt(),
@@ -755,7 +755,7 @@ internal fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillSsi,
+    instruction: MemorySuperInstruction.MemoryFillSsi,
 ) = MemoryFillExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -770,7 +770,7 @@ internal inline fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillSsi,
+    instruction: MemorySuperInstruction.MemoryFillSsi,
     crossinline filler: LinearMemoryFiller,
 ) = executeMemoryFill(
     bytesToFill = vstack.getFrameSlot(instruction.bytesToFillSlot).toInt(),
@@ -785,7 +785,7 @@ internal fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillSss,
+    instruction: MemorySuperInstruction.MemoryFillSss,
 ) = MemoryFillExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -800,7 +800,7 @@ internal inline fun MemoryFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedMemoryInstruction.MemoryFillSss,
+    instruction: MemorySuperInstruction.MemoryFillSss,
     crossinline filler: LinearMemoryFiller,
 ) = executeMemoryFill(
     bytesToFill = vstack.getFrameSlot(instruction.bytesToFillSlot).toInt(),

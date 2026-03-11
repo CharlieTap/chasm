@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.executor.invoker.ext.nearest
 import io.github.charlietap.chasm.executor.invoker.ext.sqrt
 import io.github.charlietap.chasm.executor.invoker.ext.trunc
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -17,7 +17,7 @@ internal inline fun F64AbsExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64AbsI,
+    instruction: NumericSuperInstruction.F64AbsI,
 ) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand -> operand.absoluteValue }
 
 internal inline fun F64AbsExecutor(
@@ -25,7 +25,7 @@ internal inline fun F64AbsExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64AbsS,
+    instruction: NumericSuperInstruction.F64AbsS,
 ) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> operand.absoluteValue }
 
 internal inline fun F64NegExecutor(
@@ -33,7 +33,7 @@ internal inline fun F64NegExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64NegI,
+    instruction: NumericSuperInstruction.F64NegI,
 ) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand -> -operand }
 
 internal inline fun F64NegExecutor(
@@ -41,7 +41,7 @@ internal inline fun F64NegExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64NegS,
+    instruction: NumericSuperInstruction.F64NegS,
 ) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> -operand }
 
 internal inline fun F64CeilExecutor(
@@ -49,7 +49,7 @@ internal inline fun F64CeilExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64CeilI,
+    instruction: NumericSuperInstruction.F64CeilI,
 ) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand, Double::ceil)
 
 internal inline fun F64CeilExecutor(
@@ -57,7 +57,7 @@ internal inline fun F64CeilExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64CeilS,
+    instruction: NumericSuperInstruction.F64CeilS,
 ) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Double::ceil)
 
 internal inline fun F64FloorExecutor(
@@ -65,7 +65,7 @@ internal inline fun F64FloorExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64FloorI,
+    instruction: NumericSuperInstruction.F64FloorI,
 ) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand, Double::floor)
 
 internal inline fun F64FloorExecutor(
@@ -73,7 +73,7 @@ internal inline fun F64FloorExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64FloorS,
+    instruction: NumericSuperInstruction.F64FloorS,
 ) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Double::floor)
 
 internal inline fun F64TruncExecutor(
@@ -81,7 +81,7 @@ internal inline fun F64TruncExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64TruncI,
+    instruction: NumericSuperInstruction.F64TruncI,
 ) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand, Double::trunc)
 
 internal inline fun F64TruncExecutor(
@@ -89,7 +89,7 @@ internal inline fun F64TruncExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64TruncS,
+    instruction: NumericSuperInstruction.F64TruncS,
 ) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Double::trunc)
 
 internal inline fun F64NearestExecutor(
@@ -97,7 +97,7 @@ internal inline fun F64NearestExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64NearestI,
+    instruction: NumericSuperInstruction.F64NearestI,
 ) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand, Double::nearest)
 
 internal inline fun F64NearestExecutor(
@@ -105,7 +105,7 @@ internal inline fun F64NearestExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64NearestS,
+    instruction: NumericSuperInstruction.F64NearestS,
 ) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Double::nearest)
 
 internal inline fun F64SqrtExecutor(
@@ -113,7 +113,7 @@ internal inline fun F64SqrtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64SqrtI,
+    instruction: NumericSuperInstruction.F64SqrtI,
 ) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand, Double::sqrt)
 
 internal inline fun F64SqrtExecutor(
@@ -121,5 +121,5 @@ internal inline fun F64SqrtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64SqrtS,
+    instruction: NumericSuperInstruction.F64SqrtS,
 ) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Double::sqrt)

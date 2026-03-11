@@ -16,7 +16,7 @@ import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.ext.toStructAddress
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instance.StructInstance
-import io.github.charlietap.chasm.runtime.instruction.FusedAggregateInstruction
+import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -30,7 +30,7 @@ internal inline fun ArrayCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayCopyIii,
+    instruction: AggregateSuperInstruction.ArrayCopyIii,
 ) = executeArrayCopy(
     store = store,
     elementsToCopy = instruction.elementsToCopy,
@@ -45,7 +45,7 @@ internal inline fun ArrayCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayCopyIis,
+    instruction: AggregateSuperInstruction.ArrayCopyIis,
 ) = executeArrayCopy(
     store = store,
     elementsToCopy = instruction.elementsToCopy,
@@ -60,7 +60,7 @@ internal inline fun ArrayCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayCopyIsi,
+    instruction: AggregateSuperInstruction.ArrayCopyIsi,
 ) = executeArrayCopy(
     store = store,
     elementsToCopy = instruction.elementsToCopy,
@@ -75,7 +75,7 @@ internal inline fun ArrayCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayCopyIss,
+    instruction: AggregateSuperInstruction.ArrayCopyIss,
 ) = executeArrayCopy(
     store = store,
     elementsToCopy = instruction.elementsToCopy,
@@ -90,7 +90,7 @@ internal inline fun ArrayCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayCopySii,
+    instruction: AggregateSuperInstruction.ArrayCopySii,
 ) = executeArrayCopy(
     store = store,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -105,7 +105,7 @@ internal inline fun ArrayCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayCopySis,
+    instruction: AggregateSuperInstruction.ArrayCopySis,
 ) = executeArrayCopy(
     store = store,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -120,7 +120,7 @@ internal inline fun ArrayCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayCopySsi,
+    instruction: AggregateSuperInstruction.ArrayCopySsi,
 ) = executeArrayCopy(
     store = store,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -135,7 +135,7 @@ internal inline fun ArrayCopyExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayCopySss,
+    instruction: AggregateSuperInstruction.ArrayCopySss,
 ) = executeArrayCopy(
     store = store,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -150,7 +150,7 @@ internal inline fun ArrayFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayFillIii,
+    instruction: AggregateSuperInstruction.ArrayFillIii,
 ) = executeArrayFill(
     store = store,
     elementsToFill = instruction.elementsToFill,
@@ -164,7 +164,7 @@ internal inline fun ArrayFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayFillIis,
+    instruction: AggregateSuperInstruction.ArrayFillIis,
 ) = executeArrayFill(
     store = store,
     elementsToFill = instruction.elementsToFill,
@@ -178,7 +178,7 @@ internal inline fun ArrayFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayFillIsi,
+    instruction: AggregateSuperInstruction.ArrayFillIsi,
 ) = executeArrayFill(
     store = store,
     elementsToFill = instruction.elementsToFill,
@@ -192,7 +192,7 @@ internal inline fun ArrayFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayFillIss,
+    instruction: AggregateSuperInstruction.ArrayFillIss,
 ) = executeArrayFill(
     store = store,
     elementsToFill = instruction.elementsToFill,
@@ -206,7 +206,7 @@ internal inline fun ArrayFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayFillSii,
+    instruction: AggregateSuperInstruction.ArrayFillSii,
 ) = executeArrayFill(
     store = store,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -220,7 +220,7 @@ internal inline fun ArrayFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayFillSis,
+    instruction: AggregateSuperInstruction.ArrayFillSis,
 ) = executeArrayFill(
     store = store,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -234,7 +234,7 @@ internal inline fun ArrayFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayFillSsi,
+    instruction: AggregateSuperInstruction.ArrayFillSsi,
 ) = executeArrayFill(
     store = store,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -248,7 +248,7 @@ internal inline fun ArrayFillExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayFillSss,
+    instruction: AggregateSuperInstruction.ArrayFillSss,
 ) = executeArrayFill(
     store = store,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -262,7 +262,7 @@ internal inline fun ArrayGetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetI,
+    instruction: AggregateSuperInstruction.ArrayGetI,
 ) = executeArrayGet(
     vstack = vstack,
     store = store,
@@ -276,7 +276,7 @@ internal inline fun ArrayGetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetS,
+    instruction: AggregateSuperInstruction.ArrayGetS,
 ) = executeArrayGet(
     vstack = vstack,
     store = store,
@@ -290,7 +290,7 @@ internal fun ArrayGetSignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetSignedI,
+    instruction: AggregateSuperInstruction.ArrayGetSignedI,
 ) = ArrayGetSignedExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -305,7 +305,7 @@ internal inline fun ArrayGetSignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetSignedI,
+    instruction: AggregateSuperInstruction.ArrayGetSignedI,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedArrayGet(
     vstack = vstack,
@@ -322,7 +322,7 @@ internal fun ArrayGetSignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetSignedS,
+    instruction: AggregateSuperInstruction.ArrayGetSignedS,
 ) = ArrayGetSignedExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -337,7 +337,7 @@ internal inline fun ArrayGetSignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetSignedS,
+    instruction: AggregateSuperInstruction.ArrayGetSignedS,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedArrayGet(
     vstack = vstack,
@@ -354,7 +354,7 @@ internal fun ArrayGetUnsignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetUnsignedI,
+    instruction: AggregateSuperInstruction.ArrayGetUnsignedI,
 ) = ArrayGetUnsignedExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -369,7 +369,7 @@ internal inline fun ArrayGetUnsignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetUnsignedI,
+    instruction: AggregateSuperInstruction.ArrayGetUnsignedI,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedArrayGet(
     vstack = vstack,
@@ -386,7 +386,7 @@ internal fun ArrayGetUnsignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetUnsignedS,
+    instruction: AggregateSuperInstruction.ArrayGetUnsignedS,
 ) = ArrayGetUnsignedExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -401,7 +401,7 @@ internal inline fun ArrayGetUnsignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayGetUnsignedS,
+    instruction: AggregateSuperInstruction.ArrayGetUnsignedS,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedArrayGet(
     vstack = vstack,
@@ -418,7 +418,7 @@ internal fun ArrayLenExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayLenS,
+    instruction: AggregateSuperInstruction.ArrayLenS,
 ) = executeArrayLen(
     vstack = vstack,
     store = store,
@@ -431,7 +431,7 @@ internal inline fun ArrayNewExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayNewIi,
+    instruction: AggregateSuperInstruction.ArrayNewIi,
 ) = executeArrayNew(
     vstack = vstack,
     store = store,
@@ -447,7 +447,7 @@ internal inline fun ArrayNewExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayNewIs,
+    instruction: AggregateSuperInstruction.ArrayNewIs,
 ) = executeArrayNew(
     vstack = vstack,
     store = store,
@@ -463,7 +463,7 @@ internal inline fun ArrayNewExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayNewSi,
+    instruction: AggregateSuperInstruction.ArrayNewSi,
 ) = executeArrayNew(
     vstack = vstack,
     store = store,
@@ -479,7 +479,7 @@ internal inline fun ArrayNewExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayNewSs,
+    instruction: AggregateSuperInstruction.ArrayNewSs,
 ) = executeArrayNew(
     vstack = vstack,
     store = store,
@@ -495,7 +495,7 @@ internal inline fun ArrayNewFixedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArrayNewFixedS,
+    instruction: AggregateSuperInstruction.ArrayNewFixedS,
 ) = executeArrayNewFixed(
     vstack = vstack,
     store = store,
@@ -511,7 +511,7 @@ internal inline fun ArraySetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArraySetIi,
+    instruction: AggregateSuperInstruction.ArraySetIi,
 ) = executeArraySet(
     store = store,
     value = instruction.value,
@@ -524,7 +524,7 @@ internal inline fun ArraySetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArraySetIs,
+    instruction: AggregateSuperInstruction.ArraySetIs,
 ) = executeArraySet(
     store = store,
     value = instruction.value,
@@ -537,7 +537,7 @@ internal inline fun ArraySetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArraySetSi,
+    instruction: AggregateSuperInstruction.ArraySetSi,
 ) = executeArraySet(
     store = store,
     value = vstack.getFrameSlot(instruction.valueSlot),
@@ -550,7 +550,7 @@ internal inline fun ArraySetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.ArraySetSs,
+    instruction: AggregateSuperInstruction.ArraySetSs,
 ) = executeArraySet(
     store = store,
     value = vstack.getFrameSlot(instruction.valueSlot),
@@ -563,7 +563,7 @@ internal inline fun StructGetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructGetS,
+    instruction: AggregateSuperInstruction.StructGetS,
 ) = executeStructGet(
     vstack = vstack,
     store = store,
@@ -577,7 +577,7 @@ internal fun StructGetSignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructGetSignedS,
+    instruction: AggregateSuperInstruction.StructGetSignedS,
 ) = StructGetSignedExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -592,7 +592,7 @@ internal inline fun StructGetSignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructGetSignedS,
+    instruction: AggregateSuperInstruction.StructGetSignedS,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedStructGet(
     vstack = vstack,
@@ -609,7 +609,7 @@ internal fun StructGetUnsignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructGetUnsignedS,
+    instruction: AggregateSuperInstruction.StructGetUnsignedS,
 ) = StructGetUnsignedExecutor(
     vstack = vstack,
     cstack = cstack,
@@ -624,7 +624,7 @@ internal inline fun StructGetUnsignedExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructGetUnsignedS,
+    instruction: AggregateSuperInstruction.StructGetUnsignedS,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedStructGet(
     vstack = vstack,
@@ -641,7 +641,7 @@ internal inline fun StructNewExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructNewS,
+    instruction: AggregateSuperInstruction.StructNewS,
 ) = executeStructNew(
     vstack = vstack,
     store = store,
@@ -656,7 +656,7 @@ internal inline fun StructNewDefaultExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructNewDefaultS,
+    instruction: AggregateSuperInstruction.StructNewDefaultS,
 ) = executeStructNewDefault(
     vstack = vstack,
     store = store,
@@ -671,7 +671,7 @@ internal inline fun StructSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructSetI,
+    instruction: AggregateSuperInstruction.StructSetI,
 ) = executeStructSet(
     store = store,
     value = instruction.value,
@@ -684,7 +684,7 @@ internal inline fun StructSetExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedAggregateInstruction.StructSetS,
+    instruction: AggregateSuperInstruction.StructSetS,
 ) = executeStructSet(
     store = store,
     value = vstack.getFrameSlot(instruction.valueSlot),

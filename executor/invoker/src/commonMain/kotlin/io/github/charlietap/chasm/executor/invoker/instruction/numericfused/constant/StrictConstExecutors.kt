@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.numericfused.constant
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -11,7 +11,7 @@ internal inline fun I32ConstExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32ConstS,
+    instruction: NumericSuperInstruction.I32ConstS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.value.toLong())
 }
@@ -21,7 +21,7 @@ internal inline fun I64ConstExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I64ConstS,
+    instruction: NumericSuperInstruction.I64ConstS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.value)
 }
@@ -31,7 +31,7 @@ internal inline fun F32ConstExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConstS,
+    instruction: NumericSuperInstruction.F32ConstS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.bits.toLong())
 }
@@ -41,7 +41,7 @@ internal inline fun F64ConstExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F64ConstS,
+    instruction: NumericSuperInstruction.F64ConstS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.bits)
 }

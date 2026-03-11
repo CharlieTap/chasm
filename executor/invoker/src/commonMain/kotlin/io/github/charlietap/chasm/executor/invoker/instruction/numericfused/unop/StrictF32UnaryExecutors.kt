@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.executor.invoker.ext.nearest
 import io.github.charlietap.chasm.executor.invoker.ext.sqrt
 import io.github.charlietap.chasm.executor.invoker.ext.trunc
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -17,7 +17,7 @@ internal inline fun F32AbsExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32AbsI,
+    instruction: NumericSuperInstruction.F32AbsI,
 ) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand -> operand.absoluteValue }
 
 internal inline fun F32AbsExecutor(
@@ -25,7 +25,7 @@ internal inline fun F32AbsExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32AbsS,
+    instruction: NumericSuperInstruction.F32AbsS,
 ) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> operand.absoluteValue }
 
 internal inline fun F32NegExecutor(
@@ -33,7 +33,7 @@ internal inline fun F32NegExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32NegI,
+    instruction: NumericSuperInstruction.F32NegI,
 ) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand -> -operand }
 
 internal inline fun F32NegExecutor(
@@ -41,7 +41,7 @@ internal inline fun F32NegExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32NegS,
+    instruction: NumericSuperInstruction.F32NegS,
 ) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> -operand }
 
 internal inline fun F32CeilExecutor(
@@ -49,7 +49,7 @@ internal inline fun F32CeilExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32CeilI,
+    instruction: NumericSuperInstruction.F32CeilI,
 ) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand, Float::ceil)
 
 internal inline fun F32CeilExecutor(
@@ -57,7 +57,7 @@ internal inline fun F32CeilExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32CeilS,
+    instruction: NumericSuperInstruction.F32CeilS,
 ) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Float::ceil)
 
 internal inline fun F32FloorExecutor(
@@ -65,7 +65,7 @@ internal inline fun F32FloorExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32FloorI,
+    instruction: NumericSuperInstruction.F32FloorI,
 ) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand, Float::floor)
 
 internal inline fun F32FloorExecutor(
@@ -73,7 +73,7 @@ internal inline fun F32FloorExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32FloorS,
+    instruction: NumericSuperInstruction.F32FloorS,
 ) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Float::floor)
 
 internal inline fun F32TruncExecutor(
@@ -81,7 +81,7 @@ internal inline fun F32TruncExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32TruncI,
+    instruction: NumericSuperInstruction.F32TruncI,
 ) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand, Float::trunc)
 
 internal inline fun F32TruncExecutor(
@@ -89,7 +89,7 @@ internal inline fun F32TruncExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32TruncS,
+    instruction: NumericSuperInstruction.F32TruncS,
 ) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Float::trunc)
 
 internal inline fun F32NearestExecutor(
@@ -97,7 +97,7 @@ internal inline fun F32NearestExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32NearestI,
+    instruction: NumericSuperInstruction.F32NearestI,
 ) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand, Float::nearest)
 
 internal inline fun F32NearestExecutor(
@@ -105,7 +105,7 @@ internal inline fun F32NearestExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32NearestS,
+    instruction: NumericSuperInstruction.F32NearestS,
 ) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Float::nearest)
 
 internal inline fun F32SqrtExecutor(
@@ -113,7 +113,7 @@ internal inline fun F32SqrtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32SqrtI,
+    instruction: NumericSuperInstruction.F32SqrtI,
 ) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand, Float::sqrt)
 
 internal inline fun F32SqrtExecutor(
@@ -121,5 +121,5 @@ internal inline fun F32SqrtExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32SqrtS,
+    instruction: NumericSuperInstruction.F32SqrtS,
 ) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, Float::sqrt)

@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.bino
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.executeI32BinarySi
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.executeI32BinarySs
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -15,7 +15,7 @@ internal inline fun I32EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32EqIi,
+    instruction: NumericSuperInstruction.I32EqIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left == right) 1 else 0
 }
@@ -25,7 +25,7 @@ internal inline fun I32EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32EqIs,
+    instruction: NumericSuperInstruction.I32EqIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left == right) 1 else 0
 }
@@ -35,7 +35,7 @@ internal inline fun I32EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32EqSi,
+    instruction: NumericSuperInstruction.I32EqSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left == right) 1 else 0
 }
@@ -45,7 +45,7 @@ internal inline fun I32EqExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32EqSs,
+    instruction: NumericSuperInstruction.I32EqSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left == right) 1 else 0
 }
@@ -55,7 +55,7 @@ internal inline fun I32NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32NeIi,
+    instruction: NumericSuperInstruction.I32NeIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left != right) 1 else 0
 }
@@ -65,7 +65,7 @@ internal inline fun I32NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32NeIs,
+    instruction: NumericSuperInstruction.I32NeIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left != right) 1 else 0
 }
@@ -75,7 +75,7 @@ internal inline fun I32NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32NeSi,
+    instruction: NumericSuperInstruction.I32NeSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left != right) 1 else 0
 }
@@ -85,7 +85,7 @@ internal inline fun I32NeExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32NeSs,
+    instruction: NumericSuperInstruction.I32NeSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left != right) 1 else 0
 }
@@ -95,7 +95,7 @@ internal inline fun I32LtSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LtSIi,
+    instruction: NumericSuperInstruction.I32LtSIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left < right) 1 else 0
 }
@@ -105,7 +105,7 @@ internal inline fun I32LtSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LtSIs,
+    instruction: NumericSuperInstruction.I32LtSIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left < right) 1 else 0
 }
@@ -115,7 +115,7 @@ internal inline fun I32LtSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LtSSi,
+    instruction: NumericSuperInstruction.I32LtSSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left < right) 1 else 0
 }
@@ -125,7 +125,7 @@ internal inline fun I32LtSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LtSSs,
+    instruction: NumericSuperInstruction.I32LtSSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left < right) 1 else 0
 }
@@ -135,7 +135,7 @@ internal inline fun I32LtUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LtUIi,
+    instruction: NumericSuperInstruction.I32LtUIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left.toUInt() < right.toUInt()) 1 else 0
 }
@@ -145,7 +145,7 @@ internal inline fun I32LtUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LtUIs,
+    instruction: NumericSuperInstruction.I32LtUIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left.toUInt() < right.toUInt()) 1 else 0
 }
@@ -155,7 +155,7 @@ internal inline fun I32LtUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LtUSi,
+    instruction: NumericSuperInstruction.I32LtUSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left.toUInt() < right.toUInt()) 1 else 0
 }
@@ -165,7 +165,7 @@ internal inline fun I32LtUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LtUSs,
+    instruction: NumericSuperInstruction.I32LtUSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left.toUInt() < right.toUInt()) 1 else 0
 }
@@ -175,7 +175,7 @@ internal inline fun I32GtSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GtSIi,
+    instruction: NumericSuperInstruction.I32GtSIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left > right) 1 else 0
 }
@@ -185,7 +185,7 @@ internal inline fun I32GtSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GtSIs,
+    instruction: NumericSuperInstruction.I32GtSIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left > right) 1 else 0
 }
@@ -195,7 +195,7 @@ internal inline fun I32GtSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GtSSi,
+    instruction: NumericSuperInstruction.I32GtSSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left > right) 1 else 0
 }
@@ -205,7 +205,7 @@ internal inline fun I32GtSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GtSSs,
+    instruction: NumericSuperInstruction.I32GtSSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left > right) 1 else 0
 }
@@ -215,7 +215,7 @@ internal inline fun I32GtUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GtUIi,
+    instruction: NumericSuperInstruction.I32GtUIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left.toUInt() > right.toUInt()) 1 else 0
 }
@@ -225,7 +225,7 @@ internal inline fun I32GtUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GtUIs,
+    instruction: NumericSuperInstruction.I32GtUIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left.toUInt() > right.toUInt()) 1 else 0
 }
@@ -235,7 +235,7 @@ internal inline fun I32GtUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GtUSi,
+    instruction: NumericSuperInstruction.I32GtUSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left.toUInt() > right.toUInt()) 1 else 0
 }
@@ -245,7 +245,7 @@ internal inline fun I32GtUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GtUSs,
+    instruction: NumericSuperInstruction.I32GtUSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left.toUInt() > right.toUInt()) 1 else 0
 }
@@ -255,7 +255,7 @@ internal inline fun I32LeSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LeSIi,
+    instruction: NumericSuperInstruction.I32LeSIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left <= right) 1 else 0
 }
@@ -265,7 +265,7 @@ internal inline fun I32LeSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LeSIs,
+    instruction: NumericSuperInstruction.I32LeSIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left <= right) 1 else 0
 }
@@ -275,7 +275,7 @@ internal inline fun I32LeSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LeSSi,
+    instruction: NumericSuperInstruction.I32LeSSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left <= right) 1 else 0
 }
@@ -285,7 +285,7 @@ internal inline fun I32LeSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LeSSs,
+    instruction: NumericSuperInstruction.I32LeSSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left <= right) 1 else 0
 }
@@ -295,7 +295,7 @@ internal inline fun I32LeUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LeUIi,
+    instruction: NumericSuperInstruction.I32LeUIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left.toUInt() <= right.toUInt()) 1 else 0
 }
@@ -305,7 +305,7 @@ internal inline fun I32LeUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LeUIs,
+    instruction: NumericSuperInstruction.I32LeUIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left.toUInt() <= right.toUInt()) 1 else 0
 }
@@ -315,7 +315,7 @@ internal inline fun I32LeUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LeUSi,
+    instruction: NumericSuperInstruction.I32LeUSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left.toUInt() <= right.toUInt()) 1 else 0
 }
@@ -325,7 +325,7 @@ internal inline fun I32LeUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32LeUSs,
+    instruction: NumericSuperInstruction.I32LeUSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left.toUInt() <= right.toUInt()) 1 else 0
 }
@@ -335,7 +335,7 @@ internal inline fun I32GeSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GeSIi,
+    instruction: NumericSuperInstruction.I32GeSIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left >= right) 1 else 0
 }
@@ -345,7 +345,7 @@ internal inline fun I32GeSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GeSIs,
+    instruction: NumericSuperInstruction.I32GeSIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left >= right) 1 else 0
 }
@@ -355,7 +355,7 @@ internal inline fun I32GeSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GeSSi,
+    instruction: NumericSuperInstruction.I32GeSSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left >= right) 1 else 0
 }
@@ -365,7 +365,7 @@ internal inline fun I32GeSExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GeSSs,
+    instruction: NumericSuperInstruction.I32GeSSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left >= right) 1 else 0
 }
@@ -375,7 +375,7 @@ internal inline fun I32GeUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GeUIi,
+    instruction: NumericSuperInstruction.I32GeUIi,
 ) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right ->
     if (left.toUInt() >= right.toUInt()) 1 else 0
 }
@@ -385,7 +385,7 @@ internal inline fun I32GeUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GeUIs,
+    instruction: NumericSuperInstruction.I32GeUIs,
 ) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right ->
     if (left.toUInt() >= right.toUInt()) 1 else 0
 }
@@ -395,7 +395,7 @@ internal inline fun I32GeUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GeUSi,
+    instruction: NumericSuperInstruction.I32GeUSi,
 ) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right ->
     if (left.toUInt() >= right.toUInt()) 1 else 0
 }
@@ -405,7 +405,7 @@ internal inline fun I32GeUExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.I32GeUSs,
+    instruction: NumericSuperInstruction.I32GeUSs,
 ) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right ->
     if (left.toUInt() >= right.toUInt()) 1 else 0
 }

@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.compiler.passes.fusion
 
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
+import io.github.charlietap.chasm.ir.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
@@ -48,7 +48,7 @@ internal inline fun AggregateInstructionFuser(
             when {
                 sourceOffset == null -> {
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayCopy(
+                    AggregateSuperInstruction.ArrayCopy(
                         elementsToCopy = elementsToCopy,
                         sourceOffset = FusedOperand.ValueStack,
                         sourceAddress = FusedOperand.ValueStack,
@@ -61,7 +61,7 @@ internal inline fun AggregateInstructionFuser(
                 sourceAddress == null -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayCopy(
+                    AggregateSuperInstruction.ArrayCopy(
                         elementsToCopy = elementsToCopy,
                         sourceOffset = sourceOffset,
                         sourceAddress = FusedOperand.ValueStack,
@@ -75,7 +75,7 @@ internal inline fun AggregateInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayCopy(
+                    AggregateSuperInstruction.ArrayCopy(
                         elementsToCopy = elementsToCopy,
                         sourceOffset = sourceOffset,
                         sourceAddress = sourceAddress,
@@ -90,7 +90,7 @@ internal inline fun AggregateInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayCopy(
+                    AggregateSuperInstruction.ArrayCopy(
                         elementsToCopy = elementsToCopy,
                         sourceOffset = sourceOffset,
                         sourceAddress = sourceAddress,
@@ -106,7 +106,7 @@ internal inline fun AggregateInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayCopy(
+                    AggregateSuperInstruction.ArrayCopy(
                         elementsToCopy = elementsToCopy,
                         sourceOffset = sourceOffset,
                         sourceAddress = sourceAddress,
@@ -136,7 +136,7 @@ internal inline fun AggregateInstructionFuser(
             when {
                 fillValue == null -> {
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayFill(
+                    AggregateSuperInstruction.ArrayFill(
                         elementsToFill = elementsToFill,
                         fillValue = FusedOperand.ValueStack,
                         arrayElementOffset = FusedOperand.ValueStack,
@@ -147,7 +147,7 @@ internal inline fun AggregateInstructionFuser(
                 arrayElementOffset == null -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayFill(
+                    AggregateSuperInstruction.ArrayFill(
                         elementsToFill = elementsToFill,
                         fillValue = fillValue,
                         arrayElementOffset = FusedOperand.ValueStack,
@@ -159,7 +159,7 @@ internal inline fun AggregateInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayFill(
+                    AggregateSuperInstruction.ArrayFill(
                         elementsToFill = elementsToFill,
                         fillValue = fillValue,
                         arrayElementOffset = arrayElementOffset,
@@ -172,7 +172,7 @@ internal inline fun AggregateInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayFill(
+                    AggregateSuperInstruction.ArrayFill(
                         elementsToFill = elementsToFill,
                         fillValue = fillValue,
                         arrayElementOffset = arrayElementOffset,
@@ -198,7 +198,7 @@ internal inline fun AggregateInstructionFuser(
             instruction
         } else {
             when {
-                field == null -> FusedAggregateInstruction.ArrayGet(
+                field == null -> AggregateSuperInstruction.ArrayGet(
                     field = FusedOperand.ValueStack,
                     address = FusedOperand.ValueStack,
                     destination = destination,
@@ -206,7 +206,7 @@ internal inline fun AggregateInstructionFuser(
                 )
                 address == null -> {
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayGet(
+                    AggregateSuperInstruction.ArrayGet(
                         field = field,
                         address = FusedOperand.ValueStack,
                         destination = destination,
@@ -216,7 +216,7 @@ internal inline fun AggregateInstructionFuser(
                 else -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayGet(
+                    AggregateSuperInstruction.ArrayGet(
                         field = field,
                         address = address,
                         destination = destination,
@@ -245,7 +245,7 @@ internal inline fun AggregateInstructionFuser(
             instruction
         } else {
             when {
-                field == null -> FusedAggregateInstruction.ArrayGetSigned(
+                field == null -> AggregateSuperInstruction.ArrayGetSigned(
                     field = FusedOperand.ValueStack,
                     address = FusedOperand.ValueStack,
                     destination = destination,
@@ -253,7 +253,7 @@ internal inline fun AggregateInstructionFuser(
                 )
                 address == null -> {
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayGetSigned(
+                    AggregateSuperInstruction.ArrayGetSigned(
                         field = field,
                         address = FusedOperand.ValueStack,
                         destination = destination,
@@ -263,7 +263,7 @@ internal inline fun AggregateInstructionFuser(
                 else -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayGetSigned(
+                    AggregateSuperInstruction.ArrayGetSigned(
                         field = field,
                         address = address,
                         destination = destination,
@@ -292,7 +292,7 @@ internal inline fun AggregateInstructionFuser(
             instruction
         } else {
             when {
-                field == null -> FusedAggregateInstruction.ArrayGetUnsigned(
+                field == null -> AggregateSuperInstruction.ArrayGetUnsigned(
                     field = FusedOperand.ValueStack,
                     address = FusedOperand.ValueStack,
                     destination = destination,
@@ -300,7 +300,7 @@ internal inline fun AggregateInstructionFuser(
                 )
                 address == null -> {
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayGetUnsigned(
+                    AggregateSuperInstruction.ArrayGetUnsigned(
                         field = field,
                         address = FusedOperand.ValueStack,
                         destination = destination,
@@ -310,7 +310,7 @@ internal inline fun AggregateInstructionFuser(
                 else -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayGetUnsigned(
+                    AggregateSuperInstruction.ArrayGetUnsigned(
                         field = field,
                         address = address,
                         destination = destination,
@@ -338,13 +338,13 @@ internal inline fun AggregateInstructionFuser(
             instruction
         } else {
             when {
-                address == null -> FusedAggregateInstruction.ArrayLen(
+                address == null -> AggregateSuperInstruction.ArrayLen(
                     address = FusedOperand.ValueStack,
                     destination = destination,
                 )
                 else -> {
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayLen(
+                    AggregateSuperInstruction.ArrayLen(
                         address = address,
                         destination = destination,
                     )
@@ -372,7 +372,7 @@ internal inline fun AggregateInstructionFuser(
             instruction
         } else {
             when {
-                size == null -> FusedAggregateInstruction.ArrayNew(
+                size == null -> AggregateSuperInstruction.ArrayNew(
                     size = FusedOperand.ValueStack,
                     value = FusedOperand.ValueStack,
                     destination = destination,
@@ -380,7 +380,7 @@ internal inline fun AggregateInstructionFuser(
                 )
                 value == null -> {
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayNew(
+                    AggregateSuperInstruction.ArrayNew(
                         size = size,
                         value = FusedOperand.ValueStack,
                         destination = destination,
@@ -390,7 +390,7 @@ internal inline fun AggregateInstructionFuser(
                 else -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArrayNew(
+                    AggregateSuperInstruction.ArrayNew(
                         size = size,
                         value = value,
                         destination = destination,
@@ -417,7 +417,7 @@ internal inline fun AggregateInstructionFuser(
         val instruction = if (destination == FusedDestination.ValueStack) {
             instruction
         } else {
-            FusedAggregateInstruction.ArrayNewFixed(
+            AggregateSuperInstruction.ArrayNewFixed(
                 destination = destination,
                 typeIndex = instruction.typeIndex,
                 size = instruction.size.toInt(),
@@ -444,7 +444,7 @@ internal inline fun AggregateInstructionFuser(
             when {
                 field == null -> {
                     output.removeLast()
-                    FusedAggregateInstruction.ArraySet(
+                    AggregateSuperInstruction.ArraySet(
                         value = value,
                         field = FusedOperand.ValueStack,
                         address = FusedOperand.ValueStack,
@@ -454,7 +454,7 @@ internal inline fun AggregateInstructionFuser(
                 address == null -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArraySet(
+                    AggregateSuperInstruction.ArraySet(
                         value = value,
                         field = field,
                         address = FusedOperand.ValueStack,
@@ -465,7 +465,7 @@ internal inline fun AggregateInstructionFuser(
                     output.removeLast()
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.ArraySet(
+                    AggregateSuperInstruction.ArraySet(
                         value = value,
                         field = field,
                         address = address,
@@ -489,7 +489,7 @@ internal inline fun AggregateInstructionFuser(
             instruction
         } else {
             when {
-                address == null -> FusedAggregateInstruction.StructGet(
+                address == null -> AggregateSuperInstruction.StructGet(
                     address = FusedOperand.ValueStack,
                     destination = destination,
                     typeIndex = instruction.typeIndex,
@@ -497,7 +497,7 @@ internal inline fun AggregateInstructionFuser(
                 )
                 else -> {
                     output.removeLast()
-                    FusedAggregateInstruction.StructGet(
+                    AggregateSuperInstruction.StructGet(
                         address = address,
                         destination = destination,
                         typeIndex = instruction.typeIndex,
@@ -525,7 +525,7 @@ internal inline fun AggregateInstructionFuser(
             instruction
         } else {
             when {
-                address == null -> FusedAggregateInstruction.StructGetSigned(
+                address == null -> AggregateSuperInstruction.StructGetSigned(
                     address = FusedOperand.ValueStack,
                     destination = destination,
                     typeIndex = instruction.typeIndex,
@@ -533,7 +533,7 @@ internal inline fun AggregateInstructionFuser(
                 )
                 else -> {
                     output.removeLast()
-                    FusedAggregateInstruction.StructGetSigned(
+                    AggregateSuperInstruction.StructGetSigned(
                         address = address,
                         destination = destination,
                         typeIndex = instruction.typeIndex,
@@ -561,7 +561,7 @@ internal inline fun AggregateInstructionFuser(
             instruction
         } else {
             when {
-                address == null -> FusedAggregateInstruction.StructGetUnsigned(
+                address == null -> AggregateSuperInstruction.StructGetUnsigned(
                     address = FusedOperand.ValueStack,
                     destination = destination,
                     typeIndex = instruction.typeIndex,
@@ -569,7 +569,7 @@ internal inline fun AggregateInstructionFuser(
                 )
                 else -> {
                     output.removeLast()
-                    FusedAggregateInstruction.StructGetUnsigned(
+                    AggregateSuperInstruction.StructGetUnsigned(
                         address = address,
                         destination = destination,
                         typeIndex = instruction.typeIndex,
@@ -595,7 +595,7 @@ internal inline fun AggregateInstructionFuser(
         val instruction = if (destination == FusedDestination.ValueStack) {
             instruction
         } else {
-            FusedAggregateInstruction.StructNew(
+            AggregateSuperInstruction.StructNew(
                 destination = destination,
                 typeIndex = instruction.typeIndex,
             )
@@ -617,7 +617,7 @@ internal inline fun AggregateInstructionFuser(
         val instruction = if (destination == FusedDestination.ValueStack) {
             instruction
         } else {
-            FusedAggregateInstruction.StructNewDefault(
+            AggregateSuperInstruction.StructNewDefault(
                 destination = destination,
                 typeIndex = instruction.typeIndex,
             )
@@ -642,7 +642,7 @@ internal inline fun AggregateInstructionFuser(
             when {
                 address == null -> {
                     output.removeLast()
-                    FusedAggregateInstruction.StructSet(
+                    AggregateSuperInstruction.StructSet(
                         value = value,
                         address = FusedOperand.ValueStack,
                         typeIndex = instruction.typeIndex,
@@ -652,7 +652,7 @@ internal inline fun AggregateInstructionFuser(
                 else -> {
                     output.removeLast()
                     output.removeLast()
-                    FusedAggregateInstruction.StructSet(
+                    AggregateSuperInstruction.StructSet(
                         value = value,
                         address = address,
                         typeIndex = instruction.typeIndex,

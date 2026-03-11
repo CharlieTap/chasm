@@ -1,14 +1,14 @@
 package io.github.charlietap.chasm.compiler.ext
 
 import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
-import io.github.charlietap.chasm.ir.instruction.FusedAggregateInstruction
+import io.github.charlietap.chasm.ir.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.ir.module.Export
 import io.github.charlietap.chasm.ir.module.Module
 
 internal fun Module.containsGcInstructions(): Boolean = functions.any { function ->
     function.traverseInstructions().any { instruction ->
         instruction is AggregateInstruction ||
-            instruction is FusedAggregateInstruction
+            instruction is AggregateSuperInstruction
     }
 }
 

@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.numericfused.cvt
 import io.github.charlietap.chasm.executor.invoker.ext.convertF32s
 import io.github.charlietap.chasm.executor.invoker.ext.convertF32u
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.FusedNumericInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -13,7 +13,7 @@ internal inline fun F32ConvertI32SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConvertI32SI,
+    instruction: NumericSuperInstruction.F32ConvertI32SI,
 ) = executeI32ToF32I(vstack, instruction.destinationSlot, instruction.operand, Int::convertF32s)
 
 internal inline fun F32ConvertI32SExecutor(
@@ -21,7 +21,7 @@ internal inline fun F32ConvertI32SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConvertI32SS,
+    instruction: NumericSuperInstruction.F32ConvertI32SS,
 ) = executeI32ToF32S(vstack, instruction.destinationSlot, instruction.operandSlot, Int::convertF32s)
 
 internal inline fun F32ConvertI32UExecutor(
@@ -29,7 +29,7 @@ internal inline fun F32ConvertI32UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConvertI32UI,
+    instruction: NumericSuperInstruction.F32ConvertI32UI,
 ) = executeI32ToF32I(vstack, instruction.destinationSlot, instruction.operand, Int::convertF32u)
 
 internal inline fun F32ConvertI32UExecutor(
@@ -37,7 +37,7 @@ internal inline fun F32ConvertI32UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConvertI32US,
+    instruction: NumericSuperInstruction.F32ConvertI32US,
 ) = executeI32ToF32S(vstack, instruction.destinationSlot, instruction.operandSlot, Int::convertF32u)
 
 internal inline fun F32ConvertI64SExecutor(
@@ -45,7 +45,7 @@ internal inline fun F32ConvertI64SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConvertI64SI,
+    instruction: NumericSuperInstruction.F32ConvertI64SI,
 ) = executeI64ToF32I(vstack, instruction.destinationSlot, instruction.operand, Long::convertF32s)
 
 internal inline fun F32ConvertI64SExecutor(
@@ -53,7 +53,7 @@ internal inline fun F32ConvertI64SExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConvertI64SS,
+    instruction: NumericSuperInstruction.F32ConvertI64SS,
 ) = executeI64ToF32S(vstack, instruction.destinationSlot, instruction.operandSlot, Long::convertF32s)
 
 internal inline fun F32ConvertI64UExecutor(
@@ -61,7 +61,7 @@ internal inline fun F32ConvertI64UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConvertI64UI,
+    instruction: NumericSuperInstruction.F32ConvertI64UI,
 ) = executeI64ToF32I(vstack, instruction.destinationSlot, instruction.operand, Long::convertF32u)
 
 internal inline fun F32ConvertI64UExecutor(
@@ -69,7 +69,7 @@ internal inline fun F32ConvertI64UExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ConvertI64US,
+    instruction: NumericSuperInstruction.F32ConvertI64US,
 ) = executeI64ToF32S(vstack, instruction.destinationSlot, instruction.operandSlot, Long::convertF32u)
 
 internal inline fun F32DemoteF64Executor(
@@ -77,7 +77,7 @@ internal inline fun F32DemoteF64Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32DemoteF64I,
+    instruction: NumericSuperInstruction.F32DemoteF64I,
 ) = executeF64ToF32I(vstack, instruction.destinationSlot, instruction.operand) { operand -> operand.toFloat() }
 
 internal inline fun F32DemoteF64Executor(
@@ -85,7 +85,7 @@ internal inline fun F32DemoteF64Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32DemoteF64S,
+    instruction: NumericSuperInstruction.F32DemoteF64S,
 ) = executeF64ToF32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> operand.toFloat() }
 
 internal inline fun F32ReinterpretI32Executor(
@@ -93,7 +93,7 @@ internal inline fun F32ReinterpretI32Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ReinterpretI32I,
+    instruction: NumericSuperInstruction.F32ReinterpretI32I,
 ) = executeI32BitsToF32I(vstack, instruction.destinationSlot, instruction.operand)
 
 internal inline fun F32ReinterpretI32Executor(
@@ -101,5 +101,5 @@ internal inline fun F32ReinterpretI32Executor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: FusedNumericInstruction.F32ReinterpretI32S,
+    instruction: NumericSuperInstruction.F32ReinterpretI32S,
 ) = executeI32BitsToF32S(vstack, instruction.destinationSlot, instruction.operandSlot)

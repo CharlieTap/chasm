@@ -1,29 +1,29 @@
 package io.github.charlietap.chasm.compiler.passes.fusion
 
 import io.github.charlietap.chasm.compiler.passes.PassContext
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.F32Store
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.F64Store
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I32Load
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I32Load16S
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I32Load16U
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I32Load8S
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I32Load8U
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I32Store
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I32Store16
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I32Store8
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Load
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Load16S
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Load16U
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Load32S
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Load32U
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Load8S
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Load8U
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Store
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Store16
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Store32
-import io.github.charlietap.chasm.ir.instruction.FusedMemoryInstruction.I64Store8
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.F32Store
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.F64Store
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I32Load
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I32Load16S
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I32Load16U
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I32Load8S
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I32Load8U
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I32Store
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I32Store16
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I32Store8
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Load
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Load16S
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Load16U
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Load32S
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Load32U
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Load8S
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Load8U
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Store
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Store16
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Store32
+import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction.I64Store8
 
 internal typealias MemoryInstructionFuser = (PassContext, Int, MemoryInstruction, List<Instruction>, MutableList<Instruction>) -> Int
 
