@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModule
 import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
-import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
@@ -19,18 +18,13 @@ import io.github.charlietap.chasm.fixture.ir.module.import
 import io.github.charlietap.chasm.fixture.ir.module.module
 import io.github.charlietap.chasm.fixture.ir.module.startFunction
 import io.github.charlietap.chasm.fixture.ir.module.table
-import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.runtime.returnArity
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.ir.factory.ModuleFactory
-import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.predecoder.Predecoder
-import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import kotlin.test.Test
@@ -38,7 +32,6 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.fixture.ast.module.module as astModule
 import io.github.charlietap.chasm.fixture.runtime.instance.import as runtimeImport
-import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
 
 class ModuleInstantiatorTest {
 
@@ -110,13 +103,12 @@ class ModuleInstantiatorTest {
             Ok(partialInstance)
         }
 
-        val evaluator: ExpressionEvaluator = { _config, _store, _instance, _expression, _arity ->
-            assertEquals(config, _config)
+        val constantExpressionEvaluator: ConstantExpressionEvaluator = { _store, _instance, _expression ->
             assertEquals(store, _store)
             assertEquals(partialInstance, _instance)
-            assertEquals(returnArity(1), _arity)
+            assertEquals(tableInitExpression, _expression)
 
-            Ok(ReferenceValue.Null(heapType()).toLong())
+            Ok(ReferenceValue.Null(heapType()).toLongFromBoxed())
         }
 
         val invoker: FunctionInvoker = { _config, _store, _address, _locals ->
@@ -142,13 +134,6 @@ class ModuleInstantiatorTest {
             Ok(Unit)
         }
 
-        val runtimeTableInitExpression = runtimeExpression()
-        val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _expression ->
-            assertEquals(tableInitExpression, _expression)
-
-            Ok(runtimeTableInitExpression)
-        }
-
         val actual = ModuleInstantiator(
             config = config,
             store = store,
@@ -160,10 +145,9 @@ class ModuleInstantiatorTest {
             partialAllocator = pallocator,
             allocator = allocator,
             invoker = invoker,
-            evaluator = evaluator,
+            constantExpressionEvaluator = constantExpressionEvaluator,
             tableInitializer = tableInitializer,
             memoryInitializer = memoryInitializer,
-            expressionPredecoder = expressionPredecoder,
         )
 
         assertEquals(Ok(partialInstance), actual)

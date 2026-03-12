@@ -1,28 +1,26 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
-import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.ir.instruction.dataDropInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
-import io.github.charlietap.chasm.fixture.ir.instruction.memoryInitInstruction
 import io.github.charlietap.chasm.fixture.ir.module.activeDataSegmentMode
 import io.github.charlietap.chasm.fixture.ir.module.dataIndex
 import io.github.charlietap.chasm.fixture.ir.module.dataSegment
 import io.github.charlietap.chasm.fixture.ir.module.memoryIndex
 import io.github.charlietap.chasm.fixture.ir.module.module
-import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
+import io.github.charlietap.chasm.fixture.runtime.instance.dataAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.dataInstance
+import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.store
-import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.predecoder.Predecoder
-import io.github.charlietap.chasm.runtime.Arity
+import io.github.charlietap.chasm.memory.init.LinearMemoryInitialiser
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
 
 class MemoryInitializerTest {
 
@@ -46,12 +44,20 @@ class MemoryInitializerTest {
         )
 
         val config = runtimeConfig()
-        val store = store()
+        val memInstance = memoryInstance()
+        val dataInst = dataInstance()
+        val store = store(
+            memories = mutableListOf(memInstance),
+            data = mutableListOf(dataInst),
+        )
         val module = module(
             dataSegments = listOf(activeSegment),
         )
 
-        val instance = moduleInstance()
+        val instance = moduleInstance(
+            memAddresses = mutableListOf(memoryAddress(0)),
+            dataAddresses = mutableListOf(dataAddress(0)),
+        )
         val context = instantiationContext(
             store = store,
             module = module,
@@ -59,36 +65,25 @@ class MemoryInitializerTest {
             instance = instance,
         )
 
-        val expression = expression(
-            listOf(
-                i32ConstInstruction(offset),
-                i32ConstInstruction(0),
-                i32ConstInstruction(activeSegment.initData.size),
-                memoryInitInstruction(memoryIndex, activeDataIndex),
-                dataDropInstruction(activeDataIndex),
-            ),
-        )
-        val runtimeExpression = runtimeExpression()
-        val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _expression ->
-            assertEquals(expression, _expression)
-            Ok(runtimeExpression)
-        }
-
-        val evaluator: ExpressionEvaluator = { _config, _store, _instance, _expression, _arity ->
-            assertEquals(config, _config)
+        val constantExpressionEvaluator: ConstantExpressionEvaluator = { _store, _instance, _expression ->
             assertEquals(store, _store)
             assertEquals(instance, _instance)
-            assertEquals(runtimeExpression, _expression)
-            assertEquals(Arity.Return.SIDE_EFFECT, _arity)
+            assertEquals(activeOffsetExpression, _expression)
 
-            Ok(null)
+            Ok(offset.toLong())
+        }
+
+        val linearMemoryInitialiser: LinearMemoryInitialiser = { _src, _dst, _srcOffset, _dstOffset, _bytesToInit, _srcUpperBound, _dstUpperBound ->
+            assertEquals(0, _srcOffset)
+            assertEquals(offset, _dstOffset)
+            assertEquals(activeSegment.initData.size, _bytesToInit)
         }
 
         val actual = MemoryInitializer(
             context = context,
             instance = instance,
-            evaluator = evaluator,
-            expressionPredecoder = expressionPredecoder,
+            constantExpressionEvaluator = constantExpressionEvaluator,
+            linearMemoryInitialiser = linearMemoryInitialiser,
         )
 
         assertEquals(Ok(Unit), actual)

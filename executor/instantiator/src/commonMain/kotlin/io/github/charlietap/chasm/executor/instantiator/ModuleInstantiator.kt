@@ -8,22 +8,15 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocat
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChecker
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.executor.instantiator.ext.asPredecodingContext
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
-import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.ir.factory.ModuleFactory
-import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.predecoder.ExpressionPredecoder
-import io.github.charlietap.chasm.predecoder.Predecoder
-import io.github.charlietap.chasm.runtime.Arity
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.ast.module.Module as ASTModule
-import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
 
 typealias ModuleInstantiator = (RuntimeConfig, Store, ASTModule, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
 
@@ -44,10 +37,9 @@ fun ModuleInstantiator(
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
         invoker = ::FunctionInvoker,
-        evaluator = ::ExpressionEvaluator,
+        constantExpressionEvaluator = ::ConstantExpressionEvaluator,
         tableInitializer = ::TableInitializer,
         memoryInitializer = ::MemoryInitializer,
-        expressionPredecoder = ::ExpressionPredecoder,
     )
 
 internal inline fun ModuleInstantiator(
@@ -61,10 +53,9 @@ internal inline fun ModuleInstantiator(
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline allocator: ModuleAllocator,
     crossinline invoker: FunctionInvoker,
-    crossinline evaluator: ExpressionEvaluator,
+    crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
     crossinline tableInitializer: TableInitializer,
     crossinline memoryInitializer: MemoryInitializer,
-    crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     compatibilityChecker(module).bind()
@@ -75,8 +66,7 @@ internal inline fun ModuleInstantiator(
 
     val tableInitValues = LongArray(irModule.tables.size) { tableIndex ->
         val table = irModule.tables[tableIndex]
-        val initExpression = expressionPredecoder(context.asPredecodingContext(), table.initExpression).bind()
-        evaluator(config, store, partialInstance, initExpression, Arity.Return(1)).bind() ?: 0L
+        constantExpressionEvaluator(store, partialInstance, table.initExpression).bind()
     }
 
     val instance = allocator(context, partialInstance, tableInitValues).bind()

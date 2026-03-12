@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation
 
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
@@ -9,7 +10,6 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.global.Global
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
-import io.github.charlietap.chasm.executor.invoker.ExpressionEvaluator
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.module.dataSegment
@@ -34,7 +34,6 @@ import io.github.charlietap.chasm.fixture.ir.module.tagIndex
 import io.github.charlietap.chasm.fixture.ir.module.type
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
 import io.github.charlietap.chasm.fixture.ir.value.nameValue
-import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.dataAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.elementAddress
@@ -56,7 +55,6 @@ import io.github.charlietap.chasm.fixture.runtime.value.nullReferenceValue
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.heapType
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
-import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.runtime.ext.toLong
@@ -64,10 +62,10 @@ import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ext.definedType
 import io.github.charlietap.chasm.type.ext.recursiveType
+import kotlin.jvm.JvmName
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import io.github.charlietap.chasm.runtime.function.Expression as RuntimeExpression
 import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
 class ModuleAllocatorTest {
@@ -236,13 +234,8 @@ class ModuleAllocatorTest {
         )
 
         val expressionValues = sequenceOf(globalInitValue, elementSegmentRef).iterator()
-        val expressionEvaluator: ExpressionEvaluator = { _, _, _, _, _ ->
+        val constantExpressionEvaluator: ConstantExpressionEvaluator = { _, _, _ ->
             Ok(expressionValues.next())
-        }
-
-        val expressionPredecoder: Predecoder<Expression, RuntimeExpression> = { _context, _ ->
-
-            Ok(runtimeExpression())
         }
 
         val functionPredecoder: Predecoder<Function, RuntimeFunction> = { _context, _function ->
@@ -289,14 +282,13 @@ class ModuleAllocatorTest {
             context = context,
             instance = partial,
             tableInitValues = tableInitValues,
-            evaluator = expressionEvaluator,
+            constantExpressionEvaluator = constantExpressionEvaluator,
             tableAllocator = tableAllocator,
             memoryAllocator = memoryAllocator,
             tagAllocator = tagAllocator,
             globalAllocator = globalAllocator,
             elementAllocator = elementAllocator,
             dataAllocator = dataAllocator,
-            expressionPredecoder = expressionPredecoder,
             functionPredecoder = functionPredecoder,
             exportAllocator = exportAllocator,
         )
