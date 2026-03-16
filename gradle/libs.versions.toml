@@ -46,7 +46,7 @@ k-poet = "2.2.0"
 kotlinter = "5.3.0"
 
 kotlinx-atomic-fu = "0.26.1"
-kotlinx-benchmark = "0.4.13"
+kotlinx-benchmark = "0.4.14"
 kotlinx-coroutines = "1.8.0"
 kotlinx-datetime = "0.5.0"
 kotlinx-io = "0.6.0"
