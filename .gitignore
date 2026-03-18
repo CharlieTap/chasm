@@ -393,3 +393,5 @@ fabric.properties
 *.trace
 /kotlin-js-store
 **/karma.config.d
+
+spec.pdf
