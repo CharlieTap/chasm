@@ -37,11 +37,6 @@ kotlin {
     abiValidation {
         enabled.set(true)
     }
-
-    compilerOptions {
-        freeCompilerArgs.add("-Xwhen-guards")
-    }
-
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))
     }

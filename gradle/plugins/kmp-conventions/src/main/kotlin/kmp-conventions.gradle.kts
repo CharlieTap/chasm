@@ -42,8 +42,6 @@ kotlin {
         freeCompilerArgs.add("-Xwarning-level=REDUNDANT_VISIBILITY_MODIFIER:disabled")
 
         freeCompilerArgs.add("-Xexpect-actual-classes")
-        freeCompilerArgs.add("-Xnon-local-break-continue")
-        freeCompilerArgs.add("-Xwhen-guards")
     }
 
     jvm {
