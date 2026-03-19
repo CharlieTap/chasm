@@ -46,7 +46,6 @@ class ImportTest {
                 ),
             ),
         )
-        val definedType = definedType(functionRecursiveType(functionType, RecursiveType.State.CLOSED))
         val hostFunction: HostFunction = {
             emptyList()
         }
