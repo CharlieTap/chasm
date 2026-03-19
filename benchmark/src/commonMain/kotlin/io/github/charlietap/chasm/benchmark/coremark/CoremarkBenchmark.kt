@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 fun main() {
     val benchmark = CoremarkBenchmark()

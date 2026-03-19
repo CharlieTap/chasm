@@ -38,7 +38,6 @@ kotlin {
                 implementation(projects.test.fixture.runtime)
 
                 implementation(libs.kotlinx.benchmark)
-                implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.test.resources)
             }
         }
