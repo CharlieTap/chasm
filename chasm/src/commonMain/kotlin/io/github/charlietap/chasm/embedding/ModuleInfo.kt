@@ -14,19 +14,19 @@ fun moduleInfo(
     module: Module,
 ): ModuleInfo = moduleInfo(
     module = module,
-    importMapper = ImportMapper.instance,
+    importMapper = ::ImportMapper,
     exportMapper = ExportMapper(module.module),
 )
 
 internal fun moduleInfo(
     module: Module,
-    importMapper: Mapper<Import, ImportDefinition>,
+    importMapper: ImportMapper,
     exportMapper: Mapper<Export, ExportDefinition>,
 ): ModuleInfo {
 
     val internalModule = module.module
 
-    val imports = internalModule.imports.map(importMapper::map)
+    val imports = internalModule.imports.map { importMapper(internalModule, it) }
     val exports = internalModule.exports.map(exportMapper::map)
 
     return ModuleInfo(imports, exports)

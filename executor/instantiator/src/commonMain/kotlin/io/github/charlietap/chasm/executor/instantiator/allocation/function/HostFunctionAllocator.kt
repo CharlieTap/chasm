@@ -40,7 +40,7 @@ fun HostFunctionAllocator(
         hydrate()
     }
 
-    val instance = FunctionInstance.HostFunction(type, rtt, functionType, function)
+    val instance = FunctionInstance.HostFunction(rtt, functionType, function)
 
     store.functions.add(instance)
     val address = Address.Function(store.functions.size - 1)

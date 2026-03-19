@@ -19,6 +19,7 @@ class TagTypeDecoderTest {
     @Test
     fun `can decode an encoded tag type`() {
 
+        val index = typeIndex(0u)
         val functionType = functionType()
         val functionRecursiveType = functionRecursiveType(
             functionType = functionType,
@@ -39,12 +40,11 @@ class TagTypeDecoderTest {
             Ok(attribute)
         }
 
-        val index = typeIndex(0u)
         val typeIndexDecoder: Decoder<Index.TypeIndex> = {
             Ok(index)
         }
 
-        val expected = Ok(TagType(attribute, definedType, functionType))
+        val expected = Ok(TagType(attribute, index.idx.toInt(), functionType))
 
         val actual = TagTypeDecoder(
             context,

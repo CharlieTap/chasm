@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.ir.factory
 
 import io.github.charlietap.chasm.ast.module.Custom
 import io.github.charlietap.chasm.ast.module.DataSegment
-import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Global
@@ -14,9 +13,9 @@ import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
+import io.github.charlietap.chasm.type.rolling.substitution.Substitution
 import io.github.charlietap.chasm.ir.module.Custom as IRCustom
 import io.github.charlietap.chasm.ir.module.DataSegment as IRDataSegment
-import io.github.charlietap.chasm.ir.module.ElementSegment as IRElementSegment
 import io.github.charlietap.chasm.ir.module.Export as IRExport
 import io.github.charlietap.chasm.ir.module.Function as IRFunction
 import io.github.charlietap.chasm.ir.module.Global as IRGlobal
@@ -33,52 +32,65 @@ typealias ModuleFactory = (Module) -> IRModule
 
 fun ModuleFactory(
     module: Module,
-): IRModule = ModuleFactory(
-    module = module,
-    versionFactory = ::VersionFactory,
-    typeFactory = ::TypeFactory,
-    importFactory = ::ImportFactory,
-    functionFactory = ::FunctionFactory,
-    tableFactory = ::TableFactory,
-    memoryFactory = ::MemoryFactory,
-    tagFactory = ::TagFactory,
-    globalFactory = ::GlobalFactory,
-    exportFactory = ::ExportFactory,
-    startFunctionFactory = ::StartFunctionFactory,
-    elementSegmentFactory = ::ElementSegmentFactory,
-    dataSegmentFactory = ::DataSegmentFactory,
-    customFactory = ::CustomFactory,
-)
+): IRModule {
+    return ModuleFactory(
+        module = module,
+        versionFactory = ::VersionFactory,
+        typeFactory = ::TypeFactory,
+        importFactory = ::ImportFactory,
+        functionFactory = ::FunctionFactory,
+        tableFactory = ::TableFactory,
+        memoryFactory = ::MemoryFactory,
+        tagFactory = ::TagFactory,
+        globalFactory = ::GlobalFactory,
+        exportFactory = ::ExportFactory,
+        startFunctionFactory = ::StartFunctionFactory,
+        elementSegmentFactory = ::ElementSegmentFactory,
+        dataSegmentFactory = ::DataSegmentFactory,
+        customFactory = ::CustomFactory,
+    )
+}
 
 internal inline fun ModuleFactory(
     module: Module,
     versionFactory: IRFactory<Version, IRVersion>,
     typeFactory: IRFactory<Type, IRType>,
-    importFactory: IRFactory<Import, IRImport>,
+    importFactory: ImportFactory,
     functionFactory: IRFactory<Function, IRFunction>,
-    tableFactory: IRFactory<Table, IRTable>,
+    tableFactory: TableFactory,
     memoryFactory: IRFactory<Memory, IRMemory>,
-    tagFactory: IRFactory<Tag, IRTag>,
-    globalFactory: IRFactory<Global, IRGlobal>,
+    tagFactory: TagFactory,
+    globalFactory: GlobalFactory,
     exportFactory: IRFactory<Export, IRExport>,
     startFunctionFactory: IRFactory<StartFunction, IRStartFunction?>,
-    elementSegmentFactory: IRFactory<ElementSegment, IRElementSegment>,
+    elementSegmentFactory: ElementSegmentFactory,
     dataSegmentFactory: IRFactory<DataSegment, IRDataSegment>,
     customFactory: IRFactory<Custom, IRCustom>,
 ): IRModule {
+    val substitution = Substitution.TypeIndexToDefinedType(module.definedTypes)
     return IRModule(
         version = versionFactory(module.version),
         types = module.types.map(typeFactory),
         definedTypes = module.definedTypes,
-        imports = module.imports.map(importFactory),
+        imports = module.imports.map { import ->
+            importFactory(import, substitution)
+        },
         functions = module.functions.map(functionFactory),
-        tables = module.tables.map(tableFactory),
+        tables = module.tables.map { table ->
+            tableFactory(table, substitution)
+        },
         memories = module.memories.map(memoryFactory),
-        tags = module.tags.map(tagFactory),
-        globals = module.globals.map(globalFactory),
+        tags = module.tags.map { tag ->
+            tagFactory(tag, substitution)
+        },
+        globals = module.globals.map { global ->
+            globalFactory(global, substitution)
+        },
         exports = module.exports.map(exportFactory),
         startFunction = module.startFunction?.let(startFunctionFactory),
-        elementSegments = module.elementSegments.map(elementSegmentFactory),
+        elementSegments = module.elementSegments.map { segment ->
+            elementSegmentFactory(segment, substitution)
+        },
         dataSegments = module.dataSegments.map(dataSegmentFactory),
         customs = module.customs.map(customFactory),
     )

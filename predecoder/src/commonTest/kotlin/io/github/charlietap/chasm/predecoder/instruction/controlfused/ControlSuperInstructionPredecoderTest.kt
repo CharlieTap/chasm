@@ -187,7 +187,7 @@ class ControlSuperInstructionPredecoderTest {
                 ),
             ),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instruction = ControlSuperInstruction.Call(
             operands = emptyList(),
@@ -248,7 +248,7 @@ class ControlSuperInstructionPredecoderTest {
                 ),
             ),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instruction = ControlSuperInstruction.Call(
             operands = emptyList(),
@@ -311,7 +311,7 @@ class ControlSuperInstructionPredecoderTest {
                 ),
             ),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instruction = ControlSuperInstruction.CallIndirect(
             elementIndex = FusedOperand.I32Const(0),
@@ -374,7 +374,7 @@ class ControlSuperInstructionPredecoderTest {
                 ),
             ),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instruction = ControlSuperInstruction.CallRef(
             functionReference = FusedOperand.FrameSlot(1),
@@ -427,7 +427,7 @@ class ControlSuperInstructionPredecoderTest {
                 ),
             ),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instruction = ControlSuperInstruction.ReturnCall(
             operands = listOf(FusedOperand.FrameSlot(0)),
@@ -496,7 +496,7 @@ class ControlSuperInstructionPredecoderTest {
                 ),
             ),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instruction = ControlSuperInstruction.ReturnCallIndirect(
             elementIndex = FusedOperand.FrameSlot(1),
@@ -569,7 +569,7 @@ class ControlSuperInstructionPredecoderTest {
                 ),
             ),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instruction = ControlSuperInstruction.ReturnCallRef(
             functionReference = FusedOperand.FrameSlot(1),
@@ -614,7 +614,7 @@ class ControlSuperInstructionPredecoderTest {
         instance = moduleInstance(),
         store = store(),
         instructionCache = hashMapOf(),
-        types = mutableListOf(),
+        runtimeTypes = mutableListOf(),
     )
 
     private fun execute(

@@ -30,6 +30,7 @@ import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
+import io.github.charlietap.chasm.type.expansion.LegacyBlockTypeExpander
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.type.ext.structType
 
@@ -1314,7 +1315,7 @@ private fun FrameSlotThrowLowerer(
     instruction: ControlInstruction.Throw,
     state: FrameSlotState,
 ): List<Instruction>? {
-    val payloadArity = context.tagType(instruction.tagIndex)?.functionType?.params?.types?.size ?: return null
+    val payloadArity = context.tagType(instruction.tagIndex)?.params?.types?.size ?: return null
     val loweredOperands = FrameSlotStackOperands(payloadArity, state) ?: return null
     val (payloadMaterialization, payloadSlots) = FrameSlotOperandSlots(
         operands = loweredOperands.lowered,
@@ -3857,7 +3858,7 @@ private fun FrameSlotStackOperandForTeeResult(
 
 private fun PassContext.blockType(
     blockType: BlockType,
-): FunctionType? = BlockTypeExpander(module.definedTypes, blockType)
+): FunctionType? = LegacyBlockTypeExpander(module.definedTypes, blockType)
 
 private fun PassContext.functionType(
     typeIndex: Index.TypeIndex,
@@ -3870,16 +3871,16 @@ private fun PassContext.tagType(
         module.imports
             .map(Import::descriptor)
             .filterIsInstance<Import.Descriptor.Tag>()
-            .map(Import.Descriptor.Tag::type),
+            .map { descriptor -> module.definedTypes.getOrNull(descriptor.type.typeIndex)?.functionType() },
     )
-    addAll(module.tags.map { it.type })
+    addAll(module.tags.map { it.type.functionType })
 }.getOrNull(tagIndex.idx)
 
 private fun PassContext.catchHandlerPayloadArity(
     handler: ControlInstruction.CatchHandler,
 ): Int? = when (handler) {
-    is ControlInstruction.CatchHandler.Catch -> tagType(handler.tagIndex)?.functionType?.params?.types?.size
-    is ControlInstruction.CatchHandler.CatchRef -> tagType(handler.tagIndex)?.functionType?.params?.types?.size?.plus(1)
+    is ControlInstruction.CatchHandler.Catch -> tagType(handler.tagIndex)?.params?.types?.size
+    is ControlInstruction.CatchHandler.CatchRef -> tagType(handler.tagIndex)?.params?.types?.size?.plus(1)
     is ControlInstruction.CatchHandler.CatchAll -> 0
     is ControlInstruction.CatchHandler.CatchAllRef -> 1
 }

@@ -8,12 +8,10 @@ import io.github.charlietap.chasm.runtime.instance.HostFunction as HostFunctionI
 
 sealed class FunctionInstance {
 
-    abstract val type: DefinedType
     abstract val rtt: RTT
     abstract val functionType: FunctionType
 
     data class WasmFunction(
-        override val type: DefinedType,
         override val rtt: RTT,
         override val functionType: FunctionType,
         val module: ModuleInstance,
@@ -21,7 +19,6 @@ sealed class FunctionInstance {
     ) : FunctionInstance()
 
     data class HostFunction(
-        override val type: DefinedType,
         override val rtt: RTT,
         override val functionType: FunctionType,
         val function: HostFunctionImpl,

@@ -55,6 +55,7 @@ class ImportModuleTest {
             state = RecursiveType.State.SYNTAX,
         )
 
+        val expectedTypeIndex = typeIndex(0u)
         val expectedType = type(
             idx = typeIndex(0u),
             recursiveType = expectedRecursiveType,
@@ -68,7 +69,7 @@ class ImportModuleTest {
         val expectedFunctionImport = Import(
             moduleName = NameValue("env"),
             entityName = NameValue("externalFunction"),
-            descriptor = Import.Descriptor.Function(expectedDefinedType),
+            descriptor = Import.Descriptor.Function(expectedTypeIndex),
         )
 
         val expectedTableType = TableType(i32AddressType(), ReferenceType.RefNull(AbstractHeapType.Func), Limits(1u, 2u))

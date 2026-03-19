@@ -213,7 +213,7 @@ class ImportTest {
         )
         val expectedTagType = tagType(
             attribute = exceptionAttribute(),
-            definedType = definedType(functionRecursiveType(expectedFunctionType)),
+            typeIndex = 0,
             functionType = expectedFunctionType,
         )
 

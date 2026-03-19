@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.memory
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.type.MemoryType
+import io.github.charlietap.chasm.type.matching.EmptyTypeMatcherContext
 import io.github.charlietap.chasm.type.matching.MemoryTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.ir.module.Import as ModuleImport
@@ -38,5 +39,5 @@ internal inline fun MemoryImportMatcher(
     val actualMemoryType = actualMemory.type
     val requiredMemoryType = descriptor.type
 
-    memoryTypeMatcher(actualMemoryType, requiredMemoryType, context)
+    memoryTypeMatcher(actualMemoryType, requiredMemoryType, EmptyTypeMatcherContext)
 }

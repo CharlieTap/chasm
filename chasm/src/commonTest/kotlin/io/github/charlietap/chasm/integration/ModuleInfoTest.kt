@@ -71,13 +71,11 @@ class ModuleInfoTest {
         val importedTagFunctionType = functionType(
             params = resultType(listOf(i32ValueType())),
         )
-        val importedTagDefinedType = definedType(functionRecursiveType(importedTagFunctionType, RecursiveType.State.CLOSED))
-        val importedTagType = tagType(exceptionAttribute(), importedTagDefinedType, importedTagFunctionType)
+        val importedTagType = tagType(exceptionAttribute(), 0, importedTagFunctionType)
         val exportedTagFunctionType = functionType(
             params = resultType(listOf(i64ValueType())),
         )
-        val exportedTagDefinedType = definedType(functionRecursiveType(exportedTagFunctionType, RecursiveType.State.CLOSED), typeIndex = 2)
-        val exportedTagType = tagType(exceptionAttribute(), exportedTagDefinedType, exportedTagFunctionType)
+        val exportedTagType = tagType(exceptionAttribute(), 2, exportedTagFunctionType)
 
         val byteStream = Resource(FILE_DIR + "module_info.wasm").readBytes()
         val reader = FakeSourceReader(byteStream)

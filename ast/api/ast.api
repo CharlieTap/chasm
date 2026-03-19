@@ -5652,17 +5652,17 @@ public abstract interface class io/github/charlietap/chasm/ast/module/Import$Des
 }
 
 public final class io/github/charlietap/chasm/ast/module/Import$Descriptor$Function : io/github/charlietap/chasm/ast/module/Import$Descriptor {
-	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/DefinedType;)Lio/github/charlietap/chasm/ast/module/Import$Descriptor$Function;
-	public static fun constructor-impl (Lio/github/charlietap/chasm/type/DefinedType;)Lio/github/charlietap/chasm/type/DefinedType;
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/ast/module/Import$Descriptor$Function;
+	public static fun constructor-impl (I)I
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Lio/github/charlietap/chasm/type/DefinedType;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/DefinedType;)Z
-	public final fun getType ()Lio/github/charlietap/chasm/type/DefinedType;
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getTypeIndex-Q7G2E2s ()I
 	public fun hashCode ()I
-	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/DefinedType;)I
+	public static fun hashCode-impl (I)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Lio/github/charlietap/chasm/type/DefinedType;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/DefinedType;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
 }
 
 public final class io/github/charlietap/chasm/ast/module/Import$Descriptor$Global : io/github/charlietap/chasm/ast/module/Import$Descriptor {

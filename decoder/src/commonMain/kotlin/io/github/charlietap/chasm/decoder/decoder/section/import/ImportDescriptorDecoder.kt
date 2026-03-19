@@ -43,10 +43,7 @@ internal inline fun ImportDescriptorDecoder(
     when (val descriptorType = context.reader.ubyte().bind()) {
         IMPORT_DESCRIPTOR_TYPE_FUNCTION -> {
             val typeIndex = typeIndexDecoder(context).bind()
-            val type = context.definedTypes
-                .getOrNull(typeIndex.idx.toInt())
-                ?: Err(SectionDecodeError.UnknownImportDescriptor(descriptorType)).bind()
-            Import.Descriptor.Function(type)
+            Import.Descriptor.Function(typeIndex)
         }
         IMPORT_DESCRIPTOR_TYPE_TABLE -> Import.Descriptor.Table(tableTypeDecoder(context).bind())
         IMPORT_DESCRIPTOR_TYPE_MEMORY -> Import.Descriptor.Memory(memTypeDecoder(context).bind())

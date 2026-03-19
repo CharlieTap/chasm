@@ -7,7 +7,7 @@ typealias RTTFactory = (DefinedType, MutableMap<DefinedType, RTT>) -> RTT
 
 inline fun RTTFactory(
     type: DefinedType,
-    cache: Map<DefinedType, RTT>,
-): RTT {
-    return RTT(type, cache)
+    cache: MutableMap<DefinedType, RTT>,
+): RTT = cache.getOrPut(type) {
+    RTT(type, cache)
 }

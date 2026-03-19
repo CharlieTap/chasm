@@ -8,10 +8,6 @@ import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.type.DefinedType
-
-inline fun ModuleInstance.definedType(index: Index.TypeIndex): Result<DefinedType, InvocationError.FunctionTypeLookupFailed> =
-    types.getOrNull(index.idx)?.let(::Ok) ?: Err(InvocationError.FunctionTypeLookupFailed(index.idx))
 
 inline fun ModuleInstance.functionAddress(index: Index.FunctionIndex): Result<Address.Function, InvocationError.FunctionAddressLookupFailed> =
     functionAddresses.getOrNull(index.idx)?.let(::Ok) ?: Err(InvocationError.FunctionAddressLookupFailed(index.idx))

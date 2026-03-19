@@ -1781,7 +1781,7 @@ class FrameSlotPassTest {
             imports = listOf(
                 functionImport(
                     descriptor = functionImportDescriptor(
-                        type = definedType(recursiveType = recursiveType),
+                        typeIndex = typeIndex(0),
                     ),
                 ),
             ),

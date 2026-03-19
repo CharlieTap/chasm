@@ -28,11 +28,11 @@ internal inline fun StructNewInstructionPredecoder(
     instruction: AggregateInstruction.StructNew,
     crossinline dispatcher: Dispatcher<StructNew>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val definedType = context.types[instruction.typeIndex.idx]
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
+    val definedType = rtt.type
     val structType = definedType.asSubType.compositeType.structType() ?: Err(
         InvocationError.StructCompositeTypeExpected,
     ).bind()
-    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
 
     dispatcher(StructNew(rtt, structType))
 }

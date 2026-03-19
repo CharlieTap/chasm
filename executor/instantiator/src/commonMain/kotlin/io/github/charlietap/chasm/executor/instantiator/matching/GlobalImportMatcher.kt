@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.global
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.matching.EmptyTypeMatcherContext
 import io.github.charlietap.chasm.type.matching.GlobalTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 
@@ -37,5 +38,6 @@ internal inline fun GlobalImportMatcher(
     val actualGlobalType = actualGlobal.type
     val requiredGlobalType = descriptor.type
 
-    globalTypeMatcher(actualGlobalType, requiredGlobalType, context)
+    // types should be closed by this point so defined types are already resolved
+    globalTypeMatcher(actualGlobalType, requiredGlobalType, EmptyTypeMatcherContext)
 }

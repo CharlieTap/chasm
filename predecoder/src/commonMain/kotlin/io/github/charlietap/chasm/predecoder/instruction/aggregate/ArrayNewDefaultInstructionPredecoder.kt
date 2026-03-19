@@ -29,11 +29,12 @@ internal inline fun ArrayNewDefaultInstructionPredecoder(
     instruction: AggregateInstruction.ArrayNewDefault,
     crossinline dispatcher: Dispatcher<ArrayNewDefault>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val definedType = context.types[instruction.typeIndex.idx]
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
+    val definedType = rtt.type
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
-    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
+
     val field = arrayType.fieldType.default()
 
     dispatcher(ArrayNewDefault(rtt, arrayType, field))

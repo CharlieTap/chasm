@@ -34,9 +34,9 @@ class ImportDescriptorDecoderTest {
 
         val descriptor = IMPORT_DESCRIPTOR_TYPE_FUNCTION
 
+        val typeIndex = typeIndex(0u)
         val recursiveType = functionRecursiveType()
-        val functionType = definedType(recursiveType)
-        val expected = Ok(functionImportDescriptor(functionType))
+        val expected = Ok(functionImportDescriptor(typeIndex))
 
         val reader = FakeUByteReader {
             Ok(descriptor)
@@ -48,7 +48,6 @@ class ImportDescriptorDecoderTest {
             ),
         )
 
-        val typeIndex = typeIndex(0u)
         val typeIndexDecoder: Decoder<Index.TypeIndex> = {
             Ok(typeIndex)
         }

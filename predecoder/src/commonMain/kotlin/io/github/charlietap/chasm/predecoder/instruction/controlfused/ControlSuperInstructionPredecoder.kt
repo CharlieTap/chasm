@@ -411,7 +411,7 @@ private fun strictIfInstruction(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val operandImmediate = strictControlImmediate(instruction.operand)
     val operandSlot = strictControlOperandSlot(instruction.operand)
-    val functionType = BlockTypeExpander(context.types, instruction.blockType)
+    val functionType = BlockTypeExpander(context.runtimeTypes, instruction.blockType)
         .toResultOr { InstantiationError.PredecodingError }
         .bind()
     val instructions = predecodeIfInstructions(context, instruction.thenInstructions, instruction.elseInstructions).bind()

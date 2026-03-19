@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.RTT
 
 fun moduleInstance(
-    types: List<DefinedType> = emptyList(),
     runtimeTypes: List<RTT> = emptyList(),
     functionAddresses: MutableList<Address.Function> = mutableListOf(),
     tableAddresses: MutableList<Address.Table> = mutableListOf(),
@@ -19,7 +18,6 @@ fun moduleInstance(
     exports: MutableList<ExportInstance> = mutableListOf(),
     deallocated: Boolean = false,
 ) = ModuleInstance(
-    types = types,
     runtimeTypes = runtimeTypes,
     functionAddresses = functionAddresses,
     tableAddresses = tableAddresses,

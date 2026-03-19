@@ -28,7 +28,7 @@ class InstructionPredecoderCacheTest {
             instance = moduleInstance(),
             store = store(),
             instructionCache = instructionCache,
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
 
         val zeroResultContext = baseContext.copy(

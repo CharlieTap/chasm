@@ -85,7 +85,8 @@ internal inline fun ModuleAllocator(
     }
 
     module.tags.forEach { tag ->
-        val address = tagAllocator(store, tag.type)
+        val rtt = context.runtimeTypes[tag.type.typeIndex]
+        val address = tagAllocator(store, rtt, tag.type)
         instance.addTagAddress(address)
     }
 

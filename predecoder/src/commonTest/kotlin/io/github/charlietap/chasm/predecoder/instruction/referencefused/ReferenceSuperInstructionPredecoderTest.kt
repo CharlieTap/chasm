@@ -122,7 +122,7 @@ class ReferenceSuperInstructionPredecoderTest {
             ),
             store = store(),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instruction = ReferenceSuperInstruction.RefFunc(
             destination = FusedDestination.FrameSlot(0),
@@ -190,7 +190,7 @@ class ReferenceSuperInstructionPredecoderTest {
         instance = moduleInstance(),
         store = store(),
         instructionCache = hashMapOf(),
-        types = mutableListOf(),
+        runtimeTypes = mutableListOf(),
     )
 
     private fun referenceCstack(

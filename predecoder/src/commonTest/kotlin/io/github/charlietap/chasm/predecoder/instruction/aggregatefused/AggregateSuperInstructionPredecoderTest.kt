@@ -272,7 +272,7 @@ class AggregateSuperInstructionPredecoderTest {
         instance = moduleInstance(runtimeTypes = runtimeTypes.toMutableList()),
         store = store,
         instructionCache = hashMapOf(),
-        types = types.toMutableList(),
+        runtimeTypes = runtimeTypes,
     )
 
     private fun arrayDefinedType(

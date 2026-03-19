@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.table
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.type.TableType
+import io.github.charlietap.chasm.type.matching.EmptyTypeMatcherContext
 import io.github.charlietap.chasm.type.matching.TableTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.ir.module.Import as ModuleImport
@@ -35,8 +36,8 @@ internal inline fun TableImportMatcher(
     val store = context.store
     val actualTable = store.table(import.address)
     val actualTableType = actualTable.type
-
     val requiredTableType = descriptor.type
 
-    tableTypeMatcher(actualTableType, requiredTableType, context)
+    // types should be closed by this point so defined types are already resolved
+    tableTypeMatcher(actualTableType, requiredTableType, EmptyTypeMatcherContext)
 }

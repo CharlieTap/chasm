@@ -23,8 +23,6 @@ internal inline fun TypeAllocator(
 ): List<RTT> {
     val cache = store.rttCache
     return module.definedTypes.map { type ->
-        cache.getOrPut(type) {
-            rttFactory(type, cache)
-        }
+        rttFactory(type, cache)
     }
 }

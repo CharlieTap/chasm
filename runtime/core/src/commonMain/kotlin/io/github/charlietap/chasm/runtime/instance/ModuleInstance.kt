@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.RTT
 
 data class ModuleInstance(
-    val types: List<DefinedType>,
     val runtimeTypes: List<RTT>,
     val functionAddresses: MutableList<Address.Function> = mutableListOf(),
     val tableAddresses: MutableList<Address.Table> = mutableListOf(),

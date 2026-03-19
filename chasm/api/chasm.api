@@ -577,6 +577,10 @@ public final class io/github/charlietap/chasm/embedding/table/WriteTableKt {
 	public static final fun writeTable (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Table;ILio/github/charlietap/chasm/runtime/value/ReferenceValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public final class io/github/charlietap/chasm/embedding/transform/ImportMapperKt {
+	public static final fun ImportMapper (Lio/github/charlietap/chasm/ast/module/Module;Lio/github/charlietap/chasm/ast/module/Import;)Lio/github/charlietap/chasm/embedding/shapes/ImportDefinition;
+}
+
 public final class io/github/charlietap/chasm/embedding/transform/ImportableMapper : io/github/charlietap/chasm/embedding/transform/BidirectionalMapper {
 	public static final field INSTANCE Lio/github/charlietap/chasm/embedding/transform/ImportableMapper;
 	public fun bimap (Lio/github/charlietap/chasm/runtime/instance/ExternalValue;)Lio/github/charlietap/chasm/embedding/shapes/Importable;

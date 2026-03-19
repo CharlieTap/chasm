@@ -16,7 +16,7 @@ data class Import(
     sealed interface Descriptor {
 
         @JvmInline
-        value class Function(val type: DefinedType) : Descriptor
+        value class Function(val typeIndex: Index.TypeIndex) : Descriptor
 
         @JvmInline
         value class Table(val type: TableType) : Descriptor

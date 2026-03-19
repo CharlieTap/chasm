@@ -34,7 +34,7 @@ class InstructionSequencePredecoderJumpIntegrationTest {
             instance = moduleInstance(),
             store = store(),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instructions = listOf(
             AdminInstruction.PushHandler(
@@ -73,7 +73,7 @@ class InstructionSequencePredecoderJumpIntegrationTest {
             instance = moduleInstance(),
             store = store(),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instructions = listOf(
             blockInstruction(
@@ -155,7 +155,7 @@ class InstructionSequencePredecoderJumpIntegrationTest {
             instance = moduleInstance(),
             store = store(),
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
         val instructions = listOf(
             blockInstruction(

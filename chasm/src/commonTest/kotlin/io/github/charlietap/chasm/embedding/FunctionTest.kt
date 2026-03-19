@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.embedding.shapes.HostFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.rtt
 import io.github.charlietap.chasm.type.ext.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,13 +23,13 @@ class FunctionTest {
             emptyList()
         }
 
-        val expectedType = functionType().definedType()
+        val expectedType = functionType()
         val expected = publicFunction(functionExternalValue(functionAddress(0)))
 
         val actual = function(store, funcType, hostFunction)
 
         assertEquals(expected, actual)
-        assertEquals(expectedType, store.store.functions[0].type)
+        assertEquals(expectedType, store.store.functions[0].functionType)
         assertNotNull(store.store.functions[0])
     }
 }

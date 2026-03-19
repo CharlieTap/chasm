@@ -1209,7 +1209,7 @@ private fun resolveArrayType(
     context: PredecodingContext,
     typeIndex: Index.TypeIndex,
 ): Result<ArrayType, ModuleTrapError> = binding {
-    val definedType = context.types[typeIndex.idx]
+    val definedType = context.runtimeTypes[typeIndex.idx].type
     definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
@@ -1219,7 +1219,7 @@ private fun resolveStructType(
     context: PredecodingContext,
     typeIndex: Index.TypeIndex,
 ): Result<StructType, ModuleTrapError> = binding {
-    val definedType = context.types[typeIndex.idx]
+    val definedType = context.runtimeTypes[typeIndex.idx].type
     definedType.asSubType.compositeType.structType() ?: Err(
         InvocationError.StructCompositeTypeExpected,
     ).bind()

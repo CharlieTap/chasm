@@ -73,7 +73,7 @@ class ParametricSuperInstructionPredecoderTest {
         instance = moduleInstance(),
         store = store(),
         instructionCache = hashMapOf(),
-        types = mutableListOf(),
+        runtimeTypes = mutableListOf(),
     )
 
     private fun execute(

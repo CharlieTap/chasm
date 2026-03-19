@@ -7,5 +7,5 @@ internal inline fun InstantiationContext.asPredecodingContext() = PredecodingCon
     instance = instance!!,
     store = store,
     instructionCache = instructionCache,
-    types = types,
+    runtimeTypes = runtimeTypes,
 )

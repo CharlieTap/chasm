@@ -323,6 +323,7 @@ public final class io/github/charlietap/chasm/type/GlobalType : io/github/charli
 	public final fun getMutability ()Lio/github/charlietap/chasm/type/Mutability;
 	public final fun getValueType ()Lio/github/charlietap/chasm/type/ValueType;
 	public fun hashCode ()I
+	public final fun setValueType (Lio/github/charlietap/chasm/type/ValueType;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -623,21 +624,23 @@ public final class io/github/charlietap/chasm/type/TableType : io/github/charlie
 	public final fun getLimits ()Lio/github/charlietap/chasm/type/Limits;
 	public final fun getReferenceType ()Lio/github/charlietap/chasm/type/ReferenceType;
 	public fun hashCode ()I
+	public final fun setReferenceType (Lio/github/charlietap/chasm/type/ReferenceType;)V
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class io/github/charlietap/chasm/type/TagType {
-	public fun <init> (Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/FunctionType;)V
+	public fun <init> (Lio/github/charlietap/chasm/type/TagType$Attribute;ILio/github/charlietap/chasm/type/FunctionType;)V
 	public final fun component1 ()Lio/github/charlietap/chasm/type/TagType$Attribute;
-	public final fun component2 ()Lio/github/charlietap/chasm/type/DefinedType;
+	public final fun component2 ()I
 	public final fun component3 ()Lio/github/charlietap/chasm/type/FunctionType;
-	public final fun copy (Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/TagType;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/TagType$Attribute;Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/FunctionType;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/TagType;
+	public final fun copy (Lio/github/charlietap/chasm/type/TagType$Attribute;ILio/github/charlietap/chasm/type/FunctionType;)Lio/github/charlietap/chasm/type/TagType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/TagType$Attribute;ILio/github/charlietap/chasm/type/FunctionType;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/TagType;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAttribute ()Lio/github/charlietap/chasm/type/TagType$Attribute;
-	public final fun getDefinedType ()Lio/github/charlietap/chasm/type/DefinedType;
 	public final fun getFunctionType ()Lio/github/charlietap/chasm/type/FunctionType;
+	public final fun getTypeIndex ()I
 	public fun hashCode ()I
+	public final fun setFunctionType (Lio/github/charlietap/chasm/type/FunctionType;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -789,6 +792,7 @@ public final class io/github/charlietap/chasm/type/differ/ReferenceTypeDifferKt 
 
 public final class io/github/charlietap/chasm/type/expansion/BlockTypeExpanderKt {
 	public static final fun BlockTypeExpander (Ljava/util/List;Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/FunctionType;
+	public static final fun LegacyBlockTypeExpander (Ljava/util/List;Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/FunctionType;
 }
 
 public final class io/github/charlietap/chasm/type/expansion/DefinedTypeExpanderKt {
@@ -854,6 +858,11 @@ public final class io/github/charlietap/chasm/type/matching/DefinedTypeMatcherKt
 	public static final fun DefinedTypeMatcher (Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
 }
 
+public final class io/github/charlietap/chasm/type/matching/EmptyTypeMatcherContext : io/github/charlietap/chasm/type/matching/TypeMatcherContext {
+	public static final field INSTANCE Lio/github/charlietap/chasm/type/matching/EmptyTypeMatcherContext;
+	public fun getLookup ()Lkotlin/jvm/functions/Function1;
+}
+
 public final class io/github/charlietap/chasm/type/matching/FunctionTypeMatcherKt {
 	public static final fun FunctionTypeMatcher (Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/type/FunctionType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
 }
@@ -890,10 +899,6 @@ public final class io/github/charlietap/chasm/type/matching/TableTypeMatcherKt {
 	public static final fun TableTypeMatcher (Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
 }
 
-public final class io/github/charlietap/chasm/type/matching/TagTypeMatcherKt {
-	public static final fun TagTypeMatcher (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/matching/TypeMatcherContext;)Z
-}
-
 public abstract interface class io/github/charlietap/chasm/type/matching/TypeMatcherContext {
 	public abstract fun getLookup ()Lkotlin/jvm/functions/Function1;
 }
@@ -918,6 +923,10 @@ public final class io/github/charlietap/chasm/type/rolling/substitution/Concrete
 	public static final fun RecursiveTypeIndexToDefinedTypeSubstitutor (Lio/github/charlietap/chasm/type/RecursiveType;)Lkotlin/jvm/functions/Function1;
 	public static final fun TypeIndexToDefinedTypeSubstitutor (Ljava/util/List;)Lkotlin/jvm/functions/Function1;
 	public static final fun TypeIndexToRecursiveTypeIndexSubsitutor (II)Lkotlin/jvm/functions/Function1;
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/GlobalTypeSubstitutorKt {
+	public static final fun GlobalTypeSubstitutor (Lio/github/charlietap/chasm/type/GlobalType;Lio/github/charlietap/chasm/type/rolling/substitution/Substitution;)Lio/github/charlietap/chasm/type/GlobalType;
 }
 
 public final class io/github/charlietap/chasm/type/rolling/substitution/RecursiveTypeSubstitutorKt {
@@ -950,5 +959,13 @@ public final class io/github/charlietap/chasm/type/rolling/substitution/Substitu
 	public fun <init> (II)V
 	public fun getConcreteHeapTypeSubstitutor ()Lkotlin/jvm/functions/Function1;
 	public fun getOutputState-qG_ZTqg ()B
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/TableTypeSubstitutorKt {
+	public static final fun TableTypeSubstitutor (Lio/github/charlietap/chasm/type/TableType;Lio/github/charlietap/chasm/type/rolling/substitution/Substitution;)Lio/github/charlietap/chasm/type/TableType;
+}
+
+public final class io/github/charlietap/chasm/type/rolling/substitution/TagTypeSubstitutorKt {
+	public static final fun TagTypeSubstitutor (Lio/github/charlietap/chasm/type/TagType;Lio/github/charlietap/chasm/type/rolling/substitution/Substitution;)Lio/github/charlietap/chasm/type/TagType;
 }
 

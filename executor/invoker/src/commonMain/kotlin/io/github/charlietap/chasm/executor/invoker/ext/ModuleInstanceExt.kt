@@ -6,17 +6,6 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.type.DefinedType
-
-inline fun ModuleInstance.definedType(
-    index: Index.TypeIndex,
-): DefinedType = try {
-    types[index.idx]
-} catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.FunctionTypeLookupFailed(index.idx))
-} catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.FunctionTypeLookupFailed(index.idx))
-}
 
 inline fun ModuleInstance.functionAddress(
     index: Index.FunctionIndex,

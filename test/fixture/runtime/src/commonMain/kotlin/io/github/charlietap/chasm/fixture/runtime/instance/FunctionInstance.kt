@@ -15,25 +15,21 @@ import io.github.charlietap.chasm.type.RTT
 fun functionInstance(): FunctionInstance = hostFunctionInstance()
 
 fun hostFunctionInstance(
-    type: DefinedType = definedType(),
     rtt: RTT = rtt(),
     functionType: FunctionType = functionType(),
     function: HostFunction = { emptyList() },
 ) = FunctionInstance.HostFunction(
-    type = type,
     rtt = rtt,
     functionType = functionType,
     function = function,
 )
 
 fun wasmFunctionInstance(
-    type: DefinedType = definedType(),
     rtt: RTT = rtt(),
     functionType: FunctionType = functionType(),
     module: ModuleInstance = moduleInstance(),
     function: Function = runtimeFunction(),
 ) = FunctionInstance.WasmFunction(
-    type = type,
     rtt = rtt,
     functionType = functionType,
     module = module,

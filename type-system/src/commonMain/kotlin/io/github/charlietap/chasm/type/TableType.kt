@@ -2,6 +2,6 @@ package io.github.charlietap.chasm.type
 
 data class TableType(
     val addressType: AddressType,
-    val referenceType: ReferenceType,
+    var referenceType: ReferenceType,
     val limits: Limits,
 ) : Type

@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.value.NameValue
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
+import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.definedType
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,7 +23,7 @@ class ImportDecoderTest {
             Ok(nameIter.next())
         }
 
-        val descriptor = Import.Descriptor.Function(definedType())
+        val descriptor = Import.Descriptor.Function(typeIndex())
         val importDescriptorDecoder: Decoder<Import.Descriptor> = { _ ->
             Ok(descriptor)
         }

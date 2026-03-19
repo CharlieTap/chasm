@@ -213,7 +213,7 @@ class TableSuperInstructionPredecoderTest {
             instance = instance,
             store = store,
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
     }
 

@@ -25,9 +25,7 @@ internal inline fun FunctionPredecoder(
     function: Function,
     crossinline expressionPredecoder: Predecoder<Expression, RuntimeExpression>,
 ): Result<RuntimeFunction, ModuleTrapError> = binding {
-    val type = context.types
-        .getOrNull(function.typeIndex.idx)
-        ?.functionType()
+    val type = context.runtimeTypes[function.typeIndex.idx].type.functionType()
     val params = type?.params?.types?.size ?: 0
     val results = type?.results?.types?.size ?: 0
 

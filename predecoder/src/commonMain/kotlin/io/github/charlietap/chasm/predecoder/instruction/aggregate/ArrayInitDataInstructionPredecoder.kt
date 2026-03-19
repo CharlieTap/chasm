@@ -32,7 +32,7 @@ internal inline fun ArrayInitDataInstructionPredecoder(
     instruction: AggregateInstruction.ArrayInitData,
     crossinline dispatcher: Dispatcher<ArrayInitData>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val definedType = context.types[instruction.typeIndex.idx]
+    val definedType = context.runtimeTypes[instruction.typeIndex.idx].type
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()

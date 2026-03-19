@@ -28,11 +28,11 @@ internal inline fun ArrayNewFixedInstructionPredecoder(
     instruction: AggregateInstruction.ArrayNewFixed,
     crossinline dispatcher: Dispatcher<ArrayNewFixed>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val definedType = context.types[instruction.typeIndex.idx]
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
+    val definedType = rtt.type
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
-    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
 
     dispatcher(ArrayNewFixed(rtt, arrayType, instruction.size))
 }

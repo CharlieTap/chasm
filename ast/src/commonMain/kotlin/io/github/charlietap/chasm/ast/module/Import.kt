@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.ast.module
 
 import io.github.charlietap.chasm.ast.value.NameValue
-import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.TableType
@@ -16,7 +15,7 @@ data class Import(
     sealed interface Descriptor {
 
         @JvmInline
-        value class Function(val type: DefinedType) : Descriptor
+        value class Function(val typeIndex: Index.TypeIndex) : Descriptor
 
         @JvmInline
         value class Table(val type: TableType) : Descriptor

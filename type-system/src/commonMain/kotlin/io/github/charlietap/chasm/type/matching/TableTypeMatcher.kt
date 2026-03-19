@@ -22,5 +22,8 @@ internal fun TableTypeMatcher(
     context: TypeMatcherContext,
     limitsMatcher: TypeMatcher<Limits>,
     referenceTypeMatcher: TypeMatcher<ReferenceType>,
-): Boolean = referenceTypeMatcher(type1.referenceType, type2.referenceType, context) &&
-    limitsMatcher(type1.limits, type2.limits, context)
+): Boolean =
+    // Tables are mutable, so their element reference type must match in both directions.
+    referenceTypeMatcher(type1.referenceType, type2.referenceType, context) &&
+        referenceTypeMatcher(type2.referenceType, type1.referenceType, context) &&
+        limitsMatcher(type1.limits, type2.limits, context)

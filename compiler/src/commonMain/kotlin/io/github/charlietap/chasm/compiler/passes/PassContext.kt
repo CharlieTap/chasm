@@ -14,7 +14,7 @@ internal data class PassContext(
         val imports = module.imports
             .map(Import::descriptor)
             .filterIsInstance<Import.Descriptor.Function>()
-            .map(Import.Descriptor.Function::type)
+            .map { descriptor -> module.definedTypes[descriptor.typeIndex.idx] }
 
         val functions = module.functions.map(Function::typeIndex).map { index ->
             module.definedTypes[index.idx]

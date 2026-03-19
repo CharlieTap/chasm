@@ -8,15 +8,18 @@ import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.ir.module.Module
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.type.RTT
 
 fun instantiationContext(
     store: Store = store(),
     module: Module = module(),
     config: RuntimeConfig = runtimeConfig(),
+    runtimeTypes: List<RTT> = emptyList(),
     instance: ModuleInstance? = null,
 ): InstantiationContext = InstantiationContext(
     store = store,
     module = module,
     config = config,
+    runtimeTypes = runtimeTypes,
     instance = instance,
 )

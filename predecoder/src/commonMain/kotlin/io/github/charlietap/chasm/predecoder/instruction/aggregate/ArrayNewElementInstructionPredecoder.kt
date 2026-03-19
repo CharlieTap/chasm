@@ -32,11 +32,11 @@ internal inline fun ArrayNewElementInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val elementAddress = context.instance.elementAddress(instruction.elementIndex).bind()
     val elementInstance = context.store.element(elementAddress)
-    val definedType = context.types[instruction.typeIndex.idx]
+    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
+    val definedType = rtt.type
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()
-    val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
 
     dispatcher(ArrayNewElement(rtt, arrayType, elementInstance))
 }

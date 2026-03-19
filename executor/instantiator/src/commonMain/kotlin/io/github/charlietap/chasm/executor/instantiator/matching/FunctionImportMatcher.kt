@@ -13,29 +13,23 @@ import io.github.charlietap.chasm.type.matching.TypeMatcher
 
 internal typealias FunctionImportMatcher = (InstantiationContext, Import.Descriptor.Function, ExternalValue.Function) -> Result<Boolean, ModuleTrapError>
 
-internal fun FunctionImportMatcher(
-    context: InstantiationContext,
-    descriptor: Import.Descriptor.Function,
-    import: ExternalValue.Function,
-): Result<Boolean, ModuleTrapError> =
-    FunctionImportMatcher(
-        context = context,
-        descriptor = descriptor,
-        import = import,
-        definedTypeMatcher = ::DefinedTypeMatcher,
-    )
-
 internal inline fun FunctionImportMatcher(
     context: InstantiationContext,
     descriptor: Import.Descriptor.Function,
     import: ExternalValue.Function,
-    crossinline definedTypeMatcher: TypeMatcher<DefinedType>,
 ): Result<Boolean, ModuleTrapError> = binding {
 
     val store = context.store
     val actualFunction = store.function(import.address)
-    val actualFunctionType = actualFunction.type
-    val requiredFunctionType = descriptor.type
+    val actualFunctionRtt = actualFunction.rtt
+    val descriptorFunctionRtt = context.runtimeTypes[descriptor.typeIndex.idx]
 
-    definedTypeMatcher(actualFunctionType, requiredFunctionType, context)
+    when {
+        actualFunctionRtt === descriptorFunctionRtt -> true
+        else -> {
+            actualFunctionRtt.superTypes.any { superType ->
+                superType === descriptorFunctionRtt
+            }
+        }
+    }
 }

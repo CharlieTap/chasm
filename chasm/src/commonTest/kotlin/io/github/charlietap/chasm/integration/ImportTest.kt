@@ -85,7 +85,7 @@ class ImportTest {
         val tagFunctionType = functionType(
             params = resultType(listOf(i32ValueType())),
         )
-        val tagType = tagType(exceptionAttribute(), definedType, tagFunctionType)
+        val tagType = tagType(exceptionAttribute(), 0, tagFunctionType)
         val tagExternal = tag(store, tagType)
         val tagImport = Import(
             "env",

@@ -67,7 +67,7 @@ class MemorySuperInstructionPredecoderTest {
             instance = instance,
             store = store,
             instructionCache = hashMapOf(),
-            types = mutableListOf(),
+            runtimeTypes = mutableListOf(),
         )
     }
 

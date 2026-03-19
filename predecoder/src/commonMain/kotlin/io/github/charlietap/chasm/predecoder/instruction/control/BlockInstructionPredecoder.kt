@@ -35,7 +35,7 @@ internal inline fun BlockInstructionPredecoder(
     crossinline blockDispatcher: Dispatcher<Block>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
 
-    val functionType = blockTypeExpander(context.types, instruction.blockType)
+    val functionType = blockTypeExpander(context.runtimeTypes, instruction.blockType)
         .toResultOr {
             InstantiationError.PredecodingError
         }.bind()

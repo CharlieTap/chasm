@@ -5661,10 +5661,10 @@ final class io.github.charlietap.chasm.ast.module/Import { // io.github.charliet
 
     sealed interface Descriptor { // io.github.charlietap.chasm.ast.module/Import.Descriptor|null[0]
         final value class Function : io.github.charlietap.chasm.ast.module/Import.Descriptor { // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function|null[0]
-            constructor <init>(io.github.charlietap.chasm.type/DefinedType) // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.<init>|<init>(io.github.charlietap.chasm.type.DefinedType){}[0]
+            constructor <init>(io.github.charlietap.chasm.ast.module/Index.TypeIndex) // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.<init>|<init>(io.github.charlietap.chasm.ast.module.Index.TypeIndex){}[0]
 
-            final val type // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.type|{}type[0]
-                final fun <get-type>(): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.type.<get-type>|<get-type>(){}[0]
+            final val typeIndex // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.typeIndex|{}typeIndex[0]
+                final fun <get-typeIndex>(): io.github.charlietap.chasm.ast.module/Index.TypeIndex // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.typeIndex.<get-typeIndex>|<get-typeIndex>(){}[0]
 
             final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.equals|equals(kotlin.Any?){}[0]
             final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.ast.module/Import.Descriptor.Function.hashCode|hashCode(){}[0]

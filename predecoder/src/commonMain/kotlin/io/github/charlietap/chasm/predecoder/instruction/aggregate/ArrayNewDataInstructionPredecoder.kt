@@ -34,8 +34,8 @@ internal inline fun ArrayNewDataInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val dataAddress = context.instance.dataAddress(instruction.dataIndex).bind()
     val dataInstance = context.store.data(dataAddress)
-    val definedType = context.types[instruction.typeIndex.idx]
     val rtt = context.instance.runtimeTypes[instruction.typeIndex.idx]
+    val definedType = rtt.type
     val arrayType = definedType.asSubType.compositeType.arrayType() ?: Err(
         InvocationError.ArrayCompositeTypeExpected,
     ).bind()

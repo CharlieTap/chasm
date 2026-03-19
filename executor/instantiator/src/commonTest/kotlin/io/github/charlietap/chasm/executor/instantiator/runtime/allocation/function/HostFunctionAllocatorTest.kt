@@ -38,9 +38,7 @@ class HostFunctionAllocatorTest {
             rtt
         }
 
-        val definedType = functionType.definedType()
         val expectedInstance = FunctionInstance.HostFunction(
-            type = definedType,
             rtt = rtt,
             functionType = functionType,
             function = hostFunction,

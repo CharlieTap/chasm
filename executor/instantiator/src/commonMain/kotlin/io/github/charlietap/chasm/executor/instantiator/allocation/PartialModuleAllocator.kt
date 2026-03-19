@@ -26,7 +26,6 @@ internal fun PartialModuleAllocator(
         context = context,
         imports = imports,
         importMatcher = ::ImportMatcher,
-        typeAllocator = ::TypeAllocator,
         wasmFunctionAllocator = ::WasmFunctionAllocator,
     )
 
@@ -34,18 +33,15 @@ internal inline fun PartialModuleAllocator(
     context: InstantiationContext,
     imports: List<Import>,
     crossinline importMatcher: ImportMatcher,
-    crossinline typeAllocator: TypeAllocator,
     crossinline wasmFunctionAllocator: WasmFunctionAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val module = context.module
     val store = context.store
 
-    val runtimeTypes = typeAllocator(module, store)
-    val instance = ModuleInstance(module.definedTypes, runtimeTypes)
+    val instance = ModuleInstance(context.runtimeTypes)
 
     context.instance = instance
-    context.types += instance.types
 
     val matchedImports = importMatcher(context, imports).bind()
 
@@ -60,7 +56,7 @@ internal inline fun PartialModuleAllocator(
     }
 
     module.functions.forEach { function ->
-        wasmFunctionAllocator(instance, function, store).bind()
+        wasmFunctionAllocator(module, instance, function, store).bind()
     }
 
     instance

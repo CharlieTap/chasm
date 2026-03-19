@@ -45,7 +45,9 @@ internal data class ValidationContext(
             .asSequence()
             .map(Import::descriptor)
             .filterIsInstance<Import.Descriptor.Function>()
-            .map(Import.Descriptor.Function::type)
+            .mapNotNull { descriptor ->
+                types.getOrNull(descriptor.typeIndex.idx.toInt())
+            }
             .toList()
         val moduleFunctions = module.functions.mapNotNull { function ->
             types.getOrNull(function.typeIndex.idx.toInt())
