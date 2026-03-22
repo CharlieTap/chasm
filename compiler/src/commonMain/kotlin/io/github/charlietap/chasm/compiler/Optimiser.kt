@@ -11,11 +11,7 @@ import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.ir.module.Module
 
-/** Public API entry point for the compiler pipeline. */
 typealias Compiler = (RuntimeConfig, Module) -> Module
-
-/** Temporary alias for consumers still referring to Optimiser. */
-typealias Optimiser = Compiler
 
 fun Compiler(
     config: RuntimeConfig,
