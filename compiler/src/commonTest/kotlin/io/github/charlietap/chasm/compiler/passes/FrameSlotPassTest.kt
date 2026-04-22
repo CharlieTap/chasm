@@ -60,6 +60,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.returnInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.selectInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.signedTypeIndexBlockType
 import io.github.charlietap.chasm.fixture.ir.instruction.structGetInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.structNewInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.tableSizeInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.unreachableInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.valueBlockType
@@ -80,14 +81,20 @@ import io.github.charlietap.chasm.fixture.ir.module.tableIndex
 import io.github.charlietap.chasm.fixture.ir.module.type
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
 import io.github.charlietap.chasm.fixture.type.definedType
+import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionHeapType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.immutableFieldType
+import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.refNonNullReferenceType
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.referenceValueType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.fixture.type.structCompositeType
+import io.github.charlietap.chasm.fixture.type.structType
+import io.github.charlietap.chasm.fixture.type.valueStorageType
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
@@ -1881,7 +1888,7 @@ class FrameSlotPassTest {
     }
 
     @Test
-    fun `can place strict call frames below live local aliases`() {
+    fun `keeps strict call frames above live local aliases`() {
         val recursiveType = functionRecursiveType(
             functionType(
                 params = resultType(
@@ -1912,14 +1919,14 @@ class FrameSlotPassTest {
 
         val actual = FrameSlotPass(context, module).functions[0]
 
-        assertEquals(2, actual.frameSlots)
+        assertEquals(3, actual.frameSlots)
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
+                *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
                 fusedCall(
                     functionIndex = functionIndex(0),
-                    callFrameSlot = 1,
+                    callFrameSlot = 2,
                 ),
             ),
             actual.body.instructions,
@@ -1927,7 +1934,7 @@ class FrameSlotPassTest {
     }
 
     @Test
-    fun `can place strict call frames below live immediates`() {
+    fun `keeps strict call frames above live immediates`() {
         val recursiveType = functionRecursiveType(
             functionType(
                 params = resultType(
@@ -1958,14 +1965,14 @@ class FrameSlotPassTest {
 
         val actual = FrameSlotPass(context, module).functions[0]
 
-        assertEquals(2, actual.frameSlots)
+        assertEquals(3, actual.frameSlots)
         assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
+                *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
                 fusedCall(
                     functionIndex = functionIndex(0),
-                    callFrameSlot = 1,
+                    callFrameSlot = 2,
                 ),
             ),
             actual.body.instructions,
@@ -2017,6 +2024,107 @@ class FrameSlotPassTest {
                 fusedCall(
                     functionIndex = functionIndex(0),
                     callFrameSlot = 2,
+                ),
+            ),
+            actual.body.instructions,
+        )
+    }
+
+    @Test
+    fun `keeps strict call frames above live immediates when a later struct new consumes them`() {
+        val calleeRecursiveType = functionRecursiveType(
+            functionType(
+                params = resultType(
+                    types = listOf(i32ValueType()),
+                ),
+                results = resultType(
+                    types = listOf(i32ValueType()),
+                ),
+            ),
+        )
+        val structRecursiveType = recursiveType(
+            subTypes = listOf(
+                finalSubType(
+                    compositeType = structCompositeType(
+                        structType = structType(
+                            fields = List(3) {
+                                immutableFieldType(valueStorageType(i32ValueType()))
+                            },
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val callerRecursiveType = functionRecursiveType(
+            functionType(
+                params = resultType(
+                    types = listOf(i32ValueType()),
+                ),
+            ),
+        )
+        val module = module(
+            types = listOf(
+                type(idx = typeIndex(0), recursiveType = calleeRecursiveType),
+                type(idx = typeIndex(1), recursiveType = structRecursiveType),
+                type(idx = typeIndex(2), recursiveType = callerRecursiveType),
+            ),
+            definedTypes = listOf(
+                definedType(recursiveType = calleeRecursiveType, typeIndex = 0),
+                definedType(recursiveType = structRecursiveType, typeIndex = 1),
+                definedType(recursiveType = callerRecursiveType, typeIndex = 2),
+            ),
+            functions = listOf(
+                function(
+                    idx = functionIndex(0),
+                    typeIndex = typeIndex(0),
+                    body = expression(
+                        instructions = listOf(
+                            localGetInstruction(localIndex(0)),
+                        ),
+                    ),
+                ),
+                function(
+                    idx = functionIndex(1),
+                    typeIndex = typeIndex(2),
+                    body = expression(
+                        instructions = listOf(
+                            i32ConstInstruction(101),
+                            i32ConstInstruction(0),
+                            localGetInstruction(localIndex(0)),
+                            callInstruction(functionIndex(0)),
+                            structNewInstruction(typeIndex(1)),
+                            dropInstruction(),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val context = passContext(module = module)
+
+        val actual = FrameSlotPass(context, module).functions[1]
+
+        assertEquals(4, actual.frameSlots)
+        assertEquals(true, actual.frameSlotMode)
+        assertEquals(
+            listOf(
+                *frameSlotCopyInstructions(listOf(0), listOf(3)).toTypedArray(),
+                fusedCall(
+                    functionIndex = functionIndex(0),
+                    resultSlots = listOf(3),
+                    callFrameSlot = 3,
+                ),
+                fusedI32Const(
+                    value = 101,
+                    destination = frameSlotDestination(1),
+                ),
+                fusedI32Const(
+                    value = 0,
+                    destination = frameSlotDestination(2),
+                ),
+                AggregateSuperInstruction.StructNew(
+                    destination = frameSlotDestination(3),
+                    typeIndex = typeIndex(1),
+                    fieldSlots = listOf(1, 2, 3),
                 ),
             ),
             actual.body.instructions,

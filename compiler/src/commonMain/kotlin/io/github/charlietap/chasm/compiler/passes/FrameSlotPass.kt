@@ -3533,12 +3533,9 @@ private fun FrameSlotOperandSlots(
 
 private fun FrameSlotState.liveTemporarySlotExclusive(): Int {
     val highestLiveTemporarySlot = stack
-        .map { operand -> FrameSlotLoweredOperand(operand, this) }
-        .mapNotNull { operand ->
-            (operand as? FusedOperand.FrameSlot)
-                ?.offset
-                ?.takeIf(allocator::isTemporarySlot)
-        }.maxOrNull()
+        .map(FrameSlotStackOperand::reservedSlot)
+        .filter(allocator::isTemporarySlot)
+        .maxOrNull()
 
     return highestLiveTemporarySlot?.plus(1) ?: baseSlots
 }
