@@ -2,6 +2,7 @@
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -63,5 +64,11 @@ kotlin {
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
         jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
+    }
+}
+
+tasks.withType<KotlinNativeLink>().configureEach {
+    if (name.endsWith("DebugTestMingwX64")) {
+        binary.linkerOpts("-Wl,--stack,33554432")
     }
 }
