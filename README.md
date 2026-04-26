@@ -48,7 +48,7 @@ A minimal example using the plugin looks like this:
 ```kotlin
 plugins {
     ...
-    id("io.github.charlietap.chasm.gradle") version "2.0.1-1.4.3"
+    id("io.github.charlietap.chasm.gradle") version "2.0.2-1.4.3"
 }
 
 chasm {
