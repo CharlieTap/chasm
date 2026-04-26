@@ -10,12 +10,7 @@ on:
         type: choice
         options:
           - ''
-          - ':chasm-gradle-plugin:'
-          - ':chasm-gradle-plugin-api:'
-          - ':chasm-gradle-plugin-compat:'
-          - ':chasm-gradle-plugin-codegen:'
-          - ':chasm-gradle-plugin-agp8:'
-          - ':chasm-gradle-plugin-agp9:'
+          - ':chasm-gradle-plugin:publishToMavenCentral :chasm-gradle-plugin-api:publishToMavenCentral :chasm-gradle-plugin-compat:publishToMavenCentral :chasm-gradle-plugin-codegen:publishToMavenCentral :chasm-gradle-plugin-agp8:publishToMavenCentral :chasm-gradle-plugin-agp9:'
         default: ''
 jobs:
   publish:
