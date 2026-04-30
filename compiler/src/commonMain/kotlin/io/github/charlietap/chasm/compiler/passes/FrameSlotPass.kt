@@ -925,6 +925,10 @@ private fun FrameSlotIfLowerer(
         labels = thenLabels,
         label = thenLabel,
     ) ?: return null
+    val canonicalizedThenInstructions = FrameSlotCanonicalizeReachableStack(
+        instructions = finalizedThenInstructions,
+        state = thenState,
+    )
     val thenOutcome = FrameSlotStructuredOutcome(
         entryStack = entryStack,
         state = thenState,
@@ -956,6 +960,10 @@ private fun FrameSlotIfLowerer(
         labels = elseLabels,
         label = elseLabel,
     ) ?: return null
+    val canonicalizedElseInstructions = FrameSlotCanonicalizeReachableStack(
+        instructions = finalizedElseInstructions,
+        state = elseState,
+    )
     val elseOutcome = FrameSlotStructuredOutcome(
         entryStack = entryStack,
         state = elseState,
@@ -988,8 +996,8 @@ private fun FrameSlotIfLowerer(
         ControlSuperInstruction.If(
             operand = loweredOperand.lowered,
             blockType = blockType,
-            thenInstructions = finalizedThenInstructions,
-            elseInstructions = if (elseInstructions == null) null else finalizedElseInstructions,
+            thenInstructions = canonicalizedThenInstructions,
+            elseInstructions = if (elseInstructions == null) null else canonicalizedElseInstructions,
         ),
     )
 }
@@ -1087,6 +1095,20 @@ private fun FrameSlotFinalizeReachableLabel(
     val finalizedInstructions = FrameSlotFinalizeLabelFallthrough(label, state) ?: return null
     state.rewindTemporaryAllocator(labels)
     return instructions + finalizedInstructions
+}
+
+private fun FrameSlotCanonicalizeReachableStack(
+    instructions: List<Instruction>,
+    state: FrameSlotState,
+): List<Instruction> {
+    if (!state.reachable) return instructions
+
+    val (materializeStack, _) = FrameSlotMaterializeOperands(state.stack, state)
+    return if (materializeStack.isEmpty()) {
+        instructions
+    } else {
+        instructions + materializeStack
+    }
 }
 
 private fun FrameSlotFinalizeLabelFallthrough(
