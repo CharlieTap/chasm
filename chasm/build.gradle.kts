@@ -2,6 +2,7 @@ import io.github.charlietap.sweet.lib.SemanticPhase
 import io.github.charlietap.sweet.plugin.LimitedSupport
 import io.github.charlietap.sweet.plugin.Proposal
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
@@ -12,6 +13,7 @@ plugins {
     alias(libs.plugins.conventions.publishing)
 
     alias(libs.plugins.wasm.testsuite)
+    alias(libs.plugins.wasm.corpus)
     alias(libs.plugins.kotlinx.test.resources)
 }
 
@@ -33,6 +35,19 @@ sweet {
             setOf("**/*64.wast", "**/memory64*", "table_copy_mixed.wast"),
             SemanticPhase.VALIDATION,
         ),
+    )
+}
+
+corpus {
+    corpusRef = libs.versions.wasm.corpus.ref
+    corpusRunner = "io.github.charlietap.chasm.corpus.ChasmCorpusRunner"
+    testPackageName = "io.github.charlietap.chasm.corpus.generated"
+    phase = io.github.charlietap.corpus.lib.CorpusPhase.INVOCATION
+    versions = listOf("1.0", "2.0", "3.0")
+    excludedFeatures = listOf("memory64", "simd", "relaxed-simd")
+    excludedTargets = listOf(
+        // Huge finite loop; valid corpus case, but too slow for the current JVM interpreter path.
+        "learning_rate_scheduling",
     )
 }
 
@@ -77,8 +92,11 @@ kotlin {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.test.resources)
                 implementation(libs.sweet.lib)
+                implementation(libs.corpus.lib)
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.io.core)
+                implementation(libs.wasi.emscripten.host.chasm.emscripten)
+                implementation(libs.wasi.emscripten.host.chasm.wasip1)
             }
         }
     }
@@ -91,4 +109,9 @@ configure<PublishingConventionsExtension> {
 
 tasks.withType<ConfigurableKtLintTask>().configureEach {
     dependsOn(tasks.withType<GenerateTestsTask>())
+}
+
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "2g"
+    jvmArgs("-Xss32m")
 }
