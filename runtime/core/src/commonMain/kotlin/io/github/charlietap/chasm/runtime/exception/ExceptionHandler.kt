@@ -7,6 +7,8 @@ data class ExceptionHandler(
     var instructions: List<ControlInstruction.CatchHandler>,
     var payloadDestinationSlots: List<List<Int>> = emptyList(),
     var continuations: List<Array<DispatchableInstruction>> = emptyList(),
+    var continuationSource: List<DispatchableInstruction?>? = null,
+    var continuationOffsets: List<Int> = emptyList(),
     val framesDepth: Int,
     val instructionsDepth: Int,
     val labelsDepth: Int,

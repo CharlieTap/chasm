@@ -89,6 +89,7 @@ internal inline fun ThrowRefValueExecutor(
         val otherHandlers = handler.instructions.drop(1)
         val payloadDestinationSlots = handler.payloadDestinationSlots.firstOrNull() ?: emptyList()
         val continuation = handler.continuations.firstOrNull()
+        val continuationOffset = handler.continuationOffsets.firstOrNull() ?: -1
 
         val tagMatches = when (catchHandler) {
             is CatchHandler.Catch -> {
@@ -110,7 +111,7 @@ internal inline fun ThrowRefValueExecutor(
                 } else {
                     vstack.push(instance.fields)
                 }
-                routeExceptionHandlerMatch(cstack, continuation, breakDispatcher, catchHandler.labelIndex)
+                routeExceptionHandlerMatch(cstack, continuation, handler.continuationSource, continuationOffset, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchRef && tagMatches -> {
                 instance.fields.reverse()
@@ -120,10 +121,10 @@ internal inline fun ThrowRefValueExecutor(
                     vstack.push(instance.fields)
                     vstack.push(ref)
                 }
-                routeExceptionHandlerMatch(cstack, continuation, breakDispatcher, catchHandler.labelIndex)
+                routeExceptionHandlerMatch(cstack, continuation, handler.continuationSource, continuationOffset, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchAll -> {
-                routeExceptionHandlerMatch(cstack, continuation, breakDispatcher, catchHandler.labelIndex)
+                routeExceptionHandlerMatch(cstack, continuation, handler.continuationSource, continuationOffset, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchAllRef -> {
                 if (frame.frameSlotMode) {
@@ -131,13 +132,14 @@ internal inline fun ThrowRefValueExecutor(
                 } else {
                     vstack.push(ref)
                 }
-                routeExceptionHandlerMatch(cstack, continuation, breakDispatcher, catchHandler.labelIndex)
+                routeExceptionHandlerMatch(cstack, continuation, handler.continuationSource, continuationOffset, breakDispatcher, catchHandler.labelIndex)
             }
             else -> {
 
                 handler.instructions = otherHandlers
                 handler.payloadDestinationSlots = handler.payloadDestinationSlots.drop(1)
                 handler.continuations = handler.continuations.drop(1)
+                handler.continuationOffsets = handler.continuationOffsets.drop(1)
                 cstack.push(handler)
                 vstack.push(ref)
                 cstack.push(ThrowRefDispatcher(ControlInstruction.ThrowRef))
@@ -184,10 +186,14 @@ private fun writeCatchRefPayloadToSlots(
 private inline fun routeExceptionHandlerMatch(
     cstack: ControlStack,
     continuation: Array<io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction>?,
+    continuationSource: List<io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction?>?,
+    continuationOffset: Int,
     breakDispatcher: Dispatcher<ControlInstruction.Br>,
     labelIndex: io.github.charlietap.chasm.ir.module.Index.LabelIndex,
 ) {
-    if (continuation != null) {
+    if (continuationSource != null) {
+        cstack.pushContinuation(continuationSource, continuationOffset)
+    } else if (continuation != null) {
         if (continuation.isNotEmpty()) {
             cstack.push(continuation)
         }

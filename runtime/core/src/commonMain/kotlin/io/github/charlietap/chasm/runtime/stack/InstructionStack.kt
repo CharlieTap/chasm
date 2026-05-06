@@ -39,6 +39,31 @@ class InstructionStack
             top += values.size
         }
 
+        fun pushContinuation(
+            values: List<DispatchableInstruction?>,
+            offset: Int,
+        ) {
+            require(offset in 0..values.size) {
+                "jump target offset $offset is outside instruction sequence of size ${values.size}"
+            }
+
+            val continuationSize = values.size - offset
+            val requiredSize = top + continuationSize
+            while (requiredSize > elements.size) {
+                doubleCapacity()
+            }
+
+            var destinationIndex = top
+            var sourceIndex = values.size - 1
+            while (sourceIndex >= offset) {
+                elements[destinationIndex] = values[sourceIndex]
+                    ?: error("jump target continuation must be patched after all dispatchables are populated")
+                destinationIndex++
+                sourceIndex--
+            }
+            top = destinationIndex
+        }
+
         // we intentionally leave the instruction in the stack
         // and just move the stack pointer, this memory will not be reclaimed
         // irrespective as the thread object has a reference to it,
