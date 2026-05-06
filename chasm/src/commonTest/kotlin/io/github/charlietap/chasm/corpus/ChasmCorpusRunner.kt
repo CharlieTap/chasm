@@ -279,12 +279,16 @@ class ChasmCorpusRunner(
                 }
                 this.realTimeClock = object : Clock {
                     private var nanos = 0L
+
                     override fun getCurrentTimeEpochNanoseconds(): Long = ++nanos
+
                     override fun getResolutionNanoseconds(): Long = 1L
                 }
                 this.monotonicClock = object : MonotonicClock {
                     private var nanos = 0L
+
                     override fun getTimeMarkNanoseconds(): Long = ++nanos
+
                     override fun getResolutionNanoseconds(): Long = 1L
                 }
 

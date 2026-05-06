@@ -19,6 +19,8 @@ internal inline fun PushHandlerInstructionExecutor(
         instructions = instruction.handlers,
         payloadDestinationSlots = instruction.payloadDestinationSlots,
         continuations = instruction.continuations,
+        continuationSource = instruction.continuationSource,
+        continuationOffsets = instruction.continuationOffsets,
         framesDepth = cstack.framesDepth(),
         instructionsDepth = cstack.instructionsDepth() - instruction.discardCount,
         labelsDepth = cstack.labelsDepth(),

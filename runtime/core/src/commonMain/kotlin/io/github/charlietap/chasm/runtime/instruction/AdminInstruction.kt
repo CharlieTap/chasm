@@ -20,6 +20,8 @@ sealed interface AdminInstruction : LinkedInstruction {
     data class Jump(
         var continuation: Array<DispatchableInstruction>,
         val discardCount: Int,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpIfI(
@@ -27,6 +29,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         var continuation: Array<DispatchableInstruction>,
         val discardCount: Int,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpIfS(
@@ -34,6 +38,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         var continuation: Array<DispatchableInstruction>,
         val discardCount: Int,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpTableI(
@@ -43,6 +49,9 @@ sealed interface AdminInstruction : LinkedInstruction {
         val discardCount: Int,
         val takenInstructions: List<List<DispatchableInstruction>>,
         val defaultTakenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffsets: List<Int> = emptyList(),
+        var defaultContinuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpTableS(
@@ -52,6 +61,9 @@ sealed interface AdminInstruction : LinkedInstruction {
         val discardCount: Int,
         val takenInstructions: List<List<DispatchableInstruction>>,
         val defaultTakenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffsets: List<Int> = emptyList(),
+        var defaultContinuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnNullI(
@@ -59,6 +71,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         var continuation: Array<DispatchableInstruction>,
         val discardCount: Int,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnNullS(
@@ -66,6 +80,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         var continuation: Array<DispatchableInstruction>,
         val discardCount: Int,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnNonNullI(
@@ -73,6 +89,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         var continuation: Array<DispatchableInstruction>,
         val discardCount: Int,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnNonNullS(
@@ -80,6 +98,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         var continuation: Array<DispatchableInstruction>,
         val discardCount: Int,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnCastI(
@@ -89,6 +109,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnCastS(
@@ -98,6 +120,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnCastFailI(
@@ -107,6 +131,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnCastFailS(
@@ -116,6 +142,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
         val takenInstructions: List<DispatchableInstruction>,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class PushHandler(
@@ -123,6 +151,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         var continuations: List<Array<DispatchableInstruction>>,
         val payloadDestinationSlots: List<List<Int>> = emptyList(),
         val discardCount: Int,
+        var continuationSource: List<DispatchableInstruction?>? = null,
+        var continuationOffsets: List<Int> = emptyList(),
     ) : AdminInstruction
 
     data object PopHandler : AdminInstruction

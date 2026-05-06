@@ -17,9 +17,10 @@ internal fun JumpPass(
             if (!function.frameSlotMode) {
                 function
             } else {
+                val loweredInstructions = JumpInstructionLowerer(function.body.instructions)
                 function.copy(
                     body = Expression(
-                        instructions = JumpInstructionLowerer(function.body.instructions),
+                        instructions = loweredInstructions,
                     ),
                 )
             }

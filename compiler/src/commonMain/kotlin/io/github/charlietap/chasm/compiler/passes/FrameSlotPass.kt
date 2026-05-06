@@ -847,6 +847,10 @@ private fun FrameSlotStructuredControlLowerer(
         },
         fallthroughTypes = functionType.results.types,
     )
+    val entryMaterializations = FrameSlotMaterializeLiveOperandsBelowControlInputs(
+        state = state,
+        controlInputCount = functionType.params.types.size,
+    )
     val innerState = FrameSlotForkState(state)
     val loopParamMaterializations = if (kind == LabelKind.Loop && functionType.params.types.isNotEmpty()) {
         FrameSlotMaterializeOperands(
@@ -882,6 +886,7 @@ private fun FrameSlotStructuredControlLowerer(
     state.rewindTemporaryAllocator(labels)
 
     return buildList {
+        addAll(entryMaterializations)
         addAll(loopParamMaterializations)
         add(rewrite(finalizedInstructions))
     }
@@ -896,6 +901,10 @@ private fun FrameSlotIfLowerer(
     state: FrameSlotState,
     labels: ArrayDeque<LabelContext>,
 ): List<Instruction>? {
+    val splitMaterializations = FrameSlotMaterializeLiveOperandsBelowControlInputs(
+        state = state,
+        controlInputCount = if (operand == FusedOperand.ValueStack) 1 else 0,
+    )
     val loweredOperand = FrameSlotOperandLowerer(operand, state) ?: return null
     val functionType = context.blockType(blockType) ?: return null
     val baseHeight = state.stack.size - functionType.params.types.size
@@ -925,18 +934,6 @@ private fun FrameSlotIfLowerer(
         labels = thenLabels,
         label = thenLabel,
     ) ?: return null
-    val canonicalizedThenInstructions = FrameSlotCanonicalizeReachableStack(
-        instructions = finalizedThenInstructions,
-        state = thenState,
-    )
-    val thenOutcome = FrameSlotStructuredOutcome(
-        entryStack = entryStack,
-        state = thenState,
-        labels = thenLabels,
-        outerLabelCount = labels.size,
-        currentLabel = thenLabel,
-        branchToCurrentContinues = true,
-    ) ?: return null
 
     state.allocator.restoreTemporaryHeight(branchEntryTemporaryHeight)
 
@@ -960,10 +957,23 @@ private fun FrameSlotIfLowerer(
         labels = elseLabels,
         label = elseLabel,
     ) ?: return null
-    val canonicalizedElseInstructions = FrameSlotCanonicalizeReachableStack(
-        instructions = finalizedElseInstructions,
-        state = elseState,
+
+    val (canonicalizedThenInstructions, canonicalizedElseInstructions) = FrameSlotCanonicalizeMatchingStacks(
+        thenInstructions = finalizedThenInstructions,
+        thenState = thenState,
+        elseInstructions = finalizedElseInstructions,
+        elseState = elseState,
     )
+
+    val thenOutcome = FrameSlotStructuredOutcome(
+        entryStack = entryStack,
+        state = thenState,
+        labels = thenLabels,
+        outerLabelCount = labels.size,
+        currentLabel = thenLabel,
+        branchToCurrentContinues = true,
+    ) ?: return null
+
     val elseOutcome = FrameSlotStructuredOutcome(
         entryStack = entryStack,
         state = elseState,
@@ -971,7 +981,8 @@ private fun FrameSlotIfLowerer(
         outerLabelCount = labels.size,
         currentLabel = elseLabel,
         branchToCurrentContinues = true,
-    ) ?: return null
+    )
+        ?: return null
 
     val mergedOutcome = when {
         thenOutcome.reachable && elseOutcome.reachable -> {
@@ -993,11 +1004,16 @@ private fun FrameSlotIfLowerer(
     state.rewindTemporaryAllocator(labels)
 
     return listOf(
+        *splitMaterializations.toTypedArray(),
         ControlSuperInstruction.If(
             operand = loweredOperand.lowered,
             blockType = blockType,
             thenInstructions = canonicalizedThenInstructions,
-            elseInstructions = if (elseInstructions == null) null else canonicalizedElseInstructions,
+            elseInstructions = if (elseInstructions == null && canonicalizedElseInstructions.isEmpty()) {
+                null
+            } else {
+                canonicalizedElseInstructions
+            },
         ),
     )
 }
@@ -1097,18 +1113,31 @@ private fun FrameSlotFinalizeReachableLabel(
     return instructions + finalizedInstructions
 }
 
-private fun FrameSlotCanonicalizeReachableStack(
-    instructions: List<Instruction>,
-    state: FrameSlotState,
-): List<Instruction> {
-    if (!state.reachable) return instructions
-
-    val (materializeStack, _) = FrameSlotMaterializeOperands(state.stack, state)
-    return if (materializeStack.isEmpty()) {
-        instructions
-    } else {
-        instructions + materializeStack
+private fun FrameSlotCanonicalizeMatchingStacks(
+    thenInstructions: List<Instruction>,
+    thenState: FrameSlotState,
+    elseInstructions: List<Instruction>,
+    elseState: FrameSlotState,
+): Pair<List<Instruction>, List<Instruction>> {
+    if (!thenState.reachable || !elseState.reachable) {
+        return thenInstructions to elseInstructions
     }
+    if (thenState.stack.size != elseState.stack.size) {
+        return thenInstructions to elseInstructions
+    }
+
+    val thenMaterializations = mutableListOf<Instruction>()
+    val elseMaterializations = mutableListOf<Instruction>()
+
+    thenState.stack.zip(elseState.stack).forEach { (thenOperand, elseOperand) ->
+        if (thenOperand == elseOperand) return@forEach
+        if (thenOperand.reservedSlot != elseOperand.reservedSlot || thenOperand.type != elseOperand.type) return@forEach
+
+        thenMaterializations += FrameSlotMaterializeOperand(thenOperand, thenState)
+        elseMaterializations += FrameSlotMaterializeOperand(elseOperand, elseState)
+    }
+
+    return (thenInstructions + thenMaterializations) to (elseInstructions + elseMaterializations)
 }
 
 private fun FrameSlotFinalizeLabelFallthrough(
@@ -3780,6 +3809,19 @@ private fun FrameSlotPlanMaterializedOperands(
         }
     }
     return instructions to operands.map(FrameSlotStackOperand::reservedSlot)
+}
+
+private fun FrameSlotMaterializeLiveOperandsBelowControlInputs(
+    state: FrameSlotState,
+    controlInputCount: Int,
+): List<Instruction> {
+    if (controlInputCount > state.stack.size) return emptyList()
+    return buildList {
+        val exclusiveEnd = state.stack.size - controlInputCount
+        for (index in 0 until exclusiveEnd) {
+            addAll(FrameSlotMaterializeOperand(state.stack[index], state))
+        }
+    }
 }
 
 private fun FrameSlotMaterializeOperand(

@@ -12,6 +12,8 @@ import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction as RuntimeAdminInstruction
 
+private const val LAZY_CONTINUATION_INSTRUCTION_THRESHOLD = 4_096
+
 internal fun InstructionSequencePredecoder(
     context: PredecodingContext,
     instructions: List<Instruction>,
@@ -65,7 +67,7 @@ private fun predecodeJump(
         discardCount = remainingInstructionCount(instructionCount, index),
     )
     patches += {
-        runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+        patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
     }
     return JumpDispatcher(runtimeInstruction)
 }
@@ -83,9 +85,7 @@ private fun predecodePushHandler(
         discardCount = instruction.endOffset - index,
     )
     patches += {
-        runtimeInstruction.continuations = instruction.offsets.map { offset ->
-            continuationForOffset(dispatchables, offset)
-        }
+        patchHandlerContinuations(runtimeInstruction, dispatchables, instruction.offsets)
     }
     return PushHandlerDispatcher(runtimeInstruction)
 }
@@ -112,7 +112,7 @@ private fun predecodeJumpIf(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -125,7 +125,7 @@ private fun predecodeJumpIf(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -161,10 +161,7 @@ private fun predecodeJumpTable(
                 defaultTakenInstructions = defaultTakenInstructions,
             )
             patches += {
-                runtimeInstruction.continuations = instruction.offsets.map { offset ->
-                    continuationForOffset(dispatchables, offset)
-                }
-                runtimeInstruction.defaultContinuation = continuationForOffset(dispatchables, instruction.defaultOffset)
+                patchTableContinuations(runtimeInstruction, dispatchables, instruction.offsets, instruction.defaultOffset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -179,10 +176,7 @@ private fun predecodeJumpTable(
                 defaultTakenInstructions = defaultTakenInstructions,
             )
             patches += {
-                runtimeInstruction.continuations = instruction.offsets.map { offset ->
-                    continuationForOffset(dispatchables, offset)
-                }
-                runtimeInstruction.defaultContinuation = continuationForOffset(dispatchables, instruction.defaultOffset)
+                patchTableContinuations(runtimeInstruction, dispatchables, instruction.offsets, instruction.defaultOffset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -213,7 +207,7 @@ private fun predecodeJumpOnNull(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -226,7 +220,7 @@ private fun predecodeJumpOnNull(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -257,7 +251,7 @@ private fun predecodeJumpOnNonNull(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -270,7 +264,7 @@ private fun predecodeJumpOnNonNull(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -303,7 +297,7 @@ private fun predecodeJumpOnCast(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -318,7 +312,7 @@ private fun predecodeJumpOnCast(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -351,7 +345,7 @@ private fun predecodeJumpOnCastFail(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -366,7 +360,7 @@ private fun predecodeJumpOnCastFail(
                 takenInstructions = takenInstructions,
             )
             patches += {
-                runtimeInstruction.continuation = continuationForOffset(dispatchables, instruction.offset)
+                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
             }
             JumpDispatcher(runtimeInstruction)
         }
@@ -380,6 +374,136 @@ private fun remainingInstructionCount(
     index: Int,
 ): Int = instructionCount - index - 1
 
+private fun shouldUseLazyContinuation(
+    dispatchables: List<DispatchableInstruction?>,
+): Boolean = dispatchables.size > LAZY_CONTINUATION_INSTRUCTION_THRESHOLD
+
+private fun patchContinuation(
+    instruction: RuntimeAdminInstruction,
+    dispatchables: List<DispatchableInstruction?>,
+    offset: Int,
+) {
+    if (shouldUseLazyContinuation(dispatchables)) {
+        when (instruction) {
+            is RuntimeAdminInstruction.Jump -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpIfI -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpIfS -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpOnNullI -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpOnNullS -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpOnNonNullI -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpOnNonNullS -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpOnCastI -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpOnCastS -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpOnCastFailI -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            is RuntimeAdminInstruction.JumpOnCastFailS -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffset = offset
+            }
+            else -> error("instruction does not support a single continuation: $instruction")
+        }
+    } else {
+        val continuation = continuationForOffset(dispatchables, offset)
+        when (instruction) {
+            is RuntimeAdminInstruction.Jump -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpIfI -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpIfS -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpOnNullI -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpOnNullS -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpOnNonNullI -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpOnNonNullS -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpOnCastI -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpOnCastS -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpOnCastFailI -> instruction.continuation = continuation
+            is RuntimeAdminInstruction.JumpOnCastFailS -> instruction.continuation = continuation
+            else -> error("instruction does not support a single continuation: $instruction")
+        }
+    }
+}
+
+private fun patchTableContinuations(
+    instruction: RuntimeAdminInstruction,
+    dispatchables: List<DispatchableInstruction?>,
+    offsets: List<Int>,
+    defaultOffset: Int,
+) {
+    if (shouldUseLazyContinuation(dispatchables)) {
+        when (instruction) {
+            is RuntimeAdminInstruction.JumpTableI -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffsets = offsets
+                instruction.defaultContinuationOffset = defaultOffset
+            }
+            is RuntimeAdminInstruction.JumpTableS -> {
+                instruction.continuationSource = dispatchables
+                instruction.continuationOffsets = offsets
+                instruction.defaultContinuationOffset = defaultOffset
+            }
+            else -> error("instruction does not support table continuations: $instruction")
+        }
+    } else {
+        val continuations = offsets.map { offset ->
+            continuationForOffset(dispatchables, offset)
+        }
+        val defaultContinuation = continuationForOffset(dispatchables, defaultOffset)
+        when (instruction) {
+            is RuntimeAdminInstruction.JumpTableI -> {
+                instruction.continuations = continuations
+                instruction.defaultContinuation = defaultContinuation
+            }
+            is RuntimeAdminInstruction.JumpTableS -> {
+                instruction.continuations = continuations
+                instruction.defaultContinuation = defaultContinuation
+            }
+            else -> error("instruction does not support table continuations: $instruction")
+        }
+    }
+}
+
+private fun patchHandlerContinuations(
+    instruction: RuntimeAdminInstruction.PushHandler,
+    dispatchables: List<DispatchableInstruction?>,
+    offsets: List<Int>,
+) {
+    if (shouldUseLazyContinuation(dispatchables)) {
+        instruction.continuationSource = dispatchables
+        instruction.continuationOffsets = offsets
+    } else {
+        instruction.continuations = offsets.map { offset ->
+            continuationForOffset(dispatchables, offset)
+        }
+    }
+}
+
 private fun continuationForOffset(
     dispatchables: List<DispatchableInstruction?>,
     offset: Int,
@@ -389,13 +513,11 @@ private fun continuationForOffset(
     }
     if (offset == dispatchables.size) return emptyArray()
 
-    val continuation = dispatchables.subList(offset, dispatchables.size).map { dispatchable ->
-        dispatchable ?: error("jump target continuation must be patched after all dispatchables are populated")
-    }
-
-    return Array(continuation.size) { index ->
-        val reversedIndex = continuation.size - 1 - index
-        continuation[reversedIndex]
+    val continuationSize = dispatchables.size - offset
+    return Array(continuationSize) { index ->
+        val sourceIndex = dispatchables.size - 1 - index
+        dispatchables[sourceIndex]
+            ?: error("jump target continuation must be patched after all dispatchables are populated")
     }
 }
 

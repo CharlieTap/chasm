@@ -49,6 +49,11 @@ data class ControlStack(
 
     fun push(many: Array<DispatchableInstruction>) = instructions.pushAll(many)
 
+    fun pushContinuation(
+        source: List<DispatchableInstruction?>,
+        offset: Int,
+    ) = instructions.pushContinuation(source, offset)
+
     fun popFrame(): ActivationFrame = frames.pop()
 
     fun popHandler(): ExceptionHandler = handlers.pop()

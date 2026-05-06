@@ -17,7 +17,13 @@ internal inline fun JumpExecutor(
     context: ExecutionContext,
     instruction: AdminInstruction.Jump,
 ) {
-    jump(cstack, instruction.continuation, instruction.discardCount)
+    jump(
+        cstack = cstack,
+        continuation = instruction.continuation,
+        discardCount = instruction.discardCount,
+        continuationSource = instruction.continuationSource,
+        continuationOffset = instruction.continuationOffset,
+    )
 }
 
 internal fun JumpExecutor(
@@ -35,6 +41,8 @@ internal fun JumpExecutor(
     continuation = instruction.continuation,
     discardCount = instruction.discardCount,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
 )
 
 internal fun JumpExecutor(
@@ -52,6 +60,8 @@ internal fun JumpExecutor(
     continuation = instruction.continuation,
     discardCount = instruction.discardCount,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
 )
 
 internal inline fun JumpExecutor(
@@ -63,10 +73,12 @@ internal inline fun JumpExecutor(
     continuation: Array<DispatchableInstruction>,
     discardCount: Int,
     takenInstructions: List<DispatchableInstruction>,
+    continuationSource: List<DispatchableInstruction?>?,
+    continuationOffset: Int,
 ) {
     if (operand != 0L) {
         executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        jump(cstack, continuation, discardCount)
+        jump(cstack, continuation, discardCount, continuationSource, continuationOffset)
     }
 }
 
@@ -87,6 +99,9 @@ internal fun JumpTableExecutor(
     discardCount = instruction.discardCount,
     takenInstructions = instruction.takenInstructions,
     defaultTakenInstructions = instruction.defaultTakenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffsets = instruction.continuationOffsets,
+    defaultContinuationOffset = instruction.defaultContinuationOffset,
 )
 
 internal fun JumpTableExecutor(
@@ -106,6 +121,9 @@ internal fun JumpTableExecutor(
     discardCount = instruction.discardCount,
     takenInstructions = instruction.takenInstructions,
     defaultTakenInstructions = instruction.defaultTakenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffsets = instruction.continuationOffsets,
+    defaultContinuationOffset = instruction.defaultContinuationOffset,
 )
 
 internal inline fun JumpTableExecutor(
@@ -119,13 +137,24 @@ internal inline fun JumpTableExecutor(
     discardCount: Int,
     takenInstructions: List<List<DispatchableInstruction>>,
     defaultTakenInstructions: List<DispatchableInstruction>,
+    continuationSource: List<DispatchableInstruction?>?,
+    continuationOffsets: List<Int>,
+    defaultContinuationOffset: Int,
 ) {
-    val targetIndex = if (operand >= 0 && operand < continuations.size) operand else -1
-    val continuation = if (targetIndex >= 0) continuations[targetIndex] else defaultContinuation
+    val targetCount = continuationSource?.let { continuationOffsets.size } ?: continuations.size
+    val targetIndex = if (operand >= 0 && operand < targetCount) operand else -1
+    val continuation = if (targetIndex >= 0 && continuationSource == null) continuations[targetIndex] else defaultContinuation
+    val continuationOffset = if (continuationSource == null) {
+        -1
+    } else if (targetIndex >= 0) {
+        continuationOffsets[targetIndex]
+    } else {
+        defaultContinuationOffset
+    }
     val selectedInstructions = if (targetIndex >= 0) takenInstructions[targetIndex] else defaultTakenInstructions
 
     executeTakenInstructions(vstack, cstack, store, context, selectedInstructions)
-    jump(cstack, continuation, discardCount)
+    jump(cstack, continuation, discardCount, continuationSource, continuationOffset)
 }
 
 internal fun JumpOnNullExecutor(
@@ -143,6 +172,8 @@ internal fun JumpOnNullExecutor(
     continuation = instruction.continuation,
     discardCount = instruction.discardCount,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
 )
 
 internal fun JumpOnNullExecutor(
@@ -160,6 +191,8 @@ internal fun JumpOnNullExecutor(
     continuation = instruction.continuation,
     discardCount = instruction.discardCount,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
 )
 
 internal inline fun JumpOnNullExecutor(
@@ -171,10 +204,12 @@ internal inline fun JumpOnNullExecutor(
     continuation: Array<DispatchableInstruction>,
     discardCount: Int,
     takenInstructions: List<DispatchableInstruction>,
+    continuationSource: List<DispatchableInstruction?>?,
+    continuationOffset: Int,
 ) {
     if (operand.isNullableReference()) {
         executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        jump(cstack, continuation, discardCount)
+        jump(cstack, continuation, discardCount, continuationSource, continuationOffset)
     }
 }
 
@@ -193,6 +228,8 @@ internal fun JumpOnNonNullExecutor(
     continuation = instruction.continuation,
     discardCount = instruction.discardCount,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
 )
 
 internal fun JumpOnNonNullExecutor(
@@ -210,6 +247,8 @@ internal fun JumpOnNonNullExecutor(
     continuation = instruction.continuation,
     discardCount = instruction.discardCount,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
 )
 
 internal inline fun JumpOnNonNullExecutor(
@@ -221,10 +260,12 @@ internal inline fun JumpOnNonNullExecutor(
     continuation: Array<DispatchableInstruction>,
     discardCount: Int,
     takenInstructions: List<DispatchableInstruction>,
+    continuationSource: List<DispatchableInstruction?>?,
+    continuationOffset: Int,
 ) {
     if (!operand.isNullableReference()) {
         executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        jump(cstack, continuation, discardCount)
+        jump(cstack, continuation, discardCount, continuationSource, continuationOffset)
     }
 }
 
@@ -244,6 +285,8 @@ internal fun JumpOnCastExecutor(
     discardCount = instruction.discardCount,
     dstReferenceType = instruction.dstReferenceType,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
     jumpIfMatches = true,
     caster = ::Caster,
 )
@@ -264,6 +307,8 @@ internal fun JumpOnCastExecutor(
     discardCount = instruction.discardCount,
     dstReferenceType = instruction.dstReferenceType,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
     jumpIfMatches = true,
     caster = ::Caster,
 )
@@ -284,6 +329,8 @@ internal fun JumpOnCastExecutor(
     discardCount = instruction.discardCount,
     dstReferenceType = instruction.dstReferenceType,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
     jumpIfMatches = false,
     caster = ::Caster,
 )
@@ -304,6 +351,8 @@ internal fun JumpOnCastExecutor(
     discardCount = instruction.discardCount,
     dstReferenceType = instruction.dstReferenceType,
     takenInstructions = instruction.takenInstructions,
+    continuationSource = instruction.continuationSource,
+    continuationOffset = instruction.continuationOffset,
     jumpIfMatches = false,
     caster = ::Caster,
 )
@@ -318,6 +367,8 @@ internal inline fun JumpOnCastExecutor(
     discardCount: Int,
     dstReferenceType: ReferenceType,
     takenInstructions: List<DispatchableInstruction>,
+    continuationSource: List<DispatchableInstruction?>?,
+    continuationOffset: Int,
     jumpIfMatches: Boolean,
     crossinline caster: Caster,
 ) {
@@ -325,7 +376,7 @@ internal inline fun JumpOnCastExecutor(
     val casted = caster(operand, dstReferenceType, moduleInstance, store)
     if (casted == jumpIfMatches) {
         executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        jump(cstack, continuation, discardCount)
+        jump(cstack, continuation, discardCount, continuationSource, continuationOffset)
     }
 }
 
@@ -333,9 +384,13 @@ private inline fun jump(
     cstack: ControlStack,
     continuation: Array<DispatchableInstruction>,
     discardCount: Int,
+    continuationSource: List<DispatchableInstruction?>? = null,
+    continuationOffset: Int = -1,
 ) {
     cstack.shrinkInstructions(cstack.instructionsDepth() - discardCount)
-    if (continuation.isNotEmpty()) {
+    if (continuationSource != null) {
+        cstack.pushContinuation(continuationSource, continuationOffset)
+    } else if (continuation.isNotEmpty()) {
         cstack.push(continuation)
     }
 }
