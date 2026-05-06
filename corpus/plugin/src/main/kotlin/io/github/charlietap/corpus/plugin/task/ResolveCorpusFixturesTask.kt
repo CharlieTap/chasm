@@ -47,6 +47,8 @@ abstract class ResolveCorpusFixturesTask : DefaultTask() {
     @get:Inject
     abstract val cli: ExecOperations
 
+    private val json = Json { prettyPrint = true }
+
     @TaskAction
     fun resolve() {
         val corpusRoot = corpusDirectory.get().asFile
@@ -61,7 +63,7 @@ abstract class ResolveCorpusFixturesTask : DefaultTask() {
 
         outputFile.get().asFile.apply {
             parentFile.mkdirs()
-            writeText(Json { prettyPrint = true }.encodeToString(JsonArray.serializer(), JsonArray(fixtures)))
+            writeText(json.encodeToString(JsonArray.serializer(), JsonArray(fixtures)))
         }
     }
 
