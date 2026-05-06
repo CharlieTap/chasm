@@ -22,7 +22,7 @@ androidx-benchmark = "1.5.0-alpha02"
 androidx-collection = "1.5.0"
 androidx-core = "1.15.0"
 androidx-junit = "1.2.1"
-androidx-lifecycle = "2.9.1"
+androidx-lifecycle = "2.9.2"
 
 compose-compiler = "1.5.12"
 compose-core = "1.6.6"
