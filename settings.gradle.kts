@@ -6,6 +6,7 @@ pluginManagement {
     }
 
     includeBuild("bolt")
+    includeBuild("corpus")
     includeBuild("sweet")
     includeBuild("gradle/plugins/kmp-conventions")
     includeBuild("gradle/plugins/linting-conventions")
@@ -88,6 +89,7 @@ include(":validator")
 include(":vm")
 
 includeBuild("sweet")
+includeBuild("corpus")
 
 rootProject.name = "chasm-multiplatform"
 

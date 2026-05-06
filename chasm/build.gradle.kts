@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.conventions.publishing)
 
     alias(libs.plugins.wasm.testsuite)
+    alias(libs.plugins.wasm.corpus)
     alias(libs.plugins.kotlinx.test.resources)
 }
 
@@ -33,6 +34,19 @@ sweet {
             setOf("**/*64.wast", "**/memory64*", "table_copy_mixed.wast"),
             SemanticPhase.VALIDATION,
         ),
+    )
+}
+
+corpus {
+    corpusRef = libs.versions.wasm.corpus.ref
+    corpusRunner = "io.github.charlietap.chasm.corpus.ChasmCorpusRunner"
+    testPackageName = "io.github.charlietap.chasm.corpus.generated"
+    phase = io.github.charlietap.corpus.lib.CorpusPhase.INVOCATION
+    versions = listOf("1.0", "2.0", "3.0")
+    excludedFeatures = listOf("memory64", "simd", "relaxed-simd")
+    excludedTargets = listOf(
+        // Huge finite loop; valid corpus case, but too slow for the current JVM interpreter path.
+        "learning_rate_scheduling",
     )
 }
 
@@ -79,6 +93,14 @@ kotlin {
                 implementation(libs.sweet.lib)
                 implementation(libs.kotlinx.serialization)
                 implementation(libs.kotlinx.io.core)
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation(libs.corpus.lib)
+                implementation(libs.wasi.emscripten.host.chasm.emscripten)
+                implementation(libs.wasi.emscripten.host.chasm.wasip1)
             }
         }
     }

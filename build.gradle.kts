@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.gradle.maven.publish) apply false
     alias(libs.plugins.wasm.testsuite) apply false
+    alias(libs.plugins.wasm.corpus) apply false
 
     alias(libs.plugins.conventions.kmp) apply false
     alias(libs.plugins.conventions.publishing) apply false
@@ -36,4 +37,11 @@ tasks.register("test") {
     }
 
     dependsOn(jvmTestTasks)
+}
+
+tasks.register("corpus") {
+    group = "verification"
+    description = "Run the configured wasm-corpus slice against Chasm on JVM"
+
+    dependsOn(":chasm:corpus")
 }

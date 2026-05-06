@@ -57,6 +57,8 @@ ksp = "2.2.20-2.0.3"
 metro = "0.11.4"
 
 result = "2.1.0"
+wasi-emscripten-host = "0.6.0"
+wasm-corpus-ref = "7557aeac8ace7b1f8d0f276441fd5b66f422c507"
 
 [plugins]
 
@@ -84,6 +86,7 @@ kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 maven-publish = { id = "maven-publish" }
 metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 wasm-testsuite = { id = "io.github.charlietap.sweet.plugin" }
+wasm-corpus = { id = "io.github.charlietap.corpus.plugin" }
 
 conventions-kmp  = { id = "kmp-conventions" }
 conventions-linting  = { id = "linting-conventions" }
@@ -139,6 +142,9 @@ metrox-viewmodel = { module = "dev.zacsweers.metro:metrox-viewmodel", version.re
 result = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref = "result"}
 
 sweet-lib = { module = "io.github.charlietap.sweet:lib" }
+corpus-lib = { module = "io.github.charlietap.corpus:lib" }
+wasi-emscripten-host-chasm-wasip1 = { module = "at.released.weh:bindings-chasm-wasip1", version.ref = "wasi-emscripten-host" }
+wasi-emscripten-host-chasm-emscripten = { module = "at.released.weh:bindings-chasm-emscripten", version.ref = "wasi-emscripten-host" }
 
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 
