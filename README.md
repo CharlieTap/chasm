@@ -86,8 +86,7 @@ dependencies {
 
 ### Invoking functions
 
-WebAssembly compilations output a [Module](chasm/src/commonMain/kotlin/io/gi
-thub/charlietap/chasm/embedding/shapes/Module.kt) encoded as either a
+WebAssembly compilations output a [Module](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Module.kt) encoded as either a
 `.wasm` or `.wat` file (currently only `.wasm` binaries are supported):
 
 ```kotlin
@@ -112,8 +111,7 @@ val result = invoke(store, instance, "fibonacci")
 
 ### Imports
 
-Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/char
-lietap/chasm/embedding/shapes/Import.kt). Imports can be one of the
+Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Import.kt). Imports can be one of the
 following:
 
 - Functions
@@ -153,8 +151,7 @@ Host functions are Kotlin functions that can be called by wasm programs
 at runtime. The majority of host functions represent system calls (for
 example WASI APIs).
 
-Allocation of a host function requires a [FunctionType](chasm/src/commonMain
-/kotlin/io/github/charlietap/chasm/embedding/shapes/FunctionType.kt). The
+Allocation of a host function requires a [FunctionType](type-system/src/commonMain/kotlin/io/github/charlietap/chasm/type/FunctionType.kt). The
 function type describes the inputs and outputs of your function so the
 runtime can call it and use its results. Once you have defined a
 function type you can allocate the host function like so:
