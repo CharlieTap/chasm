@@ -125,9 +125,10 @@ class InvokeTest {
         )
 
         val results = listOf(i32(117))
-        val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
+        val functionInvoker: FunctionInvoker = { _config, _store, _instance, _address, _args ->
             assertEquals(config, _config)
             assertEquals(store.store, _store)
+            assertEquals(instance.instance, _instance)
             assertEquals(address, _address)
             assertEquals(emptyList(), _args)
 
@@ -162,9 +163,10 @@ class InvokeTest {
         )
 
         val error = InvocationError.FunctionNotFound("function")
-        val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
+        val functionInvoker: FunctionInvoker = { _config, _store, _instance, _address, _args ->
             assertEquals(config, _config)
             assertEquals(store.store, _store)
+            assertEquals(instance.instance, _instance)
             assertEquals(address, _address)
             assertEquals(emptyList(), _args)
 
@@ -201,9 +203,10 @@ class InvokeTest {
         )
 
         val results = listOf(i32(117))
-        val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
+        val functionInvoker: FunctionInvoker = { _config, _store, _instance, _address, _args ->
             assertEquals(config, _config)
             assertEquals(store.store, _store)
+            assertEquals(instance.instance, _instance)
             assertEquals(address, _address)
             assertEquals(emptyList(), _args)
 
@@ -239,9 +242,10 @@ class InvokeTest {
         )
 
         val error = InvocationError.FunctionNotFound("function")
-        val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
+        val functionInvoker: FunctionInvoker = { _config, _store, _instance, _address, _args ->
             assertEquals(config, _config)
             assertEquals(store.store, _store)
+            assertEquals(instance.instance, _instance)
             assertEquals(address, _address)
             assertEquals(emptyList(), _args)
 
@@ -276,9 +280,10 @@ class InvokeTest {
         )
 
         val results = listOf(i32(117))
-        val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
+        val functionInvoker: FunctionInvoker = { _config, _store, _instance, _address, _args ->
             assertEquals(config, _config)
             assertEquals(store.store, _store)
+            assertEquals(instance.instance, _instance)
             assertEquals(address, _address)
             assertEquals(emptyList(), _args)
 
@@ -312,9 +317,10 @@ class InvokeTest {
         )
 
         val error = InvocationError.FunctionNotFound("function")
-        val functionInvoker: FunctionInvoker = { _config, _store, _address, _args ->
+        val functionInvoker: FunctionInvoker = { _config, _store, _instance, _address, _args ->
             assertEquals(config, _config)
             assertEquals(store.store, _store)
+            assertEquals(instance.instance, _instance)
             assertEquals(address, _address)
             assertEquals(emptyList(), _args)
 

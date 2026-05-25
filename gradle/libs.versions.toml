@@ -56,7 +56,7 @@ metro = "0.11.4"
 
 result = "2.1.0"
 wasi-emscripten-host = "0.6.0"
-wasm-corpus-ref = "7a35cc4f918e4068b10d14567e58d0e67c93a2f0"
+wasm-corpus-ref = "9ac18dcc2c01743880379057648d58decb37f376"
 
 [plugins]
 

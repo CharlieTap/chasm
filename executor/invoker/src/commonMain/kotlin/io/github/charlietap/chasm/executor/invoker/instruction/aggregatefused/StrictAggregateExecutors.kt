@@ -866,7 +866,7 @@ private fun executeStructNewDefault(
     structType: StructType,
     fields: LongArray,
 ) {
-    val instance = StructInstance(rtt, structType, fields)
+    val instance = StructInstance(rtt, structType, fields.copyOf())
     val address = store.allocateStruct(instance)
     vstack.setFrameSlot(destinationSlot, ReferenceValue.Struct(address).toLong())
 }

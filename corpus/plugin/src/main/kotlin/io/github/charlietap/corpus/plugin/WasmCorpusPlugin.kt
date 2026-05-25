@@ -18,6 +18,9 @@ class WasmCorpusPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val extension = project.extensions.create<WasmCorpusPluginExtension>("corpus")
+        extension.targets.convention(
+            project.providers.gradleProperty(PROP_TARGETS).map(::parseTargets).orElse(emptyList()),
+        )
         val corpusRequested = project.isCorpusRequested()
 
         val syncCorpus = project.tasks.register<SyncCorpusRepositoryTask>(TASK_NAME_SYNC_CORPUS) {
@@ -108,7 +111,13 @@ class WasmCorpusPlugin : Plugin<Project> {
             taskName.endsWith(":$TASK_NAME_LEGACY_CORPUS")
     }
 
+    private fun parseTargets(value: String): List<String> = value
+        .split(",")
+        .map(String::trim)
+        .filter(String::isNotEmpty)
+
     private companion object {
+        const val PROP_TARGETS = "wasmCorpus.targets"
         const val GROUP = "corpus"
         const val TASK_NAME_CORPUS = "corpus"
         const val TASK_NAME_LEGACY_CORPUS = "wasmCorpusTest"

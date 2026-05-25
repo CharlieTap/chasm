@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.embedding.global.writeGlobal
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.memory
+import io.github.charlietap.chasm.embedding.memory.growMemory
 import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.memory.writeBytes
 import io.github.charlietap.chasm.embedding.module
@@ -315,6 +316,7 @@ class ChasmCorpusRunner(
             "function.invoke" -> runFunctionInvoke(fixture, context, store, setup, captures, step)
             "memory.write" -> runMemoryWrite(fixture, context, store, setup, captures, step)
             "memory.read" -> runMemoryRead(fixture, context, store, setup, captures, step)
+            "memory.grow" -> runMemoryGrow(fixture, context, store, setup, captures, step)
             "global.write" -> runGlobalWrite(fixture, context, store, setup, captures, step)
             "global.read" -> runGlobalRead(fixture, context, store, setup, captures, step)
             "table.write", "table.read" -> CorpusResult.Skipped(fixture.name, "$type steps are not supported yet")
@@ -488,6 +490,37 @@ class ChasmCorpusRunner(
             CorpusResult.Success
         } else {
             failure(fixture, context, "memory mismatch", expected = expected.toHex(), actual = actual.toHex())
+        }
+    }
+
+    private fun runMemoryGrow(
+        fixture: Fixture,
+        context: String,
+        store: Store,
+        setup: RuntimeSetup,
+        captures: MutableMap<String, ExecutionValue>,
+        step: JsonObject,
+    ): CorpusResult {
+        val memory = resolveMemory(setup, step.stringOrDefault("memory", "memory"))
+            ?: return failure(fixture, context, "memory not found", step["memory"]?.toString())
+        val pagesToAdd = parseIndex(step.getValue("pages"), captures)
+        val actual = when (val result = growMemory(store, memory, pagesToAdd)) {
+            is ChasmResult.Success -> NumberValue.I32(result.result)
+            is ChasmResult.Error -> return failure(fixture, context, "memory grow failed", result.error.toString())
+        }
+
+        step["capture"]?.jsonPrimitive?.contentOrNull?.let { capture ->
+            captures[capture] = actual
+        }
+
+        val assertion = step["assert"]?.jsonObject ?: return CorpusResult.Success
+        val expected = assertion["value"]?.jsonObject?.let { value -> parseValue(value, captures) }
+            ?: return failure(fixture, context, "unsupported memory grow assertion")
+
+        return if (expected.toLongFromBoxed() == actual.toLongFromBoxed()) {
+            CorpusResult.Success
+        } else {
+            failure(fixture, context, "memory grow mismatch", expected = expected.describeBits(), actual = actual.describeBits())
         }
     }
 

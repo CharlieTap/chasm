@@ -1889,6 +1889,36 @@ private inline fun <T : Instruction> FrameSlotBinaryLowerer(
     )
 }
 
+private inline fun <T : Instruction> FrameSlotStackBinaryLowerer(
+    destination: FusedDestination,
+    state: FrameSlotState,
+    rewrite: (FusedOperand, FusedOperand, FusedDestination) -> T,
+): List<Instruction>? {
+    val loweredRight = FrameSlotOperandLowerer(FusedOperand.ValueStack, state) ?: return null
+    val loweredLeft = FrameSlotOperandLowerer(FusedOperand.ValueStack, state) ?: return null
+    val loweredDestination = FrameSlotDestinationLowerer(destination, state) ?: return null
+
+    return listOf(
+        rewrite(
+            loweredLeft.lowered,
+            loweredRight.lowered,
+            loweredDestination.lowered(loweredLeft.consumed + loweredRight.consumed),
+        ),
+    )
+}
+
+private inline fun <T : Instruction> FrameSlotArrayGetLowerer(
+    address: FusedOperand,
+    field: FusedOperand,
+    destination: FusedDestination,
+    state: FrameSlotState,
+    rewrite: (FusedOperand, FusedOperand, FusedDestination) -> T,
+): List<Instruction>? = if (address == FusedOperand.ValueStack && field == FusedOperand.ValueStack) {
+    FrameSlotStackBinaryLowerer(destination, state, rewrite)
+} else {
+    FrameSlotBinaryLowerer(address, field, destination, state, rewrite)
+}
+
 private inline fun <T : Instruction> FrameSlotBinaryOperandsLowerer(
     left: FusedOperand,
     right: FusedOperand,
@@ -2104,13 +2134,13 @@ private fun FrameSlotAggregateInstructionLowerer(
             address = operands[3],
         )
     }
-    is AggregateSuperInstruction.ArrayGet -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
+    is AggregateSuperInstruction.ArrayGet -> FrameSlotArrayGetLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
         instruction.copy(address = address, field = field, destination = destination)
     }
-    is AggregateSuperInstruction.ArrayGetSigned -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
+    is AggregateSuperInstruction.ArrayGetSigned -> FrameSlotArrayGetLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
         instruction.copy(address = address, field = field, destination = destination)
     }
-    is AggregateSuperInstruction.ArrayGetUnsigned -> FrameSlotBinaryLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
+    is AggregateSuperInstruction.ArrayGetUnsigned -> FrameSlotArrayGetLowerer(instruction.address, instruction.field, instruction.destination, state) { address, field, destination ->
         instruction.copy(address = address, field = field, destination = destination)
     }
     is AggregateSuperInstruction.ArrayLen -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->

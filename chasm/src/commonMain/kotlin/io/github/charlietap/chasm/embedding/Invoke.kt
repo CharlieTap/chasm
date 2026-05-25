@@ -115,7 +115,7 @@ internal inline fun invoke(
         )
     }
 
-    return invoker(instance.config, store.store, address, args)
+    return invoker(instance.config, store.store, instance.instance, address, args)
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .fold(::Success, ::Error)
