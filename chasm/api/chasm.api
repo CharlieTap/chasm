@@ -376,6 +376,26 @@ public final class io/github/charlietap/chasm/embedding/memory/WriteUtf8StringKt
 	public static final fun writeUtf8String (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public final class io/github/charlietap/chasm/embedding/reference/ReadArrayElementKt {
+	public static final fun readArrayElement-ysangS8 (Lio/github/charlietap/chasm/embedding/shapes/Store;II)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/embedding/reference/ReadArrayLengthKt {
+	public static final fun readArrayLength-m3AehMY (Lio/github/charlietap/chasm/embedding/shapes/Store;I)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/embedding/reference/ReadStructFieldKt {
+	public static final fun readStructField-HGiMjpc (Lio/github/charlietap/chasm/embedding/shapes/Store;II)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/embedding/reference/WriteArrayElementKt {
+	public static final fun writeArrayElement-5_qwMlw (Lio/github/charlietap/chasm/embedding/shapes/Store;IILio/github/charlietap/chasm/runtime/value/FieldValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/embedding/reference/WriteStructFieldKt {
+	public static final fun writeStructField-8B0qVec (Lio/github/charlietap/chasm/embedding/shapes/Store;IILio/github/charlietap/chasm/runtime/value/FieldValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
 public abstract interface class io/github/charlietap/chasm/embedding/shapes/Allocator {
 	public abstract fun alloc (Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun free (Ljava/lang/Object;)V
