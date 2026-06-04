@@ -4,6 +4,8 @@ pluginManagement {
         google()
         mavenCentral()
     }
+
+    includeBuild("../gradle/plugins/kotlin-conventions")
 }
 
 plugins {

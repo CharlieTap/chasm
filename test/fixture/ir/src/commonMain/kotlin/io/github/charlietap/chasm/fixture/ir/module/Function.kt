@@ -9,11 +9,11 @@ import io.github.charlietap.chasm.ir.module.Local
 fun function(
     idx: Index.FunctionIndex = functionIndex(),
     typeIndex: Index.TypeIndex = typeIndex(),
-    locals: List<Local> = emptyList(),
+    locals: List<Local> = [],
     body: Expression = expression(),
     frameSlots: Int = 0,
     frameSlotMode: Boolean = false,
-    returnSlots: List<Int> = emptyList(),
+    returnSlots: List<Int> = [],
 ) = Function(
     idx = idx,
     typeIndex = typeIndex,

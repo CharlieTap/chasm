@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.config.Proposal
 
 fun moduleConfig(
     profile: Profile = Profile.Default,
-    proposals: Set<Proposal> = emptySet(),
+    proposals: Set<Proposal> = [],
     decodeNameSection: Boolean = false,
 ) = ModuleConfig(
     profile = profile,

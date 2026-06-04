@@ -17,11 +17,11 @@ import io.github.charlietap.chasm.runtime.value.ExecutionValue
 fun testRunner(
     fileName: String,
     fileDirectory: String,
-    arguments: List<ExecutionValue> = emptyList(),
+    arguments: List<ExecutionValue> = [],
     store: Store = Store(),
-    imports: List<Import> = emptyList(),
+    imports: List<Import> = [],
     functionName: String = fileName.replace(".wasm", ""),
-    setupFunctions: List<Pair<String, List<ExecutionValue>>> = emptyList(),
+    setupFunctions: List<Pair<String, List<ExecutionValue>>> = [],
     config: RuntimeConfig = RuntimeConfig(),
 ): ChasmResult<List<ExecutionValue>, ChasmError> {
 

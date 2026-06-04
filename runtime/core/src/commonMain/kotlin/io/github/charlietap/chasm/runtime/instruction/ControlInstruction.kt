@@ -95,7 +95,7 @@ sealed interface ControlInstruction : LinkedInstruction {
         val results: Int,
         val handlers: List<CatchHandler>,
         val instructions: Array<DispatchableInstruction>,
-        val payloadDestinationSlots: List<List<Int>> = emptyList(),
+        val payloadDestinationSlots: List<List<Int>> = [],
     ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

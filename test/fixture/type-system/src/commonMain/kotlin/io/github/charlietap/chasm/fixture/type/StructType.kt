@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.type.FieldType
 import io.github.charlietap.chasm.type.StructType
 
 fun structType(
-    fields: List<FieldType> = emptyList(),
+    fields: List<FieldType> = [],
 ) = StructType(fields)

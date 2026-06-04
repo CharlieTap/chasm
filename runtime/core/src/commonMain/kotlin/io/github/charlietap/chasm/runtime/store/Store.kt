@@ -16,17 +16,17 @@ import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.RTT
 
 data class Store(
-    val functions: MutableList<FunctionInstance> = mutableListOf(),
-    val tables: MutableList<TableInstance> = mutableListOf(),
-    val memories: MutableList<MemoryInstance> = mutableListOf(),
-    val tags: MutableList<TagInstance> = mutableListOf(),
-    val globals: MutableList<GlobalInstance> = mutableListOf(),
-    val elements: MutableList<ElementInstance> = mutableListOf(),
-    val data: MutableList<DataInstance> = mutableListOf(),
-    val exceptions: MutableList<ExceptionInstance> = mutableListOf(),
-    val instructions: MutableList<DispatchableInstruction> = mutableListOf(),
-    val structs: MutableList<StructInstance?> = mutableListOf(),
-    val arrays: MutableList<ArrayInstance?> = mutableListOf(),
+    val functions: MutableList<FunctionInstance> = [],
+    val tables: MutableList<TableInstance> = [],
+    val memories: MutableList<MemoryInstance> = [],
+    val tags: MutableList<TagInstance> = [],
+    val globals: MutableList<GlobalInstance> = [],
+    val elements: MutableList<ElementInstance> = [],
+    val data: MutableList<DataInstance> = [],
+    val exceptions: MutableList<ExceptionInstance> = [],
+    val instructions: MutableList<DispatchableInstruction> = [],
+    val structs: MutableList<StructInstance?> = [],
+    val arrays: MutableList<ArrayInstance?> = [],
     val rttCache: MutableMap<DefinedType, RTT> = mutableMapOf(),
     val heap: Heap = Heap(),
 )

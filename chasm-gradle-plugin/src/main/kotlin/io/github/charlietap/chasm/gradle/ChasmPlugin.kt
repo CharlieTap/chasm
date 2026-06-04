@@ -7,8 +7,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.CopySpec
 import org.gradle.api.tasks.Copy
-import org.gradle.kotlin.dsl.create
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -26,7 +26,7 @@ class ChasmPlugin : Plugin<Project> {
     @Suppress("DEPRECATION")
     override fun apply(project: Project) {
 
-        val extension = project.extensions.create<ChasmExtension>("chasm")
+        val extension = project.extensions.create("chasm", ChasmExtension::class.java, project.objects)
 
         val workerClasspath = createWorkerClasspathConfiguration(project)
 
@@ -34,13 +34,13 @@ class ChasmPlugin : Plugin<Project> {
             val mpp = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
             project.afterEvaluate {
-                extension.modules.configureEach {
+                extension.modules.configureEach { module ->
                     when (extension.mode.get()) {
                         Mode.CONSUMER -> {
                             val commonMainSourceSet = mpp.sourceSets.getByName("commonMain")
                             addVMRuntimeForKmp(project, extension.runtimeDependencyConfiguration.get(), commonMainSourceSet)
 
-                            val task = registerCodegenTask(project, this, "commonMain", workerClasspath)
+                            val task = registerCodegenTask(project, module, "commonMain", workerClasspath)
                             commonMainSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
                         }
                         Mode.PRODUCER -> {
@@ -50,8 +50,8 @@ class ChasmPlugin : Plugin<Project> {
                             )
                             // For producers, we can't add the common target as it lacks support for wasm
                             // instead we configure every target other than wasm individually
-                            mpp.targets.configureEach {
-                                addVMRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
+                            mpp.targets.configureEach { target ->
+                                target.addVMRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
                             }
 
                             val wasmTargets = mpp.targets.filter { target ->
@@ -68,8 +68,8 @@ class ChasmPlugin : Plugin<Project> {
                                 return@configureEach
                             }
 
-                            project.tasks.withType(KotlinJsCompile::class.java).configureEach {
-                                compilerOptions.freeCompilerArgs.add(
+                            project.tasks.withType(KotlinJsCompile::class.java).configureEach { compile ->
+                                compile.compilerOptions.freeCompilerArgs.add(
                                     "-Xwasm-use-new-exception-proposal",
                                 )
                             }
@@ -79,9 +79,9 @@ class ChasmPlugin : Plugin<Project> {
                                 val mjsFile = executable.binaries.first().mainFile.get().asFile
                                 val binary = File(mjsFile.parentFile, mjsFile.nameWithoutExtension + ".wasm")
 
-                                val task = registerCodegenTask(project, this, target.name, workerClasspath, binary)
-                                task.configure {
-                                    dependsOn(executable.binaries.first().linkTask)
+                                val task = registerCodegenTask(project, module, target.name, workerClasspath, binary)
+                                task.configure { codegenTask ->
+                                    codegenTask.dependsOn(executable.binaries.first().linkTask)
                                 }
 
                                 nonWasmSourceSets.forEach { nonWasmSourceSet ->
@@ -89,11 +89,11 @@ class ChasmPlugin : Plugin<Project> {
 
                                     val targetName = nonWasmSourceSet.name.removeSuffix("Main")
                                     val taskName = "${targetName}ProcessResources"
-                                    project.tasks.named(taskName, Copy::class.java).configure {
-                                        dependsOn(executable.binaries.first().linkTask)
-                                        inputs.file(binary)
-                                        from({ binary }) {
-                                            rename { _ -> "producer.wasm" }
+                                    project.tasks.named(taskName, Copy::class.java).configure { copy ->
+                                        copy.dependsOn(executable.binaries.first().linkTask)
+                                        copy.inputs.file(binary)
+                                        copy.from({ binary }) { spec: CopySpec ->
+                                            spec.rename { _: String -> "producer.wasm" }
                                         }
                                     }
                                 }
@@ -110,16 +110,14 @@ class ChasmPlugin : Plugin<Project> {
 
             addVMRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
 
-            extension.modules.configureEach {
+            extension.modules.configureEach { module ->
                 if (extension.mode.get() == Mode.PRODUCER) {
                     project.logger.error("Producer mode is only supported for Kotlin Multiplatform projects with WASM targets")
                     return@configureEach
                 }
 
-                val task = registerCodegenTask(project, this, MAIN_COMPILATION_NAME, workerClasspath)
-                mainCompilation.defaultSourceSet {
-                    kotlin.srcDir(task.flatMap { it.outputDirectory })
-                }
+                val task = registerCodegenTask(project, module, MAIN_COMPILATION_NAME, workerClasspath)
+                mainCompilation.defaultSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
             }
         }
 
@@ -151,18 +149,18 @@ class ChasmPlugin : Plugin<Project> {
     }
 
     private fun createWorkerClasspathConfiguration(project: Project): Configuration {
-        return project.configurations.create(WORKER_CLASSPATH_CONFIGURATION_NAME) {
-            isCanBeConsumed = false
-            isCanBeResolved = true
-            isTransitive = true
-            description = "Classpath for the chasm codegen worker"
+        return project.configurations.create(WORKER_CLASSPATH_CONFIGURATION_NAME) { configuration ->
+            configuration.isCanBeConsumed = false
+            configuration.isCanBeResolved = true
+            configuration.isTransitive = true
+            configuration.description = "Classpath for the chasm codegen worker"
 
-            attributes {
-                attribute(
+            configuration.attributes { attributes ->
+                attributes.attribute(
                     Usage.USAGE_ATTRIBUTE,
                     project.objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
                 )
-                attribute(
+                attributes.attribute(
                     Category.CATEGORY_ATTRIBUTE,
                     project.objects.named(Category::class.java, Category.LIBRARY),
                 )

@@ -26,7 +26,7 @@ fun returnTypeDefinition(
 
 fun wasmFunction(
     name: String = "",
-    parameters: List<FunctionParameterDefinition> = emptyList(),
+    parameters: List<FunctionParameterDefinition> = [],
     returnType: ReturnTypeDefinition = returnTypeDefinition(),
 ) = WasmFunction(
     name = name,

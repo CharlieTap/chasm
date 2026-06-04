@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.Instruction
 
 fun expression(
-    instructions: List<Instruction> = emptyList(),
+    instructions: List<Instruction> = [],
 ) = Expression(
     instructions = instructions,
 )

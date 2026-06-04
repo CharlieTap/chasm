@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.type.ReferenceType
 fun elementSegment(
     idx: Index.ElementIndex = Index.ElementIndex(0u),
     type: ReferenceType = ReferenceType.RefNull(AbstractHeapType.Func),
-    initExpressions: List<Expression> = emptyList(),
+    initExpressions: List<Expression> = [],
     mode: ElementSegment.Mode = elementSegmentMode(),
 ) = ElementSegment(
     idx = idx,

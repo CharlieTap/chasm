@@ -9,12 +9,12 @@ data class Fixture(
     val name: String,
     val path: String,
     val version: String? = null,
-    val features: List<String> = emptyList(),
-    val imports: List<FixtureImport> = emptyList(),
-    val exports: List<FixtureExport> = emptyList(),
-    val tests: List<FixtureTest> = emptyList(),
+    val features: List<String> = [],
+    val imports: List<FixtureImport> = [],
+    val exports: List<FixtureExport> = [],
+    val tests: List<FixtureTest> = [],
     val sha256: String? = null,
-    val tags: List<String> = emptyList(),
+    val tags: List<String> = [],
 )
 
 @Serializable
@@ -28,8 +28,8 @@ data class FixtureImport(
 
 @Serializable
 data class FixtureImportStub(
-    val params: List<FixtureValue> = emptyList(),
-    val returns: List<FixtureValue> = emptyList(),
+    val params: List<FixtureValue> = [],
+    val returns: List<FixtureValue> = [],
     val trap: String? = null,
     val value: FixtureValue? = null,
 )
@@ -47,7 +47,7 @@ data class FixtureTest(
     @SerialName("shared_instance")
     val sharedInstance: Boolean = false,
     val host: FixtureHost? = null,
-    val steps: List<JsonObject> = emptyList(),
+    val steps: List<JsonObject> = [],
 )
 
 @Serializable
@@ -59,7 +59,7 @@ data class FixtureHost(
 @Serializable
 data class FixtureWasiPreview1Host(
     @SerialName("command_args")
-    val commandArgs: List<String> = emptyList(),
+    val commandArgs: List<String> = [],
     @SerialName("system_env")
     val systemEnv: Map<String, String> = emptyMap(),
     @SerialName("preopened_directories")

@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    `kotlin-dsl`
 
+    alias(libs.plugins.conventions.kotlin)
     alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
 }
@@ -19,9 +19,7 @@ configure<PublishingConventionsExtension> {
 kotlin {
 
     @OptIn(ExperimentalAbiValidation::class)
-    abiValidation {
-        enabled.set(true)
-    }
+    abiValidation()
 
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))
@@ -29,6 +27,7 @@ kotlin {
 
     dependencies {
         api(projects.chasmGradlePluginApi)
+        compileOnly(gradleApi())
         implementation(projects.chasm)?.because("We use the module and moduleInfo calls during codegen")
         implementation(projects.vm)
         implementation(libs.kotlin.poet)

@@ -80,30 +80,30 @@ abstract class CodegenTask
             val wasmFunctions = functions.get()
             val ignoredExportNames = ignoredExports.get()
 
-            val workQueue = workerExecutor.classLoaderIsolation {
-                classpath.from(workerClasspath)
+            val workQueue = workerExecutor.classLoaderIsolation { spec: ClassLoaderWorkerSpec ->
+                spec.classpath.from(workerClasspath)
             }
 
-            workQueue.submit(CodegenWorkAction::class.java) {
+            workQueue.submit(CodegenWorkAction::class.java) { workParameters ->
 
-                binaryPath.set(binaryFile.absolutePath)
-                outputDirectoryPath.set(outputDir.absolutePath)
-                interfaceName.set(interfaceNameValue)
-                packageName.set(packageNameValue)
-                interfaceVisibility.set(interfaceVisibilityValue.name)
-                implementationVisibility.set(implementationVisibilityValue.name)
+                workParameters.binaryPath.set(binaryFile.absolutePath)
+                workParameters.outputDirectoryPath.set(outputDir.absolutePath)
+                workParameters.interfaceName.set(interfaceNameValue)
+                workParameters.packageName.set(packageNameValue)
+                workParameters.interfaceVisibility.set(interfaceVisibilityValue.name)
+                workParameters.implementationVisibility.set(implementationVisibilityValue.name)
 
-                configGenerateTypesafeGlobalProperties.set(codegenConfigValue.generateTypesafeGlobalProperties)
+                workParameters.configGenerateTypesafeGlobalProperties.set(codegenConfigValue.generateTypesafeGlobalProperties)
 
-                hasAllocator.set(allocatorValue != null)
+                workParameters.hasAllocator.set(allocatorValue != null)
                 allocatorValue?.let {
-                    allocatorAllocationFunction.set(it.allocationFunction)
-                    allocatorDeallocationFunction.set(it.deallocationFunction)
+                    workParameters.allocatorAllocationFunction.set(it.allocationFunction)
+                    workParameters.allocatorDeallocationFunction.set(it.deallocationFunction)
                 }
 
-                initializers.set(initializerNames)
-                functions.set(wasmFunctions.map { it.toWorkData() })
-                ignoredExports.set(ignoredExportNames)
+                workParameters.initializers.set(initializerNames)
+                workParameters.functions.set(wasmFunctions.map { it.toWorkData() })
+                workParameters.ignoredExports.set(ignoredExportNames)
             }
         }
     }

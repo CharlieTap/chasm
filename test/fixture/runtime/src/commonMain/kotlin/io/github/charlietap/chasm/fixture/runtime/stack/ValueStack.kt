@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
 fun vstack(
-    values: List<ExecutionValue> = emptyList(),
+    values: List<ExecutionValue> = [],
 ) = ValueStack().apply {
     values.forEach { value ->
         push(value.toLongFromBoxed())

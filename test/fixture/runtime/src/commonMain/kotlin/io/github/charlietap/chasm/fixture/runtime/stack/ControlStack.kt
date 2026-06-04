@@ -7,10 +7,10 @@ import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.StackDepths
 
 fun cstack(
-    frames: List<ActivationFrame> = emptyList(),
-    handlers: List<ExceptionHandler> = emptyList(),
-    instructions: List<DispatchableInstruction> = emptyList(),
-    labels: List<ControlStack.Entry.Label> = emptyList(),
+    frames: List<ActivationFrame> = [],
+    handlers: List<ExceptionHandler> = [],
+    instructions: List<DispatchableInstruction> = [],
+    labels: List<ControlStack.Entry.Label> = [],
 ) = ControlStack(
     frames = frames,
     handlers = handlers,

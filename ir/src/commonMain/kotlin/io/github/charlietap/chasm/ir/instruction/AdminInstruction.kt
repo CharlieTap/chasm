@@ -21,7 +21,7 @@ sealed interface AdminInstruction : Instruction {
     data class JumpIf(
         val operand: FusedOperand,
         val offset: Int,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
         val adjustment: StackAdjustment = StackAdjustment(depth = 0, keep = 0),
     ) : AdminInstruction
 
@@ -29,22 +29,22 @@ sealed interface AdminInstruction : Instruction {
         val operand: FusedOperand,
         val offsets: List<Int>,
         val defaultOffset: Int,
-        val takenInstructions: List<List<Instruction>> = emptyList(),
-        val defaultTakenInstructions: List<Instruction> = emptyList(),
-        val adjustments: List<StackAdjustment> = emptyList(),
+        val takenInstructions: List<List<Instruction>> = [],
+        val defaultTakenInstructions: List<Instruction> = [],
+        val adjustments: List<StackAdjustment> = [],
     ) : AdminInstruction
 
     data class JumpOnNull(
         val operand: FusedOperand,
         val offset: Int,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
         val adjustment: StackAdjustment = StackAdjustment(depth = 0, keep = 0),
     ) : AdminInstruction
 
     data class JumpOnNonNull(
         val operand: FusedOperand,
         val offset: Int,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
         val adjustment: StackAdjustment = StackAdjustment(depth = 0, keep = 0),
     ) : AdminInstruction
 
@@ -53,7 +53,7 @@ sealed interface AdminInstruction : Instruction {
         val offset: Int,
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
         val adjustment: StackAdjustment = StackAdjustment(depth = 0, keep = 0),
     ) : AdminInstruction
 
@@ -62,14 +62,14 @@ sealed interface AdminInstruction : Instruction {
         val offset: Int,
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
         val adjustment: StackAdjustment = StackAdjustment(depth = 0, keep = 0),
     ) : AdminInstruction
 
     data class PushHandler(
         val handlers: List<ControlInstruction.CatchHandler>,
         val offsets: List<Int>,
-        val payloadDestinationSlots: List<List<Int>> = emptyList(),
+        val payloadDestinationSlots: List<List<Int>> = [],
         val endOffset: Int,
     ) : AdminInstruction
 

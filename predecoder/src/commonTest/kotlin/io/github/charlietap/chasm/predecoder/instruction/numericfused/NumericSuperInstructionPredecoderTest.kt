@@ -586,7 +586,7 @@ class NumericSuperInstructionPredecoderTest {
     }
 
     private fun predecodingContext(
-        globals: MutableList<GlobalInstance> = mutableListOf(),
+        globals: MutableList<GlobalInstance> = [],
     ): PredecodingContext {
         val instance = moduleInstance(
             globalAddresses = globals.indices

@@ -266,8 +266,8 @@ class AggregateSuperInstructionPredecoderTest {
 
     private fun predecodingContext(
         store: Store = store(),
-        types: List<DefinedType> = emptyList(),
-        runtimeTypes: List<RTT> = emptyList(),
+        types: List<DefinedType> = [],
+        runtimeTypes: List<RTT> = [],
     ): PredecodingContext = PredecodingContext(
         instance = moduleInstance(runtimeTypes = runtimeTypes.toMutableList()),
         store = store,

@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.decoder.section.TableSection
 
 internal fun tableSection(
-    tables: List<Table> = emptyList(),
+    tables: List<Table> = [],
 ) = TableSection(tables)

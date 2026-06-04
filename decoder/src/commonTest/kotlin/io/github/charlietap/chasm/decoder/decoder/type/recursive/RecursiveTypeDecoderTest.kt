@@ -35,7 +35,7 @@ class RecursiveTypeDecoderTest {
             fail("SubTypeDecoder should not be directly called in this scenario")
         }
 
-        val subTypes: List<SubType> = emptyList()
+        val subTypes: List<SubType> = []
         val vectorDecoder: VectorDecoder<SubType> = { _context, _decoder ->
             assertEquals(context, _context)
             assertEquals(subTypeDecoder, _decoder)

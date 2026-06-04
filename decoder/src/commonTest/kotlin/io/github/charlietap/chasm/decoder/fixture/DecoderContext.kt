@@ -21,10 +21,10 @@ internal fun decoderContext(
     config: ModuleConfig = moduleConfig(),
     sectionSize: SectionSize = sectionSize(),
     sectionType: SectionType = sectionType(),
-    types: MutableList<Type> = mutableListOf(),
-    definedTypes: MutableList<DefinedType> = mutableListOf(),
+    types: MutableList<Type> = [],
+    definedTypes: MutableList<DefinedType> = [],
     blockEndOpcode: UByte = 0u,
-    imports: List<Import> = emptyList(),
+    imports: List<Import> = [],
     index: Int = 0,
 ) = DecoderContext(
     config = config,

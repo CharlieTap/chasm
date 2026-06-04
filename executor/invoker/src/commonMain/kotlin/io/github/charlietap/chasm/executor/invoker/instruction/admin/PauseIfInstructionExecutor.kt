@@ -31,6 +31,7 @@ internal inline fun PauseIfInstructionExecutor(
     garbageCollector: GarbageCollector,
 ) {
     if (store.heap.sizeInBytes >= context.config.gcThreshold.bytes) {
+        @Suppress("RETURN_VALUE_NOT_USED")
         garbageCollector(store, vstack)
     }
 }

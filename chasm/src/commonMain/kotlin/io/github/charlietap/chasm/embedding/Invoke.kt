@@ -20,7 +20,7 @@ fun invoke(
     store: Store,
     instance: Instance,
     function: Function,
-    args: List<ExecutionValue> = emptyList(),
+    args: List<ExecutionValue> = [],
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> = invoke(
     store = store,
     instance = instance,
@@ -33,7 +33,7 @@ fun invoke(
     store: Store,
     instance: Instance,
     name: String,
-    args: List<ExecutionValue> = emptyList(),
+    args: List<ExecutionValue> = [],
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 
     val extern = instance.instance.exports
@@ -58,7 +58,7 @@ internal fun invoke(
     store: Store,
     instance: Instance,
     function: Function,
-    args: List<ExecutionValue> = emptyList(),
+    args: List<ExecutionValue> = [],
     invoker: FunctionInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> = invoke(
     store = store,
@@ -72,7 +72,7 @@ internal fun invoke(
     store: Store,
     instance: Instance,
     name: String,
-    args: List<ExecutionValue> = emptyList(),
+    args: List<ExecutionValue> = [],
     invoker: FunctionInvoker,
 ): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
 

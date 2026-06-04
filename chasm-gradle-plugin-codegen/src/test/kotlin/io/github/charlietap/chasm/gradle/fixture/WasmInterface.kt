@@ -45,7 +45,7 @@ internal fun field(
 
 internal fun generatedType(
     name: String = "",
-    fields: List<Field> = emptyList(),
+    fields: List<Field> = [],
 ) = GeneratedType(
     name = name,
     fields = fields,
@@ -85,7 +85,7 @@ internal fun functionProxy(
 
 internal fun function(
     name: String = "",
-    params: List<FunctionParameter> = emptyList(),
+    params: List<FunctionParameter> = [],
     returns: FunctionReturn = functionReturn(),
     implementation: FunctionImplementation = functionImplementation(),
 ) = Function(
@@ -120,10 +120,10 @@ internal fun property(
 internal fun wasmInterface(
     interfaceName: String = "",
     packageName: String = "",
-    initializers: Set<String> = emptySet(),
-    types: List<GeneratedType> = emptyList(),
-    functions: List<Function> = emptyList(),
-    properties: List<Property> = emptyList(),
+    initializers: Set<String> = [],
+    types: List<GeneratedType> = [],
+    functions: List<Function> = [],
+    properties: List<Property> = [],
     allocator: ExportedAllocator? = null,
 ) = WasmInterface(
     interfaceName = interfaceName,

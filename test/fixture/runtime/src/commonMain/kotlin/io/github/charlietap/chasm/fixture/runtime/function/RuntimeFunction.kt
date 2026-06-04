@@ -11,7 +11,7 @@ fun runtimeFunction(
     body: Expression = runtimeExpression(),
     frameSlots: Int = 0,
     frameSlotMode: Boolean = false,
-    returnSlots: List<Int> = emptyList(),
+    returnSlots: List<Int> = [],
 ) = Function(
     idx = idx,
     typeIndex = typeIndex,

@@ -10,9 +10,7 @@ plugins {
 
 kotlin {
     @OptIn(ExperimentalAbiValidation::class)
-    abiValidation {
-        enabled.set(true)
-    }
+    abiValidation()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     applyHierarchyTemplate {

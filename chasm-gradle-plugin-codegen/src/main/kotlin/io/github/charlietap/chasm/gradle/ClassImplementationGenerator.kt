@@ -176,7 +176,7 @@ private fun FunSpec.Builder.addReturn(
     proxy: FunctionProxy,
     returnType: TypeName,
     returnGenerator: FunctionReturnImplementationGenerator,
-    freeAllocs: List<String> = emptyList(),
+    freeAllocs: List<String> = [],
 ) = returnGenerator(this, function, proxy, returnType, freeAllocs)
 
 internal class FunctionProxyImplementationGenerator(

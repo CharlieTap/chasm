@@ -5,8 +5,8 @@ import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 
 fun moduleInfo(
-    imports: List<ImportDefinition> = emptyList(),
-    exports: List<ExportDefinition> = emptyList(),
+    imports: List<ImportDefinition> = [],
+    exports: List<ExportDefinition> = [],
 ) = ModuleInfo(
     imports = imports,
     exports = exports,

@@ -27,7 +27,7 @@ abstract class WasmModule
         init {
             binary.convention(project.layout.projectDirectory.file(DEFAULT_MODULE_FILE_PATH))
             codegenConfig.convention(CodegenConfig())
-            functions.convention(emptyList())
+            functions.convention([])
             interfaceVisibility.convention(TypeVisibility.PUBLIC)
             implementationVisibility.convention(TypeVisibility.INTERNAL)
         }

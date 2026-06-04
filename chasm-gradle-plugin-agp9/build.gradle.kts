@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    `kotlin-dsl`
 
+    alias(libs.plugins.conventions.kotlin)
     alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
 }
@@ -25,6 +25,7 @@ kotlin {
     dependencies {
         implementation(projects.chasmGradlePluginCompat)
         implementation(projects.chasmGradlePluginCodegen)
+        compileOnly(gradleApi())
         compileOnly(libs.android.gradle.plugin)
 
         testImplementation(libs.kotlin.test)

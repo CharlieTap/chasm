@@ -34,7 +34,7 @@ class SubTypeDecoderTest {
 
         val typeIndexDecoder = typeIndexDecoder()
 
-        val typeIndices: List<Index.TypeIndex> = emptyList()
+        val typeIndices: List<Index.TypeIndex> = []
         val vectorDecoder: VectorDecoder<Index.TypeIndex> = { _context, _decoder ->
             assertEquals(context, _context)
             assertEquals(typeIndexDecoder, _decoder)
@@ -78,7 +78,7 @@ class SubTypeDecoderTest {
 
         val typeIndexDecoder = typeIndexDecoder()
 
-        val typeIndices: List<Index.TypeIndex> = emptyList()
+        val typeIndices: List<Index.TypeIndex> = []
         val vectorDecoder: VectorDecoder<Index.TypeIndex> = { _context, _decoder ->
             assertEquals(context, _context)
             assertEquals(typeIndexDecoder, _decoder)

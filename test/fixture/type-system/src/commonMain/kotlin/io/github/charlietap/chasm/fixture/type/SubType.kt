@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.type.SubType
 fun subType() = openSubType()
 
 fun openSubType(
-    heapTypes: List<HeapType> = emptyList(),
+    heapTypes: List<HeapType> = [],
     compositeType: CompositeType = compositeType(),
 ) = SubType.Open(
     heapTypes,
@@ -15,7 +15,7 @@ fun openSubType(
 )
 
 fun finalSubType(
-    heapTypes: List<HeapType> = emptyList(),
+    heapTypes: List<HeapType> = [],
     compositeType: CompositeType = compositeType(),
 ) = SubType.Final(
     heapTypes,

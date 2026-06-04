@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.decoder.section.ImportSection
 
 internal fun importSection(
-    imports: List<Import> = emptyList(),
+    imports: List<Import> = [],
 ) = ImportSection(imports)

@@ -81,7 +81,7 @@ sealed interface AggregateSuperInstruction : Instruction {
         val destination: FusedDestination,
         val typeIndex: Index.TypeIndex,
         val size: Int,
-        val valueSlots: List<Int> = emptyList(),
+        val valueSlots: List<Int> = [],
     ) : AggregateSuperInstruction
 
     data class ArraySet(
@@ -158,7 +158,7 @@ sealed interface AggregateSuperInstruction : Instruction {
     data class StructNew(
         val destination: FusedDestination,
         val typeIndex: Index.TypeIndex,
-        val fieldSlots: List<Int> = emptyList(),
+        val fieldSlots: List<Int> = [],
     ) : AggregateSuperInstruction
 
     data class StructNewDefault(

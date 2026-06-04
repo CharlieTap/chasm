@@ -14,7 +14,7 @@ fun instantiationContext(
     store: Store = store(),
     module: Module = module(),
     config: RuntimeConfig = runtimeConfig(),
-    runtimeTypes: List<RTT> = emptyList(),
+    runtimeTypes: List<RTT> = [],
     instance: ModuleInstance? = null,
 ): InstantiationContext = InstantiationContext(
     store = store,

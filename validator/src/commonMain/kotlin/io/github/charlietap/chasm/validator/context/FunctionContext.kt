@@ -14,7 +14,7 @@ internal interface FunctionContext {
 }
 
 internal data class FunctionContextImpl(
-    override var locals: MutableList<LocalType> = mutableListOf(),
+    override var locals: MutableList<LocalType> = [],
     override var labels: Stack<Label> = stackOf(),
     override var result: ResultType? = null,
     override var operands: Stack<ValueType> = stackOf(),

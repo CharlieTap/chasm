@@ -552,7 +552,6 @@ public abstract interface class io/github/charlietap/chasm/embedding/shapes/Name
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/Store {
-	public fun <init> ()V
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/Table : io/github/charlietap/chasm/embedding/shapes/Importable {

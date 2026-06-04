@@ -16,9 +16,9 @@ import io.github.charlietap.chasm.type.ReferenceType
 fun fusedControlInstruction(): ControlSuperInstruction = fusedIf()
 
 fun fusedCall(
-    operands: List<FusedOperand> = emptyList(),
+    operands: List<FusedOperand> = [],
     functionIndex: Index.FunctionIndex = functionIndex(),
-    resultSlots: List<Int> = emptyList(),
+    resultSlots: List<Int> = [],
     callFrameSlot: Int = 0,
 ) = ControlSuperInstruction.Call(
     operands = operands,
@@ -28,7 +28,7 @@ fun fusedCall(
 )
 
 fun fusedReturnCall(
-    operands: List<FusedOperand> = emptyList(),
+    operands: List<FusedOperand> = [],
     functionIndex: Index.FunctionIndex = functionIndex(),
 ) = ControlSuperInstruction.ReturnCall(
     operands = operands,
@@ -37,10 +37,10 @@ fun fusedReturnCall(
 
 fun fusedCallIndirect(
     elementIndex: FusedOperand = fusedOperand(),
-    operands: List<FusedOperand> = emptyList(),
+    operands: List<FusedOperand> = [],
     typeIndex: Index.TypeIndex = typeIndex(),
     tableIndex: Index.TableIndex = tableIndex(),
-    resultSlots: List<Int> = emptyList(),
+    resultSlots: List<Int> = [],
     callFrameSlot: Int = 0,
 ) = ControlSuperInstruction.CallIndirect(
     elementIndex = elementIndex,
@@ -53,9 +53,9 @@ fun fusedCallIndirect(
 
 fun fusedCallRef(
     functionReference: FusedOperand = fusedOperand(),
-    operands: List<FusedOperand> = emptyList(),
+    operands: List<FusedOperand> = [],
     typeIndex: Index.TypeIndex = typeIndex(),
-    resultSlots: List<Int> = emptyList(),
+    resultSlots: List<Int> = [],
     callFrameSlot: Int = 0,
 ) = ControlSuperInstruction.CallRef(
     functionReference = functionReference,
@@ -67,7 +67,7 @@ fun fusedCallRef(
 
 fun fusedReturnCallIndirect(
     elementIndex: FusedOperand = fusedOperand(),
-    operands: List<FusedOperand> = emptyList(),
+    operands: List<FusedOperand> = [],
     typeIndex: Index.TypeIndex = typeIndex(),
     tableIndex: Index.TableIndex = tableIndex(),
 ) = ControlSuperInstruction.ReturnCallIndirect(
@@ -79,7 +79,7 @@ fun fusedReturnCallIndirect(
 
 fun fusedReturnCallRef(
     functionReference: FusedOperand = fusedOperand(),
-    operands: List<FusedOperand> = emptyList(),
+    operands: List<FusedOperand> = [],
     typeIndex: Index.TypeIndex = typeIndex(),
 ) = ControlSuperInstruction.ReturnCallRef(
     functionReference = functionReference,
@@ -90,7 +90,7 @@ fun fusedReturnCallRef(
 fun fusedBrIf(
     operand: FusedOperand = fusedOperand(),
     labelIndex: Index.LabelIndex = labelIndex(),
-    takenInstructions: List<Instruction> = emptyList(),
+    takenInstructions: List<Instruction> = [],
 ) = ControlSuperInstruction.BrIf(
     operand = operand,
     labelIndex = labelIndex,
@@ -100,8 +100,8 @@ fun fusedBrIf(
 fun fusedBrIf(
     operand: FusedOperand = fusedOperand(),
     labelIndex: Index.LabelIndex = labelIndex(),
-    sourceSlots: List<Int> = emptyList(),
-    destinationSlots: List<Int> = emptyList(),
+    sourceSlots: List<Int> = [],
+    destinationSlots: List<Int> = [],
 ) = fusedBrIf(
     operand = operand,
     labelIndex = labelIndex,
@@ -110,10 +110,10 @@ fun fusedBrIf(
 
 fun fusedBrTable(
     operand: FusedOperand = fusedOperand(),
-    labelIndices: List<Index.LabelIndex> = emptyList(),
+    labelIndices: List<Index.LabelIndex> = [],
     defaultLabelIndex: Index.LabelIndex = labelIndex(),
-    takenInstructions: List<List<Instruction>> = emptyList(),
-    defaultTakenInstructions: List<Instruction> = emptyList(),
+    takenInstructions: List<List<Instruction>> = [],
+    defaultTakenInstructions: List<Instruction> = [],
 ) = ControlSuperInstruction.BrTable(
     operand = operand,
     labelIndices = labelIndices,
@@ -124,11 +124,11 @@ fun fusedBrTable(
 
 fun fusedBrTable(
     operand: FusedOperand = fusedOperand(),
-    labelIndices: List<Index.LabelIndex> = emptyList(),
+    labelIndices: List<Index.LabelIndex> = [],
     defaultLabelIndex: Index.LabelIndex = labelIndex(),
-    sourceSlots: List<Int> = emptyList(),
-    destinationSlots: List<List<Int>> = emptyList(),
-    defaultDestinationSlots: List<Int> = emptyList(),
+    sourceSlots: List<Int> = [],
+    destinationSlots: List<List<Int>> = [],
+    defaultDestinationSlots: List<Int> = [],
 ) = fusedBrTable(
     operand = operand,
     labelIndices = labelIndices,
@@ -142,7 +142,7 @@ fun fusedBrTable(
 fun fusedBrOnNull(
     operand: FusedOperand = fusedOperand(),
     labelIndex: Index.LabelIndex = labelIndex(),
-    takenInstructions: List<Instruction> = emptyList(),
+    takenInstructions: List<Instruction> = [],
 ) = ControlSuperInstruction.BrOnNull(
     operand = operand,
     labelIndex = labelIndex,
@@ -152,8 +152,8 @@ fun fusedBrOnNull(
 fun fusedBrOnNull(
     operand: FusedOperand = fusedOperand(),
     labelIndex: Index.LabelIndex = labelIndex(),
-    sourceSlots: List<Int> = emptyList(),
-    destinationSlots: List<Int> = emptyList(),
+    sourceSlots: List<Int> = [],
+    destinationSlots: List<Int> = [],
 ) = fusedBrOnNull(
     operand = operand,
     labelIndex = labelIndex,
@@ -163,7 +163,7 @@ fun fusedBrOnNull(
 fun fusedBrOnNonNull(
     operand: FusedOperand = fusedOperand(),
     labelIndex: Index.LabelIndex = labelIndex(),
-    takenInstructions: List<Instruction> = emptyList(),
+    takenInstructions: List<Instruction> = [],
 ) = ControlSuperInstruction.BrOnNonNull(
     operand = operand,
     labelIndex = labelIndex,
@@ -173,8 +173,8 @@ fun fusedBrOnNonNull(
 fun fusedBrOnNonNull(
     operand: FusedOperand = fusedOperand(),
     labelIndex: Index.LabelIndex = labelIndex(),
-    sourceSlots: List<Int> = emptyList(),
-    destinationSlots: List<Int> = emptyList(),
+    sourceSlots: List<Int> = [],
+    destinationSlots: List<Int> = [],
 ) = fusedBrOnNonNull(
     operand = operand,
     labelIndex = labelIndex,
@@ -186,7 +186,7 @@ fun fusedBrOnCast(
     labelIndex: Index.LabelIndex = labelIndex(),
     srcReferenceType: ReferenceType = referenceType(),
     dstReferenceType: ReferenceType = referenceType(),
-    takenInstructions: List<Instruction> = emptyList(),
+    takenInstructions: List<Instruction> = [],
 ) = ControlSuperInstruction.BrOnCast(
     operand = operand,
     labelIndex = labelIndex,
@@ -200,8 +200,8 @@ fun fusedBrOnCast(
     labelIndex: Index.LabelIndex = labelIndex(),
     srcReferenceType: ReferenceType = referenceType(),
     dstReferenceType: ReferenceType = referenceType(),
-    sourceSlots: List<Int> = emptyList(),
-    destinationSlots: List<Int> = emptyList(),
+    sourceSlots: List<Int> = [],
+    destinationSlots: List<Int> = [],
 ) = fusedBrOnCast(
     operand = operand,
     labelIndex = labelIndex,
@@ -215,7 +215,7 @@ fun fusedBrOnCastFail(
     labelIndex: Index.LabelIndex = labelIndex(),
     srcReferenceType: ReferenceType = referenceType(),
     dstReferenceType: ReferenceType = referenceType(),
-    takenInstructions: List<Instruction> = emptyList(),
+    takenInstructions: List<Instruction> = [],
 ) = ControlSuperInstruction.BrOnCastFail(
     operand = operand,
     labelIndex = labelIndex,
@@ -229,8 +229,8 @@ fun fusedBrOnCastFail(
     labelIndex: Index.LabelIndex = labelIndex(),
     srcReferenceType: ReferenceType = referenceType(),
     dstReferenceType: ReferenceType = referenceType(),
-    sourceSlots: List<Int> = emptyList(),
-    destinationSlots: List<Int> = emptyList(),
+    sourceSlots: List<Int> = [],
+    destinationSlots: List<Int> = [],
 ) = fusedBrOnCastFail(
     operand = operand,
     labelIndex = labelIndex,
@@ -242,7 +242,7 @@ fun fusedBrOnCastFail(
 fun fusedIf(
     operand: FusedOperand = fusedOperand(),
     blockType: BlockType = blockType(),
-    thenInstructions: List<Instruction> = emptyList(),
+    thenInstructions: List<Instruction> = [],
     elseInstructions: List<Instruction>? = null,
 ) = ControlSuperInstruction.If(
     operand = operand,

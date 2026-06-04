@@ -14,7 +14,7 @@ class Agp8AndroidConfigurer : AndroidConfigurer {
         val components = androidComponents as AndroidComponentsExtension<*, *, *>
 
         components.onVariants { variant: Variant ->
-            context.extension.modules.configureEach {
+            context.extension.modules.configureEach { module ->
                 if (context.extension.mode.get() == Mode.PRODUCER) {
                     context.project.logger.error(
                         "Producer mode is only supported for Kotlin Multiplatform projects with WASM targets",
@@ -22,7 +22,7 @@ class Agp8AndroidConfigurer : AndroidConfigurer {
                     return@configureEach
                 }
 
-                val task = registerCodegenTask(context.project, this, variant.name, context.workerClasspath)
+                val task = registerCodegenTask(context.project, module, variant.name, context.workerClasspath)
                 variant.sources.java?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
                 variant.sources.kotlin?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
             }

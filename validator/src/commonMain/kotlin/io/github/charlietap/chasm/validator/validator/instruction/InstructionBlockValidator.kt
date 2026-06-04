@@ -31,7 +31,7 @@ internal inline fun InstructionBlockValidator(
 
     val locals = context.locals.map(LocalType::status)
 
-    instructions.map { instruction ->
+    instructions.forEach { instruction ->
         instructionValidator(context, instruction).bind()
     }
 

@@ -50,7 +50,7 @@ sealed interface AdminInstruction : LinkedInstruction {
         val takenInstructions: List<List<DispatchableInstruction>>,
         val defaultTakenInstructions: List<DispatchableInstruction>,
         var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffsets: List<Int> = emptyList(),
+        var continuationOffsets: List<Int> = [],
         var defaultContinuationOffset: Int = -1,
     ) : AdminInstruction
 
@@ -62,7 +62,7 @@ sealed interface AdminInstruction : LinkedInstruction {
         val takenInstructions: List<List<DispatchableInstruction>>,
         val defaultTakenInstructions: List<DispatchableInstruction>,
         var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffsets: List<Int> = emptyList(),
+        var continuationOffsets: List<Int> = [],
         var defaultContinuationOffset: Int = -1,
     ) : AdminInstruction
 
@@ -149,10 +149,10 @@ sealed interface AdminInstruction : LinkedInstruction {
     data class PushHandler(
         val handlers: List<CatchHandler>,
         var continuations: List<Array<DispatchableInstruction>>,
-        val payloadDestinationSlots: List<List<Int>> = emptyList(),
+        val payloadDestinationSlots: List<List<Int>> = [],
         val discardCount: Int,
         var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffsets: List<Int> = emptyList(),
+        var continuationOffsets: List<Int> = [],
     ) : AdminInstruction
 
     data object PopHandler : AdminInstruction

@@ -53,9 +53,7 @@ corpus {
 kotlin {
 
     @OptIn(ExperimentalAbiValidation::class)
-    abiValidation {
-        enabled.set(true)
-    }
+    abiValidation()
 
     sourceSets {
        commonMain {

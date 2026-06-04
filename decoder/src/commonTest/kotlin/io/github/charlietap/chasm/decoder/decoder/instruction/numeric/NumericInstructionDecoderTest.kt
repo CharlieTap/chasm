@@ -376,7 +376,7 @@ class NumericInstructionDecoderTest {
         }
         val context = decoderContext(reader)
 
-        opcodeInstructionMap.map { (_opcode, _instruction) ->
+        opcodeInstructionMap.forEach { (_opcode, _instruction) ->
             opcode = _opcode
             val expected = Ok(_instruction)
 

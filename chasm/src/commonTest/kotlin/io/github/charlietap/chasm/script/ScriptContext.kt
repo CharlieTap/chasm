@@ -15,7 +15,7 @@ data class ScriptContext(
     val store: Store,
     val modules: MutableMap<String?, Module>,
     val instances: MutableMap<String?, Instance>,
-    val imports: MutableList<Import> = mutableListOf(),
+    val imports: MutableList<Import> = [],
 ) {
 
     fun instance(name: String?): Instance = instances[name]!!

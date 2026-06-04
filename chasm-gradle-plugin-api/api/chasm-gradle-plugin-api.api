@@ -153,14 +153,15 @@ public final class io/github/charlietap/chasm/gradle/WasmFunctionBuilder {
 	public final fun intReturnType ()V
 	public final fun longParam (Ljava/lang/String;)V
 	public final fun longReturnType ()V
+	public final synthetic fun stringParam (Ljava/lang/String;)V
 	public final fun stringParam (Ljava/lang/String;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;Z)V
 	public static synthetic fun stringParam$default (Lio/github/charlietap/chasm/gradle/WasmFunctionBuilder;Ljava/lang/String;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;ZILjava/lang/Object;)V
+	public final synthetic fun stringReturnType ()V
 	public final fun stringReturnType (Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;)V
 	public static synthetic fun stringReturnType$default (Lio/github/charlietap/chasm/gradle/WasmFunctionBuilder;Lio/github/charlietap/chasm/gradle/StringEncodingStrategy;ILjava/lang/Object;)V
 }
 
 public abstract class io/github/charlietap/chasm/gradle/WasmModule {
-	public static final field DEFAULT_MODULE_FILE_PATH Ljava/lang/String;
 	public fun <init> (Lorg/gradle/api/Project;Ljava/lang/String;)V
 	public final fun function (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
 	public abstract fun getAllocator ()Lorg/gradle/api/provider/Property;

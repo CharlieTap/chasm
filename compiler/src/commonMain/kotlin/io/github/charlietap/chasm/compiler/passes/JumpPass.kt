@@ -483,13 +483,13 @@ private fun patchHandlerOffsetInstruction(
 private data class JumpLabel(
     var targetIndex: Int?,
     val handlerDepth: Int,
-    val holes: MutableList<JumpHole> = mutableListOf(),
+    val holes: MutableList<JumpHole> = [],
 )
 
 private data object ActiveTryHandler
 
 private data class SequenceSuffix(
-    val instructions: List<Instruction> = emptyList(),
+    val instructions: List<Instruction> = [],
     val dropCount: Int = 0,
     val hasRootLabel: Boolean = false,
 )

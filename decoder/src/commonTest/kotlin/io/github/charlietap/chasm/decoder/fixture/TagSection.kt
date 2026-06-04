@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.decoder.section.TagSection
 
 internal fun tagSection(
-    tags: List<Tag> = emptyList(),
+    tags: List<Tag> = [],
 ) = TagSection(tags)

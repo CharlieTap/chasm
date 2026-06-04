@@ -68,7 +68,7 @@ fun nopInstruction() = ControlInstruction.Nop
 
 fun blockInstruction(
     blockType: BlockType = blockType(),
-    instructions: List<Instruction> = emptyList(),
+    instructions: List<Instruction> = [],
 ) = ControlInstruction.Block(
     blockType = blockType,
     instructions = instructions,
@@ -76,7 +76,7 @@ fun blockInstruction(
 
 fun loopInstruction(
     blockType: BlockType = blockType(),
-    instructions: List<Instruction> = emptyList(),
+    instructions: List<Instruction> = [],
 ) = ControlInstruction.Loop(
     blockType = blockType,
     instructions = instructions,
@@ -84,7 +84,7 @@ fun loopInstruction(
 
 fun ifInstruction(
     blockType: BlockType = blockType(),
-    thenInstructions: List<Instruction> = emptyList(),
+    thenInstructions: List<Instruction> = [],
     elseInstructions: List<Instruction>? = null,
 ) = ControlInstruction.If(
     blockType = blockType,
@@ -105,7 +105,7 @@ fun brIfInstruction(
 )
 
 fun brTableInstruction(
-    labelIndices: List<Index.LabelIndex> = emptyList(),
+    labelIndices: List<Index.LabelIndex> = [],
     defaultLabelIndex: Index.LabelIndex = labelIndex(),
 ) = ControlInstruction.BrTable(
     labelIndices = labelIndices,

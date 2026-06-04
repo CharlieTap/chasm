@@ -27,20 +27,20 @@ import io.github.charlietap.chasm.decoder.error.SectionDecodeError
 import io.github.charlietap.chasm.type.DefinedType
 
 internal class ModuleBuilder(private val version: Version) {
-    private var types: MutableList<Type> = mutableListOf()
-    private var definedTypes: MutableList<DefinedType> = mutableListOf()
-    private var functionHeaders: MutableList<FunctionHeader> = mutableListOf()
-    private var functionBodies: MutableList<FunctionBody> = mutableListOf()
-    private var tables: MutableList<Table> = mutableListOf()
-    private var memories: MutableList<Memory> = mutableListOf()
-    private var tags: MutableList<Tag> = mutableListOf()
-    private var globals: MutableList<Global> = mutableListOf()
-    private var elementSegments: MutableList<ElementSegment> = mutableListOf()
-    private var dataSegments: MutableList<DataSegment> = mutableListOf()
-    private var startFunctions: MutableList<StartFunction> = mutableListOf()
-    private var exports: MutableList<Export> = mutableListOf()
-    private var imports: MutableList<Import> = mutableListOf()
-    private var customs: MutableList<Custom> = mutableListOf()
+    private var types: MutableList<Type> = []
+    private var definedTypes: MutableList<DefinedType> = []
+    private var functionHeaders: MutableList<FunctionHeader> = []
+    private var functionBodies: MutableList<FunctionBody> = []
+    private var tables: MutableList<Table> = []
+    private var memories: MutableList<Memory> = []
+    private var tags: MutableList<Tag> = []
+    private var globals: MutableList<Global> = []
+    private var elementSegments: MutableList<ElementSegment> = []
+    private var dataSegments: MutableList<DataSegment> = []
+    private var startFunctions: MutableList<StartFunction> = []
+    private var exports: MutableList<Export> = []
+    private var imports: MutableList<Import> = []
+    private var customs: MutableList<Custom> = []
     private var dataCount: UInt? = null
 
     fun types(

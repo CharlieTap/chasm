@@ -36,7 +36,7 @@ sealed interface ControlInstruction : Instruction {
         val blockType: BlockType,
         val handlers: List<CatchHandler>,
         val instructions: List<Instruction>,
-        val payloadDestinationSlots: List<List<Int>> = emptyList(),
+        val payloadDestinationSlots: List<List<Int>> = [],
     ) : ControlInstruction
 
     @JvmInline

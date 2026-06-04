@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.decoder.section.DataSection
 
 internal fun dataSection(
-    segments: List<DataSegment> = emptyList(),
+    segments: List<DataSegment> = [],
 ) = DataSection(segments)

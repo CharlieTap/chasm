@@ -5,10 +5,10 @@ import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 
 data class ExceptionHandler(
     var instructions: List<ControlInstruction.CatchHandler>,
-    var payloadDestinationSlots: List<List<Int>> = emptyList(),
-    var continuations: List<Array<DispatchableInstruction>> = emptyList(),
+    var payloadDestinationSlots: List<List<Int>> = [],
+    var continuations: List<Array<DispatchableInstruction>> = [],
     var continuationSource: List<DispatchableInstruction?>? = null,
-    var continuationOffsets: List<Int> = emptyList(),
+    var continuationOffsets: List<Int> = [],
     val framesDepth: Int,
     val instructionsDepth: Int,
     val labelsDepth: Int,

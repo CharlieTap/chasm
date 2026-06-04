@@ -9,27 +9,27 @@ sealed interface ControlSuperInstruction : Instruction {
     data class BrIf(
         val operand: FusedOperand,
         val labelIndex: Index.LabelIndex,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
     ) : ControlSuperInstruction
 
     data class BrTable(
         val operand: FusedOperand,
         val labelIndices: List<Index.LabelIndex>,
         val defaultLabelIndex: Index.LabelIndex,
-        val takenInstructions: List<List<Instruction>> = emptyList(),
-        val defaultTakenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<List<Instruction>> = [],
+        val defaultTakenInstructions: List<Instruction> = [],
     ) : ControlSuperInstruction
 
     data class BrOnNull(
         val operand: FusedOperand,
         val labelIndex: Index.LabelIndex,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
     ) : ControlSuperInstruction
 
     data class BrOnNonNull(
         val operand: FusedOperand,
         val labelIndex: Index.LabelIndex,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
     ) : ControlSuperInstruction
 
     data class BrOnCast(
@@ -37,7 +37,7 @@ sealed interface ControlSuperInstruction : Instruction {
         val labelIndex: Index.LabelIndex,
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
     ) : ControlSuperInstruction
 
     data class BrOnCastFail(
@@ -45,13 +45,13 @@ sealed interface ControlSuperInstruction : Instruction {
         val labelIndex: Index.LabelIndex,
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
-        val takenInstructions: List<Instruction> = emptyList(),
+        val takenInstructions: List<Instruction> = [],
     ) : ControlSuperInstruction
 
     data class Call(
         val operands: List<FusedOperand>,
         val functionIndex: Index.FunctionIndex,
-        val resultSlots: List<Int> = emptyList(),
+        val resultSlots: List<Int> = [],
         val callFrameSlot: Int = 0,
     ) : ControlSuperInstruction
 
@@ -65,7 +65,7 @@ sealed interface ControlSuperInstruction : Instruction {
         val operands: List<FusedOperand>,
         val typeIndex: Index.TypeIndex,
         val tableIndex: Index.TableIndex,
-        val resultSlots: List<Int> = emptyList(),
+        val resultSlots: List<Int> = [],
         val callFrameSlot: Int = 0,
     ) : ControlSuperInstruction
 
@@ -73,7 +73,7 @@ sealed interface ControlSuperInstruction : Instruction {
         val functionReference: FusedOperand,
         val operands: List<FusedOperand>,
         val typeIndex: Index.TypeIndex,
-        val resultSlots: List<Int> = emptyList(),
+        val resultSlots: List<Int> = [],
         val callFrameSlot: Int = 0,
     ) : ControlSuperInstruction
 

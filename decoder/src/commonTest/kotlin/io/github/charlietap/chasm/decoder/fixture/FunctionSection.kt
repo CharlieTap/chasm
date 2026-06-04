@@ -15,5 +15,5 @@ internal fun functionHeader(
 )
 
 internal fun functionSection(
-    headers: List<FunctionHeader> = emptyList(),
+    headers: List<FunctionHeader> = [],
 ) = FunctionSection(headers)

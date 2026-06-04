@@ -4,5 +4,5 @@ import io.github.charlietap.chasm.ast.module.ElementSegment
 import io.github.charlietap.chasm.decoder.section.ElementSection
 
 internal fun elementSection(
-    segments: List<ElementSegment> = emptyList(),
+    segments: List<ElementSegment> = [],
 ) = ElementSection(segments)

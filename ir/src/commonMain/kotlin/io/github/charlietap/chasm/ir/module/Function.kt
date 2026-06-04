@@ -9,5 +9,5 @@ data class Function(
     val body: Expression,
     val frameSlots: Int = 0,
     val frameSlotMode: Boolean = false,
-    val returnSlots: List<Int> = emptyList(),
+    val returnSlots: List<Int> = [],
 )

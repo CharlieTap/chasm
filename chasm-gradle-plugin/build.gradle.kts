@@ -3,9 +3,9 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.build.config)
-    `kotlin-dsl`
     `java-gradle-plugin`
 
+    alias(libs.plugins.conventions.kotlin)
     alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
 }
@@ -34,9 +34,7 @@ gradlePlugin {
 kotlin {
 
     @OptIn(ExperimentalAbiValidation::class)
-    abiValidation {
-        enabled.set(true)
-    }
+    abiValidation()
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))
     }
@@ -51,4 +49,3 @@ kotlin {
         implementation(libs.kotlin.gradle.plugin)
     }
 }
-

@@ -61,7 +61,7 @@ fun brIfRuntimeInstruction(
 )
 
 fun brTableRuntimeInstruction(
-    labelIndices: List<Index.LabelIndex> = emptyList(),
+    labelIndices: List<Index.LabelIndex> = [],
     defaultLabelIndex: Index.LabelIndex = labelIndex(),
 ) = ControlInstruction.BrTable(
     labelIndices = labelIndices,

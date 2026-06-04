@@ -8,6 +8,6 @@ internal interface ModuleContext {
 }
 
 internal data class ModuleContextImpl(
-    override var imports: List<Import> = mutableListOf(),
+    override var imports: List<Import> = [],
     override var requiresDataCount: Boolean = false,
 ) : ModuleContext

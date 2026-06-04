@@ -194,7 +194,7 @@ class TableSuperInstructionPredecoderTest {
 
     private fun predecodingContext(
         tables: MutableList<TableInstance>,
-        elements: MutableList<ElementInstance> = mutableListOf(),
+        elements: MutableList<ElementInstance> = [],
     ): PredecodingContext {
         val instance = moduleInstance(
             tableAddresses = tables.indices

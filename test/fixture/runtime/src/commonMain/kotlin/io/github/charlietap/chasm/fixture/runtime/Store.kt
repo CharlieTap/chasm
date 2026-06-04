@@ -13,15 +13,15 @@ import io.github.charlietap.chasm.runtime.instance.TagInstance
 import io.github.charlietap.chasm.runtime.store.Store
 
 fun store(
-    data: MutableList<DataInstance> = mutableListOf(),
-    elements: MutableList<ElementInstance> = mutableListOf(),
-    exceptions: MutableList<ExceptionInstance> = mutableListOf(),
-    functions: MutableList<FunctionInstance> = mutableListOf(),
-    globals: MutableList<GlobalInstance> = mutableListOf(),
-    memories: MutableList<MemoryInstance> = mutableListOf(),
-    tables: MutableList<TableInstance> = mutableListOf(),
-    tags: MutableList<TagInstance> = mutableListOf(),
-    instructions: MutableList<DispatchableInstruction> = mutableListOf(),
+    data: MutableList<DataInstance> = [],
+    elements: MutableList<ElementInstance> = [],
+    exceptions: MutableList<ExceptionInstance> = [],
+    functions: MutableList<FunctionInstance> = [],
+    globals: MutableList<GlobalInstance> = [],
+    memories: MutableList<MemoryInstance> = [],
+    tables: MutableList<TableInstance> = [],
+    tags: MutableList<TagInstance> = [],
+    instructions: MutableList<DispatchableInstruction> = [],
     heap: Heap = heap(),
 ) = Store(
     data = data,

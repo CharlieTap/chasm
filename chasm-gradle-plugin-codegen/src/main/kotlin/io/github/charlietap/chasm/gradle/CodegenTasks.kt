@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.gradle
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.register
 import java.io.File
 
 fun registerCodegenTask(
@@ -14,24 +13,24 @@ fun registerCodegenTask(
     moduleBinary: File? = null,
 ): TaskProvider<CodegenTask> {
     val capitalizedSourceName = sourceSetName.replaceFirstChar { it.uppercase() }
-    return project.tasks.register<CodegenTask>("codegenModule$capitalizedSourceName${module.name}") {
-        group = "chasm"
-        description = "Generates a typesafe Kotlin interface from a wasm binary"
+    return project.tasks.register("codegenModule$capitalizedSourceName${module.name}", CodegenTask::class.java) { task ->
+        task.group = "chasm"
+        task.description = "Generates a typesafe Kotlin interface from a wasm binary"
 
-        workerClasspath.from(classpath)
+        task.workerClasspath.from(classpath)
 
         moduleBinary?.let {
-            binary.set(moduleBinary)
-        } ?: binary.set(module.binary)
-        allocator.set(module.allocator)
-        config.set(module.codegenConfig)
-        interfaceName.set(module.name)
-        packageName.set(module.packageName)
-        interfaceVisibility.set(module.interfaceVisibility)
-        implementationVisibility.set(module.implementationVisibility)
-        initializers.set(module.initializers)
-        functions.set(module.functions)
-        ignoredExports.set(module.ignoredExports)
-        outputDirectory.set(project.layout.buildDirectory.dir("generated/kotlin/$sourceSetName"))
+            task.binary.set(moduleBinary)
+        } ?: task.binary.set(module.binary)
+        task.allocator.set(module.allocator)
+        task.config.set(module.codegenConfig)
+        task.interfaceName.set(module.name)
+        task.packageName.set(module.packageName)
+        task.interfaceVisibility.set(module.interfaceVisibility)
+        task.implementationVisibility.set(module.implementationVisibility)
+        task.initializers.set(module.initializers)
+        task.functions.set(module.functions)
+        task.ignoredExports.set(module.ignoredExports)
+        task.outputDirectory.set(project.layout.buildDirectory.dir("generated/kotlin/$sourceSetName"))
     }
 }

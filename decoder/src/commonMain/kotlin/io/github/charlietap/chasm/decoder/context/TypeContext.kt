@@ -9,6 +9,6 @@ internal interface TypeContext {
 }
 
 internal data class TypeContextImpl(
-    override val types: MutableList<Type> = mutableListOf(),
-    override val definedTypes: MutableList<DefinedType> = mutableListOf(),
+    override val types: MutableList<Type> = [],
+    override val definedTypes: MutableList<DefinedType> = [],
 ) : TypeContext

@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.gradle
 
 import java.io.Serializable
+import kotlin.ExperimentalVersionOverloading
+import kotlin.IntroducedAt
 
 data class FunctionParameterDefinition(
     val name: String,
@@ -23,7 +25,7 @@ data class WasmFunction(
 class WasmFunctionBuilder(
     val name: String,
 ) {
-    private val parameters: MutableList<FunctionParameterDefinition> = mutableListOf()
+    private val parameters: MutableList<FunctionParameterDefinition> = []
     private var returnType: ReturnTypeDefinition = ReturnTypeDefinition(Scalar.Unit)
 
     fun intParam(name: String) {
@@ -42,9 +44,12 @@ class WasmFunctionBuilder(
         parameters.add(FunctionParameterDefinition(name, Scalar.Double))
     }
 
+    @OptIn(ExperimentalVersionOverloading::class)
     fun stringParam(
         name: String,
+        @IntroducedAt("2.0.2")
         encodingStrategy: StringEncodingStrategy = StringEncodingStrategy.POINTER_AND_LENGTH,
+        @IntroducedAt("2.0.2")
         freeAfterCall: Boolean = false,
     ) {
         parameters.add(
@@ -73,7 +78,11 @@ class WasmFunctionBuilder(
         returnType = ReturnTypeDefinition(Scalar.Double)
     }
 
-    fun stringReturnType(encodingStrategy: StringEncodingStrategy = StringEncodingStrategy.POINTER_AND_LENGTH) {
+    @OptIn(ExperimentalVersionOverloading::class)
+    fun stringReturnType(
+        @IntroducedAt("2.0.2")
+        encodingStrategy: StringEncodingStrategy = StringEncodingStrategy.POINTER_AND_LENGTH,
+    ) {
         returnType = ReturnTypeDefinition(Scalar.String, encodingStrategy)
     }
 

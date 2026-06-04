@@ -5,7 +5,7 @@ pluginManagement {
         mavenCentral()
     }
 
-    includeBuild("../gradle/plugins/kmp-conventions")
+    includeBuild("../gradle/plugins/kotlin-conventions")
     includeBuild("../gradle/plugins/linting-conventions")
     includeBuild("../gradle/plugins/publishing-conventions")
     includeBuild("../gradle/plugins/versions-conventions")

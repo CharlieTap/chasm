@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.fixture.ast.module.functionIndex
 
 internal fun functionBody(
     idx: Index.FunctionIndex = functionIndex(),
-    locals: List<Local> = emptyList(),
+    locals: List<Local> = [],
     body: Expression = expression(),
 ) = FunctionBody(
     idx = idx,
@@ -19,5 +19,5 @@ internal fun functionBody(
 )
 
 internal fun codeSection(
-    bodies: List<FunctionBody> = emptyList(),
+    bodies: List<FunctionBody> = [],
 ) = CodeSection(bodies)
