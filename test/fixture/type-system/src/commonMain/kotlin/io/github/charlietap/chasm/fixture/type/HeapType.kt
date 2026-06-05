@@ -13,6 +13,8 @@ fun noneHeapType() = AbstractHeapType.None
 
 fun functionHeapType() = AbstractHeapType.Func
 
+fun externHeapType() = AbstractHeapType.Extern
+
 fun concreteHeapType(): ConcreteHeapType = concreteTypeIndexHeapType()
 
 fun concreteTypeIndexHeapType(

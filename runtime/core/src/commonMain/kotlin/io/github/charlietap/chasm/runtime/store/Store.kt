@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.ExceptionInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
+import io.github.charlietap.chasm.runtime.instance.HostInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
@@ -27,6 +28,7 @@ data class Store(
     val instructions: MutableList<DispatchableInstruction> = [],
     val structs: MutableList<StructInstance?> = [],
     val arrays: MutableList<ArrayInstance?> = [],
+    val hosts: MutableList<HostInstance> = [],
     val rttCache: MutableMap<DefinedType, RTT> = mutableMapOf(),
     val heap: Heap = Heap(),
 )

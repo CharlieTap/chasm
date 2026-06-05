@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.ExceptionInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
+import io.github.charlietap.chasm.runtime.instance.HostInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
@@ -115,4 +116,20 @@ inline fun Store.array(address: Address.Array): ArrayInstance = try {
     throw InvocationException(InvocationError.ArrayLookupFailed(address))
 } catch (_: NullPointerException) {
     throw InvocationException(InvocationError.ArrayLookupFailed(address))
+}
+
+inline fun Store.host(address: Address.Host): HostInstance = try {
+    hosts[address.address]
+} catch (_: IndexOutOfBoundsException) {
+    throw InvocationException(InvocationError.HostLookupFailed(address))
+} catch (_: IllegalArgumentException) {
+    throw InvocationException(InvocationError.HostLookupFailed(address))
+}
+
+fun Store.allocateHost(
+    instance: HostInstance,
+): Address.Host {
+    hosts.add(instance)
+
+    return Address.Host(hosts.lastIndex)
 }

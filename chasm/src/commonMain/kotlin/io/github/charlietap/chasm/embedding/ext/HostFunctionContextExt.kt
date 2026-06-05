@@ -1,12 +1,16 @@
 package io.github.charlietap.chasm.embedding.ext
 
 import io.github.charlietap.chasm.embedding.error.ChasmError
+import io.github.charlietap.chasm.embedding.extern.externRef
+import io.github.charlietap.chasm.embedding.extern.readExternValue
+import io.github.charlietap.chasm.embedding.extern.readExternValueAs
 import io.github.charlietap.chasm.embedding.memory.readByte
 import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.HostFunctionContext
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.map
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 inline fun HostFunctionContext.byte(
     memory: Memory,
@@ -79,3 +83,15 @@ inline fun HostFunctionContext.ulong(
     }
     result
 }
+
+fun HostFunctionContext.externRef(
+    value: Any?,
+): ReferenceValue = externRef(this.store, value)
+
+fun HostFunctionContext.readExternValue(
+    reference: ReferenceValue,
+): ChasmResult<Any?, ChasmError.ExecutionError> = readExternValue(this.store, reference)
+
+inline fun <reified T> HostFunctionContext.readExternValueAs(
+    reference: ReferenceValue,
+): ChasmResult<T?, ChasmError.ExecutionError> = readExternValueAs<T>(this.store, reference)

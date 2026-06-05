@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.ExceptionInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
+import io.github.charlietap.chasm.runtime.instance.HostInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
@@ -26,6 +27,7 @@ fun store(
     instructions: MutableList<DispatchableInstruction> = [],
     structs: MutableList<StructInstance?> = [],
     arrays: MutableList<ArrayInstance?> = [],
+    hosts: MutableList<HostInstance> = [],
     heap: Heap = heap(),
 ) = Store(
     data = data,
@@ -39,5 +41,6 @@ fun store(
     instructions = instructions,
     structs = structs,
     arrays = arrays,
+    hosts = hosts,
     heap = heap,
 )

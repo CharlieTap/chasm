@@ -44,6 +44,8 @@ internal fun dropStore(
     }
     store.globals.clear()
 
+    store.hosts.clear()
+
     store.memories.forEach { memory ->
         memoryDropper(memory)
     }

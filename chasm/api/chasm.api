@@ -289,14 +289,24 @@ public final class io/github/charlietap/chasm/embedding/ext/HostFunctionContextE
 	public static final fun byte (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;I)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun bytes (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun bytes$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun externRef (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Ljava/lang/Object;)Lio/github/charlietap/chasm/runtime/value/ReferenceValue;
 	public static final fun int (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun int$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun long (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun long$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun readExternValue (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/runtime/value/ReferenceValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun uint (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun uint$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun ulong (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun ulong$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/embedding/extern/ExternRefKt {
+	public static final fun externRef (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;)Lio/github/charlietap/chasm/runtime/value/ReferenceValue;
+}
+
+public final class io/github/charlietap/chasm/embedding/extern/ReadExternValueKt {
+	public static final fun readExternValue (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/runtime/value/ReferenceValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/global/ReadGlobalKt {
