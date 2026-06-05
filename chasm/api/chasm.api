@@ -294,11 +294,16 @@ public final class io/github/charlietap/chasm/embedding/ext/HostFunctionContextE
 	public static synthetic fun int$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun long (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun long$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun readArrayElement-ysangS8 (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;II)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun readArrayLength-m3AehMY (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;I)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun readExternValue (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/runtime/value/ReferenceValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun readStructField-HGiMjpc (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;II)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun uint (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun uint$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun ulong (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun ulong$default (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Memory;[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun writeArrayElement-5_qwMlw (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;IILio/github/charlietap/chasm/runtime/value/FieldValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun writeStructField-8B0qVec (Lio/github/charlietap/chasm/embedding/shapes/HostFunctionContext;IILio/github/charlietap/chasm/runtime/value/FieldValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/extern/ExternRefKt {
