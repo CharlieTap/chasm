@@ -52,9 +52,9 @@ kotlin {
 
 dependencies {
 
-    implementation(projects.consumerAndroidFibonacci)
-    implementation(projects.consumerJvmTest)
-    implementation(projects.consumerMultiplatformFactorial)
+    implementation(projects.consumerAndroid)
+    implementation(projects.consumerJvm)
+    implementation(projects.consumerMultiplatform)
 
     implementation(libs.bundles.androidx)
     implementation(libs.bundles.compose.ui)

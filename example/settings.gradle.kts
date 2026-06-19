@@ -52,9 +52,9 @@ includeBuild("..") {
 include(":android")
 include(":benchmark")
 include(":binary")
-include(":consumer-android-fibonacci")
-include(":consumer-jvm-test")
-include(":consumer-multiplatform-factorial")
+include(":consumer-android")
+include(":consumer-jvm")
+include(":consumer-multiplatform")
 include(":producer")
 include(":web")
 

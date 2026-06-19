@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.test.chasm.FactorialService
 import com.test.chasm.FibonacciService
+import com.test.chasm.InteropService
 import com.test.chasm.StringService
 import com.test.chasm.TestService
 import dev.zacsweers.metro.AppScope
@@ -25,12 +26,14 @@ import kotlinx.coroutines.launch
 class ChasmViewModel(
     private val factorialService: FactorialService,
     private val fibonacciService: FibonacciService,
+    private val interopService: InteropService,
     private val stringService: StringService,
     private val testService: TestService,
 ) : MVIViewModel<ChasmState, ChasmEvent, ChasmEffect>() {
 
     init {
         factorialPrinter()
+        interopPrinter()
         testPrinter()
     }
 
@@ -78,6 +81,33 @@ class ChasmViewModel(
     private fun factorialPrinter() {
         val factorial = factorialService.factorial(5)
         Log.d("ChasmViewModel", "factorial: $factorial")
+    }
+
+    private fun interopPrinter() {
+        val interopMultipleReturn = interopService.interopMultipleReturn()
+        Log.d("ChasmViewModel", "interop int: ${interopService.intFunction()}")
+        Log.d("ChasmViewModel", "interop long: ${interopService.longFunction()}")
+        Log.d("ChasmViewModel", "interop float: ${interopService.floatFunction()}")
+        Log.d("ChasmViewModel", "interop double: ${interopService.doubleFunction()}")
+        Log.d("ChasmViewModel", "interop i32 param: ${interopService.identityI32(123)}")
+        Log.d("ChasmViewModel", "interop i64 param: ${interopService.identityI64(456)}")
+        Log.d("ChasmViewModel", "interop f32 param: ${interopService.identityF32(7.5f)}")
+        Log.d("ChasmViewModel", "interop f64 param: ${interopService.identityF64(8.25)}")
+        Log.d("ChasmViewModel", "interop mixed params: ${interopService.mixedNumericFunction(1, 2, 3.5f, 4.25)}")
+        Log.d(
+            "ChasmViewModel",
+            "interop multi return: r0 = ${interopMultipleReturn.r0}, r1 = ${interopMultipleReturn.r1}, r2 = ${interopMultipleReturn.r2}, r3 = ${interopMultipleReturn.r3}",
+        )
+        Log.d("ChasmViewModel", "interop pointer and length string: ${interopService.pointerAndLengthString()}")
+        Log.d("ChasmViewModel", "interop length prefixed string: ${interopService.lengthPrefixedString()}")
+        Log.d("ChasmViewModel", "interop null terminated string: ${interopService.nullTerminatedString()}")
+        Log.d("ChasmViewModel", "interop packed string: ${interopService.packedI64String()}")
+        Log.d("ChasmViewModel", "interop immutable global: ${interopService.immutableGlobal}")
+        Log.d("ChasmViewModel", "interop mutable global before: ${interopService.mutableGlobal}")
+        interopService.unitFunction()
+        Log.d("ChasmViewModel", "interop mutable global after unit: ${interopService.mutableGlobal}")
+        interopService.mutableGlobal = 512
+        Log.d("ChasmViewModel", "interop mutable global after write: ${interopService.mutableGlobal}")
     }
 
     private fun testPrinter() {

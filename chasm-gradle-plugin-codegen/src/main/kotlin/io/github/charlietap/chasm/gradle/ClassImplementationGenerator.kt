@@ -18,6 +18,8 @@ import io.github.charlietap.chasm.gradle.ext.asTypeName
 import io.github.charlietap.chasm.gradle.ext.asValue
 import io.github.charlietap.chasm.vm.Wasm32Allocator
 import io.github.charlietap.chasm.vm.WasmVirtualMachine
+import io.github.charlietap.chasm.type.NumberType as WasmNumberType
+import io.github.charlietap.chasm.type.ValueType as WasmValueType
 
 internal class PrimaryConstructorGenerator {
     operator fun invoke(
@@ -102,8 +104,8 @@ internal class InitializerBlockGenerator() {
     ): CodeBlock = CodeBlock.builder().apply {
         initializers.forEach { name ->
             addStatement(
-                "virtualMachine.%L(store, instance, %S, emptyList()).%M(%S)",
-                INVOKE_FUNCTION,
+                "virtualMachine.%L(store, instance, %S, emptyList(), emptyList()).%M(%S)",
+                INVOKE_TYPED_FUNCTION,
                 name,
                 EXPECT_RESULT_FUNCTION,
                 "Initializer function $name failed",
@@ -176,8 +178,21 @@ private fun FunSpec.Builder.addReturn(
     proxy: FunctionProxy,
     returnType: TypeName,
     returnGenerator: FunctionReturnImplementationGenerator,
+    resultTypes: CodeBlock,
     freeAllocs: List<String> = [],
-) = returnGenerator(this, function, proxy, returnType, freeAllocs)
+) = returnGenerator(this, function, proxy, returnType, resultTypes, freeAllocs)
+
+private fun resultTypesPropertyName(function: Function): String {
+    return function.name + "ResultTypes"
+}
+
+private fun resultTypesExpression(function: Function): CodeBlock {
+    return if (function.resultTypes.isEmpty()) {
+        CodeBlock.of("emptyList()")
+    } else {
+        CodeBlock.of("%L", resultTypesPropertyName(function))
+    }
+}
 
 internal class FunctionProxyImplementationGenerator(
     private val returnImplementationGenerator: FunctionReturnImplementationGenerator = FunctionReturnImplementationGenerator(),
@@ -260,7 +275,70 @@ internal class FunctionProxyImplementationGenerator(
             endControlFlow()
         }
 
-        addReturn(function, proxy, returnType, returnImplementationGenerator, allocationsToFree)
+        addReturn(
+            function = function,
+            proxy = proxy,
+            returnType = returnType,
+            returnGenerator = returnImplementationGenerator,
+            resultTypes = resultTypesExpression(function),
+            freeAllocs = allocationsToFree,
+        )
+    }
+}
+
+internal class ResultTypePropertiesGenerator {
+    operator fun invoke(wasmInterface: WasmInterface): TypeSpec? {
+        val functionsWithResults = wasmInterface.functions.filter { it.resultTypes.isNotEmpty() }
+        if (functionsWithResults.isEmpty()) {
+            return null
+        }
+
+        return TypeSpec.companionObjectBuilder().addModifiers(KModifier.PRIVATE).apply {
+            functionsWithResults.forEach { function ->
+                addProperty(
+                    PropertySpec.builder(resultTypesPropertyName(function), VALUE_TYPE_LIST_CLASS_NAME)
+                        .addModifiers(KModifier.PRIVATE)
+                        .initializer(resultTypesInitializer(function.resultTypes))
+                        .build(),
+                )
+            }
+        }.build()
+    }
+
+    private fun resultTypesInitializer(types: List<WasmValueType>): CodeBlock {
+        return CodeBlock.builder().apply {
+            add("listOf(\n")
+            indent()
+            types.forEach { type ->
+                add("%L,\n", resultTypeInitializer(type))
+            }
+            unindent()
+            add(")")
+        }.build()
+    }
+
+    private fun resultTypeInitializer(type: WasmValueType): CodeBlock {
+        return when (type) {
+            is WasmValueType.Number -> CodeBlock.of(
+                "%T(%T.%L)",
+                VALUE_TYPE_NUMBER_CLASS_NAME,
+                NUMBER_TYPE_CLASS_NAME,
+                type.numberType.asVmNumberTypeName(),
+            )
+            is WasmValueType.Bottom,
+            is WasmValueType.Reference,
+            is WasmValueType.Vector,
+            -> throw IllegalStateException("Cannot generate VM result type for $type")
+        }
+    }
+
+    private fun WasmNumberType.asVmNumberTypeName(): String {
+        return when (this) {
+            WasmNumberType.I32 -> "I32"
+            WasmNumberType.I64 -> "I64"
+            WasmNumberType.F32 -> "F32"
+            WasmNumberType.F64 -> "F64"
+        }
     }
 }
 
@@ -393,6 +471,7 @@ internal class ClassImplementationGenerator(
     private val initializerBlockGenerator: InitializerBlockGenerator = InitializerBlockGenerator(),
     private val functionImplementationGenerator: FunctionImplementationGenerator = FunctionImplementationGenerator(),
     private val propertiesGenerator: ClassPropertiesGenerator = ClassPropertiesGenerator(),
+    private val resultTypePropertiesGenerator: ResultTypePropertiesGenerator = ResultTypePropertiesGenerator(),
 ) {
     operator fun invoke(
         packageName: String,
@@ -419,6 +498,8 @@ internal class ClassImplementationGenerator(
         if (wasmInterface.initializers.isNotEmpty()) {
             addInitializerBlock(initializerBlockGenerator(wasmInterface.initializers))
         }
+
+        resultTypePropertiesGenerator(wasmInterface)?.let(::addType)
 
         wasmInterface.functions.forEach { function ->
             addFunction(functionImplementationGenerator(packageName, function))

@@ -117,6 +117,12 @@ class WasmInterfaceFactoryTest {
                             generated = type,
                         ),
                     ),
+                    resultTypes = listOf(
+                        i32ValueType(),
+                        i64ValueType(),
+                        f32ValueType(),
+                        f64ValueType(),
+                    ),
                     implementation = functionProxy(
                         name = "multiple_return",
                     ),
@@ -276,6 +282,9 @@ class WasmInterfaceFactoryTest {
                     ),
                     returns = functionReturn(
                         integerScalarType(),
+                    ),
+                    resultTypes = listOf(
+                        i32ValueType(),
                     ),
                     implementation = functionProxy(
                         name = "foo",

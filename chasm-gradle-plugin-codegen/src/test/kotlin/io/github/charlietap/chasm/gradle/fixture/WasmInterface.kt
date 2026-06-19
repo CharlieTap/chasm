@@ -87,11 +87,13 @@ internal fun function(
     name: String = "",
     params: List<FunctionParameter> = [],
     returns: FunctionReturn = functionReturn(),
+    resultTypes: List<io.github.charlietap.chasm.type.ValueType> = emptyList(),
     implementation: FunctionImplementation = functionImplementation(),
 ) = Function(
     name = name,
     params = params,
     returns = returns,
+    resultTypes = resultTypes,
     implementation = implementation,
 )
 

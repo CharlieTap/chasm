@@ -118,6 +118,16 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         }.let(ResultFactory::new)
     }
 
+    override fun functionInvokeTyped(
+        store: Store,
+        instance: Instance,
+        functionName: String,
+        args: List<Value>,
+        resultTypes: List<ValueType>,
+    ): Result<List<Value>> {
+        return functionInvoke(store, instance, functionName, args)
+    }
+
     override fun globalRead(
         store: Store,
         global: Global,

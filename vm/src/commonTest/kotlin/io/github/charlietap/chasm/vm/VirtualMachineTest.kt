@@ -7,6 +7,12 @@ import kotlin.text.decodeToString
 
 class VirtualMachineTest {
 
+    private val i32ResultTypes = listOf(ValueType.Number(NumberType.I32))
+    private val i64ResultTypes = listOf(ValueType.Number(NumberType.I64))
+    private val f32ResultTypes = listOf(ValueType.Number(NumberType.F32))
+    private val f64ResultTypes = listOf(ValueType.Number(NumberType.F64))
+    private val i32I32ResultTypes = listOf(ValueType.Number(NumberType.I32), ValueType.Number(NumberType.I32))
+
     @Test
     fun `can invoke a wasm function and return an int`() {
 
@@ -17,7 +23,8 @@ class VirtualMachineTest {
         val module = vm.moduleDecode(bytes).expect("Failed to decode module")
         val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
         val actual =
-            vm.functionInvoke(store, instance, "int_function", emptyList()).expectFirstValue("Failed to invoke function int_function")
+            vm.functionInvokeTyped(store, instance, "int_function", emptyList(), i32ResultTypes)
+                .expectFirstValue("Failed to invoke function int_function")
 
         assertEquals(WasmVirtualMachine.Value.I32(1), actual)
     }
@@ -32,7 +39,8 @@ class VirtualMachineTest {
         val module = vm.moduleDecode(bytes).expect("Failed to decode module")
         val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
         val actual =
-            vm.functionInvoke(store, instance, "long_function", emptyList()).expectFirstValue("Failed to invoke function long_function")
+            vm.functionInvokeTyped(store, instance, "long_function", emptyList(), i64ResultTypes)
+                .expectFirstValue("Failed to invoke function long_function")
 
         assertEquals(WasmVirtualMachine.Value.I64(2), actual)
     }
@@ -47,7 +55,8 @@ class VirtualMachineTest {
         val module = vm.moduleDecode(bytes).expect("Failed to decode module")
         val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
         val actual =
-            vm.functionInvoke(store, instance, "float_function", emptyList()).expectFirstValue("Failed to invoke function float_function")
+            vm.functionInvokeTyped(store, instance, "float_function", emptyList(), f32ResultTypes)
+                .expectFirstValue("Failed to invoke function float_function")
 
         assertEquals(WasmVirtualMachine.Value.F32(3.1f), actual)
     }
@@ -62,7 +71,8 @@ class VirtualMachineTest {
         val module = vm.moduleDecode(bytes).expect("Failed to decode module")
         val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
         val actual =
-            vm.functionInvoke(store, instance, "double_function", emptyList()).expectFirstValue("Failed to invoke function double_function")
+            vm.functionInvokeTyped(store, instance, "double_function", emptyList(), f64ResultTypes)
+                .expectFirstValue("Failed to invoke function double_function")
 
         assertEquals(WasmVirtualMachine.Value.F64(4.2), actual)
     }
@@ -76,7 +86,8 @@ class VirtualMachineTest {
         val store = vm.storeInit()
         val module = vm.moduleDecode(bytes).expect("Failed to decode module")
         val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
-        val actual = vm.functionInvoke(store, instance, "unit_function", emptyList()).expect("Failed to invoke function unit_function")
+        val actual = vm.functionInvokeTyped(store, instance, "unit_function", emptyList(), emptyList())
+            .expect("Failed to invoke function unit_function")
 
         assertEquals(emptyList(), actual)
     }
@@ -302,7 +313,7 @@ class VirtualMachineTest {
         val module = vm.moduleDecode(bytes).expect("Failed to decode module")
 
         val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
-        val actual = vm.functionInvoke(store, instance, "imported_function", listOf(WasmVirtualMachine.Value.I32(107)))
+        val actual = vm.functionInvokeTyped(store, instance, "imported_function", listOf(WasmVirtualMachine.Value.I32(107)), i32ResultTypes)
             .expectFirstValue("Failed to invoke function imported_function")
 
         assertEquals(WasmVirtualMachine.Value.I32(117), actual)
@@ -318,11 +329,12 @@ class VirtualMachineTest {
         val module = vm.moduleDecode(bytes).expect("Failed to decode module")
 
         val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
-        val result = vm.functionInvoke(
+        val result = vm.functionInvokeTyped(
             store,
             instance,
             "imported_function_2",
             listOf(WasmVirtualMachine.Value.I32(5), WasmVirtualMachine.Value.I32(7)),
+            i32I32ResultTypes,
         ).expect("Failed to invoke function imported_function_2")
 
         assertEquals(listOf(WasmVirtualMachine.Value.I32(10), WasmVirtualMachine.Value.I32(21)), result)
@@ -338,10 +350,11 @@ class VirtualMachineTest {
         val module = vm.moduleDecode(bytes).expect("Failed to decode module")
 
         val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
-        val result = vm.functionInvoke(
+        val result = vm.functionInvokeTyped(
             store,
             instance,
             "imported_noop",
+            emptyList(),
             emptyList(),
         ).expect("Failed to invoke function noop_function")
 

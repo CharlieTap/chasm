@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.metro)
@@ -11,27 +13,35 @@ kotlin {
         binaries.executable()
     }
 
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
+
     sourceSets {
-        jsMain {
+        commonMain {
             dependencies {
-                implementation(projects.consumerMultiplatformFactorial)
+                implementation(projects.consumerMultiplatform)
             }
         }
     }
 }
 
 val copyWasmBinaries by tasks.registering(Copy::class) {
-    val resources = project(":consumer-multiplatform-factorial").layout.projectDirectory.dir("src/commonMain/resources")
+    val resources = project(":consumer-multiplatform").layout.projectDirectory.dir("src/commonMain/resources")
     from(resources) {
         include("*.wasm")
     }
     into(layout.buildDirectory.dir("wasm"))
 }
 
-kotlin.sourceSets.named("jsMain") {
+kotlin.sourceSets.named("commonMain") {
     resources.srcDir(layout.buildDirectory.dir("wasm"))
 }
 
-tasks.matching { it.name.startsWith("js") && it.name.contains("ProcessResources") }.configureEach {
+tasks.matching {
+    (it.name.startsWith("js") || it.name.startsWith("wasmJs")) && it.name.contains("ProcessResources")
+}.configureEach {
     dependsOn(copyWasmBinaries)
 }
