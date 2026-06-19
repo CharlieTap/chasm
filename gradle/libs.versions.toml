@@ -1,7 +1,7 @@
 [versions]
 
-version-name = "1.4.6"
-plugin-version-name = "2.0.2-1.4.6"
+version-name = "1.4.7"
+plugin-version-name = "2.0.2-1.4.7"
 
 application-id = "com.tap.chasm"
 application-namespace = "com.tap.chasm"
