@@ -69,6 +69,14 @@ interface WasmVirtualMachine {
         args: List<Value>,
     ): Result<List<Value>>
 
+    fun functionInvokeTyped(
+        store: Store,
+        instance: Instance,
+        functionName: String,
+        args: List<Value>,
+        resultTypes: List<ValueType>,
+    ): Result<List<Value>>
+
     fun globalRead(
         store: Store,
         global: Global,

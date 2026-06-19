@@ -14,16 +14,7 @@ external class WasmInstance(module: WasmModule, imports: dynamic = definedExtern
 }
 
 @JsName("Function")
-external class WasmFunction(descriptor: Any? = definedExternally, impl: Any? = definedExternally) {
-    companion object {
-        fun type(fn: dynamic): WasmFunctionType
-    }
-}
-
-external interface WasmFunctionType {
-    val parameters: Array<String>?
-    val results: Array<String>?
-}
+external class WasmFunction(descriptor: Any? = definedExternally, impl: Any? = definedExternally)
 
 @JsName("Global")
 external class WasmGlobal {

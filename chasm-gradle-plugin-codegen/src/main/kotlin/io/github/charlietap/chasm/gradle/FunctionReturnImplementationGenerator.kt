@@ -11,13 +11,15 @@ internal class PointerAndLengthStringFunctionReturnGenerator {
     operator fun invoke(
         function: Function,
         proxy: FunctionProxy,
+        resultTypes: CodeBlock,
     ) = CodeBlock.builder().apply {
         add(
-            "virtualMachine.%L(store, instance, %S, args).%M { (pointer, length) ->\n" +
+            "virtualMachine.%L(store, instance, %S, args, %L).%M { (pointer, length) ->\n" +
                 "    virtualMachine.%L(store, memory, (pointer as %T).value, (length as %T).value)\n" +
                 "}.expect(%S)",
-            INVOKE_FUNCTION,
+            INVOKE_TYPED_FUNCTION,
             proxy.name,
+            resultTypes,
             FLATMAP_RESULT_FUNCTION,
             READ_STRING_FUNCTION,
             WasmVirtualMachine.Value.I32::class,
@@ -31,13 +33,15 @@ internal class NullTerminatedStringFunctionReturnGenerator {
     operator fun invoke(
         function: Function,
         proxy: FunctionProxy,
+        resultTypes: CodeBlock,
     ) = CodeBlock.builder().apply {
         add(
-            "virtualMachine.%L(store, instance, %S, args).%M { (pointer) ->\n" +
+            "virtualMachine.%L(store, instance, %S, args, %L).%M { (pointer) ->\n" +
                 "    virtualMachine.%L(store, memory, (pointer as %T).value)\n" +
                 "}.expect(%S)",
-            INVOKE_FUNCTION,
+            INVOKE_TYPED_FUNCTION,
             proxy.name,
+            resultTypes,
             FLATMAP_RESULT_FUNCTION,
             READ_NULL_STRING_FUNCTION,
             WasmVirtualMachine.Value.I32::class,
@@ -50,14 +54,16 @@ internal class LengthPrefixedStringFunctionReturnGenerator {
     operator fun invoke(
         function: Function,
         proxy: FunctionProxy,
+        resultTypes: CodeBlock,
     ) = CodeBlock.builder().apply {
         add(
-            "virtualMachine.%L(store, instance, %S, args).%M { (pointer) ->\n" +
+            "virtualMachine.%L(store, instance, %S, args, %L).%M { (pointer) ->\n" +
                 "    val length = virtualMachine.%L(store, memory, (pointer as %T).value).%M(%S)\n" +
                 "    virtualMachine.%L(store, memory, (pointer as %T).value + 4, length)\n" +
                 "}.expect(%S)",
-            INVOKE_FUNCTION,
+            INVOKE_TYPED_FUNCTION,
             proxy.name,
+            resultTypes,
             FLATMAP_RESULT_FUNCTION,
             READ_INT_FUNCTION,
             WasmVirtualMachine.Value.I32::class,
@@ -74,16 +80,18 @@ internal class PackedStringFunctionReturnGenerator {
     operator fun invoke(
         function: Function,
         proxy: FunctionProxy,
+        resultTypes: CodeBlock,
     ) = CodeBlock.builder().apply {
         add(
-            "virtualMachine.%L(store, instance, %S, args).%M { (pointerAndLength) ->\n" +
+            "virtualMachine.%L(store, instance, %S, args, %L).%M { (pointerAndLength) ->\n" +
                 "    val packed = (pointerAndLength as %T).value\n" +
                 "    val pointer = (packed ushr 32).toInt()\n" +
                 "    val length = packed.toInt()\n" +
                 "    virtualMachine.%L(store, memory, pointer, length)\n" +
                 "}.expect(%S)",
-            INVOKE_FUNCTION,
+            INVOKE_TYPED_FUNCTION,
             proxy.name,
+            resultTypes,
             FLATMAP_RESULT_FUNCTION,
             WasmVirtualMachine.Value.I64::class,
             READ_STRING_FUNCTION,
@@ -101,11 +109,12 @@ internal class StringFunctionReturnImplementationGenerator(
     operator fun invoke(
         function: Function,
         proxy: FunctionProxy,
+        resultTypes: CodeBlock,
     ): CodeBlock = when (requireNotNull(function.returns.stringEncodingStrategy)) {
-        StringEncodingStrategy.POINTER_AND_LENGTH -> pointerAndLengthStrategy(function, proxy)
-        StringEncodingStrategy.NULL_TERMINATED -> nullTerminatedStrategy(function, proxy)
-        StringEncodingStrategy.LENGTH_PREFIXED -> lengthPrefixedStrategy(function, proxy)
-        StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> packedStringStrategy(function, proxy)
+        StringEncodingStrategy.POINTER_AND_LENGTH -> pointerAndLengthStrategy(function, proxy, resultTypes)
+        StringEncodingStrategy.NULL_TERMINATED -> nullTerminatedStrategy(function, proxy, resultTypes)
+        StringEncodingStrategy.LENGTH_PREFIXED -> lengthPrefixedStrategy(function, proxy, resultTypes)
+        StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> packedStringStrategy(function, proxy, resultTypes)
     }
 }
 
@@ -117,6 +126,7 @@ internal class FunctionReturnImplementationGenerator(
         function: Function,
         proxy: FunctionProxy,
         returnType: TypeName,
+        resultTypes: CodeBlock,
         freeAllocs: List<String>,
     ) = builder.apply {
         when (val type = function.returns.type) {
@@ -133,9 +143,10 @@ internal class FunctionReturnImplementationGenerator(
                     else -> EXPECT_RESULT_FUNCTION
                 }
                 addStatement(
-                    "val result = virtualMachine.%L(store, instance, %S, args).%M(%S)",
-                    INVOKE_FUNCTION,
+                    "val result = virtualMachine.%L(store, instance, %S, args, %L).%M(%S)",
+                    INVOKE_TYPED_FUNCTION,
                     proxy.name,
+                    resultTypes,
                     expectFirstMember,
                     "Failed to invoke function ${function.name}",
                 )
@@ -145,9 +156,10 @@ internal class FunctionReturnImplementationGenerator(
 
             Scalar.Unit -> {
                 addStatement(
-                    "virtualMachine.%L(store, instance, %S, args).%M(%S)",
-                    INVOKE_FUNCTION,
+                    "virtualMachine.%L(store, instance, %S, args, %L).%M(%S)",
+                    INVOKE_TYPED_FUNCTION,
                     proxy.name,
+                    resultTypes,
                     EXPECT_RESULT_FUNCTION,
                     "Failed to invoke function ${function.name}",
                 )
@@ -155,7 +167,7 @@ internal class FunctionReturnImplementationGenerator(
             }
 
             Scalar.String -> {
-                val expr = stringReturnGenerator(function, proxy)
+                val expr = stringReturnGenerator(function, proxy, resultTypes)
                 addStatement("val result = %L", expr)
                 freeAllocs.forEach { allocVar -> addStatement("allocator.free(%L)", allocVar) }
                 addStatement("return result")
@@ -168,14 +180,15 @@ internal class FunctionReturnImplementationGenerator(
 
                 addStatement(
                     """
-                    val result = virtualMachine.%L(store, instance, %S, args).%M {
+                    val result = virtualMachine.%L(store, instance, %S, args, %L).%M {
                         %T(
                             %L
                         )
                     }.%M(%S)
                     """.trimIndent(),
-                    INVOKE_FUNCTION,
+                    INVOKE_TYPED_FUNCTION,
                     proxy.name,
+                    resultTypes,
                     MAP_RESULT_FUNCTION,
                     returnType,
                     generatedType,

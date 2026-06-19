@@ -169,6 +169,7 @@ public final class io/github/charlietap/chasm/vm/NonJsVirtualMachine : io/github
 	public fun exportMemory (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun exportTable (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun functionInvoke (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun functionInvokeTyped (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun globalRead (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun globalWrite (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryReadBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II[BI)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
@@ -320,6 +321,7 @@ public abstract interface class io/github/charlietap/chasm/vm/WasmVirtualMachine
 	public abstract fun exportMemory (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun exportTable (Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun functionInvoke (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public abstract fun functionInvokeTyped (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun globalRead (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun globalWrite (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Global;Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Value;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun memoryReadBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II[BI)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;

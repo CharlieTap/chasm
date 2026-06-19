@@ -236,6 +236,7 @@ internal class FunctionFactory(
             name = formatter(name),
             params = params,
             returns = returnType,
+            resultTypes = type.results.types,
             implementation = implementation,
         )
     }

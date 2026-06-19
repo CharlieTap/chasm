@@ -392,6 +392,7 @@ fabric.properties
 .nfs*
 *.trace
 /kotlin-js-store
+/example/kotlin-js-store
 **/karma.config.d
 
 spec.pdf

@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
@@ -8,6 +9,8 @@ plugins {
     alias(libs.plugins.kotlinx.test.resources)
 }
 
+val isCi = !System.getenv("GITHUB_ACTIONS").isNullOrEmpty()
+
 kotlin {
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
@@ -15,7 +18,10 @@ kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     applyHierarchyTemplate {
         common {
-            withJs()
+            group("web") {
+                withJs()
+                withWasmJs()
+            }
             group("nonJs") {
                 withJvm()
                 withNative()
@@ -25,10 +31,29 @@ kotlin {
 
     js {
         nodejs()
-        browser{
+        browser {
             testTask {
                 useKarma {
-                    useFirefoxHeadless()
+                    if (isCi) {
+                        useFirefoxHeadless()
+                    } else {
+                        useChromeHeadless()
+                    }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser {
+            testTask {
+                useKarma {
+                    if (isCi) {
+                        useFirefoxHeadless()
+                    } else {
+                        useChromeHeadless()
+                    }
                 }
             }
         }

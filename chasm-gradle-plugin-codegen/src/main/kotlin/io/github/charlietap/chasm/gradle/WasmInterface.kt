@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import kotlin.reflect.KClass
 
@@ -29,6 +30,7 @@ internal data class Function(
     val name: String,
     val params: List<FunctionParameter>,
     val returns: FunctionReturn,
+    val resultTypes: List<ValueType>,
     val implementation: FunctionImplementation,
 )
 
