@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.instance
 
 import io.github.charlietap.chasm.runtime.function.Function
+import io.github.charlietap.chasm.runtime.function.StackFunctionBody
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.RTT
@@ -22,5 +23,11 @@ sealed class FunctionInstance {
         override val rtt: RTT,
         override val functionType: FunctionType,
         val function: HostFunctionImpl,
+    ) : FunctionInstance()
+
+    data class StackFunction(
+        override val rtt: RTT,
+        override val functionType: FunctionType,
+        val body: StackFunctionBody,
     ) : FunctionInstance()
 }

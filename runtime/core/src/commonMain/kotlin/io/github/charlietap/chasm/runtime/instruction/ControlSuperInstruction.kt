@@ -85,6 +85,12 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
         val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
+    data class StackCall(
+        val instance: FunctionInstance.StackFunction,
+        val resultSlots: List<Int>,
+        val callFrameSlot: Int,
+    ) : ControlSuperInstruction
+
     data class ReturnWasmCall(
         val instance: FunctionInstance.WasmFunction,
         val operands: List<CallOperand>,
@@ -92,6 +98,11 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class ReturnHostCall(
         val instance: FunctionInstance.HostFunction,
+        val operands: List<CallOperand>,
+    ) : ControlSuperInstruction
+
+    data class ReturnStackCall(
+        val instance: FunctionInstance.StackFunction,
         val operands: List<CallOperand>,
     ) : ControlSuperInstruction
 

@@ -59,10 +59,9 @@ internal inline fun WasmFunctionAllocator(
         module = moduleInstance,
         function = RuntimeFunction.TEMP,
     )
-    store.functions.add(instance)
-    moduleInstance.addFunctionAddress(Address.Function(store.functions.size - 1))
-
-    // Preallocate the handler
     val instruction = callDispatcher(ControlInstruction.WasmFunctionCall(instance))
+
+    store.functions.add(instance)
     store.instructions.add(instruction)
+    moduleInstance.addFunctionAddress(Address.Function(store.functions.size - 1))
 }

@@ -56,6 +56,30 @@ internal inline fun FunctionInvoker(
             Err(InvocationError.HostFunctionError(e.reason))
         }
     }
+    is FunctionInstance.StackFunction -> binding {
+        val instruction = store.instruction(address)
+        val arity = function.functionType.results.types.size
+
+        val thread = Thread(
+            frame = ActivationFrame(
+                arity = arity,
+                instance = instance,
+                depths = StackDepths(0, 0, 0, 0),
+            ),
+            instructions = arrayOf(instruction),
+        )
+
+        val configuration = Configuration(
+            store = store,
+            thread = thread,
+            config = config,
+        )
+
+        threadExecutor(configuration, values).bind().mapIndexed { idx, result ->
+            val expected = function.functionType.results.types[idx]
+            result.toExecutionValue(expected)
+        }
+    }
     is FunctionInstance.WasmFunction -> binding {
         val instruction = store.instruction(address)
         val arity = function.functionType.results.types.size

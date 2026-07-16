@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstructi
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.instance.stackFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.i32
@@ -95,6 +96,46 @@ class FunctionInvokerTest {
         val actual = FunctionInvoker(
             config = config,
             store = runtimeStore,
+            instance = moduleInstance,
+            address = address,
+            values = params,
+            threadExecutor = threadExecutor,
+        )
+
+        assertEquals(Ok(listOf(i32(118))), actual)
+    }
+
+    @Test
+    fun `can invoke a stack function and return a result`() {
+        val config = runtimeConfig()
+        val params = mutableListOf<ExecutionValue>(i32(117))
+        val address = functionAddress(0)
+        val moduleInstance = moduleInstance(
+            functionAddresses = mutableListOf(address),
+        )
+        val functionType = functionType(
+            params = resultType(listOf(i32ValueType())),
+            results = resultType(listOf(i32ValueType())),
+        )
+        val functionInstance = stackFunctionInstance(
+            functionType = functionType,
+        )
+        val functionInstruction = dispatchableInstruction()
+        val store = store(
+            functions = mutableListOf(functionInstance),
+            instructions = mutableListOf(functionInstruction),
+        )
+        val threadExecutor: ThreadExecutor = { configuration, values ->
+            assertEquals(config, configuration.config)
+            assertEquals(moduleInstance, configuration.thread.frame.instance)
+            assertEquals(functionInstruction, configuration.thread.instructions.single())
+            assertEquals(params, values)
+            Ok(listOf(118L))
+        }
+
+        val actual = FunctionInvoker(
+            config = config,
+            store = store,
             instance = moduleInstance,
             address = address,
             values = params,

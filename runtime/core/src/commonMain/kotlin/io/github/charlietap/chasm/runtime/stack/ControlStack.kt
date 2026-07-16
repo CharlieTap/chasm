@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.runtime.stack
 
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 
 data class ControlStack(
     private val frames: FrameStack = FrameStack(),
@@ -9,6 +11,8 @@ data class ControlStack(
     private val instructions: InstructionStack = InstructionStack(INITIAL_CAPACITY),
     private val labels: LabelStack = LabelStack(INITIAL_CAPACITY),
 ) {
+    private var nestedExecutionDepth = 0
+
     constructor(
         frames: List<ActivationFrame>,
         handlers: List<ExceptionHandler>,
@@ -101,6 +105,7 @@ data class ControlStack(
         handlers.clear()
         instructions.clear()
         labels.clear()
+        nestedExecutionDepth = 0
     }
 
     fun clearHandlers() = handlers.clear()
@@ -136,6 +141,18 @@ data class ControlStack(
 
     fun instructionStack() = instructions
 
+    fun enterNestedExecution() {
+        if (nestedExecutionDepth == MAX_NESTED_EXECUTION_DEPTH) {
+            throw InvocationException(InvocationError.CallStackExhausted)
+        }
+        nestedExecutionDepth += 1
+    }
+
+    fun leaveNestedExecution() {
+        check(nestedExecutionDepth > 0)
+        nestedExecutionDepth -= 1
+    }
+
     sealed interface Entry {
 
         data class Label(
@@ -148,5 +165,6 @@ data class ControlStack(
     companion object {
         const val INITIAL_CAPACITY = 256
         const val MAX_DEPTH = 1028
+        const val MAX_NESTED_EXECUTION_DEPTH = 64
     }
 }

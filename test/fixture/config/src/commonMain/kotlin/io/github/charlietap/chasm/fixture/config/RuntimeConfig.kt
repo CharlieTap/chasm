@@ -4,6 +4,8 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 
 fun runtimeConfig(
     debugInfo: Boolean = false,
+    bytecodeFusion: Boolean = true,
 ) = RuntimeConfig(
     debugInfo = debugInfo,
+    bytecodeFusion = bytecodeFusion,
 )

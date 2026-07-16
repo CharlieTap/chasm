@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.ReturnStackFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.StackFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.function
@@ -24,6 +26,7 @@ internal fun ReturnCallRefExecutor(
     store = store,
     context = context,
     hostFunctionCall = ::HostFunctionCall,
+    stackFunctionCall = ::ReturnStackFunctionCall,
     wasmFunctionCall = ::ReturnWasmFunctionCall,
 )
 
@@ -33,12 +36,14 @@ internal inline fun ReturnCallRefExecutor(
     store: Store,
     context: ExecutionContext,
     crossinline hostFunctionCall: HostFunctionCall,
+    crossinline stackFunctionCall: StackFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
 ) {
     val address = vstack.popFunctionAddress()
 
     when (val instance = store.function(address)) {
         is FunctionInstance.HostFunction -> hostFunctionCall(vstack, cstack, store, context, instance)
+        is FunctionInstance.StackFunction -> stackFunctionCall(vstack, cstack, store, context, instance)
         is FunctionInstance.WasmFunction -> wasmFunctionCall(vstack, cstack, store, context, instance)
     }
 }

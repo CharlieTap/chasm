@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.runtime.store
 
 import io.github.charlietap.chasm.runtime.Heap
+import io.github.charlietap.chasm.runtime.address.StoreIdentity
+import io.github.charlietap.chasm.runtime.address.StoreIdentityGenerator
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instance.DataInstance
@@ -32,3 +34,15 @@ data class Store(
     val rttCache: MutableMap<DefinedType, RTT> = mutableMapOf(),
     val heap: Heap = Heap(),
 )
+
+fun Store.identity(): StoreIdentity = heap.storeIdentity
+    ?: StoreIdentityGenerator().identity.also { identity ->
+        heap.storeIdentity = identity
+    }
+
+fun Store.instanceLifetimes(): InstanceLifetimeRegistry = heap.instanceLifetimeRegistry
+    ?: InstanceLifetimeRegistry().also { registry ->
+        heap.instanceLifetimeRegistry = registry
+    }
+
+fun Store.instanceLifetimesOrNull(): InstanceLifetimeRegistry? = heap.instanceLifetimeRegistry

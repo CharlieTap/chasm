@@ -1,17 +1,19 @@
 package io.github.charlietap.chasm.embedding
 
+import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.mapError
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
+import io.github.charlietap.chasm.embedding.shapes.ComponentInstance
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
-import io.github.charlietap.chasm.runtime.ext.data
-import io.github.charlietap.chasm.runtime.ext.element
-import io.github.charlietap.chasm.runtime.ext.global
-import io.github.charlietap.chasm.runtime.ext.memory
-import io.github.charlietap.chasm.runtime.ext.table
-import io.github.charlietap.chasm.type.SharedStatus
+import io.github.charlietap.chasm.executor.invoker.drop.ComponentInstanceDropError
+import io.github.charlietap.chasm.executor.invoker.drop.ComponentInstanceDropper
+import io.github.charlietap.chasm.executor.invoker.drop.ModuleInstanceDropper
+import io.github.charlietap.chasm.runtime.component.error.ComponentInvocationError
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 
 fun dropInstance(
     store: Store,
@@ -20,60 +22,41 @@ fun dropInstance(
     return dropInstance(
         store = store,
         instance = instance,
-        memoryDropper = ::MemoryInstanceDropper,
+        instanceDropper = ::ModuleInstanceDropper,
     )
 }
 
 internal fun dropInstance(
     store: Store,
     instance: Instance,
-    memoryDropper: MemoryInstanceDropper,
+    instanceDropper: ModuleInstanceDropper,
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
+    return instanceDropper(store.store, instance.instance)
+        .mapError(ModuleTrapError::toString)
+        .mapError(ChasmError::ExecutionError)
+        .fold(::Success, ::Error)
+}
 
-    val instance = instance.instance
-    val store = store.store
+fun dropInstance(
+    store: Store,
+    instance: ComponentInstance,
+): ChasmResult<Unit, ChasmError.ExecutionError> = dropInstance(
+    store = store,
+    instance = instance,
+    instanceDropper = ::ComponentInstanceDropper,
+)
 
-    instance.dataAddresses.forEach { address ->
-        store.data(address).let { data ->
-            data.bytes = ubyteArrayOf()
-        }
+internal fun dropInstance(
+    store: Store,
+    instance: ComponentInstance,
+    instanceDropper: ComponentInstanceDropper,
+): ChasmResult<Unit, ChasmError.ExecutionError> {
+    if (store.identity !== instance.store) {
+        return Error(ChasmError.ExecutionError(ComponentInvocationError.StoreMismatch.toString()))
     }
-    instance.dataAddresses.clear()
 
-    instance.elemAddresses.forEach { address ->
-        store.element(address).let { element ->
-            element.elements = longArrayOf()
-        }
-    }
-    instance.elemAddresses.clear()
-
-    instance.exports.clear()
-
-    instance.functionAddresses.clear()
-
-    instance.globalAddresses.forEach { address ->
-        store.global(address).value = 0L
-    }
-    instance.globalAddresses.clear()
-
-    instance.memAddresses.forEach { address ->
-        store.memory(address).let { memory ->
-            if (memory.type.shared == SharedStatus.Unshared) {
-                memoryDropper(memory)
-            }
-        }
-    }
-    instance.memAddresses.clear()
-
-    instance.tableAddresses.forEach { address ->
-        store.table(address).let { table ->
-            table.elements = longArrayOf()
-        }
-    }
-    instance.tableAddresses.clear()
-
-    instance.tagAddresses.clear()
-    instance.deallocated = true
-
-    return Success(Unit)
+    return instanceDropper(store.store, store.componentStore(), instance.root)
+        .mapError(ComponentInstanceDropError::toString)
+        .mapError(ChasmError::ExecutionError)
+        .fold(::Success, ::Error)
 }

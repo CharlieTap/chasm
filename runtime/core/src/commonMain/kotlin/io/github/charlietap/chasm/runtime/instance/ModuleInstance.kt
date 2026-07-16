@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.runtime.instance
 
 import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.type.DefinedType
+import io.github.charlietap.chasm.runtime.address.RuntimeInstanceId
 import io.github.charlietap.chasm.type.RTT
 
 data class ModuleInstance(
@@ -14,5 +14,7 @@ data class ModuleInstance(
     val elemAddresses: MutableList<Address.Element> = [],
     val dataAddresses: MutableList<Address.Data> = [],
     val exports: MutableList<ExportInstance> = [],
+    var runtimeInstanceId: RuntimeInstanceId? = null,
+    var allocation: ModuleAllocation? = null,
     var deallocated: Boolean = false,
 )

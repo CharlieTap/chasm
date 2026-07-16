@@ -10,6 +10,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.ast)
+                api(projects.runtime.component)
                 api(projects.runtime.core)
                 api(projects.executor.invoker)
                 api(projects.ir)
@@ -25,6 +26,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.test.fixture.executor.instantiator)
+                implementation(projects.test.fixture.runtime.component)
                 implementation(projects.test.fixture.runtime)
                 implementation(projects.test.fixture.ir)
                 implementation(libs.kotlin.test)

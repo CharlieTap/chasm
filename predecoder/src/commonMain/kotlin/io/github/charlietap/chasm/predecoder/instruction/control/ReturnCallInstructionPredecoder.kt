@@ -5,6 +5,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnHostFunctionCallDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnStackFunctionCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnWasmFunctionCallDispatcher
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.predecoder.PredecodingContext
@@ -15,6 +16,7 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.ReturnHostFunctionCall
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.ReturnStackFunctionCall
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction.ReturnWasmFunctionCall
 
 internal fun ReturnCallInstructionPredecoder(
@@ -26,6 +28,7 @@ internal fun ReturnCallInstructionPredecoder(
         instruction = instruction,
         returnWasmFunctionCallDispatcher = ::ReturnWasmFunctionCallDispatcher,
         returnHostFunctionCallDispatcher = ::ReturnHostFunctionCallDispatcher,
+        returnStackFunctionCallDispatcher = ::ReturnStackFunctionCallDispatcher,
     )
 
 internal inline fun ReturnCallInstructionPredecoder(
@@ -33,11 +36,16 @@ internal inline fun ReturnCallInstructionPredecoder(
     instruction: ControlInstruction.ReturnCall,
     crossinline returnWasmFunctionCallDispatcher: Dispatcher<ReturnWasmFunctionCall>,
     crossinline returnHostFunctionCallDispatcher: Dispatcher<ReturnHostFunctionCall>,
+    crossinline returnStackFunctionCallDispatcher: Dispatcher<ReturnStackFunctionCall>,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     val address = context.instance.functionAddress(instruction.functionIndex).bind()
     when (val instance = context.store.function(address)) {
         is FunctionInstance.HostFunction -> {
             returnHostFunctionCallDispatcher(ReturnHostFunctionCall(instance))
+        }
+
+        is FunctionInstance.StackFunction -> {
+            returnStackFunctionCallDispatcher(ReturnStackFunctionCall(instance))
         }
 
         is FunctionInstance.WasmFunction -> {

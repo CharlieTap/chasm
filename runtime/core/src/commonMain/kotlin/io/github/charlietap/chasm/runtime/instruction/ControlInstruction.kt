@@ -162,6 +162,9 @@ sealed interface ControlInstruction : LinkedInstruction {
     value class ReturnHostFunctionCall(val instance: FunctionInstance.HostFunction) : ControlInstruction
 
     @JvmInline
+    value class ReturnStackFunctionCall(val instance: FunctionInstance.StackFunction) : ControlInstruction
+
+    @JvmInline
     value class ReturnCallRef(val typeIndex: Index.TypeIndex) : ControlInstruction
 
     @JvmInline
@@ -169,6 +172,9 @@ sealed interface ControlInstruction : LinkedInstruction {
 
     @JvmInline
     value class HostFunctionCall(val instance: FunctionInstance.HostFunction) : ControlInstruction
+
+    @JvmInline
+    value class StackFunctionCall(val instance: FunctionInstance.StackFunction) : ControlInstruction
 
     @JvmInline
     value class CallRef(val typeIndex: Index.TypeIndex) : ControlInstruction

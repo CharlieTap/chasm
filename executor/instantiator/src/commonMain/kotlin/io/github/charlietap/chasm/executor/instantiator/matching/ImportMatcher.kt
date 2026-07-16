@@ -31,6 +31,25 @@ internal inline fun ImportMatcher(
     val requiredImports = context.module.imports
     val missingImports = mutableListOf<ModuleImport>()
 
+    if (requiredImports.size == imports.size) {
+        val ordered = ArrayList<ExternalValue>(imports.size)
+        var index = 0
+        while (index < imports.size) {
+            val requiredImport = requiredImports[index]
+            val import = imports[index]
+            if (
+                requiredImport.moduleName.name != import.moduleName ||
+                requiredImport.entityName.name != import.entityName ||
+                !descriptorMatcher(context, requiredImport.descriptor, import.externalValue).bind()
+            ) {
+                break
+            }
+            ordered += import.externalValue
+            index += 1
+        }
+        if (index == imports.size) return@binding ordered
+    }
+
     val matched = requiredImports.mapNotNull { requiredImport ->
         val match = imports.firstOrNull { (moduleName, entityName, externalValue) ->
             requiredImport.moduleName.name == moduleName &&

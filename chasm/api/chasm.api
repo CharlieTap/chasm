@@ -5,7 +5,15 @@ public final class io/github/charlietap/chasm/embedding/ComponentKt {
 	public static synthetic fun component$default ([BLio/github/charlietap/chasm/config/ComponentConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public final class io/github/charlietap/chasm/embedding/ComponentResourceKt {
+	public static final fun componentResourceType (Lio/github/charlietap/chasm/embedding/shapes/Store;Lkotlin/jvm/functions/Function2;)Lio/github/charlietap/chasm/embedding/shapes/ComponentResourceType;
+	public static final fun dropResource (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/runtime/value/component/ComponentValue$Resource$Own;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun resource (Lio/github/charlietap/chasm/embedding/shapes/ComponentHostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/ComponentResourceType;Ljava/lang/Object;)Lio/github/charlietap/chasm/runtime/value/component/ComponentValue$Resource$Own;
+	public static final fun resourceValue (Lio/github/charlietap/chasm/embedding/shapes/ComponentHostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/ComponentResourceType;Lio/github/charlietap/chasm/runtime/value/component/ComponentValue$Resource;)Ljava/lang/Object;
+}
+
 public final class io/github/charlietap/chasm/embedding/DropInstanceKt {
+	public static final fun dropInstance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/ComponentInstance;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun dropInstance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
@@ -30,13 +38,19 @@ public final class io/github/charlietap/chasm/embedding/GlobalKt {
 }
 
 public final class io/github/charlietap/chasm/embedding/InstanceKt {
+	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Component;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Component;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/InvokeKt {
+	public static final fun invoke (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/ComponentFunction;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun invoke (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/ComponentInstance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun invoke (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Lio/github/charlietap/chasm/embedding/shapes/Function;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun invoke (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun invoke$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/ComponentFunction;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun invoke$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/ComponentInstance;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun invoke$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Lio/github/charlietap/chasm/embedding/shapes/Function;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static synthetic fun invoke$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
@@ -469,6 +483,116 @@ public final class io/github/charlietap/chasm/embedding/shapes/ChasmResultKt {
 public final class io/github/charlietap/chasm/embedding/shapes/Component {
 }
 
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentExport {
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/embedding/shapes/ComponentExportable;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/charlietap/chasm/embedding/shapes/ComponentExportable;
+	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/embedding/shapes/ComponentExportable;)Lio/github/charlietap/chasm/embedding/shapes/ComponentExport;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ComponentExport;Ljava/lang/String;Lio/github/charlietap/chasm/embedding/shapes/ComponentExportable;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ComponentExport;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getValue ()Lio/github/charlietap/chasm/embedding/shapes/ComponentExportable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentExportInstance : io/github/charlietap/chasm/embedding/shapes/ComponentExportable {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ComponentExportInstance;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ComponentExportInstance;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ComponentExportInstance;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getExports ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/embedding/shapes/ComponentExportable : io/github/charlietap/chasm/embedding/shapes/ComponentImportable {
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentFunction : io/github/charlietap/chasm/embedding/shapes/ComponentExportable {
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentHostFunctionContext {
+	public fun <init> (Lio/github/charlietap/chasm/embedding/shapes/Store;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/embedding/shapes/Store;
+	public final fun copy (Lio/github/charlietap/chasm/embedding/shapes/Store;)Lio/github/charlietap/chasm/embedding/shapes/ComponentHostFunctionContext;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ComponentHostFunctionContext;Lio/github/charlietap/chasm/embedding/shapes/Store;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ComponentHostFunctionContext;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getStore ()Lio/github/charlietap/chasm/embedding/shapes/Store;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentImport {
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable;
+	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImport;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ComponentImport;Ljava/lang/String;Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImport;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getValue ()Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/charlietap/chasm/embedding/shapes/ComponentImportable {
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentImportable$CoreModule : io/github/charlietap/chasm/embedding/shapes/ComponentImportable {
+	public fun <init> (Lio/github/charlietap/chasm/embedding/shapes/Module;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/embedding/shapes/Module;
+	public final fun copy (Lio/github/charlietap/chasm/embedding/shapes/Module;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$CoreModule;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$CoreModule;Lio/github/charlietap/chasm/embedding/shapes/Module;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$CoreModule;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModule ()Lio/github/charlietap/chasm/embedding/shapes/Module;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentImportable$Function : io/github/charlietap/chasm/embedding/shapes/ComponentImportable {
+	public fun <init> (Lkotlin/jvm/functions/Function2;)V
+	public final fun component1 ()Lkotlin/jvm/functions/Function2;
+	public final fun copy (Lkotlin/jvm/functions/Function2;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$Function;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$Function;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$Function;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFunction ()Lkotlin/jvm/functions/Function2;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentImportable$Instance : io/github/charlietap/chasm/embedding/shapes/ComponentImportable {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$Instance;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$Instance;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$Instance;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getImports ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentImportable$ResourceType : io/github/charlietap/chasm/embedding/shapes/ComponentImportable {
+	public fun <init> (Lio/github/charlietap/chasm/embedding/shapes/ComponentResourceType;)V
+	public final fun component1 ()Lio/github/charlietap/chasm/embedding/shapes/ComponentResourceType;
+	public final fun copy (Lio/github/charlietap/chasm/embedding/shapes/ComponentResourceType;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$ResourceType;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$ResourceType;Lio/github/charlietap/chasm/embedding/shapes/ComponentResourceType;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ComponentImportable$ResourceType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getType ()Lio/github/charlietap/chasm/embedding/shapes/ComponentResourceType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentInstance {
+	public final fun getExports ()Ljava/util/List;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ComponentResourceType : io/github/charlietap/chasm/embedding/shapes/ComponentExportable {
+}
+
 public final class io/github/charlietap/chasm/embedding/shapes/Export {
 	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/embedding/shapes/Importable;)V
 	public final fun component1 ()Ljava/lang/String;
@@ -576,7 +700,7 @@ public final class io/github/charlietap/chasm/embedding/shapes/Memory : io/githu
 	public fun hashCode ()I
 }
 
-public final class io/github/charlietap/chasm/embedding/shapes/Module {
+public final class io/github/charlietap/chasm/embedding/shapes/Module : io/github/charlietap/chasm/embedding/shapes/ComponentExportable {
 	public final fun getExports ()Ljava/util/List;
 	public final fun getImports ()Ljava/util/List;
 }
@@ -624,6 +748,10 @@ public final class io/github/charlietap/chasm/embedding/table/ReadTableKt {
 
 public final class io/github/charlietap/chasm/embedding/table/WriteTableKt {
 	public static final fun writeTable (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Table;ILio/github/charlietap/chasm/runtime/value/ReferenceValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/embedding/transform/ComponentImportMapperKt {
+	public static final fun mapComponentImports (Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/util/List;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 }
 
 public final class io/github/charlietap/chasm/embedding/transform/ImportMapperKt {

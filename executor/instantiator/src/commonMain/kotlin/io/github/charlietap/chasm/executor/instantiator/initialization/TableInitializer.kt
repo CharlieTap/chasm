@@ -8,28 +8,32 @@ import io.github.charlietap.chasm.executor.instantiator.context.InstantiationCon
 import io.github.charlietap.chasm.executor.instantiator.ext.elementAddress
 import io.github.charlietap.chasm.executor.instantiator.ext.tableAddress
 import io.github.charlietap.chasm.ir.module.ElementSegment
+import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.ext.table
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 
-internal typealias TableInitializer = (InstantiationContext, ModuleInstance) -> Result<Unit, ModuleTrapError>
+internal typealias TableInitializer = (InstantiationContext, ModuleInstance, (Index.TableIndex) -> Unit) -> Result<Unit, ModuleTrapError>
 
 internal fun TableInitializer(
     context: InstantiationContext,
     instance: ModuleInstance,
+    tableInitialized: (Index.TableIndex) -> Unit,
 ): Result<Unit, ModuleTrapError> =
     TableInitializer(
         context = context,
         instance = instance,
         constantExpressionEvaluator = ::ConstantExpressionEvaluator,
+        tableInitialized = tableInitialized,
     )
 
 internal inline fun TableInitializer(
     context: InstantiationContext,
     instance: ModuleInstance,
     crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
+    crossinline tableInitialized: (Index.TableIndex) -> Unit,
 ): Result<Unit, ModuleTrapError> = binding {
 
     val store = context.store
@@ -56,6 +60,7 @@ internal inline fun TableInitializer(
                 Err(InvocationError.TableOperationOutOfBounds).bind<Unit>()
             }
 
+            tableInitialized(mode.tableIndex)
             elementInstance.elements = longArrayOf()
         }
 

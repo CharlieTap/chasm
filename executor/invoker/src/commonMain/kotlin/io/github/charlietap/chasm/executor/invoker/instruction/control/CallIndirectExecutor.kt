@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.StackFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -30,6 +31,7 @@ internal fun CallIndirectExecutor(
     table = instruction.table,
     type = instruction.type,
     hostFunctionCall = ::HostFunctionCall,
+    stackFunctionCall = ::StackFunctionCall,
     wasmFunctionCall = ::WasmFunctionCall,
 )
 
@@ -41,6 +43,7 @@ internal inline fun CallIndirectExecutor(
     table: TableInstance,
     type: RTT,
     crossinline hostFunctionCall: HostFunctionCall,
+    crossinline stackFunctionCall: StackFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
 ) {
     val elementIndex = vstack.popI32()
@@ -59,6 +62,7 @@ internal inline fun CallIndirectExecutor(
 
     when (functionInstance) {
         is FunctionInstance.HostFunction -> hostFunctionCall(vstack, cstack, store, context, functionInstance)
+        is FunctionInstance.StackFunction -> stackFunctionCall(vstack, cstack, store, context, functionInstance)
         is FunctionInstance.WasmFunction -> wasmFunctionCall(vstack, cstack, store, context, functionInstance)
     }
 }

@@ -1428,6 +1428,17 @@ public final class io/github/charlietap/chasm/type/component/canonical/Canonical
 	public static fun values ()[Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiContext;
 }
 
+public final class io/github/charlietap/chasm/type/component/canonical/CanonicalAbiDeferredType : java/lang/Enum {
+	public static final field ErrorContext Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiDeferredType;
+	public static final field FixedLengthList Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiDeferredType;
+	public static final field Future Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiDeferredType;
+	public static final field Map Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiDeferredType;
+	public static final field Stream Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiDeferredType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiDeferredType;
+	public static fun values ()[Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiDeferredType;
+}
+
 public final class io/github/charlietap/chasm/type/component/canonical/CanonicalAbiDescriptor {
 	public fun <init> (Lio/github/charlietap/chasm/type/DefinedType;ZZ)V
 	public synthetic fun <init> (Lio/github/charlietap/chasm/type/DefinedType;ZZILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -1448,6 +1459,8 @@ public final class io/github/charlietap/chasm/type/component/canonical/Canonical
 	public static final field MAX_FLAT_ASYNC_PARAMS I
 	public static final field MAX_FLAT_PARAMS I
 	public static final field MAX_FLAT_RESULTS I
+	public static final fun CanonicalAbiShape (Lio/github/charlietap/chasm/type/component/ComponentValueType;Lio/github/charlietap/chasm/type/AddressType;)Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiShape;
+	public static final fun CanonicalAbiShape (Ljava/util/List;Lio/github/charlietap/chasm/type/AddressType;)Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiShape;
 	public static final fun CanonicalCoreFunctionType (Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/type/DefinedType;
 	public static synthetic fun CanonicalCoreFunctionType$default (Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/DefinedType;
 	public static final fun CanonicalFunctionType (Lio/github/charlietap/chasm/type/component/ComponentFunctionType;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiSignatureOptions;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiContext;)Lio/github/charlietap/chasm/type/DefinedType;
@@ -1469,6 +1482,42 @@ public final class io/github/charlietap/chasm/type/component/canonical/Canonical
 	public final fun getRequiresMemory ()Z
 	public final fun getRequiresRealloc ()Z
 	public final fun getType ()Lio/github/charlietap/chasm/type/DefinedType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties {
+	public fun <init> ()V
+	public fun <init> (ZZZZLjava/util/Set;)V
+	public synthetic fun <init> (ZZZZLjava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Z
+	public final fun component3 ()Z
+	public final fun component4 ()Z
+	public final fun component5 ()Ljava/util/Set;
+	public final fun copy (ZZZZLjava/util/Set;)Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties;ZZZZLjava/util/Set;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContainsBorrow ()Z
+	public final fun getContainsDynamicList ()Z
+	public final fun getContainsResource ()Z
+	public final fun getContainsString ()Z
+	public final fun getDeferredTypes ()Ljava/util/Set;
+	public final fun getRequiresAllocation ()Z
+	public final fun getRequiresAllocationSensitiveHandling ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/type/component/canonical/CanonicalAbiShape {
+	public fun <init> (Ljava/util/List;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties;
+	public final fun copy (Ljava/util/List;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties;)Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiShape;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiShape;Ljava/util/List;Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties;ILjava/lang/Object;)Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiShape;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFlatTypes ()Ljava/util/List;
+	public final fun getProperties ()Lio/github/charlietap/chasm/type/component/canonical/CanonicalAbiProperties;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

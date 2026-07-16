@@ -1,0 +1,38 @@
+public abstract interface class io/github/charlietap/chasm/wasi/p2/WasiP2ByteSink {
+	public fun flush ()V
+	public abstract fun write ([B)V
+}
+
+public final class io/github/charlietap/chasm/wasi/p2/WasiP2ByteSink$DefaultImpls {
+	public static fun flush (Lio/github/charlietap/chasm/wasi/p2/WasiP2ByteSink;)V
+}
+
+public final class io/github/charlietap/chasm/wasi/p2/WasiP2ByteSinkFailure : java/lang/Exception {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun getReason ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/wasi/p2/WasiP2CommandConfig {
+	public fun <init> ()V
+	public fun <init> (II)V
+	public synthetic fun <init> (IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lio/github/charlietap/chasm/wasi/p2/WasiP2CommandConfig;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/wasi/p2/WasiP2CommandConfig;IIILjava/lang/Object;)Lio/github/charlietap/chasm/wasi/p2/WasiP2CommandConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMaxRandomBytes ()I
+	public final fun getWritePermitBytes ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/wasi/p2/WasiP2CommandKt {
+	public static final fun wasiP2CommandImports (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/wasi/p2/WasiP2ByteSink;Lio/github/charlietap/chasm/wasi/p2/WasiP2ByteSink;Lio/github/charlietap/chasm/wasi/p2/WasiP2Entropy;Lio/github/charlietap/chasm/wasi/p2/WasiP2CommandConfig;)Ljava/util/List;
+	public static synthetic fun wasiP2CommandImports$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/wasi/p2/WasiP2ByteSink;Lio/github/charlietap/chasm/wasi/p2/WasiP2ByteSink;Lio/github/charlietap/chasm/wasi/p2/WasiP2Entropy;Lio/github/charlietap/chasm/wasi/p2/WasiP2CommandConfig;ILjava/lang/Object;)Ljava/util/List;
+}
+
+public abstract interface class io/github/charlietap/chasm/wasi/p2/WasiP2Entropy {
+	public abstract fun bytes (I)[B
+}
+

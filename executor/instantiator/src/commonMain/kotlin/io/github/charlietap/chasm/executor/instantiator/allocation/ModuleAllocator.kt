@@ -96,13 +96,11 @@ internal inline fun ModuleAllocator(
         instance.addGlobalAddress(address)
     }
 
-    module.elementSegments.forEachIndexed { idx, elementSegment ->
-        val elementSegmentReferences = module.elementSegments.map { segment ->
-            LongArray(segment.initExpressions.size) { initExpressionIndex ->
-                constantExpressionEvaluator(store, instance, segment.initExpressions[initExpressionIndex]).bind()
-            }
+    module.elementSegments.forEach { elementSegment ->
+        val elementSegmentReferences = LongArray(elementSegment.initExpressions.size) { initExpressionIndex ->
+            constantExpressionEvaluator(store, instance, elementSegment.initExpressions[initExpressionIndex]).bind()
         }
-        val address = elementAllocator(store, elementSegment.type, elementSegmentReferences[idx])
+        val address = elementAllocator(store, elementSegment.type, elementSegmentReferences)
         instance.addElementAddress(address)
     }
 

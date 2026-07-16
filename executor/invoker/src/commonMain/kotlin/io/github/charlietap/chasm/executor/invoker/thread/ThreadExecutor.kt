@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
 internal typealias ThreadExecutor = (Configuration, List<ExecutionValue>) -> Result<List<Long>, InvocationError>
+internal typealias RawThreadExecutor = (Configuration, LongArray, Int, LongArray) -> Result<Int, InvocationError>
 
 internal fun ThreadExecutor(
     configuration: Configuration,
@@ -56,4 +57,47 @@ internal fun ThreadExecutor(
     List(thread.frame.arity) {
         vstack.pop()
     }.asReversed()
+}
+
+internal fun RawThreadExecutor(
+    configuration: Configuration,
+    params: LongArray,
+    paramCount: Int,
+    results: LongArray,
+): Result<Int, InvocationError> = binding {
+
+    val thread = configuration.thread
+    val store = configuration.store
+    val istack = InstructionStack()
+    val cstack = ControlStack(instructions = istack)
+    val vstack = ValueStack()
+    val context = ExecutionContext(
+        cstack = cstack,
+        vstack = vstack,
+        store = store,
+        instance = thread.frame.instance,
+        config = configuration.config,
+    )
+
+    cstack.push(thread.frame)
+    vstack.push(params, paramCount)
+    istack.pushAll(thread.instructions)
+
+    try {
+        istack.execute(vstack, cstack, store, context)
+    } catch (exception: InvocationException) {
+        Err(exception.error).bind()
+    }
+
+    if (context.depth() != thread.frame.arity) {
+        Err(InvocationError.ProgramFinishedInconsistentState).bind<Int>()
+    }
+    if (results.size < thread.frame.arity) {
+        Err(InvocationError.ProgramFinishedInconsistentState).bind<Int>()
+    }
+
+    repeat(thread.frame.arity) { index ->
+        results[index] = vstack.getFrameSlot(index)
+    }
+    thread.frame.arity
 }

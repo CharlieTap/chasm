@@ -40,7 +40,8 @@ class ValidateTest {
 
         assertIs<ChasmResult.Success<Component>>(actual)
         assertEquals(internalComponent, actual.result.component)
-        assertEquals(types, actual.result.types)
+        assertEquals(types, actual.result.analysisCache.types)
+        assertEquals(component.preparationCache, actual.result.preparationCache)
     }
 
     @Test
@@ -89,6 +90,7 @@ class ValidateTest {
 
         assertIs<ChasmResult.Success<Module>>(actual)
         assertEquals(internalModule, actual.result.module)
+        assertEquals(module.compilationCache, actual.result.compilationCache)
     }
 
     @Test

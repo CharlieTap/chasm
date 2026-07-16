@@ -17,6 +17,20 @@ final enum class io.github.charlietap.chasm.type.component.canonical/CanonicalAb
     final fun values(): kotlin/Array<io.github.charlietap.chasm.type.component.canonical/CanonicalAbiContext> // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiContext.values|values#static(){}[0]
 }
 
+final enum class io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType : kotlin/Enum<io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType> { // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType|null[0]
+    enum entry ErrorContext // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.ErrorContext|null[0]
+    enum entry FixedLengthList // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.FixedLengthList|null[0]
+    enum entry Future // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.Future|null[0]
+    enum entry Map // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.Map|null[0]
+    enum entry Stream // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.Stream|null[0]
+
+    final val entries // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType> // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType> // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType.values|values#static(){}[0]
+}
+
 final enum class io.github.charlietap.chasm.type.component/ComponentPrimitiveType : kotlin/Enum<io.github.charlietap.chasm.type.component/ComponentPrimitiveType> { // io.github.charlietap.chasm.type.component/ComponentPrimitiveType|null[0]
     enum entry Bool // io.github.charlietap.chasm.type.component/ComponentPrimitiveType.Bool|null[0]
     enum entry Char // io.github.charlietap.chasm.type.component/ComponentPrimitiveType.Char|null[0]
@@ -1058,6 +1072,51 @@ final class io.github.charlietap.chasm.type.component.canonical/CanonicalAbiLowe
     final fun toString(): kotlin/String // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiLowering.toString|toString(){}[0]
 }
 
+final class io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties { // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties|null[0]
+    constructor <init>(kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin.collections/Set<io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType> = ...) // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.<init>|<init>(kotlin.Boolean;kotlin.Boolean;kotlin.Boolean;kotlin.Boolean;kotlin.collections.Set<io.github.charlietap.chasm.type.component.canonical.CanonicalAbiDeferredType>){}[0]
+
+    final val containsBorrow // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.containsBorrow|{}containsBorrow[0]
+        final fun <get-containsBorrow>(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.containsBorrow.<get-containsBorrow>|<get-containsBorrow>(){}[0]
+    final val containsDynamicList // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.containsDynamicList|{}containsDynamicList[0]
+        final fun <get-containsDynamicList>(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.containsDynamicList.<get-containsDynamicList>|<get-containsDynamicList>(){}[0]
+    final val containsResource // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.containsResource|{}containsResource[0]
+        final fun <get-containsResource>(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.containsResource.<get-containsResource>|<get-containsResource>(){}[0]
+    final val containsString // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.containsString|{}containsString[0]
+        final fun <get-containsString>(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.containsString.<get-containsString>|<get-containsString>(){}[0]
+    final val deferredTypes // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.deferredTypes|{}deferredTypes[0]
+        final fun <get-deferredTypes>(): kotlin.collections/Set<io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType> // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.deferredTypes.<get-deferredTypes>|<get-deferredTypes>(){}[0]
+    final val requiresAllocation // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.requiresAllocation|{}requiresAllocation[0]
+        final fun <get-requiresAllocation>(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.requiresAllocation.<get-requiresAllocation>|<get-requiresAllocation>(){}[0]
+    final val requiresAllocationSensitiveHandling // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.requiresAllocationSensitiveHandling|{}requiresAllocationSensitiveHandling[0]
+        final fun <get-requiresAllocationSensitiveHandling>(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.requiresAllocationSensitiveHandling.<get-requiresAllocationSensitiveHandling>|<get-requiresAllocationSensitiveHandling>(){}[0]
+
+    final fun component1(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.component1|component1(){}[0]
+    final fun component2(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.component2|component2(){}[0]
+    final fun component3(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.component3|component3(){}[0]
+    final fun component4(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.component4|component4(){}[0]
+    final fun component5(): kotlin.collections/Set<io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType> // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.component5|component5(){}[0]
+    final fun copy(kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin.collections/Set<io.github.charlietap.chasm.type.component.canonical/CanonicalAbiDeferredType> = ...): io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.copy|copy(kotlin.Boolean;kotlin.Boolean;kotlin.Boolean;kotlin.Boolean;kotlin.collections.Set<io.github.charlietap.chasm.type.component.canonical.CanonicalAbiDeferredType>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties.toString|toString(){}[0]
+}
+
+final class io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape { // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape|null[0]
+    constructor <init>(kotlin.collections/List<io.github.charlietap.chasm.type/ValueType>, io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties) // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.<init>|<init>(kotlin.collections.List<io.github.charlietap.chasm.type.ValueType>;io.github.charlietap.chasm.type.component.canonical.CanonicalAbiProperties){}[0]
+
+    final val flatTypes // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.flatTypes|{}flatTypes[0]
+        final fun <get-flatTypes>(): kotlin.collections/List<io.github.charlietap.chasm.type/ValueType> // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.flatTypes.<get-flatTypes>|<get-flatTypes>(){}[0]
+    final val properties // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.properties|{}properties[0]
+        final fun <get-properties>(): io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.properties.<get-properties>|<get-properties>(){}[0]
+
+    final fun component1(): kotlin.collections/List<io.github.charlietap.chasm.type/ValueType> // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.component1|component1(){}[0]
+    final fun component2(): io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.component2|component2(){}[0]
+    final fun copy(kotlin.collections/List<io.github.charlietap.chasm.type/ValueType> = ..., io.github.charlietap.chasm.type.component.canonical/CanonicalAbiProperties = ...): io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.copy|copy(kotlin.collections.List<io.github.charlietap.chasm.type.ValueType>;io.github.charlietap.chasm.type.component.canonical.CanonicalAbiProperties){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape.toString|toString(){}[0]
+}
+
 final class io.github.charlietap.chasm.type.component.canonical/CanonicalAbiSignatureOptions { // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiSignatureOptions|null[0]
     constructor <init>(io.github.charlietap.chasm.type/AddressType = ..., kotlin/Boolean = ..., kotlin/Boolean = ...) // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiSignatureOptions.<init>|<init>(io.github.charlietap.chasm.type.AddressType;kotlin.Boolean;kotlin.Boolean){}[0]
 
@@ -1648,6 +1707,8 @@ final const val io.github.charlietap.chasm.type.component.canonical/MAX_FLAT_RES
 
 final fun (io.github.charlietap.chasm.type.component/ComponentValueType).io.github.charlietap.chasm.type.component.canonical/containsListOrString(): kotlin/Boolean // io.github.charlietap.chasm.type.component.canonical/containsListOrString|containsListOrString@io.github.charlietap.chasm.type.component.ComponentValueType(){}[0]
 final fun (io.github.charlietap.chasm.type/AddressType).io.github.charlietap.chasm.type.component.canonical/coreValueType(): io.github.charlietap.chasm.type/ValueType // io.github.charlietap.chasm.type.component.canonical/coreValueType|coreValueType@io.github.charlietap.chasm.type.AddressType(){}[0]
+final fun io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape(io.github.charlietap.chasm.type.component/ComponentValueType, io.github.charlietap.chasm.type/AddressType): io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape? // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape|CanonicalAbiShape(io.github.charlietap.chasm.type.component.ComponentValueType;io.github.charlietap.chasm.type.AddressType){}[0]
+final fun io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape(kotlin.collections/List<io.github.charlietap.chasm.type.component/ComponentValueType>, io.github.charlietap.chasm.type/AddressType): io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape? // io.github.charlietap.chasm.type.component.canonical/CanonicalAbiShape|CanonicalAbiShape(kotlin.collections.List<io.github.charlietap.chasm.type.component.ComponentValueType>;io.github.charlietap.chasm.type.AddressType){}[0]
 final fun io.github.charlietap.chasm.type.component.canonical/CanonicalCoreFunctionType(kotlin.collections/List<io.github.charlietap.chasm.type/ValueType> = ..., kotlin.collections/List<io.github.charlietap.chasm.type/ValueType> = ...): io.github.charlietap.chasm.type/DefinedType // io.github.charlietap.chasm.type.component.canonical/CanonicalCoreFunctionType|CanonicalCoreFunctionType(kotlin.collections.List<io.github.charlietap.chasm.type.ValueType>;kotlin.collections.List<io.github.charlietap.chasm.type.ValueType>){}[0]
 final fun io.github.charlietap.chasm.type.component.canonical/CanonicalFunctionType(io.github.charlietap.chasm.type.component/ComponentFunctionType, io.github.charlietap.chasm.type.component.canonical/CanonicalAbiSignatureOptions, io.github.charlietap.chasm.type.component.canonical/CanonicalAbiContext): io.github.charlietap.chasm.type/DefinedType? // io.github.charlietap.chasm.type.component.canonical/CanonicalFunctionType|CanonicalFunctionType(io.github.charlietap.chasm.type.component.ComponentFunctionType;io.github.charlietap.chasm.type.component.canonical.CanonicalAbiSignatureOptions;io.github.charlietap.chasm.type.component.canonical.CanonicalAbiContext){}[0]
 final fun io.github.charlietap.chasm.type.component.canonical/CanonicalFunctionTypeLowering(io.github.charlietap.chasm.type.component/ComponentFunctionType, io.github.charlietap.chasm.type.component.canonical/CanonicalAbiSignatureOptions, io.github.charlietap.chasm.type.component.canonical/CanonicalAbiContext): io.github.charlietap.chasm.type.component.canonical/CanonicalAbiLowering? // io.github.charlietap.chasm.type.component.canonical/CanonicalFunctionTypeLowering|CanonicalFunctionTypeLowering(io.github.charlietap.chasm.type.component.ComponentFunctionType;io.github.charlietap.chasm.type.component.canonical.CanonicalAbiSignatureOptions;io.github.charlietap.chasm.type.component.canonical.CanonicalAbiContext){}[0]

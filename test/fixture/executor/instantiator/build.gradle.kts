@@ -10,6 +10,7 @@ kotlin {
                 api(projects.executor.instantiator)
                 api(projects.test.fixture.ast)
                 api(projects.test.fixture.runtime)
+                api(projects.test.fixture.runtime.component)
             }
         }
     }

@@ -1,0 +1,41 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.charlietap.chasm:p2>
+abstract fun interface io.github.charlietap.chasm.wasi.p2/WasiP2ByteSink { // io.github.charlietap.chasm.wasi.p2/WasiP2ByteSink|null[0]
+    abstract fun write(kotlin/ByteArray) // io.github.charlietap.chasm.wasi.p2/WasiP2ByteSink.write|write(kotlin.ByteArray){}[0]
+    open fun flush() // io.github.charlietap.chasm.wasi.p2/WasiP2ByteSink.flush|flush(){}[0]
+}
+
+abstract fun interface io.github.charlietap.chasm.wasi.p2/WasiP2Entropy { // io.github.charlietap.chasm.wasi.p2/WasiP2Entropy|null[0]
+    abstract fun bytes(kotlin/Int): kotlin/ByteArray // io.github.charlietap.chasm.wasi.p2/WasiP2Entropy.bytes|bytes(kotlin.Int){}[0]
+}
+
+final class io.github.charlietap.chasm.wasi.p2/WasiP2ByteSinkFailure : kotlin/Exception { // io.github.charlietap.chasm.wasi.p2/WasiP2ByteSinkFailure|null[0]
+    constructor <init>(kotlin/String) // io.github.charlietap.chasm.wasi.p2/WasiP2ByteSinkFailure.<init>|<init>(kotlin.String){}[0]
+
+    final val reason // io.github.charlietap.chasm.wasi.p2/WasiP2ByteSinkFailure.reason|{}reason[0]
+        final fun <get-reason>(): kotlin/String // io.github.charlietap.chasm.wasi.p2/WasiP2ByteSinkFailure.reason.<get-reason>|<get-reason>(){}[0]
+}
+
+final class io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig { // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig|null[0]
+    constructor <init>(kotlin/Int = ..., kotlin/Int = ...) // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.<init>|<init>(kotlin.Int;kotlin.Int){}[0]
+
+    final val maxRandomBytes // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.maxRandomBytes|{}maxRandomBytes[0]
+        final fun <get-maxRandomBytes>(): kotlin/Int // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.maxRandomBytes.<get-maxRandomBytes>|<get-maxRandomBytes>(){}[0]
+    final val writePermitBytes // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.writePermitBytes|{}writePermitBytes[0]
+        final fun <get-writePermitBytes>(): kotlin/Int // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.writePermitBytes.<get-writePermitBytes>|<get-writePermitBytes>(){}[0]
+
+    final fun component1(): kotlin/Int // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.component1|component1(){}[0]
+    final fun component2(): kotlin/Int // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.component2|component2(){}[0]
+    final fun copy(kotlin/Int = ..., kotlin/Int = ...): io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.copy|copy(kotlin.Int;kotlin.Int){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig.toString|toString(){}[0]
+}
+
+final fun io.github.charlietap.chasm.wasi.p2/wasiP2CommandImports(io.github.charlietap.chasm.embedding.shapes/Store, io.github.charlietap.chasm.wasi.p2/WasiP2ByteSink, io.github.charlietap.chasm.wasi.p2/WasiP2ByteSink, io.github.charlietap.chasm.wasi.p2/WasiP2Entropy, io.github.charlietap.chasm.wasi.p2/WasiP2CommandConfig = ...): kotlin.collections/List<io.github.charlietap.chasm.embedding.shapes/ComponentImport> // io.github.charlietap.chasm.wasi.p2/wasiP2CommandImports|wasiP2CommandImports(io.github.charlietap.chasm.embedding.shapes.Store;io.github.charlietap.chasm.wasi.p2.WasiP2ByteSink;io.github.charlietap.chasm.wasi.p2.WasiP2ByteSink;io.github.charlietap.chasm.wasi.p2.WasiP2Entropy;io.github.charlietap.chasm.wasi.p2.WasiP2CommandConfig){}[0]

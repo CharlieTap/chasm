@@ -150,13 +150,15 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
 
     fun push(
         values: LongArray,
+        size: Int = values.size,
     ) {
-        val requiredSize = top + values.size
+        require(size in 0..values.size)
+        val requiredSize = top + size
         while (requiredSize > elements.size) {
             doubleCapacity()
         }
-        values.copyInto(elements, startIndex = 0, endIndex = values.size, destinationOffset = top)
-        top += values.size
+        values.copyInto(elements, startIndex = 0, endIndex = size, destinationOffset = top)
+        top += size
     }
 
     fun shrink(

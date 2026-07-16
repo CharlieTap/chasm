@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.embedding.fixture
 
 import io.github.charlietap.chasm.config.ComponentConfig
 import io.github.charlietap.chasm.embedding.shapes.Component
+import io.github.charlietap.chasm.embedding.shapes.ComponentAnalysisCache
 import io.github.charlietap.chasm.fixture.ast.component.component
 import io.github.charlietap.chasm.fixture.config.componentConfig
 import io.github.charlietap.chasm.type.component.ComponentScopeTypes
@@ -15,7 +16,7 @@ fun publicComponent(
 ) = Component(
     config = config,
     component = component,
-    types = types,
+    analysisCache = ComponentAnalysisCache(types),
 )
 
 fun componentTypes(

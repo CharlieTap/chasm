@@ -1,10 +1,14 @@
 package io.github.charlietap.chasm.script.command
 
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.runtime.value.component.ComponentValue
 import io.github.charlietap.chasm.script.ScriptContext
 import io.github.charlietap.chasm.script.action.ActionResult
 import io.github.charlietap.chasm.script.action.ActionRunner
 import io.github.charlietap.chasm.script.ext.mismatchTemplate
+import io.github.charlietap.chasm.script.value.ComponentValueMapper
+import io.github.charlietap.chasm.script.value.ComponentValueMatcher
+import io.github.charlietap.chasm.script.value.ScriptValue
 import io.github.charlietap.chasm.script.value.ValueMapper
 import io.github.charlietap.chasm.script.value.ValueMatcher
 import io.github.charlietap.sweet.lib.command.AssertReturnCommand
@@ -21,6 +25,8 @@ fun AssertReturnCommandRunner(
     ::ActionRunner,
     ::ValueMapper,
     ::ValueMatcher,
+    ::ComponentValueMapper,
+    ::ComponentValueMatcher,
 )
 
 fun AssertReturnCommandRunner(
@@ -29,16 +35,25 @@ fun AssertReturnCommandRunner(
     actionRunner: ActionRunner,
     valueMapper: ValueMapper,
     valueMatcher: ValueMatcher,
+    componentValueMapper: ComponentValueMapper,
+    componentValueMatcher: (ComponentValue, ComponentValue) -> Boolean,
 ): CommandResult {
     return when (val result = actionRunner(context, command, command.action)) {
         is ActionResult.Success -> {
-            val resultsMatch = compareResults(command.expected, result.value, valueMapper, valueMatcher)
+            val resultsMatch = compareResults(
+                expected = command.expected,
+                actual = result.value,
+                componentResultType = result.componentResultType,
+                valueMapper = valueMapper,
+                valueMatcher = valueMatcher,
+                componentValueMapper = componentValueMapper,
+                componentValueMatcher = componentValueMatcher,
+            )
 
             if (resultsMatch) {
                 CommandResult.Success
             } else {
-                val expected = command.expected.mapNotNull(valueMapper)
-                val mismatch = mismatchTemplate(expected, result.value)
+                val mismatch = mismatchTemplate(command.expected, result.value)
                 CommandResult.Failure(command, mismatch)
             }
         }
@@ -51,12 +66,22 @@ fun AssertReturnCommandRunner(
 
 private fun compareResults(
     expected: List<Value>,
-    actual: List<ExecutionValue>,
+    actual: List<ScriptValue>,
+    componentResultType: io.github.charlietap.chasm.type.component.ComponentValueType?,
     valueMapper: ValueMapper,
     valueMatcher: ValueMatcher,
+    componentValueMapper: ComponentValueMapper,
+    componentValueMatcher: (ComponentValue, ComponentValue) -> Boolean,
 ): Boolean = if (expected.size == actual.size) {
     expected.zip(actual).all { (expectedValue, actualValue) ->
-        matchValue(expectedValue, actualValue, valueMapper, valueMatcher)
+        when (actualValue) {
+            is ScriptValue.Core -> matchValue(expectedValue, actualValue.value, valueMapper, valueMatcher)
+            is ScriptValue.ComponentModel -> {
+                val resultType = componentResultType ?: return@all false
+                val mapped = componentValueMapper(expectedValue, resultType) ?: return@all false
+                componentValueMatcher(mapped, actualValue.value)
+            }
+        }
     }
 } else {
     false

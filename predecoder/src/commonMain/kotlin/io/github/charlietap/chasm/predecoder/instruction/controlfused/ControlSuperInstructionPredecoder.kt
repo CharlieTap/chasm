@@ -71,6 +71,15 @@ private fun strictCallInstruction(
                 ),
             )
         }
+        is FunctionInstance.StackFunction -> {
+            CallDispatcher(
+                RuntimeFusedControlInstruction.StackCall(
+                    instance = instance,
+                    resultSlots = instruction.resultSlots,
+                    callFrameSlot = instruction.callFrameSlot,
+                ),
+            )
+        }
 
         is FunctionInstance.WasmFunction -> {
             CallDispatcher(
@@ -95,6 +104,15 @@ private fun strictReturnCallInstruction(
         is FunctionInstance.HostFunction -> {
             ReturnCallDispatcher(
                 RuntimeFusedControlInstruction.ReturnHostCall(
+                    instance = instance,
+                    operands = operands,
+                ),
+            )
+        }
+
+        is FunctionInstance.StackFunction -> {
+            ReturnCallDispatcher(
+                RuntimeFusedControlInstruction.ReturnStackCall(
                     instance = instance,
                     operands = operands,
                 ),

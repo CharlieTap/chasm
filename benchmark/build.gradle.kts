@@ -27,6 +27,16 @@ benchmark {
             register("macosArm64")
         }
     }
+
+    configurations {
+        register("component") {
+            include("ComponentCanonicalCallBenchmark")
+        }
+        register("coreModule") {
+            include("CoreModuleBenchmark")
+            include("StackFunctionBenchmark")
+        }
+    }
 }
 
 kotlin {
@@ -38,10 +48,13 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(projects.chasm)
+                implementation(projects.decoder)
+                implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
                 implementation(projects.memory)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.runtime)
+                implementation(projects.test.fixture.runtime.component)
 
                 implementation(libs.kotlinx.benchmark)
                 implementation(libs.kotlinx.test.resources)

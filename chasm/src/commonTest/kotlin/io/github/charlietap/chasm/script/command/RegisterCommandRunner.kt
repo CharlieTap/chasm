@@ -12,7 +12,9 @@ fun RegisterCommandRunner(
 
     val instance = context.instance(command.name)
 
-    context.registerImports(command.registerAs, instance)
+    if (!context.registerImports(command.registerAs, instance)) {
+        return CommandResult.Failure(command, "component instance registration is not executable yet")
+    }
 
     return CommandResult.Success
 }

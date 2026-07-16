@@ -26,16 +26,18 @@ internal fun validate(
     component: Component,
     analyzer: WasmComponentAnalyzer,
 ): ChasmResult<Component, ValidationError> {
-    component.types?.let { return Success(component) }
+    component.analysisCache.types?.let { return Success(component) }
 
     return analyzer(component.config, component.component)
         .mapError(ComponentValidatorError::toString)
         .mapError(::ValidationError)
         .map { types ->
+            component.analysisCache.types = types
             Component(
                 config = component.config,
                 component = component.component,
-                types = types,
+                analysisCache = component.analysisCache,
+                preparationCache = component.preparationCache,
             )
         }.fold(::Success, ::Error)
 }
@@ -51,6 +53,7 @@ internal fun validate(
             Module(
                 config = module.config,
                 module = internal,
+                compilationCache = module.compilationCache,
             )
         }.fold(::Success, ::Error)
 }

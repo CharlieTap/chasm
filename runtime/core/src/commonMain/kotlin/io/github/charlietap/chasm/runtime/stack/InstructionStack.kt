@@ -79,8 +79,16 @@ class InstructionStack
             cstack: ControlStack,
             store: Store,
             context: ExecutionContext,
+        ) = executeUntil(0, vstack, cstack, store, context)
+
+        fun executeUntil(
+            depth: Int,
+            vstack: ValueStack,
+            cstack: ControlStack,
+            store: Store,
+            context: ExecutionContext,
         ) {
-            while (top != 0) {
+            while (top > depth) {
                 top--
                 elements[top](vstack, cstack, store, context)
             }

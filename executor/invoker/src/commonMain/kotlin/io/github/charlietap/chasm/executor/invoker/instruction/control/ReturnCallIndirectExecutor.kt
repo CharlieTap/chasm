@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.ReturnStackFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
@@ -22,5 +23,6 @@ internal inline fun ReturnCallIndirectExecutor(
     table = instruction.table,
     type = instruction.type,
     hostFunctionCall = ::HostFunctionCall,
+    stackFunctionCall = ::ReturnStackFunctionCall,
     wasmFunctionCall = ::ReturnWasmFunctionCall,
 )

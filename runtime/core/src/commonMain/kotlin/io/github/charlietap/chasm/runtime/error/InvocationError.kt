@@ -12,6 +12,10 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object InvocationOfADeinstantiatedInstance : InvocationError
 
+    data object InstanceHasDependants : InvocationError
+
+    data object InstanceNotOwnedByStore : InvocationError
+
     @JvmInline
     value class FunctionNotFound(val function: String) : InvocationError
 
@@ -190,6 +194,9 @@ sealed interface InvocationError : ModuleTrapError {
 
     @JvmInline
     value class HostFunctionError(val error: String) : InvocationError
+
+    @JvmInline
+    value class ComponentFunctionError(val error: String) : InvocationError
 
     data object ProgramFinishedInconsistentState : InvocationError
 

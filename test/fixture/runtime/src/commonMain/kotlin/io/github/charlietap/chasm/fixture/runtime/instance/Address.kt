@@ -1,6 +1,11 @@
 package io.github.charlietap.chasm.fixture.runtime.instance
 
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.address.RuntimeInstanceId
+
+fun runtimeInstanceId(
+    id: Int = 0,
+): RuntimeInstanceId = RuntimeInstanceId(id)
 
 fun functionAddress(
     address: Int = 0,

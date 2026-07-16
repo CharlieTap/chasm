@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.rtt
 import io.github.charlietap.chasm.runtime.function.Function
+import io.github.charlietap.chasm.runtime.function.StackFunctionBody
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.HostFunction
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
@@ -34,4 +35,14 @@ fun wasmFunctionInstance(
     functionType = functionType,
     module = module,
     function = function,
+)
+
+fun stackFunctionInstance(
+    rtt: RTT = rtt(),
+    functionType: FunctionType = functionType(),
+    body: StackFunctionBody = StackFunctionBody { _, _, _, _ -> },
+) = FunctionInstance.StackFunction(
+    rtt = rtt,
+    functionType = functionType,
+    body = body,
 )

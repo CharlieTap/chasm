@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.instance.stackFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
@@ -35,6 +36,7 @@ import io.github.charlietap.chasm.predecoder.loadCache
 import io.github.charlietap.chasm.predecoder.storeCache
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.toLong
+import io.github.charlietap.chasm.runtime.function.StackFunctionBody
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import kotlin.test.Test
@@ -210,6 +212,54 @@ class ControlSuperInstructionPredecoderTest {
 
         assertEquals(41L, vstack.getFrameSlot(0))
         assertEquals(77L, vstack.getFrameSlot(1))
+        assertEquals(2, vstack.depth())
+        assertTrue(context.loadCache.isEmpty())
+        assertTrue(context.storeCache.isEmpty())
+    }
+
+    @Test
+    fun `predecodes stack calls into direct slot writes without using caches`() {
+        val functionType = functionType(
+            params = resultType(listOf(i32ValueType())),
+            results = resultType(listOf(i32ValueType())),
+        )
+        val body = StackFunctionBody { stack, _, _, _ ->
+            stack.setFrameSlot(0, stack.getFrameSlot(0) + 1)
+        }
+        val functionInstance = stackFunctionInstance(
+            functionType = functionType,
+            body = body,
+        )
+        val context = PredecodingContext(
+            instance = moduleInstance(
+                functionAddresses = mutableListOf(functionAddress(0)),
+            ),
+            store = store(
+                functions = mutableListOf(functionInstance),
+            ),
+            instructionCache = hashMapOf(),
+            runtimeTypes = mutableListOf(),
+        )
+        val instruction = ControlSuperInstruction.Call(
+            operands = emptyList(),
+            functionIndex = functionIndex(0),
+            resultSlots = listOf(0),
+            callFrameSlot = 1,
+        )
+        val dispatchable = ControlSuperInstructionPredecoder(context, instruction).value
+        val vstack = ValueStack().apply {
+            reserveFrame(2)
+            setFrameSlot(0, 11L)
+            setFrameSlot(1, 41L)
+        }
+        val controlStack = cstack(
+            frames = listOf(frame(instance = context.instance, frameSlotMode = true)),
+        )
+
+        execute(dispatchable, context, vstack, controlStack)
+
+        assertEquals(42L, vstack.getFrameSlot(0))
+        assertEquals(42L, vstack.getFrameSlot(1))
         assertEquals(2, vstack.depth())
         assertTrue(context.loadCache.isEmpty())
         assertTrue(context.storeCache.isEmpty())
@@ -460,6 +510,63 @@ class ControlSuperInstructionPredecoderTest {
         assertEquals(0, vstack.framePointer)
         assertEquals(2, vstack.depth())
         assertEquals(77L, vstack.getFrameSlot(1))
+        assertTrue(context.loadCache.isEmpty())
+        assertTrue(context.storeCache.isEmpty())
+    }
+
+    @Test
+    fun `predecodes return stack calls from frame slots without using caches`() {
+        val functionType = functionType(
+            params = resultType(listOf(i32ValueType())),
+            results = resultType(listOf(i32ValueType())),
+        )
+        val body = StackFunctionBody { stack, _, _, _ ->
+            stack.setFrameSlot(0, stack.getFrameSlot(0) + 1)
+        }
+        val functionInstance = stackFunctionInstance(
+            functionType = functionType,
+            body = body,
+        )
+        val context = PredecodingContext(
+            instance = moduleInstance(
+                functionAddresses = mutableListOf(functionAddress(0)),
+            ),
+            store = store(
+                functions = mutableListOf(functionInstance),
+            ),
+            instructionCache = hashMapOf(),
+            runtimeTypes = mutableListOf(),
+        )
+        val instruction = ControlSuperInstruction.ReturnCall(
+            operands = listOf(FusedOperand.FrameSlot(0)),
+            functionIndex = functionIndex(0),
+        )
+        val dispatchable = ControlSuperInstructionPredecoder(context, instruction).value
+        val vstack = ValueStack().apply {
+            reserveFrame(2)
+            framePointer = 2
+            reserveFrame(1)
+            setFrameSlot(0, 41L)
+        }
+        val controlStack = cstack(
+            frames = listOf(
+                frame(
+                    instance = context.instance,
+                    previousFramePointer = 0,
+                    frameSlotMode = true,
+                    visibleResultBase = 1,
+                    depths = stackDepths(values = 2),
+                ),
+            ),
+            labels = listOf(label()),
+        )
+
+        execute(dispatchable, context, vstack, controlStack)
+
+        assertEquals(0, controlStack.framesDepth())
+        assertEquals(0, vstack.framePointer)
+        assertEquals(2, vstack.depth())
+        assertEquals(42L, vstack.getFrameSlot(1))
         assertTrue(context.loadCache.isEmpty())
         assertTrue(context.storeCache.isEmpty())
     }

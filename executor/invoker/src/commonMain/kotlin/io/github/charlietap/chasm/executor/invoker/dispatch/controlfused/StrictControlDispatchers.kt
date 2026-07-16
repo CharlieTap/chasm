@@ -34,6 +34,8 @@ fun CallDispatcher(instruction: ControlSuperInstruction.WasmCall) = dispatchInst
 
 fun CallDispatcher(instruction: ControlSuperInstruction.HostCall) = dispatchInstruction(instruction, ::CallExecutor)
 
+fun CallDispatcher(instruction: ControlSuperInstruction.StackCall) = dispatchInstruction(instruction, ::CallExecutor)
+
 fun CallDispatcher(instruction: ControlSuperInstruction.CallIndirectI) = dispatchInstruction(instruction, ::CallExecutor)
 
 fun CallDispatcher(instruction: ControlSuperInstruction.CallIndirectS) = dispatchInstruction(instruction, ::CallExecutor)
@@ -43,6 +45,8 @@ fun CallDispatcher(instruction: ControlSuperInstruction.CallRefS) = dispatchInst
 fun ReturnCallDispatcher(instruction: ControlSuperInstruction.ReturnWasmCall) = dispatchInstruction(instruction, ::ReturnCallExecutor)
 
 fun ReturnCallDispatcher(instruction: ControlSuperInstruction.ReturnHostCall) = dispatchInstruction(instruction, ::ReturnCallExecutor)
+
+fun ReturnCallDispatcher(instruction: ControlSuperInstruction.ReturnStackCall) = dispatchInstruction(instruction, ::ReturnCallExecutor)
 
 fun ReturnCallDispatcher(instruction: ControlSuperInstruction.ReturnCallIndirectI) = dispatchInstruction(instruction, ::ReturnCallExecutor)
 

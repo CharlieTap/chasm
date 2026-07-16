@@ -17,6 +17,35 @@ const val MAX_FLAT_PARAMS = 16
 const val MAX_FLAT_ASYNC_PARAMS = 4
 const val MAX_FLAT_RESULTS = 1
 
+enum class CanonicalAbiDeferredType {
+    ErrorContext,
+    FixedLengthList,
+    Map,
+    Stream,
+    Future,
+}
+
+data class CanonicalAbiProperties(
+    val containsString: Boolean = false,
+    val containsDynamicList: Boolean = false,
+    val containsResource: Boolean = false,
+    val containsBorrow: Boolean = false,
+    val deferredTypes: Set<CanonicalAbiDeferredType> = emptySet(),
+) {
+    val requiresAllocation: Boolean
+        get() = containsString ||
+            containsDynamicList ||
+            CanonicalAbiDeferredType.Map in deferredTypes
+
+    val requiresAllocationSensitiveHandling: Boolean
+        get() = requiresAllocation || containsResource
+}
+
+data class CanonicalAbiShape(
+    val flatTypes: List<ValueType>,
+    val properties: CanonicalAbiProperties,
+)
+
 enum class CanonicalAbiContext {
     Lift,
     Lower,
@@ -61,7 +90,10 @@ fun CanonicalFunctionTypeLowering(
 ): CanonicalAbiLowering? {
     val flattener = CanonicalAbiFlattener(options.addressType)
     val flatParams = flattener.flatten(type.params) { parameter -> parameter.type } ?: return null
-    val flatResults = type.result?.let(flattener::flatten) ?: FlatResult(emptyList(), false)
+    val flatResults = type.result?.let(flattener::flatten) ?: CanonicalAbiShape(
+        flatTypes = emptyList(),
+        properties = CanonicalAbiProperties(),
+    )
     val pointer = options.addressType.coreValueType()
 
     val parameterLimit = when {
@@ -75,24 +107,26 @@ fun CanonicalFunctionTypeLowering(
         else -> 0
     }
     val requiresMemory = when (context) {
-        CanonicalAbiContext.Lift -> flatResults.containsListOrString || flatResults.types.size > resultLimit
+        CanonicalAbiContext.Lift ->
+            flatResults.properties.requiresAllocation || flatResults.flatTypes.size > resultLimit
         CanonicalAbiContext.Lower ->
             options.async && type.result != null ||
-                flatParams.containsListOrString ||
-                flatParams.types.size > parameterLimit ||
-                flatResults.types.size > resultLimit
+                flatParams.properties.requiresAllocation ||
+                flatParams.flatTypes.size > parameterLimit ||
+                flatResults.flatTypes.size > resultLimit
     }
     val requiresRealloc = when (context) {
-        CanonicalAbiContext.Lift -> flatParams.containsListOrString || flatParams.types.size > parameterLimit
-        CanonicalAbiContext.Lower -> flatResults.containsListOrString
+        CanonicalAbiContext.Lift ->
+            flatParams.properties.requiresAllocation || flatParams.flatTypes.size > parameterLimit
+        CanonicalAbiContext.Lower -> flatResults.properties.requiresAllocation
     }
 
     val params: List<ValueType>
     val results: List<ValueType>
     if (!options.async) {
-        params = if (flatParams.types.size > parameterLimit) listOf(pointer) else flatParams.types
+        params = if (flatParams.flatTypes.size > parameterLimit) listOf(pointer) else flatParams.flatTypes
         when {
-            flatResults.types.size <= resultLimit -> results = flatResults.types
+            flatResults.flatTypes.size <= resultLimit -> results = flatResults.flatTypes
             context == CanonicalAbiContext.Lift -> results = listOf(pointer)
             else -> return CanonicalAbiLowering(
                 type = CanonicalCoreFunctionType(params = params + pointer),
@@ -103,12 +137,13 @@ fun CanonicalFunctionTypeLowering(
     } else {
         when (context) {
             CanonicalAbiContext.Lift -> {
-                params = if (flatParams.types.size > parameterLimit) listOf(pointer) else flatParams.types
+                params = if (flatParams.flatTypes.size > parameterLimit) listOf(pointer) else flatParams.flatTypes
                 results = if (options.hasCallback) listOf(I32) else emptyList()
             }
             CanonicalAbiContext.Lower -> {
-                val directParams = if (flatParams.types.size > parameterLimit) listOf(pointer) else flatParams.types
-                params = if (flatResults.types.isEmpty()) directParams else directParams + pointer
+                val directParams =
+                    if (flatParams.flatTypes.size > parameterLimit) listOf(pointer) else flatParams.flatTypes
+                params = if (flatResults.flatTypes.isEmpty()) directParams else directParams + pointer
                 results = listOf(I32)
             }
         }
@@ -121,54 +156,33 @@ fun CanonicalFunctionTypeLowering(
     )
 }
 
+fun CanonicalAbiShape(
+    types: List<ComponentValueType>,
+    addressType: AddressType,
+): CanonicalAbiShape? = CanonicalAbiFlattener(addressType).flatten(types) { type -> type }
+
+fun CanonicalAbiShape(
+    type: ComponentValueType,
+    addressType: AddressType,
+): CanonicalAbiShape? = CanonicalAbiFlattener(addressType).flatten(type)
+
 fun FlattenComponentTypes(
     types: List<ComponentValueType>,
     addressType: AddressType,
-): List<ValueType>? = CanonicalAbiFlattener(addressType).flatten(types) { type -> type }?.types
+): List<ValueType>? = CanonicalAbiShape(types, addressType)?.flatTypes
 
 fun FlattenComponentType(
     type: ComponentValueType,
     addressType: AddressType,
-): List<ValueType>? = CanonicalAbiFlattener(addressType).flatten(type)?.types
+): List<ValueType>? = CanonicalAbiShape(type, addressType)?.flatTypes
 
-fun ComponentValueType.containsListOrString(): Boolean = when (this) {
-    is ComponentValueType.Primitive -> type == ComponentPrimitiveType.String
-    is ComponentValueType.Defined -> {
-        val value = definition.type as? ComponentDefinedType.Value ?: return false
-        value.type.containsListOrString()
-    }
-}
+fun ComponentValueType.containsListOrString(): Boolean =
+    CanonicalAbiShape(this, AddressType.I32)?.properties?.requiresAllocation == true
 
 fun AddressType.coreValueType(): ValueType = when (this) {
     AddressType.I32 -> I32
     AddressType.I64 -> I64
 }
-
-private fun ComponentDefinedValueType.containsListOrString(): Boolean = when (this) {
-    is ComponentDefinedValueType.Primitive -> type == ComponentPrimitiveType.String
-    is ComponentDefinedValueType.Record -> fields.any { field -> field.type.containsListOrString() }
-    is ComponentDefinedValueType.Variant -> cases.any { case -> case.type?.containsListOrString() == true }
-    is ComponentDefinedValueType.ListValue,
-    is ComponentDefinedValueType.Map,
-    -> true
-    is ComponentDefinedValueType.FixedLengthList -> element.containsListOrString()
-    is ComponentDefinedValueType.Tuple -> elements.any(ComponentValueType::containsListOrString)
-    is ComponentDefinedValueType.Option -> value.containsListOrString()
-    is ComponentDefinedValueType.Result ->
-        ok?.containsListOrString() == true || error?.containsListOrString() == true
-    is ComponentDefinedValueType.Own,
-    is ComponentDefinedValueType.Borrow,
-    is ComponentDefinedValueType.Stream,
-    is ComponentDefinedValueType.Future,
-    is ComponentDefinedValueType.Flags,
-    is ComponentDefinedValueType.Enum,
-    -> false
-}
-
-private data class FlatResult(
-    val types: List<ValueType>,
-    val containsListOrString: Boolean,
-)
 
 private class CanonicalAbiFlattener(
     private val addressType: AddressType,
@@ -176,7 +190,7 @@ private class CanonicalAbiFlattener(
     private val buffers = mutableListOf(FlatBuffer())
     private var depth = 0
 
-    fun flatten(type: ComponentValueType): FlatResult? {
+    fun flatten(type: ComponentValueType): CanonicalAbiShape? {
         val buffer = buffers[0]
         buffer.clear()
         if (!flatten(type, buffer)) return null
@@ -186,7 +200,7 @@ private class CanonicalAbiFlattener(
     inline fun <T> flatten(
         types: Iterable<T>,
         type: (T) -> ComponentValueType,
-    ): FlatResult? {
+    ): CanonicalAbiShape? {
         val buffer = buffers[0]
         buffer.clear()
         for (value in types) {
@@ -200,7 +214,7 @@ private class CanonicalAbiFlattener(
         buffer: FlatBuffer,
     ): Boolean {
         if (buffer.full) {
-            buffer.containsListOrString = buffer.containsListOrString || type.containsListOrString()
+            collectProperties(type, buffer.properties)
             return true
         }
         return when (type) {
@@ -219,24 +233,48 @@ private class CanonicalAbiFlattener(
         is ComponentDefinedValueType.Primitive -> flattenPrimitive(type.type, buffer)
         is ComponentDefinedValueType.Record -> type.fields.all { field -> flatten(field.type, buffer) }
         is ComponentDefinedValueType.Variant -> flattenVariant(type, buffer)
-        is ComponentDefinedValueType.ListValue,
-        is ComponentDefinedValueType.Map,
-        -> {
+        is ComponentDefinedValueType.ListValue -> {
             buffer.add(addressType.coreValueType())
             buffer.add(addressType.coreValueType())
-            buffer.containsListOrString = true
+            buffer.properties.containsDynamicList = true
+            collectProperties(type.element, buffer.properties)
+            true
+        }
+        is ComponentDefinedValueType.Map -> {
+            buffer.add(addressType.coreValueType())
+            buffer.add(addressType.coreValueType())
+            buffer.properties.deferredTypes += CanonicalAbiDeferredType.Map
+            collectProperties(type.key, buffer.properties)
+            collectProperties(type.value, buffer.properties)
             true
         }
         is ComponentDefinedValueType.FixedLengthList -> flattenFixedLengthList(type, buffer)
         is ComponentDefinedValueType.Tuple -> type.elements.all { element -> flatten(element, buffer) }
         is ComponentDefinedValueType.Flags,
         is ComponentDefinedValueType.Enum,
-        is ComponentDefinedValueType.Own,
-        is ComponentDefinedValueType.Borrow,
-        is ComponentDefinedValueType.Stream,
-        is ComponentDefinedValueType.Future,
         -> {
             buffer.add(I32)
+            true
+        }
+        is ComponentDefinedValueType.Own -> {
+            buffer.add(I32)
+            buffer.properties.containsResource = true
+            true
+        }
+        is ComponentDefinedValueType.Borrow -> {
+            buffer.add(I32)
+            buffer.properties.containsResource = true
+            buffer.properties.containsBorrow = true
+            true
+        }
+        is ComponentDefinedValueType.Stream -> {
+            buffer.add(I32)
+            buffer.properties.deferredTypes += CanonicalAbiDeferredType.Stream
+            true
+        }
+        is ComponentDefinedValueType.Future -> {
+            buffer.add(I32)
+            buffer.properties.deferredTypes += CanonicalAbiDeferredType.Future
             true
         }
         is ComponentDefinedValueType.Option -> flattenOption(type.value, buffer)
@@ -255,8 +293,12 @@ private class CanonicalAbiFlattener(
         ComponentPrimitiveType.S32,
         ComponentPrimitiveType.U32,
         ComponentPrimitiveType.Char,
-        ComponentPrimitiveType.ErrorContext,
         -> buffer.add(I32).let { true }
+        ComponentPrimitiveType.ErrorContext -> {
+            buffer.add(I32)
+            buffer.properties.deferredTypes += CanonicalAbiDeferredType.ErrorContext
+            true
+        }
         ComponentPrimitiveType.S64,
         ComponentPrimitiveType.U64,
         -> buffer.add(I64).let { true }
@@ -265,7 +307,7 @@ private class CanonicalAbiFlattener(
         ComponentPrimitiveType.String -> {
             buffer.add(addressType.coreValueType())
             buffer.add(addressType.coreValueType())
-            buffer.containsListOrString = true
+            buffer.properties.containsString = true
             true
         }
     }
@@ -274,12 +316,14 @@ private class CanonicalAbiFlattener(
         type: ComponentDefinedValueType.FixedLengthList,
         buffer: FlatBuffer,
     ): Boolean {
+        buffer.properties.deferredTypes += CanonicalAbiDeferredType.FixedLengthList
         val scratch = acquireBuffer()
         val flattened = flatten(type.element, scratch)
         releaseBuffer()
         if (!flattened) return false
 
-        buffer.containsListOrString = buffer.containsListOrString || scratch.containsListOrString
+        buffer.properties.include(scratch.properties)
+        if (scratch.size == 0) return true
         var index = 0u
         while (index < type.length && !buffer.full) {
             buffer.append(scratch)
@@ -329,7 +373,7 @@ private class CanonicalAbiFlattener(
         releaseBuffer()
         if (!flattened) return false
 
-        buffer.containsListOrString = buffer.containsListOrString || scratch.containsListOrString
+        buffer.properties.include(scratch.properties)
         for (index in 0 until scratch.size) buffer.join(payloadStart + index, scratch[index])
         return true
     }
@@ -346,11 +390,79 @@ private class CanonicalAbiFlattener(
     }
 }
 
+private fun collectProperties(
+    type: ComponentValueType,
+    properties: MutableCanonicalAbiProperties,
+) {
+    when (type) {
+        is ComponentValueType.Primitive -> collectProperties(type.type, properties)
+        is ComponentValueType.Defined -> {
+            val value = type.definition.type as? ComponentDefinedType.Value ?: return
+            collectProperties(value.type, properties)
+        }
+    }
+}
+
+private fun collectProperties(
+    type: ComponentDefinedValueType,
+    properties: MutableCanonicalAbiProperties,
+) {
+    when (type) {
+        is ComponentDefinedValueType.Primitive -> collectProperties(type.type, properties)
+        is ComponentDefinedValueType.Record ->
+            type.fields.forEach { field -> collectProperties(field.type, properties) }
+        is ComponentDefinedValueType.Variant ->
+            type.cases.forEach { case -> case.type?.let { collectProperties(it, properties) } }
+        is ComponentDefinedValueType.ListValue -> {
+            properties.containsDynamicList = true
+            collectProperties(type.element, properties)
+        }
+        is ComponentDefinedValueType.Map -> {
+            properties.deferredTypes += CanonicalAbiDeferredType.Map
+            collectProperties(type.key, properties)
+            collectProperties(type.value, properties)
+        }
+        is ComponentDefinedValueType.FixedLengthList -> {
+            properties.deferredTypes += CanonicalAbiDeferredType.FixedLengthList
+            collectProperties(type.element, properties)
+        }
+        is ComponentDefinedValueType.Tuple ->
+            type.elements.forEach { element -> collectProperties(element, properties) }
+        is ComponentDefinedValueType.Option -> collectProperties(type.value, properties)
+        is ComponentDefinedValueType.Result -> {
+            type.ok?.let { collectProperties(it, properties) }
+            type.error?.let { collectProperties(it, properties) }
+        }
+        is ComponentDefinedValueType.Own -> properties.containsResource = true
+        is ComponentDefinedValueType.Borrow -> {
+            properties.containsResource = true
+            properties.containsBorrow = true
+        }
+        is ComponentDefinedValueType.Stream -> properties.deferredTypes += CanonicalAbiDeferredType.Stream
+        is ComponentDefinedValueType.Future -> properties.deferredTypes += CanonicalAbiDeferredType.Future
+        is ComponentDefinedValueType.Flags,
+        is ComponentDefinedValueType.Enum,
+        -> Unit
+    }
+}
+
+private fun collectProperties(
+    type: ComponentPrimitiveType,
+    properties: MutableCanonicalAbiProperties,
+) {
+    when (type) {
+        ComponentPrimitiveType.String -> properties.containsString = true
+        ComponentPrimitiveType.ErrorContext ->
+            properties.deferredTypes += CanonicalAbiDeferredType.ErrorContext
+        else -> Unit
+    }
+}
+
 private class FlatBuffer {
     private val values = arrayOfNulls<ValueType>(FLAT_BUFFER_CAPACITY)
+    val properties = MutableCanonicalAbiProperties()
     var size: Int = 0
         private set
-    var containsListOrString: Boolean = false
 
     val full: Boolean
         get() = size == FLAT_BUFFER_CAPACITY
@@ -379,12 +491,44 @@ private class FlatBuffer {
 
     fun clear() {
         size = 0
-        containsListOrString = false
+        properties.clear()
     }
 
-    fun result(): FlatResult = FlatResult(
-        types = List(size) { index -> values[index]!! },
-        containsListOrString = containsListOrString,
+    fun result(): CanonicalAbiShape = CanonicalAbiShape(
+        flatTypes = List(size) { index -> values[index]!! },
+        properties = properties.result(),
+    )
+}
+
+private class MutableCanonicalAbiProperties {
+    var containsString: Boolean = false
+    var containsDynamicList: Boolean = false
+    var containsResource: Boolean = false
+    var containsBorrow: Boolean = false
+    val deferredTypes = mutableSetOf<CanonicalAbiDeferredType>()
+
+    fun include(other: MutableCanonicalAbiProperties) {
+        containsString = containsString || other.containsString
+        containsDynamicList = containsDynamicList || other.containsDynamicList
+        containsResource = containsResource || other.containsResource
+        containsBorrow = containsBorrow || other.containsBorrow
+        deferredTypes += other.deferredTypes
+    }
+
+    fun clear() {
+        containsString = false
+        containsDynamicList = false
+        containsResource = false
+        containsBorrow = false
+        deferredTypes.clear()
+    }
+
+    fun result(): CanonicalAbiProperties = CanonicalAbiProperties(
+        containsString = containsString,
+        containsDynamicList = containsDynamicList,
+        containsResource = containsResource,
+        containsBorrow = containsBorrow,
+        deferredTypes = deferredTypes.toSet(),
     )
 }
 

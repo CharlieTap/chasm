@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 
 import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
@@ -19,6 +20,8 @@ import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -74,13 +77,17 @@ class TableInitializerTest {
 
             Ok(117L)
         }
+        val initializedTables = mutableListOf<Index.TableIndex>()
+        val tableInitialized: (Index.TableIndex) -> Unit = initializedTables::add
 
         val actual = TableInitializer(
             context = context,
             instance = instance,
             constantExpressionEvaluator = constantExpressionEvaluator,
+            tableInitialized = tableInitialized,
         )
 
-        assertEquals(Ok(Unit), actual)
+        val expected: Pair<Result<Unit, ModuleTrapError>, List<Index.TableIndex>> = Ok(Unit) to listOf(activeTableIndex)
+        assertEquals(expected, actual to initializedTables)
     }
 }

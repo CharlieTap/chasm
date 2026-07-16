@@ -49,6 +49,21 @@ class StackExtTest {
     }
 
     @Test
+    fun `nesting too many executions returns an error`() {
+        val subject = cstack()
+        repeat(ControlStack.MAX_NESTED_EXECUTION_DEPTH) {
+            subject.enterNestedExecution()
+        }
+
+        val actual = assertFailsWith<InvocationException> {
+            subject.enterNestedExecution()
+        }.error
+
+        val expected = InvocationError.CallStackExhausted
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun `can run an const operation on the stack`() {
 
         val stack = vstack()

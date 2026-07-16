@@ -4,7 +4,9 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnHostFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.ReturnStackFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.StackFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.instruction.control.BlockExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.control.BreakExecutor
@@ -312,6 +314,22 @@ internal fun CallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
+    instruction: ControlSuperInstruction.StackCall,
+) = StackFunctionCall(
+    vstack = vstack,
+    cstack = cstack,
+    store = store,
+    context = context,
+    function = instruction.instance,
+    resultSlots = instruction.resultSlots,
+    callFrameSlot = instruction.callFrameSlot,
+)
+
+internal fun CallExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
+    context: ExecutionContext,
     instruction: ControlSuperInstruction.HostCall,
 ) = HostFunctionCall(
     vstack = vstack,
@@ -387,6 +405,21 @@ internal fun ReturnCallExecutor(
     store = store,
     context = context,
     instance = instruction.instance,
+    operands = instruction.operands,
+)
+
+internal fun ReturnCallExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
+    context: ExecutionContext,
+    instruction: ControlSuperInstruction.ReturnStackCall,
+) = ReturnStackFunctionCall(
+    vstack = vstack,
+    cstack = cstack,
+    store = store,
+    context = context,
+    function = instruction.instance,
     operands = instruction.operands,
 )
 
@@ -619,6 +652,15 @@ private fun strictInvokeFunction(
             resultSlots = resultSlots,
             callFrameSlot = callFrameSlot,
         )
+        is FunctionInstance.StackFunction -> StackFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
+            context = context,
+            function = functionInstance,
+            resultSlots = resultSlots,
+            callFrameSlot = callFrameSlot,
+        )
         is FunctionInstance.WasmFunction -> WasmFunctionCall(
             vstack = vstack,
             cstack = cstack,
@@ -641,6 +683,14 @@ private fun strictInvokeReturnFunction(
 ) {
     when (functionInstance) {
         is FunctionInstance.HostFunction -> ReturnHostFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
+            context = context,
+            function = functionInstance,
+            operands = operands,
+        )
+        is FunctionInstance.StackFunction -> ReturnStackFunctionCall(
             vstack = vstack,
             cstack = cstack,
             store = store,

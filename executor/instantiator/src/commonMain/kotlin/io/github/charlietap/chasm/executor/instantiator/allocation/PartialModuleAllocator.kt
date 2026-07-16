@@ -15,33 +15,41 @@ import io.github.charlietap.chasm.runtime.ext.addTagAddress
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.store.instanceLifetimes
 
-internal typealias PartialModuleAllocator = (InstantiationContext, List<Import>) -> Result<ModuleInstance, ModuleTrapError>
+internal typealias PartialModuleAllocator = (
+    InstantiationContext,
+    ModuleInstance,
+    List<Import>,
+    ModuleAllocationJournal,
+) -> Result<ModuleInstance, ModuleTrapError>
 
 internal fun PartialModuleAllocator(
     context: InstantiationContext,
+    instance: ModuleInstance,
     imports: List<Import>,
+    journal: ModuleAllocationJournal,
 ): Result<ModuleInstance, ModuleTrapError> =
     PartialModuleAllocator(
         context = context,
+        instance = instance,
         imports = imports,
+        journal = journal,
         importMatcher = ::ImportMatcher,
         wasmFunctionAllocator = ::WasmFunctionAllocator,
     )
 
 internal inline fun PartialModuleAllocator(
     context: InstantiationContext,
+    instance: ModuleInstance,
     imports: List<Import>,
+    journal: ModuleAllocationJournal,
     crossinline importMatcher: ImportMatcher,
     crossinline wasmFunctionAllocator: WasmFunctionAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
     val module = context.module
     val store = context.store
-
-    val instance = ModuleInstance(context.runtimeTypes)
-
-    context.instance = instance
 
     val matchedImports = importMatcher(context, imports).bind()
 
@@ -54,6 +62,9 @@ internal inline fun PartialModuleAllocator(
             is ExternalValue.Tag -> instance.addTagAddress(import.address)
         }
     }
+
+    journal.markImports()
+    store.instanceLifetimes().begin(instance, matchedImports).bind()
 
     module.functions.forEach { function ->
         wasmFunctionAllocator(module, instance, function, store).bind()

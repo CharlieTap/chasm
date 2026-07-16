@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.fixture.runtime.instance
 
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.address.RuntimeInstanceId
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
+import io.github.charlietap.chasm.runtime.instance.ModuleAllocation
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.RTT
@@ -16,6 +18,8 @@ fun moduleInstance(
     elemAddresses: MutableList<Address.Element> = [],
     dataAddresses: MutableList<Address.Data> = [],
     exports: MutableList<ExportInstance> = [],
+    runtimeInstanceId: RuntimeInstanceId? = null,
+    allocation: ModuleAllocation? = null,
     deallocated: Boolean = false,
 ) = ModuleInstance(
     runtimeTypes = runtimeTypes,
@@ -27,5 +31,7 @@ fun moduleInstance(
     elemAddresses = elemAddresses,
     dataAddresses = dataAddresses,
     exports = exports,
+    runtimeInstanceId = runtimeInstanceId,
+    allocation = allocation,
     deallocated = deallocated,
 )

@@ -68,7 +68,19 @@ sweet {
             revision = "7c720726f183a8c809889dc46716bc6df0dd225d"
             testDirectory = "test"
             includes = listOf("**/*.wast")
-            phaseSupport = SemanticPhase.VALIDATION
+            phaseSupport = SemanticPhase.EXECUTION
+            phaseLimits = listOf(
+                PhaseLimit(
+                    patterns = setOf(
+                        "async/**",
+                        "names/**",
+                        "validation/**",
+                        "values/post-return.wast",
+                        "wasm-tools/memory64.wast",
+                    ),
+                    phaseSupport = SemanticPhase.VALIDATION,
+                ),
+            )
         }
     }
 }
@@ -105,6 +117,7 @@ kotlin {
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
                 implementation(projects.memory)
+                implementation(projects.runtime.component)
                 implementation(projects.runtime.core)
                 implementation(projects.typeSystem)
                 implementation(projects.validator)
@@ -120,6 +133,7 @@ kotlin {
                 implementation(projects.test.fixture.chasm)
                 implementation(projects.test.fixture.config)
                 implementation(projects.test.fixture.runtime)
+                implementation(projects.test.fixture.runtime.component)
                 implementation(projects.test.fixture.ir)
 
                 implementation(libs.kotlin.test)

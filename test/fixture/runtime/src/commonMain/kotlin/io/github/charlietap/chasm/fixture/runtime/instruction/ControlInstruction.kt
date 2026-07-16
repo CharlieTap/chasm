@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.fixture.runtime.instruction
 
 import io.github.charlietap.chasm.fixture.ir.module.labelIndex
 import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.fixture.runtime.instance.stackFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.type.referenceType
@@ -108,6 +109,12 @@ fun returnWasmFunctionCallRuntimeInstruction(
     instance = instance,
 )
 
+fun returnStackFunctionCallRuntimeInstruction(
+    instance: FunctionInstance.StackFunction = stackFunctionInstance(),
+) = ControlInstruction.ReturnStackFunctionCall(
+    instance = instance,
+)
+
 fun returnCallRefRuntimeInstruction(
     typeIndex: Index.TypeIndex = typeIndex(),
 ) = ControlInstruction.ReturnCallRef(
@@ -117,6 +124,12 @@ fun returnCallRefRuntimeInstruction(
 fun wasmFunctionCallRuntimeInstruction(
     instance: FunctionInstance.WasmFunction = wasmFunctionInstance(),
 ) = ControlInstruction.WasmFunctionCall(
+    instance = instance,
+)
+
+fun stackFunctionCallRuntimeInstruction(
+    instance: FunctionInstance.StackFunction = stackFunctionInstance(),
+) = ControlInstruction.StackFunctionCall(
     instance = instance,
 )
 

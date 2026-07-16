@@ -68,6 +68,7 @@ include(":predecoder")
 include(":compiler")
 
 include(":runtime:address")
+include(":runtime:component")
 include(":runtime:core")
 include(":runtime:type")
 include(":runtime:value")
@@ -82,11 +83,14 @@ include(":test:fixture:config")
 include(":test:fixture:executor:instantiator")
 include(":test:fixture:ir")
 include(":test:fixture:runtime")
+include(":test:fixture:runtime:component")
 include(":test:fixture:type-system")
 
 include(":type-system")
 include(":validator")
 include(":vm")
+
+include(":wasi:p2")
 
 includeBuild("sweet")
 includeBuild("corpus")
