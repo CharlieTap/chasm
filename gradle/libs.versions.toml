@@ -29,7 +29,7 @@ compose-core = "1.6.6"
 compose-activity = "1.9.3"
 compose-viewmodel = "2.7.0"
 
-dependency-analysis="2.6.1"
+dependency-analysis="2.19.0"
 dokka="2.0.0"
 
 gradle-maven-publish-plugin = "0.30.0"
