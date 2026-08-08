@@ -9,7 +9,7 @@ compile-sdk = "36"
 target-sdk = "35"
 min-sdk = "28"
 
-java-compiler-version = "21"
+java-compiler-version = "25"
 java-library-bytecode-version = "11"
 java-plugin-bytecode-version = "17"
 
