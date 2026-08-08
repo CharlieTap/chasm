@@ -1,7 +1,6 @@
 
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.MavenPublishPlugin
-import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Project.DEFAULT_VERSION
@@ -30,7 +29,7 @@ class PublishingConventionsPlugin : Plugin<Project> {
 
         project.configure<MavenPublishBaseExtension> {
 
-            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+            publishToMavenCentral()
             signAllPublications()
 
             pom {

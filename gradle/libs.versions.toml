@@ -33,7 +33,7 @@ compose-viewmodel = "2.7.0"
 dependency-analysis="2.6.1"
 dokka="2.0.0"
 
-gradle-maven-publish-plugin = "0.30.0"
+gradle-maven-publish-plugin = "0.37.0"
 
 dagger = "2.56.2"
 hilt-integrations = "1.2.0"
