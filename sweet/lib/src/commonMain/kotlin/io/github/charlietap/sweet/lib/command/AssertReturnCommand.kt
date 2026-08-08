@@ -11,4 +11,4 @@ data class AssertReturnCommand(
     override val line: Int,
     val action: Action,
     val expected: List<Value>,
-): Command
+) : Command

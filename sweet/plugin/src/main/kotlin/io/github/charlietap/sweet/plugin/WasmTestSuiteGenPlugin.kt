@@ -16,6 +16,7 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.TEST_COMPILATION_NAME
 
 class WasmTestSuiteGenPlugin : Plugin<Project> {
 
@@ -41,9 +42,11 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
 
             wasmToolsVersion.set(extension.wasmToolsVersion)
             wasmToolsDirectory.set(downloadWasmToolsTask.flatMap { it.outputDirectory })
-            outputFile.set(wasmToolsVersion.zip(wasmToolsDirectory) { version, directory ->
-                directory.dir(version).file("wasm-tools")
-            })
+            outputFile.set(
+                wasmToolsVersion.zip(wasmToolsDirectory) { version, directory ->
+                    directory.dir(version).file("wasm-tools")
+                },
+            )
         }
 
         val syncTestSuiteTask = project.tasks.register(TASK_NAME_SYNC_SUITE) {
@@ -85,18 +88,18 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             },
         )
 
-        project.tasks.configureEach {
-            if (name.contains("compileTestKotlin")) {
-                dependsOn(generateTestsTask)
-            }
-        }
-
         project.pluginManager.withPlugin(KOTLIN_MULTIPLATFORM_PLUGIN_ID) {
-            project.extensions.getByType<KotlinMultiplatformExtension>()
-                .sourceSets
-                .getByName("commonTest")
-                .kotlin
-                .srcDir(extension.testsDirectory)
+            val kotlinExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
+            kotlinExtension.sourceSets.getByName("commonTest").kotlin.srcDir(extension.testsDirectory)
+            kotlinExtension.targets.configureEach {
+                compilations.configureEach {
+                    if (name == TEST_COMPILATION_NAME) {
+                        compileTaskProvider.configure {
+                            dependsOn(generateTestsTask)
+                        }
+                    }
+                }
+            }
         }
     }
 

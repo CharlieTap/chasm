@@ -34,7 +34,7 @@ android {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.bytecode.version.get()))
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.library.bytecode.version.get()))
     }
 }
 

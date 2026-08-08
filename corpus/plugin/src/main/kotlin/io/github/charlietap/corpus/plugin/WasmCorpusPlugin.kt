@@ -7,12 +7,13 @@ import io.github.charlietap.corpus.plugin.task.ResolveCorpusFixturesTask
 import io.github.charlietap.corpus.plugin.task.SyncCorpusRepositoryTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.TEST_COMPILATION_NAME
+import org.jetbrains.kotlin.gradle.plugin.KotlinTargetWithTests.Companion.DEFAULT_TEST_RUN_NAME
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 class WasmCorpusPlugin : Plugin<Project> {
 
@@ -62,14 +63,6 @@ class WasmCorpusPlugin : Plugin<Project> {
             outputDirectory.set(extension.corpusTestsDirectory)
         }
 
-        project.tasks.register(TASK_NAME_CORPUS) {
-            group = GROUP
-            description = "Runs wasm-corpus fixtures against the JVM test runtime"
-
-            dependsOn(generateTests)
-            dependsOn(project.tasks.named(TASK_NAME_JVM_TEST))
-        }
-
         project.tasks.register<CorpusMatrixTask>(TASK_NAME_MATRIX) {
             group = GROUP
             description = "Prints a wasm-corpus fixture matrix"
@@ -86,17 +79,28 @@ class WasmCorpusPlugin : Plugin<Project> {
         }
 
         val kotlinExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
-        kotlinExtension.sourceSets.getByName("jvmTest") {
-            kotlin.srcDir(extension.corpusTestsDirectory)
-        }
+        val jvmTarget = kotlinExtension.targets.withType(KotlinJvmTarget::class.java).single()
+        val jvmTestCompilation = jvmTarget.compilations.getByName(TEST_COMPILATION_NAME)
+        val jvmTest = jvmTarget.testRuns.getByName(DEFAULT_TEST_RUN_NAME).executionTask
 
-        if (corpusRequested) {
-            project.tasks.named(TASK_NAME_COMPILE_JVM_TEST).configure {
-                dependsOn(generateTests)
+        jvmTestCompilation.defaultSourceSet.apply {
+            val corpusTestsDirectory = if (corpusRequested) {
+                generateTests.flatMap { it.outputDirectory }
+            } else {
+                extension.corpusTestsDirectory
             }
+            kotlin.srcDir(corpusTestsDirectory)
         }
 
-        project.tasks.named<Test>(TASK_NAME_JVM_TEST).configure {
+        project.tasks.register(TASK_NAME_CORPUS) {
+            group = GROUP
+            description = "Runs wasm-corpus fixtures against the JVM test runtime"
+
+            dependsOn(generateTests)
+            dependsOn(jvmTest)
+        }
+
+        jvmTest.configure {
             maxHeapSize = "2g"
             jvmArgs("-Xss32m")
 
@@ -130,7 +134,5 @@ class WasmCorpusPlugin : Plugin<Project> {
         const val TASK_NAME_GENERATE_TESTS = "generateCorpusTests"
         const val TASK_NAME_MATRIX = "corpusMatrix"
         const val TASK_NAME_CLEAN_TESTS = "cleanCorpusTests"
-        const val TASK_NAME_JVM_TEST = "jvmTest"
-        const val TASK_NAME_COMPILE_JVM_TEST = "compileTestKotlinJvm"
     }
 }

@@ -1,7 +1,5 @@
 package io.github.charlietap.sweet.plugin.task
 
-import java.nio.file.Files
-import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -10,6 +8,8 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
+import java.nio.file.Files
+import javax.inject.Inject
 
 @CacheableTask
 abstract class SyncRepositoryTask : DefaultTask() {
@@ -71,10 +71,12 @@ abstract class SyncRepositoryTask : DefaultTask() {
 
         val outputDir = outputDirectory.get().asFile
 
-        return if(outputDir.exists() && outputDir.isDirectory) {
+        return if (outputDir.exists() && outputDir.isDirectory) {
             val path = outputDir.toPath()
             Files.list(path).findAny().isPresent
-        } else false
+        } else {
+            false
+        }
     }
 
     private fun wipeDirectory() {

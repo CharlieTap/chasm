@@ -14,4 +14,4 @@ data class ModuleDefinitionCommand(
     val type: ModuleType? = null,
     @SerialName("binary_filename")
     val binaryFilename: String? = null,
-): Command
+) : Command

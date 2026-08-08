@@ -6,3 +6,10 @@ plugins {
     alias(libs.plugins.conventions.kmp) apply false
     alias(libs.plugins.conventions.linting) apply false
 }
+
+tasks.register("fmt") {
+    group = "formatting"
+    description = "Format sources"
+
+    dependsOn(":lib:fmt", ":plugin:fmt")
+}

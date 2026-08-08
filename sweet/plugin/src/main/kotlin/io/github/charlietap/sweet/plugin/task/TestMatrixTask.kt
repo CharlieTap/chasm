@@ -23,11 +23,11 @@ abstract class TestMatrixTask : DefaultTask() {
 
         val references = testFiles.mapNotNull { file ->
 
-            val packageName = file.useLines {
-                lines -> lines.drop(1).firstOrNull()
+            val packageName = file.useLines { lines ->
+                lines.drop(1).firstOrNull()
             }?.replace("package ", "")?.replace("`", "")
 
-            if(packageName == null) {
+            if (packageName == null) {
                 logger.warn("Skipping matrix gen for file $file")
             }
 
@@ -38,16 +38,18 @@ abstract class TestMatrixTask : DefaultTask() {
 
         val size = references.size
         val remainder = size % MAX_PARALLELISM
-        val taskLists = if(size <= MAX_PARALLELISM) {
+        val taskLists = if (size <= MAX_PARALLELISM) {
             references.chunked(1)
         } else {
             val chunkSize = references.size / MAX_PARALLELISM
 
             val lists = references.drop(remainder).chunked(chunkSize)
             lists.mapIndexed { idx, list ->
-                if(idx <= remainder - 1) {
+                if (idx <= remainder - 1) {
                     list + listOf(references[idx])
-                } else list
+                } else {
+                    list
+                }
             }
         }
 

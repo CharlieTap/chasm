@@ -7,6 +7,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 val libs = the<LibrariesForLibs>()
+val conventions = extensions.create<KotlinConventionsExtension>("kotlinConventions")
+
+conventions.jvmBytecodeVersion.convention(
+    libs.versions.java.library.bytecode.version.map(String::toInt),
+)
 
 plugins.withId("org.jetbrains.kotlin.jvm") {
     extensions.configure<KotlinBaseExtension>("kotlin") {
@@ -43,21 +48,21 @@ tasks.withType<KotlinCompilationTask<*>>().configureEach {
 tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
         freeCompilerArgs.addAll(
-            "-Xjdk-release=" + libs.versions.java.bytecode.version.get().toInt(),
             "-Xno-call-assertions",
             "-Xno-param-assertions",
             "-Xno-receiver-assertions",
             "-XIntrinsic-const-evaluation",
         )
+        freeCompilerArgs.add(conventions.jvmBytecodeVersion.map { version -> "-Xjdk-release=$version" })
     }
 }
 
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
-        jvmTarget = JvmTarget.fromTarget(libs.versions.java.bytecode.version.get())
+        jvmTarget.set(conventions.jvmBytecodeVersion.map { version -> JvmTarget.fromTarget(version.toString()) })
     }
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(libs.versions.java.bytecode.version.get().toInt())
+    options.release.set(conventions.jvmBytecodeVersion)
 }

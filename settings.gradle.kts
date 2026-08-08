@@ -94,3 +94,4 @@ includeBuild("corpus")
 rootProject.name = "chasm-multiplatform"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+enableFeaturePreview("ENHANCED_GRAPH_ORDERING")

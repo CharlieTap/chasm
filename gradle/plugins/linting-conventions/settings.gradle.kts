@@ -11,3 +11,4 @@ plugins {
 }
 
 rootProject.name = "linting-conventions"
+enableFeaturePreview("ENHANCED_GRAPH_ORDERING")

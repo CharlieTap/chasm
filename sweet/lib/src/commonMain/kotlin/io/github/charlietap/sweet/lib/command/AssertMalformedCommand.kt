@@ -12,4 +12,4 @@ data class AssertMalformedCommand(
     val text: String,
     @SerialName("module_type")
     val moduleType: ModuleType,
-): Command
+) : Command

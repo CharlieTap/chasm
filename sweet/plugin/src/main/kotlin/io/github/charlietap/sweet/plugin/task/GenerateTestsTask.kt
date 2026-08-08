@@ -7,7 +7,6 @@ import io.github.charlietap.sweet.plugin.ext.deleteAndPruneEmptyParents
 import io.github.charlietap.sweet.plugin.ext.generatedTestLocation
 import io.github.charlietap.sweet.plugin.ext.relativeSuitePath
 import io.github.charlietap.sweet.plugin.ext.resolvePhaseSupport
-import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -27,6 +26,7 @@ import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
+import javax.inject.Inject
 
 @CacheableTask
 abstract class GenerateTestsTask : DefaultTask() {

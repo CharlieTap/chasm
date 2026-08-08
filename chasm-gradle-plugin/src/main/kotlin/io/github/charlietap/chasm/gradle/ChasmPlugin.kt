@@ -7,9 +7,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
-import org.gradle.api.file.CopySpec
-import org.gradle.api.tasks.Copy
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
@@ -18,12 +16,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
-import java.io.File
 import kotlin.jvm.java
 
 class ChasmPlugin : Plugin<Project> {
 
-    @Suppress("DEPRECATION")
     override fun apply(project: Project) {
 
         val extension = project.extensions.create("chasm", ChasmExtension::class.java, project.objects)
@@ -44,60 +40,7 @@ class ChasmPlugin : Plugin<Project> {
                             commonMainSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
                         }
                         Mode.PRODUCER -> {
-                            project.logger.warn(
-                                "Producer mode is deprecated and will be removed in a future release. " +
-                                    "For a more robust solution, see https://github.com/CharlieTap/glueball",
-                            )
-                            // For producers, we can't add the common target as it lacks support for wasm
-                            // instead we configure every target other than wasm individually
-                            mpp.targets.configureEach { target ->
-                                target.addVMRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
-                            }
-
-                            val wasmTargets = mpp.targets.filter { target ->
-                                target.name.startsWith("wasmJs") || target.name.startsWith("wasmWasi")
-                            }
-                            val nonWasmSourceSets = mpp.sourceSets.filter {
-                                it.name.lowercase().contains("main") &&
-                                    !it.name.lowercase().contains("common") &&
-                                    !it.name.lowercase().contains("wasm")
-                            }
-
-                            if (wasmTargets.isEmpty()) {
-                                project.logger.warn("Producer mode requires at least one WASM target (wasmJs or wasmWasi)")
-                                return@configureEach
-                            }
-
-                            project.tasks.withType(KotlinJsCompile::class.java).configureEach { compile ->
-                                compile.compilerOptions.freeCompilerArgs.add(
-                                    "-Xwasm-use-new-exception-proposal",
-                                )
-                            }
-
-                            wasmTargets.forEach { target ->
-                                val executable = (target as KotlinJsIrTarget)
-                                val mjsFile = executable.binaries.first().mainFile.get().asFile
-                                val binary = File(mjsFile.parentFile, mjsFile.nameWithoutExtension + ".wasm")
-
-                                val task = registerCodegenTask(project, module, target.name, workerClasspath, binary)
-                                task.configure { codegenTask ->
-                                    codegenTask.dependsOn(executable.binaries.first().linkTask)
-                                }
-
-                                nonWasmSourceSets.forEach { nonWasmSourceSet ->
-                                    nonWasmSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
-
-                                    val targetName = nonWasmSourceSet.name.removeSuffix("Main")
-                                    val taskName = "${targetName}ProcessResources"
-                                    project.tasks.named(taskName, Copy::class.java).configure { copy ->
-                                        copy.dependsOn(executable.binaries.first().linkTask)
-                                        copy.inputs.file(binary)
-                                        copy.from({ binary }) { spec: CopySpec ->
-                                            spec.rename { _: String -> "producer.wasm" }
-                                        }
-                                    }
-                                }
-                            }
+                            configureProducerModule(project, mpp, extension, module, workerClasspath)
                         }
                     }
                 }
@@ -110,14 +53,16 @@ class ChasmPlugin : Plugin<Project> {
 
             addVMRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
 
-            extension.modules.configureEach { module ->
-                if (extension.mode.get() == Mode.PRODUCER) {
-                    project.logger.error("Producer mode is only supported for Kotlin Multiplatform projects with WASM targets")
-                    return@configureEach
-                }
+            project.afterEvaluate {
+                extension.modules.configureEach { module ->
+                    if (extension.mode.get() == Mode.PRODUCER) {
+                        project.logger.error("Producer mode is only supported for Kotlin Multiplatform projects with WASM targets")
+                        return@configureEach
+                    }
 
-                val task = registerCodegenTask(project, module, MAIN_COMPILATION_NAME, workerClasspath)
-                mainCompilation.defaultSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
+                    val task = registerCodegenTask(project, module, MAIN_COMPILATION_NAME, workerClasspath)
+                    mainCompilation.defaultSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
+                }
             }
         }
 
@@ -138,22 +83,89 @@ class ChasmPlugin : Plugin<Project> {
                 ),
             )
         }
+    }
 
-        project.gradle.projectsEvaluated {
-            if (System.getProperty("idea.sync.active")?.toBoolean() == true) {
-                val tasksToTrigger = project.tasks.withType(CodegenTask::class.java).map { it.name }
-                val sp = project.gradle.startParameter
-                sp.setTaskNames(sp.taskNames + tasksToTrigger)
+    private fun configureProducerModule(
+        project: Project,
+        mpp: KotlinMultiplatformExtension,
+        extension: ChasmExtension,
+        module: WasmModule,
+        workerClasspath: Configuration,
+    ) {
+        project.logger.warn(
+            "Producer mode is deprecated and will be removed in a future release. " +
+                "For a more robust solution, see https://github.com/CharlieTap/glueball",
+        )
+
+        val wasmTargets = mpp.targets.withType(KotlinJsIrTarget::class.java).filter { target ->
+            target.platformType == KotlinPlatformType.wasm
+        }
+        if (wasmTargets.isEmpty()) {
+            throw GradleException("Producer mode requires at least one WASM target (wasmJs or wasmWasi)")
+        }
+
+        val generatedSources = project.objects.fileCollection()
+        val generatedResources = project.objects.fileCollection()
+
+        mpp.targets.configureEach { target ->
+            target.addVMRuntimeToKmpTarget(extension.runtimeDependencyConfiguration.get())
+
+            if (target.platformType != KotlinPlatformType.wasm && target.platformType != KotlinPlatformType.common) {
+                val mainCompilation = target.compilations.getByName(MAIN_COMPILATION_NAME)
+                mainCompilation.defaultSourceSet.kotlin.srcDir(generatedSources)
+                mainCompilation.defaultSourceSet.resources.srcDir(generatedResources)
             }
+        }
+
+        wasmTargets.forEach { target ->
+            target.compilations.configureEach { compilation ->
+                compilation.compileTaskProvider.configure { compileTask ->
+                    compileTask.compilerOptions.freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
+                }
+            }
+
+            val executable = target
+            val linkedBinary = executable.binaries.first()
+            val wasmFile = project.layout.file(
+                linkedBinary.mainFile.map { mainFile ->
+                    val file = mainFile.asFile
+                    file.resolveSibling(file.nameWithoutExtension + ".wasm")
+                },
+            )
+            val codegen = registerCodegenTask(project, module, target.name, workerClasspath).apply {
+                configure { task ->
+                    task.binary.set(wasmFile)
+                    task.dependsOn(linkedBinary.linkTask)
+                }
+            }
+            val preparedResources = project.tasks.register(
+                "prepareModule${target.name.toTaskNameSegment()}${module.name}Resources",
+                Sync::class.java,
+            ) { task ->
+                task.dependsOn(linkedBinary.linkTask)
+                task.from(wasmFile) { spec ->
+                    spec.rename { "producer.wasm" }
+                }
+                task.into(project.layout.buildDirectory.dir("generated/resources/${target.name}/${module.name}"))
+            }
+
+            generatedSources.from(codegen.flatMap { it.outputDirectory })
+            generatedResources.from(preparedResources.map { it.destinationDir })
         }
     }
 
+    private fun String.toTaskNameSegment(): String = replaceFirstChar { it.uppercase() }
+
     private fun createWorkerClasspathConfiguration(project: Project): Configuration {
-        return project.configurations.create(WORKER_CLASSPATH_CONFIGURATION_NAME) { configuration ->
-            configuration.isCanBeConsumed = false
-            configuration.isCanBeResolved = true
-            configuration.isTransitive = true
+        val dependencies = project.configurations.dependencyScope(WORKER_DEPENDENCIES_CONFIGURATION_NAME) { configuration ->
+            configuration.description = "Dependencies for the chasm codegen worker"
+        }
+        project.dependencies.add(dependencies.name, resolveChasmRuntimeNotation())
+        project.dependencies.add(dependencies.name, resolveVMRuntimeNotation())
+
+        return project.configurations.resolvable(WORKER_CLASSPATH_CONFIGURATION_NAME) { configuration ->
             configuration.description = "Classpath for the chasm codegen worker"
+            configuration.extendsFrom(dependencies.get())
 
             configuration.attributes { attributes ->
                 attributes.attribute(
@@ -165,12 +177,7 @@ class ChasmPlugin : Plugin<Project> {
                     project.objects.named(Category::class.java, Category.LIBRARY),
                 )
             }
-        }.also { config ->
-            val chasmDep = resolveChasmRuntimeNotation()
-            val vmDep = resolveVMRuntimeNotation()
-            project.dependencies.add(config.name, chasmDep)
-            project.dependencies.add(config.name, vmDep)
-        }
+        }.get()
     }
 
     private fun loadAndroidConfigurer(agpVersion: AgpVersion): AndroidConfigurer {
@@ -290,6 +297,7 @@ class ChasmPlugin : Plugin<Project> {
         private const val RUNTIME_ARTIFACT = "vm"
         private const val RUNTIME_JVM_ARTIFACT_SUFFIX = "jvm"
         private const val CHASM_ARTIFACT = "chasm"
+        private const val WORKER_DEPENDENCIES_CONFIGURATION_NAME = "chasmCodegenWorkerDependencies"
         private const val WORKER_CLASSPATH_CONFIGURATION_NAME = "chasmCodegenWorkerClasspath"
     }
 }

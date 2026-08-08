@@ -10,4 +10,4 @@ data class ModuleInstanceCommand(
     override val line: Int,
     val module: String,
     val instance: String,
-): Command
+) : Command

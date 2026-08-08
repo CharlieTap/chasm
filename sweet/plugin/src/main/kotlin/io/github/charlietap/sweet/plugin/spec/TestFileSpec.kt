@@ -61,14 +61,14 @@ private fun testFileSpec(
         TypeSpec.classBuilder(testClassName)
             .addAnnotation(
                 AnnotationSpec.builder(Suppress::class)
-                .addMember("%S", "RedundantVisibilityModifier")
-                .build()
+                    .addMember("%S", "RedundantVisibilityModifier")
+                    .build(),
             )
             .addProperty(
                 PropertySpec.builder("runner", ClassName(runner.substringBeforeLast("."), runner.substringAfterLast(".")))
                     .initializer(runner.substringAfterLast(".") + "()")
                     .addModifiers(KModifier.PRIVATE)
-                    .build()
+                    .build(),
             )
             .addFunction(
                 FunSpec.builder("script ${script.name.replace(".", " ")} passes successfully")
@@ -80,10 +80,14 @@ private fun testFileSpec(
                     val result = runner.execute(TEST_DIR, script, %T.${phaseSupport.name})
 
                     %T(%T.Success, result)
-                    """.trimIndent(),
-                        jsonClassName, scriptClassName, semanticPhaseClassName, assertEqualsFunction, scriptResultClassName
+                        """.trimIndent(),
+                        jsonClassName,
+                        scriptClassName,
+                        semanticPhaseClassName,
+                        assertEqualsFunction,
+                        scriptResultClassName,
                     )
-                    .build()
+                    .build(),
             )
             .addType(
                 TypeSpec.companionObjectBuilder()
@@ -91,10 +95,10 @@ private fun testFileSpec(
                         PropertySpec.builder("TEST_DIR", String::class)
                             .addModifiers(KModifier.CONST)
                             .initializer("%S", script.parentFile.absolutePath + "/")
-                            .build()
+                            .build(),
                     )
-                    .build()
+                    .build(),
             )
-            .build()
+            .build(),
     )
 }.build()

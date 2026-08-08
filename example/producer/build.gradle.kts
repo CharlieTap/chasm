@@ -17,6 +17,7 @@ plugins {
 kotlin {
     jvm()
     wasmWasi {
+        nodejs()
         binaries.executable()
     }
 }

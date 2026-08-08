@@ -1,9 +1,5 @@
 package io.github.charlietap.sweet.plugin.task
 
-import java.io.File
-import java.net.URI
-import java.net.URL
-import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ArchiveOperations
@@ -14,6 +10,10 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.io.File
+import java.net.URI
+import java.net.URL
+import javax.inject.Inject
 
 @CacheableTask
 abstract class DownloadWasmToolsTask : DefaultTask() {
@@ -37,7 +37,6 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
         val osArch = System.getProperty("os.arch").lowercase()
         val osName = System.getProperty("os.name").lowercase()
 
-
         val (os, extension) = when {
             osName.contains("mac") -> OS_MAC to FILE_EXTENSION_TAR
             osName.contains("nux") -> OS_LINUX to FILE_EXTENSION_TAR
@@ -51,9 +50,9 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
         }
 
         val filename = filename(version, arch, os)
-        val url = "${RELEASE_URL}v${version}/${filename}${extension}"
+        val url = "${RELEASE_URL}v$version/${filename}$extension"
 
-        val compressed = if(os == OS_WINDOWS) {
+        val compressed = if (os == OS_WINDOWS) {
             outputDirectory.file("${version}${FILE_EXTENSION_ZIP}").get().asFile
         } else {
             outputDirectory.file("${version}${FILE_EXTENSION_TAR}").get().asFile
@@ -62,7 +61,7 @@ abstract class DownloadWasmToolsTask : DefaultTask() {
         wipeDirectory()
         downloadRelease(URI(url).toURL(), compressed)
 
-        val tree = if(os == OS_WINDOWS) {
+        val tree = if (os == OS_WINDOWS) {
             archive.zipTree(compressed)
         } else {
             archive.tarTree(archive.gzip(compressed))

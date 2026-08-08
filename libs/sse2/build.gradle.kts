@@ -12,7 +12,7 @@ kotlin {
     mingwX64 {
         compilations.getByName("main") {
             cinterops {
-                val libsse2 by creating {
+                create("libsse2") {
                     defFile(project.file("src/cinterop/libsse2.def"))
                 }
             }

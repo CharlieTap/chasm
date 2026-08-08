@@ -11,7 +11,5 @@ tasks.register("fmt") {
     group = "formatting"
     description = "Format sources"
 
-    val lintingTasks = subprojects.mapNotNull { it.tasks.findByName("formatKotlin") }
-
-    dependsOn(lintingTasks)
+    dependsOn(":lib:fmt", ":plugin:fmt")
 }

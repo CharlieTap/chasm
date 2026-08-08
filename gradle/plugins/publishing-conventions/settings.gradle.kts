@@ -11,3 +11,4 @@ plugins {
 }
 
 rootProject.name = "publishing-conventions"
+enableFeaturePreview("ENHANCED_GRAPH_ORDERING")

@@ -14,4 +14,4 @@ data class AssertInvalidCommand(
     val moduleType: ModuleType,
     @SerialName("binary_filename")
     val binaryFilename: String? = null,
-): Command
+) : Command

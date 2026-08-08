@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.build.config)
     `java-gradle-plugin`
 
-    alias(libs.plugins.conventions.kotlin)
+    alias(libs.plugins.conventions.gradle.plugin)
     alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
 }

@@ -2,6 +2,8 @@ import io.github.charlietap.chasm.gradle.CodegenConfig
 import io.github.charlietap.chasm.gradle.CodegenTask
 import io.github.charlietap.chasm.gradle.ExportedAllocator
 import io.github.charlietap.chasm.gradle.StringEncodingStrategy
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.gradle.kotlin.dsl.withType
 import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
@@ -13,6 +15,18 @@ plugins {
 
     alias(libs.plugins.conventions.linting)
 }
+
+val wasmResourcesElements = configurations.consumable("wasmResourcesElements") {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named("chasm-wasm"))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named("resources"))
+    }
+}
+
+artifacts.add(
+    wasmResourcesElements.name,
+    layout.projectDirectory.dir("src/commonMain/resources"),
+)
 
 chasm {
     modules {

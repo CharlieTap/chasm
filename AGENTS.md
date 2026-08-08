@@ -20,8 +20,8 @@
 
 - Run `./gradlew fmt` before committing to keep formatting consistent.
 - If you’ve changed a public ABI, first check it with `./gradlew
-  checkLegacyAbi`. If it reports changes, record them with `./gradlew
-  updateLegacyAbi`.
+  checkKotlinAbi`. If it reports changes, record them with `./gradlew
+  updateKotlinAbi`.
 - In Cursor, use the `read_lints` command before finishing to surface IDE
   diagnostics (detekt/ktlint) for the files you edited.
 

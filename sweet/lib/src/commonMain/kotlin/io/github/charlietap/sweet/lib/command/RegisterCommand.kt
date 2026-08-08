@@ -10,4 +10,4 @@ data class RegisterCommand(
     val name: String? = null,
     @SerialName("as")
     val registerAs: String,
-): Command
+) : Command

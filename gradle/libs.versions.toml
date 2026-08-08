@@ -10,9 +10,10 @@ target-sdk = "35"
 min-sdk = "28"
 
 java-compiler-version = "21"
-java-bytecode-version = "11"
+java-library-bytecode-version = "11"
+java-plugin-bytecode-version = "17"
 
-android-build-tools-plugin = "9.0.0"
+android-build-tools-plugin = "9.3.1"
 android-build-tools-plugin-8 = "8.13.2"
 build-config-plugin = "5.6.7"
 versions-plugin = "0.51.0"
@@ -88,6 +89,7 @@ wasm-corpus = { id = "io.github.charlietap.corpus.plugin" }
 
 conventions-kmp  = { id = "kmp-conventions" }
 conventions-kotlin = { id = "kotlin-conventions" }
+conventions-gradle-plugin = { id = "gradle-plugin-conventions" }
 conventions-linting  = { id = "linting-conventions" }
 conventions-publishing  = { id = "publishing-conventions" }
 conventions-versions  = { id = "versions-conventions" }

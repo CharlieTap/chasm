@@ -1,3 +1,5 @@
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -5,6 +7,19 @@ plugins {
     alias(libs.plugins.metro)
 
     alias(libs.plugins.conventions.linting)
+}
+
+val wasmResourcesDependencies = configurations.dependencyScope("wasmResourcesDependencies")
+val wasmResources = configurations.resolvable("wasmResources") {
+    extendsFrom(wasmResourcesDependencies.get())
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named("chasm-wasm"))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named("resources"))
+    }
+}
+
+dependencies {
+    add(wasmResourcesDependencies.name, projects.consumerMultiplatform)
 }
 
 kotlin {
@@ -28,20 +43,13 @@ kotlin {
     }
 }
 
-val copyWasmBinaries by tasks.registering(Copy::class) {
-    val resources = project(":consumer-multiplatform").layout.projectDirectory.dir("src/commonMain/resources")
-    from(resources) {
+val copyWasmBinaries = tasks.register<Copy>("copyWasmBinaries") {
+    from(wasmResources) {
         include("*.wasm")
     }
     into(layout.buildDirectory.dir("wasm"))
 }
 
 kotlin.sourceSets.named("commonMain") {
-    resources.srcDir(layout.buildDirectory.dir("wasm"))
-}
-
-tasks.matching {
-    (it.name.startsWith("js") || it.name.startsWith("wasmJs")) && it.name.contains("ProcessResources")
-}.configureEach {
-    dependsOn(copyWasmBinaries)
+    resources.srcDir(copyWasmBinaries.map { it.destinationDir })
 }

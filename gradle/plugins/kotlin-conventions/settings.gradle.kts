@@ -11,3 +11,4 @@ plugins {
 }
 
 rootProject.name = "kotlin-conventions"
+enableFeaturePreview("ENHANCED_GRAPH_ORDERING")

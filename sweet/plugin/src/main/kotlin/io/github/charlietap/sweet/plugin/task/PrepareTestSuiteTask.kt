@@ -2,7 +2,6 @@ package io.github.charlietap.sweet.plugin.task
 
 import io.github.charlietap.sweet.plugin.action.WasmToolsAction
 import io.github.charlietap.sweet.plugin.ext.relativeSuitePath
-import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
@@ -22,6 +21,7 @@ import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
+import javax.inject.Inject
 
 @CacheableTask
 abstract class PrepareTestSuiteTask : DefaultTask() {

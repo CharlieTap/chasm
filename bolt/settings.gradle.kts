@@ -30,3 +30,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "bolt-gradle-plugin"
+enableFeaturePreview("ENHANCED_GRAPH_ORDERING")

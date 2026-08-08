@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 enum class ModuleType {
     @SerialName("binary")
     Binary,
+
     @SerialName("text")
     Text,
 }

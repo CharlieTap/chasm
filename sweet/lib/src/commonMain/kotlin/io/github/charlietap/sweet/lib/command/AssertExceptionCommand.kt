@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
 data class AssertExceptionCommand(
     override val line: Int,
     val action: Action,
-): Command
+) : Command

@@ -60,22 +60,20 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting
-
-        val nonJsMain by getting {
+        getByName("nonJsMain") {
             kotlin.srcDir("src/nonJsTargetsMain/kotlin")
             dependencies {
                 implementation(projects.chasm)
             }
         }
 
-        val commonTest by getting {
+        getByName("commonTest") {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.test.resources)
             }
         }
-        val nonJsTest by getting {
+        getByName("nonJsTest") {
             kotlin.srcDir("src/nonJsTargetsTest/kotlin")
         }
     }

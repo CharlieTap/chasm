@@ -10,4 +10,4 @@ data class AssertTrapCommand(
     override val line: Int,
     val action: Action,
     val text: String,
-): Command
+) : Command

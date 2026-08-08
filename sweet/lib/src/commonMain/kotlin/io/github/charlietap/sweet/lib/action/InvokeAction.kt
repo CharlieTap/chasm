@@ -11,4 +11,4 @@ data class InvokeAction(
     val args: List<Value>,
     @SerialName("module")
     val moduleName: String? = null,
-): Action
+) : Action

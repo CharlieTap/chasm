@@ -13,6 +13,7 @@ plugins {
 
     alias(libs.plugins.conventions.kmp) apply false
     alias(libs.plugins.conventions.kotlin) apply false
+    alias(libs.plugins.conventions.gradle.plugin) apply false
     alias(libs.plugins.conventions.publishing) apply false
     alias(libs.plugins.conventions.linting) apply false
     alias(libs.plugins.conventions.versions)
@@ -22,28 +23,8 @@ tasks.register("fmt") {
     group = "formatting"
     description = "Format sources"
 
-    val lintingTasks = subprojects.mapNotNull { it.tasks.findByName("formatKotlin") }
-    val corpusLintingTask = gradle.includedBuild("corpus").task(":fmt")
-
-    dependsOn(lintingTasks, corpusLintingTask)
-}
-
-tasks.register("test") {
-    group = "development"
-    description = "Developer loop, run testsuite designed for fast feedback"
-
-    val jvmTestTasks = subprojects.mapNotNull { subproject ->
-        subproject.tasks.findByName("jvmTest")?.also { task ->
-            (task as Test).exclude("**/WehTest.class")
-        }
-    }
-
-    dependsOn(jvmTestTasks)
-}
-
-tasks.register("corpus") {
-    group = "verification"
-    description = "Run the configured wasm-corpus slice against Chasm on JVM"
-
-    dependsOn(":chasm:corpus")
+    dependsOn(
+        gradle.includedBuild("corpus").task(":fmt"),
+        gradle.includedBuild("sweet").task(":fmt"),
+    )
 }

@@ -9,4 +9,4 @@ data class GetAction(
     val field: String,
     @SerialName("module")
     val moduleName: String? = null,
-): Action
+) : Action
