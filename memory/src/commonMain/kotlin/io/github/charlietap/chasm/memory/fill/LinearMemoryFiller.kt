@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 typealias LinearMemoryFiller = (LinearMemory, Int, Int, Byte, Int) -> Unit
 
-expect inline fun LinearMemoryFiller(
+expect fun LinearMemoryFiller(
     memory: LinearMemory,
     address: Int,
     bytesToFill: Int,

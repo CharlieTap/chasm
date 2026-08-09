@@ -12,17 +12,33 @@ actual inline fun LinearMemoryGrower(
     memory: LinearMemory,
     pagesToAdd: Int,
 ): LinearMemory {
-    val srcBuffer = (memory as ByteBufferLinearMemory).memory
-    val currentSize = srcBuffer.capacity()
+    val linearMemory = memory as ByteBufferLinearMemory
+    val buffer = linearMemory.memory
+    val currentSize = buffer.limit()
     val newSize = currentSize + (pagesToAdd * PAGE_SIZE)
 
-    val newBuffer = ByteBuffer.allocateDirect(newSize).order(ByteOrder.LITTLE_ENDIAN)
+    if (newSize <= buffer.capacity()) {
+        buffer.limit(newSize)
+        return linearMemory
+    }
 
-    srcBuffer.duplicate().apply {
+    val doubledCapacity = minOf(buffer.capacity().toLong() * 2, Int.MAX_VALUE.toLong()).toInt()
+    val reservedCapacity = minOf(newSize.toLong() + (newSize / 2), Int.MAX_VALUE.toLong()).toInt()
+    val newCapacity = maxOf(doubledCapacity, reservedCapacity)
+    val newBuffer = try {
+        ByteBuffer.allocateDirect(newCapacity)
+    } catch (error: OutOfMemoryError) {
+        if (newCapacity == newSize) throw error
+        ByteBuffer.allocateDirect(newSize)
+    }.order(ByteOrder.LITTLE_ENDIAN)
+
+    buffer.duplicate().apply {
         position(0)
         limit(currentSize)
         newBuffer.put(this)
     }
-
-    return ByteBufferLinearMemory(newBuffer)
+    newBuffer.position(0)
+    newBuffer.limit(newSize)
+    linearMemory.memory = newBuffer
+    return linearMemory
 }

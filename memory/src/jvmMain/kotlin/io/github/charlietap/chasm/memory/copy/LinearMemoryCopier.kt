@@ -18,7 +18,11 @@ actual inline fun LinearMemoryCopier(
     srcUpperBound: Int,
     dstUpperBound: Int,
 ) {
-    if (copySize < 0 || srcOffset < 0 || dstOffset < 0) {
+    if (
+        (copySize or srcOffset or dstOffset) < 0 ||
+        copySize > srcUpperBound - srcOffset ||
+        copySize > dstUpperBound - dstOffset
+    ) {
         throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
     }
 

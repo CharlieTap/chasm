@@ -6,15 +6,20 @@ import io.github.charlietap.chasm.memory.ByteBufferLinearMemory
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import java.util.Arrays
 
-actual inline fun LinearMemoryFiller(
+private const val BULK_FILL_THRESHOLD = 64
+private val zeroFillChunk = ByteArray(LinearMemory.PAGE_SIZE)
+private val nonZeroFillChunk = ThreadLocal.withInitial { ByteArray(LinearMemory.PAGE_SIZE) }
+
+actual fun LinearMemoryFiller(
     memory: LinearMemory,
     address: Int,
     bytesToFill: Int,
     fillValue: Byte,
     upperBound: Int,
 ) {
-    if (bytesToFill < 0 || address < 0 || address > upperBound - bytesToFill) {
+    if ((bytesToFill or address) < 0 || bytesToFill > upperBound - address) {
         throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
     }
 
@@ -25,7 +30,22 @@ actual inline fun LinearMemoryFiller(
         limit(address + bytesToFill)
     }
 
-    repeat(bytesToFill) {
-        slice.put(fillValue)
+    if (bytesToFill < BULK_FILL_THRESHOLD) {
+        repeat(bytesToFill) {
+            slice.put(fillValue)
+        }
+        return
+    }
+
+    val chunkSize = minOf(bytesToFill, LinearMemory.PAGE_SIZE)
+    val fillChunk: ByteArray
+    if (fillValue.toInt() == 0) {
+        fillChunk = zeroFillChunk
+    } else {
+        fillChunk = nonZeroFillChunk.get()
+        Arrays.fill(fillChunk, 0, chunkSize, fillValue)
+    }
+    while (slice.hasRemaining()) {
+        slice.put(fillChunk, 0, minOf(slice.remaining(), chunkSize))
     }
 }
