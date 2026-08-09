@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.runtime.stack.NO_RESULT_SLOT_BASE
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -47,6 +48,7 @@ class WasmFunctionCallTest {
 
         assertEquals(37, entryIp)
         assertEquals(19, cstack.peekFrame().returnIp)
+        assertEquals(NO_RESULT_SLOT_BASE, cstack.peekFrame().resultSlotBase)
         assertEquals(0, vstack.framePointer)
         assertEquals(2, vstack.depth())
         assertEquals(11L, vstack.getFrameSlot(0))

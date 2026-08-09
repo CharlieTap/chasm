@@ -8,6 +8,8 @@ data class ActivationFrame(
     val valueDepth: Int,
     val instance: ModuleInstance,
     val previousFramePointer: Int = 0,
-    val visibleResultBase: Int? = null,
+    val resultSlotBase: Int = NO_RESULT_SLOT_BASE,
     val returnIp: Int,
 )
+
+const val NO_RESULT_SLOT_BASE = -1

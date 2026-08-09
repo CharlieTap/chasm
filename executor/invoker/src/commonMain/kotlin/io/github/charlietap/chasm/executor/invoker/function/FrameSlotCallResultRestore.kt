@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
 import io.github.charlietap.chasm.runtime.stack.ActivationFrame
+import io.github.charlietap.chasm.runtime.stack.NO_RESULT_SLOT_BASE
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal fun FinishFrameSlotCallResult(
@@ -19,12 +20,12 @@ internal fun FinishFrameSlotCallResult(
         return
     }
 
-    val visibleResultBase = frame.visibleResultBase
+    val resultSlotBase = frame.resultSlotBase
 
-    if (visibleResultBase != null) {
-        val sharesVisibleResultRegion = currentFramePointer == callerFramePointer + visibleResultBase
+    if (resultSlotBase != NO_RESULT_SLOT_BASE) {
+        val resultsAlreadyInPlace = currentFramePointer == callerFramePointer + resultSlotBase
 
-        if (sharesVisibleResultRegion) {
+        if (resultsAlreadyInPlace) {
             vstack.framePointer = callerFramePointer
             vstack.shrink(
                 preserveTopN = 0,
@@ -39,7 +40,7 @@ internal fun FinishFrameSlotCallResult(
 
         vstack.framePointer = callerFramePointer
         resultValues.forEachIndexed { index, value ->
-            vstack.setFrameSlot(visibleResultBase + index, value)
+            vstack.setFrameSlot(resultSlotBase + index, value)
         }
         vstack.shrink(
             preserveTopN = 0,
@@ -55,7 +56,7 @@ internal fun FinishFrameSlotCallResult(
     vstack.framePointer = callerFramePointer
 }
 
-internal fun StrictVisibleResultBase(
+internal fun ResultSlotBase(
     resultSlots: List<Int>,
 ): Int = resultSlots.firstOrNull() ?: 0
 

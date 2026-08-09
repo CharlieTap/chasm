@@ -163,7 +163,7 @@ class HostFunctionCallTest {
                 valueDepth = 2,
                 previousFramePointer = 0,
                 instance = moduleInstance(),
-                visibleResultBase = 1,
+                resultSlotBase = 1,
             ),
         )
 

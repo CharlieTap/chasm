@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.HostFunctionContext
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.NO_RESULT_SLOT_BASE
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
@@ -109,10 +110,10 @@ internal fun ReturnHostFunctionCall(
         throw InvocationException(InvocationError.HostFunctionError(e.reason))
     }
 
-    val visibleResultBase = frame.visibleResultBase
-    if (visibleResultBase != null) {
+    val resultSlotBase = frame.resultSlotBase
+    if (resultSlotBase != NO_RESULT_SLOT_BASE) {
         results.forEachIndexed { index, result ->
-            vstack.setFrameSlot(visibleResultBase + index, result.toLongFromBoxed())
+            vstack.setFrameSlot(resultSlotBase + index, result.toLongFromBoxed())
         }
     } else {
         results.forEach { result ->
@@ -163,10 +164,10 @@ internal fun ReturnHostFunctionCall(
         throw InvocationException(InvocationError.HostFunctionError(e.reason))
     }
 
-    val visibleResultBase = frame.visibleResultBase
-    if (visibleResultBase != null) {
+    val resultSlotBase = frame.resultSlotBase
+    if (resultSlotBase != NO_RESULT_SLOT_BASE) {
         results.forEachIndexed { index, result ->
-            vstack.setFrameSlot(visibleResultBase + index, result.toLongFromBoxed())
+            vstack.setFrameSlot(resultSlotBase + index, result.toLongFromBoxed())
         }
     } else {
         results.forEach { result ->

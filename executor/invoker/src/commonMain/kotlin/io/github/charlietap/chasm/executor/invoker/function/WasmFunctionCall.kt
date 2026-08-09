@@ -79,7 +79,7 @@ internal fun WasmFunctionCall(
             valueDepth = valueDepth,
             instance = instance.module,
             previousFramePointer = callerFramePointer,
-            visibleResultBase = StrictVisibleResultBase(resultSlots),
+            resultSlotBase = ResultSlotBase(resultSlots),
             returnIp = returnIp,
         ),
     )
