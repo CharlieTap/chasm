@@ -15,13 +15,6 @@ internal fun ControlInstructionPredecoder(
     ControlInstructionPredecoder(
         context = context,
         instruction = instruction,
-        brInstructionPredecoder = ::BrInstructionPredecoder,
-        brIfInstructionPredecoder = ::BrIfInstructionPredecoder,
-        brOnCastInstructionPredecoder = ::BrOnCastInstructionPredecoder,
-        brOnCastFailInstructionPredecoder = ::BrOnCastFailInstructionPredecoder,
-        brOnNonNullInstructionPredecoder = ::BrOnNonNullInstructionPredecoder,
-        brOnNullInstructionPredecoder = ::BrOnNullInstructionPredecoder,
-        brTableInstructionPredecoder = ::BrTableInstructionPredecoder,
         callInstructionPredecoder = ::CallInstructionPredecoder,
         callIndirectInstructionPredecoder = ::CallIndirectInstructionPredecoder,
         callRefInstructionPredecoder = ::CallRefInstructionPredecoder,
@@ -38,13 +31,6 @@ internal fun ControlInstructionPredecoder(
 internal inline fun ControlInstructionPredecoder(
     context: PredecodingContext,
     instruction: ControlInstruction,
-    crossinline brInstructionPredecoder: Predecoder<ControlInstruction.Br, DispatchableInstruction>,
-    crossinline brIfInstructionPredecoder: Predecoder<ControlInstruction.BrIf, DispatchableInstruction>,
-    crossinline brOnCastInstructionPredecoder: Predecoder<ControlInstruction.BrOnCast, DispatchableInstruction>,
-    crossinline brOnCastFailInstructionPredecoder: Predecoder<ControlInstruction.BrOnCastFail, DispatchableInstruction>,
-    crossinline brOnNonNullInstructionPredecoder: Predecoder<ControlInstruction.BrOnNonNull, DispatchableInstruction>,
-    crossinline brOnNullInstructionPredecoder: Predecoder<ControlInstruction.BrOnNull, DispatchableInstruction>,
-    crossinline brTableInstructionPredecoder: Predecoder<ControlInstruction.BrTable, DispatchableInstruction>,
     crossinline callInstructionPredecoder: Predecoder<ControlInstruction.Call, DispatchableInstruction>,
     crossinline callIndirectInstructionPredecoder: Predecoder<ControlInstruction.CallIndirect, DispatchableInstruction>,
     crossinline callRefInstructionPredecoder: Predecoder<ControlInstruction.CallRef, DispatchableInstruction>,
@@ -64,14 +50,14 @@ internal inline fun ControlInstructionPredecoder(
         is ControlInstruction.TryTable,
         ControlInstruction.Else,
         is ControlInstruction.End,
+        is ControlInstruction.Br,
+        is ControlInstruction.BrIf,
+        is ControlInstruction.BrOnCast,
+        is ControlInstruction.BrOnCastFail,
+        is ControlInstruction.BrOnNonNull,
+        is ControlInstruction.BrOnNull,
+        is ControlInstruction.BrTable,
         -> error("structured control instruction reached predecoding: $instruction")
-        is ControlInstruction.Br -> brInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrIf -> brIfInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrOnCast -> brOnCastInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrOnCastFail -> brOnCastFailInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrOnNonNull -> brOnNonNullInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrOnNull -> brOnNullInstructionPredecoder(context, instruction).bind()
-        is ControlInstruction.BrTable -> brTableInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.Call -> callInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.CallIndirect -> callIndirectInstructionPredecoder(context, instruction).bind()
         is ControlInstruction.CallRef -> callRefInstructionPredecoder(context, instruction).bind()

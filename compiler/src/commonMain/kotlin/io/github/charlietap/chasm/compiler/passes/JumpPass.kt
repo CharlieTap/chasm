@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Expression
+import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.ir.module.Module
@@ -33,6 +34,7 @@ private fun JumpInstructionLowerer(
     val labels = ArrayDeque<JumpLabel>()
     val handlers = ArrayDeque<ActiveTryHandler>()
     val work = ArrayDeque<JumpWork>()
+    val takenPaths = mutableListOf<TakenPath>()
 
     if (hasRootLabel) {
         val functionLabel = JumpLabel(
@@ -48,6 +50,7 @@ private fun JumpInstructionLowerer(
             labels = labels,
             handlers = handlers,
             work = work,
+            takenPaths = takenPaths,
         )
         require(labels.removeLastOrNull() === functionLabel) {
             "jump lowering left an invalid function label stack: $labels"
@@ -62,6 +65,7 @@ private fun JumpInstructionLowerer(
             labels = labels,
             handlers = handlers,
             work = work,
+            takenPaths = takenPaths,
         )
     }
 
@@ -75,6 +79,7 @@ private fun JumpInstructionLowerer(
     if (hasRootLabel) {
         output.add(AdminInstruction.EndFunction)
     }
+    appendTakenPaths(output, takenPaths, hasRootLabel)
     return output
 }
 
@@ -85,6 +90,7 @@ private fun JumpWorkLowerer(
     labels: ArrayDeque<JumpLabel>,
     handlers: ArrayDeque<ActiveTryHandler>,
     work: ArrayDeque<JumpWork>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     while (work.isNotEmpty()) {
         when (val item = work.removeLast()) {
@@ -96,6 +102,7 @@ private fun JumpWorkLowerer(
                 labels = labels,
                 handlers = handlers,
                 work = work,
+                takenPaths = takenPaths,
             )
             is JumpWork.CloseBlock -> {
                 require(labels.removeLastOrNull() === item.label) {
@@ -156,6 +163,7 @@ private fun JumpRangeLowerer(
     labels: ArrayDeque<JumpLabel>,
     handlers: ArrayDeque<ActiveTryHandler>,
     work: ArrayDeque<JumpWork>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     var index = range.start
     while (index < range.endExclusive) {
@@ -185,7 +193,7 @@ private fun JumpRangeLowerer(
         require(instruction !is ControlInstruction.Else && instruction !is ControlInstruction.End) {
             "jump lowering encountered an unindexed control marker at $index: $instruction"
         }
-        JumpInstructionLowerer(instruction, output, labels, handlers)
+        JumpInstructionLowerer(instruction, output, labels, handlers, takenPaths)
         index++
     }
 }
@@ -275,6 +283,7 @@ private fun JumpInstructionLowerer(
     output: MutableList<Instruction>,
     labels: ArrayDeque<JumpLabel>,
     handlers: ArrayDeque<ActiveTryHandler>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     when (instruction) {
         is ControlInstruction.Br -> lowerJump(
@@ -282,41 +291,112 @@ private fun JumpInstructionLowerer(
             currentHandlerDepth = handlers.size,
             output = output,
         )
+        is ControlInstruction.BrIf -> lowerJumpIf(
+            instruction = ControlSuperInstruction.BrIf(
+                operand = FusedOperand.ValueStack,
+                labelIndex = instruction.labelIndex,
+            ),
+            target = jumpTarget(labels, instruction.labelIndex),
+            currentHandlerDepth = handlers.size,
+            output = output,
+            takenPaths = takenPaths,
+        )
+        is ControlInstruction.BrTable -> lowerJumpTable(
+            instruction = ControlSuperInstruction.BrTable(
+                operand = FusedOperand.ValueStack,
+                labelIndices = instruction.labelIndices,
+                defaultLabelIndex = instruction.defaultLabelIndex,
+            ),
+            labels = labels,
+            currentHandlerDepth = handlers.size,
+            output = output,
+            takenPaths = takenPaths,
+        )
+        is ControlInstruction.BrOnNull -> lowerJumpOnNull(
+            instruction = ControlSuperInstruction.BrOnNull(
+                operand = FusedOperand.ValueStack,
+                labelIndex = instruction.labelIndex,
+            ),
+            target = jumpTarget(labels, instruction.labelIndex),
+            currentHandlerDepth = handlers.size,
+            output = output,
+            takenPaths = takenPaths,
+        )
+        is ControlInstruction.BrOnNonNull -> lowerJumpOnNonNull(
+            instruction = ControlSuperInstruction.BrOnNonNull(
+                operand = FusedOperand.ValueStack,
+                labelIndex = instruction.labelIndex,
+            ),
+            target = jumpTarget(labels, instruction.labelIndex),
+            currentHandlerDepth = handlers.size,
+            output = output,
+            takenPaths = takenPaths,
+        )
+        is ControlInstruction.BrOnCast -> lowerJumpOnCast(
+            instruction = ControlSuperInstruction.BrOnCast(
+                operand = FusedOperand.ValueStack,
+                labelIndex = instruction.labelIndex,
+                srcReferenceType = instruction.srcReferenceType,
+                dstReferenceType = instruction.dstReferenceType,
+            ),
+            target = jumpTarget(labels, instruction.labelIndex),
+            currentHandlerDepth = handlers.size,
+            output = output,
+            takenPaths = takenPaths,
+        )
+        is ControlInstruction.BrOnCastFail -> lowerJumpOnCastFail(
+            instruction = ControlSuperInstruction.BrOnCastFail(
+                operand = FusedOperand.ValueStack,
+                labelIndex = instruction.labelIndex,
+                srcReferenceType = instruction.srcReferenceType,
+                dstReferenceType = instruction.dstReferenceType,
+            ),
+            target = jumpTarget(labels, instruction.labelIndex),
+            currentHandlerDepth = handlers.size,
+            output = output,
+            takenPaths = takenPaths,
+        )
         is ControlSuperInstruction.BrIf -> lowerJumpIf(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
+            takenPaths = takenPaths,
         )
         is ControlSuperInstruction.BrTable -> lowerJumpTable(
             instruction = instruction,
             labels = labels,
             currentHandlerDepth = handlers.size,
             output = output,
+            takenPaths = takenPaths,
         )
         is ControlSuperInstruction.BrOnNull -> lowerJumpOnNull(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
+            takenPaths = takenPaths,
         )
         is ControlSuperInstruction.BrOnNonNull -> lowerJumpOnNonNull(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
+            takenPaths = takenPaths,
         )
         is ControlSuperInstruction.BrOnCast -> lowerJumpOnCast(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
+            takenPaths = takenPaths,
         )
         is ControlSuperInstruction.BrOnCastFail -> lowerJumpOnCastFail(
             instruction = instruction,
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
             output = output,
+            takenPaths = takenPaths,
         )
         else -> output.add(instruction)
     }
@@ -427,14 +507,19 @@ private fun lowerJumpIf(
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     val instructionIndex = output.size
     output.add(
         AdminInstruction.JumpIf(
             operand = instruction.operand,
             offset = target.targetIndex ?: UNPATCHED_OFFSET,
-            takenInstructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
         ),
+    )
+    addTakenPath(
+        takenPaths = takenPaths,
+        instructionIndex = instructionIndex,
+        instructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
     )
     if (target.targetIndex == null) {
         target.holes.add(OffsetJumpHole(instructionIndex))
@@ -446,6 +531,7 @@ private fun lowerJumpTable(
     labels: ArrayDeque<JumpLabel>,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     val targets = instruction.labelIndices.map { labelIndex ->
         jumpTarget(labels, labelIndex)
@@ -457,12 +543,23 @@ private fun lowerJumpTable(
             operand = instruction.operand,
             offsets = targets.map { target -> target.targetIndex ?: UNPATCHED_OFFSET },
             defaultOffset = defaultTarget.targetIndex ?: UNPATCHED_OFFSET,
-            takenInstructions = instruction.takenInstructions.mapIndexed { index, takenInstructions ->
-                takenInstructions + handlerExitInstructions(currentHandlerDepth, targets[index])
-            },
-            defaultTakenInstructions = instruction.defaultTakenInstructions +
-                handlerExitInstructions(currentHandlerDepth, defaultTarget),
         ),
+    )
+
+    instruction.takenInstructions.forEachIndexed { index, instructions ->
+        addTakenPath(
+            takenPaths = takenPaths,
+            instructionIndex = instructionIndex,
+            branchIndex = index,
+            instructions = instructions + handlerExitInstructions(currentHandlerDepth, targets[index]),
+        )
+    }
+    addTakenPath(
+        takenPaths = takenPaths,
+        instructionIndex = instructionIndex,
+        branchIndex = null,
+        instructions = instruction.defaultTakenInstructions +
+            handlerExitInstructions(currentHandlerDepth, defaultTarget),
     )
 
     targets.forEachIndexed { index, target ->
@@ -481,14 +578,19 @@ private fun lowerJumpOnNull(
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     val instructionIndex = output.size
     output.add(
         AdminInstruction.JumpOnNull(
             operand = instruction.operand,
             offset = target.targetIndex ?: UNPATCHED_OFFSET,
-            takenInstructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
         ),
+    )
+    addTakenPath(
+        takenPaths = takenPaths,
+        instructionIndex = instructionIndex,
+        instructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
     )
     if (target.targetIndex == null) {
         target.holes.add(OffsetJumpHole(instructionIndex))
@@ -500,14 +602,19 @@ private fun lowerJumpOnNonNull(
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     val instructionIndex = output.size
     output.add(
         AdminInstruction.JumpOnNonNull(
             operand = instruction.operand,
             offset = target.targetIndex ?: UNPATCHED_OFFSET,
-            takenInstructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
         ),
+    )
+    addTakenPath(
+        takenPaths = takenPaths,
+        instructionIndex = instructionIndex,
+        instructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
     )
     if (target.targetIndex == null) {
         target.holes.add(OffsetJumpHole(instructionIndex))
@@ -519,6 +626,7 @@ private fun lowerJumpOnCast(
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     val instructionIndex = output.size
     output.add(
@@ -527,8 +635,12 @@ private fun lowerJumpOnCast(
             offset = target.targetIndex ?: UNPATCHED_OFFSET,
             srcReferenceType = instruction.srcReferenceType,
             dstReferenceType = instruction.dstReferenceType,
-            takenInstructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
         ),
+    )
+    addTakenPath(
+        takenPaths = takenPaths,
+        instructionIndex = instructionIndex,
+        instructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
     )
     if (target.targetIndex == null) {
         target.holes.add(OffsetJumpHole(instructionIndex))
@@ -540,6 +652,7 @@ private fun lowerJumpOnCastFail(
     target: JumpLabel,
     currentHandlerDepth: Int,
     output: MutableList<Instruction>,
+    takenPaths: MutableList<TakenPath>,
 ) {
     val instructionIndex = output.size
     output.add(
@@ -548,8 +661,12 @@ private fun lowerJumpOnCastFail(
             offset = target.targetIndex ?: UNPATCHED_OFFSET,
             srcReferenceType = instruction.srcReferenceType,
             dstReferenceType = instruction.dstReferenceType,
-            takenInstructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
         ),
+    )
+    addTakenPath(
+        takenPaths = takenPaths,
+        instructionIndex = instructionIndex,
+        instructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
     )
     if (target.targetIndex == null) {
         target.holes.add(OffsetJumpHole(instructionIndex))
@@ -640,6 +757,102 @@ private data class JumpLabel(
 )
 
 private data object ActiveTryHandler
+
+private sealed interface TakenPath {
+    val instructionIndex: Int
+    val instructions: List<Instruction>
+
+    fun targetIndex(output: List<Instruction>): Int
+
+    fun patchTarget(output: MutableList<Instruction>, targetIndex: Int)
+}
+
+private data class OffsetTakenPath(
+    override val instructionIndex: Int,
+    override val instructions: List<Instruction>,
+) : TakenPath {
+    override fun targetIndex(output: List<Instruction>): Int = when (val instruction = output[instructionIndex]) {
+        is AdminInstruction.JumpIf -> instruction.offset
+        is AdminInstruction.JumpOnNull -> instruction.offset
+        is AdminInstruction.JumpOnNonNull -> instruction.offset
+        is AdminInstruction.JumpOnCast -> instruction.offset
+        is AdminInstruction.JumpOnCastFail -> instruction.offset
+        else -> error("unsupported taken-path instruction: $instruction")
+    }
+
+    override fun patchTarget(
+        output: MutableList<Instruction>,
+        targetIndex: Int,
+    ) {
+        output[instructionIndex] = patchOffsetInstruction(output[instructionIndex], targetIndex)
+    }
+}
+
+private data class JumpTableTakenPath(
+    override val instructionIndex: Int,
+    val branchIndex: Int?,
+    override val instructions: List<Instruction>,
+) : TakenPath {
+    override fun targetIndex(output: List<Instruction>): Int {
+        val instruction = output[instructionIndex] as AdminInstruction.JumpTable
+        return if (branchIndex != null) instruction.offsets[branchIndex] else instruction.defaultOffset
+    }
+
+    override fun patchTarget(
+        output: MutableList<Instruction>,
+        targetIndex: Int,
+    ) {
+        output[instructionIndex] = patchJumpTableInstruction(output[instructionIndex], branchIndex, targetIndex)
+    }
+}
+
+private fun addTakenPath(
+    takenPaths: MutableList<TakenPath>,
+    instructionIndex: Int,
+    instructions: List<Instruction>,
+) {
+    if (instructions.isNotEmpty()) {
+        takenPaths.add(OffsetTakenPath(instructionIndex, instructions))
+    }
+}
+
+private fun addTakenPath(
+    takenPaths: MutableList<TakenPath>,
+    instructionIndex: Int,
+    branchIndex: Int?,
+    instructions: List<Instruction>,
+) {
+    if (instructions.isNotEmpty()) {
+        takenPaths.add(JumpTableTakenPath(instructionIndex, branchIndex, instructions))
+    }
+}
+
+private fun appendTakenPaths(
+    output: MutableList<Instruction>,
+    takenPaths: List<TakenPath>,
+    hasRootLabel: Boolean,
+) {
+    if (takenPaths.isEmpty()) return
+
+    val skipStubsIndex = if (hasRootLabel) {
+        null
+    } else {
+        output.size.also {
+            output.add(AdminInstruction.Jump(offset = UNPATCHED_OFFSET))
+        }
+    }
+
+    takenPaths.forEach { path ->
+        val targetIndex = path.targetIndex(output)
+        path.patchTarget(output, output.size)
+        output.addAll(path.instructions)
+        output.add(AdminInstruction.Jump(offset = targetIndex))
+    }
+
+    if (skipStubsIndex != null) {
+        output[skipStubsIndex] = AdminInstruction.Jump(offset = output.size)
+    }
+}
 
 private sealed interface JumpHole {
     val instructionIndex: Int

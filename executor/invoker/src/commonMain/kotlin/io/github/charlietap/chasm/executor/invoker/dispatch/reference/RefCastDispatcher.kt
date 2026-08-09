@@ -15,6 +15,7 @@ fun RefCastDispatcher(
 internal inline fun RefCastDispatcher(
     instruction: ReferenceInstruction.RefCast,
     crossinline executor: Executor<ReferenceInstruction.RefCast>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

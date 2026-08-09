@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.runtime.execution.Executor
 internal inline fun <T> dispatchInstruction(
     instruction: T,
     crossinline executor: Executor<T>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

@@ -11,5 +11,6 @@ fun interface DispatchableInstruction {
         cstack: ControlStack,
         store: Store,
         context: ExecutionContext,
-    )
+        nextIp: Int,
+    ): Int
 }

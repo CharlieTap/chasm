@@ -15,6 +15,7 @@ fun UnreachableDispatcher(
 internal inline fun UnreachableDispatcher(
     instruction: ControlInstruction.Unreachable,
     crossinline executor: Executor<ControlInstruction.Unreachable>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

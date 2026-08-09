@@ -15,6 +15,7 @@ fun F32AbsDispatcher(
 internal inline fun F32AbsDispatcher(
     instruction: NumericInstruction.F32Abs,
     crossinline executor: Executor<NumericInstruction.F32Abs>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

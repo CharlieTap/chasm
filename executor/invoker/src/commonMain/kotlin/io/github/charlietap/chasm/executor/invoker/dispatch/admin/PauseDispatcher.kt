@@ -15,6 +15,7 @@ fun PauseDispatcher(
 internal inline fun PauseDispatcher(
     instruction: AdminInstruction.Pause,
     crossinline executor: Executor<AdminInstruction.Pause>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

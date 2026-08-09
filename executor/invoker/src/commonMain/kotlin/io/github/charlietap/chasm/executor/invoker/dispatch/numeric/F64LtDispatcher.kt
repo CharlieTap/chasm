@@ -15,6 +15,7 @@ fun F64LtDispatcher(
 internal inline fun F64LtDispatcher(
     instruction: NumericInstruction.F64Lt,
     crossinline executor: Executor<NumericInstruction.F64Lt>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

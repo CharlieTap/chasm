@@ -15,6 +15,7 @@ fun I32RemUDispatcher(
 internal inline fun I32RemUDispatcher(
     instruction: NumericInstruction.I32RemU,
     crossinline executor: Executor<NumericInstruction.I32RemU>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

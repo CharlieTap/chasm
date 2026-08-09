@@ -15,6 +15,7 @@ fun F64PromoteF32Dispatcher(
 internal inline fun F64PromoteF32Dispatcher(
     instruction: NumericInstruction.F64PromoteF32,
     crossinline executor: Executor<NumericInstruction.F64PromoteF32>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

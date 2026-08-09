@@ -22,13 +22,15 @@ internal fun CallIndirectExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlInstruction.CallIndirect,
-) = CallIndirectExecutor(
+    returnIp: Int,
+): Int = CallIndirectExecutor(
     vstack = vstack,
     cstack = cstack,
     store = store,
     context = context,
     table = instruction.table,
     type = instruction.type,
+    returnIp = returnIp,
     hostFunctionCall = ::HostFunctionCall,
     wasmFunctionCall = ::WasmFunctionCall,
 )
@@ -40,9 +42,10 @@ internal inline fun CallIndirectExecutor(
     context: ExecutionContext,
     table: TableInstance,
     type: RTT,
+    returnIp: Int,
     crossinline hostFunctionCall: HostFunctionCall,
     crossinline wasmFunctionCall: WasmFunctionCall,
-) {
+): Int {
     val elementIndex = vstack.popI32()
     val address = table.element(elementIndex).toFunctionAddress()
 
@@ -57,8 +60,11 @@ internal inline fun CallIndirectExecutor(
         }
     }
 
-    when (functionInstance) {
-        is FunctionInstance.HostFunction -> hostFunctionCall(vstack, cstack, store, context, functionInstance)
-        is FunctionInstance.WasmFunction -> wasmFunctionCall(vstack, cstack, store, context, functionInstance)
+    return when (functionInstance) {
+        is FunctionInstance.HostFunction -> {
+            hostFunctionCall(vstack, cstack, store, context, functionInstance)
+            returnIp
+        }
+        is FunctionInstance.WasmFunction -> wasmFunctionCall(vstack, cstack, store, context, functionInstance, returnIp)
     }
 }

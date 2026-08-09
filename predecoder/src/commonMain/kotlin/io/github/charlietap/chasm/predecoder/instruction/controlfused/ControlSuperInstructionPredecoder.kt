@@ -2,20 +2,12 @@ package io.github.charlietap.chasm.predecoder.instruction.controlfused
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrIfDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrOnCastDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrOnCastFailDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrOnNonNullDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrOnNullDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrTableDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.CallDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ReturnCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowRefDispatcher
 import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
-import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.predecoder.InstructionSequencePredecoderList
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.ext.functionAddress
 import io.github.charlietap.chasm.predecoder.ext.tableAddress
@@ -24,7 +16,6 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.table
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction as RuntimeFusedControlInstruction
 
 internal fun ControlSuperInstructionPredecoder(
@@ -32,16 +23,17 @@ internal fun ControlSuperInstructionPredecoder(
     instruction: ControlSuperInstruction,
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
-        is ControlSuperInstruction.BrIf -> strictBrIfInstruction(context, instruction).bind()
-        is ControlSuperInstruction.BrOnCast -> strictBrOnCastInstruction(context, instruction).bind()
-        is ControlSuperInstruction.BrOnCastFail -> strictBrOnCastFailInstruction(context, instruction).bind()
-        is ControlSuperInstruction.BrOnNonNull -> strictBrOnNonNullInstruction(context, instruction).bind()
-        is ControlSuperInstruction.BrOnNull -> strictBrOnNullInstruction(context, instruction).bind()
-        is ControlSuperInstruction.BrTable -> strictBrTableInstruction(context, instruction).bind()
+        is ControlSuperInstruction.BrIf,
+        is ControlSuperInstruction.BrOnCast,
+        is ControlSuperInstruction.BrOnCastFail,
+        is ControlSuperInstruction.BrOnNonNull,
+        is ControlSuperInstruction.BrOnNull,
+        is ControlSuperInstruction.BrTable,
+        is ControlSuperInstruction.If,
+        -> error("structured fused control instruction reached predecoding: $instruction")
         is ControlSuperInstruction.Call -> strictCallInstruction(context, instruction).bind()
         is ControlSuperInstruction.CallIndirect -> strictCallIndirectInstruction(context, instruction).bind()
         is ControlSuperInstruction.CallRef -> strictCallRefInstruction(instruction)
-        is ControlSuperInstruction.If -> error("structured fused if reached predecoding: $instruction")
         is ControlSuperInstruction.ReturnCall -> strictReturnCallInstruction(context, instruction).bind()
         is ControlSuperInstruction.ReturnCallIndirect -> strictReturnCallIndirectInstruction(context, instruction).bind()
         is ControlSuperInstruction.ReturnCallRef -> strictReturnCallRefInstruction(instruction)
@@ -237,179 +229,6 @@ private fun strictThrowRefInstruction(
     )
 }
 
-private fun strictBrIfInstruction(
-    context: PredecodingContext,
-    instruction: ControlSuperInstruction.BrIf,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val operandImmediate = strictControlImmediate(instruction.operand)
-    val operandSlot = strictControlOperandSlot(instruction.operand)
-    val takenInstructions = predecodeTakenInstructions(context, instruction.takenInstructions).bind()
-
-    when {
-        operandImmediate != null -> {
-            BrIfDispatcher(
-                RuntimeFusedControlInstruction.BrIfI(
-                    operand = operandImmediate,
-                    labelIndex = instruction.labelIndex,
-                    takenInstructions = takenInstructions,
-                ),
-            )
-        }
-
-        operandSlot != null -> {
-            BrIfDispatcher(
-                RuntimeFusedControlInstruction.BrIfS(
-                    operandSlot = operandSlot,
-                    labelIndex = instruction.labelIndex,
-                    takenInstructions = takenInstructions,
-                ),
-            )
-        }
-
-        else -> unsupportedUnloweredControlInstruction()
-    }
-}
-
-private fun strictBrTableInstruction(
-    context: PredecodingContext,
-    instruction: ControlSuperInstruction.BrTable,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val operandImmediate = strictControlIndexImmediate(instruction.operand)
-    val operandSlot = strictControlOperandSlot(instruction.operand)
-    val takenInstructions = predecodeTakenInstructionGroups(context, instruction.takenInstructions).bind()
-    val defaultTakenInstructions = predecodeTakenInstructions(context, instruction.defaultTakenInstructions).bind()
-
-    when {
-        operandImmediate != null -> {
-            BrTableDispatcher(
-                RuntimeFusedControlInstruction.BrTableI(
-                    operand = operandImmediate,
-                    labelIndices = instruction.labelIndices,
-                    defaultLabelIndex = instruction.defaultLabelIndex,
-                    takenInstructions = takenInstructions,
-                    defaultTakenInstructions = defaultTakenInstructions,
-                ),
-            )
-        }
-
-        operandSlot != null -> {
-            BrTableDispatcher(
-                RuntimeFusedControlInstruction.BrTableS(
-                    operandSlot = operandSlot,
-                    labelIndices = instruction.labelIndices,
-                    defaultLabelIndex = instruction.defaultLabelIndex,
-                    takenInstructions = takenInstructions,
-                    defaultTakenInstructions = defaultTakenInstructions,
-                ),
-            )
-        }
-
-        else -> unsupportedUnloweredControlInstruction()
-    }
-}
-
-private fun strictBrOnNullInstruction(
-    context: PredecodingContext,
-    instruction: ControlSuperInstruction.BrOnNull,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val operandSlot = strictControlOperandSlot(instruction.operand)
-    val takenInstructions = predecodeTakenInstructions(context, instruction.takenInstructions).bind()
-
-    when {
-        operandSlot != null -> {
-            BrOnNullDispatcher(
-                RuntimeFusedControlInstruction.BrOnNullS(
-                    operandSlot = operandSlot,
-                    labelIndex = instruction.labelIndex,
-                    takenInstructions = takenInstructions,
-                ),
-            )
-        }
-
-        else -> unsupportedUnloweredControlInstruction()
-    }
-}
-
-private fun strictBrOnNonNullInstruction(
-    context: PredecodingContext,
-    instruction: ControlSuperInstruction.BrOnNonNull,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val operandSlot = strictControlOperandSlot(instruction.operand)
-    val takenInstructions = predecodeTakenInstructions(context, instruction.takenInstructions).bind()
-
-    when {
-        operandSlot != null -> {
-            BrOnNonNullDispatcher(
-                RuntimeFusedControlInstruction.BrOnNonNullS(
-                    operandSlot = operandSlot,
-                    labelIndex = instruction.labelIndex,
-                    takenInstructions = takenInstructions,
-                ),
-            )
-        }
-
-        else -> unsupportedUnloweredControlInstruction()
-    }
-}
-
-private fun strictBrOnCastInstruction(
-    context: PredecodingContext,
-    instruction: ControlSuperInstruction.BrOnCast,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val operandSlot = strictControlOperandSlot(instruction.operand)
-    val takenInstructions = predecodeTakenInstructions(context, instruction.takenInstructions).bind()
-    preResolveCastType(context, instruction.dstReferenceType)
-
-    when {
-        operandSlot != null -> {
-            BrOnCastDispatcher(
-                RuntimeFusedControlInstruction.BrOnCastS(
-                    operandSlot = operandSlot,
-                    labelIndex = instruction.labelIndex,
-                    dstReferenceType = instruction.dstReferenceType,
-                    takenInstructions = takenInstructions,
-                ),
-            )
-        }
-
-        else -> unsupportedUnloweredControlInstruction()
-    }
-}
-
-private fun strictBrOnCastFailInstruction(
-    context: PredecodingContext,
-    instruction: ControlSuperInstruction.BrOnCastFail,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val operandSlot = strictControlOperandSlot(instruction.operand)
-    val takenInstructions = predecodeTakenInstructions(context, instruction.takenInstructions).bind()
-    preResolveCastType(context, instruction.dstReferenceType)
-
-    when {
-        operandSlot != null -> {
-            BrOnCastFailDispatcher(
-                RuntimeFusedControlInstruction.BrOnCastFailS(
-                    operandSlot = operandSlot,
-                    labelIndex = instruction.labelIndex,
-                    dstReferenceType = instruction.dstReferenceType,
-                    takenInstructions = takenInstructions,
-                ),
-            )
-        }
-
-        else -> unsupportedUnloweredControlInstruction()
-    }
-}
-
-private fun preResolveCastType(
-    context: PredecodingContext,
-    referenceType: io.github.charlietap.chasm.type.ReferenceType,
-) {
-    when (val heapType = referenceType.heapType) {
-        is ConcreteHeapType.TypeIndex -> context.instance.runtimeTypes[heapType.index].hydrate()
-        else -> Unit
-    }
-}
-
 private fun strictControlImmediate(
     operand: FusedOperand,
 ): Long? = when (operand) {
@@ -419,10 +238,6 @@ private fun strictControlImmediate(
     is FusedOperand.F64Const -> operand.const.toRawBits()
     else -> null
 }
-
-private fun strictControlIndexImmediate(
-    operand: FusedOperand,
-): Int? = strictControlImmediate(operand)?.toInt()
 
 private fun strictControlOperandSlot(
     operand: FusedOperand,
@@ -452,22 +267,6 @@ private fun strictControlOperandSlots(
 ): List<Int> = operands.map { operand ->
     strictControlOperandSlot(operand)
         ?: error("$instructionName operands must lower to frame slots before predecode: $operand")
-}
-
-private fun predecodeTakenInstructions(
-    context: PredecodingContext,
-    instructions: List<Instruction>,
-): Result<List<DispatchableInstruction>, ModuleTrapError> = binding {
-    InstructionSequencePredecoderList(context, instructions).bind()
-}
-
-private fun predecodeTakenInstructionGroups(
-    context: PredecodingContext,
-    instructionGroups: List<List<Instruction>>,
-): Result<List<List<DispatchableInstruction>>, ModuleTrapError> = binding {
-    instructionGroups.map { instructions ->
-        predecodeTakenInstructions(context, instructions).bind()
-    }
 }
 
 private fun unsupportedUnloweredControlInstruction(): DispatchableInstruction =

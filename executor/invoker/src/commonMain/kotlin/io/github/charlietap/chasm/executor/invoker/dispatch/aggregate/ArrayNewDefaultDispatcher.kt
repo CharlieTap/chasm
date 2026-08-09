@@ -15,6 +15,7 @@ fun ArrayNewDefaultDispatcher(
 internal inline fun ArrayNewDefaultDispatcher(
     instruction: AggregateInstruction.ArrayNewDefault,
     crossinline executor: Executor<AggregateInstruction.ArrayNewDefault>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

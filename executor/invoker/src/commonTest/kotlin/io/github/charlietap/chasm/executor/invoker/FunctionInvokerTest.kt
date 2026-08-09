@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.executor.invoker
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
-import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
@@ -37,15 +36,15 @@ class FunctionInvokerTest {
             functionType = functionType,
             module = moduleInstance,
         )
-        val functionInstruction = dispatchableInstruction()
         val store = store(
             functions = mutableListOf(functionInstance),
-            instructions = mutableListOf(functionInstruction),
         )
 
-        val threadExecutor: ThreadExecutor = { _config, _params ->
-            assertEquals(config, _config.config)
-            assertEquals(params, _params)
+        val threadExecutor: ThreadExecutor = { actualConfig, actualStore, actualFunction, actualParams ->
+            assertEquals(config, actualConfig)
+            assertEquals(store, actualStore)
+            assertEquals(functionInstance, actualFunction)
+            assertEquals(params, actualParams)
             Ok(listOf(117L))
         }
 
@@ -88,7 +87,7 @@ class FunctionInvokerTest {
         )
         runtimeStore.functions += functionInstance
 
-        val threadExecutor: ThreadExecutor = { _, _ ->
+        val threadExecutor: ThreadExecutor = { _, _, _, _ ->
             error("thread executor should not be called for host functions")
         }
 

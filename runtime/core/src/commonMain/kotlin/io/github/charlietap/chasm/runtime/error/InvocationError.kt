@@ -16,9 +16,6 @@ sealed interface InvocationError : ModuleTrapError {
     value class FunctionNotFound(val function: String) : InvocationError
 
     @JvmInline
-    value class InstructionLookupFailed(val address: Address.Function) : InvocationError
-
-    @JvmInline
     value class FunctionLookupFailed(val address: Address.Function) : InvocationError
 
     @JvmInline
@@ -103,10 +100,6 @@ sealed interface InvocationError : ModuleTrapError {
     data object InvalidAddress : InvocationError
 
     data object MissingStackFrame : InvocationError
-
-    data object MissingInstruction : InvocationError
-
-    data object MissingStackLabel : InvocationError
 
     data object MissingStackValue : InvocationError
 

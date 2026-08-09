@@ -1,11 +1,9 @@
 package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.type.RTT
-import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ControlSuperInstruction : LinkedInstruction {
@@ -18,60 +16,6 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
         @JvmInline
         value class Slot(val slot: Int) : CallOperand
     }
-
-    data class BrIfI(
-        val operand: Long,
-        val labelIndex: Index.LabelIndex,
-        val takenInstructions: List<DispatchableInstruction>,
-    ) : ControlSuperInstruction
-
-    data class BrIfS(
-        val operandSlot: Int,
-        val labelIndex: Index.LabelIndex,
-        val takenInstructions: List<DispatchableInstruction>,
-    ) : ControlSuperInstruction
-
-    data class BrTableI(
-        val operand: Int,
-        val labelIndices: List<Index.LabelIndex>,
-        val defaultLabelIndex: Index.LabelIndex,
-        val takenInstructions: List<List<DispatchableInstruction>>,
-        val defaultTakenInstructions: List<DispatchableInstruction>,
-    ) : ControlSuperInstruction
-
-    data class BrTableS(
-        val operandSlot: Int,
-        val labelIndices: List<Index.LabelIndex>,
-        val defaultLabelIndex: Index.LabelIndex,
-        val takenInstructions: List<List<DispatchableInstruction>>,
-        val defaultTakenInstructions: List<DispatchableInstruction>,
-    ) : ControlSuperInstruction
-
-    data class BrOnNullS(
-        val operandSlot: Int,
-        val labelIndex: Index.LabelIndex,
-        val takenInstructions: List<DispatchableInstruction>,
-    ) : ControlSuperInstruction
-
-    data class BrOnNonNullS(
-        val operandSlot: Int,
-        val labelIndex: Index.LabelIndex,
-        val takenInstructions: List<DispatchableInstruction>,
-    ) : ControlSuperInstruction
-
-    data class BrOnCastS(
-        val operandSlot: Int,
-        val labelIndex: Index.LabelIndex,
-        val dstReferenceType: ReferenceType,
-        val takenInstructions: List<DispatchableInstruction>,
-    ) : ControlSuperInstruction
-
-    data class BrOnCastFailS(
-        val operandSlot: Int,
-        val labelIndex: Index.LabelIndex,
-        val dstReferenceType: ReferenceType,
-        val takenInstructions: List<DispatchableInstruction>,
-    ) : ControlSuperInstruction
 
     data class WasmCall(
         val instance: FunctionInstance.WasmFunction,
@@ -144,50 +88,4 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
     data class ThrowRefS(
         val exceptionSlot: Int,
     ) : ControlSuperInstruction
-
-    data class IfI(
-        val operand: Long,
-        val instructions: Array<Array<DispatchableInstruction>>,
-    ) : ControlSuperInstruction {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as IfI
-
-            if (operand != other.operand) return false
-            if (!instructions.contentEquals(other.instructions)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = operand.hashCode()
-            result = 31 * result + instructions.contentHashCode()
-            return result
-        }
-    }
-
-    data class IfS(
-        val operandSlot: Int,
-        val instructions: Array<Array<DispatchableInstruction>>,
-    ) : ControlSuperInstruction {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as IfS
-
-            if (operandSlot != other.operandSlot) return false
-            if (!instructions.contentEquals(other.instructions)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = operandSlot
-            result = 31 * result + instructions.contentHashCode()
-            return result
-        }
-    }
 }

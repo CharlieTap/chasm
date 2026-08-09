@@ -15,6 +15,7 @@ fun I64TruncF32UDispatcher(
 internal inline fun I64TruncF32UDispatcher(
     instruction: NumericInstruction.I64TruncF32U,
     crossinline executor: Executor<NumericInstruction.I64TruncF32U>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

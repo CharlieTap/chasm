@@ -15,6 +15,7 @@ fun I32Extend8SDispatcher(
 internal inline fun I32Extend8SDispatcher(
     instruction: NumericInstruction.I32Extend8S,
     crossinline executor: Executor<NumericInstruction.I32Extend8S>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

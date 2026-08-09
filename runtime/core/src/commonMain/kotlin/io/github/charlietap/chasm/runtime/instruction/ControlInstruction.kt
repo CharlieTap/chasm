@@ -1,12 +1,9 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.ir.module.Index
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.type.RTT
-import io.github.charlietap.chasm.type.ReferenceType
 import kotlin.jvm.JvmInline
 
 sealed interface ControlInstruction : LinkedInstruction {
@@ -15,119 +12,10 @@ sealed interface ControlInstruction : LinkedInstruction {
 
     data object Nop : ControlInstruction
 
-    data class Block(
-        val instructions: Array<DispatchableInstruction>,
-    ) : ControlInstruction {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as Block
-
-            if (!instructions.contentEquals(other.instructions)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return instructions.contentHashCode()
-        }
-    }
-
-    data class Loop(
-        val instructions: Array<DispatchableInstruction>,
-    ) : ControlInstruction {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as Loop
-
-            if (!instructions.contentEquals(other.instructions)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return instructions.contentHashCode()
-        }
-    }
-
-    data class If(
-        val instructions: Array<Array<DispatchableInstruction>>,
-    ) : ControlInstruction {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as If
-
-            if (!instructions.contentEquals(other.instructions)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return instructions.contentHashCode()
-        }
-    }
-
-    data class TryTable(
-        val handlers: List<CatchHandler>,
-        val instructions: Array<DispatchableInstruction>,
-        val payloadDestinationSlots: List<List<Int>> = [],
-    ) : ControlInstruction {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as TryTable
-
-            if (handlers != other.handlers) return false
-            if (!instructions.contentEquals(other.instructions)) return false
-            if (payloadDestinationSlots != other.payloadDestinationSlots) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = handlers.hashCode()
-            result = 31 * result + instructions.contentHashCode()
-            result = 31 * result + payloadDestinationSlots.hashCode()
-            return result
-        }
-    }
-
     @JvmInline
     value class Throw(val tagIndex: Index.TagIndex) : ControlInstruction
 
     data object ThrowRef : ControlInstruction
-
-    @JvmInline
-    value class Br(val labelIndex: Index.LabelIndex) : ControlInstruction
-
-    @JvmInline
-    value class BrIf(val labelIndex: Index.LabelIndex) : ControlInstruction
-
-    data class BrTable(val labelIndices: List<Index.LabelIndex>, val defaultLabelIndex: Index.LabelIndex) : ControlInstruction
-
-    @JvmInline
-    value class BrOnNull(val labelIndex: Index.LabelIndex) : ControlInstruction
-
-    @JvmInline
-    value class BrOnNonNull(val labelIndex: Index.LabelIndex) : ControlInstruction
-
-    data class BrOnCast(
-        val labelIndex: Index.LabelIndex,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
-    ) : ControlInstruction
-
-    data class BrOnCastFail(
-        val labelIndex: Index.LabelIndex,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
-    ) : ControlInstruction
 
     data object Return : ControlInstruction
 

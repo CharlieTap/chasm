@@ -1,35 +1,28 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
-import io.github.charlietap.chasm.executor.invoker.instruction.admin.PopHandlerInstructionExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.admin.PushHandlerInstructionExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.execution.Executor
+import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 
 fun PushHandlerDispatcher(
     instruction: AdminInstruction.PushHandler,
-) = PushHandlerDispatcher(
-    instruction = instruction,
-    executor = ::PushHandlerInstructionExecutor,
-)
-
-internal inline fun PushHandlerDispatcher(
-    instruction: AdminInstruction.PushHandler,
-    crossinline executor: Executor<AdminInstruction.PushHandler>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+    cstack.push(
+        ExceptionHandler(
+            handlers = instruction.handlers,
+            payloadDestinationSlots = instruction.payloadDestinationSlots,
+            continuationIps = instruction.continuationIps,
+            framesDepth = cstack.framesDepth(),
+            framePointer = vstack.framePointer,
+            valueDepth = vstack.depth(),
+        ),
+    )
+    nextIp
 }
 
 fun PopHandlerDispatcher(
     instruction: AdminInstruction.PopHandler,
-) = PopHandlerDispatcher(
-    instruction = instruction,
-    executor = ::PopHandlerInstructionExecutor,
-)
-
-internal inline fun PopHandlerDispatcher(
-    instruction: AdminInstruction.PopHandler,
-    crossinline executor: Executor<AdminInstruction.PopHandler>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { _, cstack, _, _, nextIp ->
+    cstack.popHandler()
+    nextIp
 }

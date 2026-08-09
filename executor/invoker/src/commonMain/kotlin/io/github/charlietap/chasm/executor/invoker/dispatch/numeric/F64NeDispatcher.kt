@@ -15,6 +15,7 @@ fun F64NeDispatcher(
 internal inline fun F64NeDispatcher(
     instruction: NumericInstruction.F64Ne,
     crossinline executor: Executor<NumericInstruction.F64Ne>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

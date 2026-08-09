@@ -1,10 +1,7 @@
 package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.type.ReferenceType
-import kotlin.jvm.JvmInline
 
 sealed interface AdminInstruction : LinkedInstruction {
 
@@ -15,148 +12,108 @@ sealed interface AdminInstruction : LinkedInstruction {
         val destinationSlots: List<Int>,
     ) : AdminInstruction
 
-    data class Jump(
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
-    ) : AdminInstruction
+    data class Jump(val targetIp: Int) : AdminInstruction
 
     data class JumpIfI(
         val operand: Long,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
+        val targetIp: Int,
     ) : AdminInstruction
 
     data class JumpIfS(
         val operandSlot: Int,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
+        val targetIp: Int,
     ) : AdminInstruction
+
+    data class JumpIfV(val targetIp: Int) : AdminInstruction
 
     data class JumpTableI(
         val operand: Int,
-        var continuations: List<Array<DispatchableInstruction>>,
-        var defaultContinuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        val takenInstructions: List<List<DispatchableInstruction>>,
-        val defaultTakenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffsets: List<Int> = [],
-        var defaultContinuationOffset: Int = -1,
+        val targetIps: IntArray,
+        val defaultTargetIp: Int,
     ) : AdminInstruction
 
     data class JumpTableS(
         val operandSlot: Int,
-        var continuations: List<Array<DispatchableInstruction>>,
-        var defaultContinuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        val takenInstructions: List<List<DispatchableInstruction>>,
-        val defaultTakenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffsets: List<Int> = [],
-        var defaultContinuationOffset: Int = -1,
+        val targetIps: IntArray,
+        val defaultTargetIp: Int,
+    ) : AdminInstruction
+
+    data class JumpTableV(
+        val targetIps: IntArray,
+        val defaultTargetIp: Int,
     ) : AdminInstruction
 
     data class JumpOnNullI(
         val operand: Long,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
+        val targetIp: Int,
     ) : AdminInstruction
 
     data class JumpOnNullS(
         val operandSlot: Int,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
+        val targetIp: Int,
     ) : AdminInstruction
+
+    data class JumpOnNullV(val targetIp: Int) : AdminInstruction
 
     data class JumpOnNonNullI(
         val operand: Long,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
+        val targetIp: Int,
     ) : AdminInstruction
 
     data class JumpOnNonNullS(
         val operandSlot: Int,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
+        val targetIp: Int,
     ) : AdminInstruction
+
+    data class JumpOnNonNullV(val targetIp: Int) : AdminInstruction
 
     data class JumpOnCastI(
         val operand: Long,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
+        val targetIp: Int,
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnCastS(
         val operandSlot: Int,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
+        val targetIp: Int,
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
+    ) : AdminInstruction
+
+    data class JumpOnCastV(
+        val targetIp: Int,
+        val srcReferenceType: ReferenceType,
+        val dstReferenceType: ReferenceType,
     ) : AdminInstruction
 
     data class JumpOnCastFailI(
         val operand: Long,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
+        val targetIp: Int,
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
     ) : AdminInstruction
 
     data class JumpOnCastFailS(
         val operandSlot: Int,
-        var continuation: Array<DispatchableInstruction>,
-        val discardCount: Int,
+        val targetIp: Int,
         val srcReferenceType: ReferenceType,
         val dstReferenceType: ReferenceType,
-        val takenInstructions: List<DispatchableInstruction>,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffset: Int = -1,
+    ) : AdminInstruction
+
+    data class JumpOnCastFailV(
+        val targetIp: Int,
+        val srcReferenceType: ReferenceType,
+        val dstReferenceType: ReferenceType,
     ) : AdminInstruction
 
     data class PushHandler(
         val handlers: List<CatchHandler>,
-        var continuations: List<Array<DispatchableInstruction>>,
+        val continuationIps: IntArray,
         val payloadDestinationSlots: List<List<Int>> = [],
-        val discardCount: Int,
-        var continuationSource: List<DispatchableInstruction?>? = null,
-        var continuationOffsets: List<Int> = [],
     ) : AdminInstruction
 
     data object PopHandler : AdminInstruction
-
-    @JvmInline
-    value class Handler(val handler: ExceptionHandler) : AdminInstruction
 
     data object Pause : AdminInstruction
 

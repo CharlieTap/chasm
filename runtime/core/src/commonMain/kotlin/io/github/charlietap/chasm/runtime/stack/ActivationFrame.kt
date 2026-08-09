@@ -4,8 +4,10 @@ import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 
 data class ActivationFrame(
     val arity: Int,
-    val depths: StackDepths,
+    val handlerDepth: Int,
+    val valueDepth: Int,
     val instance: ModuleInstance,
     val previousFramePointer: Int = 0,
     val visibleResultBase: Int? = null,
+    val returnIp: Int,
 )

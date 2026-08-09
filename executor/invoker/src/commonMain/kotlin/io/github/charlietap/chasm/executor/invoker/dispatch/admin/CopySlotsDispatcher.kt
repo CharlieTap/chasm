@@ -15,6 +15,7 @@ fun CopySlotsDispatcher(
 internal inline fun CopySlotsDispatcher(
     instruction: AdminInstruction.CopySlots,
     crossinline executor: Executor<AdminInstruction.CopySlots>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

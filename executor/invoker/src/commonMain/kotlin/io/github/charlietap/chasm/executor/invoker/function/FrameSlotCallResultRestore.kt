@@ -14,7 +14,7 @@ internal fun FinishFrameSlotCallResult(
         vstack.framePointer = callerFramePointer
         vstack.shrink(
             preserveTopN = 0,
-            depth = frame.depths.values,
+            depth = frame.valueDepth,
         )
         return
     }
@@ -28,7 +28,7 @@ internal fun FinishFrameSlotCallResult(
             vstack.framePointer = callerFramePointer
             vstack.shrink(
                 preserveTopN = 0,
-                depth = frame.depths.values,
+                depth = frame.valueDepth,
             )
             return
         }
@@ -43,14 +43,14 @@ internal fun FinishFrameSlotCallResult(
         }
         vstack.shrink(
             preserveTopN = 0,
-            depth = frame.depths.values,
+            depth = frame.valueDepth,
         )
         return
     }
 
     vstack.shrinkFromFrameSlots(
         slots = List(resultArity, ::identity),
-        depth = frame.depths.values,
+        depth = frame.valueDepth,
     )
     vstack.framePointer = callerFramePointer
 }

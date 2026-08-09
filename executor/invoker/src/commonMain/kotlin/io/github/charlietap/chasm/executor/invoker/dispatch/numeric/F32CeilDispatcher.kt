@@ -15,6 +15,7 @@ fun F32CeilDispatcher(
 internal inline fun F32CeilDispatcher(
     instruction: NumericInstruction.F32Ceil,
     crossinline executor: Executor<NumericInstruction.F32Ceil>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

@@ -7,48 +7,38 @@ import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
-internal inline fun ReturnWasmFunctionCall(
+internal fun ReturnWasmFunctionCall(
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
-) {
+): Int {
     val frame = cstack.popFrame()
     val type = instance.functionType
     val params = type.params.types.size
     val results = type.results.types.size
     val interfaceSlots = maxOf(params, results)
-    val depths = frame.depths
 
-    cstack.shrinkHandlers(depths.handlers)
-    cstack.shrinkInstructions(depths.instructions)
-    // leave top label in place
-    cstack.shrinkLabels(depths.labels + 1)
-    vstack.shrink(params, depths.values)
-
-    vstack.framePointer = depths.values
+    cstack.shrinkHandlers(frame.handlerDepth)
+    vstack.shrink(params, frame.valueDepth)
+    vstack.framePointer = frame.valueDepth
     vstack.reserveFrame(instance.function.frameSlots)
     instance.function.locals.forEachIndexed { index, value ->
         vstack.setFrameSlot(interfaceSlots + index, value)
     }
-    cstack.push(
-        frame.copy(
-            instance = instance.module,
-            visibleResultBase = frame.visibleResultBase,
-        ),
-    )
-    cstack.push(instance.function.body.instructions)
+    cstack.push(frame.copy(instance = instance.module))
+    return instance.function.body.entryIp
 }
 
-internal inline fun ReturnWasmFunctionCall(
+internal fun ReturnWasmFunctionCall(
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
     operands: List<ControlSuperInstruction.CallOperand>,
-) {
+): Int {
     val currentFramePointer = vstack.framePointer
     val operandValues = LongArray(operands.size) { index ->
         when (val operand = operands[index]) {
@@ -62,15 +52,11 @@ internal inline fun ReturnWasmFunctionCall(
     val params = type.params.types.size
     val results = type.results.types.size
     val interfaceSlots = maxOf(params, results)
-    val depths = frame.depths
 
-    cstack.shrinkHandlers(depths.handlers)
-    cstack.shrinkInstructions(depths.instructions)
-    // leave top label in place
-    cstack.shrinkLabels(depths.labels + 1)
-    vstack.shrink(0, depths.values)
+    cstack.shrinkHandlers(frame.handlerDepth)
+    vstack.shrink(0, frame.valueDepth)
 
-    val calleeFramePointer = depths.values
+    val calleeFramePointer = frame.valueDepth
     vstack.reserveDepth(calleeFramePointer + instance.function.frameSlots)
     operandValues.forEachIndexed { index, value ->
         vstack.setFrameSlot(calleeFramePointer, index, value)
@@ -81,11 +67,6 @@ internal inline fun ReturnWasmFunctionCall(
 
     vstack.framePointer = calleeFramePointer
     vstack.reserveFrame(instance.function.frameSlots)
-    cstack.push(
-        frame.copy(
-            instance = instance.module,
-            visibleResultBase = frame.visibleResultBase,
-        ),
-    )
-    cstack.push(instance.function.body.instructions)
+    cstack.push(frame.copy(instance = instance.module))
+    return instance.function.body.entryIp
 }

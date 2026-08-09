@@ -1,14 +1,12 @@
 package io.github.charlietap.chasm.runtime.ext
 
 import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.InvocationError.DataLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.ElementLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.ExceptionLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.FunctionLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.GlobalLookupFailed
-import io.github.charlietap.chasm.runtime.error.InvocationError.InstructionLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.MemoryLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.TableLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.TagLookupFailed
@@ -88,14 +86,6 @@ inline fun Store.exception(address: Address.Exception): ExceptionInstance = try 
     throw InvocationException(ExceptionLookupFailed(address))
 } catch (_: IllegalArgumentException) {
     throw InvocationException(ExceptionLookupFailed(address))
-}
-
-inline fun Store.instruction(address: Address.Function): DispatchableInstruction = try {
-    instructions[address.address]
-} catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InstructionLookupFailed(address))
-} catch (_: IllegalArgumentException) {
-    throw InvocationException(InstructionLookupFailed(address))
 }
 
 inline fun Store.struct(address: Address.Struct): StructInstance = try {

@@ -15,6 +15,7 @@ fun I64RemUDispatcher(
 internal inline fun I64RemUDispatcher(
     instruction: NumericInstruction.I64RemU,
     crossinline executor: Executor<NumericInstruction.I64RemU>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

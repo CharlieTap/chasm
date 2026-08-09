@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.runtime.function
 
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class Expression(val instructions: Array<DispatchableInstruction>) {
+value class Expression(val entryIp: Int) {
     companion object {
-        val EMPTY = Expression(emptyArray())
+        val EMPTY = Expression(EXIT_IP)
     }
 }

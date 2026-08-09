@@ -15,6 +15,7 @@ fun StructSetDispatcher(
 internal inline fun StructSetDispatcher(
     instruction: AggregateInstruction.StructSet,
     crossinline executor: Executor<AggregateInstruction.StructSet>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

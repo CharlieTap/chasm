@@ -15,6 +15,7 @@ fun F32GeDispatcher(
 internal inline fun F32GeDispatcher(
     instruction: NumericInstruction.F32Ge,
     crossinline executor: Executor<NumericInstruction.F32Ge>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

@@ -2,37 +2,24 @@
 
 package io.github.charlietap.chasm.predecoder
 
-import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.fixture.ir.instruction.catchAllRefHandler
-import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotDestination
-import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotOperand
-import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Const
 import io.github.charlietap.chasm.fixture.ir.module.labelIndex
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.ext.depth
-import io.github.charlietap.chasm.runtime.stack.ControlStack
-import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class InstructionSequencePredecoderJumpIntegrationTest {
 
     @Test
-    fun `predecodes handler offsets into continuations`() {
-        val context = PredecodingContext(
-            instance = moduleInstance(),
-            store = store(),
-            instructionCache = hashMapOf(),
-            runtimeTypes = mutableListOf(),
-        )
+    fun `predecodes handler offsets into program addresses`() {
+        val context = context()
         val instructions = listOf(
             AdminInstruction.PushHandler(
                 handlers = listOf(catchAllRefHandler(labelIndex = labelIndex(0))),
@@ -43,170 +30,72 @@ class InstructionSequencePredecoderJumpIntegrationTest {
             AdminInstruction.PopHandler,
             AdminInstruction.EndFunction,
         )
+        val baseIp = 100
+        val dispatchables = InstructionSequencePredecoder(context, instructions, baseIp).value
+        val vstack = vstack()
+        val cstack = cstack(frames = listOf(frame(instance = context.instance)))
 
-        val dispatchables = InstructionSequencePredecoderList(context, instructions).value
+        dispatchables[0](
+            vstack,
+            cstack,
+            context.store,
+            executionContext(cstack, vstack, context.store, context.instance),
+            baseIp + 1,
+        )
+
+        assertEquals(baseIp + 2, cstack.handlers().single().continuationIps.single())
+    }
+
+    @Test
+    fun `predecodes taken and fallthrough jump addresses`() {
+        val context = context()
+        val baseIp = 100
+        val taken = InstructionSequencePredecoder(
+            context,
+            listOf(AdminInstruction.JumpIf(FusedOperand.I32Const(1), offset = 2)),
+            baseIp,
+        ).value.single()
+        val fallthrough = InstructionSequencePredecoder(
+            context,
+            listOf(AdminInstruction.JumpIf(FusedOperand.I32Const(0), offset = 2)),
+            baseIp,
+        ).value.single()
         val vstack = vstack()
         val cstack = cstack()
-        val executionContext = executionContext(
-            cstack = cstack,
-            vstack = vstack,
-            store = context.store,
-            instance = context.instance,
-        )
+        val executionContext = executionContext(cstack, vstack, context.store, context.instance)
 
-        // Simulate the remaining sequence after the current push_handler instruction has been popped.
-        cstack.push(arrayOf(dispatchables[2], dispatchables[1]))
-        dispatchables[0](vstack, cstack, context.store, executionContext)
-
-        val handler = cstack.handlers().single()
-        assertEquals(1, handler.continuations.size)
-        assertEquals(1, handler.continuations.single().size)
-        assertEquals(1, handler.instructionsDepth)
+        assertEquals(baseIp + 2, taken(vstack, cstack, context.store, executionContext, baseIp + 1))
+        assertEquals(baseIp + 1, fallthrough(vstack, cstack, context.store, executionContext, baseIp + 1))
     }
 
     @Test
-    fun `executes flat jump sequence for br_if first shape`() {
-        val context = PredecodingContext(
-            instance = moduleInstance(),
-            store = store(),
-            instructionCache = hashMapOf(),
-            runtimeTypes = mutableListOf(),
-        )
-        val instructions = listOf(
-            fusedI32Const(
-                value = 1,
-                destination = frameSlotDestination(3),
-            ),
-            AdminInstruction.CopySlots(
-                sourceSlots = listOf(3),
-                destinationSlots = listOf(2),
-            ),
-            fusedI32Const(
-                value = 2,
-                destination = frameSlotDestination(4),
-            ),
-            AdminInstruction.JumpIf(
-                operand = frameSlotOperand(4),
-                offset = 5,
-                takenInstructions = listOf(
-                    AdminInstruction.CopySlots(
-                        sourceSlots = listOf(2),
-                        destinationSlots = listOf(1),
-                    ),
-                ),
-            ),
-            AdminInstruction.CopySlots(
-                sourceSlots = listOf(2),
-                destinationSlots = listOf(1),
-            ),
-            AdminInstruction.CopySlots(
-                sourceSlots = listOf(1),
-                destinationSlots = listOf(0),
-            ),
-            AdminInstruction.EndFunction,
-        )
-
-        val dispatchables = InstructionSequencePredecoder(context, instructions).value
-        val vstack = vstack().apply {
-            reserveFrame(5)
-        }
+    fun `predecodes unfused stack branches without a label stack`() {
+        val context = context()
+        val baseIp = 100
+        val branch = InstructionSequencePredecoder(
+            context,
+            listOf(AdminInstruction.JumpIf(FusedOperand.ValueStack, offset = 2)),
+            baseIp,
+        ).value.single()
+        val vstack = vstack().apply { pushI32(1) }
         val cstack = cstack()
-        val executionContext = executionContext(
-            cstack = cstack,
-            vstack = vstack,
-            store = context.store,
-            instance = context.instance,
+
+        val result = branch(
+            vstack,
+            cstack,
+            context.store,
+            executionContext(cstack, vstack, context.store, context.instance),
+            baseIp + 1,
         )
-        var loop = true
-        val exitLoop: (ValueStack, ControlStack, Store, io.github.charlietap.chasm.runtime.execution.ExecutionContext) -> Unit =
-            { _, _, _, _ -> loop = false }
 
-        cstack.push(
-            frame(
-                arity = 1,
-                depths = stackDepths(instructions = 1, values = 0),
-                instance = context.instance,
-            ),
-        )
-        cstack.push(exitLoop)
-        cstack.push(dispatchables)
-
-        while (loop) {
-            cstack.popInstruction()(vstack, cstack, context.store, executionContext)
-        }
-
-        assertEquals(1, executionContext.depth())
-        assertEquals(Ok(listOf(1L)), Ok(listOf(vstack.pop())))
+        assertEquals(baseIp + 2, result)
+        assertEquals(0, vstack.depth())
     }
 
-    @Test
-    fun `executes flat immediate jump sequence for br_if first shape`() {
-        val context = PredecodingContext(
-            instance = moduleInstance(),
-            store = store(),
-            instructionCache = hashMapOf(),
-            runtimeTypes = mutableListOf(),
-        )
-        val instructions = listOf(
-            fusedI32Const(
-                value = 1,
-                destination = frameSlotDestination(3),
-            ),
-            AdminInstruction.CopySlots(
-                sourceSlots = listOf(3),
-                destinationSlots = listOf(2),
-            ),
-            AdminInstruction.JumpIf(
-                operand = io.github.charlietap.chasm.ir.instruction.FusedOperand.I32Const(2),
-                offset = 4,
-                takenInstructions = listOf(
-                    AdminInstruction.CopySlots(
-                        sourceSlots = listOf(2),
-                        destinationSlots = listOf(1),
-                    ),
-                ),
-            ),
-            AdminInstruction.CopySlots(
-                sourceSlots = listOf(2),
-                destinationSlots = listOf(1),
-            ),
-            AdminInstruction.CopySlots(
-                sourceSlots = listOf(1),
-                destinationSlots = listOf(0),
-            ),
-            AdminInstruction.EndFunction,
-        )
-
-        val dispatchables = InstructionSequencePredecoder(context, instructions).value
-        val vstack = vstack().apply {
-            reserveFrame(4)
-        }
-        val cstack = cstack()
-        val executionContext = executionContext(
-            cstack = cstack,
-            vstack = vstack,
-            store = context.store,
-            instance = context.instance,
-        )
-        var loop = true
-        val exitLoop: (ValueStack, ControlStack, Store, io.github.charlietap.chasm.runtime.execution.ExecutionContext) -> Unit =
-            { _, _, _, _ -> loop = false }
-
-        cstack.push(
-            frame(
-                arity = 1,
-                depths = stackDepths(instructions = 1, values = 0),
-                instance = context.instance,
-            ),
-        )
-        cstack.push(exitLoop)
-        cstack.push(dispatchables)
-
-        while (loop) {
-            cstack.popInstruction()(vstack, cstack, context.store, executionContext)
-        }
-
-        assertEquals(1, executionContext.depth())
-        assertEquals(Ok(listOf(1L)), Ok(listOf(vstack.pop())))
-    }
+    private fun context() = PredecodingContext(
+        instance = moduleInstance(),
+        store = store(),
+        instructionCache = hashMapOf(),
+        runtimeTypes = mutableListOf(),
+    )
 }

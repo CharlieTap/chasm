@@ -312,6 +312,6 @@ class AggregateSuperInstructionPredecoderTest {
             instance = context.instance,
         )
 
-        dispatchable(vstack, controlStack, context.store, executionContext)
+        dispatchable(vstack, controlStack, context.store, executionContext, 1)
     }
 }

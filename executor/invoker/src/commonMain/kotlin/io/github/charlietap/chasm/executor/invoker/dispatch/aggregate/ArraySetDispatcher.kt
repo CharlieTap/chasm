@@ -15,6 +15,7 @@ fun ArraySetDispatcher(
 internal inline fun ArraySetDispatcher(
     instruction: AggregateInstruction.ArraySet,
     crossinline executor: Executor<AggregateInstruction.ArraySet>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

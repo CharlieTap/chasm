@@ -5,8 +5,6 @@ import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.runtime.stack.label
-import io.github.charlietap.chasm.fixture.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.i32
@@ -135,9 +133,7 @@ class HostFunctionCallTest {
     @Test
     fun `can execute a strict tail host call through the current visible result region`() {
         val store = store()
-        val cstack = cstack(
-            labels = listOf(label()),
-        )
+        val cstack = cstack()
         val vstack = vstack()
         val context = executionContext(
             store = store,
@@ -164,7 +160,7 @@ class HostFunctionCallTest {
         cstack.push(
             frame(
                 arity = 1,
-                depths = stackDepths(values = 2),
+                valueDepth = 2,
                 previousFramePointer = 0,
                 instance = moduleInstance(),
                 visibleResultBase = 1,

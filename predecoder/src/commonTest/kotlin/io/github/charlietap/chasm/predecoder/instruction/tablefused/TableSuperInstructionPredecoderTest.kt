@@ -230,6 +230,6 @@ class TableSuperInstructionPredecoderTest {
             instance = context.instance,
         )
 
-        dispatchable(vstack, cstack, context.store, executionContext)
+        dispatchable(vstack, cstack, context.store, executionContext, 1)
     }
 }

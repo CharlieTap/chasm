@@ -1,12 +1,9 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.function
 
-import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.HostFunctionCallDispatcher
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.HostFunction
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ext.definedType
@@ -23,7 +20,6 @@ fun HostFunctionAllocator(
         store = store,
         functionType = functionType,
         function = function,
-        callDispatcher = ::HostFunctionCallDispatcher,
         rttFactory = ::RTTFactory,
     )
 
@@ -31,7 +27,6 @@ fun HostFunctionAllocator(
     store: Store,
     functionType: FunctionType,
     function: HostFunction,
-    callDispatcher: Dispatcher<ControlInstruction.HostFunctionCall>,
     rttFactory: RTTFactory,
 ): ExternalValue.Function {
 
@@ -44,9 +39,6 @@ fun HostFunctionAllocator(
 
     store.functions.add(instance)
     val address = Address.Function(store.functions.size - 1)
-
-    val instruction = callDispatcher(ControlInstruction.HostFunctionCall(instance))
-    store.instructions.add(instruction)
 
     return ExternalValue.Function(address)
 }

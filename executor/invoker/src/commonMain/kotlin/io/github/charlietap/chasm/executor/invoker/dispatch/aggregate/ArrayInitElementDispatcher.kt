@@ -15,6 +15,7 @@ fun ArrayInitElementDispatcher(
 internal inline fun ArrayInitElementDispatcher(
     instruction: AggregateInstruction.ArrayInitElement,
     crossinline executor: Executor<AggregateInstruction.ArrayInitElement>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

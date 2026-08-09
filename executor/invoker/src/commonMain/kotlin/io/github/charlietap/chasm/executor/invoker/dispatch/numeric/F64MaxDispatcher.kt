@@ -15,6 +15,7 @@ fun F64MaxDispatcher(
 internal inline fun F64MaxDispatcher(
     instruction: NumericInstruction.F64Max,
     crossinline executor: Executor<NumericInstruction.F64Max>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

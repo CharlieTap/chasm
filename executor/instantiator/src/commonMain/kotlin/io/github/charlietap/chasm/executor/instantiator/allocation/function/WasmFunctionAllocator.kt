@@ -3,8 +3,6 @@ package io.github.charlietap.chasm.executor.instantiator.allocation.function
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.WasmFunctionCallDispatcher
 import io.github.charlietap.chasm.ir.module.Function
 import io.github.charlietap.chasm.ir.module.Module
 import io.github.charlietap.chasm.runtime.address.Address
@@ -13,33 +11,17 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.addFunctionAddress
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
 internal typealias WasmFunctionAllocator = (Module, ModuleInstance, Function, Store) -> Result<Unit, ModuleTrapError>
 
-internal inline fun WasmFunctionAllocator(
+internal fun WasmFunctionAllocator(
     module: Module,
     moduleInstance: ModuleInstance,
     function: Function,
     store: Store,
-): Result<Unit, ModuleTrapError> =
-    WasmFunctionAllocator(
-        module = module,
-        moduleInstance = moduleInstance,
-        function = function,
-        store = store,
-        callDispatcher = ::WasmFunctionCallDispatcher,
-    )
-
-internal inline fun WasmFunctionAllocator(
-    module: Module,
-    moduleInstance: ModuleInstance,
-    function: Function,
-    store: Store,
-    crossinline callDispatcher: Dispatcher<ControlInstruction.WasmFunctionCall>,
 ): Result<Unit, ModuleTrapError> = binding {
 
     val type = module.definedTypes.getOrNull(function.typeIndex.idx)
@@ -61,8 +43,4 @@ internal inline fun WasmFunctionAllocator(
     )
     store.functions.add(instance)
     moduleInstance.addFunctionAddress(Address.Function(store.functions.size - 1))
-
-    // Preallocate the handler
-    val instruction = callDispatcher(ControlInstruction.WasmFunctionCall(instance))
-    store.instructions.add(instruction)
 }

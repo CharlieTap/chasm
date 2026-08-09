@@ -31,7 +31,7 @@ data class Function(
         if (idx != other.idx) return false
         if (typeIndex != other.typeIndex) return false
         if (!(locals contentEquals other.locals)) return false
-        if (!(body.instructions contentEquals other.body.instructions)) return false
+        if (body != other.body) return false
         if (frameSlots != other.frameSlots) return false
         if (returnSlots != other.returnSlots) return false
 

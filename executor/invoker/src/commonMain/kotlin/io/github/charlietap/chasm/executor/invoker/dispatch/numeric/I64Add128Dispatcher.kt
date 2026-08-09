@@ -15,6 +15,7 @@ fun I64Add128Dispatcher(
 internal inline fun I64Add128Dispatcher(
     instruction: NumericInstruction.I64Add128,
     crossinline executor: Executor<NumericInstruction.I64Add128>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

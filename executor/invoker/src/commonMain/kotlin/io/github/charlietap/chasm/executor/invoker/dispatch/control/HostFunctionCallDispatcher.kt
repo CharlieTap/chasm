@@ -16,6 +16,7 @@ fun HostFunctionCallDispatcher(
 internal inline fun HostFunctionCallDispatcher(
     instruction: ControlInstruction.HostFunctionCall,
     crossinline executor: Executor<FunctionInstance.HostFunction>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction.instance)
+    nextIp
 }

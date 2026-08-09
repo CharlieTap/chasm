@@ -2,8 +2,6 @@ package io.github.charlietap.chasm.runtime
 
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
-import io.github.charlietap.chasm.fixture.runtime.stack.label
-import io.github.charlietap.chasm.fixture.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,29 +29,6 @@ class StackTest {
 
         assertEquals(frame2, result1)
         assertEquals(frame1, result2)
-    }
-
-    @Test
-    fun `peek nth label returns the correct value`() {
-
-        val stack = cstack()
-
-        val label1 = label(
-            depths = stackDepths(labels = 1),
-        )
-
-        val label2 = label(
-            depths = stackDepths(labels = 2),
-        )
-
-        stack.push(label1)
-        stack.push(label2)
-
-        val result1 = stack.peekNthLabel(0)
-        val result2 = stack.peekNthLabel(1)
-
-        assertEquals(label2, result1)
-        assertEquals(label1, result2)
     }
 
     @Test

@@ -10,265 +10,114 @@ import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.HeapType
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction as RuntimeAdminInstruction
-
-private const val LAZY_CONTINUATION_INSTRUCTION_THRESHOLD = 4_096
 
 internal fun InstructionSequencePredecoder(
     context: PredecodingContext,
     instructions: List<Instruction>,
+    baseIp: Int = context.store.program.size,
 ): Result<Array<DispatchableInstruction>, ModuleTrapError> = binding {
-    val dispatchables = InstructionSequencePredecoderList(context, instructions).bind()
-
-    Array(dispatchables.size) { index ->
-        val reversedIndex = dispatchables.size - 1 - index
-        dispatchables[reversedIndex]
+    Array(instructions.size) { index ->
+        predecodeInstruction(context, instructions[index], baseIp).bind()
     }
 }
 
-internal fun InstructionSequencePredecoderList(
+private fun predecodeInstruction(
     context: PredecodingContext,
-    instructions: List<Instruction>,
-): Result<List<DispatchableInstruction>, ModuleTrapError> = binding {
-    val dispatchables = MutableList<DispatchableInstruction?>(instructions.size) { null }
-    val patches = mutableListOf<() -> Unit>()
-
-    instructions.forEachIndexed { index, instruction ->
-        dispatchables[index] = when (instruction) {
-            is AdminInstruction.Jump -> predecodeJump(instruction, instructions.size, index, patches, dispatchables)
-            is AdminInstruction.JumpIf -> predecodeJumpIf(context, instruction, instructions.size, index, patches, dispatchables).bind()
-            is AdminInstruction.JumpTable -> predecodeJumpTable(context, instruction, instructions.size, index, patches, dispatchables).bind()
-            is AdminInstruction.JumpOnNull -> predecodeJumpOnNull(context, instruction, instructions.size, index, patches, dispatchables).bind()
-            is AdminInstruction.JumpOnNonNull -> predecodeJumpOnNonNull(context, instruction, instructions.size, index, patches, dispatchables).bind()
-            is AdminInstruction.JumpOnCast -> predecodeJumpOnCast(context, instruction, instructions.size, index, patches, dispatchables).bind()
-            is AdminInstruction.JumpOnCastFail -> predecodeJumpOnCastFail(context, instruction, instructions.size, index, patches, dispatchables).bind()
-            is AdminInstruction.PushHandler -> predecodePushHandler(instruction, index, patches, dispatchables)
-            is AdminInstruction.PopHandler -> PopHandlerDispatcher(RuntimeAdminInstruction.PopHandler)
-            else -> InstructionPredecoder(context, instruction).bind()
-        }
+    instruction: Instruction,
+    baseIp: Int,
+): Result<DispatchableInstruction, ModuleTrapError> = binding {
+    when (instruction) {
+        is AdminInstruction.Jump -> JumpDispatcher(
+            RuntimeAdminInstruction.Jump(targetIp = baseIp + instruction.offset),
+        )
+        is AdminInstruction.JumpIf -> predecodeJumpIf(instruction, baseIp)
+        is AdminInstruction.JumpTable -> predecodeJumpTable(instruction, baseIp)
+        is AdminInstruction.JumpOnNull -> predecodeJumpOnNull(instruction, baseIp)
+        is AdminInstruction.JumpOnNonNull -> predecodeJumpOnNonNull(instruction, baseIp)
+        is AdminInstruction.JumpOnCast -> predecodeJumpOnCast(context, instruction, baseIp)
+        is AdminInstruction.JumpOnCastFail -> predecodeJumpOnCastFail(context, instruction, baseIp)
+        is AdminInstruction.PushHandler -> PushHandlerDispatcher(
+            RuntimeAdminInstruction.PushHandler(
+                handlers = instruction.handlers,
+                continuationIps = IntArray(instruction.offsets.size) { index ->
+                    baseIp + instruction.offsets[index]
+                },
+                payloadDestinationSlots = instruction.payloadDestinationSlots,
+            ),
+        )
+        is AdminInstruction.PopHandler -> PopHandlerDispatcher(RuntimeAdminInstruction.PopHandler)
+        else -> InstructionPredecoder(context, instruction).bind()
     }
-
-    patches.forEach { patch -> patch() }
-
-    dispatchables.map { dispatchable ->
-        dispatchable ?: error("instruction sequence predecode must patch all dispatchables")
-    }
-}
-
-private fun predecodeJump(
-    instruction: AdminInstruction.Jump,
-    instructionCount: Int,
-    index: Int,
-    patches: MutableList<() -> Unit>,
-    dispatchables: List<DispatchableInstruction?>,
-): DispatchableInstruction {
-    val runtimeInstruction = RuntimeAdminInstruction.Jump(
-        continuation = emptyArray(),
-        discardCount = remainingInstructionCount(instructionCount, index),
-    )
-    patches += {
-        patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-    }
-    return JumpDispatcher(runtimeInstruction)
-}
-
-private fun predecodePushHandler(
-    instruction: AdminInstruction.PushHandler,
-    index: Int,
-    patches: MutableList<() -> Unit>,
-    dispatchables: List<DispatchableInstruction?>,
-): DispatchableInstruction {
-    val runtimeInstruction = RuntimeAdminInstruction.PushHandler(
-        handlers = instruction.handlers,
-        continuations = List(instruction.offsets.size) { emptyArray() },
-        payloadDestinationSlots = instruction.payloadDestinationSlots,
-        discardCount = instruction.endOffset - index,
-    )
-    patches += {
-        patchHandlerContinuations(runtimeInstruction, dispatchables, instruction.offsets)
-    }
-    return PushHandlerDispatcher(runtimeInstruction)
 }
 
 private fun predecodeJumpIf(
-    context: PredecodingContext,
     instruction: AdminInstruction.JumpIf,
-    instructionCount: Int,
-    index: Int,
-    patches: MutableList<() -> Unit>,
-    dispatchables: List<DispatchableInstruction?>,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val discardCount = remainingInstructionCount(instructionCount, index)
-    val takenInstructions = InstructionSequencePredecoderList(context, instruction.takenInstructions).bind()
+    baseIp: Int,
+): DispatchableInstruction {
+    val targetIp = baseIp + instruction.offset
     val operandImmediate = jumpImmediate(instruction.operand)
     val operandSlot = jumpOperandSlot(instruction.operand)
-
-    when {
-        operandImmediate != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpIfI(
-                operand = operandImmediate,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
-        operandSlot != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpIfS(
-                operandSlot = operandSlot,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
+    return when {
+        operandImmediate != null -> JumpDispatcher(RuntimeAdminInstruction.JumpIfI(operandImmediate, targetIp))
+        operandSlot != null -> JumpDispatcher(RuntimeAdminInstruction.JumpIfS(operandSlot, targetIp))
+        instruction.operand is FusedOperand.ValueStack -> JumpDispatcher(RuntimeAdminInstruction.JumpIfV(targetIp))
         else -> unsupportedUnloweredJumpInstruction()
     }
 }
 
 private fun predecodeJumpTable(
-    context: PredecodingContext,
     instruction: AdminInstruction.JumpTable,
-    instructionCount: Int,
-    index: Int,
-    patches: MutableList<() -> Unit>,
-    dispatchables: List<DispatchableInstruction?>,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val discardCount = remainingInstructionCount(instructionCount, index)
-    val takenInstructions = instruction.takenInstructions.map { instructions ->
-        InstructionSequencePredecoderList(context, instructions).bind()
+    baseIp: Int,
+): DispatchableInstruction {
+    val targetIps = IntArray(instruction.offsets.size) { index ->
+        baseIp + instruction.offsets[index]
     }
-    val defaultTakenInstructions = InstructionSequencePredecoderList(context, instruction.defaultTakenInstructions).bind()
+    val defaultTargetIp = baseIp + instruction.defaultOffset
     val operandImmediate = jumpIndexImmediate(instruction.operand)
     val operandSlot = jumpOperandSlot(instruction.operand)
-
-    when {
-        operandImmediate != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpTableI(
-                operand = operandImmediate,
-                continuations = emptyList(),
-                defaultContinuation = emptyArray(),
-                discardCount = discardCount,
-                takenInstructions = takenInstructions,
-                defaultTakenInstructions = defaultTakenInstructions,
-            )
-            patches += {
-                patchTableContinuations(runtimeInstruction, dispatchables, instruction.offsets, instruction.defaultOffset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
-        operandSlot != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpTableS(
-                operandSlot = operandSlot,
-                continuations = emptyList(),
-                defaultContinuation = emptyArray(),
-                discardCount = discardCount,
-                takenInstructions = takenInstructions,
-                defaultTakenInstructions = defaultTakenInstructions,
-            )
-            patches += {
-                patchTableContinuations(runtimeInstruction, dispatchables, instruction.offsets, instruction.defaultOffset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
+    return when {
+        operandImmediate != null -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpTableI(operandImmediate, targetIps, defaultTargetIp),
+        )
+        operandSlot != null -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpTableS(operandSlot, targetIps, defaultTargetIp),
+        )
+        instruction.operand is FusedOperand.ValueStack -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpTableV(targetIps, defaultTargetIp),
+        )
         else -> unsupportedUnloweredJumpInstruction()
     }
 }
 
 private fun predecodeJumpOnNull(
-    context: PredecodingContext,
     instruction: AdminInstruction.JumpOnNull,
-    instructionCount: Int,
-    index: Int,
-    patches: MutableList<() -> Unit>,
-    dispatchables: List<DispatchableInstruction?>,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val discardCount = remainingInstructionCount(instructionCount, index)
-    val takenInstructions = InstructionSequencePredecoderList(context, instruction.takenInstructions).bind()
+    baseIp: Int,
+): DispatchableInstruction {
+    val targetIp = baseIp + instruction.offset
     val operandImmediate = jumpImmediate(instruction.operand)
     val operandSlot = jumpOperandSlot(instruction.operand)
-
-    when {
-        operandImmediate != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpOnNullI(
-                operand = operandImmediate,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
-        operandSlot != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpOnNullS(
-                operandSlot = operandSlot,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
+    return when {
+        operandImmediate != null -> JumpDispatcher(RuntimeAdminInstruction.JumpOnNullI(operandImmediate, targetIp))
+        operandSlot != null -> JumpDispatcher(RuntimeAdminInstruction.JumpOnNullS(operandSlot, targetIp))
+        instruction.operand is FusedOperand.ValueStack -> JumpDispatcher(RuntimeAdminInstruction.JumpOnNullV(targetIp))
         else -> unsupportedUnloweredJumpInstruction()
     }
 }
 
 private fun predecodeJumpOnNonNull(
-    context: PredecodingContext,
     instruction: AdminInstruction.JumpOnNonNull,
-    instructionCount: Int,
-    index: Int,
-    patches: MutableList<() -> Unit>,
-    dispatchables: List<DispatchableInstruction?>,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val discardCount = remainingInstructionCount(instructionCount, index)
-    val takenInstructions = InstructionSequencePredecoderList(context, instruction.takenInstructions).bind()
+    baseIp: Int,
+): DispatchableInstruction {
+    val targetIp = baseIp + instruction.offset
     val operandImmediate = jumpImmediate(instruction.operand)
     val operandSlot = jumpOperandSlot(instruction.operand)
-
-    when {
-        operandImmediate != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpOnNonNullI(
-                operand = operandImmediate,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
-        operandSlot != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpOnNonNullS(
-                operandSlot = operandSlot,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
+    return when {
+        operandImmediate != null -> JumpDispatcher(RuntimeAdminInstruction.JumpOnNonNullI(operandImmediate, targetIp))
+        operandSlot != null -> JumpDispatcher(RuntimeAdminInstruction.JumpOnNonNullS(operandSlot, targetIp))
+        instruction.operand is FusedOperand.ValueStack -> JumpDispatcher(RuntimeAdminInstruction.JumpOnNonNullV(targetIp))
         else -> unsupportedUnloweredJumpInstruction()
     }
 }
@@ -276,47 +125,36 @@ private fun predecodeJumpOnNonNull(
 private fun predecodeJumpOnCast(
     context: PredecodingContext,
     instruction: AdminInstruction.JumpOnCast,
-    instructionCount: Int,
-    index: Int,
-    patches: MutableList<() -> Unit>,
-    dispatchables: List<DispatchableInstruction?>,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val discardCount = remainingInstructionCount(instructionCount, index)
-    val takenInstructions = InstructionSequencePredecoderList(context, instruction.takenInstructions).bind()
+    baseIp: Int,
+): DispatchableInstruction {
+    hydrateReferenceType(context, instruction.dstReferenceType.heapType)
+    val targetIp = baseIp + instruction.offset
     val operandImmediate = jumpImmediate(instruction.operand)
     val operandSlot = jumpOperandSlot(instruction.operand)
-
-    when {
-        operandImmediate != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpOnCastI(
-                operand = operandImmediate,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                srcReferenceType = instruction.srcReferenceType,
-                dstReferenceType = instruction.dstReferenceType,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
-        operandSlot != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpOnCastS(
-                operandSlot = operandSlot,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                srcReferenceType = instruction.srcReferenceType,
-                dstReferenceType = instruction.dstReferenceType,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
+    return when {
+        operandImmediate != null -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpOnCastI(
+                operandImmediate,
+                targetIp,
+                instruction.srcReferenceType,
+                instruction.dstReferenceType,
+            ),
+        )
+        operandSlot != null -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpOnCastS(
+                operandSlot,
+                targetIp,
+                instruction.srcReferenceType,
+                instruction.dstReferenceType,
+            ),
+        )
+        instruction.operand is FusedOperand.ValueStack -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpOnCastV(
+                targetIp,
+                instruction.srcReferenceType,
+                instruction.dstReferenceType,
+            ),
+        )
         else -> unsupportedUnloweredJumpInstruction()
     }
 }
@@ -324,206 +162,41 @@ private fun predecodeJumpOnCast(
 private fun predecodeJumpOnCastFail(
     context: PredecodingContext,
     instruction: AdminInstruction.JumpOnCastFail,
-    instructionCount: Int,
-    index: Int,
-    patches: MutableList<() -> Unit>,
-    dispatchables: List<DispatchableInstruction?>,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val discardCount = remainingInstructionCount(instructionCount, index)
-    val takenInstructions = InstructionSequencePredecoderList(context, instruction.takenInstructions).bind()
+    baseIp: Int,
+): DispatchableInstruction {
+    hydrateReferenceType(context, instruction.dstReferenceType.heapType)
+    val targetIp = baseIp + instruction.offset
     val operandImmediate = jumpImmediate(instruction.operand)
     val operandSlot = jumpOperandSlot(instruction.operand)
-
-    when {
-        operandImmediate != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpOnCastFailI(
-                operand = operandImmediate,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                srcReferenceType = instruction.srcReferenceType,
-                dstReferenceType = instruction.dstReferenceType,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
-        operandSlot != null -> {
-            val runtimeInstruction = RuntimeAdminInstruction.JumpOnCastFailS(
-                operandSlot = operandSlot,
-                continuation = emptyArray(),
-                discardCount = discardCount,
-                srcReferenceType = instruction.srcReferenceType,
-                dstReferenceType = instruction.dstReferenceType,
-                takenInstructions = takenInstructions,
-            )
-            patches += {
-                patchContinuation(runtimeInstruction, dispatchables, instruction.offset)
-            }
-            JumpDispatcher(runtimeInstruction)
-        }
-
+    return when {
+        operandImmediate != null -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpOnCastFailI(
+                operandImmediate,
+                targetIp,
+                instruction.srcReferenceType,
+                instruction.dstReferenceType,
+            ),
+        )
+        operandSlot != null -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpOnCastFailS(
+                operandSlot,
+                targetIp,
+                instruction.srcReferenceType,
+                instruction.dstReferenceType,
+            ),
+        )
+        instruction.operand is FusedOperand.ValueStack -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpOnCastFailV(
+                targetIp,
+                instruction.srcReferenceType,
+                instruction.dstReferenceType,
+            ),
+        )
         else -> unsupportedUnloweredJumpInstruction()
     }
 }
 
-private fun remainingInstructionCount(
-    instructionCount: Int,
-    index: Int,
-): Int = instructionCount - index - 1
-
-private fun shouldUseLazyContinuation(
-    dispatchables: List<DispatchableInstruction?>,
-): Boolean = dispatchables.size > LAZY_CONTINUATION_INSTRUCTION_THRESHOLD
-
-private fun patchContinuation(
-    instruction: RuntimeAdminInstruction,
-    dispatchables: List<DispatchableInstruction?>,
-    offset: Int,
-) {
-    if (shouldUseLazyContinuation(dispatchables)) {
-        when (instruction) {
-            is RuntimeAdminInstruction.Jump -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpIfI -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpIfS -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpOnNullI -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpOnNullS -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpOnNonNullI -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpOnNonNullS -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpOnCastI -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpOnCastS -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpOnCastFailI -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            is RuntimeAdminInstruction.JumpOnCastFailS -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffset = offset
-            }
-            else -> error("instruction does not support a single continuation: $instruction")
-        }
-    } else {
-        val continuation = continuationForOffset(dispatchables, offset)
-        when (instruction) {
-            is RuntimeAdminInstruction.Jump -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpIfI -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpIfS -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpOnNullI -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpOnNullS -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpOnNonNullI -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpOnNonNullS -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpOnCastI -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpOnCastS -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpOnCastFailI -> instruction.continuation = continuation
-            is RuntimeAdminInstruction.JumpOnCastFailS -> instruction.continuation = continuation
-            else -> error("instruction does not support a single continuation: $instruction")
-        }
-    }
-}
-
-private fun patchTableContinuations(
-    instruction: RuntimeAdminInstruction,
-    dispatchables: List<DispatchableInstruction?>,
-    offsets: List<Int>,
-    defaultOffset: Int,
-) {
-    if (shouldUseLazyContinuation(dispatchables)) {
-        when (instruction) {
-            is RuntimeAdminInstruction.JumpTableI -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffsets = offsets
-                instruction.defaultContinuationOffset = defaultOffset
-            }
-            is RuntimeAdminInstruction.JumpTableS -> {
-                instruction.continuationSource = dispatchables
-                instruction.continuationOffsets = offsets
-                instruction.defaultContinuationOffset = defaultOffset
-            }
-            else -> error("instruction does not support table continuations: $instruction")
-        }
-    } else {
-        val continuations = offsets.map { offset ->
-            continuationForOffset(dispatchables, offset)
-        }
-        val defaultContinuation = continuationForOffset(dispatchables, defaultOffset)
-        when (instruction) {
-            is RuntimeAdminInstruction.JumpTableI -> {
-                instruction.continuations = continuations
-                instruction.defaultContinuation = defaultContinuation
-            }
-            is RuntimeAdminInstruction.JumpTableS -> {
-                instruction.continuations = continuations
-                instruction.defaultContinuation = defaultContinuation
-            }
-            else -> error("instruction does not support table continuations: $instruction")
-        }
-    }
-}
-
-private fun patchHandlerContinuations(
-    instruction: RuntimeAdminInstruction.PushHandler,
-    dispatchables: List<DispatchableInstruction?>,
-    offsets: List<Int>,
-) {
-    if (shouldUseLazyContinuation(dispatchables)) {
-        instruction.continuationSource = dispatchables
-        instruction.continuationOffsets = offsets
-    } else {
-        instruction.continuations = offsets.map { offset ->
-            continuationForOffset(dispatchables, offset)
-        }
-    }
-}
-
-private fun continuationForOffset(
-    dispatchables: List<DispatchableInstruction?>,
-    offset: Int,
-): Array<DispatchableInstruction> {
-    require(offset in 0..dispatchables.size) {
-        "jump target offset $offset is outside instruction sequence of size ${dispatchables.size}"
-    }
-    if (offset == dispatchables.size) return emptyArray()
-
-    val continuationSize = dispatchables.size - offset
-    return Array(continuationSize) { index ->
-        val sourceIndex = dispatchables.size - 1 - index
-        dispatchables[sourceIndex]
-            ?: error("jump target continuation must be patched after all dispatchables are populated")
-    }
-}
-
-private fun jumpImmediate(
-    operand: FusedOperand,
-): Long? = when (operand) {
+private fun jumpImmediate(operand: FusedOperand): Long? = when (operand) {
     is FusedOperand.I32Const -> operand.const.toLong()
     is FusedOperand.I64Const -> operand.const
     is FusedOperand.F32Const -> operand.const.toRawBits().toLong()
@@ -531,16 +204,21 @@ private fun jumpImmediate(
     else -> null
 }
 
-private fun jumpIndexImmediate(
-    operand: FusedOperand,
-): Int? = jumpImmediate(operand)?.toInt()
+private fun jumpIndexImmediate(operand: FusedOperand): Int? = jumpImmediate(operand)?.toInt()
 
-private fun jumpOperandSlot(
-    operand: FusedOperand,
-): Int? = when (operand) {
+private fun jumpOperandSlot(operand: FusedOperand): Int? = when (operand) {
     is FusedOperand.FrameSlot -> operand.offset
     is FusedOperand.LocalGet -> operand.index.idx
     else -> null
+}
+
+private fun hydrateReferenceType(
+    context: PredecodingContext,
+    heapType: HeapType,
+) {
+    if (heapType is ConcreteHeapType.TypeIndex) {
+        context.instance.runtimeTypes[heapType.index].hydrate()
+    }
 }
 
 private fun unsupportedUnloweredJumpInstruction(): DispatchableInstruction =

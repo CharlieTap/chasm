@@ -1,10 +1,8 @@
 package io.github.charlietap.chasm.fixture.runtime.function
 
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.function.Expression
+import io.github.charlietap.chasm.runtime.program.EXIT_IP
 
 fun runtimeExpression(
-    instructions: Array<DispatchableInstruction> = emptyArray(),
-) = Expression(
-    instructions = instructions,
-)
+    entryIp: Int = EXIT_IP,
+) = Expression(entryIp)

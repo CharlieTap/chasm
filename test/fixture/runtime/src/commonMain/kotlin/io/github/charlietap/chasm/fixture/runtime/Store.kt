@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.fixture.runtime
 
 import io.github.charlietap.chasm.runtime.Heap
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instance.TagInstance
+import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.store.Store
 
 fun store(
@@ -24,7 +24,7 @@ fun store(
     memories: MutableList<MemoryInstance> = [],
     tables: MutableList<TableInstance> = [],
     tags: MutableList<TagInstance> = [],
-    instructions: MutableList<DispatchableInstruction> = [],
+    program: Program = Program(),
     structs: MutableList<StructInstance?> = [],
     arrays: MutableList<ArrayInstance?> = [],
     hosts: MutableList<HostInstance> = [],
@@ -38,7 +38,7 @@ fun store(
     memories = memories,
     tables = tables,
     tags = tags,
-    instructions = instructions,
+    program = program,
     structs = structs,
     arrays = arrays,
     hosts = hosts,

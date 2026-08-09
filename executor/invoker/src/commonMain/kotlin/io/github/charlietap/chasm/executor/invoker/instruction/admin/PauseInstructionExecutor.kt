@@ -31,7 +31,7 @@ internal inline fun PauseInstructionExecutor(
     garbageCollector: GarbageCollector,
 ) {
     // Prevent runs on instances where one exported function calls another
-    if (cstack.instructionStack().depth() == 1) {
+    if (cstack.framesDepth() == 1) {
         @Suppress("RETURN_VALUE_NOT_USED")
         garbageCollector(store, vstack)
     }

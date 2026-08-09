@@ -15,6 +15,7 @@ fun MemoryCopyDispatcher(
 internal inline fun MemoryCopyDispatcher(
     instruction: MemoryInstruction.MemoryCopy,
     crossinline executor: Executor<MemoryInstruction.MemoryCopy>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }

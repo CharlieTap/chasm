@@ -90,8 +90,46 @@ internal fun ReturnHostFunctionCall(
     store: Store,
     context: ExecutionContext,
     function: FunctionInstance.HostFunction,
+): Int {
+    val params = List(function.functionType.params.types.size) {
+        vstack.pop()
+    }.asReversed()
+    val frame = cstack.popFrame()
+    cstack.shrinkHandlers(frame.handlerDepth)
+    vstack.shrink(0, frame.valueDepth)
+    vstack.framePointer = frame.previousFramePointer
+
+    val functionContext = HostFunctionContext(context.config, store, frame.instance)
+    val results = try {
+        val hostParams = params.mapIndexed { index, param ->
+            param.toExecutionValue(function.functionType.params.types[index])
+        }
+        function.function.invoke(functionContext, hostParams)
+    } catch (e: HostFunctionException) {
+        throw InvocationException(InvocationError.HostFunctionError(e.reason))
+    }
+
+    val visibleResultBase = frame.visibleResultBase
+    if (visibleResultBase != null) {
+        results.forEachIndexed { index, result ->
+            vstack.setFrameSlot(visibleResultBase + index, result.toLongFromBoxed())
+        }
+    } else {
+        results.forEach { result ->
+            vstack.push(result.toLongFromBoxed())
+        }
+    }
+    return frame.returnIp
+}
+
+internal fun ReturnHostFunctionCall(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
+    context: ExecutionContext,
+    function: FunctionInstance.HostFunction,
     operands: List<ControlSuperInstruction.CallOperand>,
-) {
+): Int {
     val currentFramePointer = vstack.framePointer
     val operandValues = LongArray(operands.size) { index ->
         when (val operand = operands[index]) {
@@ -101,11 +139,8 @@ internal fun ReturnHostFunctionCall(
     }
 
     val frame = cstack.popFrame()
-    val depths = frame.depths
-    cstack.shrinkHandlers(depths.handlers)
-    cstack.shrinkInstructions(depths.instructions)
-    cstack.shrinkLabels(depths.labels + 1)
-    vstack.shrink(0, depths.values)
+    cstack.shrinkHandlers(frame.handlerDepth)
+    vstack.shrink(0, frame.valueDepth)
     vstack.framePointer = frame.previousFramePointer
 
     val functionContext = HostFunctionContext(
@@ -138,4 +173,5 @@ internal fun ReturnHostFunctionCall(
             vstack.push(result.toLongFromBoxed())
         }
     }
+    return frame.returnIp
 }

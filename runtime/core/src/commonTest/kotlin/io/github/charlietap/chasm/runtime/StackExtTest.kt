@@ -26,7 +26,7 @@ class StackExtTest {
 
         stack.push(frame)
 
-        assertEquals(1, stack.size())
+        assertEquals(1, stack.framesDepth())
 
         val frameEntry = stack.popFrame()
         assertEquals(frame, frameEntry)
@@ -45,7 +45,7 @@ class StackExtTest {
         }
 
         assertEquals(InvocationError.CallStackExhausted, actual.error)
-        assertEquals(ControlStack.MAX_DEPTH, controlStack.size())
+        assertEquals(ControlStack.MAX_DEPTH, controlStack.framesDepth())
     }
 
     @Test

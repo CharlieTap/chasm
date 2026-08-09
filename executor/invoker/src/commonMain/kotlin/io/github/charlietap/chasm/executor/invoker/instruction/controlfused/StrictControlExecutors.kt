@@ -1,22 +1,16 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.controlfused
 
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.BrDispatcher
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnHostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
-import io.github.charlietap.chasm.executor.invoker.instruction.control.BlockExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.control.BreakExecutor
-import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.ext.function
-import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instance.ExceptionInstance
@@ -28,268 +22,7 @@ import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.RTT
-import io.github.charlietap.chasm.type.ReferenceType
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher as ControlThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor as ControlThrowRefExecutor
-
-internal fun BrIfExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.BrIfI,
-) = BrIfExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = instruction.operand,
-    labelIndex = instruction.labelIndex,
-    takenInstructions = instruction.takenInstructions,
-    breakExecutor = ::BreakExecutor,
-)
-
-internal fun BrIfExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.BrIfS,
-) = BrIfExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = vstack.getFrameSlot(instruction.operandSlot),
-    labelIndex = instruction.labelIndex,
-    takenInstructions = instruction.takenInstructions,
-    breakExecutor = ::BreakExecutor,
-)
-
-internal inline fun BrIfExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    operand: Long,
-    labelIndex: io.github.charlietap.chasm.ir.module.Index.LabelIndex,
-    takenInstructions: List<DispatchableInstruction>,
-    crossinline breakExecutor: BreakExecutor,
-) {
-    if (operand != 0L) {
-        executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        breakExecutor(cstack, labelIndex)
-    }
-}
-
-internal fun BrTableExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.BrTableI,
-) = BrTableExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = instruction.operand,
-    labelIndices = instruction.labelIndices,
-    defaultLabelIndex = instruction.defaultLabelIndex,
-    takenInstructions = instruction.takenInstructions,
-    defaultTakenInstructions = instruction.defaultTakenInstructions,
-    breakExecutor = ::BreakExecutor,
-)
-
-internal fun BrTableExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.BrTableS,
-) = BrTableExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = vstack.getFrameSlot(instruction.operandSlot).toInt(),
-    labelIndices = instruction.labelIndices,
-    defaultLabelIndex = instruction.defaultLabelIndex,
-    takenInstructions = instruction.takenInstructions,
-    defaultTakenInstructions = instruction.defaultTakenInstructions,
-    breakExecutor = ::BreakExecutor,
-)
-
-internal inline fun BrTableExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    operand: Int,
-    labelIndices: List<io.github.charlietap.chasm.ir.module.Index.LabelIndex>,
-    defaultLabelIndex: io.github.charlietap.chasm.ir.module.Index.LabelIndex,
-    takenInstructions: List<List<DispatchableInstruction>>,
-    defaultTakenInstructions: List<DispatchableInstruction>,
-    crossinline breakExecutor: BreakExecutor,
-) {
-    val targetIndex = if (operand >= 0 && operand < labelIndices.size) {
-        operand
-    } else {
-        -1
-    }
-    val label = if (targetIndex >= 0) {
-        labelIndices[targetIndex]
-    } else {
-        defaultLabelIndex
-    }
-    val selectedTakenInstructions = if (targetIndex >= 0) {
-        takenInstructions[targetIndex]
-    } else {
-        defaultTakenInstructions
-    }
-
-    executeTakenInstructions(vstack, cstack, store, context, selectedTakenInstructions)
-    breakExecutor(cstack, label)
-}
-
-internal fun BrOnNullExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.BrOnNullS,
-) = BrOnNullExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = vstack.getFrameSlot(instruction.operandSlot),
-    labelIndex = instruction.labelIndex,
-    takenInstructions = instruction.takenInstructions,
-    breakExecutor = ::BreakExecutor,
-)
-
-internal inline fun BrOnNullExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    operand: Long,
-    labelIndex: io.github.charlietap.chasm.ir.module.Index.LabelIndex,
-    takenInstructions: List<DispatchableInstruction>,
-    crossinline breakExecutor: BreakExecutor,
-) {
-    if (operand.isNullableReference()) {
-        executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        breakExecutor(cstack, labelIndex)
-    }
-}
-
-internal fun BrOnNonNullExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.BrOnNonNullS,
-) = BrOnNonNullExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = vstack.getFrameSlot(instruction.operandSlot),
-    labelIndex = instruction.labelIndex,
-    takenInstructions = instruction.takenInstructions,
-    breakExecutor = ::BreakExecutor,
-)
-
-internal inline fun BrOnNonNullExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    operand: Long,
-    labelIndex: io.github.charlietap.chasm.ir.module.Index.LabelIndex,
-    takenInstructions: List<DispatchableInstruction>,
-    crossinline breakExecutor: BreakExecutor,
-) {
-    if (!operand.isNullableReference()) {
-        executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        breakExecutor(cstack, labelIndex)
-    }
-}
-
-internal fun BrOnCastExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.BrOnCastS,
-) = BrOnCastExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = vstack.getFrameSlot(instruction.operandSlot),
-    labelIndex = instruction.labelIndex,
-    referenceType = instruction.dstReferenceType,
-    takenInstructions = instruction.takenInstructions,
-    breakIfMatches = true,
-    caster = ::Caster,
-    breakExecutor = ::BreakExecutor,
-)
-
-internal fun BrOnCastFailExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.BrOnCastFailS,
-) = BrOnCastExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = vstack.getFrameSlot(instruction.operandSlot),
-    labelIndex = instruction.labelIndex,
-    referenceType = instruction.dstReferenceType,
-    takenInstructions = instruction.takenInstructions,
-    breakIfMatches = false,
-    caster = ::Caster,
-    breakExecutor = ::BreakExecutor,
-)
-
-internal inline fun BrOnCastExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    operand: Long,
-    labelIndex: io.github.charlietap.chasm.ir.module.Index.LabelIndex,
-    referenceType: ReferenceType,
-    takenInstructions: List<DispatchableInstruction>,
-    breakIfMatches: Boolean,
-    crossinline caster: Caster,
-    crossinline breakExecutor: BreakExecutor,
-) {
-    val moduleInstance = cstack.peekFrame().instance
-    val casted = caster(operand, referenceType, moduleInstance, store)
-    if (casted == breakIfMatches) {
-        executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        breakExecutor(cstack, labelIndex)
-    }
-}
-
-private inline fun executeTakenInstructions(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instructions: List<DispatchableInstruction>,
-) {
-    instructions.forEach { instruction ->
-        instruction(vstack, cstack, store, context)
-    }
-}
 
 internal fun CallExecutor(
     vstack: ValueStack,
@@ -297,7 +30,8 @@ internal fun CallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.WasmCall,
-) = WasmFunctionCall(
+    returnIp: Int,
+): Int = WasmFunctionCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -305,6 +39,7 @@ internal fun CallExecutor(
     instance = instruction.instance,
     resultSlots = instruction.resultSlots,
     callFrameSlot = instruction.callFrameSlot,
+    returnIp = returnIp,
 )
 
 internal fun CallExecutor(
@@ -313,15 +48,19 @@ internal fun CallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.HostCall,
-) = HostFunctionCall(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    function = instruction.instance,
-    resultSlots = instruction.resultSlots,
-    callFrameSlot = instruction.callFrameSlot,
-)
+    returnIp: Int,
+): Int {
+    HostFunctionCall(
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
+        context = context,
+        function = instruction.instance,
+        resultSlots = instruction.resultSlots,
+        callFrameSlot = instruction.callFrameSlot,
+    )
+    return returnIp
+}
 
 internal fun CallExecutor(
     vstack: ValueStack,
@@ -329,7 +68,8 @@ internal fun CallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.CallIndirectI,
-) = strictIndirectCall(
+    returnIp: Int,
+): Int = strictIndirectCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -339,6 +79,7 @@ internal fun CallExecutor(
     table = instruction.table,
     resultSlots = instruction.resultSlots,
     callFrameSlot = instruction.callFrameSlot,
+    returnIp = returnIp,
 )
 
 internal fun CallExecutor(
@@ -347,7 +88,8 @@ internal fun CallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.CallIndirectS,
-) = strictIndirectCall(
+    returnIp: Int,
+): Int = strictIndirectCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -357,6 +99,7 @@ internal fun CallExecutor(
     table = instruction.table,
     resultSlots = instruction.resultSlots,
     callFrameSlot = instruction.callFrameSlot,
+    returnIp = returnIp,
 )
 
 internal fun CallExecutor(
@@ -365,7 +108,8 @@ internal fun CallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.CallRefS,
-) = strictReferenceCall(
+    returnIp: Int,
+): Int = strictReferenceCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -373,6 +117,7 @@ internal fun CallExecutor(
     functionSlot = instruction.functionSlot,
     resultSlots = instruction.resultSlots,
     callFrameSlot = instruction.callFrameSlot,
+    returnIp = returnIp,
 )
 
 internal fun ReturnCallExecutor(
@@ -381,7 +126,7 @@ internal fun ReturnCallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnWasmCall,
-) = ReturnWasmFunctionCall(
+): Int = ReturnWasmFunctionCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -396,7 +141,7 @@ internal fun ReturnCallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnHostCall,
-) = ReturnHostFunctionCall(
+): Int = ReturnHostFunctionCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -411,7 +156,7 @@ internal fun ReturnCallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnCallIndirectI,
-) = strictIndirectReturnCall(
+): Int = strictIndirectReturnCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -428,7 +173,7 @@ internal fun ReturnCallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnCallIndirectS,
-) = strictIndirectReturnCall(
+): Int = strictIndirectReturnCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -445,7 +190,7 @@ internal fun ReturnCallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnCallRefS,
-) = strictReferenceReturnCall(
+): Int = strictReferenceReturnCall(
     vstack = vstack,
     cstack = cstack,
     store = store,
@@ -458,9 +203,8 @@ internal fun ThrowExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
-    context: ExecutionContext,
     instruction: ControlSuperInstruction.Throw,
-) {
+): Int {
     val frame = cstack.peekFrame()
     val address = frame.instance.tagAddress(instruction.tagIndex)
     val params = LongArray(instruction.payloadSlots.size) { index ->
@@ -474,14 +218,11 @@ internal fun ThrowExecutor(
 
     store.exceptions.add(exceptionInstance)
     val exceptionAddress = Address.Exception(store.exceptions.size - 1)
-    ControlThrowRefExecutor(
+    return ControlThrowRefExecutor(
         vstack = vstack,
         cstack = cstack,
         store = store,
-        context = context,
         ref = ReferenceValue.Exception(exceptionAddress).toLong(),
-        breakDispatcher = ::BrDispatcher,
-        throwRefDispatcher = ::ControlThrowRefDispatcher,
     )
 }
 
@@ -489,16 +230,12 @@ internal fun ThrowRefExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
-    context: ExecutionContext,
     instruction: ControlSuperInstruction.ThrowRefS,
 ) = ControlThrowRefExecutor(
     vstack = vstack,
     cstack = cstack,
     store = store,
-    context = context,
     ref = vstack.getFrameSlot(instruction.exceptionSlot),
-    breakDispatcher = ::BrDispatcher,
-    throwRefDispatcher = ::ControlThrowRefDispatcher,
 )
 
 private fun strictIndirectCall(
@@ -511,9 +248,10 @@ private fun strictIndirectCall(
     table: TableInstance,
     resultSlots: List<Int>,
     callFrameSlot: Int,
-) {
+    returnIp: Int,
+): Int {
     val functionInstance = strictResolveIndirectFunction(store, table, type, elementIndex)
-    strictInvokeFunction(
+    return strictInvokeFunction(
         vstack = vstack,
         cstack = cstack,
         store = store,
@@ -521,6 +259,7 @@ private fun strictIndirectCall(
         functionInstance = functionInstance,
         resultSlots = resultSlots,
         callFrameSlot = callFrameSlot,
+        returnIp = returnIp,
     )
 }
 
@@ -532,9 +271,10 @@ private fun strictReferenceCall(
     functionSlot: Int,
     resultSlots: List<Int>,
     callFrameSlot: Int,
-) {
+    returnIp: Int,
+): Int {
     val address = vstack.getFrameSlot(functionSlot).toFunctionAddress()
-    strictInvokeFunction(
+    return strictInvokeFunction(
         vstack = vstack,
         cstack = cstack,
         store = store,
@@ -542,6 +282,7 @@ private fun strictReferenceCall(
         functionInstance = store.function(address),
         resultSlots = resultSlots,
         callFrameSlot = callFrameSlot,
+        returnIp = returnIp,
     )
 }
 
@@ -554,9 +295,9 @@ private fun strictIndirectReturnCall(
     operands: List<ControlSuperInstruction.CallOperand>,
     type: RTT,
     table: TableInstance,
-) {
+): Int {
     val functionInstance = strictResolveIndirectFunction(store, table, type, elementIndex)
-    strictInvokeReturnFunction(
+    return strictInvokeReturnFunction(
         vstack = vstack,
         cstack = cstack,
         store = store,
@@ -573,9 +314,9 @@ private fun strictReferenceReturnCall(
     context: ExecutionContext,
     functionSlot: Int,
     operands: List<ControlSuperInstruction.CallOperand>,
-) {
+): Int {
     val address = vstack.getFrameSlot(functionSlot).toFunctionAddress()
-    strictInvokeReturnFunction(
+    return strictInvokeReturnFunction(
         vstack = vstack,
         cstack = cstack,
         store = store,
@@ -608,9 +349,10 @@ private fun strictInvokeFunction(
     functionInstance: FunctionInstance,
     resultSlots: List<Int>,
     callFrameSlot: Int,
-) {
-    when (functionInstance) {
-        is FunctionInstance.HostFunction -> HostFunctionCall(
+    returnIp: Int,
+): Int = when (functionInstance) {
+    is FunctionInstance.HostFunction -> {
+        HostFunctionCall(
             vstack = vstack,
             cstack = cstack,
             store = store,
@@ -619,16 +361,18 @@ private fun strictInvokeFunction(
             resultSlots = resultSlots,
             callFrameSlot = callFrameSlot,
         )
-        is FunctionInstance.WasmFunction -> WasmFunctionCall(
-            vstack = vstack,
-            cstack = cstack,
-            store = store,
-            context = context,
-            instance = functionInstance,
-            resultSlots = resultSlots,
-            callFrameSlot = callFrameSlot,
-        )
+        returnIp
     }
+    is FunctionInstance.WasmFunction -> WasmFunctionCall(
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
+        context = context,
+        instance = functionInstance,
+        resultSlots = resultSlots,
+        callFrameSlot = callFrameSlot,
+        returnIp = returnIp,
+    )
 }
 
 private fun strictInvokeReturnFunction(
@@ -638,68 +382,21 @@ private fun strictInvokeReturnFunction(
     context: ExecutionContext,
     functionInstance: FunctionInstance,
     operands: List<ControlSuperInstruction.CallOperand>,
-) {
-    when (functionInstance) {
-        is FunctionInstance.HostFunction -> ReturnHostFunctionCall(
-            vstack = vstack,
-            cstack = cstack,
-            store = store,
-            context = context,
-            function = functionInstance,
-            operands = operands,
-        )
-        is FunctionInstance.WasmFunction -> ReturnWasmFunctionCall(
-            vstack = vstack,
-            cstack = cstack,
-            store = store,
-            context = context,
-            instance = functionInstance,
-            operands = operands,
-        )
-    }
-}
-
-internal fun IfExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.IfI,
-) = IfExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = instruction.operand,
-    instructions = instruction.instructions,
-    blockExecutor = ::BlockExecutor,
-)
-
-internal fun IfExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: ControlSuperInstruction.IfS,
-) = IfExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    operand = vstack.getFrameSlot(instruction.operandSlot),
-    instructions = instruction.instructions,
-    blockExecutor = ::BlockExecutor,
-)
-
-internal inline fun IfExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    operand: Long,
-    instructions: Array<Array<DispatchableInstruction>>,
-    crossinline blockExecutor: BlockExecutor,
-) {
-    val branchIndex = ((operand or -operand) ushr 63).toInt()
-    blockExecutor(cstack, instructions[branchIndex])
+): Int = when (functionInstance) {
+    is FunctionInstance.HostFunction -> ReturnHostFunctionCall(
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
+        context = context,
+        function = functionInstance,
+        operands = operands,
+    )
+    is FunctionInstance.WasmFunction -> ReturnWasmFunctionCall(
+        vstack = vstack,
+        cstack = cstack,
+        store = store,
+        context = context,
+        instance = functionInstance,
+        operands = operands,
+    )
 }

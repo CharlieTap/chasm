@@ -1,16 +1,12 @@
 package io.github.charlietap.chasm.runtime.exception
 
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 
 data class ExceptionHandler(
-    var instructions: List<ControlInstruction.CatchHandler>,
-    var payloadDestinationSlots: List<List<Int>> = [],
-    var continuations: List<Array<DispatchableInstruction>> = [],
-    var continuationSource: List<DispatchableInstruction?>? = null,
-    var continuationOffsets: List<Int> = [],
+    val handlers: List<ControlInstruction.CatchHandler>,
+    val payloadDestinationSlots: List<List<Int>> = [],
+    val continuationIps: IntArray,
     val framesDepth: Int,
-    val instructionsDepth: Int,
-    val labelsDepth: Int,
     val framePointer: Int,
+    val valueDepth: Int,
 )

@@ -15,6 +15,7 @@ fun I32StoreDispatcher(
 internal inline fun I32StoreDispatcher(
     instruction: MemoryInstruction.I32Store,
     crossinline executor: Executor<MemoryInstruction.I32Store>,
-): DispatchableInstruction = { vstack, cstack, store, context ->
+): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
+    nextIp
 }
