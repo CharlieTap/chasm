@@ -21,30 +21,20 @@ fun unreachableRuntimeInstruction() = ControlInstruction.Unreachable
 fun nopRuntimeInstruction() = ControlInstruction.Nop
 
 fun blockRuntimeInstruction(
-    params: Int = 0,
-    results: Int = 0,
     instructions: Array<DispatchableInstruction> = emptyArray(),
 ) = ControlInstruction.Block(
-    params = params,
-    results = results,
     instructions = instructions,
 )
 
 fun loopRuntimeInstruction(
-    params: Int = 0,
     instructions: Array<DispatchableInstruction> = emptyArray(),
 ) = ControlInstruction.Loop(
-    params = params,
     instructions = instructions,
 )
 
 fun ifRuntimeInstruction(
-    params: Int = 0,
-    results: Int = 0,
     instructions: Array<Array<DispatchableInstruction>> = emptyArray(),
 ) = ControlInstruction.If(
-    params = params,
-    results = results,
     instructions = instructions,
 )
 

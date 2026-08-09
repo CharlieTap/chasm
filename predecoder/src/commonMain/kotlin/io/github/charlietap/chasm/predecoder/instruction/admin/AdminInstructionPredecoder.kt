@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.invoker.dispatch.Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotsDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndBlockDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PauseDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PauseIfDispatcher
@@ -13,7 +12,6 @@ import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.CopySlots
-import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.EndBlock
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.EndFunction
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.Pause
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction.PauseIf
@@ -26,7 +24,6 @@ internal fun AdminInstructionPredecoder(
         context = context,
         instruction = instruction,
         copySlotsDispatcher = ::CopySlotsDispatcher,
-        endBlockDispatcher = ::EndBlockDispatcher,
         endFunctionDispatcher = ::EndFunctionDispatcher,
         pauseInstructionDispatcher = ::PauseDispatcher,
         pauseIfInstructionDispatcher = ::PauseIfDispatcher,
@@ -36,7 +33,6 @@ internal inline fun AdminInstructionPredecoder(
     context: PredecodingContext,
     instruction: AdminInstruction,
     crossinline copySlotsDispatcher: Dispatcher<CopySlots>,
-    crossinline endBlockDispatcher: Dispatcher<EndBlock>,
     crossinline endFunctionDispatcher: Dispatcher<EndFunction>,
     crossinline pauseInstructionDispatcher: Dispatcher<Pause>,
     crossinline pauseIfInstructionDispatcher: Dispatcher<PauseIf>,
@@ -48,7 +44,6 @@ internal inline fun AdminInstructionPredecoder(
                 destinationSlots = instruction.destinationSlots,
             ),
         )
-        is AdminInstruction.EndBlock -> endBlockDispatcher(EndBlock)
         is AdminInstruction.EndFunction -> endFunctionDispatcher(EndFunction)
         is AdminInstruction.PushHandler -> error("push_handler requires instruction-sequence predecoding")
         is AdminInstruction.PopHandler -> error("pop_handler requires instruction-sequence predecoding")

@@ -14,88 +14,269 @@ internal fun JumpPass(
 ): Module =
     module.copy(
         functions = module.functions.map { function ->
-            if (!function.frameSlotMode) {
-                function
-            } else {
-                val loweredInstructions = JumpInstructionLowerer(function.body.instructions)
-                function.copy(
-                    body = Expression(
-                        instructions = loweredInstructions,
-                    ),
-                )
-            }
+            val loweredInstructions = JumpInstructionLowerer(function.body.instructions)
+            function.copy(
+                body = Expression(
+                    instructions = loweredInstructions,
+                ),
+            )
         },
     )
 
 private fun JumpInstructionLowerer(
     instructions: List<Instruction>,
-): List<Instruction> = JumpSequenceLowerer(
-    instructions = instructions,
-    suffix = functionSuffix(instructions),
-    handlers = ArrayDeque(),
-)
-
-private fun JumpSequenceLowerer(
-    instructions: List<Instruction>,
-    suffix: SequenceSuffix,
-    handlers: ArrayDeque<ActiveTryHandler>,
 ): List<Instruction> {
-    val lowerableInstructions = instructions.dropLast(suffix.dropCount)
-    val lowered = mutableListOf<Instruction>()
+    val hasRootLabel = instructions.lastOrNull() is AdminInstruction.EndFunction
+    val endExclusive = instructions.size - if (hasRootLabel) 1 else 0
+    val controlFlow = JumpControlFlowIndex(instructions, endExclusive)
+    val output = ArrayList<Instruction>(instructions.size)
     val labels = ArrayDeque<JumpLabel>()
+    val handlers = ArrayDeque<ActiveTryHandler>()
+    val work = ArrayDeque<JumpWork>()
 
-    if (suffix.hasRootLabel) {
+    if (hasRootLabel) {
         val functionLabel = JumpLabel(
             targetIndex = null,
             handlerDepth = handlers.size,
         )
         labels.addLast(functionLabel)
-        lowerInstructions(lowerableInstructions, lowered, labels, handlers)
-        labels.removeLast()
-        patchJumpHoles(lowered, functionLabel, lowered.size)
+        work.addLast(JumpWork.Range(0, endExclusive))
+        JumpWorkLowerer(
+            instructions = instructions,
+            controlFlow = controlFlow,
+            output = output,
+            labels = labels,
+            handlers = handlers,
+            work = work,
+        )
+        require(labels.removeLastOrNull() === functionLabel) {
+            "jump lowering left an invalid function label stack: $labels"
+        }
+        patchJumpHoles(output, functionLabel, output.size)
     } else {
-        lowerInstructions(lowerableInstructions, lowered, labels, handlers)
+        work.addLast(JumpWork.Range(0, endExclusive))
+        JumpWorkLowerer(
+            instructions = instructions,
+            controlFlow = controlFlow,
+            output = output,
+            labels = labels,
+            handlers = handlers,
+            work = work,
+        )
     }
 
-    lowered.addAll(suffix.instructions)
-    return lowered
+    require(labels.isEmpty() && handlers.isEmpty() && work.isEmpty()) {
+        "jump lowering left compiler control state: labels=$labels handlers=$handlers work=$work"
+    }
+    require(output.none(::isStructuredControlInstruction)) {
+        "jump lowering left a structured control instruction in its output"
+    }
+
+    if (hasRootLabel) {
+        output.add(AdminInstruction.EndFunction)
+    }
+    return output
 }
 
-private fun functionSuffix(
+private fun JumpWorkLowerer(
     instructions: List<Instruction>,
-): SequenceSuffix = when {
-    instructions.lastOrNull() is AdminInstruction.EndFunction ->
-        SequenceSuffix(
-            instructions = instructions.takeLast(1),
-            dropCount = 1,
-            hasRootLabel = true,
-        )
-    else -> SequenceSuffix()
-}
-
-private fun lowerInstructions(
-    instructions: List<Instruction>,
-    output: MutableList<Instruction>,
+    controlFlow: JumpControlFlow,
+    output: ArrayList<Instruction>,
     labels: ArrayDeque<JumpLabel>,
     handlers: ArrayDeque<ActiveTryHandler>,
+    work: ArrayDeque<JumpWork>,
 ) {
-    instructions.forEach { instruction ->
-        lowerInstruction(instruction, output, labels, handlers)
+    while (work.isNotEmpty()) {
+        when (val item = work.removeLast()) {
+            is JumpWork.Range -> JumpRangeLowerer(
+                range = item,
+                instructions = instructions,
+                controlFlow = controlFlow,
+                output = output,
+                labels = labels,
+                handlers = handlers,
+                work = work,
+            )
+            is JumpWork.CloseBlock -> {
+                require(labels.removeLastOrNull() === item.label) {
+                    "jump block label stack does not match its source structure"
+                }
+                patchJumpHoles(output, item.label, output.size)
+            }
+            is JumpWork.CloseLoop -> {
+                require(labels.removeLastOrNull() === item.label) {
+                    "jump loop label stack does not match its source structure"
+                }
+            }
+            is JumpWork.BeginThen -> {
+                item.state.jumpPastThenIndex = output.size
+                output.add(AdminInstruction.Jump(offset = UNPATCHED_OFFSET))
+                val thenStart = output.size
+                output[item.state.jumpToThenIndex] =
+                    (output[item.state.jumpToThenIndex] as AdminInstruction.JumpIf).copy(offset = thenStart)
+            }
+            is JumpWork.CloseIf -> {
+                require(labels.removeLastOrNull() === item.state.label) {
+                    "jump if label stack does not match its source structure"
+                }
+                val endIndex = output.size
+                val jumpPastThenIndex = item.state.jumpPastThenIndex
+                require(jumpPastThenIndex >= 0) {
+                    "jump if lowering did not emit its then-arm jump"
+                }
+                output[jumpPastThenIndex] =
+                    (output[jumpPastThenIndex] as AdminInstruction.Jump).copy(offset = endIndex)
+                patchJumpHoles(output, item.state.label, endIndex)
+            }
+            is JumpWork.CloseTryTable -> {
+                require(handlers.removeLastOrNull() === ActiveTryHandler) {
+                    "jump try-table handler stack does not match its source structure"
+                }
+                require(labels.removeLastOrNull() === item.label) {
+                    "jump try-table label stack does not match its source structure"
+                }
+
+                val popHandlerIndex = output.size
+                output[item.pushHandlerIndex] =
+                    (output[item.pushHandlerIndex] as AdminInstruction.PushHandler).copy(
+                        endOffset = popHandlerIndex,
+                    )
+                patchJumpHoles(output, item.label, popHandlerIndex)
+                output.add(AdminInstruction.PopHandler)
+            }
+        }
     }
 }
 
-private fun lowerInstruction(
+private fun JumpRangeLowerer(
+    range: JumpWork.Range,
+    instructions: List<Instruction>,
+    controlFlow: JumpControlFlow,
+    output: ArrayList<Instruction>,
+    labels: ArrayDeque<JumpLabel>,
+    handlers: ArrayDeque<ActiveTryHandler>,
+    work: ArrayDeque<JumpWork>,
+) {
+    var index = range.start
+    while (index < range.endExclusive) {
+        val instruction = instructions[index]
+        if (isStructuredControlOpener(instruction)) {
+            val endIndex = controlFlow.endIndices[index]
+            require(endIndex in (index + 1) until range.endExclusive) {
+                "jump control range does not contain its end: index=$index end=$endIndex range=$range"
+            }
+
+            if (endIndex + 1 < range.endExclusive) {
+                work.addLast(JumpWork.Range(endIndex + 1, range.endExclusive))
+            }
+            JumpControlEnterLowerer(
+                sourceIndex = index,
+                instruction = instruction,
+                endIndex = endIndex,
+                controlFlow = controlFlow,
+                output = output,
+                labels = labels,
+                handlers = handlers,
+                work = work,
+            )
+            return
+        }
+
+        require(instruction !is ControlInstruction.Else && instruction !is ControlInstruction.End) {
+            "jump lowering encountered an unindexed control marker at $index: $instruction"
+        }
+        JumpInstructionLowerer(instruction, output, labels, handlers)
+        index++
+    }
+}
+
+private fun JumpControlEnterLowerer(
+    sourceIndex: Int,
+    instruction: Instruction,
+    endIndex: Int,
+    controlFlow: JumpControlFlow,
+    output: ArrayList<Instruction>,
+    labels: ArrayDeque<JumpLabel>,
+    handlers: ArrayDeque<ActiveTryHandler>,
+    work: ArrayDeque<JumpWork>,
+) {
+    when (instruction) {
+        is ControlInstruction.Block -> {
+            val label = JumpLabel(targetIndex = null, handlerDepth = handlers.size)
+            labels.addLast(label)
+            work.addLast(JumpWork.CloseBlock(label))
+            work.addLast(JumpWork.Range(sourceIndex + 1, endIndex))
+        }
+        is ControlInstruction.Loop -> {
+            val label = JumpLabel(targetIndex = output.size, handlerDepth = handlers.size)
+            labels.addLast(label)
+            work.addLast(JumpWork.CloseLoop(label))
+            work.addLast(JumpWork.Range(sourceIndex + 1, endIndex))
+        }
+        is ControlSuperInstruction.If -> {
+            val label = JumpLabel(targetIndex = null, handlerDepth = handlers.size)
+            labels.addLast(label)
+            val state = JumpIfState(
+                label = label,
+                jumpToThenIndex = output.size,
+            )
+            output.add(
+                AdminInstruction.JumpIf(
+                    operand = instruction.operand,
+                    offset = UNPATCHED_OFFSET,
+                ),
+            )
+
+            val elseIndex = controlFlow.elseIndices[sourceIndex]
+            val thenEnd = if (elseIndex >= 0) elseIndex else endIndex
+            val elseStart = if (elseIndex >= 0) elseIndex + 1 else endIndex
+            work.addLast(JumpWork.CloseIf(state))
+            work.addLast(JumpWork.Range(sourceIndex + 1, thenEnd))
+            work.addLast(JumpWork.BeginThen(state))
+            work.addLast(JumpWork.Range(elseStart, endIndex))
+        }
+        is ControlInstruction.TryTable -> {
+            val pushHandlerIndex = output.size
+            output.add(
+                AdminInstruction.PushHandler(
+                    handlers = instruction.handlers,
+                    offsets = instruction.handlers.map { handler ->
+                        jumpTarget(labels, handler.labelIndex).targetIndex ?: UNPATCHED_OFFSET
+                    },
+                    payloadDestinationSlots = instruction.payloadDestinationSlots,
+                    endOffset = UNPATCHED_OFFSET,
+                ),
+            )
+            instruction.handlers.forEachIndexed { handlerIndex, handler ->
+                val target = jumpTarget(labels, handler.labelIndex)
+                if (target.targetIndex == null) {
+                    target.holes.add(
+                        HandlerTargetHole(
+                            instructionIndex = pushHandlerIndex,
+                            handlerIndex = handlerIndex,
+                        ),
+                    )
+                }
+            }
+
+            val label = JumpLabel(targetIndex = null, handlerDepth = handlers.size + 1)
+            labels.addLast(label)
+            handlers.addLast(ActiveTryHandler)
+            work.addLast(JumpWork.CloseTryTable(label, pushHandlerIndex))
+            work.addLast(JumpWork.Range(sourceIndex + 1, endIndex))
+        }
+        is ControlInstruction.If -> error("raw if reached jump lowering: $instruction")
+        else -> error("unsupported jump control opener: $instruction")
+    }
+}
+
+private fun JumpInstructionLowerer(
     instruction: Instruction,
     output: MutableList<Instruction>,
     labels: ArrayDeque<JumpLabel>,
     handlers: ArrayDeque<ActiveTryHandler>,
 ) {
     when (instruction) {
-        is AdminInstruction.EndBlock -> Unit
-        is ControlInstruction.TryTable -> lowerTryTable(instruction, output, labels, handlers)
-        is ControlInstruction.Block -> lowerBlock(instruction.instructions, output, labels, handlers)
-        is ControlInstruction.Loop -> lowerLoop(instruction.instructions, output, labels, handlers)
-        is ControlSuperInstruction.If -> lowerIf(instruction, output, labels, handlers)
         is ControlInstruction.Br -> lowerJump(
             target = jumpTarget(labels, instruction.labelIndex),
             currentHandlerDepth = handlers.size,
@@ -141,119 +322,91 @@ private fun lowerInstruction(
     }
 }
 
-private fun lowerBlock(
+private fun JumpControlFlowIndex(
     instructions: List<Instruction>,
-    output: MutableList<Instruction>,
-    labels: ArrayDeque<JumpLabel>,
-    handlers: ArrayDeque<ActiveTryHandler>,
-) {
-    val label = JumpLabel(
-        targetIndex = null,
-        handlerDepth = handlers.size,
-    )
-    labels.addLast(label)
-    lowerInstructions(instructions, output, labels, handlers)
-    labels.removeLast()
-    patchJumpHoles(output, label, output.size)
-}
+    endExclusive: Int,
+): JumpControlFlow {
+    val endIndices = IntArray(instructions.size) { -1 }
+    val elseIndices = IntArray(instructions.size) { -1 }
+    val openers = ArrayDeque<Int>()
 
-private fun lowerLoop(
-    instructions: List<Instruction>,
-    output: MutableList<Instruction>,
-    labels: ArrayDeque<JumpLabel>,
-    handlers: ArrayDeque<ActiveTryHandler>,
-) {
-    val label = JumpLabel(
-        targetIndex = output.size,
-        handlerDepth = handlers.size,
-    )
-    labels.addLast(label)
-    lowerInstructions(instructions, output, labels, handlers)
-    labels.removeLast()
-}
-
-private fun lowerIf(
-    instruction: ControlSuperInstruction.If,
-    output: MutableList<Instruction>,
-    labels: ArrayDeque<JumpLabel>,
-    handlers: ArrayDeque<ActiveTryHandler>,
-) {
-    val label = JumpLabel(
-        targetIndex = null,
-        handlerDepth = handlers.size,
-    )
-    labels.addLast(label)
-
-    val jumpToThenIndex = output.size
-    output.add(
-        AdminInstruction.JumpIf(
-            operand = instruction.operand,
-            offset = UNPATCHED_OFFSET,
-        ),
-    )
-
-    lowerInstructions(instruction.elseInstructions.orEmpty(), output, labels, handlers)
-
-    val jumpPastThenIndex = output.size
-    output.add(AdminInstruction.Jump(offset = UNPATCHED_OFFSET))
-
-    val thenStart = output.size
-    output[jumpToThenIndex] = (output[jumpToThenIndex] as AdminInstruction.JumpIf).copy(offset = thenStart)
-
-    lowerInstructions(instruction.thenInstructions, output, labels, handlers)
-
-    labels.removeLast()
-    val endIndex = output.size
-    output[jumpPastThenIndex] = (output[jumpPastThenIndex] as AdminInstruction.Jump).copy(offset = endIndex)
-    patchJumpHoles(output, label, endIndex)
-}
-
-private fun lowerTryTable(
-    instruction: ControlInstruction.TryTable,
-    output: MutableList<Instruction>,
-    labels: ArrayDeque<JumpLabel>,
-    handlers: ArrayDeque<ActiveTryHandler>,
-) {
-    val pushHandlerInstructionIndex = output.size
-    output.add(
-        AdminInstruction.PushHandler(
-            handlers = instruction.handlers,
-            offsets = instruction.handlers.map { handler ->
-                jumpTarget(labels, handler.labelIndex).targetIndex ?: UNPATCHED_OFFSET
-            },
-            payloadDestinationSlots = instruction.payloadDestinationSlots,
-            endOffset = UNPATCHED_OFFSET,
-        ),
-    )
-
-    instruction.handlers.forEachIndexed { handlerIndex, handler ->
-        val target = jumpTarget(labels, handler.labelIndex)
-        if (target.targetIndex == null) {
-            target.holes.add(
-                HandlerTargetHole(
-                    instructionIndex = pushHandlerInstructionIndex,
-                    handlerIndex = handlerIndex,
-                ),
-            )
+    repeat(endExclusive) { index ->
+        val instruction = instructions[index]
+        when {
+            isStructuredControlOpener(instruction) -> openers.addLast(index)
+            instruction is ControlInstruction.Else -> {
+                val openerIndex = openers.lastOrNull()
+                    ?: error("jump control index found else without an opener at $index")
+                require(instructions[openerIndex] is ControlSuperInstruction.If) {
+                    "jump control index found else outside an if at $index"
+                }
+                require(elseIndices[openerIndex] < 0) {
+                    "jump control index found duplicate else at $index"
+                }
+                elseIndices[openerIndex] = index
+            }
+            instruction is ControlInstruction.End -> {
+                require(instruction.count == 1) {
+                    "jump lowering requires frame-slot-normalized End(1), found $instruction at $index"
+                }
+                val openerIndex = openers.removeLastOrNull()
+                    ?: error("jump control index found end without an opener at $index")
+                endIndices[openerIndex] = index
+            }
         }
     }
 
-    val label = JumpLabel(
-        targetIndex = null,
-        handlerDepth = handlers.size + 1,
-    )
-    labels.addLast(label)
-    handlers.addLast(ActiveTryHandler)
-    lowerInstructions(instruction.instructions, output, labels, handlers)
-    handlers.removeLast()
-    labels.removeLast()
+    require(openers.isEmpty()) {
+        "jump control index found unclosed openers: $openers"
+    }
+    return JumpControlFlow(endIndices, elseIndices)
+}
 
-    val popHandlerIndex = output.size
-    output[pushHandlerInstructionIndex] = (output[pushHandlerInstructionIndex] as AdminInstruction.PushHandler).copy(
-        endOffset = popHandlerIndex,
-    )
-    patchJumpHoles(output, label, popHandlerIndex)
-    output.add(AdminInstruction.PopHandler)
+private fun isStructuredControlOpener(instruction: Instruction): Boolean = when (instruction) {
+    is ControlInstruction.Block,
+    is ControlInstruction.Loop,
+    is ControlInstruction.If,
+    is ControlInstruction.TryTable,
+    is ControlSuperInstruction.If,
+    -> true
+    else -> false
+}
+
+private fun isStructuredControlInstruction(instruction: Instruction): Boolean =
+    isStructuredControlOpener(instruction) ||
+        instruction is ControlInstruction.Else ||
+        instruction is ControlInstruction.End
+
+private data class JumpControlFlow(
+    val endIndices: IntArray,
+    val elseIndices: IntArray,
+)
+
+private data class JumpIfState(
+    val label: JumpLabel,
+    val jumpToThenIndex: Int,
+    var jumpPastThenIndex: Int = -1,
+)
+
+private sealed interface JumpWork {
+
+    data class Range(
+        val start: Int,
+        val endExclusive: Int,
+    ) : JumpWork
+
+    data class CloseBlock(val label: JumpLabel) : JumpWork
+
+    data class CloseLoop(val label: JumpLabel) : JumpWork
+
+    data class BeginThen(val state: JumpIfState) : JumpWork
+
+    data class CloseIf(val state: JumpIfState) : JumpWork
+
+    data class CloseTryTable(
+        val label: JumpLabel,
+        val pushHandlerIndex: Int,
+    ) : JumpWork
 }
 
 private fun lowerJump(
@@ -487,12 +640,6 @@ private data class JumpLabel(
 )
 
 private data object ActiveTryHandler
-
-private data class SequenceSuffix(
-    val instructions: List<Instruction> = [],
-    val dropCount: Int = 0,
-    val hasRootLabel: Boolean = false,
-)
 
 private sealed interface JumpHole {
     val instructionIndex: Int

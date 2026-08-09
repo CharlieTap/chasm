@@ -203,9 +203,7 @@ internal fun ConstantExpressionEvaluator(
                     }
                 }
             }
-            is AdminInstruction.EndBlock,
-            is AdminInstruction.EndFunction,
-            -> break
+            is AdminInstruction.EndFunction -> break
 
             else -> continue
         }

@@ -25,6 +25,8 @@ internal fun ControlInstructionValidator(
         callValidator = ::CallInstructionValidator,
         callIndirectValidator = ::CallIndirectValidator,
         callRefValidator = ::CallRefInstructionValidator,
+        elseValidator = ::ElseInstructionValidator,
+        endValidator = ::EndInstructionValidator,
         ifValidator = ::IfInstructionValidator,
         throwValidator = ::ThrowInstructionValidator,
         throwRefValidator = ::ThrowRefInstructionValidator,
@@ -51,6 +53,8 @@ internal inline fun ControlInstructionValidator(
     crossinline callValidator: ModuleValidator<ControlInstruction.Call>,
     crossinline callIndirectValidator: ModuleValidator<ControlInstruction.CallIndirect>,
     crossinline callRefValidator: ModuleValidator<ControlInstruction.CallRef>,
+    crossinline elseValidator: ModuleValidator<ControlInstruction.Else>,
+    crossinline endValidator: ModuleValidator<ControlInstruction.End>,
     crossinline ifValidator: ModuleValidator<ControlInstruction.If>,
     crossinline throwValidator: ModuleValidator<ControlInstruction.Throw>,
     crossinline throwRefValidator: ModuleValidator<ControlInstruction.ThrowRef>,
@@ -74,6 +78,8 @@ internal inline fun ControlInstructionValidator(
         is ControlInstruction.Call -> callValidator(context, instruction)
         is ControlInstruction.CallIndirect -> callIndirectValidator(context, instruction)
         is ControlInstruction.CallRef -> callRefValidator(context, instruction)
+        is ControlInstruction.Else -> elseValidator(context, instruction)
+        is ControlInstruction.End -> endValidator(context, instruction)
         is ControlInstruction.If -> ifValidator(context, instruction)
         is ControlInstruction.Loop -> loopValidator(context, instruction)
         is ControlInstruction.Nop -> Ok(Unit)

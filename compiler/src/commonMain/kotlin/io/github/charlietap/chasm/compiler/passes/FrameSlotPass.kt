@@ -50,7 +50,7 @@ private fun FrameSlotFunctionLowerer(
     val functionType = context.module.definedTypes
         .getOrNull(function.typeIndex.idx)
         ?.functionType()
-        ?: return function
+        ?: error("function type ${function.typeIndex.idx} is unavailable during frame-slot lowering")
 
     val layout = FrameSlotFunctionLayout(
         functionType = functionType,
@@ -76,11 +76,6 @@ private fun FrameSlotFunctionLowerer(
         addLast(rootLabel)
     }
     val loweredInstructions = FrameSlotExpressionLowerer(context, function.body.instructions, state, labels)
-        ?: error(
-            "frame-slot lowering failed before expression completed: " +
-                "typeIndex=${function.typeIndex.idx} locals=${function.locals.size} " +
-                "instructions=${function.body.instructions}",
-        )
 
     val validLabelState = if (state.reachable) {
         labels.isEmpty() || (labels.size == 1 && labels.first() === rootLabel)
@@ -126,7 +121,6 @@ private fun FrameSlotFunctionLowerer(
     return function.copy(
         body = Expression(finalizedInstructions),
         frameSlots = allocator.maxSlotExclusive,
-        frameSlotMode = true,
         returnSlots = layout.returnSlots,
     )
 }
@@ -240,7 +234,6 @@ private data class FrameSlotState(
 
 private fun FrameSlotForkState(
     state: FrameSlotState,
-    reachable: Boolean = state.reachable,
 ): FrameSlotState {
     val clonedStack = state.stack.map { operand ->
         FrameSlotStackOperand(
@@ -254,7 +247,7 @@ private fun FrameSlotForkState(
         layout = state.layout,
         allocator = state.allocator,
         stack = clonedStack,
-        reachable = reachable,
+        reachable = state.reachable,
     )
     clonedStack.forEach { operand ->
         clonedState.trackLocalAlias(operand)
@@ -262,9 +255,7 @@ private fun FrameSlotForkState(
     return clonedState
 }
 
-private fun FrameSlotState.rewindTemporaryAllocator(
-    labels: ArrayDeque<LabelContext> = ArrayDeque(),
-) {
+private fun FrameSlotState.rewindTemporaryAllocator() {
     allocator.rewindToReferencedSlots(
         referencedSlots = stack.map(FrameSlotStackOperand::reservedSlot),
     )
@@ -303,47 +294,553 @@ private data class LabelContext(
     var reachedByBranch: Boolean = false,
 )
 
+private enum class ControlKind {
+    Block,
+    Loop,
+    IfThen,
+    IfElse,
+    TryTable,
+}
+
+private sealed interface FrameSlotControlFrame {
+
+    data class Structured(
+        val kind: ControlKind,
+        val label: LabelContext,
+        val entryStackPrefix: List<FrameSlotStackOperand>,
+    ) : FrameSlotControlFrame
+
+    data class If(
+        var kind: ControlKind,
+        var label: LabelContext,
+        val entryStackPrefix: List<FrameSlotStackOperand>,
+        val elseEntryState: FrameSlotState,
+        val entryTemporaryHeight: Int,
+        var thenState: FrameSlotState? = null,
+        var thenTail: MutableList<Instruction>? = null,
+    ) : FrameSlotControlFrame
+
+    data class Inert(
+        var kind: ControlKind,
+    ) : FrameSlotControlFrame
+}
+
+private class FrameSlotInstructionBuffer {
+
+    private val segments = mutableListOf(mutableListOf<Instruction>())
+
+    val currentSegment: MutableList<Instruction>
+        get() = segments.last()
+
+    fun add(instruction: Instruction) {
+        currentSegment.add(instruction)
+    }
+
+    fun addAll(instructions: Iterable<Instruction>) {
+        currentSegment.addAll(instructions)
+    }
+
+    fun nextSegment() {
+        segments.add(mutableListOf())
+    }
+
+    fun build(): List<Instruction> {
+        val size = segments.sumOf(List<Instruction>::size)
+        return buildList(size) {
+            segments.forEach(::addAll)
+        }
+    }
+}
+
 private fun FrameSlotExpressionLowerer(
     context: PassContext,
     instructions: List<Instruction>,
     state: FrameSlotState,
     labels: ArrayDeque<LabelContext>,
-): List<Instruction>? {
-    val lowered = ArrayList<Instruction>(instructions.size)
+): List<Instruction> {
+    val output = FrameSlotInstructionBuffer()
+    val controls = ArrayDeque<FrameSlotControlFrame>()
 
-    for ((index, instruction) in instructions.withIndex()) {
-        if (!state.reachable) {
-            lowered.addAll(
-                FrameSlotUnreachableInstructionsLowerer(
-                    context = context,
-                    instructions = instructions.subList(index, instructions.size),
-                    state = state,
-                ),
-            )
-            break
-        }
-
-        val loweredInstructions = FrameSlotInstructionLowerer(context, instruction, state, labels)
-            ?: error(
-                "frame-slot instruction lowering failed: instruction=$instruction " +
-                    "state=$state labels=$labels",
-            )
-        lowered += loweredInstructions
-        state.rewindTemporaryAllocator(labels)
-    }
-
-    return lowered
-}
-
-private fun FrameSlotUnreachableInstructionsLowerer(
-    context: PassContext,
-    instructions: List<Instruction>,
-    state: FrameSlotState,
-): List<Instruction> = buildList {
     instructions.forEach { instruction ->
-        addAll(FrameSlotUnreachableInstructionLowerer(context, instruction, state))
+        when (instruction) {
+            is ControlInstruction.Block -> FrameSlotControlEnterLowerer(
+                context = context,
+                kind = ControlKind.Block,
+                blockType = instruction.blockType,
+                instruction = instruction,
+                state = state,
+                labels = labels,
+                controls = controls,
+                output = output,
+            )
+            is ControlInstruction.Loop -> FrameSlotControlEnterLowerer(
+                context = context,
+                kind = ControlKind.Loop,
+                blockType = instruction.blockType,
+                instruction = instruction,
+                state = state,
+                labels = labels,
+                controls = controls,
+                output = output,
+            )
+            is ControlInstruction.TryTable -> FrameSlotTryTableEnterLowerer(
+                context = context,
+                instruction = instruction,
+                state = state,
+                labels = labels,
+                controls = controls,
+                output = output,
+            )
+            is ControlInstruction.If -> FrameSlotIfEnterLowerer(
+                context = context,
+                operand = FusedOperand.ValueStack,
+                blockType = instruction.blockType,
+                state = state,
+                labels = labels,
+                controls = controls,
+                output = output,
+            )
+            is ControlSuperInstruction.If -> FrameSlotIfEnterLowerer(
+                context = context,
+                operand = instruction.operand,
+                blockType = instruction.blockType,
+                state = state,
+                labels = labels,
+                controls = controls,
+                output = output,
+            )
+            ControlInstruction.Else -> FrameSlotElseLowerer(
+                state = state,
+                labels = labels,
+                controls = controls,
+                output = output,
+            )
+            is ControlInstruction.End -> repeat(instruction.count) {
+                FrameSlotEndLowerer(
+                    state = state,
+                    labels = labels,
+                    controls = controls,
+                    output = output,
+                )
+            }
+            else -> {
+                val loweredInstructions = if (state.reachable) {
+                    FrameSlotInstructionLowerer(context, instruction, state, labels)
+                } else {
+                    FrameSlotUnreachableInstructionLowerer(context, instruction, state)
+                } ?: error(
+                    "frame-slot instruction lowering failed: instruction=$instruction " +
+                        "state=$state labels=$labels controls=$controls",
+                )
+                output.addAll(loweredInstructions)
+            }
+        }
         state.rewindTemporaryAllocator()
     }
+
+    if (controls.isNotEmpty()) {
+        error("frame-slot lowering ended with unclosed controls: $controls")
+    }
+
+    return output.build()
+}
+
+private fun FrameSlotControlEnterLowerer(
+    context: PassContext,
+    kind: ControlKind,
+    blockType: BlockType,
+    instruction: Instruction,
+    state: FrameSlotState,
+    labels: ArrayDeque<LabelContext>,
+    controls: ArrayDeque<FrameSlotControlFrame>,
+    output: FrameSlotInstructionBuffer,
+) {
+    if (!state.reachable) {
+        controls.addLast(FrameSlotControlFrame.Inert(kind))
+        output.add(instruction)
+        return
+    }
+
+    val functionType = context.blockType(blockType)
+        ?: error("frame-slot control type is unavailable: $blockType")
+    val baseHeight = state.stack.size - functionType.params.types.size
+    require(baseHeight >= 0) {
+        "frame-slot control has insufficient parameters: instruction=$instruction state=$state"
+    }
+
+    val resultSlots = state.resultRegionSlots(baseHeight, functionType.results.types.size)
+    val labelKind = when (kind) {
+        ControlKind.Block,
+        ControlKind.TryTable,
+        -> LabelKind.Block
+        ControlKind.Loop -> LabelKind.Loop
+        ControlKind.IfThen,
+        ControlKind.IfElse,
+        -> error("if controls use FrameSlotIfEnterLowerer")
+    }
+    val branchSlots = when (labelKind) {
+        LabelKind.Block -> resultSlots
+        LabelKind.Loop -> state.stack.takeLast(functionType.params.types.size)
+            .map(FrameSlotStackOperand::reservedSlot)
+    }
+    val label = LabelContext(
+        kind = labelKind,
+        baseHeight = baseHeight,
+        branchSlots = branchSlots,
+        fallthroughSlots = resultSlots,
+        branchTypes = when (labelKind) {
+            LabelKind.Block -> functionType.results.types
+            LabelKind.Loop -> functionType.params.types
+        },
+        fallthroughTypes = functionType.results.types,
+    )
+    val entryMaterializations = FrameSlotMaterializeLiveOperandsBelowControlInputs(
+        state = state,
+        controlInputCount = functionType.params.types.size,
+    )
+    val entryStackPrefix = FrameSlotStackSnapshot(state.stack, baseHeight)
+    val loopParamMaterializations = if (labelKind == LabelKind.Loop && functionType.params.types.isNotEmpty()) {
+        FrameSlotMaterializeOperands(
+            operands = state.stack.takeLast(functionType.params.types.size),
+            state = state,
+        ).first
+    } else {
+        emptyList()
+    }
+
+    output.addAll(entryMaterializations)
+    output.addAll(loopParamMaterializations)
+    output.add(instruction)
+    labels.addLast(label)
+    controls.addLast(
+        FrameSlotControlFrame.Structured(
+            kind = kind,
+            label = label,
+            entryStackPrefix = entryStackPrefix,
+        ),
+    )
+}
+
+private fun FrameSlotTryTableEnterLowerer(
+    context: PassContext,
+    instruction: ControlInstruction.TryTable,
+    state: FrameSlotState,
+    labels: ArrayDeque<LabelContext>,
+    controls: ArrayDeque<FrameSlotControlFrame>,
+    output: FrameSlotInstructionBuffer,
+) {
+    if (!state.reachable) {
+        controls.addLast(FrameSlotControlFrame.Inert(ControlKind.TryTable))
+        output.add(instruction)
+        return
+    }
+
+    val payloadDestinationSlots = instruction.handlers.map { handler ->
+        val target = FrameSlotTargetLabel(labels, handler.labelIndex)
+            ?: error("frame-slot try handler target is unavailable: $handler")
+        val payloadArity = context.catchHandlerPayloadArity(handler)
+            ?: error("frame-slot try handler payload type is unavailable: $handler")
+        require(target.branchSlots.size == payloadArity) {
+            "frame-slot try handler payload arity does not match its target: handler=$handler target=$target"
+        }
+        target.reachedByBranch = true
+        target.branchSlots
+    }
+
+    FrameSlotControlEnterLowerer(
+        context = context,
+        kind = ControlKind.TryTable,
+        blockType = instruction.blockType,
+        instruction = instruction.copy(payloadDestinationSlots = payloadDestinationSlots),
+        state = state,
+        labels = labels,
+        controls = controls,
+        output = output,
+    )
+}
+
+private fun FrameSlotIfEnterLowerer(
+    context: PassContext,
+    operand: FusedOperand,
+    blockType: BlockType,
+    state: FrameSlotState,
+    labels: ArrayDeque<LabelContext>,
+    controls: ArrayDeque<FrameSlotControlFrame>,
+    output: FrameSlotInstructionBuffer,
+) {
+    if (!state.reachable) {
+        controls.addLast(FrameSlotControlFrame.Inert(ControlKind.IfThen))
+        output.add(
+            ControlSuperInstruction.If(
+                operand = FrameSlotUnreachableIfOperand(operand, state),
+                blockType = blockType,
+            ),
+        )
+        return
+    }
+
+    val splitMaterializations = FrameSlotMaterializeLiveOperandsBelowControlInputs(
+        state = state,
+        controlInputCount = if (operand == FusedOperand.ValueStack) 1 else 0,
+    )
+    val loweredOperand = FrameSlotOperandLowerer(operand, state)
+        ?: error("frame-slot if condition lowering failed: operand=$operand state=$state")
+    val functionType = context.blockType(blockType)
+        ?: error("frame-slot if type is unavailable: $blockType")
+    val baseHeight = state.stack.size - functionType.params.types.size
+    require(baseHeight >= 0) {
+        "frame-slot if has insufficient parameters: blockType=$blockType state=$state"
+    }
+
+    val resultSlots = state.resultRegionSlots(baseHeight, functionType.results.types.size)
+    val entryStackPrefix = FrameSlotStackSnapshot(state.stack, baseHeight)
+    val label = FrameSlotIfLabel(
+        baseHeight = baseHeight,
+        resultSlots = resultSlots,
+        resultTypes = functionType.results.types,
+    )
+
+    output.addAll(splitMaterializations)
+    output.add(
+        ControlSuperInstruction.If(
+            operand = loweredOperand.lowered,
+            blockType = blockType,
+        ),
+    )
+    labels.addLast(label)
+    controls.addLast(
+        FrameSlotControlFrame.If(
+            kind = ControlKind.IfThen,
+            label = label,
+            entryStackPrefix = entryStackPrefix,
+            elseEntryState = FrameSlotForkState(state),
+            entryTemporaryHeight = state.allocator.temporaryHeightSnapshot(),
+        ),
+    )
+}
+
+private fun FrameSlotUnreachableIfOperand(
+    operand: FusedOperand,
+    state: FrameSlotState,
+): FusedOperand = if (operand == FusedOperand.ValueStack) {
+    FusedOperand.I32Const(0)
+} else {
+    FrameSlotOperandLowerer(operand, state)?.lowered ?: FusedOperand.I32Const(0)
+}
+
+private fun FrameSlotElseLowerer(
+    state: FrameSlotState,
+    labels: ArrayDeque<LabelContext>,
+    controls: ArrayDeque<FrameSlotControlFrame>,
+    output: FrameSlotInstructionBuffer,
+) {
+    when (val frame = controls.lastOrNull()) {
+        is FrameSlotControlFrame.If -> FrameSlotIfElseLowerer(
+            frame = frame,
+            state = state,
+            labels = labels,
+            output = output,
+        )
+        is FrameSlotControlFrame.Inert -> {
+            require(frame.kind == ControlKind.IfThen) {
+                "frame-slot else does not match an if: frame=$frame"
+            }
+            frame.kind = ControlKind.IfElse
+            output.add(ControlInstruction.Else)
+        }
+        else -> error("frame-slot else does not match an if: controls=$controls")
+    }
+}
+
+private fun FrameSlotIfElseLowerer(
+    frame: FrameSlotControlFrame.If,
+    state: FrameSlotState,
+    labels: ArrayDeque<LabelContext>,
+    output: FrameSlotInstructionBuffer,
+) {
+    require(frame.kind == ControlKind.IfThen) {
+        "frame-slot else does not match an if-then frame: $frame"
+    }
+
+    FrameSlotControlLabelFinalizer(
+        state = state,
+        labels = labels,
+        label = frame.label,
+        entryStackPrefix = frame.entryStackPrefix,
+        branchToCurrentContinues = true,
+        output = output,
+    )
+    frame.thenState = FrameSlotForkState(state)
+    frame.thenTail = output.currentSegment
+
+    FrameSlotStateRestore(state, frame.elseEntryState)
+    state.allocator.restoreTemporaryHeight(frame.entryTemporaryHeight)
+
+    val elseLabel = FrameSlotIfLabel(
+        baseHeight = frame.label.baseHeight,
+        resultSlots = frame.label.fallthroughSlots,
+        resultTypes = frame.label.fallthroughTypes,
+    )
+    frame.kind = ControlKind.IfElse
+    frame.label = elseLabel
+    labels.addLast(elseLabel)
+
+    output.nextSegment()
+    output.add(ControlInstruction.Else)
+    output.nextSegment()
+}
+
+private fun FrameSlotEndLowerer(
+    state: FrameSlotState,
+    labels: ArrayDeque<LabelContext>,
+    controls: ArrayDeque<FrameSlotControlFrame>,
+    output: FrameSlotInstructionBuffer,
+) {
+    when (val frame = controls.removeLastOrNull()) {
+        is FrameSlotControlFrame.Structured -> {
+            FrameSlotControlLabelFinalizer(
+                state = state,
+                labels = labels,
+                label = frame.label,
+                entryStackPrefix = frame.entryStackPrefix,
+                branchToCurrentContinues = frame.kind != ControlKind.Loop,
+                output = output,
+            )
+            output.add(ControlInstruction.End(1))
+        }
+        is FrameSlotControlFrame.If -> {
+            if (frame.kind == ControlKind.IfThen) {
+                FrameSlotIfElseLowerer(
+                    frame = frame,
+                    state = state,
+                    labels = labels,
+                    output = output,
+                )
+            }
+            FrameSlotIfEndLowerer(
+                frame = frame,
+                state = state,
+                labels = labels,
+                output = output,
+            )
+        }
+        is FrameSlotControlFrame.Inert -> output.add(ControlInstruction.End(1))
+        null -> error("frame-slot end does not match an open control")
+    }
+}
+
+private fun FrameSlotIfEndLowerer(
+    frame: FrameSlotControlFrame.If,
+    state: FrameSlotState,
+    labels: ArrayDeque<LabelContext>,
+    output: FrameSlotInstructionBuffer,
+) {
+    require(frame.kind == ControlKind.IfElse) {
+        "frame-slot if end encountered before else transition: $frame"
+    }
+
+    FrameSlotControlLabelFinalizer(
+        state = state,
+        labels = labels,
+        label = frame.label,
+        entryStackPrefix = frame.entryStackPrefix,
+        branchToCurrentContinues = true,
+        output = output,
+    )
+
+    val thenState = checkNotNull(frame.thenState) {
+        "frame-slot if end is missing its then state"
+    }
+    val thenTail = checkNotNull(frame.thenTail) {
+        "frame-slot if end is missing its then output tail"
+    }
+    val (thenMaterializations, elseMaterializations) = FrameSlotCanonicalizeMatchingStacks(
+        thenState = thenState,
+        elseState = state,
+    )
+    thenTail.addAll(thenMaterializations)
+    output.addAll(elseMaterializations)
+
+    when {
+        thenState.reachable && state.reachable -> {
+            require(thenState.stack == state.stack) {
+                "frame-slot if arms produced different stacks: then=${thenState.stack} else=${state.stack}"
+            }
+        }
+        thenState.reachable -> FrameSlotStateRestore(state, thenState)
+        state.reachable -> Unit
+        else -> {
+            state.stack.clear()
+            state.rebuildLocalAliases()
+        }
+    }
+
+    output.add(ControlInstruction.End(1))
+}
+
+private fun FrameSlotControlLabelFinalizer(
+    state: FrameSlotState,
+    labels: ArrayDeque<LabelContext>,
+    label: LabelContext,
+    entryStackPrefix: List<FrameSlotStackOperand>,
+    branchToCurrentContinues: Boolean,
+    output: FrameSlotInstructionBuffer,
+) {
+    require(labels.removeLastOrNull() === label) {
+        "frame-slot control label stack does not match its control frame"
+    }
+
+    if (state.reachable) {
+        val finalizedInstructions = FrameSlotFinalizeLabelFallthrough(label, state)
+            ?: error("frame-slot control fallthrough does not match its label: label=$label state=$state")
+        output.addAll(finalizedInstructions)
+    } else if (branchToCurrentContinues && label.reachedByBranch) {
+        state.stack.clear()
+        state.stack.addAll(entryStackPrefix)
+        state.stack.addAll(
+            label.fallthroughSlots.mapIndexed { index, slot ->
+                FrameSlotStackOperand(
+                    type = label.fallthroughTypes.getOrNull(index),
+                    reservedSlot = slot,
+                )
+            },
+        )
+        state.rebuildLocalAliases()
+        state.reachable = true
+    } else {
+        state.stack.clear()
+        state.rebuildLocalAliases()
+    }
+
+    state.rewindTemporaryAllocator()
+}
+
+private fun FrameSlotIfLabel(
+    baseHeight: Int,
+    resultSlots: List<Int>,
+    resultTypes: List<ValueType>,
+) = LabelContext(
+    kind = LabelKind.Block,
+    baseHeight = baseHeight,
+    branchSlots = resultSlots,
+    fallthroughSlots = resultSlots,
+    branchTypes = resultTypes,
+    fallthroughTypes = resultTypes,
+)
+
+private fun FrameSlotStackSnapshot(
+    stack: List<FrameSlotStackOperand>,
+    size: Int = stack.size,
+): List<FrameSlotStackOperand> = List(size) { index -> stack[index].copy() }
+
+private fun FrameSlotStateRestore(
+    state: FrameSlotState,
+    source: FrameSlotState,
+) {
+    state.stack.clear()
+    state.stack.addAll(FrameSlotStackSnapshot(source.stack))
+    state.rebuildLocalAliases()
+    state.reachable = source.reachable
 }
 
 private fun FrameSlotUnreachableInstructionLowerer(
@@ -425,65 +922,6 @@ private fun FrameSlotUnreachableInstructionLowerer(
         instruction = instruction,
         state = state,
     ) ?: listOf(instruction)
-    is ControlInstruction.Block -> listOf(
-        instruction.copy(
-            instructions = FrameSlotUnreachableInstructionsLowerer(
-                context = context,
-                instructions = instruction.instructions,
-                state = FrameSlotForkState(state, reachable = false),
-            ),
-        ),
-    )
-    is ControlInstruction.Loop -> listOf(
-        instruction.copy(
-            instructions = FrameSlotUnreachableInstructionsLowerer(
-                context = context,
-                instructions = instruction.instructions,
-                state = FrameSlotForkState(state, reachable = false),
-            ),
-        ),
-    )
-    is ControlInstruction.If -> listOf(
-        instruction.copy(
-            thenInstructions = FrameSlotUnreachableInstructionsLowerer(
-                context = context,
-                instructions = instruction.thenInstructions,
-                state = FrameSlotForkState(state, reachable = false),
-            ),
-            elseInstructions = instruction.elseInstructions?.let { elseInstructions ->
-                FrameSlotUnreachableInstructionsLowerer(
-                    context = context,
-                    instructions = elseInstructions,
-                    state = FrameSlotForkState(state, reachable = false),
-                )
-            },
-        ),
-    )
-    is ControlInstruction.TryTable -> listOf(
-        instruction.copy(
-            instructions = FrameSlotUnreachableInstructionsLowerer(
-                context = context,
-                instructions = instruction.instructions,
-                state = FrameSlotForkState(state, reachable = false),
-            ),
-        ),
-    )
-    is ControlSuperInstruction.If -> listOf(
-        instruction.copy(
-            thenInstructions = FrameSlotUnreachableInstructionsLowerer(
-                context = context,
-                instructions = instruction.thenInstructions,
-                state = FrameSlotForkState(state, reachable = false),
-            ),
-            elseInstructions = instruction.elseInstructions?.let { elseInstructions ->
-                FrameSlotUnreachableInstructionsLowerer(
-                    context = context,
-                    instructions = elseInstructions,
-                    state = FrameSlotForkState(state, reachable = false),
-                )
-            },
-        ),
-    )
     is ControlSuperInstruction.Call -> FrameSlotCallLowerer(
         context = context,
         operands = instruction.operands,
@@ -535,7 +973,6 @@ private fun FrameSlotInstructionLowerer(
     state: FrameSlotState,
     labels: ArrayDeque<LabelContext>,
 ): List<Instruction>? = when (instruction) {
-    is AdminInstruction.EndBlock -> FrameSlotEndBlockLowerer(state, labels)
     is AdminInstruction.EndFunction -> listOf(instruction)
     is ControlInstruction.Nop -> listOf(instruction)
     is ControlInstruction.Unreachable -> {
@@ -600,21 +1037,6 @@ private fun FrameSlotInstructionLowerer(
         operands = null,
         typeIndex = instruction.typeIndex,
         state = state,
-    )
-    is ControlInstruction.If -> FrameSlotIfLowerer(
-        context = context,
-        operand = FusedOperand.ValueStack,
-        blockType = instruction.blockType,
-        thenInstructions = instruction.thenInstructions,
-        elseInstructions = instruction.elseInstructions,
-        state = state,
-        labels = labels,
-    )
-    is ControlInstruction.TryTable -> FrameSlotTryTableLowerer(
-        context = context,
-        instruction = instruction,
-        state = state,
-        labels = labels,
     )
     is ControlInstruction.Return -> FrameSlotReturnLowerer(
         state = state,
@@ -726,36 +1148,6 @@ private fun FrameSlotInstructionLowerer(
         instruction = instruction,
         state = state,
     )
-    is ControlInstruction.Block -> {
-        val functionType = context.blockType(instruction.blockType) ?: return null
-        FrameSlotStructuredControlLowerer(
-            context = context,
-            kind = LabelKind.Block,
-            functionType = functionType,
-            instructions = instruction.instructions,
-            state = state,
-            labels = labels,
-        ) { loweredInstructions ->
-            instruction.copy(
-                instructions = loweredInstructions,
-            )
-        }
-    }
-    is ControlInstruction.Loop -> {
-        val functionType = context.blockType(instruction.blockType) ?: return null
-        FrameSlotStructuredControlLowerer(
-            context = context,
-            kind = LabelKind.Loop,
-            functionType = functionType,
-            instructions = instruction.instructions,
-            state = state,
-            labels = labels,
-        ) { loweredInstructions ->
-            instruction.copy(
-                instructions = loweredInstructions,
-            )
-        }
-    }
     is ControlSuperInstruction.BrIf -> FrameSlotBrIfLowerer(
         operand = instruction.operand,
         labelIndex = instruction.labelIndex,
@@ -804,326 +1196,18 @@ private fun FrameSlotInstructionLowerer(
         typeIndex = instruction.typeIndex,
         state = state,
     )
-    is ControlSuperInstruction.If -> {
-        FrameSlotIfLowerer(
-            context = context,
-            operand = instruction.operand,
-            blockType = instruction.blockType,
-            thenInstructions = instruction.thenInstructions,
-            elseInstructions = instruction.elseInstructions,
-            state = state,
-            labels = labels,
-        )
-    }
     else -> null
 }
 
-private fun FrameSlotStructuredControlLowerer(
-    context: PassContext,
-    kind: LabelKind,
-    functionType: FunctionType,
-    instructions: List<Instruction>,
-    state: FrameSlotState,
-    labels: ArrayDeque<LabelContext>,
-    rewrite: (List<Instruction>) -> Instruction,
-): List<Instruction>? {
-    val baseHeight = state.stack.size - functionType.params.types.size
-    if (baseHeight < 0) return null
-
-    val resultSlots = state.resultRegionSlots(baseHeight, functionType.results.types.size)
-    val branchSlots = when (kind) {
-        LabelKind.Block -> resultSlots
-        LabelKind.Loop -> state.stack.takeLast(functionType.params.types.size)
-            .map(FrameSlotStackOperand::reservedSlot)
-    }
-    val label = LabelContext(
-        kind = kind,
-        baseHeight = baseHeight,
-        branchSlots = branchSlots,
-        fallthroughSlots = resultSlots,
-        branchTypes = when (kind) {
-            LabelKind.Block -> functionType.results.types
-            LabelKind.Loop -> functionType.params.types
-        },
-        fallthroughTypes = functionType.results.types,
-    )
-    val entryMaterializations = FrameSlotMaterializeLiveOperandsBelowControlInputs(
-        state = state,
-        controlInputCount = functionType.params.types.size,
-    )
-    val innerState = FrameSlotForkState(state)
-    val loopParamMaterializations = if (kind == LabelKind.Loop && functionType.params.types.isNotEmpty()) {
-        FrameSlotMaterializeOperands(
-            operands = innerState.stack.takeLast(functionType.params.types.size),
-            state = innerState,
-        ).first
-    } else {
-        emptyList()
-    }
-    val innerLabels = ArrayDeque(labels).apply {
-        addLast(label)
-    }
-    val loweredInstructions = FrameSlotExpressionLowerer(context, instructions, innerState, innerLabels) ?: return null
-    val finalizedInstructions = FrameSlotFinalizeReachableLabel(
-        instructions = loweredInstructions,
-        state = innerState,
-        labels = innerLabels,
-        label = label,
-    ) ?: return null
-    val outcome = FrameSlotStructuredOutcome(
-        entryStack = state.stack,
-        state = innerState,
-        labels = innerLabels,
-        outerLabelCount = labels.size,
-        currentLabel = label,
-        branchToCurrentContinues = kind != LabelKind.Loop,
-    ) ?: return null
-
-    state.stack.clear()
-    state.stack.addAll(outcome.stack)
-    state.rebuildLocalAliases()
-    state.reachable = outcome.reachable
-    state.rewindTemporaryAllocator(labels)
-
-    return buildList {
-        addAll(entryMaterializations)
-        addAll(loopParamMaterializations)
-        add(rewrite(finalizedInstructions))
-    }
-}
-
-private fun FrameSlotIfLowerer(
-    context: PassContext,
-    operand: FusedOperand,
-    blockType: BlockType,
-    thenInstructions: List<Instruction>,
-    elseInstructions: List<Instruction>?,
-    state: FrameSlotState,
-    labels: ArrayDeque<LabelContext>,
-): List<Instruction>? {
-    val splitMaterializations = FrameSlotMaterializeLiveOperandsBelowControlInputs(
-        state = state,
-        controlInputCount = if (operand == FusedOperand.ValueStack) 1 else 0,
-    )
-    val loweredOperand = FrameSlotOperandLowerer(operand, state) ?: return null
-    val functionType = context.blockType(blockType) ?: return null
-    val baseHeight = state.stack.size - functionType.params.types.size
-    if (baseHeight < 0) return null
-
-    val resultSlots = state.resultRegionSlots(baseHeight, functionType.results.types.size)
-    val entryStack = state.stack.toList()
-
-    val branchEntryTemporaryHeight = state.allocator.temporaryHeightSnapshot()
-
-    val thenLabel = LabelContext(
-        kind = LabelKind.Block,
-        baseHeight = baseHeight,
-        branchSlots = resultSlots,
-        fallthroughSlots = resultSlots,
-        branchTypes = functionType.results.types,
-        fallthroughTypes = functionType.results.types,
-    )
-    val thenState = FrameSlotForkState(state)
-    val thenLabels = ArrayDeque(labels).apply {
-        addLast(thenLabel)
-    }
-    val loweredThenInstructions = FrameSlotExpressionLowerer(context, thenInstructions, thenState, thenLabels) ?: return null
-    val finalizedThenInstructions = FrameSlotFinalizeReachableLabel(
-        instructions = loweredThenInstructions,
-        state = thenState,
-        labels = thenLabels,
-        label = thenLabel,
-    ) ?: return null
-
-    state.allocator.restoreTemporaryHeight(branchEntryTemporaryHeight)
-
-    val loweredElseInput = elseInstructions ?: emptyList()
-    val elseLabel = LabelContext(
-        kind = LabelKind.Block,
-        baseHeight = baseHeight,
-        branchSlots = resultSlots,
-        fallthroughSlots = resultSlots,
-        branchTypes = functionType.results.types,
-        fallthroughTypes = functionType.results.types,
-    )
-    val elseState = FrameSlotForkState(state)
-    val elseLabels = ArrayDeque(labels).apply {
-        addLast(elseLabel)
-    }
-    val loweredElseInstructions = FrameSlotExpressionLowerer(context, loweredElseInput, elseState, elseLabels) ?: return null
-    val finalizedElseInstructions = FrameSlotFinalizeReachableLabel(
-        instructions = loweredElseInstructions,
-        state = elseState,
-        labels = elseLabels,
-        label = elseLabel,
-    ) ?: return null
-
-    val (canonicalizedThenInstructions, canonicalizedElseInstructions) = FrameSlotCanonicalizeMatchingStacks(
-        thenInstructions = finalizedThenInstructions,
-        thenState = thenState,
-        elseInstructions = finalizedElseInstructions,
-        elseState = elseState,
-    )
-
-    val thenOutcome = FrameSlotStructuredOutcome(
-        entryStack = entryStack,
-        state = thenState,
-        labels = thenLabels,
-        outerLabelCount = labels.size,
-        currentLabel = thenLabel,
-        branchToCurrentContinues = true,
-    ) ?: return null
-
-    val elseOutcome = FrameSlotStructuredOutcome(
-        entryStack = entryStack,
-        state = elseState,
-        labels = elseLabels,
-        outerLabelCount = labels.size,
-        currentLabel = elseLabel,
-        branchToCurrentContinues = true,
-    )
-        ?: return null
-
-    val mergedOutcome = when {
-        thenOutcome.reachable && elseOutcome.reachable -> {
-            if (thenOutcome.stack != elseOutcome.stack) return null
-            thenOutcome
-        }
-        thenOutcome.reachable -> thenOutcome
-        elseOutcome.reachable -> elseOutcome
-        else -> StructuredOutcome(
-            reachable = false,
-            stack = emptyList(),
-        )
-    }
-
-    state.stack.clear()
-    state.stack.addAll(mergedOutcome.stack)
-    state.rebuildLocalAliases()
-    state.reachable = mergedOutcome.reachable
-    state.rewindTemporaryAllocator(labels)
-
-    return listOf(
-        *splitMaterializations.toTypedArray(),
-        ControlSuperInstruction.If(
-            operand = loweredOperand.lowered,
-            blockType = blockType,
-            thenInstructions = canonicalizedThenInstructions,
-            elseInstructions = if (elseInstructions == null && canonicalizedElseInstructions.isEmpty()) {
-                null
-            } else {
-                canonicalizedElseInstructions
-            },
-        ),
-    )
-}
-
-private fun FrameSlotTryTableLowerer(
-    context: PassContext,
-    instruction: ControlInstruction.TryTable,
-    state: FrameSlotState,
-    labels: ArrayDeque<LabelContext>,
-): List<Instruction>? {
-    val payloadDestinationSlots = instruction.handlers.map { handler ->
-        val target = FrameSlotTargetLabel(labels, handler.labelIndex) ?: return null
-        val payloadArity = context.catchHandlerPayloadArity(handler) ?: return null
-        if (target.branchSlots.size != payloadArity) return null
-        target.reachedByBranch = true
-        target.branchSlots
-    }
-    val functionType = context.blockType(instruction.blockType) ?: return null
-
-    return FrameSlotStructuredControlLowerer(
-        context = context,
-        kind = LabelKind.Block,
-        functionType = functionType,
-        instructions = instruction.instructions,
-        state = state,
-        labels = labels,
-    ) { loweredInstructions ->
-        instruction.copy(
-            instructions = loweredInstructions,
-            payloadDestinationSlots = payloadDestinationSlots,
-        )
-    }
-}
-
-private data class StructuredOutcome(
-    val reachable: Boolean,
-    val stack: List<FrameSlotStackOperand>,
-)
-
-private fun FrameSlotStructuredOutcome(
-    entryStack: List<FrameSlotStackOperand>,
-    state: FrameSlotState,
-    labels: ArrayDeque<LabelContext>,
-    outerLabelCount: Int,
-    currentLabel: LabelContext,
-    branchToCurrentContinues: Boolean,
-): StructuredOutcome? {
-    if (state.reachable) {
-        if (labels.size != outerLabelCount) return null
-        return StructuredOutcome(
-            reachable = true,
-            stack = state.stack.toList(),
-        )
-    }
-
-    if (labels.size != outerLabelCount + 1) return null
-
-    val remainingLabel = labels.removeLast()
-    if (remainingLabel !== currentLabel) return null
-
-    if (!branchToCurrentContinues || !remainingLabel.reachedByBranch) {
-        return StructuredOutcome(
-            reachable = false,
-            stack = emptyList(),
-        )
-    }
-
-    return StructuredOutcome(
-        reachable = true,
-        stack = buildList {
-            addAll(entryStack.take(remainingLabel.baseHeight))
-            addAll(
-                remainingLabel.fallthroughSlots.mapIndexed { index, slot ->
-                    FrameSlotStackOperand(
-                        type = remainingLabel.fallthroughTypes.getOrNull(index),
-                        reservedSlot = slot,
-                    )
-                },
-            )
-        },
-    )
-}
-
-private fun FrameSlotFinalizeReachableLabel(
-    instructions: List<Instruction>,
-    state: FrameSlotState,
-    labels: ArrayDeque<LabelContext>,
-    label: LabelContext,
-): List<Instruction>? {
-    if (!state.reachable || labels.lastOrNull() !== label) {
-        return instructions
-    }
-
-    labels.removeLast()
-    val finalizedInstructions = FrameSlotFinalizeLabelFallthrough(label, state) ?: return null
-    state.rewindTemporaryAllocator(labels)
-    return instructions + finalizedInstructions
-}
-
 private fun FrameSlotCanonicalizeMatchingStacks(
-    thenInstructions: List<Instruction>,
     thenState: FrameSlotState,
-    elseInstructions: List<Instruction>,
     elseState: FrameSlotState,
 ): Pair<List<Instruction>, List<Instruction>> {
     if (!thenState.reachable || !elseState.reachable) {
-        return thenInstructions to elseInstructions
+        return emptyList<Instruction>() to emptyList()
     }
     if (thenState.stack.size != elseState.stack.size) {
-        return thenInstructions to elseInstructions
+        return emptyList<Instruction>() to emptyList()
     }
 
     val thenMaterializations = mutableListOf<Instruction>()
@@ -1137,7 +1221,7 @@ private fun FrameSlotCanonicalizeMatchingStacks(
         elseMaterializations += FrameSlotMaterializeOperand(elseOperand, elseState)
     }
 
-    return (thenInstructions + thenMaterializations) to (elseInstructions + elseMaterializations)
+    return thenMaterializations to elseMaterializations
 }
 
 private fun FrameSlotFinalizeLabelFallthrough(
@@ -1167,16 +1251,6 @@ private fun FrameSlotFinalizeLabelFallthrough(
     state.rebuildLocalAliases()
 
     return lowered
-}
-
-private fun FrameSlotEndBlockLowerer(
-    state: FrameSlotState,
-    labels: ArrayDeque<LabelContext>,
-): List<Instruction>? {
-    if (labels.isEmpty()) return null
-
-    val label = labels.removeLast()
-    return FrameSlotFinalizeLabelFallthrough(label, state)
 }
 
 private fun FrameSlotBrLowerer(

@@ -34,6 +34,6 @@ internal inline fun BrOnNonNullExecutor(
 
     if (!value.isNullableReference()) {
         vstack.push(value)
-        breakExecutor(cstack, vstack, instruction.labelIndex)
+        breakExecutor(cstack, instruction.labelIndex)
     }
 }

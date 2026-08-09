@@ -20,13 +20,10 @@ class BrTableExecutorTest {
         val store = store()
         val cstack = cstack(
             frames = listOf(
-                frame(
-                    frameSlotMode = true,
-                ),
+                frame(),
             ),
             labels = listOf(
                 label(
-                    arity = 1,
                     depths = stackDepths(values = 0),
                 ),
             ),

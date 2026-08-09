@@ -9,7 +9,6 @@ data class Function(
     val locals: LongArray,
     val body: Expression,
     val frameSlots: Int,
-    val frameSlotMode: Boolean,
     val returnSlots: List<Int>,
 ) {
     companion object {
@@ -19,7 +18,6 @@ data class Function(
             locals = longArrayOf(),
             body = Expression.EMPTY,
             frameSlots = 0,
-            frameSlotMode = false,
             returnSlots = emptyList(),
         )
     }
@@ -35,7 +33,6 @@ data class Function(
         if (!(locals contentEquals other.locals)) return false
         if (!(body.instructions contentEquals other.body.instructions)) return false
         if (frameSlots != other.frameSlots) return false
-        if (frameSlotMode != other.frameSlotMode) return false
         if (returnSlots != other.returnSlots) return false
 
         return true
@@ -47,7 +44,6 @@ data class Function(
         result = 31 * result + locals.hashCode()
         result = 31 * result + body.hashCode()
         result = 31 * result + frameSlots
-        result = 31 * result + frameSlotMode.hashCode()
         result = 31 * result + returnSlots.hashCode()
         return result
     }

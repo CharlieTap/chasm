@@ -12,7 +12,6 @@ fun function(
     locals: List<Local> = [],
     body: Expression = expression(),
     frameSlots: Int = 0,
-    frameSlotMode: Boolean = false,
     returnSlots: List<Int> = [],
 ) = Function(
     idx = idx,
@@ -20,6 +19,5 @@ fun function(
     locals = locals,
     body = body,
     frameSlots = frameSlots,
-    frameSlotMode = frameSlotMode,
     returnSlots = returnSlots,
 )

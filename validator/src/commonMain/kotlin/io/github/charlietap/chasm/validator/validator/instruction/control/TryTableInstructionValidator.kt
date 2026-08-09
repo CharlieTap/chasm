@@ -4,24 +4,24 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.type.AbstractHeapType
+import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.matching.ValueTypeMatcher
 import io.github.charlietap.chasm.validator.ModuleValidator
 import io.github.charlietap.chasm.validator.context.Label
+import io.github.charlietap.chasm.validator.context.LabelKind
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
 import io.github.charlietap.chasm.validator.ext.functionType
 import io.github.charlietap.chasm.validator.ext.peek
-import io.github.charlietap.chasm.validator.ext.pop
 import io.github.charlietap.chasm.validator.ext.popValues
 import io.github.charlietap.chasm.validator.ext.pushValues
 import io.github.charlietap.chasm.validator.ext.tagType
-import io.github.charlietap.chasm.validator.validator.instruction.InstructionBlockValidator
+import io.github.charlietap.chasm.validator.validator.type.BlockTypeValidator
 import kotlin.math.max
 
 internal fun TryTableInstructionValidator(
@@ -30,19 +30,21 @@ internal fun TryTableInstructionValidator(
 ): Result<Unit, ModuleValidatorError> = TryTableInstructionValidator(
     context = context,
     instruction = instruction,
-    instructionBlockValidator = ::InstructionBlockValidator,
+    blockTypeValidator = ::BlockTypeValidator,
     typeMatcher = ::ValueTypeMatcher,
 )
 
 internal inline fun TryTableInstructionValidator(
     context: ModuleValidationContext,
     instruction: ControlInstruction.TryTable,
-    crossinline instructionBlockValidator: ModuleValidator<List<Instruction>>,
+    crossinline blockTypeValidator: ModuleValidator<BlockType>,
     crossinline typeMatcher: TypeMatcher<ValueType>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
+    blockTypeValidator(context, instruction.blockType).bind()
+
     val functionType = context.functionType(instruction.blockType).bind()
-    context.popValues(functionType.params.types)
+    context.popValues(functionType.params.types).bind()
 
     instruction.handlers.forEach { handler ->
 
@@ -112,15 +114,13 @@ internal inline fun TryTableInstructionValidator(
     }
 
     val exceptionHandler = Label(
-        instruction = instruction,
+        kind = LabelKind.TryTable,
         inputs = functionType.params,
         outputs = functionType.results,
         operandsDepth = context.operands.depth(),
+        localChangesDepth = context.localChanges.size,
         unreachable = false,
     )
     context.labels.push(exceptionHandler)
     context.pushValues(functionType.params.types)
-
-    instructionBlockValidator(context, instruction.instructions).bind()
-    context.labels.pop().bind()
 }

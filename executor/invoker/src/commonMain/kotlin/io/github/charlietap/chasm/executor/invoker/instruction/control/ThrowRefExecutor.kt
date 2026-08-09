@@ -106,32 +106,19 @@ internal inline fun ThrowRefValueExecutor(
         when {
             catchHandler is CatchHandler.Catch && tagMatches -> {
                 instance.fields.reverse()
-                if (frame.frameSlotMode) {
-                    writeCatchPayloadToSlots(vstack, instance.fields, payloadDestinationSlots)
-                } else {
-                    vstack.push(instance.fields)
-                }
+                writeCatchPayloadToSlots(vstack, instance.fields, payloadDestinationSlots)
                 routeExceptionHandlerMatch(cstack, continuation, handler.continuationSource, continuationOffset, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchRef && tagMatches -> {
                 instance.fields.reverse()
-                if (frame.frameSlotMode) {
-                    writeCatchRefPayloadToSlots(vstack, instance.fields, ref, payloadDestinationSlots)
-                } else {
-                    vstack.push(instance.fields)
-                    vstack.push(ref)
-                }
+                writeCatchRefPayloadToSlots(vstack, instance.fields, ref, payloadDestinationSlots)
                 routeExceptionHandlerMatch(cstack, continuation, handler.continuationSource, continuationOffset, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchAll -> {
                 routeExceptionHandlerMatch(cstack, continuation, handler.continuationSource, continuationOffset, breakDispatcher, catchHandler.labelIndex)
             }
             catchHandler is CatchHandler.CatchAllRef -> {
-                if (frame.frameSlotMode) {
-                    vstack.setFrameSlot(payloadDestinationSlots.single(), ref)
-                } else {
-                    vstack.push(ref)
-                }
+                vstack.setFrameSlot(payloadDestinationSlots.single(), ref)
                 routeExceptionHandlerMatch(cstack, continuation, handler.continuationSource, continuationOffset, breakDispatcher, catchHandler.labelIndex)
             }
             else -> {

@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.dsl.imports
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -23,7 +22,6 @@ class RandomGetZeroTest {
 
         val byteStream = Resource(FILE_DIR + "random_get_zero.wasm").readBytes()
         val reader = FakeSourceReader(byteStream)
-        val config = RuntimeConfig(bytecodeFusion = true)
 
         val store = store()
         val imports = imports(store) {
@@ -62,7 +60,7 @@ class RandomGetZeroTest {
         }
 
         val actual = module(reader)
-            .flatMap { module -> instance(store, module, imports, config) }
+            .flatMap { module -> instance(store, module, imports) }
             .flatMap { instance -> invoke(store, instance, "_start") }
 
         assertIs<ChasmResult.Success<List<ExecutionValue>>>(actual)

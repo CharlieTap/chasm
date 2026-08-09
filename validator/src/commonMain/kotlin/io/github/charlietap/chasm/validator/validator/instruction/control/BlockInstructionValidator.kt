@@ -3,17 +3,15 @@ package io.github.charlietap.chasm.validator.validator.instruction.control
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.validator.ModuleValidator
 import io.github.charlietap.chasm.validator.context.Label
+import io.github.charlietap.chasm.validator.context.LabelKind
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.ext.functionType
-import io.github.charlietap.chasm.validator.ext.pop
 import io.github.charlietap.chasm.validator.ext.popValues
 import io.github.charlietap.chasm.validator.ext.pushValues
-import io.github.charlietap.chasm.validator.validator.instruction.InstructionBlockValidator
 import io.github.charlietap.chasm.validator.validator.type.BlockTypeValidator
 
 internal fun BlockInstructionValidator(
@@ -24,14 +22,12 @@ internal fun BlockInstructionValidator(
         context = context,
         instruction = instruction,
         blockTypeValidator = ::BlockTypeValidator,
-        instructionBlockValidator = ::InstructionBlockValidator,
     )
 
 internal inline fun BlockInstructionValidator(
     context: ModuleValidationContext,
     instruction: ControlInstruction.Block,
     crossinline blockTypeValidator: ModuleValidator<BlockType>,
-    crossinline instructionBlockValidator: ModuleValidator<List<Instruction>>,
 ): Result<Unit, ModuleValidatorError> = binding {
 
     blockTypeValidator(context, instruction.blockType).bind()
@@ -41,17 +37,14 @@ internal inline fun BlockInstructionValidator(
     context.popValues(functionType.params.types).bind()
 
     val label = Label(
-        instruction = instruction,
+        kind = LabelKind.Block,
         inputs = functionType.params,
         outputs = functionType.results,
         operandsDepth = context.operands.depth(),
+        localChangesDepth = context.localChanges.size,
         unreachable = false,
     )
 
     context.labels.push(label)
     context.pushValues(functionType.params.types)
-
-    instructionBlockValidator(context, instruction.instructions).bind()
-
-    context.labels.pop().bind()
 }

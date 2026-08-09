@@ -3,8 +3,6 @@ package io.github.charlietap.chasm.compiler.passes.gc
 import io.github.charlietap.chasm.compiler.ext.isAllocating
 import io.github.charlietap.chasm.compiler.passes.PassContext
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
-import io.github.charlietap.chasm.ir.instruction.ControlInstruction
-import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.Expression
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.module.Module
@@ -31,46 +29,7 @@ private fun compileInstructions(
 ): List<Instruction> {
     return buildList {
         instructions.forEach { instruction ->
-            add(
-                when (instruction) {
-                    is ControlInstruction.Block -> {
-                        ControlInstruction.Block(
-                            blockType = instruction.blockType,
-                            instructions = compileInstructions(instruction.instructions),
-                        )
-                    }
-                    is ControlInstruction.Loop -> {
-                        ControlInstruction.Loop(
-                            blockType = instruction.blockType,
-                            instructions = compileInstructions(instruction.instructions),
-                        )
-                    }
-                    is ControlInstruction.If -> {
-                        ControlInstruction.If(
-                            blockType = instruction.blockType,
-                            thenInstructions = compileInstructions(instruction.thenInstructions),
-                            elseInstructions = instruction.elseInstructions?.let { compileInstructions(it) },
-                        )
-                    }
-                    is ControlInstruction.TryTable -> {
-                        ControlInstruction.TryTable(
-                            blockType = instruction.blockType,
-                            handlers = instruction.handlers,
-                            instructions = compileInstructions(instruction.instructions),
-                            payloadDestinationSlots = instruction.payloadDestinationSlots,
-                        )
-                    }
-                    is ControlSuperInstruction.If -> {
-                        ControlSuperInstruction.If(
-                            operand = instruction.operand,
-                            blockType = instruction.blockType,
-                            thenInstructions = compileInstructions(instruction.thenInstructions),
-                            elseInstructions = instruction.elseInstructions?.let { compileInstructions(it) },
-                        )
-                    }
-                    else -> instruction
-                },
-            )
+            add(instruction)
 
             if (instruction.isAllocating()) {
                 add(AdminInstruction.PauseIf)

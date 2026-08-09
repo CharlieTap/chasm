@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.integration
 
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.dsl.imports
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.store
@@ -14,7 +13,6 @@ class KotlinNullableLengthComparisonTest {
     @Test
     fun `can invoke checkLen from the Kotlin nullable length comparison artifact`() {
 
-        val config = RuntimeConfig(bytecodeFusion = true)
         val store = store()
 
         val imports = imports(store) {
@@ -38,7 +36,6 @@ class KotlinNullableLengthComparisonTest {
             fileDirectory = FILE_DIR,
             functionName = "checkLen",
             imports = imports,
-            config = config,
         )
 
         assertEquals(

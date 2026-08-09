@@ -10,7 +10,6 @@ fun runtimeFunction(
     locals: LongArray = longArrayOf(),
     body: Expression = runtimeExpression(),
     frameSlots: Int = 0,
-    frameSlotMode: Boolean = false,
     returnSlots: List<Int> = [],
 ) = Function(
     idx = idx,
@@ -18,6 +17,5 @@ fun runtimeFunction(
     locals = locals,
     body = body,
     frameSlots = frameSlots,
-    frameSlotMode = frameSlotMode,
     returnSlots = returnSlots,
 )

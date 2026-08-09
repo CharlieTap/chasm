@@ -39,11 +39,9 @@ internal inline fun Compiler(
     val context = PassContext(config, module)
     val passes = buildList {
         add(control)
-        if (config.bytecodeFusion) {
-            add(fusion)
-            add(frameSlot)
-            add(jump)
-        }
+        add(fusion)
+        add(frameSlot)
+        add(jump)
         if (config.gcStrategy != GCStrategy.MANUAL) add(gc)
     }
 

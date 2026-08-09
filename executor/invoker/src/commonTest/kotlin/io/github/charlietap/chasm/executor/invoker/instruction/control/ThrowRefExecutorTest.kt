@@ -44,7 +44,6 @@ class ThrowRefExecutorTest {
                     instance = moduleInstance(
                         tagAddresses = mutableListOf(tagAddress(0)),
                     ),
-                    frameSlotMode = true,
                 ),
             ),
             handlers = listOf(
@@ -64,7 +63,6 @@ class ThrowRefExecutorTest {
             ),
             labels = listOf(
                 label(
-                    arity = 3,
                     depths = stackDepths(values = 0),
                 ),
             ),
@@ -115,7 +113,6 @@ class ThrowRefExecutorTest {
             frames = listOf(
                 frame(
                     instance = moduleInstance(),
-                    frameSlotMode = true,
                 ),
             ),
             handlers = listOf(

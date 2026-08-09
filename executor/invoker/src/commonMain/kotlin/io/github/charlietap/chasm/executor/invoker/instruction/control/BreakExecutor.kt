@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
-internal typealias BreakExecutor = (ControlStack, ValueStack, Index.LabelIndex) -> Unit
+internal typealias BreakExecutor = (ControlStack, Index.LabelIndex) -> Unit
 
 internal inline fun BreakExecutor(
     vstack: ValueStack,
@@ -18,26 +18,19 @@ internal inline fun BreakExecutor(
     instruction: ControlInstruction.Br,
 ) = BreakExecutor(
     controlStack = cstack,
-    valueStack = vstack,
     labelIndex = instruction.labelIndex,
 )
 
 internal inline fun BreakExecutor(
     controlStack: ControlStack,
-    valueStack: ValueStack,
     labelIndex: Index.LabelIndex,
 ) {
     val breakLabel = controlStack.peekNthLabel(labelIndex.index())
-    val frame = controlStack.peekFrame()
 
     val depths = breakLabel.depths
     controlStack.shrinkHandlers(depths.handlers)
     controlStack.shrinkInstructions(depths.instructions)
     controlStack.shrinkLabels(depths.labels)
-
-    if (!frame.frameSlotMode) {
-        valueStack.shrink(breakLabel.arity, depths.values)
-    }
 
     breakLabel.continuation?.let { continuation ->
         controlStack.push(continuation)

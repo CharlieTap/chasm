@@ -16,12 +16,11 @@ internal inline fun LoopExecutor(
     instruction: ControlInstruction.Loop,
 ) {
     val label = ControlStack.Entry.Label(
-        arity = instruction.params,
         depths = StackDepths(
             handlers = cstack.handlersDepth(),
             instructions = cstack.instructionsDepth(),
             labels = cstack.labelsDepth(),
-            values = vstack.depth() - instruction.params,
+            values = 0,
         ),
         continuation = LoopDispatcher(instruction),
     )

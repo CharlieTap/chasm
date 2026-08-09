@@ -37,5 +37,5 @@ internal inline fun BrTableExecutor(
         instruction.defaultLabelIndex
     }
 
-    breakExecutor(cstack, vstack, label)
+    breakExecutor(cstack, label)
 }

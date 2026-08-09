@@ -32,6 +32,6 @@ internal inline fun BrIfExecutor(
     val shouldBreak = vstack.pop() != 0L
 
     if (shouldBreak) {
-        breakExecutor(cstack, vstack, instruction.labelIndex)
+        breakExecutor(cstack, instruction.labelIndex)
     }
 }

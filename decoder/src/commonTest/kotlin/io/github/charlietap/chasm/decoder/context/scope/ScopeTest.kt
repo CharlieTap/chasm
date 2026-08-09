@@ -12,26 +12,6 @@ import kotlin.test.assertEquals
 class ScopeTest {
 
     @Test
-    fun `block scope restores its previous value after success and error`() {
-        val context = decoderContext(blockEndOpcode = 1u)
-
-        val success = BlockScope(context, 2u) { scopedContext ->
-            assertEquals(2u, scopedContext.blockEndOpcode)
-            Ok(Unit)
-        }
-        assertEquals(Ok(Unit), success)
-        assertEquals(1u, context.blockEndOpcode)
-
-        val error = WasmDecodeError.IOError(Exception())
-        val failure = BlockScope<Unit>(context, 3u) { scopedContext ->
-            assertEquals(3u, scopedContext.blockEndOpcode)
-            Err(error)
-        }
-        assertEquals(Err(error), failure)
-        assertEquals(1u, context.blockEndOpcode)
-    }
-
-    @Test
     fun `name scope restores its previous value after success and error`() {
         val context = decoderContext(nameSectionSize = 1u)
 

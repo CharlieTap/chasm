@@ -4,8 +4,6 @@ import io.github.charlietap.chasm.type.ReferenceType
 
 sealed interface AdminInstruction : Instruction {
 
-    data object EndBlock : AdminInstruction
-
     data object EndFunction : AdminInstruction
 
     data class CopySlots(

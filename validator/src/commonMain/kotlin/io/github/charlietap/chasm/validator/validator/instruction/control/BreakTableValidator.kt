@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
+import io.github.charlietap.chasm.validator.ext.branchValues
 import io.github.charlietap.chasm.validator.ext.peek
 import io.github.charlietap.chasm.validator.ext.popI32
 import io.github.charlietap.chasm.validator.ext.popValues
@@ -20,11 +21,7 @@ internal fun BreakTableInstructionValidator(
 
     val defaultLabel = context.labels.peek(instruction.defaultLabelIndex).bind()
 
-    val defaultOutputs = if (defaultLabel.instruction is ControlInstruction.Loop) {
-        defaultLabel.inputs
-    } else {
-        defaultLabel.outputs
-    }
+    val defaultOutputs = defaultLabel.branchValues
 
     val arity = defaultOutputs.types.size
 
@@ -33,11 +30,7 @@ internal fun BreakTableInstructionValidator(
 
         val label = context.labels.peek(labelIndex).bind()
 
-        val outputs = if (label.instruction is ControlInstruction.Loop) {
-            label.inputs
-        } else {
-            label.outputs
-        }
+        val outputs = label.branchValues
 
         if (outputs.types.size != arity) {
             Err(TypeValidatorError.TypeMismatch).bind<Unit>()

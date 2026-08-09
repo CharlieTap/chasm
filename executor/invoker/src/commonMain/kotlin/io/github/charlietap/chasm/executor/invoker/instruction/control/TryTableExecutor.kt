@@ -34,12 +34,11 @@ internal inline fun TryTableExecutor(
     crossinline handlerDispatcher: Dispatcher<ExceptionHandler>,
 ) {
     val label = ControlStack.Entry.Label(
-        arity = instruction.results,
         depths = StackDepths(
             handlers = cstack.handlersDepth(),
             instructions = cstack.instructionsDepth(),
             labels = cstack.labelsDepth(),
-            values = vstack.depth() - instruction.params,
+            values = 0,
         ),
         continuation = null,
     )

@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.passes
 import io.github.charlietap.chasm.fixture.ir.instruction.blockInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.brIfInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.callInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.endInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.f32AbsInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedCall
@@ -211,20 +212,15 @@ class FusionPassTest {
     }
 
     @Test
-    fun `can fuse instructions nested in control flow`() {
+    fun `can fuse instructions between flat control markers`() {
 
         val instructions = listOf(
-            blockInstruction(
-                instructions = listOf(
-                    blockInstruction(
-                        instructions = listOf(
-                            i32ConstInstruction(5),
-                            i32ConstInstruction(2),
-                            i32AddInstruction(),
-                        ),
-                    ),
-                ),
-            ),
+            blockInstruction(),
+            blockInstruction(),
+            i32ConstInstruction(5),
+            i32ConstInstruction(2),
+            i32AddInstruction(),
+            endInstruction(2),
         )
         val module = module(
             functions = listOf(
@@ -238,19 +234,14 @@ class FusionPassTest {
         val context = passContext(module = module)
 
         val expected = listOf(
-            blockInstruction(
-                instructions = listOf(
-                    blockInstruction(
-                        instructions = listOf(
-                            fusedI32Add(
-                                left = i32ConstOperand(5),
-                                right = i32ConstOperand(2),
-                                destination = valueStackDestination(),
-                            ),
-                        ),
-                    ),
-                ),
+            blockInstruction(),
+            blockInstruction(),
+            fusedI32Add(
+                left = i32ConstOperand(5),
+                right = i32ConstOperand(2),
+                destination = valueStackDestination(),
             ),
+            endInstruction(2),
         )
         val actual = FusionPass(context, module).functions[0].body.instructions
 

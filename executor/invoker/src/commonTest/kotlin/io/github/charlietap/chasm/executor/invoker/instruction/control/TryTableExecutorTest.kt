@@ -32,8 +32,6 @@ class TryTableExecutorTest {
             store = store,
             context = context,
             instruction = ControlInstruction.TryTable(
-                params = 0,
-                results = 0,
                 handlers = listOf(catchAllRefHandler(labelIndex(0))),
                 instructions = emptyArray(),
                 payloadDestinationSlots = listOf(listOf(5)),

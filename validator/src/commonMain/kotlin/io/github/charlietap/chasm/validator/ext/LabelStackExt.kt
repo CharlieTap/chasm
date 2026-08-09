@@ -5,6 +5,7 @@ import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.stack.Stack
 import io.github.charlietap.chasm.validator.context.Label
+import io.github.charlietap.chasm.validator.context.LabelKind
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
 
@@ -21,3 +22,6 @@ internal inline fun Stack<Label>.peek(
 internal inline fun Stack<Label>.pop(): Result<Label, ModuleValidatorError> = popOrNull().toResultOr {
     TypeValidatorError.TypeMismatch
 }
+
+internal inline val Label.branchValues
+    get() = if (kind == LabelKind.Loop) inputs else outputs

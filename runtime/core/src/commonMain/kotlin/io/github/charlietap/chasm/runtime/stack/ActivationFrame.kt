@@ -7,6 +7,5 @@ data class ActivationFrame(
     val depths: StackDepths,
     val instance: ModuleInstance,
     val previousFramePointer: Int = 0,
-    val frameSlotMode: Boolean = false,
     val visibleResultBase: Int? = null,
 )

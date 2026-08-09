@@ -3,9 +3,7 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.control
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.context.scope.ScopedDecoder
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.BLOCK
 import io.github.charlietap.chasm.decoder.decoder.instruction.BR
@@ -16,7 +14,6 @@ import io.github.charlietap.chasm.decoder.decoder.instruction.BR_TABLE
 import io.github.charlietap.chasm.decoder.decoder.instruction.CALL
 import io.github.charlietap.chasm.decoder.decoder.instruction.CALL_INDIRECT
 import io.github.charlietap.chasm.decoder.decoder.instruction.CALL_REF
-import io.github.charlietap.chasm.decoder.decoder.instruction.END
 import io.github.charlietap.chasm.decoder.decoder.instruction.IF
 import io.github.charlietap.chasm.decoder.decoder.instruction.LOOP
 import io.github.charlietap.chasm.decoder.decoder.instruction.NOP
@@ -35,7 +32,6 @@ import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
 import io.github.charlietap.chasm.fixture.ast.instruction.blockType
 import io.github.charlietap.chasm.fixture.ast.instruction.catchHandler
-import io.github.charlietap.chasm.fixture.ast.instruction.instruction
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.tagIndex
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
@@ -77,30 +73,16 @@ class ControlInstructionDecoderTest {
         val context = decoderContext(
             reader = FakeUByteReader { Ok(opcode) },
         )
-        val scope: ScopedDecoder<UByte, List<Instruction>> = { ctx, blockEndOpcode, decoder ->
-            assertEquals(context, ctx)
-            assertEquals(END, blockEndOpcode)
-            decoder(ctx)
-        }
         val expectedBlockType = BlockType.Empty
-        val expectedInstructions = emptyList<Instruction>()
-        val expected = Ok(ControlInstruction.Block(expectedBlockType, expectedInstructions))
+        val expected = Ok(ControlInstruction.Block(expectedBlockType))
 
         val blockTypeDecoder: Decoder<BlockType> = { _ ->
             Ok(expectedBlockType)
         }
 
-        val instructionBlockDecoder: Decoder<List<Instruction>> = { ctx ->
-            assertEquals(context, ctx)
-            Ok(expectedInstructions)
-        }
-
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = scope,
             blockTypeDecoder = blockTypeDecoder,
-            instructionBlockDecoder = instructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -121,30 +103,16 @@ class ControlInstructionDecoderTest {
         val context = decoderContext(
             reader = FakeUByteReader { Ok(opcode) },
         )
-        val scope: ScopedDecoder<UByte, List<Instruction>> = { ctx, blockEndOpcode, decoder ->
-            assertEquals(context, ctx)
-            assertEquals(END, blockEndOpcode)
-            decoder(ctx)
-        }
         val expectedBlockType = BlockType.Empty
-        val expectedInstructions = emptyList<Instruction>()
-        val expected = Ok(ControlInstruction.Loop(expectedBlockType, expectedInstructions))
+        val expected = Ok(ControlInstruction.Loop(expectedBlockType))
 
         val blockTypeDecoder: Decoder<BlockType> = { _ ->
             Ok(expectedBlockType)
         }
 
-        val instructionBlockDecoder: Decoder<List<Instruction>> = { ctx ->
-            assertEquals(context, ctx)
-            Ok(expectedInstructions)
-        }
-
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = scope,
             blockTypeDecoder = blockTypeDecoder,
-            instructionBlockDecoder = instructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -166,23 +134,15 @@ class ControlInstructionDecoderTest {
             reader = FakeUByteReader { Ok(opcode) },
         )
         val expectedBlockType = BlockType.Empty
-        val expectedInstructions = emptyList<Instruction>()
-        val expected = Ok(ControlInstruction.If(expectedBlockType, expectedInstructions, null))
+        val expected = Ok(ControlInstruction.If(expectedBlockType))
 
         val blockTypeDecoder: Decoder<BlockType> = { _ ->
             Ok(expectedBlockType)
         }
 
-        val ifDecoder: Decoder<Pair<List<Instruction>, List<Instruction>?>> = { _ ->
-            Ok(expectedInstructions to null)
-        }
-
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = blockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = ifDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -212,10 +172,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -245,10 +202,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -283,10 +237,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -311,10 +262,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -344,10 +292,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = functionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -382,10 +327,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -415,10 +357,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = functionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -453,10 +392,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -486,10 +422,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -519,10 +452,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -552,10 +482,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -585,10 +512,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -619,10 +543,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = tagIndexDecoder,
@@ -648,10 +569,7 @@ class ControlInstructionDecoderTest {
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = neverScope,
             blockTypeDecoder = neverBlockTypeDecoder,
-            instructionBlockDecoder = neverInstructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -673,12 +591,6 @@ class ControlInstructionDecoderTest {
             reader = FakeUByteReader { Ok(opcode) },
         )
 
-        val scope: ScopedDecoder<UByte, List<Instruction>> = { ctx, blockEndOpcode, decoder ->
-            assertEquals(context, ctx)
-            assertEquals(END, blockEndOpcode)
-            decoder(ctx)
-        }
-
         val blockType = blockType()
         val blockTypeDecoder: Decoder<BlockType> = { _ ->
             Ok(blockType)
@@ -689,26 +601,16 @@ class ControlInstructionDecoderTest {
             Ok(Vector(handlers))
         }
 
-        val instructions = listOf(instruction())
-        val instructionBlockDecoder: Decoder<List<Instruction>> = { ctx ->
-            assertEquals(context, ctx)
-            Ok(instructions)
-        }
-
         val expected = Ok(
             ControlInstruction.TryTable(
                 blockType = blockType,
                 handlers = handlers,
-                instructions = instructions,
             ),
         )
 
         val actual = ControlInstructionDecoder(
             context = context,
-            scope = scope,
             blockTypeDecoder = blockTypeDecoder,
-            instructionBlockDecoder = instructionBlockDecoder,
-            ifDecoder = neverIfDecoder,
             functionIndexDecoder = neverFunctionIndexDecoder,
             handlerDecoder = neverHandlerDecoder,
             tagIndexDecoder = neverTagIndexDecoder,
@@ -738,20 +640,11 @@ class ControlInstructionDecoderTest {
     }
 
     private companion object {
-        private val neverScope: ScopedDecoder<UByte, List<Instruction>> = { _, _, _ ->
-            fail("scope should not be called in this scenario")
-        }
         private val neverBlockTypeDecoder: Decoder<BlockType> = { _ ->
             fail("block type decoder should not run in this scenario")
         }
         private val neverHandlerDecoder: Decoder<ControlInstruction.CatchHandler> = { _ ->
             fail("catch handler decoder should not run in this scenario")
-        }
-        private val neverInstructionBlockDecoder: Decoder<List<Instruction>> = { _ ->
-            fail("instruction block decoder should not run in this scenario")
-        }
-        private val neverIfDecoder: Decoder<Pair<List<Instruction>, List<Instruction>?>> = { _ ->
-            fail("if decoder should not run in this scenario")
         }
         private val neverLabelIndexDecoder: Decoder<Index.LabelIndex> = { _ ->
             fail("label index decoder should not run in this scenario")

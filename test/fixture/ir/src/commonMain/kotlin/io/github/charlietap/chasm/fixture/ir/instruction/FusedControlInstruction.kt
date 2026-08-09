@@ -242,13 +242,9 @@ fun fusedBrOnCastFail(
 fun fusedIf(
     operand: FusedOperand = fusedOperand(),
     blockType: BlockType = blockType(),
-    thenInstructions: List<Instruction> = [],
-    elseInstructions: List<Instruction>? = null,
 ) = ControlSuperInstruction.If(
     operand = operand,
     blockType = blockType,
-    thenInstructions = thenInstructions,
-    elseInstructions = elseInstructions,
 )
 
 private fun slotCopyInstructions(

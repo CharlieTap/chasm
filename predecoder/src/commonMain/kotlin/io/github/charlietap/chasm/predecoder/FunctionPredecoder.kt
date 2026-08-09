@@ -43,7 +43,6 @@ internal inline fun FunctionPredecoder(
             function.body,
         ).bind(),
         frameSlots = maxOf(function.frameSlots, params + function.locals.size),
-        frameSlotMode = function.frameSlotMode,
         returnSlots = function.returnSlots,
     )
 }

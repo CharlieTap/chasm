@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
+import io.github.charlietap.chasm.validator.ext.branchValues
 import io.github.charlietap.chasm.validator.ext.peek
 import io.github.charlietap.chasm.validator.ext.popAndReplaceValues
 import io.github.charlietap.chasm.validator.ext.popReference
@@ -19,11 +20,7 @@ internal fun BreakOnNullInstructionValidator(
 
     val label = context.labels.peek(instruction.labelIndex).bind()
 
-    val outputs = if (label.instruction is ControlInstruction.Loop) {
-        label.inputs
-    } else {
-        label.outputs
-    }
+    val outputs = label.branchValues
 
     val referenceType = context.popReference().bind()
     context.popAndReplaceValues(outputs.types).bind()

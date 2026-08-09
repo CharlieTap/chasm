@@ -12,6 +12,4 @@ fun copySlotsAdminInstruction(
     destinationSlots = destinationSlots,
 )
 
-fun endBlockAdminInstruction() = AdminInstruction.EndBlock
-
 fun endFunctionAdminInstruction() = AdminInstruction.EndFunction

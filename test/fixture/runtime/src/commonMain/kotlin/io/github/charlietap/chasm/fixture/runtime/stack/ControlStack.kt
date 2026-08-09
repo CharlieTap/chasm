@@ -19,11 +19,9 @@ fun cstack(
 )
 
 fun label(
-    arity: Int = 0,
     depths: StackDepths = stackDepths(),
     continuation: DispatchableInstruction? = null,
 ) = ControlStack.Entry.Label(
-    arity = arity,
     depths = depths,
     continuation = continuation,
 )

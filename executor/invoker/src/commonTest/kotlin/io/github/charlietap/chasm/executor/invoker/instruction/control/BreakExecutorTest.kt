@@ -17,13 +17,10 @@ class BreakExecutorTest {
         val continuation = dispatchableInstruction()
         val cstack = cstack(
             frames = listOf(
-                frame(
-                    frameSlotMode = true,
-                ),
+                frame(),
             ),
             labels = listOf(
                 label(
-                    arity = 1,
                     depths = stackDepths(values = 1),
                     continuation = continuation,
                 ),
@@ -39,7 +36,6 @@ class BreakExecutorTest {
 
         BreakExecutor(
             controlStack = cstack,
-            valueStack = vstack,
             labelIndex = labelIndex(0),
         )
 

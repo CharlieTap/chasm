@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.predecoder.instruction.controlfused
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrIfDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrOnCastDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrOnCastFailDispatcher
@@ -10,26 +9,22 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrOnNon
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrOnNullDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.BrTableDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.CallDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.IfDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ReturnCallDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowRefDispatcher
 import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
-import io.github.charlietap.chasm.predecoder.InstructionSequencePredecoder
 import io.github.charlietap.chasm.predecoder.InstructionSequencePredecoderList
 import io.github.charlietap.chasm.predecoder.PredecodingContext
 import io.github.charlietap.chasm.predecoder.ext.functionAddress
 import io.github.charlietap.chasm.predecoder.ext.tableAddress
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.table
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.type.ConcreteHeapType
-import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction as RuntimeFusedControlInstruction
 
 internal fun ControlSuperInstructionPredecoder(
@@ -46,7 +41,7 @@ internal fun ControlSuperInstructionPredecoder(
         is ControlSuperInstruction.Call -> strictCallInstruction(context, instruction).bind()
         is ControlSuperInstruction.CallIndirect -> strictCallIndirectInstruction(context, instruction).bind()
         is ControlSuperInstruction.CallRef -> strictCallRefInstruction(instruction)
-        is ControlSuperInstruction.If -> strictIfInstruction(context, instruction).bind()
+        is ControlSuperInstruction.If -> error("structured fused if reached predecoding: $instruction")
         is ControlSuperInstruction.ReturnCall -> strictReturnCallInstruction(context, instruction).bind()
         is ControlSuperInstruction.ReturnCallIndirect -> strictReturnCallIndirectInstruction(context, instruction).bind()
         is ControlSuperInstruction.ReturnCallRef -> strictReturnCallRefInstruction(instruction)
@@ -405,44 +400,6 @@ private fun strictBrOnCastFailInstruction(
     }
 }
 
-private fun strictIfInstruction(
-    context: PredecodingContext,
-    instruction: ControlSuperInstruction.If,
-): Result<DispatchableInstruction, ModuleTrapError> = binding {
-    val operandImmediate = strictControlImmediate(instruction.operand)
-    val operandSlot = strictControlOperandSlot(instruction.operand)
-    val functionType = BlockTypeExpander(context.runtimeTypes, instruction.blockType)
-        .toResultOr { InstantiationError.PredecodingError }
-        .bind()
-    val instructions = predecodeIfInstructions(context, instruction.thenInstructions, instruction.elseInstructions).bind()
-
-    when {
-        operandImmediate != null -> {
-            IfDispatcher(
-                RuntimeFusedControlInstruction.IfI(
-                    operand = operandImmediate,
-                    params = functionType.params.types.size,
-                    results = functionType.results.types.size,
-                    instructions = instructions,
-                ),
-            )
-        }
-
-        operandSlot != null -> {
-            IfDispatcher(
-                RuntimeFusedControlInstruction.IfS(
-                    operandSlot = operandSlot,
-                    params = functionType.params.types.size,
-                    results = functionType.results.types.size,
-                    instructions = instructions,
-                ),
-            )
-        }
-
-        else -> unsupportedUnloweredControlInstruction()
-    }
-}
-
 private fun preResolveCastType(
     context: PredecodingContext,
     referenceType: io.github.charlietap.chasm.type.ReferenceType,
@@ -451,19 +408,6 @@ private fun preResolveCastType(
         is ConcreteHeapType.TypeIndex -> context.instance.runtimeTypes[heapType.index].hydrate()
         else -> Unit
     }
-}
-
-private fun predecodeIfInstructions(
-    context: PredecodingContext,
-    thenInstructions: List<Instruction>,
-    elseInstructions: List<Instruction>?,
-): Result<Array<Array<DispatchableInstruction>>, ModuleTrapError> = binding {
-    val thenDispatchableInstructions = InstructionSequencePredecoder(context, thenInstructions).bind()
-    val elseDispatchableInstructions = elseInstructions?.let { instructions ->
-        InstructionSequencePredecoder(context, instructions).bind()
-    } ?: emptyArray()
-
-    arrayOf(elseDispatchableInstructions, thenDispatchableInstructions)
 }
 
 private fun strictControlImmediate(

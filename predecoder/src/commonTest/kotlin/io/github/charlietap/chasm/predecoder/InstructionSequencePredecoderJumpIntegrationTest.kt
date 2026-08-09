@@ -3,12 +3,10 @@
 package io.github.charlietap.chasm.predecoder
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.fixture.ir.instruction.blockInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.catchAllRefHandler
 import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Const
-import io.github.charlietap.chasm.fixture.ir.instruction.valueBlockType
 import io.github.charlietap.chasm.fixture.ir.module.labelIndex
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
@@ -17,7 +15,6 @@ import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
-import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.ext.depth
 import io.github.charlietap.chasm.runtime.stack.ControlStack
@@ -68,7 +65,7 @@ class InstructionSequencePredecoderJumpIntegrationTest {
     }
 
     @Test
-    fun `executes mixed block and jump sequence for br_if first shape`() {
+    fun `executes flat jump sequence for br_if first shape`() {
         val context = PredecodingContext(
             instance = moduleInstance(),
             store = store(),
@@ -76,19 +73,13 @@ class InstructionSequencePredecoderJumpIntegrationTest {
             runtimeTypes = mutableListOf(),
         )
         val instructions = listOf(
-            blockInstruction(
-                blockType = valueBlockType(i32ValueType()),
-                instructions = listOf(
-                    fusedI32Const(
-                        value = 1,
-                        destination = frameSlotDestination(3),
-                    ),
-                    AdminInstruction.CopySlots(
-                        sourceSlots = listOf(3),
-                        destinationSlots = listOf(2),
-                    ),
-                    AdminInstruction.EndBlock,
-                ),
+            fusedI32Const(
+                value = 1,
+                destination = frameSlotDestination(3),
+            ),
+            AdminInstruction.CopySlots(
+                sourceSlots = listOf(3),
+                destinationSlots = listOf(2),
             ),
             fusedI32Const(
                 value = 2,
@@ -96,7 +87,7 @@ class InstructionSequencePredecoderJumpIntegrationTest {
             ),
             AdminInstruction.JumpIf(
                 operand = frameSlotOperand(4),
-                offset = 4,
+                offset = 5,
                 takenInstructions = listOf(
                     AdminInstruction.CopySlots(
                         sourceSlots = listOf(2),
@@ -135,7 +126,6 @@ class InstructionSequencePredecoderJumpIntegrationTest {
                 arity = 1,
                 depths = stackDepths(instructions = 1, values = 0),
                 instance = context.instance,
-                frameSlotMode = true,
             ),
         )
         cstack.push(exitLoop)
@@ -150,7 +140,7 @@ class InstructionSequencePredecoderJumpIntegrationTest {
     }
 
     @Test
-    fun `executes mixed block and immediate jump sequence for br_if first shape`() {
+    fun `executes flat immediate jump sequence for br_if first shape`() {
         val context = PredecodingContext(
             instance = moduleInstance(),
             store = store(),
@@ -158,23 +148,17 @@ class InstructionSequencePredecoderJumpIntegrationTest {
             runtimeTypes = mutableListOf(),
         )
         val instructions = listOf(
-            blockInstruction(
-                blockType = valueBlockType(i32ValueType()),
-                instructions = listOf(
-                    fusedI32Const(
-                        value = 1,
-                        destination = frameSlotDestination(3),
-                    ),
-                    AdminInstruction.CopySlots(
-                        sourceSlots = listOf(3),
-                        destinationSlots = listOf(2),
-                    ),
-                    AdminInstruction.EndBlock,
-                ),
+            fusedI32Const(
+                value = 1,
+                destination = frameSlotDestination(3),
+            ),
+            AdminInstruction.CopySlots(
+                sourceSlots = listOf(3),
+                destinationSlots = listOf(2),
             ),
             AdminInstruction.JumpIf(
                 operand = io.github.charlietap.chasm.ir.instruction.FusedOperand.I32Const(2),
-                offset = 3,
+                offset = 4,
                 takenInstructions = listOf(
                     AdminInstruction.CopySlots(
                         sourceSlots = listOf(2),
@@ -213,7 +197,6 @@ class InstructionSequencePredecoderJumpIntegrationTest {
                 arity = 1,
                 depths = stackDepths(instructions = 1, values = 0),
                 instance = context.instance,
-                frameSlotMode = true,
             ),
         )
         cstack.push(exitLoop)

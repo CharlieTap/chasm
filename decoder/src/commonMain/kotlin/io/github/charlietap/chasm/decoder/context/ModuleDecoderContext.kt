@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.type.DefinedType
 internal class ModuleDecoderContext(
     val config: ModuleConfig,
     override var reader: WasmBinaryReader,
-    override var blockEndOpcode: UByte = 0u,
     override var imports: List<Import> = emptyList(),
     override var requiresDataCount: Boolean = false,
     override var nameSectionSize: UInt = 0u,
@@ -21,7 +20,6 @@ internal class ModuleDecoderContext(
     override val definedTypes: MutableList<DefinedType> = mutableListOf(),
     override var index: Int = 0,
 ) : ReaderContext,
-    BlockContext,
     ModuleContext,
     NameSectionContext,
     SectionContext,
@@ -29,7 +27,6 @@ internal class ModuleDecoderContext(
     VectorContext {
 
     internal fun reset() {
-        blockEndOpcode = 0u
         imports = emptyList()
         requiresDataCount = false
         nameSectionSize = 0u

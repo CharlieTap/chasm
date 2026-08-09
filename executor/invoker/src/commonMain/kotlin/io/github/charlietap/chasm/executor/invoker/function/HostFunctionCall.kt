@@ -128,7 +128,7 @@ internal fun ReturnHostFunctionCall(
         throw InvocationException(InvocationError.HostFunctionError(e.reason))
     }
 
-    val visibleResultBase = FrameSlotVisibleResultBase(frame)
+    val visibleResultBase = frame.visibleResultBase
     if (visibleResultBase != null) {
         results.forEachIndexed { index, result ->
             vstack.setFrameSlot(visibleResultBase + index, result.toLongFromBoxed())

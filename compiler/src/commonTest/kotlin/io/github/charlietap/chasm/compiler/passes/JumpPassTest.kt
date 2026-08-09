@@ -3,7 +3,9 @@ package io.github.charlietap.chasm.compiler.passes
 import io.github.charlietap.chasm.fixture.ir.instruction.blockInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.brInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.catchAllHandler
+import io.github.charlietap.chasm.fixture.ir.instruction.elseInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.emptyBlockType
+import io.github.charlietap.chasm.fixture.ir.instruction.endInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedBrIf
@@ -16,6 +18,7 @@ import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class JumpPassTest {
 
@@ -24,29 +27,24 @@ class JumpPassTest {
         val module = module(
             functions = listOf(
                 function(
-                    frameSlotMode = true,
                     body = expression(
                         instructions = listOf(
-                            blockInstruction(
-                                instructions = listOf(
-                                    fusedBrIf(
-                                        operand = frameSlotOperand(0),
-                                        labelIndex = labelIndex(0),
-                                        takenInstructions = listOf(
-                                            AdminInstruction.CopySlots(
-                                                sourceSlots = listOf(1),
-                                                destinationSlots = listOf(2),
-                                            ),
-                                        ),
-                                    ),
+                            blockInstruction(),
+                            fusedBrIf(
+                                operand = frameSlotOperand(0),
+                                labelIndex = labelIndex(0),
+                                takenInstructions = listOf(
                                     AdminInstruction.CopySlots(
-                                        sourceSlots = listOf(3),
-                                        destinationSlots = listOf(4),
+                                        sourceSlots = listOf(1),
+                                        destinationSlots = listOf(2),
                                     ),
-                                    AdminInstruction.EndBlock,
                                 ),
                             ),
-                            AdminInstruction.EndBlock,
+                            AdminInstruction.CopySlots(
+                                sourceSlots = listOf(3),
+                                destinationSlots = listOf(4),
+                            ),
+                            endInstruction(),
                             AdminInstruction.EndFunction,
                         ),
                     ),
@@ -84,16 +82,11 @@ class JumpPassTest {
         val module = module(
             functions = listOf(
                 function(
-                    frameSlotMode = true,
                     body = expression(
                         instructions = listOf(
-                            loopInstruction(
-                                instructions = listOf(
-                                    brInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
-                            ),
-                            AdminInstruction.EndBlock,
+                            loopInstruction(),
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
                             AdminInstruction.EndFunction,
                         ),
                     ),
@@ -118,16 +111,11 @@ class JumpPassTest {
         val module = module(
             functions = listOf(
                 function(
-                    frameSlotMode = true,
                     body = expression(
                         instructions = listOf(
-                            loopInstruction(
-                                instructions = listOf(
-                                    brInstruction(labelIndex(1)),
-                                    AdminInstruction.EndBlock,
-                                ),
-                            ),
-                            AdminInstruction.EndBlock,
+                            loopInstruction(),
+                            brInstruction(labelIndex(1)),
+                            endInstruction(),
                             AdminInstruction.EndFunction,
                         ),
                     ),
@@ -152,24 +140,18 @@ class JumpPassTest {
         val module = module(
             functions = listOf(
                 function(
-                    frameSlotMode = true,
                     body = expression(
                         instructions = listOf(
                             fusedIf(
                                 operand = frameSlotOperand(0),
-                                thenInstructions = listOf(
-                                    brInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
-                                elseInstructions = listOf(
-                                    AdminInstruction.CopySlots(
-                                        sourceSlots = listOf(1),
-                                        destinationSlots = listOf(2),
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
-                            AdminInstruction.EndBlock,
+                            brInstruction(labelIndex(0)),
+                            elseInstruction(),
+                            AdminInstruction.CopySlots(
+                                sourceSlots = listOf(1),
+                                destinationSlots = listOf(2),
+                            ),
+                            endInstruction(),
                             AdminInstruction.EndFunction,
                         ),
                     ),
@@ -203,25 +185,18 @@ class JumpPassTest {
         val tryTable = ControlInstruction.TryTable(
             blockType = emptyBlockType(),
             handlers = emptyList(),
-            instructions = listOf(
-                brInstruction(labelIndex(0)),
-                AdminInstruction.EndBlock,
-            ),
         )
         val module = module(
             functions = listOf(
                 function(
-                    frameSlotMode = true,
                     body = expression(
                         instructions = listOf(
                             tryTable,
-                            blockInstruction(
-                                instructions = listOf(
-                                    brInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
-                            ),
-                            AdminInstruction.EndBlock,
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
+                            blockInstruction(),
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
                             AdminInstruction.EndFunction,
                         ),
                     ),
@@ -254,22 +229,17 @@ class JumpPassTest {
         val tryTable = ControlInstruction.TryTable(
             blockType = emptyBlockType(),
             handlers = listOf(catchAllHandler(labelIndex = labelIndex(0))),
-            instructions = listOf(AdminInstruction.EndBlock),
         )
         val module = module(
             functions = listOf(
                 function(
-                    frameSlotMode = true,
                     body = expression(
                         instructions = listOf(
                             tryTable,
-                            loopInstruction(
-                                instructions = listOf(
-                                    brInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
-                            ),
-                            AdminInstruction.EndBlock,
+                            endInstruction(),
+                            loopInstruction(),
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
                             AdminInstruction.EndFunction,
                         ),
                     ),
@@ -301,7 +271,6 @@ class JumpPassTest {
         val tryTable = ControlInstruction.TryTable(
             blockType = emptyBlockType(),
             handlers = listOf(catchAllHandler(labelIndex = labelIndex(0))),
-            instructions = listOf(AdminInstruction.EndBlock),
         )
         val expectedInstructions = listOf(
             AdminInstruction.PushHandler(
@@ -317,17 +286,13 @@ class JumpPassTest {
         val module = module(
             functions = listOf(
                 function(
-                    frameSlotMode = true,
                     body = expression(
                         instructions = listOf(
                             tryTable,
-                            blockInstruction(
-                                instructions = listOf(
-                                    brInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
-                            ),
-                            AdminInstruction.EndBlock,
+                            endInstruction(),
+                            blockInstruction(),
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
                             AdminInstruction.EndFunction,
                         ),
                     ),
@@ -346,24 +311,17 @@ class JumpPassTest {
         val tryTable = ControlInstruction.TryTable(
             blockType = emptyBlockType(),
             handlers = emptyList(),
-            instructions = listOf(
-                blockInstruction(
-                    instructions = listOf(
-                        brInstruction(labelIndex(0)),
-                        AdminInstruction.EndBlock,
-                    ),
-                ),
-                AdminInstruction.EndBlock,
-            ),
         )
         val module = module(
             functions = listOf(
                 function(
-                    frameSlotMode = true,
                     body = expression(
                         instructions = listOf(
                             tryTable,
-                            AdminInstruction.EndBlock,
+                            blockInstruction(),
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
+                            endInstruction(),
                             AdminInstruction.EndFunction,
                         ),
                     ),
@@ -388,5 +346,27 @@ class JumpPassTest {
             ),
             result.functions[0].body.instructions,
         )
+    }
+
+    @Test
+    fun `rejects control streams that have not been normalized by frame slot lowering`() {
+        val module = module(
+            functions = listOf(
+                function(
+                    body = expression(
+                        instructions = listOf(
+                            blockInstruction(),
+                            loopInstruction(),
+                            endInstruction(2),
+                            AdminInstruction.EndFunction,
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        assertFailsWith<IllegalArgumentException> {
+            JumpPass(passContext(module = module), module)
+        }
     }
 }

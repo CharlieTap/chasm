@@ -34,31 +34,24 @@ internal inline fun WasmFunctionCall(
         depths = depths,
         instance = instance.module,
         previousFramePointer = vstack.framePointer,
-        frameSlotMode = instance.function.frameSlotMode,
     )
 
     cstack.push(frame)
 
     vstack.framePointer = valuesDepth
-    if (instance.function.frameSlotMode) {
-        vstack.reserveFrame(instance.function.frameSlots)
-        instance.function.locals.forEachIndexed { index, value ->
-            vstack.setFrameSlot(interfaceSlots + index, value)
-        }
-    } else {
-        vstack.push(instance.function.locals)
-        vstack.reserveFrame(instance.function.frameSlots)
+    vstack.reserveFrame(instance.function.frameSlots)
+    instance.function.locals.forEachIndexed { index, value ->
+        vstack.setFrameSlot(interfaceSlots + index, value)
     }
 
     val labelDepths = StackDepths(
         handlers = cstack.handlersDepth(),
         instructions = cstack.instructionsDepth() + 1, // account for endfunction instruction added later
         labels = cstack.labelsDepth(),
-        values = vstack.depth(),
+        values = 0,
     )
 
     val label = ControlStack.Entry.Label(
-        arity = results,
         depths = labelDepths,
         continuation = null,
     )
@@ -100,7 +93,6 @@ internal inline fun WasmFunctionCall(
         depths = depths,
         instance = instance.module,
         previousFramePointer = callerFramePointer,
-        frameSlotMode = true,
         visibleResultBase = StrictVisibleResultBase(resultSlots),
     )
 
@@ -110,11 +102,10 @@ internal inline fun WasmFunctionCall(
         handlers = cstack.handlersDepth(),
         instructions = cstack.instructionsDepth() + 1,
         labels = cstack.labelsDepth(),
-        values = vstack.depth(),
+        values = 0,
     )
 
     val label = ControlStack.Entry.Label(
-        arity = results,
         depths = labelDepths,
         continuation = null,
     )

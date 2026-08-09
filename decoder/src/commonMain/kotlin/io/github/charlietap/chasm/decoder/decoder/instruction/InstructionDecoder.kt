@@ -75,9 +75,10 @@ private fun Set<UIntRange>.contains(opcode: UByte): Boolean = any { range ->
 
 internal val CONTROL_OPCODES: Set<UIntRange> by lazy {
     setOf(
-        UNREACHABLE..ELSE,
+        UNREACHABLE..IF,
         THROW..THROW,
-        THROW_REF..RETURN_CALL_REF,
+        THROW_REF..THROW_REF,
+        BR..RETURN_CALL_REF,
         TRY_TABLE..TRY_TABLE,
         BR_ON_NULL..BR_ON_NON_NULL,
     )

@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.fixture.ast.instruction
 
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.fixture.ast.module.functionIndex
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
@@ -68,29 +67,27 @@ fun nopInstruction() = ControlInstruction.Nop
 
 fun blockInstruction(
     blockType: BlockType = blockType(),
-    instructions: List<Instruction> = [],
 ) = ControlInstruction.Block(
     blockType = blockType,
-    instructions = instructions,
 )
 
 fun loopInstruction(
     blockType: BlockType = blockType(),
-    instructions: List<Instruction> = [],
 ) = ControlInstruction.Loop(
     blockType = blockType,
-    instructions = instructions,
 )
 
 fun ifInstruction(
     blockType: BlockType = blockType(),
-    thenInstructions: List<Instruction> = [],
-    elseInstructions: List<Instruction>? = null,
 ) = ControlInstruction.If(
     blockType = blockType,
-    thenInstructions = thenInstructions,
-    elseInstructions = elseInstructions,
 )
+
+fun elseInstruction() = ControlInstruction.Else
+
+fun endInstruction(
+    count: Int = 1,
+) = ControlInstruction.End(count)
 
 fun brInstruction(
     labelIndex: Index.LabelIndex = labelIndex(),

@@ -10,26 +10,15 @@ internal typealias FunctionRewriter = (PassContext, Function) -> Function
 internal fun FunctionRewriter(
     context: PassContext,
     function: Function,
-): Function =
-    FunctionRewriter(
-        context = context,
-        function = function,
-        expressionRewriter = ::ExpressionRewriter,
-    )
+): Function = FunctionRewriter(function)
 
-internal inline fun FunctionRewriter(
-    context: PassContext,
+internal fun FunctionRewriter(
     function: Function,
-    expressionRewriter: ExpressionRewriter,
 ): Function {
-    val expression = expressionRewriter(context, function.body)
     return function.copy(
         body = Expression(
             instructions = buildList {
-                addAll(expression.instructions)
-                if (!context.config.bytecodeFusion) {
-                    add(AdminInstruction.EndBlock)
-                }
+                addAll(function.body.instructions)
                 add(AdminInstruction.EndFunction)
             },
         ),

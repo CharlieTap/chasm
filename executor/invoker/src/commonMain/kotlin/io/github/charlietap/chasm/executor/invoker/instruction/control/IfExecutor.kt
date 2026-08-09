@@ -32,5 +32,5 @@ internal inline fun IfExecutor(
     val value = vstack.pop()
     val branchIndex = ((value or -value) ushr 63).toInt()
 
-    blockExecutor(store, cstack, vstack, instruction.params, instruction.results, instruction.instructions[branchIndex])
+    blockExecutor(cstack, instruction.instructions[branchIndex])
 }

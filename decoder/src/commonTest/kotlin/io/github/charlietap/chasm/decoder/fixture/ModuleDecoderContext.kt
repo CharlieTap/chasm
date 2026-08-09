@@ -18,7 +18,6 @@ internal fun decoderContext(
     sectionType: SectionType = sectionType(),
     types: MutableList<Type> = [],
     definedTypes: MutableList<DefinedType> = [],
-    blockEndOpcode: UByte = 0u,
     imports: List<Import> = [],
     index: Int = 0,
     nameSectionSize: UInt = 0u,
@@ -26,7 +25,6 @@ internal fun decoderContext(
 ) = ModuleDecoderContext(
     config = config,
     reader = reader,
-    blockEndOpcode = blockEndOpcode,
     imports = imports,
     requiresDataCount = requiresDataCount,
     nameSectionSize = nameSectionSize,

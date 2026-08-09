@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.admin
 
-import io.github.charlietap.chasm.executor.invoker.function.FinishStrictFrameSlotCallResult
-import io.github.charlietap.chasm.executor.invoker.function.RestoreLegacyCallResult
+import io.github.charlietap.chasm.executor.invoker.function.FinishFrameSlotCallResult
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
@@ -22,10 +21,5 @@ internal inline fun EndFunctionInstructionExecutor(
     cstack.shrinkInstructions(depths.instructions)
     cstack.shrinkLabels(depths.labels)
 
-    if (FinishStrictFrameSlotCallResult(vstack, frame)) {
-        return
-    }
-
-    RestoreLegacyCallResult(vstack, frame)
-    vstack.framePointer = frame.previousFramePointer
+    FinishFrameSlotCallResult(vstack, frame)
 }

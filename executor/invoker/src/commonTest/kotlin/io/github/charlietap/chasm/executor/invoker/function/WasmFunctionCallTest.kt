@@ -140,7 +140,7 @@ class WasmFunctionCallTest {
     }
 
     @Test
-    fun `does not synthesize a visible result base for legacy calls`() {
+    fun `does not synthesize a visible result base for stack operand calls`() {
 
         val store = store()
         val cstack = cstack()
@@ -162,7 +162,6 @@ class WasmFunctionCallTest {
 
         val function = runtimeFunction(
             frameSlots = 1,
-            frameSlotMode = true,
             returnSlots = listOf(0),
             body = runtimeExpression(
                 arrayOf(
@@ -213,7 +212,6 @@ class WasmFunctionCallTest {
         val function = runtimeFunction(
             locals = longArrayOf(9L),
             frameSlots = 3,
-            frameSlotMode = true,
             returnSlots = listOf(0),
             body = runtimeExpression(
                 arrayOf(
@@ -234,7 +232,6 @@ class WasmFunctionCallTest {
         cstack.push(
             frame(
                 instance = functionInstance.module,
-                frameSlotMode = true,
             ),
         )
 
@@ -274,7 +271,6 @@ class WasmFunctionCallTest {
 
         val function = runtimeFunction(
             frameSlots = 2,
-            frameSlotMode = true,
             body = runtimeExpression(
                 arrayOf(
                     dispatchableInstruction(),
@@ -291,7 +287,6 @@ class WasmFunctionCallTest {
         cstack.push(
             frame(
                 instance = functionInstance.module,
-                frameSlotMode = true,
             ),
         )
 
@@ -401,7 +396,6 @@ class WasmFunctionCallTest {
         val function = runtimeFunction(
             locals = longArrayOf(0L),
             frameSlots = 5,
-            frameSlotMode = true,
             body = runtimeExpression(
                 arrayOf(
                     dispatchableInstruction(),
@@ -420,7 +414,6 @@ class WasmFunctionCallTest {
         val frame = frame(
             arity = functionType.results.types.size,
             instance = functionInstance.module,
-            frameSlotMode = false,
         )
 
         cstack.push(frame)
@@ -441,7 +434,6 @@ class WasmFunctionCallTest {
         assertEquals(7L, vstack.getFrameSlot(0))
         assertEquals(8L, vstack.getFrameSlot(1))
         assertEquals(0L, vstack.getFrameSlot(2))
-        assertEquals(true, cstack.peekFrame().frameSlotMode)
     }
 
     @Test
@@ -464,7 +456,6 @@ class WasmFunctionCallTest {
 
         val function = runtimeFunction(
             frameSlots = 1,
-            frameSlotMode = true,
             returnSlots = listOf(0),
             body = runtimeExpression(
                 arrayOf(
@@ -488,7 +479,6 @@ class WasmFunctionCallTest {
                 depths = stackDepths(values = 3),
                 previousFramePointer = 0,
                 instance = functionInstance.module,
-                frameSlotMode = true,
                 visibleResultBase = 2,
             ),
         )
@@ -532,7 +522,6 @@ class WasmFunctionCallTest {
         val function = runtimeFunction(
             locals = longArrayOf(9L),
             frameSlots = 3,
-            frameSlotMode = true,
             returnSlots = listOf(0),
             body = runtimeExpression(
                 arrayOf(
@@ -557,7 +546,6 @@ class WasmFunctionCallTest {
                 depths = stackDepths(values = 2),
                 previousFramePointer = 0,
                 instance = functionInstance.module,
-                frameSlotMode = true,
                 visibleResultBase = 1,
             ),
         )

@@ -13,6 +13,8 @@ import io.github.charlietap.chasm.fixture.ir.instruction.callInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.callRefInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.catchAllRefHandler
 import io.github.charlietap.chasm.fixture.ir.instruction.dropInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.elseInstruction
+import io.github.charlietap.chasm.fixture.ir.instruction.endInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotOperand
@@ -148,7 +150,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Add(
@@ -200,7 +201,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Add(
@@ -259,7 +259,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Add(
@@ -300,15 +299,13 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(i32ValueType()),
-                                instructions = listOf(
-                                    fusedI32Add(
-                                        left = localGetOperand(localIndex(0)),
-                                        right = localGetOperand(localIndex(1)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedI32Add(
+                                left = localGetOperand(localIndex(0)),
+                                right = localGetOperand(localIndex(1)),
+                                destination = valueStackDestination(),
+                            ),
+                            endInstruction(),
                             fusedI32Eqz(
                                 operand = valueStackOperand(),
                                 destination = valueStackDestination(),
@@ -323,21 +320,17 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(i32ValueType()),
-                    instructions = buildList {
-                        add(
-                            fusedI32Add(
-                                left = frameSlotOperand(0),
-                                right = frameSlotOperand(1),
-                                destination = frameSlotDestination(2),
-                            ),
-                        )
-                    },
                 ),
+                fusedI32Add(
+                    left = frameSlotOperand(0),
+                    right = frameSlotOperand(1),
+                    destination = frameSlotDestination(2),
+                ),
+                endInstruction(),
                 fusedI32Eqz(
                     operand = frameSlotOperand(2),
                     destination = frameSlotDestination(2),
@@ -369,16 +362,14 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(i32ValueType()),
-                                instructions = listOf(
-                                    fusedI32Add(
-                                        left = localGetOperand(localIndex(0)),
-                                        right = localGetOperand(localIndex(1)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    brInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedI32Add(
+                                left = localGetOperand(localIndex(0)),
+                                right = localGetOperand(localIndex(1)),
+                                destination = valueStackDestination(),
+                            ),
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
                             fusedI32Eqz(
                                 operand = valueStackOperand(),
                                 destination = valueStackDestination(),
@@ -393,23 +384,18 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(i32ValueType()),
-                    instructions = buildList {
-                        add(
-                            fusedI32Add(
-                                left = frameSlotOperand(0),
-                                right = frameSlotOperand(1),
-                                destination = frameSlotDestination(2),
-                            ),
-                        )
-                        add(brInstruction(labelIndex(0)))
-                        add(AdminInstruction.EndBlock)
-                    },
                 ),
+                fusedI32Add(
+                    left = frameSlotOperand(0),
+                    right = frameSlotOperand(1),
+                    destination = frameSlotDestination(2),
+                ),
+                brInstruction(labelIndex(0)),
+                endInstruction(),
                 fusedI32Eqz(
                     operand = frameSlotOperand(2),
                     destination = frameSlotDestination(2),
@@ -441,20 +427,18 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(i32ValueType()),
-                                instructions = listOf(
-                                    fusedI32Add(
-                                        left = localGetOperand(localIndex(0)),
-                                        right = localGetOperand(localIndex(1)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    fusedI32Eqz(
-                                        operand = localGetOperand(localIndex(0)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    brIfInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedI32Add(
+                                left = localGetOperand(localIndex(0)),
+                                right = localGetOperand(localIndex(1)),
+                                destination = valueStackDestination(),
+                            ),
+                            fusedI32Eqz(
+                                operand = localGetOperand(localIndex(0)),
+                                destination = valueStackDestination(),
+                            ),
+                            brIfInstruction(labelIndex(0)),
+                            endInstruction(),
                             fusedI32Eqz(
                                 operand = valueStackOperand(),
                                 destination = valueStackDestination(),
@@ -469,33 +453,25 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(i32ValueType()),
-                    instructions = buildList {
-                        add(
-                            fusedI32Add(
-                                left = frameSlotOperand(0),
-                                right = frameSlotOperand(1),
-                                destination = frameSlotDestination(2),
-                            ),
-                        )
-                        add(
-                            fusedI32Eqz(
-                                operand = frameSlotOperand(0),
-                                destination = frameSlotDestination(3),
-                            ),
-                        )
-                        add(
-                            fusedBrIf(
-                                operand = frameSlotOperand(3),
-                                labelIndex = labelIndex(0),
-                            ),
-                        )
-                    },
                 ),
+                fusedI32Add(
+                    left = frameSlotOperand(0),
+                    right = frameSlotOperand(1),
+                    destination = frameSlotDestination(2),
+                ),
+                fusedI32Eqz(
+                    operand = frameSlotOperand(0),
+                    destination = frameSlotDestination(3),
+                ),
+                fusedBrIf(
+                    operand = frameSlotOperand(3),
+                    labelIndex = labelIndex(0),
+                ),
+                endInstruction(),
                 fusedI32Eqz(
                     operand = frameSlotOperand(2),
                     destination = frameSlotDestination(2),
@@ -526,16 +502,13 @@ class FrameSlotPassTest {
                     typeIndex = typeIndex(0),
                     body = expression(
                         instructions = listOf(
-                            blockInstruction(
-                                instructions = listOf(
-                                    localGetInstruction(localIndex(0)),
-                                    localGetInstruction(localIndex(1)),
-                                    i32AddInstruction(),
-                                    localTeeInstruction(localIndex(2)),
-                                    brIfInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
-                            ),
+                            blockInstruction(),
+                            localGetInstruction(localIndex(0)),
+                            localGetInstruction(localIndex(1)),
+                            i32AddInstruction(),
+                            localTeeInstruction(localIndex(2)),
+                            brIfInstruction(labelIndex(0)),
+                            endInstruction(),
                         ),
                     ),
                 ),
@@ -549,19 +522,17 @@ class FrameSlotPassTest {
         assertEquals(4, actual.frameSlots)
         assertEquals(
             listOf(
-                blockInstruction(
-                    instructions = listOf(
-                        fusedI32Add(
-                            left = frameSlotOperand(0),
-                            right = frameSlotOperand(1),
-                            destination = frameSlotDestination(2),
-                        ),
-                        fusedBrIf(
-                            operand = frameSlotOperand(2),
-                            labelIndex = labelIndex(0),
-                        ),
-                    ),
+                blockInstruction(),
+                fusedI32Add(
+                    left = frameSlotOperand(0),
+                    right = frameSlotOperand(1),
+                    destination = frameSlotDestination(2),
                 ),
+                fusedBrIf(
+                    operand = frameSlotOperand(2),
+                    labelIndex = labelIndex(0),
+                ),
+                endInstruction(),
             ),
             actual.body.instructions,
         )
@@ -608,7 +579,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Add(
@@ -645,23 +615,21 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(i32ValueType()),
-                                instructions = listOf(
-                                    fusedI32Add(
-                                        left = localGetOperand(localIndex(0)),
-                                        right = localGetOperand(localIndex(1)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    fusedI32Eqz(
-                                        operand = localGetOperand(localIndex(0)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    brTableInstruction(
-                                        labelIndices = listOf(labelIndex(0)),
-                                        defaultLabelIndex = labelIndex(0),
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedI32Add(
+                                left = localGetOperand(localIndex(0)),
+                                right = localGetOperand(localIndex(1)),
+                                destination = valueStackDestination(),
+                            ),
+                            fusedI32Eqz(
+                                operand = localGetOperand(localIndex(0)),
+                                destination = valueStackDestination(),
+                            ),
+                            brTableInstruction(
+                                labelIndices = listOf(labelIndex(0)),
+                                defaultLabelIndex = labelIndex(0),
+                            ),
+                            endInstruction(),
                             fusedI32Eqz(
                                 operand = valueStackOperand(),
                                 destination = valueStackDestination(),
@@ -676,31 +644,28 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(i32ValueType()),
-                    instructions = listOf(
-                        fusedI32Add(
-                            left = frameSlotOperand(0),
-                            right = frameSlotOperand(1),
-                            destination = frameSlotDestination(2),
-                        ),
-                        fusedI32Eqz(
-                            operand = frameSlotOperand(0),
-                            destination = frameSlotDestination(3),
-                        ),
-                        fusedBrTable(
-                            operand = frameSlotOperand(3),
-                            labelIndices = listOf(labelIndex(0)),
-                            defaultLabelIndex = labelIndex(0),
-                            takenInstructions = listOf(emptyList()),
-                            defaultTakenInstructions = emptyList(),
-                        ),
-                        AdminInstruction.EndBlock,
-                    ),
                 ),
+                fusedI32Add(
+                    left = frameSlotOperand(0),
+                    right = frameSlotOperand(1),
+                    destination = frameSlotDestination(2),
+                ),
+                fusedI32Eqz(
+                    operand = frameSlotOperand(0),
+                    destination = frameSlotDestination(3),
+                ),
+                fusedBrTable(
+                    operand = frameSlotOperand(3),
+                    labelIndices = listOf(labelIndex(0)),
+                    defaultLabelIndex = labelIndex(0),
+                    takenInstructions = listOf(emptyList()),
+                    defaultTakenInstructions = emptyList(),
+                ),
+                endInstruction(),
                 fusedI32Eqz(
                     operand = frameSlotOperand(2),
                     destination = frameSlotDestination(2),
@@ -735,21 +700,17 @@ class FrameSlotPassTest {
                             ),
                             ifInstruction(
                                 blockType = valueBlockType(i32ValueType()),
-                                thenInstructions = listOf(
-                                    fusedI32Eqz(
-                                        operand = localGetOperand(localIndex(0)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
-                                elseInstructions = listOf(
-                                    fusedI32Eqz(
-                                        operand = localGetOperand(localIndex(0)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedI32Eqz(
+                                operand = localGetOperand(localIndex(0)),
+                                destination = valueStackDestination(),
+                            ),
+                            elseInstruction(),
+                            fusedI32Eqz(
+                                operand = localGetOperand(localIndex(0)),
+                                destination = valueStackDestination(),
+                            ),
+                            endInstruction(),
                             fusedI32Eqz(
                                 operand = valueStackOperand(),
                                 destination = valueStackDestination(),
@@ -764,7 +725,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Eqz(
@@ -774,23 +734,17 @@ class FrameSlotPassTest {
                 fusedIf(
                     operand = frameSlotOperand(1),
                     blockType = valueBlockType(i32ValueType()),
-                    thenInstructions = buildList {
-                        add(
-                            fusedI32Eqz(
-                                operand = frameSlotOperand(0),
-                                destination = frameSlotDestination(1),
-                            ),
-                        )
-                    },
-                    elseInstructions = buildList {
-                        add(
-                            fusedI32Eqz(
-                                operand = frameSlotOperand(0),
-                                destination = frameSlotDestination(1),
-                            ),
-                        )
-                    },
                 ),
+                fusedI32Eqz(
+                    operand = frameSlotOperand(0),
+                    destination = frameSlotDestination(1),
+                ),
+                elseInstruction(),
+                fusedI32Eqz(
+                    operand = frameSlotOperand(0),
+                    destination = frameSlotDestination(1),
+                ),
+                endInstruction(),
                 fusedI32Eqz(
                     operand = frameSlotOperand(1),
                     destination = frameSlotDestination(1),
@@ -842,16 +796,14 @@ class FrameSlotPassTest {
                             ),
                             loopInstruction(
                                 blockType = signedTypeIndexBlockType(1),
-                                instructions = listOf(
-                                    fusedI32Add(
-                                        left = localGetOperand(localIndex(0)),
-                                        right = localGetOperand(localIndex(1)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    brInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedI32Add(
+                                left = localGetOperand(localIndex(0)),
+                                right = localGetOperand(localIndex(1)),
+                                destination = valueStackDestination(),
+                            ),
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
                         ),
                     ),
                 ),
@@ -862,7 +814,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Add(
@@ -872,19 +823,15 @@ class FrameSlotPassTest {
                 ),
                 loopInstruction(
                     blockType = signedTypeIndexBlockType(1),
-                    instructions = buildList {
-                        add(
-                            fusedI32Add(
-                                left = frameSlotOperand(0),
-                                right = frameSlotOperand(1),
-                                destination = frameSlotDestination(3),
-                            ),
-                        )
-                        addAll(frameSlotCopyInstructions(listOf(3), listOf(2)))
-                        add(brInstruction(labelIndex(0)))
-                        add(AdminInstruction.EndBlock)
-                    },
                 ),
+                fusedI32Add(
+                    left = frameSlotOperand(0),
+                    right = frameSlotOperand(1),
+                    destination = frameSlotDestination(3),
+                ),
+                *frameSlotCopyInstructions(listOf(3), listOf(2)).toTypedArray(),
+                brInstruction(labelIndex(0)),
+                endInstruction(),
             ),
             actual.body.instructions,
         )
@@ -937,25 +884,23 @@ class FrameSlotPassTest {
                             ),
                             loopInstruction(
                                 blockType = signedTypeIndexBlockType(1),
-                                instructions = listOf(
-                                    fusedI32Add(
-                                        left = localGetOperand(localIndex(0)),
-                                        right = localGetOperand(localIndex(1)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    fusedI32Eqz(
-                                        operand = localGetOperand(localIndex(0)),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    brIfInstruction(labelIndex(0)),
-                                    fusedI32Add(
-                                        left = valueStackOperand(),
-                                        right = valueStackOperand(),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedI32Add(
+                                left = localGetOperand(localIndex(0)),
+                                right = localGetOperand(localIndex(1)),
+                                destination = valueStackDestination(),
+                            ),
+                            fusedI32Eqz(
+                                operand = localGetOperand(localIndex(0)),
+                                destination = valueStackDestination(),
+                            ),
+                            brIfInstruction(labelIndex(0)),
+                            fusedI32Add(
+                                left = valueStackOperand(),
+                                right = valueStackOperand(),
+                                destination = valueStackDestination(),
+                            ),
+                            endInstruction(),
                             fusedI32Eqz(
                                 operand = valueStackOperand(),
                                 destination = valueStackDestination(),
@@ -970,7 +915,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(5, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Add(
@@ -980,37 +924,28 @@ class FrameSlotPassTest {
                 ),
                 loopInstruction(
                     blockType = signedTypeIndexBlockType(1),
-                    instructions = buildList {
-                        add(
-                            fusedI32Add(
-                                left = frameSlotOperand(0),
-                                right = frameSlotOperand(1),
-                                destination = frameSlotDestination(3),
-                            ),
-                        )
-                        add(
-                            fusedI32Eqz(
-                                operand = frameSlotOperand(0),
-                                destination = frameSlotDestination(4),
-                            ),
-                        )
-                        add(
-                            fusedBrIf(
-                                operand = frameSlotOperand(4),
-                                labelIndex = labelIndex(0),
-                                sourceSlots = listOf(3),
-                                destinationSlots = listOf(2),
-                            ),
-                        )
-                        add(
-                            fusedI32Add(
-                                left = frameSlotOperand(3),
-                                right = frameSlotOperand(2),
-                                destination = frameSlotDestination(2),
-                            ),
-                        )
-                    },
                 ),
+                fusedI32Add(
+                    left = frameSlotOperand(0),
+                    right = frameSlotOperand(1),
+                    destination = frameSlotDestination(3),
+                ),
+                fusedI32Eqz(
+                    operand = frameSlotOperand(0),
+                    destination = frameSlotDestination(4),
+                ),
+                fusedBrIf(
+                    operand = frameSlotOperand(4),
+                    labelIndex = labelIndex(0),
+                    sourceSlots = listOf(3),
+                    destinationSlots = listOf(2),
+                ),
+                fusedI32Add(
+                    left = frameSlotOperand(3),
+                    right = frameSlotOperand(2),
+                    destination = frameSlotDestination(2),
+                ),
+                endInstruction(),
                 fusedI32Eqz(
                     operand = frameSlotOperand(2),
                     destination = frameSlotDestination(2),
@@ -1062,17 +997,15 @@ class FrameSlotPassTest {
                             localGetInstruction(localIndex(0)),
                             loopInstruction(
                                 blockType = signedTypeIndexBlockType(1),
-                                instructions = listOf(
-                                    fusedI32Add(
-                                        left = valueStackOperand(),
-                                        right = valueStackOperand(),
-                                        destination = valueStackDestination(),
-                                    ),
-                                    localGetInstruction(localIndex(0)),
-                                    brInstruction(labelIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedI32Add(
+                                left = valueStackOperand(),
+                                right = valueStackOperand(),
+                                destination = valueStackDestination(),
+                            ),
+                            localGetInstruction(localIndex(0)),
+                            brInstruction(labelIndex(0)),
+                            endInstruction(),
                         ),
                     ),
                 ),
@@ -1083,7 +1016,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Const(
@@ -1093,19 +1025,15 @@ class FrameSlotPassTest {
                 *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
                 loopInstruction(
                     blockType = signedTypeIndexBlockType(1),
-                    instructions = buildList {
-                        add(
-                            fusedI32Add(
-                                left = frameSlotOperand(2),
-                                right = frameSlotOperand(1),
-                                destination = frameSlotDestination(1),
-                            ),
-                        )
-                        addAll(frameSlotCopyInstructions(listOf(0), listOf(2)))
-                        add(brInstruction(labelIndex(0)))
-                        add(AdminInstruction.EndBlock)
-                    },
                 ),
+                fusedI32Add(
+                    left = frameSlotOperand(2),
+                    right = frameSlotOperand(1),
+                    destination = frameSlotDestination(1),
+                ),
+                *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
+                brInstruction(labelIndex(0)),
+                endInstruction(),
             ),
             actual.body.instructions,
         )
@@ -1133,14 +1061,12 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(i32ValueType()),
-                                instructions = listOf(
-                                    localGetInstruction(localIndex(0)),
-                                    localGetInstruction(localIndex(1)),
-                                    brOnNullInstruction(labelIndex(0)),
-                                    dropInstruction(),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            localGetInstruction(localIndex(0)),
+                            localGetInstruction(localIndex(1)),
+                            brOnNullInstruction(labelIndex(0)),
+                            dropInstruction(),
+                            endInstruction(),
                             dropInstruction(),
                         ),
                     ),
@@ -1152,24 +1078,20 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(i32ValueType()),
-                    instructions = buildList {
-                        add(
-                            fusedBrOnNull(
-                                operand = frameSlotOperand(1),
-                                labelIndex = labelIndex(0),
-                                takenInstructions = buildList {
-                                    addAll(frameSlotCopyInstructions(listOf(0), listOf(2)))
-                                },
-                            ),
-                        )
+                ),
+                fusedBrOnNull(
+                    operand = frameSlotOperand(1),
+                    labelIndex = labelIndex(0),
+                    takenInstructions = buildList {
                         addAll(frameSlotCopyInstructions(listOf(0), listOf(2)))
                     },
                 ),
+                *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
+                endInstruction(),
             ),
             actual.body.instructions,
         )
@@ -1197,13 +1119,11 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(referenceValueType(referenceType)),
-                                instructions = listOf(
-                                    localGetInstruction(localIndex(0)),
-                                    brOnNonNullInstruction(labelIndex(0)),
-                                    localGetInstruction(localIndex(0)),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            localGetInstruction(localIndex(0)),
+                            brOnNonNullInstruction(labelIndex(0)),
+                            localGetInstruction(localIndex(0)),
+                            endInstruction(),
                             dropInstruction(),
                         ),
                     ),
@@ -1215,24 +1135,20 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(referenceValueType(referenceType)),
-                    instructions = buildList {
-                        add(
-                            fusedBrOnNonNull(
-                                operand = frameSlotOperand(0),
-                                labelIndex = labelIndex(0),
-                                takenInstructions = buildList {
-                                    addAll(frameSlotCopyInstructions(listOf(0), listOf(1)))
-                                },
-                            ),
-                        )
+                ),
+                fusedBrOnNonNull(
+                    operand = frameSlotOperand(0),
+                    labelIndex = labelIndex(0),
+                    takenInstructions = buildList {
                         addAll(frameSlotCopyInstructions(listOf(0), listOf(1)))
                     },
                 ),
+                *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
+                endInstruction(),
             ),
             actual.body.instructions,
         )
@@ -1261,16 +1177,14 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(referenceValueType(srcReferenceType)),
-                                instructions = listOf(
-                                    localGetInstruction(localIndex(0)),
-                                    brOnCastFailInstruction(
-                                        labelIndex = labelIndex(0),
-                                        srcReferenceType = srcReferenceType,
-                                        dstReferenceType = dstReferenceType,
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            localGetInstruction(localIndex(0)),
+                            brOnCastFailInstruction(
+                                labelIndex = labelIndex(0),
+                                srcReferenceType = srcReferenceType,
+                                dstReferenceType = dstReferenceType,
+                            ),
+                            endInstruction(),
                             dropInstruction(),
                         ),
                     ),
@@ -1282,26 +1196,22 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(referenceValueType(srcReferenceType)),
-                    instructions = buildList {
-                        add(
-                            fusedBrOnCastFail(
-                                operand = frameSlotOperand(0),
-                                labelIndex = labelIndex(0),
-                                srcReferenceType = srcReferenceType,
-                                dstReferenceType = dstReferenceType,
-                                takenInstructions = buildList {
-                                    addAll(frameSlotCopyInstructions(listOf(0), listOf(1)))
-                                },
-                            ),
-                        )
+                ),
+                fusedBrOnCastFail(
+                    operand = frameSlotOperand(0),
+                    labelIndex = labelIndex(0),
+                    srcReferenceType = srcReferenceType,
+                    dstReferenceType = dstReferenceType,
+                    takenInstructions = buildList {
                         addAll(frameSlotCopyInstructions(listOf(0), listOf(1)))
                     },
                 ),
+                *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
+                endInstruction(),
             ),
             actual.body.instructions,
         )
@@ -1329,18 +1239,14 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(referenceValueType(exceptionReferenceType)),
-                                instructions = listOf(
-                                    ControlInstruction.TryTable(
-                                        blockType = valueBlockType(referenceValueType(exceptionReferenceType)),
-                                        handlers = listOf(catchAllRefHandler(labelIndex(0))),
-                                        instructions = listOf(
-                                            localGetInstruction(localIndex(0)),
-                                            AdminInstruction.EndBlock,
-                                        ),
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            ControlInstruction.TryTable(
+                                blockType = valueBlockType(referenceValueType(exceptionReferenceType)),
+                                handlers = listOf(catchAllRefHandler(labelIndex(0))),
+                            ),
+                            localGetInstruction(localIndex(0)),
+                            endInstruction(),
+                            endInstruction(),
                             dropInstruction(),
                         ),
                     ),
@@ -1352,24 +1258,19 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(referenceValueType(exceptionReferenceType)),
-                    instructions = buildList {
-                        add(
-                            ControlInstruction.TryTable(
-                                blockType = valueBlockType(referenceValueType(exceptionReferenceType)),
-                                handlers = listOf(catchAllRefHandler(labelIndex(0))),
-                                instructions = buildList {
-                                    addAll(frameSlotCopyInstructions(listOf(0), listOf(1)))
-                                },
-                                payloadDestinationSlots = listOf(listOf(1)),
-                            ),
-                        )
-                    },
                 ),
+                ControlInstruction.TryTable(
+                    blockType = valueBlockType(referenceValueType(exceptionReferenceType)),
+                    handlers = listOf(catchAllRefHandler(labelIndex(0))),
+                    payloadDestinationSlots = listOf(listOf(1)),
+                ),
+                *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
+                endInstruction(),
+                endInstruction(),
             ),
             actual.body.instructions,
         )
@@ -1407,7 +1308,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 ControlSuperInstruction.ThrowRef(frameSlotOperand(0)),
@@ -1451,7 +1351,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedGlobalGet(
@@ -1495,7 +1394,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 unreachableInstruction(),
@@ -1520,16 +1418,14 @@ class FrameSlotPassTest {
                     typeIndex = typeIndex(0),
                     body = expression(
                         instructions = listOf(
-                            blockInstruction(
-                                instructions = listOf(
-                                    unreachableInstruction(),
-                                    fusedI32Add(
-                                        left = valueStackOperand(),
-                                        right = i32ConstOperand(1),
-                                        destination = valueStackDestination(),
-                                    ),
-                                ),
+                            blockInstruction(),
+                            unreachableInstruction(),
+                            fusedI32Add(
+                                left = valueStackOperand(),
+                                right = i32ConstOperand(1),
+                                destination = valueStackDestination(),
                             ),
+                            endInstruction(),
                         ),
                     ),
                 ),
@@ -1540,19 +1436,52 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
-                blockInstruction(
-                    instructions = listOf(
-                        unreachableInstruction(),
-                        fusedI32Add(
-                            left = frameSlotOperand(0),
-                            right = i32ConstOperand(1),
-                            destination = frameSlotDestination(0),
+                blockInstruction(),
+                unreachableInstruction(),
+                fusedI32Add(
+                    left = frameSlotOperand(0),
+                    right = i32ConstOperand(1),
+                    destination = frameSlotDestination(0),
+                ),
+                endInstruction(),
+            ),
+            actual.body.instructions,
+        )
+    }
+
+    @Test
+    fun `preserves nested conditionals in unreachable control`() {
+        val recursiveType = functionRecursiveType(functionType())
+        val module = module(
+            types = listOf(type(recursiveType = recursiveType)),
+            definedTypes = listOf(definedType(recursiveType = recursiveType)),
+            functions = listOf(
+                function(
+                    typeIndex = typeIndex(0),
+                    body = expression(
+                        instructions = listOf(
+                            unreachableInstruction(),
+                            ifInstruction(),
+                            elseInstruction(),
+                            endInstruction(),
                         ),
                     ),
                 ),
+            ),
+        )
+        val context = passContext(module = module)
+
+        val actual = FrameSlotPass(context, module).functions[0]
+
+        assertEquals(0, actual.frameSlots)
+        assertEquals(
+            listOf(
+                unreachableInstruction(),
+                fusedIf(operand = i32ConstOperand(0)),
+                elseInstruction(),
+                endInstruction(),
             ),
             actual.body.instructions,
         )
@@ -1584,7 +1513,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 unreachableInstruction(),
@@ -1624,7 +1552,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 unreachableInstruction(),
@@ -1673,7 +1600,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
@@ -2231,14 +2157,12 @@ class FrameSlotPassTest {
                         instructions = listOf(
                             blockInstruction(
                                 blockType = valueBlockType(i32ValueType()),
-                                instructions = listOf(
-                                    fusedLocalTee(
-                                        operand = localGetOperand(localIndex(0)),
-                                        localIdx = localIndex(0),
-                                    ),
-                                    AdminInstruction.EndBlock,
-                                ),
                             ),
+                            fusedLocalTee(
+                                operand = localGetOperand(localIndex(0)),
+                                localIdx = localIndex(0),
+                            ),
+                            endInstruction(),
                             fusedI32Eqz(
                                 operand = valueStackOperand(),
                                 destination = valueStackDestination(),
@@ -2258,8 +2182,9 @@ class FrameSlotPassTest {
             listOf(
                 blockInstruction(
                     blockType = valueBlockType(i32ValueType()),
-                    instructions = frameSlotCopyInstructions(listOf(0), listOf(1)),
                 ),
+                *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
+                endInstruction(),
                 fusedI32Eqz(
                     operand = frameSlotOperand(1),
                     destination = frameSlotDestination(1),
@@ -2399,7 +2324,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 unreachableInstruction(),
@@ -2446,7 +2370,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 unreachableInstruction(),
@@ -2498,7 +2421,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
@@ -2562,7 +2484,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
@@ -2614,7 +2535,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Const(
@@ -2667,7 +2587,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
@@ -2713,7 +2632,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
@@ -2760,7 +2678,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Eqz(
@@ -2851,7 +2768,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[1]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(3)).toTypedArray(),
@@ -2907,7 +2823,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedReturnCall(
@@ -2949,7 +2864,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
@@ -3001,7 +2915,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(1)).toTypedArray(),
@@ -3070,7 +2983,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Eqz(
@@ -3136,7 +3048,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
@@ -3206,7 +3117,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 *frameSlotCopyInstructions(listOf(0), listOf(2)).toTypedArray(),
@@ -3256,7 +3166,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(3, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedReturnCallIndirect(
@@ -3316,7 +3225,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(4, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedReturnCallRef(
@@ -3356,7 +3264,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 unreachableInstruction(),
@@ -3397,7 +3304,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 unreachableInstruction(),
@@ -3439,7 +3345,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 unreachableInstruction(),
@@ -3478,7 +3383,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedI32Add(
@@ -3514,7 +3418,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 ReferenceSuperInstruction.RefNull(
@@ -3549,7 +3452,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 ReferenceSuperInstruction.RefFunc(
@@ -3584,7 +3486,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 TableSuperInstruction.TableSize(
@@ -3619,7 +3520,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(1, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 MemorySuperInstruction.MemorySize(
@@ -3666,7 +3566,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(6, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 fusedSelect(
@@ -3711,7 +3610,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 MemorySuperInstruction.I32Load(
@@ -3758,7 +3656,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 AggregateSuperInstruction.StructGet(
@@ -3804,7 +3701,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 MemorySuperInstruction.MemoryGrow(
@@ -3849,7 +3745,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 ReferenceSuperInstruction.RefAsNonNull(
@@ -3893,7 +3788,6 @@ class FrameSlotPassTest {
         val actual = FrameSlotPass(context, module).functions[0]
 
         assertEquals(2, actual.frameSlots)
-        assertEquals(true, actual.frameSlotMode)
         assertEquals(
             listOf(
                 AggregateSuperInstruction.ArrayNewDefault(

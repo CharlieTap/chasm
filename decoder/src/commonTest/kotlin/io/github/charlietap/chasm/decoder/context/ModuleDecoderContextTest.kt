@@ -14,7 +14,6 @@ class ModuleDecoderContextTest {
     @Test
     fun `reset clears all mutable module decode state`() {
         val context = decoderContext(
-            blockEndOpcode = 1u,
             imports = listOf(moduleImport()),
             requiresDataCount = true,
             nameSectionSize = 2u,
@@ -27,7 +26,6 @@ class ModuleDecoderContextTest {
 
         context.reset()
 
-        assertEquals(0u, context.blockEndOpcode)
         assertEquals(emptyList(), context.imports)
         assertEquals(false, context.requiresDataCount)
         assertEquals(0u, context.nameSectionSize)

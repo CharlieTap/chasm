@@ -10,13 +10,11 @@ fun frame(
     depths: StackDepths = stackDepths(),
     instance: ModuleInstance = moduleInstance(),
     previousFramePointer: Int = 0,
-    frameSlotMode: Boolean = false,
     visibleResultBase: Int? = null,
 ) = ActivationFrame(
     arity = arity,
     depths = depths,
     instance = instance,
     previousFramePointer = previousFramePointer,
-    frameSlotMode = frameSlotMode,
     visibleResultBase = visibleResultBase,
 )

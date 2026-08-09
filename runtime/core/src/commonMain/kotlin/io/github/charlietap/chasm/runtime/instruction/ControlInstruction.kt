@@ -16,8 +16,6 @@ sealed interface ControlInstruction : LinkedInstruction {
     data object Nop : ControlInstruction
 
     data class Block(
-        val params: Int,
-        val results: Int,
         val instructions: Array<DispatchableInstruction>,
     ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
@@ -26,23 +24,17 @@ sealed interface ControlInstruction : LinkedInstruction {
 
             other as Block
 
-            if (params != other.params) return false
-            if (results != other.results) return false
             if (!instructions.contentEquals(other.instructions)) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = params
-            result = 31 * result + results
-            result = 31 * result + instructions.contentHashCode()
-            return result
+            return instructions.contentHashCode()
         }
     }
 
     data class Loop(
-        val params: Int,
         val instructions: Array<DispatchableInstruction>,
     ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
@@ -51,22 +43,17 @@ sealed interface ControlInstruction : LinkedInstruction {
 
             other as Loop
 
-            if (params != other.params) return false
             if (!instructions.contentEquals(other.instructions)) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = params
-            result = 31 * result + instructions.contentHashCode()
-            return result
+            return instructions.contentHashCode()
         }
     }
 
     data class If(
-        val params: Int,
-        val results: Int,
         val instructions: Array<Array<DispatchableInstruction>>,
     ) : ControlInstruction {
         override fun equals(other: Any?): Boolean {
@@ -75,24 +62,17 @@ sealed interface ControlInstruction : LinkedInstruction {
 
             other as If
 
-            if (params != other.params) return false
-            if (results != other.results) return false
             if (!instructions.contentEquals(other.instructions)) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = params
-            result = 31 * result + results
-            result = 31 * result + instructions.contentHashCode()
-            return result
+            return instructions.contentHashCode()
         }
     }
 
     data class TryTable(
-        val params: Int,
-        val results: Int,
         val handlers: List<CatchHandler>,
         val instructions: Array<DispatchableInstruction>,
         val payloadDestinationSlots: List<List<Int>> = [],
@@ -103,8 +83,6 @@ sealed interface ControlInstruction : LinkedInstruction {
 
             other as TryTable
 
-            if (params != other.params) return false
-            if (results != other.results) return false
             if (handlers != other.handlers) return false
             if (!instructions.contentEquals(other.instructions)) return false
             if (payloadDestinationSlots != other.payloadDestinationSlots) return false
@@ -113,9 +91,7 @@ sealed interface ControlInstruction : LinkedInstruction {
         }
 
         override fun hashCode(): Int {
-            var result = params
-            result = 31 * result + results
-            result = 31 * result + handlers.hashCode()
+            var result = handlers.hashCode()
             result = 31 * result + instructions.contentHashCode()
             result = 31 * result + payloadDestinationSlots.hashCode()
             return result

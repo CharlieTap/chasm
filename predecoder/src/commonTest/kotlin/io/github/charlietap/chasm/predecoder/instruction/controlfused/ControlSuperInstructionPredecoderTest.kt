@@ -39,6 +39,7 @@ import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class ControlSuperInstructionPredecoderTest {
@@ -100,8 +101,8 @@ class ControlSuperInstructionPredecoderTest {
             setFrameSlot(3, 41L)
         }
         val controlStack = cstack(
-            frames = listOf(frame(frameSlotMode = true)),
-            labels = listOf(label(arity = 1, depths = stackDepths(values = 0))),
+            frames = listOf(frame()),
+            labels = listOf(label(depths = stackDepths(values = 0))),
         )
 
         execute(dispatchable, context, vstack, controlStack)
@@ -141,27 +142,16 @@ class ControlSuperInstructionPredecoderTest {
     }
 
     @Test
-    fun `predecodes if from frame slots without using caches`() {
+    fun `rejects a structured fused if after jump lowering`() {
         val context = predecodingContext()
         val instruction = ControlSuperInstruction.If(
             operand = FusedOperand.FrameSlot(0),
             blockType = emptyBlockType(),
-            thenInstructions = emptyList(),
-            elseInstructions = emptyList(),
         )
 
-        val dispatchable = ControlSuperInstructionPredecoder(context, instruction).value
-        val vstack = ValueStack().apply {
-            reserveFrame(1)
-            setFrameSlot(0, 1L)
+        assertFailsWith<IllegalStateException> {
+            ControlSuperInstructionPredecoder(context, instruction)
         }
-        val controlStack = cstack()
-
-        execute(dispatchable, context, vstack, controlStack)
-
-        assertEquals(1, controlStack.labelsDepth())
-        assertTrue(context.loadCache.isEmpty())
-        assertTrue(context.storeCache.isEmpty())
     }
 
     @Test
@@ -203,7 +193,7 @@ class ControlSuperInstructionPredecoderTest {
             setFrameSlot(1, 41L)
         }
         val controlStack = cstack(
-            frames = listOf(frame(instance = context.instance, frameSlotMode = true)),
+            frames = listOf(frame(instance = context.instance)),
         )
 
         execute(dispatchable, context, vstack, controlStack)
@@ -229,7 +219,6 @@ class ControlSuperInstructionPredecoderTest {
             functionType = functionType,
             function = runtimeFunction(
                 frameSlots = 3,
-                frameSlotMode = true,
                 returnSlots = listOf(0),
                 body = runtimeExpression(
                     arrayOf(
@@ -265,7 +254,7 @@ class ControlSuperInstructionPredecoderTest {
             setFrameSlot(2, 41L)
         }
         val controlStack = cstack(
-            frames = listOf(frame(instance = context.instance, frameSlotMode = true)),
+            frames = listOf(frame(instance = context.instance)),
         )
 
         execute(dispatchable, context, vstack, controlStack)
@@ -329,7 +318,7 @@ class ControlSuperInstructionPredecoderTest {
             setFrameSlot(1, 41L)
         }
         val controlStack = cstack(
-            frames = listOf(frame(instance = context.instance, frameSlotMode = true)),
+            frames = listOf(frame(instance = context.instance)),
         )
 
         execute(dispatchable, context, vstack, controlStack)
@@ -355,7 +344,6 @@ class ControlSuperInstructionPredecoderTest {
             functionType = functionType,
             function = runtimeFunction(
                 frameSlots = 3,
-                frameSlotMode = true,
                 returnSlots = listOf(0),
                 body = runtimeExpression(
                     arrayOf(
@@ -391,7 +379,7 @@ class ControlSuperInstructionPredecoderTest {
             setFrameSlot(2, 41L)
         }
         val controlStack = cstack(
-            frames = listOf(frame(instance = context.instance, frameSlotMode = true)),
+            frames = listOf(frame(instance = context.instance)),
         )
 
         execute(dispatchable, context, vstack, controlStack)
@@ -446,7 +434,6 @@ class ControlSuperInstructionPredecoderTest {
                 frame(
                     instance = context.instance,
                     previousFramePointer = 0,
-                    frameSlotMode = true,
                     visibleResultBase = 1,
                     depths = stackDepths(values = 2),
                 ),
@@ -518,7 +505,6 @@ class ControlSuperInstructionPredecoderTest {
                 frame(
                     instance = context.instance,
                     previousFramePointer = 0,
-                    frameSlotMode = true,
                     visibleResultBase = 1,
                     depths = stackDepths(values = 2),
                 ),
@@ -550,7 +536,6 @@ class ControlSuperInstructionPredecoderTest {
             functionType = functionType,
             function = runtimeFunction(
                 frameSlots = 3,
-                frameSlotMode = true,
                 returnSlots = listOf(0),
                 body = runtimeExpression(
                     arrayOf(
@@ -590,7 +575,6 @@ class ControlSuperInstructionPredecoderTest {
                 frame(
                     instance = context.instance,
                     previousFramePointer = 0,
-                    frameSlotMode = true,
                     visibleResultBase = 1,
                     depths = stackDepths(values = 2),
                 ),

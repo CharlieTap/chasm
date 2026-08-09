@@ -98,7 +98,6 @@ class HostFunctionCallTest {
         cstack.push(
             frame(
                 instance = moduleInstance(),
-                frameSlotMode = true,
             ),
         )
 
@@ -168,7 +167,6 @@ class HostFunctionCallTest {
                 depths = stackDepths(values = 2),
                 previousFramePointer = 0,
                 instance = moduleInstance(),
-                frameSlotMode = true,
                 visibleResultBase = 1,
             ),
         )

@@ -403,6 +403,35 @@ class InstructionDecoderTest {
         assertEquals(expected, actual)
     }
 
+    @Test
+    fun `does not decode structural markers as control instructions`() {
+        listOf(ELSE, END).forEach { opcode ->
+            val context = decoderContext(
+                reader = FakeWasmBinaryReader(
+                    fakePeekReader = {
+                        FakeUByteReader {
+                            Ok(opcode)
+                        }
+                    },
+                ),
+            )
+
+            val actual = InstructionDecoder(
+                context,
+                neverNumericInstructionDecoder,
+                neverReferenceInstructionDecoder,
+                neverParametricInstructionDecoder,
+                neverVariableInstructionDecoder,
+                neverTableInstructionDecoder,
+                neverMemoryInstructionDecoder,
+                neverControlInstructionDecoder,
+                neverPrefixInstructionDecoder,
+            )
+
+            assertEquals(Err(InstructionDecodeError.UnknownInstruction(opcode)), actual)
+        }
+    }
+
     companion object {
         private val neverNumericInstructionDecoder: Decoder<NumericInstruction> = {
             error("NumericInstructionDecoder should not be called in this scenario")

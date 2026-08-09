@@ -22,7 +22,6 @@ internal fun ControlInstructionFuser(
     instruction = instruction,
     input = input,
     output = output,
-    expressionFuser = ::ExpressionFuser,
     operandFactory = ::FusedOperandFactory,
 )
 
@@ -32,19 +31,15 @@ internal inline fun ControlInstructionFuser(
     instruction: ControlInstruction,
     input: List<Instruction>,
     output: MutableList<Instruction>,
-    expressionFuser: ExpressionFuser,
     operandFactory: FusedOperandFactory,
 ): Int = when (instruction) {
-    is ControlInstruction.Block -> {
-
-        val expression = Expression(instruction.instructions)
-        val fusedExpression = expressionFuser(context, expression)
-
-        output.add(
-            instruction.copy(
-                instructions = fusedExpression.instructions,
-            ),
-        )
+    is ControlInstruction.Block,
+    is ControlInstruction.Loop,
+    is ControlInstruction.TryTable,
+    ControlInstruction.Else,
+    is ControlInstruction.End,
+    -> {
+        output.add(instruction)
         index
     }
     is ControlInstruction.BrIf -> {
@@ -66,59 +61,20 @@ internal inline fun ControlInstructionFuser(
         index
     }
     is ControlInstruction.If -> {
-
-        val thenExpression = Expression(instruction.thenInstructions)
-        val fusedThenExpression = expressionFuser(context, thenExpression)
-
-        val fusedElseExpression = instruction.elseInstructions?.let {
-            expressionFuser(context, Expression(it))
-        }
-
         val operand = input.getOrNull(index - 1)?.let(operandFactory)
 
         if (operand == null) {
-            output.add(
-                instruction.copy(
-                    thenInstructions = fusedThenExpression.instructions,
-                    elseInstructions = fusedElseExpression?.instructions,
-                ),
-            )
+            output.add(instruction)
         } else {
             output.removeLast()
             output.add(
                 ControlSuperInstruction.If(
                     operand = operand,
                     blockType = instruction.blockType,
-                    thenInstructions = fusedThenExpression.instructions,
-                    elseInstructions = fusedElseExpression?.instructions,
                 ),
             )
         }
 
-        index
-    }
-    is ControlInstruction.Loop -> {
-
-        val expression = Expression(instruction.instructions)
-        val fusedExpression = expressionFuser(context, expression)
-
-        output.add(
-            instruction.copy(
-                instructions = fusedExpression.instructions,
-            ),
-        )
-        index
-    }
-    is ControlInstruction.TryTable -> {
-
-        val expression = Expression(instruction.instructions)
-        val fusedExpression = expressionFuser(context, expression)
-
-        output.add(
-            instruction.copy(
-                instructions = fusedExpression.instructions,
-            ),
-        )
         index
     }
     // TODO Implement logic to fuse operands that do not immediately precede the call instructions

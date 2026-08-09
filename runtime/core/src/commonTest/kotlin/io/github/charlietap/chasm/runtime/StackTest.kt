@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.runtime
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.label
+import io.github.charlietap.chasm.fixture.runtime.stack.stackDepths
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -38,11 +39,11 @@ class StackTest {
         val stack = cstack()
 
         val label1 = label(
-            arity = 1,
+            depths = stackDepths(labels = 1),
         )
 
         val label2 = label(
-            arity = 2,
+            depths = stackDepths(labels = 2),
         )
 
         stack.push(label1)

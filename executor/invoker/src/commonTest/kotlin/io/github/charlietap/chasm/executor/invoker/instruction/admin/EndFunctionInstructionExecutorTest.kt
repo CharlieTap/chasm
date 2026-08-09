@@ -37,7 +37,6 @@ class EndFunctionInstructionExecutorTest {
                 arity = 2,
                 depths = stackDepths(values = 1),
                 previousFramePointer = 0,
-                frameSlotMode = true,
             ),
         )
 
@@ -79,7 +78,6 @@ class EndFunctionInstructionExecutorTest {
                 arity = 2,
                 depths = stackDepths(values = 3),
                 previousFramePointer = 0,
-                frameSlotMode = true,
                 visibleResultBase = 1,
             ),
         )
@@ -121,7 +119,6 @@ class EndFunctionInstructionExecutorTest {
                 arity = 1,
                 depths = stackDepths(values = 3),
                 previousFramePointer = 0,
-                frameSlotMode = true,
                 visibleResultBase = 2,
             ),
         )

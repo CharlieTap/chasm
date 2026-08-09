@@ -8,8 +8,6 @@ import kotlin.jvm.JvmInline
 
 sealed interface AdminInstruction : LinkedInstruction {
 
-    data object EndBlock : AdminInstruction
-
     data object EndFunction : AdminInstruction
 
     data class CopySlots(

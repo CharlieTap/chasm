@@ -124,6 +124,7 @@ internal class ModuleValidationContext(
         exportContext.exportNames.clear()
         expressionContext.expressionResultType = null
         functionContext.locals.clear()
+        functionContext.localChanges.clear()
         functionContext.labels.clear()
         functionContext.result = null
         functionContext.operands.clear()

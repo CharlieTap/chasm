@@ -102,7 +102,5 @@ sealed interface ControlSuperInstruction : Instruction {
     data class If(
         val operand: FusedOperand,
         val blockType: BlockType,
-        val thenInstructions: List<Instruction>,
-        val elseInstructions: List<Instruction>?,
     ) : ControlSuperInstruction
 }

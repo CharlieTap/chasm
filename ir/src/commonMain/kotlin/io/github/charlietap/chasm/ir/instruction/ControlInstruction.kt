@@ -26,18 +26,29 @@ sealed interface ControlInstruction : Instruction {
 
     data object Nop : ControlInstruction
 
-    data class Block(val blockType: BlockType, val instructions: List<Instruction>) : ControlInstruction
+    @JvmInline
+    value class Block(val blockType: BlockType) : ControlInstruction
 
-    data class Loop(val blockType: BlockType, val instructions: List<Instruction>) : ControlInstruction
+    @JvmInline
+    value class Loop(val blockType: BlockType) : ControlInstruction
 
-    data class If(val blockType: BlockType, val thenInstructions: List<Instruction>, val elseInstructions: List<Instruction>?) : ControlInstruction
+    @JvmInline
+    value class If(val blockType: BlockType) : ControlInstruction
 
     data class TryTable(
         val blockType: BlockType,
         val handlers: List<CatchHandler>,
-        val instructions: List<Instruction>,
         val payloadDestinationSlots: List<List<Int>> = [],
     ) : ControlInstruction
+
+    data object Else : ControlInstruction
+
+    @JvmInline
+    value class End(val count: Int) : ControlInstruction {
+        init {
+            require(count > 0)
+        }
+    }
 
     @JvmInline
     value class Throw(val tagIndex: Index.TagIndex) : ControlInstruction

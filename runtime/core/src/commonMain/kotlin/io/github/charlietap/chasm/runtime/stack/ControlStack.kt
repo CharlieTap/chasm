@@ -139,7 +139,6 @@ data class ControlStack(
     sealed interface Entry {
 
         data class Label(
-            val arity: Int,
             val depths: StackDepths,
             val continuation: DispatchableInstruction?,
         ) : Entry

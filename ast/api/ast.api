@@ -3965,16 +3965,17 @@ public abstract interface class io/github/charlietap/chasm/ast/instruction/Contr
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$Block : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;)V
-	public final fun component1 ()Lio/github/charlietap/chasm/type/BlockType;
-	public final fun component2 ()Ljava/util/List;
-	public final fun copy (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Block;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Block;Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Block;
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Block;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/BlockType;
 	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/BlockType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/BlockType;Lio/github/charlietap/chasm/type/BlockType;)Z
 	public final fun getBlockType ()Lio/github/charlietap/chasm/type/BlockType;
-	public final fun getInstructions ()Ljava/util/List;
 	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/BlockType;)I
 	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/BlockType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/BlockType;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$Br : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
@@ -4175,32 +4176,53 @@ public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$If : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;Ljava/util/List;)V
-	public final fun component1 ()Lio/github/charlietap/chasm/type/BlockType;
-	public final fun component2 ()Ljava/util/List;
-	public final fun component3 ()Ljava/util/List;
-	public final fun copy (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$If;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$If;Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$If;
+public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$Else : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
+	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Else;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getBlockType ()Lio/github/charlietap/chasm/type/BlockType;
-	public final fun getElseInstructions ()Ljava/util/List;
-	public final fun getThenInstructions ()Ljava/util/List;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$Loop : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;)V
-	public final fun component1 ()Lio/github/charlietap/chasm/type/BlockType;
-	public final fun component2 ()Ljava/util/List;
-	public final fun copy (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Loop;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Loop;Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Loop;
+public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$End : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$End;
+	public static fun constructor-impl (I)I
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getBlockType ()Lio/github/charlietap/chasm/type/BlockType;
-	public final fun getInstructions ()Ljava/util/List;
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getCount ()I
 	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
 	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$If : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$If;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/BlockType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/BlockType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/BlockType;Lio/github/charlietap/chasm/type/BlockType;)Z
+	public final fun getBlockType ()Lio/github/charlietap/chasm/type/BlockType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/BlockType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/BlockType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/BlockType;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$Loop : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
+	public static final synthetic fun box-impl (Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$Loop;
+	public static fun constructor-impl (Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/BlockType;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/charlietap/chasm/type/BlockType;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/charlietap/chasm/type/BlockType;Lio/github/charlietap/chasm/type/BlockType;)Z
+	public final fun getBlockType ()Lio/github/charlietap/chasm/type/BlockType;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/charlietap/chasm/type/BlockType;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/charlietap/chasm/type/BlockType;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/charlietap/chasm/type/BlockType;
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$Nop : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
@@ -4280,16 +4302,14 @@ public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction
 }
 
 public final class io/github/charlietap/chasm/ast/instruction/ControlInstruction$TryTable : io/github/charlietap/chasm/ast/instruction/ControlInstruction {
-	public fun <init> (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;Ljava/util/List;)V
+	public fun <init> (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;)V
 	public final fun component1 ()Lio/github/charlietap/chasm/type/BlockType;
 	public final fun component2 ()Ljava/util/List;
-	public final fun component3 ()Ljava/util/List;
-	public final fun copy (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;Ljava/util/List;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$TryTable;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$TryTable;Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$TryTable;
+	public final fun copy (Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$TryTable;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$TryTable;Lio/github/charlietap/chasm/type/BlockType;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/ast/instruction/ControlInstruction$TryTable;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBlockType ()Lio/github/charlietap/chasm/type/BlockType;
 	public final fun getHandlers ()Ljava/util/List;
-	public final fun getInstructions ()Ljava/util/List;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

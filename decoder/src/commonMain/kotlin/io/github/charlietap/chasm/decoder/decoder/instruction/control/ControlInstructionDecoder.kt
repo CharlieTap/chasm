@@ -4,12 +4,9 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
-import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Index.TagIndex
 import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.context.scope.BlockScope
-import io.github.charlietap.chasm.decoder.context.scope.ScopedDecoder
 import io.github.charlietap.chasm.decoder.decoder.Decoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.BLOCK
 import io.github.charlietap.chasm.decoder.decoder.instruction.BR
@@ -20,9 +17,7 @@ import io.github.charlietap.chasm.decoder.decoder.instruction.BR_TABLE
 import io.github.charlietap.chasm.decoder.decoder.instruction.CALL
 import io.github.charlietap.chasm.decoder.decoder.instruction.CALL_INDIRECT
 import io.github.charlietap.chasm.decoder.decoder.instruction.CALL_REF
-import io.github.charlietap.chasm.decoder.decoder.instruction.END
 import io.github.charlietap.chasm.decoder.decoder.instruction.IF
-import io.github.charlietap.chasm.decoder.decoder.instruction.InstructionBlockDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.LOOP
 import io.github.charlietap.chasm.decoder.decoder.instruction.NOP
 import io.github.charlietap.chasm.decoder.decoder.instruction.RETURN
@@ -48,10 +43,7 @@ internal fun ControlInstructionDecoder(
 ): Result<ControlInstruction, WasmDecodeError> =
     ControlInstructionDecoder(
         context = context,
-        scope = ::BlockScope,
         blockTypeDecoder = ::BlockTypeDecoder,
-        instructionBlockDecoder = ::InstructionBlockDecoder,
-        ifDecoder = ::IfDecoder,
         functionIndexDecoder = ::FunctionIndexDecoder,
         handlerDecoder = ::CatchHandlerDecoder,
         tagIndexDecoder = ::TagIndexDecoder,
@@ -64,10 +56,7 @@ internal fun ControlInstructionDecoder(
 
 internal inline fun ControlInstructionDecoder(
     context: ModuleDecoderContext,
-    crossinline scope: ScopedDecoder<UByte, List<Instruction>>,
     crossinline blockTypeDecoder: Decoder<BlockType>,
-    crossinline instructionBlockDecoder: Decoder<List<Instruction>>,
-    crossinline ifDecoder: Decoder<Pair<List<Instruction>, List<Instruction>?>>,
     crossinline functionIndexDecoder: Decoder<Index.FunctionIndex>,
     noinline handlerDecoder: Decoder<ControlInstruction.CatchHandler>,
     crossinline tagIndexDecoder: Decoder<TagIndex>,
@@ -82,22 +71,15 @@ internal inline fun ControlInstructionDecoder(
         NOP -> ControlInstruction.Nop
         BLOCK -> {
             val blockType = blockTypeDecoder(context).bind()
-            val instructions = scope(context, END) { scopedContext ->
-                instructionBlockDecoder(scopedContext)
-            }.bind()
-            ControlInstruction.Block(blockType, instructions)
+            ControlInstruction.Block(blockType)
         }
         LOOP -> {
             val blockType = blockTypeDecoder(context).bind()
-            val instructions = scope(context, END) { scopedContext ->
-                instructionBlockDecoder(scopedContext)
-            }.bind()
-            ControlInstruction.Loop(blockType, instructions)
+            ControlInstruction.Loop(blockType)
         }
         IF -> {
             val blockType = blockTypeDecoder(context).bind()
-            val (thenInstructions, elseInstructions) = ifDecoder(context).bind()
-            ControlInstruction.If(blockType, thenInstructions, elseInstructions)
+            ControlInstruction.If(blockType)
         }
         THROW -> {
             val tagIndex = tagIndexDecoder(context).bind()
@@ -147,11 +129,7 @@ internal inline fun ControlInstructionDecoder(
         TRY_TABLE -> {
             val blockType = blockTypeDecoder(context).bind()
             val handlers = handlerVectorDecoder(context, handlerDecoder).bind()
-            val instructions = scope(context, END) { scopedContext ->
-                instructionBlockDecoder(scopedContext)
-            }.bind()
-
-            ControlInstruction.TryTable(blockType, handlers.vector, instructions)
+            ControlInstruction.TryTable(blockType, handlers.vector)
         }
         BR_ON_NULL -> {
             val labelIndex = labelIndexDecoder(context).bind()

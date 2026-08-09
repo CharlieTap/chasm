@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.validator.ModuleValidator
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
+import io.github.charlietap.chasm.validator.ext.branchValues
 import io.github.charlietap.chasm.validator.ext.peek
 import io.github.charlietap.chasm.validator.ext.popValues
 import io.github.charlietap.chasm.validator.ext.pushValues
@@ -51,11 +52,7 @@ internal inline fun BreakOnCastInstructionValidator(
 
     val label = context.labels.peek(instruction.labelIndex).bind()
 
-    val outputs = if (label.instruction is ControlInstruction.Loop) {
-        label.inputs
-    } else {
-        label.outputs
-    }
+    val outputs = label.branchValues
 
     if (outputs.types.isEmpty()) {
         Err(TypeValidatorError.TypeMismatch).bind()
@@ -70,6 +67,6 @@ internal inline fun BreakOnCastInstructionValidator(
 
     val diffed = referenceTypeDiffer(instruction.srcReferenceType, instruction.dstReferenceType)
 
-    context.popValues(t0 + listOf(ValueType.Reference(instruction.srcReferenceType)))
+    context.popValues(t0 + listOf(ValueType.Reference(instruction.srcReferenceType))).bind()
     context.pushValues(t0 + listOf(ValueType.Reference(diffed)))
 }

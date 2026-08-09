@@ -1,12 +1,14 @@
 package io.github.charlietap.chasm.validator.ext
 
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.GlobalType
+import io.github.charlietap.chasm.type.InitializationStatus
 import io.github.charlietap.chasm.type.LocalType
 import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.ReferenceType
@@ -97,6 +99,18 @@ internal inline fun ModuleValidationContext.localType(
 ): Result<LocalType, ModuleValidatorError> {
     return locals.getOrNull(index.idx.toInt()).toResultOr {
         InstructionValidatorError.UnknownLocal
+    }
+}
+
+internal inline fun ModuleValidationContext.initializeLocal(
+    index: Index.LocalIndex,
+): Result<LocalType, ModuleValidatorError> {
+    return localType(index).map { localType ->
+        if (localType.status == InitializationStatus.UNSET) {
+            localType.status = InitializationStatus.SET
+            localChanges += index.idx.toInt()
+        }
+        localType
     }
 }
 

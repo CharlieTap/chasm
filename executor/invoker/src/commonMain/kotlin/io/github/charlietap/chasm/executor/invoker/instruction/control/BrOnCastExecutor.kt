@@ -65,6 +65,6 @@ internal inline fun BrOnCastExecutor(
 
     val casted = caster(vstack.peek(), referenceType2, moduleInstance, store)
     if (casted == breakIfMatches) {
-        breakExecutor(cstack, vstack, labelIndex)
+        breakExecutor(cstack, labelIndex)
     }
 }

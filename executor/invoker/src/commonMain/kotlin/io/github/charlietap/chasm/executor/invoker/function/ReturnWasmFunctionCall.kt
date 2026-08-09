@@ -28,20 +28,14 @@ internal inline fun ReturnWasmFunctionCall(
     vstack.shrink(params, depths.values)
 
     vstack.framePointer = depths.values
-    if (instance.function.frameSlotMode) {
-        vstack.reserveFrame(instance.function.frameSlots)
-        instance.function.locals.forEachIndexed { index, value ->
-            vstack.setFrameSlot(interfaceSlots + index, value)
-        }
-    } else {
-        vstack.push(instance.function.locals)
-        vstack.reserveFrame(instance.function.frameSlots)
+    vstack.reserveFrame(instance.function.frameSlots)
+    instance.function.locals.forEachIndexed { index, value ->
+        vstack.setFrameSlot(interfaceSlots + index, value)
     }
     cstack.push(
         frame.copy(
             instance = instance.module,
-            frameSlotMode = instance.function.frameSlotMode,
-            visibleResultBase = FrameSlotVisibleResultBase(frame),
+            visibleResultBase = frame.visibleResultBase,
         ),
     )
     cstack.push(instance.function.body.instructions)
@@ -90,8 +84,7 @@ internal inline fun ReturnWasmFunctionCall(
     cstack.push(
         frame.copy(
             instance = instance.module,
-            frameSlotMode = instance.function.frameSlotMode,
-            visibleResultBase = FrameSlotVisibleResultBase(frame),
+            visibleResultBase = frame.visibleResultBase,
         ),
     )
     cstack.push(instance.function.body.instructions)

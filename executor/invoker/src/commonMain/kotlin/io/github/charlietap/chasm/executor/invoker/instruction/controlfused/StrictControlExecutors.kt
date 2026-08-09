@@ -29,8 +29,8 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.ReferenceType
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher as LegacyThrowRefDispatcher
-import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor as LegacyThrowRefExecutor
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher as ControlThrowRefDispatcher
+import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor as ControlThrowRefExecutor
 
 internal fun BrIfExecutor(
     vstack: ValueStack,
@@ -78,7 +78,7 @@ internal inline fun BrIfExecutor(
 ) {
     if (operand != 0L) {
         executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        breakExecutor(cstack, vstack, labelIndex)
+        breakExecutor(cstack, labelIndex)
     }
 }
 
@@ -149,7 +149,7 @@ internal inline fun BrTableExecutor(
     }
 
     executeTakenInstructions(vstack, cstack, store, context, selectedTakenInstructions)
-    breakExecutor(cstack, vstack, label)
+    breakExecutor(cstack, label)
 }
 
 internal fun BrOnNullExecutor(
@@ -181,7 +181,7 @@ internal inline fun BrOnNullExecutor(
 ) {
     if (operand.isNullableReference()) {
         executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        breakExecutor(cstack, vstack, labelIndex)
+        breakExecutor(cstack, labelIndex)
     }
 }
 
@@ -214,7 +214,7 @@ internal inline fun BrOnNonNullExecutor(
 ) {
     if (!operand.isNullableReference()) {
         executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        breakExecutor(cstack, vstack, labelIndex)
+        breakExecutor(cstack, labelIndex)
     }
 }
 
@@ -275,7 +275,7 @@ internal inline fun BrOnCastExecutor(
     val casted = caster(operand, referenceType, moduleInstance, store)
     if (casted == breakIfMatches) {
         executeTakenInstructions(vstack, cstack, store, context, takenInstructions)
-        breakExecutor(cstack, vstack, labelIndex)
+        breakExecutor(cstack, labelIndex)
     }
 }
 
@@ -474,14 +474,14 @@ internal fun ThrowExecutor(
 
     store.exceptions.add(exceptionInstance)
     val exceptionAddress = Address.Exception(store.exceptions.size - 1)
-    LegacyThrowRefExecutor(
+    ControlThrowRefExecutor(
         vstack = vstack,
         cstack = cstack,
         store = store,
         context = context,
         ref = ReferenceValue.Exception(exceptionAddress).toLong(),
         breakDispatcher = ::BrDispatcher,
-        throwRefDispatcher = ::LegacyThrowRefDispatcher,
+        throwRefDispatcher = ::ControlThrowRefDispatcher,
     )
 }
 
@@ -491,14 +491,14 @@ internal fun ThrowRefExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ThrowRefS,
-) = LegacyThrowRefExecutor(
+) = ControlThrowRefExecutor(
     vstack = vstack,
     cstack = cstack,
     store = store,
     context = context,
     ref = vstack.getFrameSlot(instruction.exceptionSlot),
     breakDispatcher = ::BrDispatcher,
-    throwRefDispatcher = ::LegacyThrowRefDispatcher,
+    throwRefDispatcher = ::ControlThrowRefDispatcher,
 )
 
 private fun strictIndirectCall(
@@ -671,8 +671,6 @@ internal fun IfExecutor(
     store = store,
     context = context,
     operand = instruction.operand,
-    params = instruction.params,
-    results = instruction.results,
     instructions = instruction.instructions,
     blockExecutor = ::BlockExecutor,
 )
@@ -689,8 +687,6 @@ internal fun IfExecutor(
     store = store,
     context = context,
     operand = vstack.getFrameSlot(instruction.operandSlot),
-    params = instruction.params,
-    results = instruction.results,
     instructions = instruction.instructions,
     blockExecutor = ::BlockExecutor,
 )
@@ -701,11 +697,9 @@ internal inline fun IfExecutor(
     store: Store,
     context: ExecutionContext,
     operand: Long,
-    params: Int,
-    results: Int,
     instructions: Array<Array<DispatchableInstruction>>,
     crossinline blockExecutor: BlockExecutor,
 ) {
     val branchIndex = ((operand or -operand) ushr 63).toInt()
-    blockExecutor(store, cstack, vstack, params, results, instructions[branchIndex])
+    blockExecutor(cstack, instructions[branchIndex])
 }

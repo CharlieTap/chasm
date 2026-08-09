@@ -147,8 +147,6 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class IfI(
         val operand: Long,
-        val params: Int,
-        val results: Int,
         val instructions: Array<Array<DispatchableInstruction>>,
     ) : ControlSuperInstruction {
         override fun equals(other: Any?): Boolean {
@@ -158,8 +156,6 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
             other as IfI
 
             if (operand != other.operand) return false
-            if (params != other.params) return false
-            if (results != other.results) return false
             if (!instructions.contentEquals(other.instructions)) return false
 
             return true
@@ -167,8 +163,6 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
         override fun hashCode(): Int {
             var result = operand.hashCode()
-            result = 31 * result + params
-            result = 31 * result + results
             result = 31 * result + instructions.contentHashCode()
             return result
         }
@@ -176,8 +170,6 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class IfS(
         val operandSlot: Int,
-        val params: Int,
-        val results: Int,
         val instructions: Array<Array<DispatchableInstruction>>,
     ) : ControlSuperInstruction {
         override fun equals(other: Any?): Boolean {
@@ -187,8 +179,6 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
             other as IfS
 
             if (operandSlot != other.operandSlot) return false
-            if (params != other.params) return false
-            if (results != other.results) return false
             if (!instructions.contentEquals(other.instructions)) return false
 
             return true
@@ -196,8 +186,6 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
         override fun hashCode(): Int {
             var result = operandSlot
-            result = 31 * result + params
-            result = 31 * result + results
             result = 31 * result + instructions.contentHashCode()
             return result
         }
