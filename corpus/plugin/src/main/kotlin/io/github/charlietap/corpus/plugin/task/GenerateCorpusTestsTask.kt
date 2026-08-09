@@ -1,5 +1,6 @@
 package io.github.charlietap.corpus.plugin.task
 
+import com.squareup.kotlinpoet.CodeBlock
 import io.github.charlietap.corpus.lib.CorpusPhase
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -13,7 +14,6 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -43,9 +43,11 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
     @get:Input
     abstract val excludedTargets: ListProperty<String>
 
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val corpusDirectory: DirectoryProperty
+    @get:Input
+    abstract val resultsDirectoryPath: Property<String>
+
+    @get:Input
+    abstract val corpusDirectoryPath: Property<String>
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
@@ -93,6 +95,9 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
         val runnerClass = corpusRunner.get().substringAfterLast(".")
         val runnerPackage = corpusRunner.get().substringBeforeLast(".")
         val fixtureJsonPath = path.replace(Regex("\\.wasm$"), ".json")
+        val corpusRoot = corpusDirectoryPath.get().quoted()
+        val fixtureJson = File(corpusDirectoryPath.get()).resolve(version).resolve(fixtureJsonPath).path.quoted()
+        val resultsDirectory = resultsDirectoryPath.get().quoted()
 
         outputFile.parentFile.mkdirs()
         outputFile.writeText(
@@ -104,19 +109,28 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
             |import io.github.charlietap.corpus.lib.CorpusPhase
             |import io.github.charlietap.corpus.lib.CorpusResult
             |import io.github.charlietap.corpus.lib.fixture.Fixture
+            |import io.github.charlietap.corpus.lib.report.CorpusFixtureResult
+            |import io.github.charlietap.corpus.lib.report.CorpusReportWriter
+            |import java.nio.file.Path
             |import kotlin.test.Test
             |import kotlin.test.assertEquals
             |import kotlinx.serialization.json.Json
             |
             |class $className {
             |    private val runner = $runnerClass()
+            |    private val reportWriter = CorpusReportWriter()
             |
             |    @Test
             |    fun `fixture $name passes corpus ${phase.get().name.lowercase()}`() {
             |        val fixture = Json { ignoreUnknownKeys = true }
             |            .decodeFromString<Fixture>(runner.readText(FIXTURE_JSON))
             |            .copy(version = CORPUS_VERSION)
-            |        val result = runner.execute(CORPUS_ROOT, fixture, CorpusPhase.${phase.get().name})
+            |        val execution = runner.execute(CORPUS_ROOT, fixture, CorpusPhase.${phase.get().name})
+            |        reportWriter.write(
+            |            Path.of(RESULTS_DIRECTORY),
+            |            CorpusFixtureResult.from(fixture, CorpusPhase.${phase.get().name}, execution),
+            |        )
+            |        val result = execution.result
             |        if (result is CorpusResult.Skipped) {
             |            println("Skipped wasm-corpus fixture $name: ${'$'}{result.reason}")
             |            return
@@ -127,8 +141,9 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
             |
             |    companion object {
             |        const val CORPUS_VERSION = "$version"
-            |        const val CORPUS_ROOT = "${corpusDirectory.get().asFile.absolutePath}"
-            |        const val FIXTURE_JSON = "${corpusDirectory.get().asFile.resolve(version).resolve(fixtureJsonPath).absolutePath}"
+            |        const val CORPUS_ROOT = $corpusRoot
+            |        const val FIXTURE_JSON = $fixtureJson
+            |        const val RESULTS_DIRECTORY = $resultsDirectory
             |    }
             |}
             |
@@ -146,4 +161,6 @@ abstract class GenerateCorpusTestsTask : DefaultTask() {
         .filter(String::isNotBlank)
         .joinToString("") { part -> part.replaceFirstChar(Char::uppercaseChar) }
         .let { if (it.firstOrNull()?.isDigit() == true) "_$it" else it }
+
+    private fun String.quoted(): String = CodeBlock.of("%S", this).toString()
 }

@@ -44,9 +44,11 @@ import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.corpus.lib.CorpusExecution
 import io.github.charlietap.corpus.lib.CorpusPhase
 import io.github.charlietap.corpus.lib.CorpusResult
 import io.github.charlietap.corpus.lib.CorpusRunner
+import io.github.charlietap.corpus.lib.CorpusTimings
 import io.github.charlietap.corpus.lib.fixture.Fixture
 import io.github.charlietap.corpus.lib.fixture.FixtureBytes
 import io.github.charlietap.corpus.lib.fixture.FixtureImport
@@ -66,6 +68,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.time.TimeSource
 
 class ChasmCorpusRunner(
     private val config: Config = Config(),
@@ -79,16 +82,39 @@ class ChasmCorpusRunner(
         corpusRoot: String,
         fixture: Fixture,
         phase: CorpusPhase,
+    ): CorpusExecution {
+        val timings = CorpusTimingRecorder()
+        val totalStart = TimeSource.Monotonic.markNow()
+        val result = executeFixture(corpusRoot, fixture, phase, timings)
+        return CorpusExecution(
+            result = result,
+            timings = timings.snapshot(totalStart.elapsedNow().inWholeNanoseconds),
+            binarySizeBytes = timings.binarySizeBytes,
+            moduleBuildCount = timings.moduleBuildCount,
+        )
+    }
+
+    private fun executeFixture(
+        corpusRoot: String,
+        fixture: Fixture,
+        phase: CorpusPhase,
+        timings: CorpusTimingRecorder,
     ): CorpusResult {
         val modulePath = "$corpusRoot/${fixture.version ?: "1.0"}/${fixture.path}"
-        val decoded = when (val result = module(readBytes(modulePath), config.moduleConfig)) {
+        val decoded = when (
+            val result = timings.decode {
+                val bytes = readBytes(modulePath)
+                timings.binarySizeBytes = bytes.size.toLong()
+                module(bytes, config.moduleConfig)
+            }
+        ) {
             is ChasmResult.Success -> result.result
             is ChasmResult.Error -> return failure(fixture, "decode", "failed to decode wasm", result.error.toString())
         }
 
         if (phase == CorpusPhase.DECODING) return CorpusResult.Success
 
-        val validated = when (val result = validate(decoded)) {
+        val validated = when (val result = timings.validate { validate(decoded) }) {
             is ChasmResult.Success -> result.result
             is ChasmResult.Error -> return failure(fixture, "validate", "failed to validate wasm", result.error.toString())
         }
@@ -96,9 +122,13 @@ class ChasmCorpusRunner(
         if (phase == CorpusPhase.VALIDATION) return CorpusResult.Success
 
         if (fixture.tests.isEmpty()) {
-            val store = store()
-            return instantiate(fixture, store, validated, null).fold(
+            val setup = timings.instantiate {
+                val store = store()
+                instantiate(fixture, store, validated, null)
+            }
+            return setup.fold(
                 { setup ->
+                    timings.moduleBuildCount++
                     setup.close()
                     CorpusResult.Success
                 },
@@ -107,24 +137,32 @@ class ChasmCorpusRunner(
         }
 
         fixture.tests.forEachIndexed { testIndex, test ->
-            val store = store()
-            val setup = instantiate(fixture, store, validated, test).fold(
-                { setup -> setup },
+            val (store, setupResult) = timings.instantiate {
+                val store = store()
+                store to instantiate(fixture, store, validated, test)
+            }
+            val setup = setupResult.fold(
+                { setup ->
+                    timings.moduleBuildCount++
+                    setup
+                },
                 { error -> return error },
             )
-            if (phase == CorpusPhase.INSTANTIATION) return@forEachIndexed
-
-            val captures = mutableMapOf<String, ExecutionValue>()
             try {
+                if (phase == CorpusPhase.INSTANTIATION) return@forEachIndexed
+
+                val captures = mutableMapOf<String, ExecutionValue>()
                 test.steps.forEachIndexed { stepIndex, step ->
-                    val result = runStep(
-                        fixture = fixture,
-                        context = "test[$testIndex] step[$stepIndex]",
-                        store = store,
-                        setup = setup,
-                        captures = captures,
-                        step = step,
-                    )
+                    val result = timings.execute {
+                        runStep(
+                            fixture = fixture,
+                            context = "test[$testIndex] step[$stepIndex]",
+                            store = store,
+                            setup = setup,
+                            captures = captures,
+                            step = step,
+                        )
+                    }
                     if (result != CorpusResult.Success) return result
                 }
             } finally {
@@ -864,6 +902,44 @@ class ChasmCorpusRunner(
         data class Success<T>(val value: T) : RunnerResult<T>
 
         data class Error(val error: CorpusResult) : RunnerResult<Nothing>
+    }
+
+    private class CorpusTimingRecorder {
+        var binarySizeBytes: Long = 0
+        var moduleBuildCount: Int = 0
+
+        private var decodeNanos: Long = 0
+        private var validateNanos: Long = 0
+        private var instantiateNanos: Long = 0
+        private var executeNanos: Long = 0
+
+        fun <T> decode(block: () -> T): T = measure(block) { elapsed -> decodeNanos += elapsed }
+
+        fun <T> validate(block: () -> T): T = measure(block) { elapsed -> validateNanos += elapsed }
+
+        fun <T> instantiate(block: () -> T): T = measure(block) { elapsed -> instantiateNanos += elapsed }
+
+        fun <T> execute(block: () -> T): T = measure(block) { elapsed -> executeNanos += elapsed }
+
+        fun snapshot(totalNanos: Long) = CorpusTimings(
+            totalNanos = totalNanos,
+            decodeNanos = decodeNanos,
+            validateNanos = validateNanos,
+            instantiateNanos = instantiateNanos,
+            executeNanos = executeNanos,
+        )
+
+        private fun <T> measure(
+            block: () -> T,
+            record: (Long) -> Unit,
+        ): T {
+            val start = TimeSource.Monotonic.markNow()
+            return try {
+                block()
+            } finally {
+                record(start.elapsedNow().inWholeNanoseconds)
+            }
+        }
     }
 
     private data class ImportCapture(

@@ -82,6 +82,9 @@ corpus {
     excludedFeatures = listOf("memory64", "simd", "relaxed-simd")
     excludedTags = listOf("stress-test", "benchmark")
     excludedTargets = listOf(
+        // Execution-heavy fixtures; keep the normal corpus run suitable for the development loop.
+        "esbuild",
+        "jsquash_hqx",
         // Huge finite loop; valid corpus case, but too slow for the current JVM interpreter path.
         "learning_rate_scheduling",
     )

@@ -11,5 +11,5 @@ interface CorpusRunner {
         corpusRoot: String,
         fixture: Fixture,
         phase: CorpusPhase,
-    ): CorpusResult
+    ): CorpusExecution
 }

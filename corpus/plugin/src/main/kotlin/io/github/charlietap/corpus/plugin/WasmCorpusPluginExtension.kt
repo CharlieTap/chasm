@@ -3,6 +3,7 @@ package io.github.charlietap.corpus.plugin
 import io.github.charlietap.corpus.lib.CorpusPhase
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -58,9 +59,24 @@ open class WasmCorpusPluginExtension
             layout.buildDirectory.dir(DIR_CORPUS_TESTS),
         )
 
+        val corpusResultsDirectory: DirectoryProperty = objects.directoryProperty().convention(
+            layout.buildDirectory.dir(DIR_CORPUS_RESULTS),
+        )
+
+        val corpusReportFile: RegularFileProperty = objects.fileProperty().convention(
+            layout.buildDirectory.file(FILE_CORPUS_REPORT),
+        )
+
+        val corpusBaselineDirectory: DirectoryProperty = objects.directoryProperty().convention(
+            layout.settingsDirectory.dir(DIR_CORPUS_BASELINE),
+        )
+
         private companion object {
             const val DIR_CORPUS = "wasm-corpus"
             const val DIR_CORPUS_FIXTURES = "wasm-corpus-fixtures"
             const val DIR_CORPUS_TESTS = "wasm-corpus-tests"
+            const val DIR_CORPUS_RESULTS = "wasm-corpus-results"
+            const val DIR_CORPUS_BASELINE = "baselines/corpus"
+            const val FILE_CORPUS_REPORT = "reports/corpus/results.json"
         }
     }
