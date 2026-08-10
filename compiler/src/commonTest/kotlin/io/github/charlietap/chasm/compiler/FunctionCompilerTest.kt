@@ -684,16 +684,23 @@ class FunctionCompilerTest {
 
     @Test
     fun preservesTheUnsupportedAtomicInstructionError() {
-        assertUnsupportedInstruction(AtomicMemoryInstruction.Fence)
+        assertUnsupportedInstruction(
+            instruction = AtomicMemoryInstruction.Fence,
+            expected = InstantiationError.UnsupportedThreadsModule,
+        )
     }
 
     @Test
     fun preservesTheUnsupportedVectorInstructionError() {
-        assertUnsupportedInstruction(VectorInstruction.V128Const(ByteArray(16)))
+        assertUnsupportedInstruction(
+            instruction = VectorInstruction.V128Const(ByteArray(16)),
+            expected = InstantiationError.UnsupportedSIMDModule,
+        )
     }
 
     private fun assertUnsupportedInstruction(
         instruction: io.github.charlietap.chasm.ast.instruction.Instruction,
+        expected: InstantiationError,
     ) {
         val module = module(
             definedTypes = listOf(definedType(recursiveType = functionRecursiveType())),
@@ -705,7 +712,7 @@ class FunctionCompilerTest {
 
         val error = FunctionCompiler(compilerContext(module), function, program).unwrapError()
 
-        assertEquals(InstantiationError.PredecodingError, error)
+        assertEquals(expected, error)
         assertEquals(1, program.size)
     }
 }

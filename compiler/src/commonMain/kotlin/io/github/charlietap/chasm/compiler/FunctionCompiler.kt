@@ -209,9 +209,8 @@ internal fun FunctionCompiler(
                             compileControlInstruction(state, instruction)
                             false
                         }
-                        is AtomicMemoryInstruction,
-                        is VectorInstruction,
-                        -> return@run Err(InstantiationError.PredecodingError)
+                        is AtomicMemoryInstruction -> return@run Err(InstantiationError.UnsupportedThreadsModule)
+                        is VectorInstruction -> return@run Err(InstantiationError.UnsupportedSIMDModule)
                     }
                 }
                 if (consumesNextInstruction) 2 else 1
