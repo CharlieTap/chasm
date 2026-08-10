@@ -53,7 +53,7 @@ data class ControlStack(
     }
 
     companion object {
-        const val INITIAL_CAPACITY = 256
+        const val INITIAL_CAPACITY = 32
         const val MAX_DEPTH = 1028
     }
 }

@@ -10,11 +10,12 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
     private var top = 0
 
     init {
+        val minimumCapacity = maxOf(minCapacity, MIN_CAPACITY)
         val arrayCapacity: Int =
-            if (minCapacity.countOneBits() != 1) {
-                (minCapacity - 1).takeHighestOneBit() shl 1
+            if (minimumCapacity.countOneBits() != 1) {
+                (minimumCapacity - 1).takeHighestOneBit() shl 1
             } else {
-                minCapacity
+                minimumCapacity
             }
         elements = LongArray(arrayCapacity)
     }
@@ -56,11 +57,10 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
-    fun push(value: Long) = try {
-        elements[top] = value
-        top++
-    } catch (_: IndexOutOfBoundsException) {
-        doubleCapacity()
+    fun push(value: Long) {
+        if (top == elements.size) {
+            doubleCapacity()
+        }
         elements[top] = value
         top++
     }
@@ -84,11 +84,10 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
-    fun pushI32(value: Int) = try {
-        elements[top] = value.toLong()
-        top++
-    } catch (_: IndexOutOfBoundsException) {
-        doubleCapacity()
+    fun pushI32(value: Int) {
+        if (top == elements.size) {
+            doubleCapacity()
+        }
         elements[top] = value.toLong()
         top++
     }
@@ -112,11 +111,10 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
-    fun pushI64(value: Long) = try {
-        elements[top] = value
-        top++
-    } catch (_: IndexOutOfBoundsException) {
-        doubleCapacity()
+    fun pushI64(value: Long) {
+        if (top == elements.size) {
+            doubleCapacity()
+        }
         elements[top] = value
         top++
     }
@@ -239,6 +237,6 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
     }
 
     companion object {
-        private const val MIN_CAPACITY = 512
+        private const val MIN_CAPACITY = 32
     }
 }

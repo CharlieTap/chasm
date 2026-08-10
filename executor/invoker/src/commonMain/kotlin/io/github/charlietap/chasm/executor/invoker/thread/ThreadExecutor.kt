@@ -26,7 +26,7 @@ internal fun ThreadExecutor(
     values: List<ExecutionValue>,
 ): Result<List<Long>, InvocationError> = binding {
     val cstack = ControlStack()
-    val vstack = ValueStack()
+    val vstack = ValueStack(instance.function.frameSlots)
     val context = ExecutionContext(
         cstack = cstack,
         vstack = vstack,

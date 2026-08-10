@@ -5,16 +5,19 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 
 class FrameStack {
 
-    private var elements: Array<ActivationFrame?> = arrayOfNulls(CAPACITY)
+    private var elements: Array<ActivationFrame?> = arrayOfNulls(INITIAL_CAPACITY)
     private var top = 0
 
-    fun push(value: ActivationFrame) = try {
+    fun push(value: ActivationFrame) {
+        val capacity = elements.size
+        if (top == capacity) {
+            if (capacity == MAX_CAPACITY) {
+                throw InvocationException(InvocationError.CallStackExhausted)
+            }
+            elements = elements.copyOf(minOf(capacity * 2, MAX_CAPACITY))
+        }
         elements[top] = value
         top++
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.CallStackExhausted)
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.CallStackExhausted)
     }
 
     fun pop(): ActivationFrame = try {
@@ -64,4 +67,5 @@ class FrameStack {
     }
 }
 
-private const val CAPACITY = 1028
+private const val INITIAL_CAPACITY = 32
+private const val MAX_CAPACITY = 1028
