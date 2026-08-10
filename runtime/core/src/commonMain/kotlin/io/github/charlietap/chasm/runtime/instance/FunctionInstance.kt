@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.instance
 
 import io.github.charlietap.chasm.runtime.function.Function
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.RTT
@@ -16,7 +17,18 @@ sealed class FunctionInstance {
         override val functionType: FunctionType,
         val module: ModuleInstance,
         var function: Function,
-    ) : FunctionInstance()
+    ) : FunctionInstance() {
+
+        var callPlan = WasmFunctionCallPlan(
+            entryIp = function.body.entryIp,
+            frameSlots = function.frameSlots,
+            params = functionType.params.types.size,
+            results = functionType.results.types.size,
+            interfaceSlots = maxOf(functionType.params.types.size, functionType.results.types.size),
+            module = module,
+            locals = function.locals.copyOf(),
+        )
+    }
 
     data class HostFunction(
         override val rtt: RTT,

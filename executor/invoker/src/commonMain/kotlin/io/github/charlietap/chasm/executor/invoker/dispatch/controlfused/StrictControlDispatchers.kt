@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.controlfused
 
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithoutLocals
 import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.CallExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.ReturnCallExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.ThrowExecutor
@@ -9,8 +11,19 @@ import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 
 fun CallDispatcher(
     instruction: ControlSuperInstruction.WasmCall,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-    CallExecutor(vstack, cstack, store, context, instruction, nextIp)
+): DispatchableInstruction {
+    val plan = instruction.plan
+    val resultSlotBase = instruction.resultSlotBase
+    val callFrameSlot = instruction.callFrameSlot
+    return if (plan.locals.isEmpty()) {
+        DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+            WasmFunctionCallWithoutLocals(vstack, cstack, plan, resultSlotBase, callFrameSlot, nextIp)
+        }
+    } else {
+        DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+            WasmFunctionCall(vstack, cstack, plan, resultSlotBase, callFrameSlot, nextIp)
+        }
+    }
 }
 
 fun CallDispatcher(

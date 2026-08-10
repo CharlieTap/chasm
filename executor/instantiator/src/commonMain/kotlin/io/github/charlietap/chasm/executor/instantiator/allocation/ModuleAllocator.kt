@@ -28,10 +28,13 @@ import io.github.charlietap.chasm.runtime.ext.addGlobalAddress
 import io.github.charlietap.chasm.runtime.ext.addMemoryAddress
 import io.github.charlietap.chasm.runtime.ext.addTableAddress
 import io.github.charlietap.chasm.runtime.ext.addTagAddress
+import io.github.charlietap.chasm.runtime.ext.default
 import io.github.charlietap.chasm.runtime.ext.function
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import kotlin.jvm.JvmName
 import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
@@ -111,12 +114,38 @@ internal inline fun ModuleAllocator(
         instance.addDataAddress(address)
     }
 
+    var nextFunctionIp = store.program.size
+    module.functions.forEach { function ->
+        val address = instance.functionAddress(function.idx).bind()
+        val functionInstance = context.store.function(address) as FunctionInstance.WasmFunction
+        val params = functionInstance.functionType.params.types.size
+        val results = functionInstance.functionType.results.types.size
+
+        functionInstance.callPlan = WasmFunctionCallPlan(
+            entryIp = if (function.body.instructions.isEmpty()) EXIT_IP else nextFunctionIp,
+            frameSlots = maxOf(function.frameSlots, params + function.locals.size),
+            params = params,
+            results = results,
+            interfaceSlots = maxOf(params, results),
+            module = functionInstance.module,
+            locals = LongArray(function.locals.size) { index ->
+                function.locals[index].type.default()
+            },
+        )
+        nextFunctionIp += function.body.instructions.size
+    }
+
     module.functions.forEach { function ->
 
         val predecoded = functionPredecoder(context.asPredecodingContext(), function).bind()
         val address = instance.functionAddress(function.idx).bind()
         val functionInstance = context.store.function(address) as FunctionInstance.WasmFunction
 
+        check(predecoded.body.entryIp == functionInstance.callPlan.entryIp) {
+            "predecoded function entry IP does not match its call plan: " +
+                "function=${function.idx} expected=${functionInstance.callPlan.entryIp} " +
+                "actual=${predecoded.body.entryIp}"
+        }
         functionInstance.function = predecoded
     }
 

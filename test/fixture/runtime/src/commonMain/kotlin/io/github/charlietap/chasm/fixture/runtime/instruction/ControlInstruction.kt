@@ -33,7 +33,7 @@ fun returnCallRefRuntimeInstruction(
 fun wasmFunctionCallRuntimeInstruction(
     instance: FunctionInstance.WasmFunction = wasmFunctionInstance(),
 ) = ControlInstruction.WasmFunctionCall(
-    instance = instance,
+    plan = instance.callPlan,
 )
 
 fun callRefRuntimeInstruction(

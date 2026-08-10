@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.type.RTT
@@ -29,7 +30,7 @@ sealed interface ControlInstruction : LinkedInstruction {
     value class ReturnCallRef(val typeIndex: Index.TypeIndex) : ControlInstruction
 
     @JvmInline
-    value class WasmFunctionCall(val instance: FunctionInstance.WasmFunction) : ControlInstruction
+    value class WasmFunctionCall(val plan: WasmFunctionCallPlan) : ControlInstruction
 
     @JvmInline
     value class HostFunctionCall(val instance: FunctionInstance.HostFunction) : ControlInstruction

@@ -21,6 +21,6 @@ internal inline fun CallInstructionPredecoder(
     val address = context.instance.functionAddress(instruction.functionIndex).bind()
     when (val instance = context.store.function(address)) {
         is FunctionInstance.HostFunction -> HostFunctionCallDispatcher(HostFunctionCall(instance))
-        is FunctionInstance.WasmFunction -> WasmFunctionCallDispatcher(WasmFunctionCall(instance))
+        is FunctionInstance.WasmFunction -> WasmFunctionCallDispatcher(WasmFunctionCall(instance.callPlan))
     }
 }

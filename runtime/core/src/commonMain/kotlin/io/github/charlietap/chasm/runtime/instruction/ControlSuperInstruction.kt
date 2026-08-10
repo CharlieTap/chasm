@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.type.RTT
@@ -18,8 +19,8 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
     }
 
     data class WasmCall(
-        val instance: FunctionInstance.WasmFunction,
-        val resultSlots: List<Int>,
+        val plan: WasmFunctionCallPlan,
+        val resultSlotBase: Int,
         val callFrameSlot: Int,
     ) : ControlSuperInstruction
 

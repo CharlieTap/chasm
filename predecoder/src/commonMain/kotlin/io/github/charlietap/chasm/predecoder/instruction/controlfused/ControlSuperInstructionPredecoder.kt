@@ -64,8 +64,8 @@ private fun strictCallInstruction(
         is FunctionInstance.WasmFunction -> {
             CallDispatcher(
                 RuntimeFusedControlInstruction.WasmCall(
-                    instance = instance,
-                    resultSlots = instruction.resultSlots,
+                    plan = instance.callPlan,
+                    resultSlotBase = instruction.resultSlots.firstOrNull() ?: 0,
                     callFrameSlot = instruction.callFrameSlot,
                 ),
             )

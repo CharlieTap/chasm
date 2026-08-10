@@ -29,24 +29,6 @@ internal fun CallExecutor(
     cstack: ControlStack,
     store: Store,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.WasmCall,
-    returnIp: Int,
-): Int = WasmFunctionCall(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    instance = instruction.instance,
-    resultSlots = instruction.resultSlots,
-    callFrameSlot = instruction.callFrameSlot,
-    returnIp = returnIp,
-)
-
-internal fun CallExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
     instruction: ControlSuperInstruction.HostCall,
     returnIp: Int,
 ): Int {

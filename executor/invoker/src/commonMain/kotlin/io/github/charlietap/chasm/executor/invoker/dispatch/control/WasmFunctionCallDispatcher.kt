@@ -7,5 +7,5 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 fun WasmFunctionCallDispatcher(
     instruction: ControlInstruction.WasmFunctionCall,
 ): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-    WasmFunctionCall(vstack, cstack, store, context, instruction.instance, nextIp)
+    WasmFunctionCall(vstack, cstack, instruction.plan, nextIp)
 }
