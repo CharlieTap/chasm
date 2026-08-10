@@ -520,21 +520,39 @@ private fun lowerJumpIf(
     takenPaths: MutableList<TakenPath>,
 ) {
     val instructionIndex = output.size
+    val copy = instruction.takenInstructions.singleResultCopy()
+        ?.takeIf { currentHandlerDepth == target.handlerDepth }
     output.add(
-        AdminInstruction.JumpIf(
-            operand = instruction.operand,
-            offset = target.targetIndex ?: UNPATCHED_OFFSET,
-        ),
+        if (copy != null) {
+            AdminInstruction.JumpIfCopy(
+                operand = instruction.operand,
+                sourceSlot = copy.sourceSlots.single(),
+                destinationSlot = copy.destinationSlots.single(),
+                offset = target.targetIndex ?: UNPATCHED_OFFSET,
+            )
+        } else {
+            AdminInstruction.JumpIf(
+                operand = instruction.operand,
+                offset = target.targetIndex ?: UNPATCHED_OFFSET,
+            )
+        },
     )
-    addTakenPath(
-        takenPaths = takenPaths,
-        instructionIndex = instructionIndex,
-        instructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
-    )
+    if (copy == null) {
+        addTakenPath(
+            takenPaths = takenPaths,
+            instructionIndex = instructionIndex,
+            instructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
+        )
+    }
     if (target.targetIndex == null) {
         target.holes.add(OffsetJumpHole(instructionIndex))
     }
 }
+
+private fun List<Instruction>.singleResultCopy(): AdminInstruction.CopySlots? =
+    (singleOrNull() as? AdminInstruction.CopySlots)?.takeIf { instruction ->
+        instruction.sourceSlots.size == 1 && instruction.destinationSlots.size == 1
+    }
 
 private fun lowerJumpIfCondition(
     instruction: ControlSuperInstruction.BrIfCondition,
@@ -762,6 +780,7 @@ private fun patchOffsetInstruction(
 ): Instruction = when (instruction) {
     is AdminInstruction.Jump -> instruction.copy(offset = targetIndex)
     is AdminInstruction.JumpIf -> instruction.copy(offset = targetIndex)
+    is AdminInstruction.JumpIfCopy -> instruction.copy(offset = targetIndex)
     is AdminInstruction.JumpIfCondition -> instruction.copy(offset = targetIndex)
     is AdminInstruction.JumpOnNull -> instruction.copy(offset = targetIndex)
     is AdminInstruction.JumpOnNonNull -> instruction.copy(offset = targetIndex)
@@ -823,6 +842,7 @@ private data class OffsetTakenPath(
 ) : TakenPath {
     override fun targetIndex(output: List<Instruction>): Int = when (val instruction = output[instructionIndex]) {
         is AdminInstruction.JumpIf -> instruction.offset
+        is AdminInstruction.JumpIfCopy -> instruction.offset
         is AdminInstruction.JumpIfCondition -> instruction.offset
         is AdminInstruction.JumpOnNull -> instruction.offset
         is AdminInstruction.JumpOnNonNull -> instruction.offset

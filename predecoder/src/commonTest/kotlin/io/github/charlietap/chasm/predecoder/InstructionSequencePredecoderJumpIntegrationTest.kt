@@ -70,6 +70,58 @@ class InstructionSequencePredecoderJumpIntegrationTest {
     }
 
     @Test
+    fun `copies a single branch result only on the taken path`() {
+        val context = context()
+        val baseIp = 100
+        val branch = InstructionSequencePredecoder(
+            context,
+            listOf(
+                AdminInstruction.JumpIfCopy(
+                    operand = FusedOperand.FrameSlot(0),
+                    sourceSlot = 1,
+                    destinationSlot = 2,
+                    offset = 2,
+                ),
+            ),
+            baseIp,
+        ).value.single()
+        val cstack = cstack()
+        val takenStack = vstack().apply {
+            setFrameSlot(0, 1)
+            setFrameSlot(1, 37)
+            setFrameSlot(2, 0)
+        }
+        val fallthroughStack = vstack().apply {
+            setFrameSlot(0, 0)
+            setFrameSlot(1, 41)
+            setFrameSlot(2, 0)
+        }
+
+        assertEquals(
+            baseIp + 2,
+            branch(
+                takenStack,
+                cstack,
+                context.store,
+                executionContext(cstack, takenStack, context.store, context.instance),
+                baseIp + 1,
+            ),
+        )
+        assertEquals(37, takenStack.getFrameSlot(2))
+        assertEquals(
+            baseIp + 1,
+            branch(
+                fallthroughStack,
+                cstack,
+                context.store,
+                executionContext(cstack, fallthroughStack, context.store, context.instance),
+                baseIp + 1,
+            ),
+        )
+        assertEquals(0, fallthroughStack.getFrameSlot(2))
+    }
+
+    @Test
     fun `predecodes numeric conditions into direct jumps`() {
         val context = context()
         val baseIp = 100

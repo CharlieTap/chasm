@@ -34,6 +34,7 @@ private fun predecodeInstruction(
             RuntimeAdminInstruction.Jump(targetIp = baseIp + instruction.offset),
         )
         is AdminInstruction.JumpIf -> predecodeJumpIf(instruction, baseIp)
+        is AdminInstruction.JumpIfCopy -> predecodeJumpIfCopy(instruction, baseIp)
         is AdminInstruction.JumpIfCondition -> JumpDispatcher(
             RuntimeAdminInstruction.JumpIfCondition(
                 condition = instruction.condition,
@@ -70,6 +71,41 @@ private fun predecodeJumpIf(
         operandImmediate != null -> JumpDispatcher(RuntimeAdminInstruction.JumpIfI(operandImmediate, targetIp))
         operandSlot != null -> JumpDispatcher(RuntimeAdminInstruction.JumpIfS(operandSlot, targetIp))
         instruction.operand is FusedOperand.ValueStack -> JumpDispatcher(RuntimeAdminInstruction.JumpIfV(targetIp))
+        else -> unsupportedUnloweredJumpInstruction()
+    }
+}
+
+private fun predecodeJumpIfCopy(
+    instruction: AdminInstruction.JumpIfCopy,
+    baseIp: Int,
+): DispatchableInstruction {
+    val targetIp = baseIp + instruction.offset
+    val operandImmediate = jumpImmediate(instruction.operand)
+    val operandSlot = jumpOperandSlot(instruction.operand)
+    return when {
+        operandImmediate != null -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpIfCopyI(
+                operand = operandImmediate,
+                sourceSlot = instruction.sourceSlot,
+                destinationSlot = instruction.destinationSlot,
+                targetIp = targetIp,
+            ),
+        )
+        operandSlot != null -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpIfCopyS(
+                operandSlot = operandSlot,
+                sourceSlot = instruction.sourceSlot,
+                destinationSlot = instruction.destinationSlot,
+                targetIp = targetIp,
+            ),
+        )
+        instruction.operand is FusedOperand.ValueStack -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpIfCopyV(
+                sourceSlot = instruction.sourceSlot,
+                destinationSlot = instruction.destinationSlot,
+                targetIp = targetIp,
+            ),
+        )
         else -> unsupportedUnloweredJumpInstruction()
     }
 }

@@ -62,20 +62,17 @@ class JumpPassTest {
 
         assertEquals(
             listOf(
-                AdminInstruction.JumpIf(
+                AdminInstruction.JumpIfCopy(
                     operand = frameSlotOperand(0),
-                    offset = 3,
+                    sourceSlot = 1,
+                    destinationSlot = 2,
+                    offset = 2,
                 ),
                 AdminInstruction.CopySlots(
                     sourceSlots = listOf(3),
                     destinationSlots = listOf(4),
                 ),
                 AdminInstruction.EndFunction,
-                AdminInstruction.CopySlots(
-                    sourceSlots = listOf(1),
-                    destinationSlots = listOf(2),
-                ),
-                AdminInstruction.Jump(offset = 2),
             ),
             result.functions[0].body.instructions,
         )

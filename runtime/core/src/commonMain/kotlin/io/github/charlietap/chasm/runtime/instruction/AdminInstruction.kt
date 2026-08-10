@@ -26,11 +26,31 @@ sealed interface AdminInstruction : LinkedInstruction {
     ) : AdminInstruction
 
     data class JumpIfV(val targetIp: Int) : AdminInstruction
+
+    data class JumpIfCopyI(
+        val operand: Long,
+        val sourceSlot: Int,
+        val destinationSlot: Int,
+        val targetIp: Int,
+    ) : AdminInstruction
+
+    data class JumpIfCopyS(
+        val operandSlot: Int,
+        val sourceSlot: Int,
+        val destinationSlot: Int,
+        val targetIp: Int,
+    ) : AdminInstruction
+
+    data class JumpIfCopyV(
+        val sourceSlot: Int,
+        val destinationSlot: Int,
+        val targetIp: Int,
+    ) : AdminInstruction
+
     data class JumpIfCondition(
         val condition: NumericCondition,
         val targetIp: Int,
     ) : AdminInstruction
-
 
     data class JumpTableI(
         val operand: Int,

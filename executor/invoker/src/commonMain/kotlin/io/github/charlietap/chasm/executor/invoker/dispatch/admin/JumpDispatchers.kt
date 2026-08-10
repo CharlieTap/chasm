@@ -32,6 +32,53 @@ fun JumpDispatcher(
 }
 
 fun JumpDispatcher(
+    instruction: AdminInstruction.JumpIfCopyI,
+): DispatchableInstruction = if (instruction.operand != 0L) {
+    val sourceSlot = instruction.sourceSlot
+    val destinationSlot = instruction.destinationSlot
+    val targetIp = instruction.targetIp
+    DispatchableInstruction { vstack, _, _, _, _ ->
+        vstack.setFrameSlot(destinationSlot, vstack.getFrameSlot(sourceSlot))
+        targetIp
+    }
+} else {
+    DispatchableInstruction { _, _, _, _, nextIp -> nextIp }
+}
+
+fun JumpDispatcher(
+    instruction: AdminInstruction.JumpIfCopyS,
+): DispatchableInstruction {
+    val operandSlot = instruction.operandSlot
+    val sourceSlot = instruction.sourceSlot
+    val destinationSlot = instruction.destinationSlot
+    val targetIp = instruction.targetIp
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        if (vstack.getFrameSlot(operandSlot) != 0L) {
+            vstack.setFrameSlot(destinationSlot, vstack.getFrameSlot(sourceSlot))
+            targetIp
+        } else {
+            nextIp
+        }
+    }
+}
+
+fun JumpDispatcher(
+    instruction: AdminInstruction.JumpIfCopyV,
+): DispatchableInstruction {
+    val sourceSlot = instruction.sourceSlot
+    val destinationSlot = instruction.destinationSlot
+    val targetIp = instruction.targetIp
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        if (vstack.pop() != 0L) {
+            vstack.setFrameSlot(destinationSlot, vstack.getFrameSlot(sourceSlot))
+            targetIp
+        } else {
+            nextIp
+        }
+    }
+}
+
+fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfCondition,
 ): DispatchableInstruction = when (val condition = instruction.condition) {
     is NumericCondition.I32Eqz -> I32ConditionDispatcher(condition.operand, instruction.targetIp) { operand, targetIp, nextIp -> if (operand == 0) targetIp else nextIp }
