@@ -45,7 +45,11 @@ fun invoke(
         ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
     )
 
-    return invoke(
+    if (instance.instance.deallocated) {
+        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
+    }
+
+    return invokeExported(
         store = store,
         instance = instance,
         address = address,
@@ -84,7 +88,11 @@ internal fun invoke(
         ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
     )
 
-    return invoke(
+    if (instance.instance.deallocated) {
+        return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
+    }
+
+    return invokeExported(
         store = store,
         instance = instance,
         address = address,
@@ -105,16 +113,25 @@ internal inline fun invoke(
         return Error(ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()))
     }
 
-    val validAddresses = instance.instance.exports.mapNotNull { export ->
-        (export.value as? ExternalValue.Function)?.address
+    val functionNotExported = instance.instance.exports.none { export ->
+        (export.value as? ExternalValue.Function)?.address == address
     }
-
-    if (!validAddresses.contains(address)) {
+    if (functionNotExported) {
         return Error(
             ChasmError.ExecutionError(InvocationError.FunctionNotFound("Function with address: ${address.address}").toString()),
         )
     }
 
+    return invokeExported(store, instance, address, args, invoker)
+}
+
+private inline fun invokeExported(
+    store: Store,
+    instance: Instance,
+    address: Address.Function,
+    args: List<ExecutionValue>,
+    invoker: FunctionInvoker,
+): ChasmResult<List<ExecutionValue>, ChasmError.ExecutionError> {
     return invoker(instance.config, store.store, instance.instance, address, args)
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
