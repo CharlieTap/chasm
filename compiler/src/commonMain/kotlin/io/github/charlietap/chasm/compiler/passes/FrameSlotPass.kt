@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
 import io.github.charlietap.chasm.ir.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ir.instruction.MemorySuperInstruction
+import io.github.charlietap.chasm.ir.instruction.NumericCondition
 import io.github.charlietap.chasm.ir.instruction.NumericInstruction
 import io.github.charlietap.chasm.ir.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.ParametricInstruction
@@ -340,6 +341,19 @@ private class FrameSlotInstructionBuffer {
         currentSegment.addAll(instructions)
     }
 
+    fun removeNumericCondition(
+        operand: FusedOperand,
+        temporarySlotBase: Int,
+    ): NumericCondition? {
+        val conditionSlot = (operand as? FusedOperand.FrameSlot)?.offset ?: return null
+        val condition = currentSegment.lastOrNull()
+            ?.let { instruction -> NumericCondition(instruction, conditionSlot) }
+            ?: return null
+        if (conditionSlot < temporarySlotBase) return null
+        currentSegment.removeLast()
+        return condition
+    }
+
     fun nextSegment() {
         segments.add(mutableListOf())
     }
@@ -350,6 +364,59 @@ private class FrameSlotInstructionBuffer {
             segments.forEach(::addAll)
         }
     }
+}
+
+private fun NumericCondition(
+    instruction: Instruction,
+    destinationSlot: Int,
+): NumericCondition? = when (instruction) {
+    is NumericSuperInstruction.I32Eqz -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32Eqz(instruction.operand) }
+    is NumericSuperInstruction.I64Eqz -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64Eqz(instruction.operand) }
+    is NumericSuperInstruction.I32Eq -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32Eq(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32Ne -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32Ne(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32LtS -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32LtS(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32LtU -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32LtU(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32GtS -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32GtS(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32GtU -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32GtU(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32LeS -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32LeS(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32LeU -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32LeU(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32GeS -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32GeS(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I32GeU -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I32GeU(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64Eq -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64Eq(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64Ne -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64Ne(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64LtS -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64LtS(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64LtU -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64LtU(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64GtS -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64GtS(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64GtU -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64GtU(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64LeS -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64LeS(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64LeU -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64LeU(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64GeS -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64GeS(instruction.left, instruction.right) }
+    is NumericSuperInstruction.I64GeU -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.I64GeU(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F32Eq -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F32Eq(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F32Ne -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F32Ne(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F32Lt -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F32Lt(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F32Gt -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F32Gt(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F32Le -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F32Le(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F32Ge -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F32Ge(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F64Eq -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F64Eq(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F64Ne -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F64Ne(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F64Lt -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F64Lt(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F64Gt -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F64Gt(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F64Le -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F64Le(instruction.left, instruction.right) }
+    is NumericSuperInstruction.F64Ge -> FrameSlotNumericCondition(instruction.destination, destinationSlot) { NumericCondition.F64Ge(instruction.left, instruction.right) }
+    else -> null
+}
+
+private inline fun FrameSlotNumericCondition(
+    destination: FusedDestination,
+    destinationSlot: Int,
+    condition: () -> NumericCondition,
+): NumericCondition? = if (
+    destination is FusedDestination.FrameSlot && destination.offset == destinationSlot
+) {
+    condition()
+} else {
+    null
 }
 
 private fun FrameSlotExpressionLowerer(
@@ -432,7 +499,24 @@ private fun FrameSlotExpressionLowerer(
                     "frame-slot instruction lowering failed: instruction=$instruction " +
                         "state=$state labels=$labels controls=$controls",
                 )
-                output.addAll(loweredInstructions)
+                val branch = loweredInstructions.singleOrNull() as? ControlSuperInstruction.BrIf
+                val condition = branch?.let { loweredBranch ->
+                    output.removeNumericCondition(
+                        operand = loweredBranch.operand,
+                        temporarySlotBase = state.baseSlots,
+                    )
+                }
+                if (branch != null && condition != null) {
+                    output.add(
+                        ControlSuperInstruction.BrIfCondition(
+                            condition = condition,
+                            labelIndex = branch.labelIndex,
+                            takenInstructions = branch.takenInstructions,
+                        ),
+                    )
+                } else {
+                    output.addAll(loweredInstructions)
+                }
             }
         }
         state.rewindTemporaryAllocator()
@@ -585,6 +669,10 @@ private fun FrameSlotIfEnterLowerer(
     )
     val loweredOperand = FrameSlotOperandLowerer(operand, state)
         ?: error("frame-slot if condition lowering failed: operand=$operand state=$state")
+    val condition = output.removeNumericCondition(
+        operand = loweredOperand.lowered,
+        temporarySlotBase = state.baseSlots,
+    )
     val functionType = context.blockType(blockType)
         ?: error("frame-slot if type is unavailable: $blockType")
     val baseHeight = state.stack.size - functionType.params.types.size

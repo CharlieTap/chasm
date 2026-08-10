@@ -34,6 +34,12 @@ private fun predecodeInstruction(
             RuntimeAdminInstruction.Jump(targetIp = baseIp + instruction.offset),
         )
         is AdminInstruction.JumpIf -> predecodeJumpIf(instruction, baseIp)
+        is AdminInstruction.JumpIfCondition -> JumpDispatcher(
+            RuntimeAdminInstruction.JumpIfCondition(
+                condition = instruction.condition,
+                targetIp = baseIp + instruction.offset,
+            ),
+        )
         is AdminInstruction.JumpTable -> predecodeJumpTable(instruction, baseIp)
         is AdminInstruction.JumpOnNull -> predecodeJumpOnNull(instruction, baseIp)
         is AdminInstruction.JumpOnNonNull -> predecodeJumpOnNonNull(instruction, baseIp)

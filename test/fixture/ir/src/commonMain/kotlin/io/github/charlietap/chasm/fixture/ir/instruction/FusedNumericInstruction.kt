@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.fixture.ir.instruction
 
 import io.github.charlietap.chasm.ir.instruction.FusedDestination
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
+import io.github.charlietap.chasm.ir.instruction.NumericCondition
 import io.github.charlietap.chasm.ir.instruction.NumericSuperInstruction
 
 fun fusedNumericInstruction(): NumericSuperInstruction = fusedI32Add()
@@ -57,6 +58,10 @@ fun fusedI32Eqz(
     operand = operand,
     destination = destination,
 )
+
+fun i32EqzCondition(
+    operand: FusedOperand = fusedOperand(),
+): NumericCondition = NumericCondition.I32Eqz(operand)
 
 fun fusedI32And(
     left: FusedOperand = fusedOperand(),

@@ -19,6 +19,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.expression
 import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotDestination
 import io.github.charlietap.chasm.fixture.ir.instruction.frameSlotOperand
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedBrIf
+import io.github.charlietap.chasm.fixture.ir.instruction.fusedBrIfCondition
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedBrOnCastFail
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedBrOnNonNull
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedBrOnNull
@@ -32,6 +33,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Add
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Const
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedI32Eqz
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedIf
+import io.github.charlietap.chasm.fixture.ir.instruction.fusedIfCondition
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedLocalSet
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedLocalTee
 import io.github.charlietap.chasm.fixture.ir.instruction.fusedReturnCall
@@ -42,6 +44,7 @@ import io.github.charlietap.chasm.fixture.ir.instruction.globalGetInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32AddInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstOperand
+import io.github.charlietap.chasm.fixture.ir.instruction.i32EqzCondition
 import io.github.charlietap.chasm.fixture.ir.instruction.i32EqzInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i32LoadInstruction
 import io.github.charlietap.chasm.fixture.ir.instruction.i64ConstOperand
@@ -463,12 +466,8 @@ class FrameSlotPassTest {
                     right = frameSlotOperand(1),
                     destination = frameSlotDestination(2),
                 ),
-                fusedI32Eqz(
-                    operand = frameSlotOperand(0),
-                    destination = frameSlotDestination(3),
-                ),
-                fusedBrIf(
-                    operand = frameSlotOperand(3),
+                fusedBrIfCondition(
+                    condition = i32EqzCondition(frameSlotOperand(0)),
                     labelIndex = labelIndex(0),
                 ),
                 endInstruction(),
@@ -727,12 +726,8 @@ class FrameSlotPassTest {
         assertEquals(2, actual.frameSlots)
         assertEquals(
             listOf(
-                fusedI32Eqz(
-                    operand = frameSlotOperand(0),
-                    destination = frameSlotDestination(1),
-                ),
-                fusedIf(
-                    operand = frameSlotOperand(1),
+                fusedIfCondition(
+                    condition = i32EqzCondition(frameSlotOperand(0)),
                     blockType = valueBlockType(i32ValueType()),
                 ),
                 fusedI32Eqz(
@@ -930,12 +925,8 @@ class FrameSlotPassTest {
                     right = frameSlotOperand(1),
                     destination = frameSlotDestination(3),
                 ),
-                fusedI32Eqz(
-                    operand = frameSlotOperand(0),
-                    destination = frameSlotDestination(4),
-                ),
-                fusedBrIf(
-                    operand = frameSlotOperand(4),
+                fusedBrIfCondition(
+                    condition = i32EqzCondition(frameSlotOperand(0)),
                     labelIndex = labelIndex(0),
                     sourceSlots = listOf(3),
                     destinationSlots = listOf(2),

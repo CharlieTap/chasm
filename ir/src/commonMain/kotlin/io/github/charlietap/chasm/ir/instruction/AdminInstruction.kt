@@ -22,6 +22,12 @@ sealed interface AdminInstruction : Instruction {
         val adjustment: StackAdjustment = StackAdjustment(depth = 0, keep = 0),
     ) : AdminInstruction
 
+    data class JumpIfCondition(
+        val condition: NumericCondition,
+        val offset: Int,
+        val adjustment: StackAdjustment = StackAdjustment(depth = 0, keep = 0),
+    ) : AdminInstruction
+
     data class JumpTable(
         val operand: FusedOperand,
         val offsets: List<Int>,

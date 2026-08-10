@@ -119,8 +119,10 @@ private fun JumpWorkLowerer(
                 item.state.jumpPastThenIndex = output.size
                 output.add(AdminInstruction.Jump(offset = UNPATCHED_OFFSET))
                 val thenStart = output.size
-                output[item.state.jumpToThenIndex] =
-                    (output[item.state.jumpToThenIndex] as AdminInstruction.JumpIf).copy(offset = thenStart)
+                output[item.state.jumpToThenIndex] = patchOffsetInstruction(
+                    instruction = output[item.state.jumpToThenIndex],
+                    targetIndex = thenStart,
+                )
             }
             is JumpWork.CloseIf -> {
                 require(labels.removeLastOrNull() === item.state.label) {
@@ -221,19 +223,16 @@ private fun JumpControlEnterLowerer(
             work.addLast(JumpWork.CloseLoop(label))
             work.addLast(JumpWork.Range(sourceIndex + 1, endIndex))
         }
-        is ControlSuperInstruction.If -> {
+        is ControlSuperInstruction.If,
+        is ControlSuperInstruction.IfCondition,
+        -> {
             val label = JumpLabel(targetIndex = null, handlerDepth = handlers.size)
             labels.addLast(label)
             val state = JumpIfState(
                 label = label,
                 jumpToThenIndex = output.size,
             )
-            output.add(
-                AdminInstruction.JumpIf(
-                    operand = instruction.operand,
-                    offset = UNPATCHED_OFFSET,
-                ),
-            )
+            output.add(JumpIfInstruction(instruction, UNPATCHED_OFFSET))
 
             val elseIndex = controlFlow.elseIndices[sourceIndex]
             val thenEnd = if (elseIndex >= 0) elseIndex else endIndex
@@ -363,6 +362,13 @@ private fun JumpInstructionLowerer(
             output = output,
             takenPaths = takenPaths,
         )
+        is ControlSuperInstruction.BrIfCondition -> lowerJumpIfCondition(
+            instruction = instruction,
+            target = jumpTarget(labels, instruction.labelIndex),
+            currentHandlerDepth = handlers.size,
+            output = output,
+            takenPaths = takenPaths,
+        )
         is ControlSuperInstruction.BrTable -> lowerJumpTable(
             instruction = instruction,
             labels = labels,
@@ -417,7 +423,10 @@ private fun JumpControlFlowIndex(
             instruction is ControlInstruction.Else -> {
                 val openerIndex = openers.lastOrNull()
                     ?: error("jump control index found else without an opener at $index")
-                require(instructions[openerIndex] is ControlSuperInstruction.If) {
+                require(
+                    instructions[openerIndex] is ControlSuperInstruction.If ||
+                        instructions[openerIndex] is ControlSuperInstruction.IfCondition,
+                ) {
                     "jump control index found else outside an if at $index"
                 }
                 require(elseIndices[openerIndex] < 0) {
@@ -448,6 +457,7 @@ private fun isStructuredControlOpener(instruction: Instruction): Boolean = when 
     is ControlInstruction.If,
     is ControlInstruction.TryTable,
     is ControlSuperInstruction.If,
+    is ControlSuperInstruction.IfCondition,
     -> true
     else -> false
 }
@@ -524,6 +534,45 @@ private fun lowerJumpIf(
     if (target.targetIndex == null) {
         target.holes.add(OffsetJumpHole(instructionIndex))
     }
+}
+
+private fun lowerJumpIfCondition(
+    instruction: ControlSuperInstruction.BrIfCondition,
+    target: JumpLabel,
+    currentHandlerDepth: Int,
+    output: MutableList<Instruction>,
+    takenPaths: MutableList<TakenPath>,
+) {
+    val instructionIndex = output.size
+    output.add(
+        AdminInstruction.JumpIfCondition(
+            condition = instruction.condition,
+            offset = target.targetIndex ?: UNPATCHED_OFFSET,
+        ),
+    )
+    addTakenPath(
+        takenPaths = takenPaths,
+        instructionIndex = instructionIndex,
+        instructions = instruction.takenInstructions + handlerExitInstructions(currentHandlerDepth, target),
+    )
+    if (target.targetIndex == null) {
+        target.holes.add(OffsetJumpHole(instructionIndex))
+    }
+}
+
+private fun JumpIfInstruction(
+    instruction: Instruction,
+    offset: Int,
+): AdminInstruction = when (instruction) {
+    is ControlSuperInstruction.If -> AdminInstruction.JumpIf(
+        operand = instruction.operand,
+        offset = offset,
+    )
+    is ControlSuperInstruction.IfCondition -> AdminInstruction.JumpIfCondition(
+        condition = instruction.condition,
+        offset = offset,
+    )
+    else -> error("unsupported if instruction: $instruction")
 }
 
 private fun lowerJumpTable(
@@ -713,6 +762,7 @@ private fun patchOffsetInstruction(
 ): Instruction = when (instruction) {
     is AdminInstruction.Jump -> instruction.copy(offset = targetIndex)
     is AdminInstruction.JumpIf -> instruction.copy(offset = targetIndex)
+    is AdminInstruction.JumpIfCondition -> instruction.copy(offset = targetIndex)
     is AdminInstruction.JumpOnNull -> instruction.copy(offset = targetIndex)
     is AdminInstruction.JumpOnNonNull -> instruction.copy(offset = targetIndex)
     is AdminInstruction.JumpOnCast -> instruction.copy(offset = targetIndex)
@@ -773,6 +823,7 @@ private data class OffsetTakenPath(
 ) : TakenPath {
     override fun targetIndex(output: List<Instruction>): Int = when (val instruction = output[instructionIndex]) {
         is AdminInstruction.JumpIf -> instruction.offset
+        is AdminInstruction.JumpIfCondition -> instruction.offset
         is AdminInstruction.JumpOnNull -> instruction.offset
         is AdminInstruction.JumpOnNonNull -> instruction.offset
         is AdminInstruction.JumpOnCast -> instruction.offset

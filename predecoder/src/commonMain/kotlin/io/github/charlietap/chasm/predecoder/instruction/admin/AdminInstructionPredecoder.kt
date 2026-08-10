@@ -51,6 +51,7 @@ internal inline fun AdminInstructionPredecoder(
         is AdminInstruction.PauseIf -> pauseIfInstructionDispatcher(PauseIf)
         is AdminInstruction.Jump -> error("jump requires instruction-sequence predecoding")
         is AdminInstruction.JumpIf -> error("jump_if requires instruction-sequence predecoding")
+        is AdminInstruction.JumpIfCondition -> error("jump_if_condition requires instruction-sequence predecoding")
         is AdminInstruction.JumpOnCast -> error("jump_on_cast requires instruction-sequence predecoding")
         is AdminInstruction.JumpOnCastFail -> error("jump_on_cast_fail requires instruction-sequence predecoding")
         is AdminInstruction.JumpOnNonNull -> error("jump_on_non_null requires instruction-sequence predecoding")

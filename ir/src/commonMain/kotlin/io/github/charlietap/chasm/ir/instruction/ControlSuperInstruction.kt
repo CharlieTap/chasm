@@ -12,6 +12,12 @@ sealed interface ControlSuperInstruction : Instruction {
         val takenInstructions: List<Instruction> = [],
     ) : ControlSuperInstruction
 
+    data class BrIfCondition(
+        val condition: NumericCondition,
+        val labelIndex: Index.LabelIndex,
+        val takenInstructions: List<Instruction> = [],
+    ) : ControlSuperInstruction
+
     data class BrTable(
         val operand: FusedOperand,
         val labelIndices: List<Index.LabelIndex>,
@@ -101,6 +107,11 @@ sealed interface ControlSuperInstruction : Instruction {
 
     data class If(
         val operand: FusedOperand,
+        val blockType: BlockType,
+    ) : ControlSuperInstruction
+
+    data class IfCondition(
+        val condition: NumericCondition,
         val blockType: BlockType,
     ) : ControlSuperInstruction
 }

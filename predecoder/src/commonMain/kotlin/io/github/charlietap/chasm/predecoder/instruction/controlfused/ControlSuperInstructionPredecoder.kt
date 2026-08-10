@@ -24,12 +24,14 @@ internal fun ControlSuperInstructionPredecoder(
 ): Result<DispatchableInstruction, ModuleTrapError> = binding {
     when (instruction) {
         is ControlSuperInstruction.BrIf,
+        is ControlSuperInstruction.BrIfCondition,
         is ControlSuperInstruction.BrOnCast,
         is ControlSuperInstruction.BrOnCastFail,
         is ControlSuperInstruction.BrOnNonNull,
         is ControlSuperInstruction.BrOnNull,
         is ControlSuperInstruction.BrTable,
         is ControlSuperInstruction.If,
+        is ControlSuperInstruction.IfCondition,
         -> error("structured fused control instruction reached predecoding: $instruction")
         is ControlSuperInstruction.Call -> strictCallInstruction(context, instruction).bind()
         is ControlSuperInstruction.CallIndirect -> strictCallIndirectInstruction(context, instruction).bind()

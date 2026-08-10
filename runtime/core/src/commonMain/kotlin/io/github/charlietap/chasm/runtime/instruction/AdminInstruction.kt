@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
+import io.github.charlietap.chasm.ir.instruction.NumericCondition
 import io.github.charlietap.chasm.type.ReferenceType
 
 sealed interface AdminInstruction : LinkedInstruction {
@@ -25,6 +26,11 @@ sealed interface AdminInstruction : LinkedInstruction {
     ) : AdminInstruction
 
     data class JumpIfV(val targetIp: Int) : AdminInstruction
+    data class JumpIfCondition(
+        val condition: NumericCondition,
+        val targetIp: Int,
+    ) : AdminInstruction
+
 
     data class JumpTableI(
         val operand: Int,

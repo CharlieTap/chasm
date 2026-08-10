@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
+import io.github.charlietap.chasm.ir.instruction.NumericCondition
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -66,6 +67,37 @@ class InstructionSequencePredecoderJumpIntegrationTest {
 
         assertEquals(baseIp + 2, taken(vstack, cstack, context.store, executionContext, baseIp + 1))
         assertEquals(baseIp + 1, fallthrough(vstack, cstack, context.store, executionContext, baseIp + 1))
+    }
+
+    @Test
+    fun `predecodes numeric conditions into direct jumps`() {
+        val context = context()
+        val baseIp = 100
+        val conditions = listOf(
+            NumericCondition.I32Eqz(FusedOperand.I32Const(0)) to true,
+            NumericCondition.I32LtU(FusedOperand.I32Const(-1), FusedOperand.I32Const(0)) to false,
+            NumericCondition.I64GtU(FusedOperand.I64Const(-1), FusedOperand.I64Const(0)) to true,
+            NumericCondition.F32Ne(FusedOperand.F32Const(Float.NaN), FusedOperand.F32Const(Float.NaN)) to true,
+            NumericCondition.F64Eq(FusedOperand.F64Const(-0.0), FusedOperand.F64Const(0.0)) to true,
+            NumericCondition.I32LtS(FusedOperand.FrameSlot(0), FusedOperand.I32Const(10)) to true,
+        )
+        val vstack = vstack().apply { setFrameSlot(0, 5) }
+        val cstack = cstack()
+        val executionContext = executionContext(cstack, vstack, context.store, context.instance)
+
+        conditions.forEach { (condition, taken) ->
+            val branch = InstructionSequencePredecoder(
+                context,
+                listOf(AdminInstruction.JumpIfCondition(condition, offset = 2)),
+                baseIp,
+            ).value.single()
+
+            assertEquals(
+                if (taken) baseIp + 2 else baseIp + 1,
+                branch(vstack, cstack, context.store, executionContext, baseIp + 1),
+                condition.toString(),
+            )
+        }
     }
 
     @Test

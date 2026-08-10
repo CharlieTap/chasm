@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.ir.instruction.AdminInstruction
 import io.github.charlietap.chasm.ir.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.ir.instruction.FusedOperand
 import io.github.charlietap.chasm.ir.instruction.Instruction
+import io.github.charlietap.chasm.ir.instruction.NumericCondition
 import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.ReferenceType
@@ -95,6 +96,27 @@ fun fusedBrIf(
     operand = operand,
     labelIndex = labelIndex,
     takenInstructions = takenInstructions,
+)
+
+fun fusedBrIfCondition(
+    condition: NumericCondition = i32EqzCondition(),
+    labelIndex: Index.LabelIndex = labelIndex(),
+    takenInstructions: List<Instruction> = [],
+) = ControlSuperInstruction.BrIfCondition(
+    condition = condition,
+    labelIndex = labelIndex,
+    takenInstructions = takenInstructions,
+)
+
+fun fusedBrIfCondition(
+    condition: NumericCondition = i32EqzCondition(),
+    labelIndex: Index.LabelIndex = labelIndex(),
+    sourceSlots: List<Int> = [],
+    destinationSlots: List<Int> = [],
+) = fusedBrIfCondition(
+    condition = condition,
+    labelIndex = labelIndex,
+    takenInstructions = slotCopyInstructions(sourceSlots, destinationSlots),
 )
 
 fun fusedBrIf(
@@ -244,6 +266,14 @@ fun fusedIf(
     blockType: BlockType = blockType(),
 ) = ControlSuperInstruction.If(
     operand = operand,
+    blockType = blockType,
+)
+
+fun fusedIfCondition(
+    condition: NumericCondition = i32EqzCondition(),
+    blockType: BlockType = blockType(),
+) = ControlSuperInstruction.IfCondition(
+    condition = condition,
     blockType = blockType,
 )
 
