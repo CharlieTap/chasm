@@ -43,6 +43,12 @@ fun GarbageCollector(
         }
     }
 
+    for (exception in store.exceptions) {
+        for (field in exception.fields) {
+            markReferences(field, markedStructs, markedArrays, store)
+        }
+    }
+
     for (i in store.arrays.indices) {
         if (i !in markedArrays) {
             heap.sizeInBytes -= store.arrays[i]?.sizeInBytes ?: 0

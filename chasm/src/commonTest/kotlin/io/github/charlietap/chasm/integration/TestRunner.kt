@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.integration
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.instance
@@ -22,7 +23,7 @@ fun testRunner(
     imports: List<Import> = [],
     functionName: String = fileName.replace(".wasm", ""),
     setupFunctions: List<Pair<String, List<ExecutionValue>>> = [],
-    config: RuntimeConfig = RuntimeConfig(),
+    config: RuntimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
 ): ChasmResult<List<ExecutionValue>, ChasmError> {
 
     val byteStream = Resource(fileDirectory + fileName).readBytes()

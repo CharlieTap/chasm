@@ -1,11 +1,9 @@
 package io.github.charlietap.chasm.compiler.context
 
-import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.operand.Operand
-import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
@@ -29,7 +27,7 @@ internal class CompilerContext(
     private val valueBlockTypes = ArrayList<ValueType>()
     private val valueBlockFunctionTypes = ArrayList<FunctionType>()
 
-    val containsGcInstructions = config.gcStrategy == GCStrategy.ARENA && module.containsGcInstructions()
+    var containsGcInstructions = false
 
     val exportedFunctions = BooleanArray(instance.functionAddresses.size).also { exportedFunctions ->
         for (index in module.exports.indices) {
@@ -56,14 +54,4 @@ internal class CompilerContext(
             valueBlockFunctionTypes.add(functionType)
         }
     }
-}
-
-private fun Module.containsGcInstructions(): Boolean {
-    for (functionIndex in functions.indices) {
-        val instructions = functions[functionIndex].body.instructions
-        for (instructionIndex in instructions.indices) {
-            if (instructions[instructionIndex] is AggregateInstruction) return true
-        }
-    }
-    return false
 }

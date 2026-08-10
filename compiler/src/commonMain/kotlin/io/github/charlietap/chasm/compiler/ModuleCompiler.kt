@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.context.CompilerContext
+import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.function
@@ -44,5 +45,17 @@ fun ModuleCompiler(
             frameSlots = compiled.frameSlots,
         )
         functionInstance.function = compiled
+    }
+
+    if (config.gcStrategy == GCStrategy.ARENA && context.containsGcInstructions) {
+        for (functionIndex in module.functions.indices) {
+            val function = module.functions[functionIndex]
+            val index = function.idx.toInt()
+            if (!context.exportedFunctions[index]) continue
+
+            val address = instance.functionAddresses[index]
+            val functionInstance = store.function(address) as FunctionInstance.WasmFunction
+            functionInstance.function.collectGarbageAfterInvocation = true
+        }
     }
 }

@@ -25,7 +25,6 @@ import io.github.charlietap.chasm.compiler.instruction.emitF64Constant
 import io.github.charlietap.chasm.compiler.instruction.emitGlobalSet
 import io.github.charlietap.chasm.compiler.instruction.emitI32Constant
 import io.github.charlietap.chasm.compiler.instruction.emitI64Constant
-import io.github.charlietap.chasm.compiler.instruction.emitPause
 import io.github.charlietap.chasm.compiler.instruction.emitPauseIf
 import io.github.charlietap.chasm.compiler.operand.FrameAllocator
 import io.github.charlietap.chasm.compiler.operand.FunctionFrameLayout
@@ -78,6 +77,7 @@ internal fun FunctionCompiler(
             val aggregateAccessChain = if (
                 state.reachable && nextInstruction is AggregateInstruction.StructGet
             ) {
+                context.containsGcInstructions = true
                 compileAggregateAccessChain(
                     state = state,
                     first = instruction,
@@ -193,13 +193,16 @@ internal fun FunctionCompiler(
                             instruction = instruction,
                             nextInstruction = nextInstruction,
                         )
-                        is AggregateInstruction -> compileAggregateInstruction(
-                            state = state,
-                            instruction = instruction,
-                            nextInstruction = nextInstruction,
-                        ).also {
-                            if (context.config.gcStrategy == GCStrategy.TRADITIONAL && instruction.isAllocating()) {
-                                state.emitPauseIf()
+                        is AggregateInstruction -> {
+                            context.containsGcInstructions = true
+                            compileAggregateInstruction(
+                                state = state,
+                                instruction = instruction,
+                                nextInstruction = nextInstruction,
+                            ).also {
+                                if (context.config.gcStrategy == GCStrategy.TRADITIONAL && instruction.isAllocating()) {
+                                    state.emitPauseIf()
+                                }
                             }
                         }
                         is ControlInstruction -> {
@@ -220,13 +223,6 @@ internal fun FunctionCompiler(
 
         finishFunctionControl(state)
         state.program.append(EndFunctionDispatcher(AdminInstruction.EndFunction))
-        if (
-            context.config.gcStrategy == GCStrategy.ARENA &&
-            context.containsGcInstructions &&
-            context.exportedFunctions[function.idx.toInt()]
-        ) {
-            state.emitPause()
-        }
 
         state.emitDeferredBranchPaths()
         state.program.finish()

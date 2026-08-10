@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.executor.invoker.GarbageCollector
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -24,6 +25,20 @@ internal fun ThreadExecutor(
     store: Store,
     instance: FunctionInstance.WasmFunction,
     values: List<ExecutionValue>,
+) = ThreadExecutor(
+    config = config,
+    store = store,
+    instance = instance,
+    values = values,
+    garbageCollector = ::GarbageCollector,
+)
+
+internal inline fun ThreadExecutor(
+    config: RuntimeConfig,
+    store: Store,
+    instance: FunctionInstance.WasmFunction,
+    values: List<ExecutionValue>,
+    crossinline garbageCollector: GarbageCollector,
 ): Result<List<Long>, InvocationError> = binding {
     val cstack = ControlStack()
     val vstack = ValueStack(instance.function.frameSlots)
@@ -70,6 +85,13 @@ internal fun ThreadExecutor(
 
     if (cstack.framesDepth() != 0 || cstack.handlersDepth() != 0 || vstack.depth() != results) {
         Err(InvocationError.ProgramFinishedInconsistentState).bind<List<Long>>()
+    }
+
+    if (
+        instance.function.collectGarbageAfterInvocation &&
+        store.heap.sizeInBytes >= config.gcThreshold.bytes
+    ) {
+        garbageCollector(store, vstack).bind()
     }
 
     List(results) {

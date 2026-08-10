@@ -641,7 +641,7 @@ class FunctionCompilerTest {
     }
 
     @Test
-    fun arenaGcEmitsACollectionPointForAnExportedFunctionInAGcModule() {
+    fun arenaGcDoesNotEmitACollectionInstructionIntoAnExportedFunction() {
         val function = allocatingFunction()
         val module = allocatingModule(function, exported = true)
 
@@ -651,7 +651,7 @@ class FunctionCompilerTest {
             baseIp = 0,
         )
 
-        assertEquals(3, compiled.instructions.size)
+        assertEquals(2, compiled.instructions.size)
     }
 
     @Test

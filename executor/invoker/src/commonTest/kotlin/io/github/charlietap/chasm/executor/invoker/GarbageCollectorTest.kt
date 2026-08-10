@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.fixture.runtime.instance.arrayAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.arrayInstance
+import io.github.charlietap.chasm.fixture.runtime.instance.exceptionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.structAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.structInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
@@ -118,6 +119,31 @@ class GarbageCollectorTest {
         val stack = vstack(listOf(structRef))
 
         val result = GarbageCollector(store, stack)
+
+        assertEquals(Ok(Unit), result)
+        assertEquals(structInstance, store.structs[0])
+        assertEquals(arrayInstance, store.arrays[0])
+    }
+
+    @Test
+    fun `preserves objects referenced by an exception`() {
+
+        val arrayInstance = arrayInstance()
+        val store = store()
+        store.arrays.add(arrayInstance)
+
+        val arrayRef = arrayReferenceValue(arrayAddress(0))
+        val structInstance = structInstance(
+            fields = longArrayOf(arrayRef.toLongFromBoxed()),
+        )
+        store.structs.add(structInstance)
+
+        val structRef = structReferenceValue(structAddress(0))
+        store.exceptions.add(
+            exceptionInstance(fields = longArrayOf(structRef.toLongFromBoxed())),
+        )
+
+        val result = GarbageCollector(store, vstack())
 
         assertEquals(Ok(Unit), result)
         assertEquals(structInstance, store.structs[0])

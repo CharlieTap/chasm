@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.script
 
 import io.github.charlietap.chasm.config.Config
+import io.github.charlietap.chasm.config.GCStrategy
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
@@ -37,7 +39,9 @@ class ChasmScriptRunner(
 
     override fun execute(directory: String, script: Script, phaseSupport: SemanticPhase): ScriptResult {
 
-        val config = Config()
+        val config = Config(
+            runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
+        )
         val context = ScriptContext(
             config = config,
             binaryDirectory = directory,

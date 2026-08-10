@@ -11,6 +11,8 @@ import at.released.weh.host.SystemEnvProvider
 import at.released.weh.host.clock.Clock
 import at.released.weh.host.clock.MonotonicClock
 import io.github.charlietap.chasm.config.Config
+import io.github.charlietap.chasm.config.GCStrategy
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.global.readGlobal
@@ -71,7 +73,9 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.TimeSource
 
 class ChasmCorpusRunner(
-    private val config: Config = Config(),
+    private val config: Config = Config(
+        runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
+    ),
 ) : CorpusRunner {
 
     override fun readText(path: String): String = path.readTextFromPath()
