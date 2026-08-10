@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.structAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.structInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
+import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.runtime.value.structReferenceValue
@@ -19,6 +20,7 @@ import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.fieldType
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.recursiveType
+import io.github.charlietap.chasm.fixture.type.refNonNullReferenceType
 import io.github.charlietap.chasm.fixture.type.rtt
 import io.github.charlietap.chasm.fixture.type.structCompositeType
 import io.github.charlietap.chasm.fixture.type.structType
@@ -34,6 +36,7 @@ import io.github.charlietap.chasm.runtime.ext.toI31
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.RTT
@@ -218,6 +221,82 @@ class AggregateSuperInstructionPredecoderTest {
     }
 
     @Test
+    fun `predecodes ref cast and struct get as one instruction`() {
+        val runtimeStore = store().apply {
+            structs.add(structInstance(fields = longArrayOf(42L)))
+        }
+        val context = predecodingContext(store = runtimeStore)
+        val instruction = AggregateSuperInstruction.RefCastStructGet(
+            reference = FusedOperand.FrameSlot(0),
+            destination = FusedDestination.FrameSlot(1),
+            referenceType = refNonNullReferenceType(AbstractHeapType.Struct),
+            typeIndex = Index.TypeIndex(0),
+            fieldIndex = Index.FieldIndex(0),
+        )
+        val dispatchable = AggregateSuperInstructionPredecoder(context, instruction).value
+        val vstack = ValueStack().apply {
+            reserveFrame(2)
+            setFrameSlot(0, structReferenceValue(structAddress(0)).toLong())
+        }
+
+        execute(dispatchable, context, vstack)
+
+        assertEquals(42L, vstack.getFrameSlot(1))
+    }
+
+    @Test
+    fun `predecodes consecutive struct gets as one instruction`() {
+        val runtimeStore = store().apply {
+            structs.add(structInstance(fields = longArrayOf(structReferenceValue(structAddress(1)).toLong())))
+            structs.add(structInstance(fields = longArrayOf(42L)))
+        }
+        val context = predecodingContext(store = runtimeStore)
+        val instruction = AggregateSuperInstruction.StructGetStructGet(
+            address = FusedOperand.FrameSlot(0),
+            destination = FusedDestination.FrameSlot(1),
+            firstTypeIndex = Index.TypeIndex(0),
+            firstFieldIndex = Index.FieldIndex(0),
+            secondTypeIndex = Index.TypeIndex(0),
+            secondFieldIndex = Index.FieldIndex(0),
+        )
+        val dispatchable = AggregateSuperInstructionPredecoder(context, instruction).value
+        val vstack = ValueStack().apply {
+            reserveFrame(2)
+            setFrameSlot(0, structReferenceValue(structAddress(0)).toLong())
+        }
+
+        execute(dispatchable, context, vstack)
+
+        assertEquals(42L, vstack.getFrameSlot(1))
+    }
+
+    @Test
+    fun `predecodes local set and struct get as one instruction`() {
+        val reference = structReferenceValue(structAddress(0)).toLong()
+        val runtimeStore = store().apply {
+            structs.add(structInstance(fields = longArrayOf(42L)))
+        }
+        val context = predecodingContext(store = runtimeStore)
+        val instruction = AggregateSuperInstruction.LocalSetStructGet(
+            operand = FusedOperand.FrameSlot(0),
+            destination = FusedDestination.FrameSlot(2),
+            localSlot = 1,
+            typeIndex = Index.TypeIndex(0),
+            fieldIndex = Index.FieldIndex(0),
+        )
+        val dispatchable = AggregateSuperInstructionPredecoder(context, instruction).value
+        val vstack = ValueStack().apply {
+            reserveFrame(3)
+            setFrameSlot(0, reference)
+        }
+
+        execute(dispatchable, context, vstack)
+
+        assertEquals(reference, vstack.getFrameSlot(1))
+        assertEquals(42L, vstack.getFrameSlot(2))
+    }
+
+    @Test
     fun `predecodes struct new default into frame slots without using caches`() {
         val structType = structType(fields = listOf(fieldType(), fieldType()))
         val structDefinedType = structDefinedType(structType)
@@ -304,7 +383,7 @@ class AggregateSuperInstructionPredecoderTest {
         context: PredecodingContext,
         vstack: ValueStack,
     ) {
-        val controlStack = cstack()
+        val controlStack = cstack(frames = listOf(frame(instance = context.instance)))
         val executionContext = executionContext(
             cstack = controlStack,
             vstack = vstack,

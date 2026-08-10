@@ -29,6 +29,7 @@ import io.github.charlietap.chasm.ir.module.Module
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
+import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 import io.github.charlietap.chasm.type.expansion.LegacyBlockTypeExpander
@@ -76,7 +77,11 @@ private fun FrameSlotFunctionLowerer(
     val labels = ArrayDeque<LabelContext>().apply {
         addLast(rootLabel)
     }
-    val loweredInstructions = FrameSlotExpressionLowerer(context, function.body.instructions, state, labels)
+    val loweredInstructions = FrameSlotAggregateChainLowerer(
+        context = context,
+        instructions = FrameSlotExpressionLowerer(context, function.body.instructions, state, labels),
+        state = state,
+    )
 
     val validLabelState = if (state.reachable) {
         labels.isEmpty() || (labels.size == 1 && labels.first() === rootLabel)
@@ -124,6 +129,86 @@ private fun FrameSlotFunctionLowerer(
         frameSlots = allocator.maxSlotExclusive,
         returnSlots = layout.returnSlots,
     )
+}
+
+private fun FrameSlotAggregateChainLowerer(
+    context: PassContext,
+    instructions: List<Instruction>,
+    state: FrameSlotState,
+): List<Instruction> = buildList(instructions.size) {
+    var index = 0
+    while (index < instructions.size) {
+        val first = instructions[index]
+        val second = instructions.getOrNull(index + 1) as? AggregateSuperInstruction.StructGet
+        val secondAddress = second?.address as? FusedOperand.FrameSlot
+        val secondDestination = second?.destination as? FusedDestination.FrameSlot
+        val fused = if (second != null && secondAddress != null && secondDestination != null) {
+            when (first) {
+                is ReferenceSuperInstruction.RefCast -> {
+                    val firstDestination = first.destination as? FusedDestination.FrameSlot
+                    if (
+                        firstDestination?.offset == secondAddress.offset &&
+                        firstDestination.offset >= state.baseSlots
+                    ) {
+                        AggregateSuperInstruction.RefCastStructGet(
+                            reference = first.reference,
+                            destination = second.destination,
+                            referenceType = first.referenceType,
+                            typeIndex = second.typeIndex,
+                            fieldIndex = second.fieldIndex,
+                        )
+                    } else {
+                        null
+                    }
+                }
+                is AggregateSuperInstruction.StructGet -> {
+                    val firstDestination = first.destination as? FusedDestination.FrameSlot
+                    if (
+                        firstDestination?.offset == secondAddress.offset &&
+                        firstDestination.offset >= state.baseSlots &&
+                        context.isReferenceStructField(first.typeIndex, first.fieldIndex)
+                    ) {
+                        AggregateSuperInstruction.StructGetStructGet(
+                            address = first.address,
+                            destination = second.destination,
+                            firstTypeIndex = first.typeIndex,
+                            firstFieldIndex = first.fieldIndex,
+                            secondTypeIndex = second.typeIndex,
+                            secondFieldIndex = second.fieldIndex,
+                        )
+                    } else {
+                        null
+                    }
+                }
+                is VariableSuperInstruction.LocalSet -> {
+                    val localSlot = state.localSlot(first.localIdx.idx)
+                    val source = first.operand as? FusedOperand.FrameSlot
+                    if (source != null && localSlot == secondAddress.offset) {
+                        AggregateSuperInstruction.LocalSetStructGet(
+                            operand = source,
+                            destination = second.destination,
+                            localSlot = localSlot,
+                            typeIndex = second.typeIndex,
+                            fieldIndex = second.fieldIndex,
+                        )
+                    } else {
+                        null
+                    }
+                }
+                else -> null
+            }
+        } else {
+            null
+        }
+
+        if (fused != null) {
+            add(fused)
+            index += 2
+        } else {
+            add(first)
+            index++
+        }
+    }
 }
 
 private data class FrameSlotFunctionLayout(
@@ -690,7 +775,12 @@ private fun FrameSlotIfEnterLowerer(
 
     output.addAll(splitMaterializations)
     output.add(
-        ControlSuperInstruction.If(
+        condition?.let { numericCondition ->
+            ControlSuperInstruction.IfCondition(
+                condition = numericCondition,
+                blockType = blockType,
+            )
+        } ?: ControlSuperInstruction.If(
             operand = loweredOperand.lowered,
             blockType = blockType,
         ),
@@ -2396,6 +2486,22 @@ private fun FrameSlotAggregateInstructionLowerer(
     }
     is AggregateSuperInstruction.StructGetUnsigned -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
         instruction.copy(address = address, destination = destination)
+    }
+    is AggregateSuperInstruction.RefCastStructGet -> FrameSlotUnaryLowerer(instruction.reference, instruction.destination, state) { reference, destination ->
+        instruction.copy(reference = reference, destination = destination)
+    }
+    is AggregateSuperInstruction.StructGetStructGet -> FrameSlotUnaryLowerer(instruction.address, instruction.destination, state) { address, destination ->
+        instruction.copy(address = address, destination = destination)
+    }
+    is AggregateSuperInstruction.LocalSetStructGet -> {
+        if (
+            instruction.operand is FusedOperand.FrameSlot &&
+            instruction.destination is FusedDestination.FrameSlot
+        ) {
+            listOf(instruction)
+        } else {
+            null
+        }
     }
     is AggregateSuperInstruction.StructNew -> {
         val fieldCount = context.structFieldCount(instruction.typeIndex) ?: return null
@@ -4145,3 +4251,19 @@ private fun PassContext.catchHandlerPayloadArity(
 private fun PassContext.structFieldCount(
     typeIndex: Index.TypeIndex,
 ): Int? = module.definedTypes.getOrNull(typeIndex.idx)?.asSubType?.compositeType?.structType()?.fields?.size
+
+private fun PassContext.isReferenceStructField(
+    typeIndex: Index.TypeIndex,
+    fieldIndex: Index.FieldIndex,
+): Boolean {
+    val storageType = module.definedTypes
+        .getOrNull(typeIndex.idx)
+        ?.asSubType
+        ?.compositeType
+        ?.structType()
+        ?.fields
+        ?.getOrNull(fieldIndex.idx)
+        ?.storageType
+
+    return storageType is StorageType.Value && storageType.type is ValueType.Reference
+}

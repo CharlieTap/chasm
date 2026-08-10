@@ -10,8 +10,11 @@ import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.Ar
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayNewExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayNewFixedExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArraySetExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.LocalSetStructGetExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.RefCastStructGetExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructGetExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructGetSignedExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructGetStructGetExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructGetUnsignedExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructNewDefaultExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructNewExecutor
@@ -87,6 +90,12 @@ fun StructGetDispatcher(instruction: AggregateSuperInstruction.StructGetS) = dis
 fun StructGetSignedDispatcher(instruction: AggregateSuperInstruction.StructGetSignedS) = dispatchInstruction(instruction, ::StructGetSignedExecutor)
 
 fun StructGetUnsignedDispatcher(instruction: AggregateSuperInstruction.StructGetUnsignedS) = dispatchInstruction(instruction, ::StructGetUnsignedExecutor)
+
+fun RefCastStructGetDispatcher(instruction: AggregateSuperInstruction.RefCastStructGetS) = dispatchInstruction(instruction, ::RefCastStructGetExecutor)
+
+fun StructGetStructGetDispatcher(instruction: AggregateSuperInstruction.StructGetStructGetS) = dispatchInstruction(instruction, ::StructGetStructGetExecutor)
+
+fun LocalSetStructGetDispatcher(instruction: AggregateSuperInstruction.LocalSetStructGetS) = dispatchInstruction(instruction, ::LocalSetStructGetExecutor)
 
 fun StructNewDispatcher(instruction: AggregateSuperInstruction.StructNewS) = dispatchInstruction(instruction, ::StructNewExecutor)
 

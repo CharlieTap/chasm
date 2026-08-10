@@ -3790,6 +3790,172 @@ class FrameSlotPassTest {
             actual.body.instructions,
         )
     }
+
+    @Test
+    fun `fuses ref cast into struct get`() {
+        val referenceType = refNonNullReferenceType(AbstractHeapType.Struct)
+        val recursiveType = functionRecursiveType(functionType())
+        val module = module(
+            types = listOf(type(recursiveType = recursiveType)),
+            definedTypes = listOf(definedType(recursiveType = recursiveType)),
+            functions = listOf(
+                function(
+                    typeIndex = typeIndex(0),
+                    body = expression(
+                        instructions = listOf(
+                            unreachableInstruction(),
+                            ReferenceSuperInstruction.RefCast(
+                                reference = frameSlotOperand(0),
+                                destination = frameSlotDestination(1),
+                                referenceType = referenceType,
+                            ),
+                            AggregateSuperInstruction.StructGet(
+                                address = frameSlotOperand(1),
+                                destination = frameSlotDestination(2),
+                                typeIndex = typeIndex(0),
+                                fieldIndex = fieldIndex(0),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val actual = FrameSlotPass(passContext(module = module), module).functions[0]
+
+        assertEquals(
+            listOf(
+                unreachableInstruction(),
+                AggregateSuperInstruction.RefCastStructGet(
+                    reference = frameSlotOperand(0),
+                    destination = frameSlotDestination(2),
+                    referenceType = referenceType,
+                    typeIndex = typeIndex(0),
+                    fieldIndex = fieldIndex(0),
+                ),
+            ),
+            actual.body.instructions,
+        )
+    }
+
+    @Test
+    fun `fuses reference struct get into struct get`() {
+        val structRecursiveType = recursiveType(
+            subTypes = listOf(
+                finalSubType(
+                    compositeType = structCompositeType(
+                        structType = structType(
+                            fields = listOf(
+                                immutableFieldType(
+                                    valueStorageType(
+                                        referenceValueType(refNullReferenceType(AbstractHeapType.Struct)),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val functionRecursiveType = functionRecursiveType(functionType())
+        val module = module(
+            types = listOf(
+                type(idx = typeIndex(0), recursiveType = structRecursiveType),
+                type(idx = typeIndex(1), recursiveType = functionRecursiveType),
+            ),
+            definedTypes = listOf(
+                definedType(recursiveType = structRecursiveType, typeIndex = 0),
+                definedType(recursiveType = functionRecursiveType, typeIndex = 1),
+            ),
+            functions = listOf(
+                function(
+                    typeIndex = typeIndex(1),
+                    body = expression(
+                        instructions = listOf(
+                            unreachableInstruction(),
+                            AggregateSuperInstruction.StructGet(
+                                address = frameSlotOperand(0),
+                                destination = frameSlotDestination(1),
+                                typeIndex = typeIndex(0),
+                                fieldIndex = fieldIndex(0),
+                            ),
+                            AggregateSuperInstruction.StructGet(
+                                address = frameSlotOperand(1),
+                                destination = frameSlotDestination(2),
+                                typeIndex = typeIndex(0),
+                                fieldIndex = fieldIndex(0),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val actual = FrameSlotPass(passContext(module = module), module).functions[0]
+
+        assertEquals(
+            listOf(
+                unreachableInstruction(),
+                AggregateSuperInstruction.StructGetStructGet(
+                    address = frameSlotOperand(0),
+                    destination = frameSlotDestination(2),
+                    firstTypeIndex = typeIndex(0),
+                    firstFieldIndex = fieldIndex(0),
+                    secondTypeIndex = typeIndex(0),
+                    secondFieldIndex = fieldIndex(0),
+                ),
+            ),
+            actual.body.instructions,
+        )
+    }
+
+    @Test
+    fun `fuses local tee into struct get`() {
+        val referenceType = refNullReferenceType(AbstractHeapType.Struct)
+        val recursiveType = functionRecursiveType(
+            functionType(
+                params = resultType(listOf(referenceValueType(referenceType))),
+            ),
+        )
+        val module = module(
+            types = listOf(type(recursiveType = recursiveType)),
+            definedTypes = listOf(definedType(recursiveType = recursiveType)),
+            functions = listOf(
+                function(
+                    typeIndex = typeIndex(0),
+                    body = expression(
+                        instructions = listOf(
+                            fusedLocalSet(
+                                operand = frameSlotOperand(1),
+                                localIdx = localIndex(0),
+                            ),
+                            AggregateSuperInstruction.StructGet(
+                                address = localGetOperand(localIndex(0)),
+                                destination = frameSlotDestination(2),
+                                typeIndex = typeIndex(0),
+                                fieldIndex = fieldIndex(0),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val actual = FrameSlotPass(passContext(module = module), module).functions[0]
+
+        assertEquals(
+            listOf(
+                AggregateSuperInstruction.LocalSetStructGet(
+                    operand = frameSlotOperand(1),
+                    destination = frameSlotDestination(2),
+                    localSlot = 0,
+                    typeIndex = typeIndex(0),
+                    fieldIndex = fieldIndex(0),
+                ),
+            ),
+            actual.body.instructions,
+        )
+    }
 }
 
 private fun frameSlotCopyInstructions(

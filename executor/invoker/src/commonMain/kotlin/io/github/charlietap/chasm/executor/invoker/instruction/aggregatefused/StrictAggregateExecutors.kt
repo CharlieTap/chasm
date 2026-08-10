@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused
 import io.github.charlietap.chasm.executor.invoker.ext.allocateArray
 import io.github.charlietap.chasm.executor.invoker.ext.allocateStruct
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.FieldUnpacker
+import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -572,6 +573,56 @@ internal inline fun StructGetExecutor(
     fieldIndex = instruction.fieldIndex,
 )
 
+internal inline fun RefCastStructGetExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
+    context: ExecutionContext,
+    instruction: AggregateSuperInstruction.RefCastStructGetS,
+) {
+    val reference = vstack.getFrameSlot(instruction.referenceSlot)
+    if (!Caster(reference, instruction.referenceType, cstack.peekFrame().instance, store)) {
+        throw InvocationException(InvocationError.FailedToCastReference)
+    }
+    vstack.setFrameSlot(
+        instruction.destinationSlot,
+        structField(store, reference, instruction.fieldIndex),
+    )
+}
+
+internal inline fun StructGetStructGetExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
+    context: ExecutionContext,
+    instruction: AggregateSuperInstruction.StructGetStructGetS,
+) {
+    val reference = structField(
+        store = store,
+        reference = vstack.getFrameSlot(instruction.addressSlot),
+        fieldIndex = instruction.firstFieldIndex,
+    )
+    vstack.setFrameSlot(
+        instruction.destinationSlot,
+        structField(store, reference, instruction.secondFieldIndex),
+    )
+}
+
+internal inline fun LocalSetStructGetExecutor(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
+    context: ExecutionContext,
+    instruction: AggregateSuperInstruction.LocalSetStructGetS,
+) {
+    val reference = vstack.getFrameSlot(instruction.sourceSlot)
+    vstack.setFrameSlot(instruction.localSlot, reference)
+    vstack.setFrameSlot(
+        instruction.destinationSlot,
+        structField(store, reference, instruction.fieldIndex),
+    )
+}
+
 internal fun StructGetSignedExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
@@ -822,6 +873,14 @@ private fun executeStructGet(
     val fieldValue = structInstance.field(Index.FieldIndex(fieldIndex))
     vstack.setFrameSlot(destinationSlot, fieldValue)
 }
+
+private fun structField(
+    store: Store,
+    reference: Long,
+    fieldIndex: Int,
+): Long = store
+    .struct(reference.toStructAddress())
+    .field(Index.FieldIndex(fieldIndex))
 
 private inline fun executePackedStructGet(
     vstack: ValueStack,

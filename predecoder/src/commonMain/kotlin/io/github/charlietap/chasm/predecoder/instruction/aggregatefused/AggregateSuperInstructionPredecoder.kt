@@ -21,9 +21,12 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.Array
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.ExternConvertAnyDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.I31GetSignedDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.I31GetUnsignedDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.LocalSetStructGetDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.RefCastStructGetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.RefI31Dispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetSignedDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetStructGetDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructGetUnsignedDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructNewDefaultDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.StructNewDispatcher
@@ -43,6 +46,7 @@ import io.github.charlietap.chasm.runtime.ext.data
 import io.github.charlietap.chasm.runtime.ext.default
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.ext.arrayType
 import io.github.charlietap.chasm.type.ext.bitWidth
@@ -76,6 +80,9 @@ internal fun AggregateSuperInstructionPredecoder(
         is AggregateSuperInstruction.StructGet -> strictStructGetInstruction(instruction)
         is AggregateSuperInstruction.StructGetSigned -> strictStructGetSignedInstruction(instruction)
         is AggregateSuperInstruction.StructGetUnsigned -> strictStructGetUnsignedInstruction(instruction)
+        is AggregateSuperInstruction.RefCastStructGet -> strictRefCastStructGetInstruction(context, instruction)
+        is AggregateSuperInstruction.StructGetStructGet -> strictStructGetStructGetInstruction(instruction)
+        is AggregateSuperInstruction.LocalSetStructGet -> strictLocalSetStructGetInstruction(instruction)
         is AggregateSuperInstruction.StructNew -> strictStructNewInstruction(context, instruction).bind()
         is AggregateSuperInstruction.StructNewDefault -> strictStructNewDefaultInstruction(context, instruction).bind()
         is AggregateSuperInstruction.StructSet -> strictStructSetInstruction(instruction)
@@ -1059,6 +1066,71 @@ private fun strictStructGetUnsignedInstruction(
             )
         }
         else -> unsupportedUnloweredAggregateInstruction()
+    }
+}
+
+private fun strictRefCastStructGetInstruction(
+    context: PredecodingContext,
+    instruction: AggregateSuperInstruction.RefCastStructGet,
+): DispatchableInstruction {
+    val referenceSlot = strictAggregateOperandSlot(instruction.reference)
+    val destinationSlot = strictAggregateDestinationSlot(instruction.destination)
+    when (val heapType = instruction.referenceType.heapType) {
+        is ConcreteHeapType.TypeIndex -> context.instance.runtimeTypes[heapType.index].hydrate()
+        else -> Unit
+    }
+
+    return if (referenceSlot != null && destinationSlot != null) {
+        RefCastStructGetDispatcher(
+            RuntimeFusedAggregateInstruction.RefCastStructGetS(
+                referenceSlot = referenceSlot,
+                destinationSlot = destinationSlot,
+                referenceType = instruction.referenceType,
+                fieldIndex = instruction.fieldIndex.idx,
+            ),
+        )
+    } else {
+        unsupportedUnloweredAggregateInstruction()
+    }
+}
+
+private fun strictStructGetStructGetInstruction(
+    instruction: AggregateSuperInstruction.StructGetStructGet,
+): DispatchableInstruction {
+    val addressSlot = strictAggregateOperandSlot(instruction.address)
+    val destinationSlot = strictAggregateDestinationSlot(instruction.destination)
+
+    return if (addressSlot != null && destinationSlot != null) {
+        StructGetStructGetDispatcher(
+            RuntimeFusedAggregateInstruction.StructGetStructGetS(
+                addressSlot = addressSlot,
+                destinationSlot = destinationSlot,
+                firstFieldIndex = instruction.firstFieldIndex.idx,
+                secondFieldIndex = instruction.secondFieldIndex.idx,
+            ),
+        )
+    } else {
+        unsupportedUnloweredAggregateInstruction()
+    }
+}
+
+private fun strictLocalSetStructGetInstruction(
+    instruction: AggregateSuperInstruction.LocalSetStructGet,
+): DispatchableInstruction {
+    val sourceSlot = strictAggregateOperandSlot(instruction.operand)
+    val destinationSlot = strictAggregateDestinationSlot(instruction.destination)
+
+    return if (sourceSlot != null && destinationSlot != null) {
+        LocalSetStructGetDispatcher(
+            RuntimeFusedAggregateInstruction.LocalSetStructGetS(
+                sourceSlot = sourceSlot,
+                localSlot = instruction.localSlot,
+                destinationSlot = destinationSlot,
+                fieldIndex = instruction.fieldIndex.idx,
+            ),
+        )
+    } else {
+        unsupportedUnloweredAggregateInstruction()
     }
 }
 

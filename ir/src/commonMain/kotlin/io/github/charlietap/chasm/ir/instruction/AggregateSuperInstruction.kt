@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.ir.instruction
 
 import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.type.ReferenceType
 
 sealed interface AggregateSuperInstruction : Instruction {
 
@@ -151,6 +152,31 @@ sealed interface AggregateSuperInstruction : Instruction {
     data class StructGetUnsigned(
         val address: FusedOperand,
         val destination: FusedDestination,
+        val typeIndex: Index.TypeIndex,
+        val fieldIndex: Index.FieldIndex,
+    ) : AggregateSuperInstruction
+
+    data class RefCastStructGet(
+        val reference: FusedOperand,
+        val destination: FusedDestination,
+        val referenceType: ReferenceType,
+        val typeIndex: Index.TypeIndex,
+        val fieldIndex: Index.FieldIndex,
+    ) : AggregateSuperInstruction
+
+    data class StructGetStructGet(
+        val address: FusedOperand,
+        val destination: FusedDestination,
+        val firstTypeIndex: Index.TypeIndex,
+        val firstFieldIndex: Index.FieldIndex,
+        val secondTypeIndex: Index.TypeIndex,
+        val secondFieldIndex: Index.FieldIndex,
+    ) : AggregateSuperInstruction
+
+    data class LocalSetStructGet(
+        val operand: FusedOperand,
+        val destination: FusedDestination,
+        val localSlot: Int,
         val typeIndex: Index.TypeIndex,
         val fieldIndex: Index.FieldIndex,
     ) : AggregateSuperInstruction

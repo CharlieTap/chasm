@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.StructType
 
 sealed interface AggregateSuperInstruction : LinkedInstruction {
@@ -503,6 +504,27 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
 
     data class StructGetUnsignedS(
         val addressSlot: Int,
+        val destinationSlot: Int,
+        val fieldIndex: Int,
+    ) : AggregateSuperInstruction
+
+    data class RefCastStructGetS(
+        val referenceSlot: Int,
+        val destinationSlot: Int,
+        val referenceType: ReferenceType,
+        val fieldIndex: Int,
+    ) : AggregateSuperInstruction
+
+    data class StructGetStructGetS(
+        val addressSlot: Int,
+        val destinationSlot: Int,
+        val firstFieldIndex: Int,
+        val secondFieldIndex: Int,
+    ) : AggregateSuperInstruction
+
+    data class LocalSetStructGetS(
+        val sourceSlot: Int,
+        val localSlot: Int,
         val destinationSlot: Int,
         val fieldIndex: Int,
     ) : AggregateSuperInstruction
