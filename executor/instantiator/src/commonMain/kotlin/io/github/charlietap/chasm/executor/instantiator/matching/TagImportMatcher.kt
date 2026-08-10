@@ -6,9 +6,7 @@ import io.github.charlietap.chasm.executor.instantiator.context.InstantiationCon
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.tag
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
-import io.github.charlietap.chasm.type.TagType
-import io.github.charlietap.chasm.type.matching.TypeMatcher
-import io.github.charlietap.chasm.ir.module.Import as ModuleImport
+import io.github.charlietap.chasm.ast.module.Import as ModuleImport
 
 internal typealias TagImportMatcher = (InstantiationContext, ModuleImport.Descriptor.Tag, ExternalValue.Tag) -> Result<Boolean, ModuleTrapError>
 
@@ -19,7 +17,7 @@ internal inline fun TagImportMatcher(
 ): Result<Boolean, ModuleTrapError> = binding {
     val store = context.store
     val tag = store.tag(import.address)
-    val descriptorRtt = context.runtimeTypes[descriptor.type.typeIndex]
+    val descriptorRtt = context.runtimeTypes[context.types.resolve(descriptor.type).typeIndex]
 
     when {
         tag.rtt === descriptorRtt -> true

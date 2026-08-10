@@ -8,7 +8,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.runtime.core)
-                api(projects.test.fixture.ir)
+                api(projects.test.fixture.ast)
                 api(projects.test.fixture.config)
             }
         }

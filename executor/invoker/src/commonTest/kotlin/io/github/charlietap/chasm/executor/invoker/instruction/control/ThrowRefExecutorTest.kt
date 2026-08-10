@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
-import io.github.charlietap.chasm.fixture.ir.instruction.catchAllRefHandler
-import io.github.charlietap.chasm.fixture.ir.instruction.catchRefHandler
-import io.github.charlietap.chasm.fixture.ir.module.labelIndex
-import io.github.charlietap.chasm.fixture.ir.module.tagIndex
+import io.github.charlietap.chasm.fixture.ast.instruction.catchAllRefHandler
+import io.github.charlietap.chasm.fixture.ast.instruction.catchRefHandler
+import io.github.charlietap.chasm.fixture.ast.module.labelIndex
+import io.github.charlietap.chasm.fixture.ast.module.tagIndex
 import io.github.charlietap.chasm.fixture.runtime.instance.exceptionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tagAddress
@@ -40,8 +40,8 @@ class ThrowRefExecutorTest {
             ),
             handlers = listOf(
                 ExceptionHandler(
-                    handlers = listOf(catchRefHandler(tagIndex(0), labelIndex(0))),
-                    payloadDestinationSlots = listOf(listOf(2, 3, 4)),
+                    handlers = listOf(catchRefHandler(tagIndex(0u), labelIndex(0u))),
+                    payloadDestinationSlots = listOf(intArrayOf(2, 3, 4)),
                     continuationIps = intArrayOf(42),
                     framesDepth = 1,
                     framePointer = 0,
@@ -79,16 +79,16 @@ class ThrowRefExecutorTest {
             frames = listOf(frame(instance = module)),
             handlers = listOf(
                 ExceptionHandler(
-                    handlers = listOf(catchAllRefHandler(labelIndex(0))),
-                    payloadDestinationSlots = listOf(listOf(1)),
+                    handlers = listOf(catchAllRefHandler(labelIndex(0u))),
+                    payloadDestinationSlots = listOf(intArrayOf(1)),
                     continuationIps = intArrayOf(73),
                     framesDepth = 1,
                     framePointer = 0,
                     valueDepth = 2,
                 ),
                 ExceptionHandler(
-                    handlers = listOf(catchRefHandler(tagIndex(0), labelIndex(0))),
-                    payloadDestinationSlots = listOf(listOf(1)),
+                    handlers = listOf(catchRefHandler(tagIndex(0u), labelIndex(0u))),
+                    payloadDestinationSlots = listOf(intArrayOf(1)),
                     continuationIps = intArrayOf(51),
                     framesDepth = 1,
                     framePointer = 0,

@@ -8,8 +8,8 @@ import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
+import io.github.charlietap.chasm.fixture.ast.value.nameValue
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
-import io.github.charlietap.chasm.fixture.ir.value.nameValue
 import io.github.charlietap.chasm.fixture.runtime.instance.exportInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue

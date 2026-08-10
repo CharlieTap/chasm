@@ -17,18 +17,19 @@ sealed class FunctionInstance {
         override val functionType: FunctionType,
         val module: ModuleInstance,
         var function: Function,
-    ) : FunctionInstance() {
-
-        var callPlan = WasmFunctionCallPlan(
-            entryIp = function.body.entryIp,
-            frameSlots = function.frameSlots,
+        val callPlan: WasmFunctionCallPlan = WasmFunctionCallPlan(
             params = functionType.params.types.size,
             results = functionType.results.types.size,
             interfaceSlots = maxOf(functionType.params.types.size, functionType.results.types.size),
             module = module,
             locals = function.locals.copyOf(),
-        )
-    }
+        ).apply {
+            install(
+                entryIp = function.body.entryIp,
+                frameSlots = function.frameSlots,
+            )
+        },
+    ) : FunctionInstance()
 
     data class HostFunction(
         override val rtt: RTT,

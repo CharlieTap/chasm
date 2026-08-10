@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
@@ -26,7 +26,7 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class HostCall(
         val instance: FunctionInstance.HostFunction,
-        val resultSlots: List<Int>,
+        val resultSlotBase: Int,
         val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
@@ -44,7 +44,7 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
         val elementIndex: Int,
         val type: RTT,
         val table: TableInstance,
-        val resultSlots: List<Int>,
+        val resultSlotBase: Int,
         val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
@@ -52,13 +52,13 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
         val elementIndexSlot: Int,
         val type: RTT,
         val table: TableInstance,
-        val resultSlots: List<Int>,
+        val resultSlotBase: Int,
         val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
     data class CallRefS(
         val functionSlot: Int,
-        val resultSlots: List<Int>,
+        val resultSlotBase: Int,
         val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
@@ -83,7 +83,7 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class Throw(
         val tagIndex: Index.TagIndex,
-        val payloadSlots: List<Int>,
+        val payloadSlots: IntArray,
     ) : ControlSuperInstruction
 
     data class ThrowRefS(

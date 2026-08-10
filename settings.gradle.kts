@@ -55,15 +55,11 @@ include(":executor:instantiator")
 include(":executor:invoker")
 
 include(":host")
-include(":ir")
-include(":ir-factory")
 
 include(":libs:sse2")
 include(":libs:stack")
 
 include(":memory")
-
-include(":predecoder")
 
 include(":compiler")
 
@@ -80,7 +76,6 @@ include(":test:fixture:ast")
 include(":test:fixture:chasm")
 include(":test:fixture:config")
 include(":test:fixture:executor:instantiator")
-include(":test:fixture:ir")
 include(":test:fixture:runtime")
 include(":test:fixture:type-system")
 

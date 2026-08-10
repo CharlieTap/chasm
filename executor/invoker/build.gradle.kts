@@ -9,7 +9,7 @@ kotlin {
     sourceSets {
        commonMain {
             dependencies {
-                api(projects.ir)
+                api(projects.ast)
                 api(projects.runtime.core)
                 api(libs.result)
 
@@ -22,7 +22,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(projects.test.fixture.runtime)
-                implementation(projects.test.fixture.ir)
+                implementation(projects.test.fixture.ast)
                 implementation(libs.kotlin.test)
             }
         }

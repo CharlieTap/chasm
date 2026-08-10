@@ -1,10 +1,10 @@
 package io.github.charlietap.chasm.fixture.runtime.instruction
 
-import io.github.charlietap.chasm.fixture.ir.module.typeIndex
+import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.type.rtt
-import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction

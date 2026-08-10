@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
-import io.github.charlietap.chasm.ir.instruction.NumericCondition
+import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.type.ReferenceType
 
 sealed interface AdminInstruction : LinkedInstruction {
@@ -9,8 +8,8 @@ sealed interface AdminInstruction : LinkedInstruction {
     data object EndFunction : AdminInstruction
 
     data class CopySlots(
-        val sourceSlots: List<Int>,
-        val destinationSlots: List<Int>,
+        val sourceSlots: IntArray,
+        val destinationSlots: IntArray,
     ) : AdminInstruction
 
     data class Jump(val targetIp: Int) : AdminInstruction
@@ -21,6 +20,16 @@ sealed interface AdminInstruction : LinkedInstruction {
     ) : AdminInstruction
 
     data class JumpIfS(
+        val operandSlot: Int,
+        val targetIp: Int,
+    ) : AdminInstruction
+
+    data class JumpIfZeroI(
+        val operand: Long,
+        val targetIp: Int,
+    ) : AdminInstruction
+
+    data class JumpIfZeroS(
         val operandSlot: Int,
         val targetIp: Int,
     ) : AdminInstruction
@@ -55,18 +64,15 @@ sealed interface AdminInstruction : LinkedInstruction {
     data class JumpTableI(
         val operand: Int,
         val targetIps: IntArray,
-        val defaultTargetIp: Int,
     ) : AdminInstruction
 
     data class JumpTableS(
         val operandSlot: Int,
         val targetIps: IntArray,
-        val defaultTargetIp: Int,
     ) : AdminInstruction
 
     data class JumpTableV(
         val targetIps: IntArray,
-        val defaultTargetIp: Int,
     ) : AdminInstruction
 
     data class JumpOnNullI(
@@ -136,7 +142,7 @@ sealed interface AdminInstruction : LinkedInstruction {
     data class PushHandler(
         val handlers: List<CatchHandler>,
         val continuationIps: IntArray,
-        val payloadDestinationSlots: List<List<Int>> = [],
+        val payloadDestinationSlots: List<IntArray> = [],
     ) : AdminInstruction
 
     data object PopHandler : AdminInstruction

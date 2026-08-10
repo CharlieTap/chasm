@@ -56,8 +56,4 @@ internal fun FinishFrameSlotCallResult(
     vstack.framePointer = callerFramePointer
 }
 
-internal fun ResultSlotBase(
-    resultSlots: List<Int>,
-): Int = resultSlots.firstOrNull() ?: 0
-
 private fun identity(index: Int): Int = index

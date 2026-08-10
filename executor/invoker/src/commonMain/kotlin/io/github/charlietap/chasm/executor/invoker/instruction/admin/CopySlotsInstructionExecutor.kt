@@ -17,7 +17,7 @@ internal inline fun CopySlotsInstructionExecutor(
         vstack.getFrameSlot(instruction.sourceSlots[index])
     }
 
-    instruction.destinationSlots.forEachIndexed { index, slot ->
-        vstack.setFrameSlot(slot, copiedValues[index])
+    for (index in instruction.destinationSlots.indices) {
+        vstack.setFrameSlot(instruction.destinationSlots[index], copiedValues[index])
     }
 }

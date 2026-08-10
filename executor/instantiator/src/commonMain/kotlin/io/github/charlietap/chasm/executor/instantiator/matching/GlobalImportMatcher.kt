@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.executor.instantiator.matching
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.ir.module.Import
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.global
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
@@ -36,7 +36,7 @@ internal inline fun GlobalImportMatcher(
     val store = context.store
     val actualGlobal = store.global(import.address)
     val actualGlobalType = actualGlobal.type
-    val requiredGlobalType = descriptor.type
+    val requiredGlobalType = context.types.resolve(descriptor.type)
 
     // types should be closed by this point so defined types are already resolved
     globalTypeMatcher(actualGlobalType, requiredGlobalType, EmptyTypeMatcherContext)

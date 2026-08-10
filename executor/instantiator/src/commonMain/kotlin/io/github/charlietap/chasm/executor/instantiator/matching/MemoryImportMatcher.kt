@@ -2,8 +2,8 @@ package io.github.charlietap.chasm.executor.instantiator.matching
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.ir.module.Import
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.memory
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.type.MemoryType
 import io.github.charlietap.chasm.type.matching.EmptyTypeMatcherContext
 import io.github.charlietap.chasm.type.matching.MemoryTypeMatcher
 import io.github.charlietap.chasm.type.matching.TypeMatcher
-import io.github.charlietap.chasm.ir.module.Import as ModuleImport
+import io.github.charlietap.chasm.ast.module.Import as ModuleImport
 
 internal typealias MemoryImportMatcher = (InstantiationContext, Import.Descriptor.Memory, ExternalValue.Memory) -> Result<Boolean, ModuleTrapError>
 

@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.executor.instantiator
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.compiler.Compiler
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
@@ -12,7 +12,6 @@ import io.github.charlietap.chasm.executor.instantiator.context.InstantiationCon
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
-import io.github.charlietap.chasm.ir.factory.ModuleFactory
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
@@ -33,8 +32,6 @@ fun ModuleInstantiator(
         module = module,
         imports = imports,
         compatibilityChecker = ::CompatibilityChecker,
-        moduleFactory = ::ModuleFactory,
-        compiler = ::Compiler,
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
         typeAllocator = ::TypeAllocator,
@@ -50,8 +47,6 @@ internal inline fun ModuleInstantiator(
     module: ASTModule,
     imports: List<Import>,
     crossinline compatibilityChecker: CompatibilityChecker,
-    crossinline moduleFactory: ModuleFactory,
-    crossinline compiler: Compiler,
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline allocator: ModuleAllocator,
     crossinline typeAllocator: TypeAllocator,
@@ -63,14 +58,13 @@ internal inline fun ModuleInstantiator(
 
     compatibilityChecker(module).bind()
 
-    val irModule = compiler(config, moduleFactory(module))
-    val runtimeTypes = typeAllocator(irModule, store)
+    val runtimeTypes = typeAllocator(module, store)
 
-    val context = InstantiationContext(config, store, irModule, runtimeTypes)
+    val context = InstantiationContext(config, store, module, runtimeTypes)
     val partialInstance = partialAllocator(context, imports).bind()
 
-    val tableInitValues = LongArray(irModule.tables.size) { tableIndex ->
-        val table = irModule.tables[tableIndex]
+    val tableInitValues = LongArray(module.tables.size) { tableIndex ->
+        val table = module.tables[tableIndex]
         constantExpressionEvaluator(store, partialInstance, table.initExpression).bind()
     }
 
@@ -79,8 +73,8 @@ internal inline fun ModuleInstantiator(
     tableInitializer(context, instance).bind()
     memoryInitializer(context, instance).bind()
 
-    irModule.startFunction?.let { function ->
-        val address = instance.functionAddresses[function.idx.idx]
+    module.startFunction?.let { function ->
+        val address = instance.functionAddresses[function.idx.toInt()]
         invoker(config, store, instance, address, emptyList()).bind()
     }
 

@@ -13,6 +13,13 @@ class Program
         var size: Int = 0
             private set
 
+        fun append(value: DispatchableInstruction): Int {
+            ensureCapacity(size + 1)
+            val index = size++
+            instructions[index] = value
+            return index
+        }
+
         fun append(values: Array<DispatchableInstruction>): Int {
             val entryIp = size
             if (values.isEmpty()) return entryIp
@@ -21,6 +28,23 @@ class Program
             values.copyInto(instructions, destinationOffset = size)
             size += values.size
             return entryIp
+        }
+
+        fun replace(index: Int, value: DispatchableInstruction) {
+            require(index in 0 until size) {
+                "program instruction index is out of bounds"
+            }
+            instructions[index] = value
+        }
+
+        fun truncate(size: Int) {
+            require(size in 0..this.size) {
+                "program size is out of bounds"
+            }
+            for (index in size until this.size) {
+                instructions[index] = unavailableInstruction
+            }
+            this.size = size
         }
 
         private fun ensureCapacity(requiredCapacity: Int) {
@@ -39,6 +63,10 @@ class Program
 const val EXIT_IP = -1
 
 private const val INITIAL_CAPACITY = 256
+
+private val unavailableInstruction = DispatchableInstruction { _, _, _, _, _ ->
+    error("unavailable program instruction cannot be dispatched")
+}
 
 @Suppress("UNCHECKED_CAST")
 private fun dispatchableArray(capacity: Int): Array<DispatchableInstruction> {

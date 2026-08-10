@@ -4778,21 +4778,21 @@ public final class io/github/charlietap/chasm/ast/instruction/MemoryInstruction$
 public abstract interface class io/github/charlietap/chasm/ast/instruction/NumericInstruction : io/github/charlietap/chasm/ast/instruction/Instruction {
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Abs : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Abs : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Abs;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Add : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Add : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Add;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ceil : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ceil : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ceil;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
@@ -4812,182 +4812,182 @@ public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI32U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI64S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ConvertI64U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Copysign : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Copysign : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Copysign;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32DemoteF64 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32DemoteF64 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32DemoteF64;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Div : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Div : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Div;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Eq : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Eq : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Eq;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Floor : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Floor : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Floor;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ge : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ge : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ge;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Gt : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Gt : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Gt;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Le : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Le : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Le;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Lt : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Lt : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Lt;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Max : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Max : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Max;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Min : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Min : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Min;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Mul : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Mul : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Mul;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ne : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ne : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Ne;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Nearest : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Nearest : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Nearest;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Neg : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Neg : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Neg;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ReinterpretI32 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ReinterpretI32 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32ReinterpretI32;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Sqrt : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Sqrt : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Sqrt;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Sub : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Sub : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Sub;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Trunc : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Trunc : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F32Trunc;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Abs : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Abs : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Abs;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Add : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Add : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Add;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ceil : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ceil : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ceil;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
@@ -5007,182 +5007,182 @@ public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI32U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI64S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ConvertI64U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Copysign : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Copysign : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Copysign;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Div : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Div : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Div;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Eq : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Eq : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Eq;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Floor : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Floor : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Floor;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ge : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ge : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ge;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Gt : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Gt : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Gt;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Le : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Le : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Le;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Lt : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Lt : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Lt;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Max : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Max : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Max;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Min : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Min : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Min;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Mul : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Mul : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Mul;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ne : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ne : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Ne;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Nearest : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Nearest : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Nearest;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Neg : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Neg : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Neg;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64PromoteF32 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64PromoteF32 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64PromoteF32;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ReinterpretI64 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ReinterpretI64 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64ReinterpretI64;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Sqrt : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Sqrt : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Sqrt;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Sub : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Sub : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Sub;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Trunc : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Trunc : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$F64Trunc;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Add : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Add : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Add;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32And : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32And : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32And;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Clz : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Clz : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Clz;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
@@ -5203,294 +5203,294 @@ public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction
 	public final synthetic fun unbox-impl ()I
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Ctz : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Ctz : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Ctz;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32DivS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32DivS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32DivS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32DivU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32DivU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32DivU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Eq : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Eq : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Eq;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Eqz : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Eqz : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Eqz;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Extend16S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Extend16S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Extend16S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Extend8S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Extend8S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Extend8S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GeS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GeS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GeS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GeU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GeU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GeU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GtS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GtS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GtS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GtU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GtU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32GtU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LeS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LeS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LeS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LeU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LeU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LeU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LtS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LtS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LtS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LtU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LtU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32LtU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Mul : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Mul : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Mul;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Ne : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Ne : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Ne;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Or : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Or : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Or;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Popcnt : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Popcnt : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Popcnt;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ReinterpretF32 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ReinterpretF32 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ReinterpretF32;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32RemS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32RemS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32RemS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32RemU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32RemU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32RemU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Rotl : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Rotl : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Rotl;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Rotr : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Rotr : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Rotr;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Shl : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Shl : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Shl;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ShrS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ShrS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ShrS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ShrU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ShrU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32ShrU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Sub : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Sub : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Sub;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF32U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF64S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncF64U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF32U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF64S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32TruncSatF64U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32WrapI64 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32WrapI64 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32WrapI64;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Xor : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Xor : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I32Xor;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Add : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Add : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Add;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Add128 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Add128 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Add128;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64And : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64And : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64And;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Clz : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Clz : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Clz;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
@@ -5511,305 +5511,456 @@ public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction
 	public final synthetic fun unbox-impl ()J
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Ctz : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Ctz : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Ctz;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64DivS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64DivS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64DivS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64DivU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64DivU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64DivU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Eq : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Eq : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Eq;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Eqz : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Eqz : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Eqz;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend16S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend16S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend16S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend8S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend8S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Extend8S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ExtendI32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ExtendI32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ExtendI32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ExtendI32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ExtendI32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ExtendI32U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GeS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GeS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GeS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GeU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GeU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GeU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GtS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GtS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GtS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GtU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GtU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64GtU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LeS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LeS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LeS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LeU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LeU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LeU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LtS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LtS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LtS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LtU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LtU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64LtU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Mul : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Mul : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Mul;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64MulWideS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64MulWideS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64MulWideS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64MulWideU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64MulWideU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64MulWideU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Ne : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Ne : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Ne;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Or : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Or : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Or;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Popcnt : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Popcnt : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Popcnt;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ReinterpretF64 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ReinterpretF64 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ReinterpretF64;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64RemS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64RemS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64RemS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64RemU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64RemU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64RemU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Rotl : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Rotl : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Rotl;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Rotr : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Rotr : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Rotr;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Shl : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Shl : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Shl;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ShrS : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ShrS : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ShrS;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ShrU : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ShrU : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64ShrU;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Sub : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Sub : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Sub;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Sub128 : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Sub128 : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Sub128;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF32U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF64S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncF64U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF32S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF32S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF32U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF32U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF64S : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF64S;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF64U : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64TruncSatF64U;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Xor : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+public final class io/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Xor : io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator {
 	public static final field INSTANCE Lio/github/charlietap/chasm/ast/instruction/NumericInstruction$I64Xor;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class io/github/charlietap/chasm/ast/instruction/NumericInstruction$Operator : io/github/charlietap/chasm/ast/instruction/NumericInstruction {
+	public synthetic fun <init> (Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getOpcode ()Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+}
+
+public final class io/github/charlietap/chasm/ast/instruction/NumericOpcode : java/lang/Enum {
+	public static final field F32Abs Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Add Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Ceil Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32ConvertI32S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32ConvertI32U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32ConvertI64S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32ConvertI64U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Copysign Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32DemoteF64 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Div Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Eq Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Floor Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Ge Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Gt Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Le Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Lt Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Max Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Min Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Mul Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Ne Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Nearest Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Neg Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32ReinterpretI32 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Sqrt Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Sub Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F32Trunc Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Abs Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Add Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Ceil Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64ConvertI32S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64ConvertI32U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64ConvertI64S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64ConvertI64U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Copysign Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Div Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Eq Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Floor Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Ge Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Gt Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Le Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Lt Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Max Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Min Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Mul Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Ne Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Nearest Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Neg Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64PromoteF32 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64ReinterpretI64 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Sqrt Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Sub Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field F64Trunc Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Add Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32And Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Clz Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Ctz Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32DivS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32DivU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Eq Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Eqz Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Extend16S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Extend8S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32GeS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32GeU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32GtS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32GtU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32LeS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32LeU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32LtS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32LtU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Mul Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Ne Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Or Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Popcnt Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32ReinterpretF32 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32RemS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32RemU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Rotl Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Rotr Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Shl Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32ShrS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32ShrU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Sub Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32TruncF32S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32TruncF32U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32TruncF64S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32TruncF64U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32TruncSatF32S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32TruncSatF32U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32TruncSatF64S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32TruncSatF64U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32WrapI64 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I32Xor Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Add Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Add128 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64And Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Clz Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Ctz Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64DivS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64DivU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Eq Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Eqz Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Extend16S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Extend32S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Extend8S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64ExtendI32S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64ExtendI32U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64GeS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64GeU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64GtS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64GtU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64LeS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64LeU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64LtS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64LtU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Mul Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64MulWideS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64MulWideU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Ne Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Or Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Popcnt Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64ReinterpretF64 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64RemS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64RemU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Rotl Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Rotr Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Shl Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64ShrS Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64ShrU Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Sub Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Sub128 Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64TruncF32S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64TruncF32U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64TruncF64S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64TruncF64U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64TruncSatF32S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64TruncSatF32U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64TruncSatF64S Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64TruncSatF64U Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static final field I64Xor Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
+	public static fun values ()[Lio/github/charlietap/chasm/ast/instruction/NumericOpcode;
 }
 
 public abstract interface class io/github/charlietap/chasm/ast/instruction/ParametricInstruction : io/github/charlietap/chasm/ast/instruction/Instruction {
@@ -8647,6 +8798,20 @@ public final class io/github/charlietap/chasm/ast/module/Index$TypeIndex : io/gi
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (I)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/ast/module/IndexExtKt {
+	public static final fun toInt-4D6Sg9E (I)I
+	public static final fun toInt-8BqobMM (I)I
+	public static final fun toInt-AENF8_4 (I)I
+	public static final fun toInt-D9o2788 (I)I
+	public static final fun toInt-IBHm4_c (I)I
+	public static final fun toInt-NgMQ3LY (I)I
+	public static final fun toInt-Tm1c7Yg (I)I
+	public static final fun toInt-UfKnbfY (I)I
+	public static final fun toInt-YnJxT-0 (I)I
+	public static final fun toInt-gm3-eEE (I)I
+	public static final fun toInt-vYLah64 (I)I
 }
 
 public final class io/github/charlietap/chasm/ast/module/LabelNameSubsection : io/github/charlietap/chasm/ast/module/NameSubsection {

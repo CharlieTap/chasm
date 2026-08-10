@@ -4,15 +4,15 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
+import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
+import io.github.charlietap.chasm.ast.instruction.Expression
+import io.github.charlietap.chasm.ast.instruction.NumericInstruction
+import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ast.instruction.VariableInstruction
+import io.github.charlietap.chasm.ast.instruction.VectorInstruction
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.instantiator.ext.globalAddress
-import io.github.charlietap.chasm.ir.instruction.AdminInstruction
-import io.github.charlietap.chasm.ir.instruction.AggregateInstruction
-import io.github.charlietap.chasm.ir.instruction.Expression
-import io.github.charlietap.chasm.ir.instruction.NumericInstruction
-import io.github.charlietap.chasm.ir.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.ir.instruction.VariableInstruction
-import io.github.charlietap.chasm.ir.instruction.VectorInstruction
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.HeapTypeEncoder
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
@@ -113,7 +113,7 @@ internal fun ConstantExpressionEvaluator(
                 stack.push(value)
             }
             is AggregateInstruction.StructNew -> {
-                val typeIndex = instruction.typeIndex.idx
+                val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val structType = DefinedTypeExpander(rtt.type).asStructType()
                 val size = structType.fields.size
@@ -126,7 +126,7 @@ internal fun ConstantExpressionEvaluator(
                 stack.push((structAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_STRUCT)
             }
             is AggregateInstruction.StructNewDefault -> {
-                val typeIndex = instruction.typeIndex.idx
+                val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val structType = DefinedTypeExpander(rtt.type).asStructType()
                 val fields = LongArray(structType.fields.size) { idx ->
@@ -137,7 +137,7 @@ internal fun ConstantExpressionEvaluator(
                 stack.push((structAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_STRUCT)
             }
             is AggregateInstruction.ArrayNew -> {
-                val typeIndex = instruction.typeIndex.idx
+                val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val arrayType = DefinedTypeExpander(rtt.type).asArrayType()
                 val size = stack.popI32()
@@ -148,7 +148,7 @@ internal fun ConstantExpressionEvaluator(
                 stack.push((arrayAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_ARRAY)
             }
             is AggregateInstruction.ArrayNewDefault -> {
-                val typeIndex = instruction.typeIndex.idx
+                val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val arrayType = DefinedTypeExpander(rtt.type).asArrayType()
                 val size = stack.popI32()
@@ -159,7 +159,7 @@ internal fun ConstantExpressionEvaluator(
                 stack.push((arrayAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_ARRAY)
             }
             is AggregateInstruction.ArrayNewFixed -> {
-                val typeIndex = instruction.typeIndex.idx
+                val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val arrayType = DefinedTypeExpander(rtt.type).asArrayType()
                 val length = instruction.size.toInt()
@@ -203,8 +203,6 @@ internal fun ConstantExpressionEvaluator(
                     }
                 }
             }
-            is AdminInstruction.EndFunction -> break
-
             else -> continue
         }
     }

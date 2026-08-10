@@ -59,14 +59,14 @@ internal fun WasmFunctionCall(
     store: Store,
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
-    resultSlots: List<Int>,
+    resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
 ): Int = WasmFunctionCall(
     vstack,
     cstack,
     instance.callPlan,
-    ResultSlotBase(resultSlots),
+    resultSlotBase,
     callFrameSlot,
     returnIp,
 )

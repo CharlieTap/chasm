@@ -12,12 +12,9 @@ kotlin {
                 api(projects.ast)
                 api(projects.runtime.core)
                 api(projects.executor.invoker)
-                api(projects.ir)
                 api(libs.result)
 
-                implementation(projects.irFactory)
                 implementation(projects.compiler)
-                implementation(projects.predecoder)
                 implementation(projects.memory)
             }
         }
@@ -26,7 +23,6 @@ kotlin {
             dependencies {
                 implementation(projects.test.fixture.executor.instantiator)
                 implementation(projects.test.fixture.runtime)
-                implementation(projects.test.fixture.ir)
                 implementation(libs.kotlin.test)
             }
         }

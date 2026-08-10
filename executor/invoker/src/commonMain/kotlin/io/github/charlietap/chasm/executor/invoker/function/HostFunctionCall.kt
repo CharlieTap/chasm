@@ -60,7 +60,7 @@ internal fun HostFunctionCall(
     store: Store,
     context: ExecutionContext,
     function: FunctionInstance.HostFunction,
-    resultSlots: List<Int>,
+    resultSlotBase: Int,
     callFrameSlot: Int,
 ) {
     val frame = cstack.peekFrame()
@@ -81,7 +81,7 @@ internal fun HostFunctionCall(
     }
 
     results.forEachIndexed { index, result ->
-        vstack.setFrameSlot(resultSlots[index], result.toLongFromBoxed())
+        vstack.setFrameSlot(resultSlotBase + index, result.toLongFromBoxed())
     }
 }
 

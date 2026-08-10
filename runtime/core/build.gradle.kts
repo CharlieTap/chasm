@@ -10,7 +10,7 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.config)
-                api(projects.ir)
+                api(projects.ast)
                 api(projects.libs.stack)
                 api(libs.result)
                 api(projects.runtime.type)

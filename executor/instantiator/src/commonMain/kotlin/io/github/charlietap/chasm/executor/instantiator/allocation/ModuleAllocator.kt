@@ -6,6 +6,9 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.toResultOr
+import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.compiler.ModuleCompiler
+import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
@@ -15,11 +18,6 @@ import io.github.charlietap.chasm.executor.instantiator.allocation.memory.Memory
 import io.github.charlietap.chasm.executor.instantiator.allocation.table.TableAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.tag.TagAllocator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.executor.instantiator.ext.asPredecodingContext
-import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
-import io.github.charlietap.chasm.ir.module.Function
-import io.github.charlietap.chasm.predecoder.FunctionPredecoder
-import io.github.charlietap.chasm.predecoder.Predecoder
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.addDataAddress
 import io.github.charlietap.chasm.runtime.ext.addElementAddress
@@ -28,17 +26,23 @@ import io.github.charlietap.chasm.runtime.ext.addGlobalAddress
 import io.github.charlietap.chasm.runtime.ext.addMemoryAddress
 import io.github.charlietap.chasm.runtime.ext.addTableAddress
 import io.github.charlietap.chasm.runtime.ext.addTagAddress
-import io.github.charlietap.chasm.runtime.ext.default
-import io.github.charlietap.chasm.runtime.ext.function
-import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
-import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.program.EXIT_IP
+import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
+import io.github.charlietap.chasm.type.RTT
 import kotlin.jvm.JvmName
-import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
 internal typealias ModuleAllocator = (InstantiationContext, ModuleInstance, LongArray) -> Result<ModuleInstance, ModuleTrapError>
+
+internal typealias ModuleCompiler = (
+    RuntimeConfig,
+    Store,
+    Module,
+    ModuleInstance,
+    List<RTT>,
+    ModuleTypeResolver,
+) -> Result<Unit, ModuleTrapError>
 
 internal fun ModuleAllocator(
     context: InstantiationContext,
@@ -56,7 +60,7 @@ internal fun ModuleAllocator(
         globalAllocator = ::GlobalAllocator,
         elementAllocator = ::ElementAllocator,
         dataAllocator = ::DataAllocator,
-        functionPredecoder = ::FunctionPredecoder,
+        moduleCompiler = ::ModuleCompiler,
         exportAllocator = ::ExportAllocator,
     )
 
@@ -71,14 +75,15 @@ internal inline fun ModuleAllocator(
     crossinline globalAllocator: GlobalAllocator,
     crossinline elementAllocator: ElementAllocator,
     crossinline dataAllocator: DataAllocator,
-    crossinline functionPredecoder: Predecoder<Function, RuntimeFunction>,
+    crossinline moduleCompiler: ModuleCompiler,
     crossinline exportAllocator: ExportAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
 
-    val (_, store, module) = context
+    val store = context.store
+    val module = context.module
 
     module.tables.forEachIndexed { idx, table ->
-        val address = tableAllocator(store, table.type, tableInitValues[idx])
+        val address = tableAllocator(store, context.types.resolve(table.type), tableInitValues[idx])
         instance.addTableAddress(address)
     }
 
@@ -88,24 +93,31 @@ internal inline fun ModuleAllocator(
     }
 
     module.tags.forEach { tag ->
-        val rtt = context.runtimeTypes[tag.type.typeIndex]
-        val address = tagAllocator(store, rtt, tag.type)
+        val type = context.types.resolve(tag.type)
+        val rtt = context.runtimeTypes[type.typeIndex]
+        val address = tagAllocator(store, rtt, type)
         instance.addTagAddress(address)
     }
 
-    module.globals.forEachIndexed { idx, global ->
+    module.globals.forEach { global ->
         val value = constantExpressionEvaluator(store, instance, global.initExpression).bind()
-        val address = globalAllocator(store, global.type, value)
+        val address = globalAllocator(store, context.types.resolve(global.type), value)
         instance.addGlobalAddress(address)
     }
 
-    module.elementSegments.forEachIndexed { idx, elementSegment ->
-        val elementSegmentReferences = module.elementSegments.map { segment ->
-            LongArray(segment.initExpressions.size) { initExpressionIndex ->
-                constantExpressionEvaluator(store, instance, segment.initExpressions[initExpressionIndex]).bind()
-            }
+    module.elementSegments.forEach { elementSegment ->
+        val references = LongArray(elementSegment.initExpressions.size) { initExpressionIndex ->
+            constantExpressionEvaluator(
+                store,
+                instance,
+                elementSegment.initExpressions[initExpressionIndex],
+            ).bind()
         }
-        val address = elementAllocator(store, elementSegment.type, elementSegmentReferences[idx])
+        val address = elementAllocator(
+            store,
+            context.types.resolve(elementSegment.type),
+            references,
+        )
         instance.addElementAddress(address)
     }
 
@@ -114,40 +126,7 @@ internal inline fun ModuleAllocator(
         instance.addDataAddress(address)
     }
 
-    var nextFunctionIp = store.program.size
-    module.functions.forEach { function ->
-        val address = instance.functionAddress(function.idx).bind()
-        val functionInstance = context.store.function(address) as FunctionInstance.WasmFunction
-        val params = functionInstance.functionType.params.types.size
-        val results = functionInstance.functionType.results.types.size
-
-        functionInstance.callPlan = WasmFunctionCallPlan(
-            entryIp = if (function.body.instructions.isEmpty()) EXIT_IP else nextFunctionIp,
-            frameSlots = maxOf(function.frameSlots, params + function.locals.size),
-            params = params,
-            results = results,
-            interfaceSlots = maxOf(params, results),
-            module = functionInstance.module,
-            locals = LongArray(function.locals.size) { index ->
-                function.locals[index].type.default()
-            },
-        )
-        nextFunctionIp += function.body.instructions.size
-    }
-
-    module.functions.forEach { function ->
-
-        val predecoded = functionPredecoder(context.asPredecodingContext(), function).bind()
-        val address = instance.functionAddress(function.idx).bind()
-        val functionInstance = context.store.function(address) as FunctionInstance.WasmFunction
-
-        check(predecoded.body.entryIp == functionInstance.callPlan.entryIp) {
-            "predecoded function entry IP does not match its call plan: " +
-                "function=${function.idx} expected=${functionInstance.callPlan.entryIp} " +
-                "actual=${predecoded.body.entryIp}"
-        }
-        functionInstance.function = predecoded
-    }
+    moduleCompiler(context.config, store, module, instance, context.runtimeTypes, context.types).bind()
 
     module.exports.forEach { export ->
         val externalValue = exportAllocator(context, export.descriptor).bind()

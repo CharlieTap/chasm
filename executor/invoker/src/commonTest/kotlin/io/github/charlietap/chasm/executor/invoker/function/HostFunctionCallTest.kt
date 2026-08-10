@@ -121,7 +121,7 @@ class HostFunctionCallTest {
             store = store,
             context = context,
             function = functionInstance,
-            resultSlots = listOf(1),
+            resultSlotBase = 1,
             callFrameSlot = 1,
         )
 

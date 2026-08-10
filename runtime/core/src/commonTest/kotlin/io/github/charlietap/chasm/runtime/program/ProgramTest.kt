@@ -31,4 +31,19 @@ class ProgramTest {
         assertEquals(0, program.size)
         assertEquals(0, program.append(arrayOf(dispatchableInstruction())))
     }
+
+    @Test
+    fun `replaces and truncates appended instructions`() {
+        val program = Program(initialCapacity = 1)
+        val first = dispatchableInstruction()
+        val replacement = dispatchableInstruction()
+
+        program.append(first)
+        program.append(dispatchableInstruction())
+        program.replace(0, replacement)
+        program.truncate(1)
+
+        assertEquals(1, program.size)
+        assertSame(replacement, program.instructions[0])
+    }
 }

@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.ext.allocateArray
 import io.github.charlietap.chasm.executor.invoker.ext.allocateStruct
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.FieldUnpacker
 import io.github.charlietap.chasm.executor.invoker.type.Caster
-import io.github.charlietap.chasm.ir.module.Index
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -870,7 +869,7 @@ private fun executeStructGet(
     fieldIndex: Int,
 ) {
     val structInstance = store.struct(address)
-    val fieldValue = structInstance.field(Index.FieldIndex(fieldIndex))
+    val fieldValue = structInstance.field(fieldIndex)
     vstack.setFrameSlot(destinationSlot, fieldValue)
 }
 
@@ -880,7 +879,7 @@ private fun structField(
     fieldIndex: Int,
 ): Long = store
     .struct(reference.toStructAddress())
-    .field(Index.FieldIndex(fieldIndex))
+    .field(fieldIndex)
 
 private inline fun executePackedStructGet(
     vstack: ValueStack,
@@ -892,7 +891,7 @@ private inline fun executePackedStructGet(
     crossinline fieldUnpacker: FieldUnpacker,
 ) {
     val structInstance = store.struct(address)
-    val (packed, type) = structInstance.packedField(Index.FieldIndex(fieldIndex))
+    val (packed, type) = structInstance.packedField(fieldIndex)
     vstack.setFrameSlot(destinationSlot, fieldUnpacker(packed, type, signed))
 }
 

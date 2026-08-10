@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
 import io.github.charlietap.chasm.executor.invoker.type.Caster
-import io.github.charlietap.chasm.ir.instruction.FusedOperand
-import io.github.charlietap.chasm.ir.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
+import io.github.charlietap.chasm.runtime.instruction.FusedOperand
+import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 
 fun JumpDispatcher(
     instruction: AdminInstruction.Jump,
@@ -23,6 +23,18 @@ fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfS,
 ): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, nextIp ->
     if (vstack.getFrameSlot(instruction.operandSlot) != 0L) instruction.targetIp else nextIp
+}
+
+fun JumpDispatcher(
+    instruction: AdminInstruction.JumpIfZeroI,
+): DispatchableInstruction = DispatchableInstruction { _, _, _, _, nextIp ->
+    if (instruction.operand == 0L) instruction.targetIp else nextIp
+}
+
+fun JumpDispatcher(
+    instruction: AdminInstruction.JumpIfZeroS,
+): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, nextIp ->
+    if (vstack.getFrameSlot(instruction.operandSlot) == 0L) instruction.targetIp else nextIp
 }
 
 fun JumpDispatcher(
@@ -115,6 +127,56 @@ fun JumpDispatcher(
     is NumericCondition.F64Gt -> F64ConditionDispatcher(condition.left, condition.right, instruction.targetIp) { left, right, targetIp, nextIp -> if (left > right) targetIp else nextIp }
     is NumericCondition.F64Le -> F64ConditionDispatcher(condition.left, condition.right, instruction.targetIp) { left, right, targetIp, nextIp -> if (left <= right) targetIp else nextIp }
     is NumericCondition.F64Ge -> F64ConditionDispatcher(condition.left, condition.right, instruction.targetIp) { left, right, targetIp, nextIp -> if (left >= right) targetIp else nextIp }
+}
+
+fun JumpConditionDispatcher(
+    condition: NumericCondition,
+    targetIp: Int,
+    branchOnMatch: Boolean = true,
+): DispatchableInstruction = if (branchOnMatch) {
+    JumpDispatcher(AdminInstruction.JumpIfCondition(condition, targetIp))
+} else {
+    JumpConditionMismatchDispatcher(condition, targetIp)
+}
+
+private fun JumpConditionMismatchDispatcher(
+    condition: NumericCondition,
+    targetIp: Int,
+): DispatchableInstruction = when (condition) {
+    is NumericCondition.I32Eqz -> I32ConditionDispatcher(condition.operand, targetIp) { operand, branchIp, nextIp -> if (operand != 0) branchIp else nextIp }
+    is NumericCondition.I64Eqz -> I64ConditionDispatcher(condition.operand, targetIp) { operand, branchIp, nextIp -> if (operand != 0L) branchIp else nextIp }
+    is NumericCondition.I32Eq -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left != right) branchIp else nextIp }
+    is NumericCondition.I32Ne -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left == right) branchIp else nextIp }
+    is NumericCondition.I32LtS -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left >= right) branchIp else nextIp }
+    is NumericCondition.I32LtU -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left.toUInt() >= right.toUInt()) branchIp else nextIp }
+    is NumericCondition.I32GtS -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left <= right) branchIp else nextIp }
+    is NumericCondition.I32GtU -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left.toUInt() <= right.toUInt()) branchIp else nextIp }
+    is NumericCondition.I32LeS -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left > right) branchIp else nextIp }
+    is NumericCondition.I32LeU -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left.toUInt() > right.toUInt()) branchIp else nextIp }
+    is NumericCondition.I32GeS -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left < right) branchIp else nextIp }
+    is NumericCondition.I32GeU -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left.toUInt() < right.toUInt()) branchIp else nextIp }
+    is NumericCondition.I64Eq -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left != right) branchIp else nextIp }
+    is NumericCondition.I64Ne -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left == right) branchIp else nextIp }
+    is NumericCondition.I64LtS -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left >= right) branchIp else nextIp }
+    is NumericCondition.I64LtU -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left.toULong() >= right.toULong()) branchIp else nextIp }
+    is NumericCondition.I64GtS -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left <= right) branchIp else nextIp }
+    is NumericCondition.I64GtU -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left.toULong() <= right.toULong()) branchIp else nextIp }
+    is NumericCondition.I64LeS -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left > right) branchIp else nextIp }
+    is NumericCondition.I64LeU -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left.toULong() > right.toULong()) branchIp else nextIp }
+    is NumericCondition.I64GeS -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left < right) branchIp else nextIp }
+    is NumericCondition.I64GeU -> I64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left.toULong() < right.toULong()) branchIp else nextIp }
+    is NumericCondition.F32Eq -> F32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left != right) branchIp else nextIp }
+    is NumericCondition.F32Ne -> F32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left == right) branchIp else nextIp }
+    is NumericCondition.F32Lt -> F32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (!(left < right)) branchIp else nextIp }
+    is NumericCondition.F32Gt -> F32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (!(left > right)) branchIp else nextIp }
+    is NumericCondition.F32Le -> F32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (!(left <= right)) branchIp else nextIp }
+    is NumericCondition.F32Ge -> F32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (!(left >= right)) branchIp else nextIp }
+    is NumericCondition.F64Eq -> F64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left != right) branchIp else nextIp }
+    is NumericCondition.F64Ne -> F64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left == right) branchIp else nextIp }
+    is NumericCondition.F64Lt -> F64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (!(left < right)) branchIp else nextIp }
+    is NumericCondition.F64Gt -> F64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (!(left > right)) branchIp else nextIp }
+    is NumericCondition.F64Le -> F64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (!(left <= right)) branchIp else nextIp }
+    is NumericCondition.F64Ge -> F64ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (!(left >= right)) branchIp else nextIp }
 }
 
 private inline fun I32ConditionDispatcher(
@@ -278,21 +340,36 @@ private fun FusedOperand.f64BitsOperand(): FusedOperand = when (this) {
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpTableI,
-): DispatchableInstruction = DispatchableInstruction { _, _, _, _, _ ->
-    instruction.targetIps.getOrElse(instruction.operand) { instruction.defaultTargetIp }
+): DispatchableInstruction {
+    val operand = instruction.operand
+    val targetIps = instruction.targetIps
+    return DispatchableInstruction { _, _, _, _, _ ->
+        targetIps.branchTarget(operand)
+    }
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpTableS,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, _ ->
-    val operand = vstack.getFrameSlot(instruction.operandSlot).toInt()
-    instruction.targetIps.getOrElse(operand) { instruction.defaultTargetIp }
+): DispatchableInstruction {
+    val operandSlot = instruction.operandSlot
+    val targetIps = instruction.targetIps
+    return DispatchableInstruction { vstack, _, _, _, _ ->
+        targetIps.branchTarget(vstack.getFrameSlot(operandSlot).toInt())
+    }
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpTableV,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, _ ->
-    instruction.targetIps.getOrElse(vstack.popI32()) { instruction.defaultTargetIp }
+): DispatchableInstruction {
+    val targetIps = instruction.targetIps
+    return DispatchableInstruction { vstack, _, _, _, _ ->
+        targetIps.branchTarget(vstack.popI32())
+    }
+}
+
+private inline fun IntArray.branchTarget(index: Int): Int {
+    val defaultIndex = size - 1
+    return if (index >= 0 && index < defaultIndex) this[index] else this[defaultIndex]
 }
 
 fun JumpDispatcher(

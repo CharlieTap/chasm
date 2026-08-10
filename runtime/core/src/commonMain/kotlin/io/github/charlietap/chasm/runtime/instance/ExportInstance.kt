@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.runtime.instance
 
-import io.github.charlietap.chasm.ir.value.NameValue
+import io.github.charlietap.chasm.ast.value.NameValue
 
 data class ExportInstance(
     val name: NameValue,

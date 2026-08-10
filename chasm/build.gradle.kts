@@ -124,7 +124,6 @@ kotlin {
                 implementation(projects.test.fixture.chasm)
                 implementation(projects.test.fixture.config)
                 implementation(projects.test.fixture.runtime)
-                implementation(projects.test.fixture.ir)
 
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.test.resources)

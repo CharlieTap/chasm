@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
-import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.packedField
 import io.github.charlietap.chasm.runtime.ext.popStructAddress

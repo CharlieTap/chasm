@@ -16,15 +16,19 @@ kotlin {
 
        commonMain {
             dependencies {
+                api(projects.ast)
                 api(projects.config)
-                api(projects.ir)
+                api(projects.runtime.core)
+
+                implementation(projects.executor.invoker)
             }
         }
 
         commonTest {
             dependencies {
+                implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.config)
-                implementation(projects.test.fixture.ir)
+                implementation(projects.test.fixture.runtime)
 
                 implementation(libs.kotlin.test)
             }
@@ -34,5 +38,5 @@ kotlin {
 
 configure<PublishingConventionsExtension> {
     name = "compiler"
-    description = "bytecode compiler passes for chasm ir"
+    description = "bytecode compiler for chasm modules"
 }

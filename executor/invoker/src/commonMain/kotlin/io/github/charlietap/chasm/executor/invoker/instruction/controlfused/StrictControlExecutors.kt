@@ -38,7 +38,7 @@ internal fun CallExecutor(
         store = store,
         context = context,
         function = instruction.instance,
-        resultSlots = instruction.resultSlots,
+        resultSlotBase = instruction.resultSlotBase,
         callFrameSlot = instruction.callFrameSlot,
     )
     return returnIp
@@ -59,7 +59,7 @@ internal fun CallExecutor(
     elementIndex = instruction.elementIndex,
     type = instruction.type,
     table = instruction.table,
-    resultSlots = instruction.resultSlots,
+    resultSlotBase = instruction.resultSlotBase,
     callFrameSlot = instruction.callFrameSlot,
     returnIp = returnIp,
 )
@@ -79,7 +79,7 @@ internal fun CallExecutor(
     elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
     type = instruction.type,
     table = instruction.table,
-    resultSlots = instruction.resultSlots,
+    resultSlotBase = instruction.resultSlotBase,
     callFrameSlot = instruction.callFrameSlot,
     returnIp = returnIp,
 )
@@ -97,7 +97,7 @@ internal fun CallExecutor(
     store = store,
     context = context,
     functionSlot = instruction.functionSlot,
-    resultSlots = instruction.resultSlots,
+    resultSlotBase = instruction.resultSlotBase,
     callFrameSlot = instruction.callFrameSlot,
     returnIp = returnIp,
 )
@@ -226,7 +226,7 @@ private fun strictIndirectCall(
     elementIndex: Int,
     type: RTT,
     table: TableInstance,
-    resultSlots: List<Int>,
+    resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
 ): Int {
@@ -237,7 +237,7 @@ private fun strictIndirectCall(
         store = store,
         context = context,
         functionInstance = functionInstance,
-        resultSlots = resultSlots,
+        resultSlotBase = resultSlotBase,
         callFrameSlot = callFrameSlot,
         returnIp = returnIp,
     )
@@ -249,7 +249,7 @@ private fun strictReferenceCall(
     store: Store,
     context: ExecutionContext,
     functionSlot: Int,
-    resultSlots: List<Int>,
+    resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
 ): Int {
@@ -260,7 +260,7 @@ private fun strictReferenceCall(
         store = store,
         context = context,
         functionInstance = store.function(address),
-        resultSlots = resultSlots,
+        resultSlotBase = resultSlotBase,
         callFrameSlot = callFrameSlot,
         returnIp = returnIp,
     )
@@ -327,7 +327,7 @@ private fun strictInvokeFunction(
     store: Store,
     context: ExecutionContext,
     functionInstance: FunctionInstance,
-    resultSlots: List<Int>,
+    resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
 ): Int = when (functionInstance) {
@@ -338,7 +338,7 @@ private fun strictInvokeFunction(
             store = store,
             context = context,
             function = functionInstance,
-            resultSlots = resultSlots,
+            resultSlotBase = resultSlotBase,
             callFrameSlot = callFrameSlot,
         )
         returnIp
@@ -349,7 +349,7 @@ private fun strictInvokeFunction(
         store = store,
         context = context,
         instance = functionInstance,
-        resultSlots = resultSlots,
+        resultSlotBase = resultSlotBase,
         callFrameSlot = callFrameSlot,
         returnIp = returnIp,
     )

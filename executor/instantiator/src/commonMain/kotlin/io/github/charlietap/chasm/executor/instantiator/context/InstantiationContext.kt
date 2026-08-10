@@ -1,11 +1,10 @@
 package io.github.charlietap.chasm.executor.instantiator.context
 
+import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.RuntimeConfig
-import io.github.charlietap.chasm.ir.module.Module
-import io.github.charlietap.chasm.predecoder.InstructionCacheKey
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.type.RTT
 
 data class InstantiationContext(
@@ -13,6 +12,6 @@ data class InstantiationContext(
     val store: Store,
     val module: Module,
     val runtimeTypes: List<RTT>,
+    val types: ModuleTypeResolver = ModuleTypeResolver(module),
     var instance: ModuleInstance? = null,
-    val instructionCache: HashMap<InstructionCacheKey, DispatchableInstruction> = hashMapOf(),
 )

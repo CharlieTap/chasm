@@ -2,8 +2,9 @@ package io.github.charlietap.chasm.executor.instantiator.allocation.export
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.module.Export
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
-import io.github.charlietap.chasm.ir.module.Export
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 
@@ -16,19 +17,19 @@ internal inline fun ExportAllocator(
     val instance = context.instance!!
     when (val descriptor = descriptor) {
         is Export.Descriptor.Function -> {
-            ExternalValue.Function(instance.functionAddresses[descriptor.functionIndex.idx])
+            ExternalValue.Function(instance.functionAddresses[descriptor.functionIndex.toInt()])
         }
         is Export.Descriptor.Table -> {
-            ExternalValue.Table(instance.tableAddresses[descriptor.tableIndex.idx])
+            ExternalValue.Table(instance.tableAddresses[descriptor.tableIndex.toInt()])
         }
         is Export.Descriptor.Global -> {
-            ExternalValue.Global(instance.globalAddresses[descriptor.globalIndex.idx])
+            ExternalValue.Global(instance.globalAddresses[descriptor.globalIndex.toInt()])
         }
         is Export.Descriptor.Memory -> {
-            ExternalValue.Memory(instance.memAddresses[descriptor.memoryIndex.idx])
+            ExternalValue.Memory(instance.memAddresses[descriptor.memoryIndex.toInt()])
         }
         is Export.Descriptor.Tag -> {
-            ExternalValue.Tag(instance.tagAddresses[descriptor.tagIndex.idx])
+            ExternalValue.Tag(instance.tagAddresses[descriptor.tagIndex.toInt()])
         }
     }
 }

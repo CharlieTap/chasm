@@ -3,12 +3,15 @@ package io.github.charlietap.chasm.executor.instantiator.allocation.function
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ir.module.Function
-import io.github.charlietap.chasm.ir.module.Module
+import io.github.charlietap.chasm.ast.module.Function
+import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.addFunctionAddress
+import io.github.charlietap.chasm.runtime.ext.default
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
@@ -24,22 +27,29 @@ internal fun WasmFunctionAllocator(
     store: Store,
 ): Result<Unit, ModuleTrapError> = binding {
 
-    val type = module.definedTypes.getOrNull(function.typeIndex.idx)
+    val typeIndex = function.typeIndex.toInt()
+    val type = module.definedTypes.getOrNull(typeIndex)
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
-    val runtimeType = moduleInstance.runtimeTypes.getOrNull(function.typeIndex.idx)?.apply {
+    val runtimeType = moduleInstance.runtimeTypes.getOrNull(typeIndex)?.apply {
         hydrate()
     } ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
     val functionType = type.functionType()
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
 
-    // We create a function instance with a temp inner function that will be replaced after
-    // precoding, functions can have instructions which reference functions with higher indices
-    // thus all instances must be created prior to precoding
+    // Function bodies may reference functions with higher indices, so create every stable
+    // function instance and call-plan shell before compiling any body.
     val instance = FunctionInstance.WasmFunction(
         rtt = runtimeType,
         functionType = functionType,
         module = moduleInstance,
         function = RuntimeFunction.TEMP,
+        callPlan = WasmFunctionCallPlan(
+            params = functionType.params.types.size,
+            results = functionType.results.types.size,
+            interfaceSlots = maxOf(functionType.params.types.size, functionType.results.types.size),
+            module = moduleInstance,
+            locals = LongArray(function.locals.size) { index -> function.locals[index].type.default() },
+        ),
     )
     store.functions.add(instance)
     moduleInstance.addFunctionAddress(Address.Function(store.functions.size - 1))

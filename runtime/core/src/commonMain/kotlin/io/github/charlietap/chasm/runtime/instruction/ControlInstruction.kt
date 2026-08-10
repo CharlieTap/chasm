@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.ir.module.Index
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance

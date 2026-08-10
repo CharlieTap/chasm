@@ -8,8 +8,8 @@ fun copySlotsAdminInstruction(
     sourceSlots: List<Int> = [],
     destinationSlots: List<Int> = [],
 ) = AdminInstruction.CopySlots(
-    sourceSlots = sourceSlots,
-    destinationSlots = destinationSlots,
+    sourceSlots = sourceSlots.toIntArray(),
+    destinationSlots = destinationSlots.toIntArray(),
 )
 
 fun endFunctionAdminInstruction() = AdminInstruction.EndFunction

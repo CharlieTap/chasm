@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.type
 
-import io.github.charlietap.chasm.ir.module.Module
+import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.factory.RTTFactory

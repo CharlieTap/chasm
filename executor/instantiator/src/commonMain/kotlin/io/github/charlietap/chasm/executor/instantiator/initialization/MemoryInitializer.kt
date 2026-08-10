@@ -3,11 +3,11 @@ package io.github.charlietap.chasm.executor.instantiator.initialization
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.ast.module.DataSegment
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.executor.instantiator.ext.dataAddress
 import io.github.charlietap.chasm.executor.instantiator.ext.memoryAddress
-import io.github.charlietap.chasm.ir.module.DataSegment
 import io.github.charlietap.chasm.memory.init.LinearMemoryInitialiser
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException

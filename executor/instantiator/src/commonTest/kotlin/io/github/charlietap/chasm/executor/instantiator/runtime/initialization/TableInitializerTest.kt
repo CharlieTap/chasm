@@ -3,16 +3,16 @@ package io.github.charlietap.chasm.executor.instantiator.runtime.initialization
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
+import io.github.charlietap.chasm.fixture.ast.instruction.expression
+import io.github.charlietap.chasm.fixture.ast.instruction.i32ConstInstruction
+import io.github.charlietap.chasm.fixture.ast.module.activeElementSegmentMode
+import io.github.charlietap.chasm.fixture.ast.module.declarativeElementSegmentMode
+import io.github.charlietap.chasm.fixture.ast.module.elementIndex
+import io.github.charlietap.chasm.fixture.ast.module.elementSegment
+import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.module.tableIndex
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.executor.instantiator.instantiationContext
-import io.github.charlietap.chasm.fixture.ir.instruction.expression
-import io.github.charlietap.chasm.fixture.ir.instruction.i32ConstInstruction
-import io.github.charlietap.chasm.fixture.ir.module.activeElementSegmentMode
-import io.github.charlietap.chasm.fixture.ir.module.declarativeElementSegmentMode
-import io.github.charlietap.chasm.fixture.ir.module.elementIndex
-import io.github.charlietap.chasm.fixture.ir.module.elementSegment
-import io.github.charlietap.chasm.fixture.ir.module.module
-import io.github.charlietap.chasm.fixture.ir.module.tableIndex
 import io.github.charlietap.chasm.fixture.runtime.instance.elementAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.elementInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
@@ -27,21 +27,21 @@ class TableInitializerTest {
     @Test
     fun `can initialize a table on a module instance`() {
 
-        val activeTableIndex = tableIndex(0)
+        val activeTableIndex = tableIndex(0u)
         val activeOffsetExpression = expression(
             listOf(
                 i32ConstInstruction(117),
             ),
         )
         val activeSegment = elementSegment(
-            idx = elementIndex(0),
+            idx = elementIndex(0u),
             mode = activeElementSegmentMode(
                 tableIndex = activeTableIndex,
                 offsetExpr = activeOffsetExpression,
             ),
         )
         val declarativeSegment = elementSegment(
-            idx = elementIndex(1),
+            idx = elementIndex(1u),
             mode = declarativeElementSegmentMode(),
         )
 

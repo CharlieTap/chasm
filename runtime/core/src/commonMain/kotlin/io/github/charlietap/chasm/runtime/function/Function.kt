@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.runtime.function
 
-import io.github.charlietap.chasm.ir.module.Index.FunctionIndex
-import io.github.charlietap.chasm.ir.module.Index.TypeIndex
+import io.github.charlietap.chasm.ast.module.Index.FunctionIndex
+import io.github.charlietap.chasm.ast.module.Index.TypeIndex
 
 data class Function(
     val idx: FunctionIndex,
@@ -9,16 +9,16 @@ data class Function(
     val locals: LongArray,
     val body: Expression,
     val frameSlots: Int,
-    val returnSlots: List<Int>,
+    val returnSlots: IntArray,
 ) {
     companion object {
         val TEMP = Function(
-            idx = FunctionIndex(0),
-            typeIndex = TypeIndex(0),
+            idx = FunctionIndex(0u),
+            typeIndex = TypeIndex(0u),
             locals = longArrayOf(),
             body = Expression.EMPTY,
             frameSlots = 0,
-            returnSlots = emptyList(),
+            returnSlots = intArrayOf(),
         )
     }
 
@@ -33,7 +33,7 @@ data class Function(
         if (!(locals contentEquals other.locals)) return false
         if (body != other.body) return false
         if (frameSlots != other.frameSlots) return false
-        if (returnSlots != other.returnSlots) return false
+        if (!returnSlots.contentEquals(other.returnSlots)) return false
 
         return true
     }
@@ -41,10 +41,10 @@ data class Function(
     override fun hashCode(): Int {
         var result = idx.hashCode()
         result = 31 * result + typeIndex.hashCode()
-        result = 31 * result + locals.hashCode()
+        result = 31 * result + locals.contentHashCode()
         result = 31 * result + body.hashCode()
         result = 31 * result + frameSlots
-        result = 31 * result + returnSlots.hashCode()
+        result = 31 * result + returnSlots.contentHashCode()
         return result
     }
 }

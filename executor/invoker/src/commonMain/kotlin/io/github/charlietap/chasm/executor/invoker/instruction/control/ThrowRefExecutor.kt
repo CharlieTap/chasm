@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
+import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
-import io.github.charlietap.chasm.ir.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.exception
@@ -72,9 +72,9 @@ internal fun ThrowRefValueExecutor(
 private fun writeCatchPayload(
     vstack: ValueStack,
     fields: LongArray,
-    destinationSlots: List<Int>,
+    destinationSlots: IntArray,
 ) {
-    fields.forEachIndexed { index, value ->
-        vstack.setFrameSlot(destinationSlots[fields.lastIndex - index], value)
+    for (index in fields.indices) {
+        vstack.setFrameSlot(destinationSlots[fields.lastIndex - index], fields[index])
     }
 }
