@@ -21,7 +21,7 @@ fun returnRuntimeInstruction() = ControlInstruction.Return
 fun returnWasmFunctionCallRuntimeInstruction(
     instance: FunctionInstance.WasmFunction = wasmFunctionInstance(),
 ) = ControlInstruction.ReturnWasmFunctionCall(
-    instance = instance,
+    plan = instance.callPlan,
 )
 
 fun returnCallRefRuntimeInstruction(

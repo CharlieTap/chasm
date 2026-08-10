@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.NO_RESULT_SLOT_BASE
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -89,5 +90,144 @@ class WasmFunctionCallTest {
         assertEquals(71, cstack.peekFrame().returnIp)
         assertEquals(calleeModule, cstack.peekFrame().instance)
         assertEquals(29L, vstack.getFrameSlot(0))
+    }
+
+    @Test
+    fun `tail call copies overlapping operands in a safe direction`() {
+        val module = moduleInstance()
+        val function = wasmFunctionInstance(
+            module = module,
+            functionType = functionType(
+                params = resultType(listOf(i32ValueType(), i32ValueType())),
+            ),
+            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 2),
+        )
+        val cstack = cstack(frames = listOf(frame(instance = module, valueDepth = 1)))
+        val vstack = vstack().apply {
+            reserveFrame(2)
+            setFrameSlot(0, 11)
+            setFrameSlot(1, 22)
+        }
+        val store = store()
+
+        ReturnWasmFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
+            context = executionContext(cstack, vstack, store, module),
+            instance = function,
+            operands = listOf(
+                ControlSuperInstruction.CallOperand.Slot(0),
+                ControlSuperInstruction.CallOperand.Slot(1),
+            ),
+        )
+
+        assertEquals(1, vstack.framePointer)
+        assertEquals(11L, vstack.getFrameSlot(0))
+        assertEquals(22L, vstack.getFrameSlot(1))
+    }
+
+    @Test
+    fun `tail call leaves operands that are already in place untouched`() {
+        val module = moduleInstance()
+        val function = wasmFunctionInstance(
+            module = module,
+            functionType = functionType(
+                params = resultType(listOf(i32ValueType(), i32ValueType())),
+            ),
+            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 2),
+        )
+        val cstack = cstack(frames = listOf(frame(instance = module, valueDepth = 0)))
+        val vstack = vstack().apply {
+            reserveFrame(2)
+            setFrameSlot(0, 11)
+            setFrameSlot(1, 22)
+        }
+        val store = store()
+
+        ReturnWasmFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
+            context = executionContext(cstack, vstack, store, module),
+            instance = function,
+            operands = listOf(
+                ControlSuperInstruction.CallOperand.Slot(0),
+                ControlSuperInstruction.CallOperand.Slot(1),
+            ),
+        )
+
+        assertEquals(11L, vstack.getFrameSlot(0))
+        assertEquals(22L, vstack.getFrameSlot(1))
+    }
+
+    @Test
+    fun `tail call copies operands forwards when their frame moves down`() {
+        val module = moduleInstance()
+        val function = wasmFunctionInstance(
+            module = module,
+            functionType = functionType(
+                params = resultType(listOf(i32ValueType(), i32ValueType())),
+            ),
+            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 2),
+        )
+        val cstack = cstack(frames = listOf(frame(instance = module, valueDepth = 0)))
+        val vstack = vstack().apply {
+            reserveDepth(3)
+            framePointer = 1
+            setFrameSlot(0, 11)
+            setFrameSlot(1, 22)
+        }
+        val store = store()
+
+        ReturnWasmFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
+            context = executionContext(cstack, vstack, store, module),
+            instance = function,
+            operands = listOf(
+                ControlSuperInstruction.CallOperand.Slot(0),
+                ControlSuperInstruction.CallOperand.Slot(1),
+            ),
+        )
+
+        assertEquals(0, vstack.framePointer)
+        assertEquals(11L, vstack.getFrameSlot(0))
+        assertEquals(22L, vstack.getFrameSlot(1))
+    }
+
+    @Test
+    fun `tail call stages cyclic operand moves`() {
+        val module = moduleInstance()
+        val function = wasmFunctionInstance(
+            module = module,
+            functionType = functionType(
+                params = resultType(listOf(i32ValueType(), i32ValueType())),
+            ),
+            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 2),
+        )
+        val cstack = cstack(frames = listOf(frame(instance = module, valueDepth = 0)))
+        val vstack = vstack().apply {
+            reserveFrame(2)
+            setFrameSlot(0, 11)
+            setFrameSlot(1, 22)
+        }
+        val store = store()
+
+        ReturnWasmFunctionCall(
+            vstack = vstack,
+            cstack = cstack,
+            store = store,
+            context = executionContext(cstack, vstack, store, module),
+            instance = function,
+            operands = listOf(
+                ControlSuperInstruction.CallOperand.Slot(1),
+                ControlSuperInstruction.CallOperand.Slot(0),
+            ),
+        )
+
+        assertEquals(22L, vstack.getFrameSlot(0))
+        assertEquals(11L, vstack.getFrameSlot(1))
     }
 }

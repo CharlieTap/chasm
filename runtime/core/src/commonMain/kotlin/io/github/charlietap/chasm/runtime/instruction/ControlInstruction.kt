@@ -21,7 +21,7 @@ sealed interface ControlInstruction : LinkedInstruction {
     data object Return : ControlInstruction
 
     @JvmInline
-    value class ReturnWasmFunctionCall(val instance: FunctionInstance.WasmFunction) : ControlInstruction
+    value class ReturnWasmFunctionCall(val plan: WasmFunctionCallPlan) : ControlInstruction
 
     @JvmInline
     value class ReturnHostFunctionCall(val instance: FunctionInstance.HostFunction) : ControlInstruction

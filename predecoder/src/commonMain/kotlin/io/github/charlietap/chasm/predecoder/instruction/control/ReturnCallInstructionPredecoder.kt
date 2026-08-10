@@ -41,7 +41,7 @@ internal inline fun ReturnCallInstructionPredecoder(
         }
 
         is FunctionInstance.WasmFunction -> {
-            returnWasmFunctionCallDispatcher(ReturnWasmFunctionCall(instance))
+            returnWasmFunctionCallDispatcher(ReturnWasmFunctionCall(instance.callPlan))
         }
     }
 }

@@ -93,7 +93,7 @@ private fun strictReturnCallInstruction(
         is FunctionInstance.WasmFunction -> {
             ReturnCallDispatcher(
                 RuntimeFusedControlInstruction.ReturnWasmCall(
-                    instance = instance,
+                    plan = instance.callPlan,
                     operands = operands,
                 ),
             )

@@ -31,7 +31,7 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
     ) : ControlSuperInstruction
 
     data class ReturnWasmCall(
-        val instance: FunctionInstance.WasmFunction,
+        val plan: WasmFunctionCallPlan,
         val operands: List<CallOperand>,
     ) : ControlSuperInstruction
 

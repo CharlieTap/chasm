@@ -111,9 +111,7 @@ internal fun ReturnCallExecutor(
 ): Int = ReturnWasmFunctionCall(
     vstack = vstack,
     cstack = cstack,
-    store = store,
-    context = context,
-    instance = instruction.instance,
+    plan = instruction.plan,
     operands = instruction.operands,
 )
 
