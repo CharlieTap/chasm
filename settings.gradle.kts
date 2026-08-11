@@ -5,9 +5,8 @@ pluginManagement {
         mavenCentral()
     }
 
-    includeBuild("bolt")
-    includeBuild("corpus")
-    includeBuild("sweet")
+    includeBuild("tools/corpus")
+    includeBuild("tools/sweet")
     includeBuild("gradle/plugins/kotlin-conventions")
     includeBuild("gradle/plugins/linting-conventions")
     includeBuild("gradle/plugins/publishing-conventions")
@@ -85,8 +84,8 @@ include(":type-system")
 include(":validator")
 include(":vm")
 
-includeBuild("sweet")
-includeBuild("corpus")
+includeBuild("tools/sweet")
+includeBuild("tools/corpus")
 
 rootProject.name = "chasm-multiplatform"
 

@@ -5,8 +5,10 @@ pluginManagement {
         mavenCentral()
     }
 
-    includeBuild("../gradle/plugins/kotlin-conventions")
-    includeBuild("../gradle/plugins/linting-conventions")
+    includeBuild("../../gradle/plugins/kotlin-conventions")
+    includeBuild("../../gradle/plugins/linting-conventions")
+    includeBuild("../../gradle/plugins/publishing-conventions")
+    includeBuild("../../gradle/plugins/versions-conventions")
 }
 
 plugins {
@@ -18,11 +20,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         mavenLocal()
-        maven(url = "https://jitpack.io")
+        maven(url = "https://jitpack.io" )
     }
     versionCatalogs {
         create("libs") {
-            from(files("../gradle/libs.versions.toml"))
+            from(files("../../gradle/libs.versions.toml"))
         }
     }
 }
@@ -32,5 +34,5 @@ include("plugin")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-rootProject.name = "corpus-gradle-plugin"
+rootProject.name = "sweet-gradle-plugin"
 enableFeaturePreview("ENHANCED_GRAPH_ORDERING")

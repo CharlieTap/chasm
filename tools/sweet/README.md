@@ -11,7 +11,7 @@ The included build contains:
 
 A runtime supplies a `ScriptRunner` that maps Sweet commands onto its own
 decode, validation, and execution APIs. Chasm's implementation is in
-[`ChasmScriptRunner.kt`](../chasm/src/commonTest/kotlin/io/github/charlietap/chasm/script/ChasmScriptRunner.kt).
+[`ChasmScriptRunner.kt`](../../chasm/src/commonTest/kotlin/io/github/charlietap/chasm/script/ChasmScriptRunner.kt).
 
 ## Configuration
 

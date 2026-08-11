@@ -65,7 +65,6 @@ android-application = { id = "com.android.application", version.ref = "android-b
 android-benchmark = { id = "androidx.benchmark", version.ref = "androidx-benchmark" }
 android-library = { id = "com.android.library", version.ref = "android-build-tools-plugin" }
 android-test = { id = "com.android.test", version.ref = "android-build-tools-plugin" }
-bolt = { id = "io.github.charlietap.bolt.plugin" }
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config-plugin" }
 chasm = { id = "io.github.charlietap.chasm.gradle", version.ref = "plugin-version-name" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
