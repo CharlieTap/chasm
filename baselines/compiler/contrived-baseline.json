@@ -1,0 +1,1471 @@
+{
+    "schemaVersion": 1,
+    "modules": [
+        {
+            "name": "contrived",
+            "functions": [
+                {
+                    "index": 0,
+                    "name": "callee.no_locals",
+                    "instructions": [
+                        "numeric.i32.const",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 1,
+                    "name": "callee.locals",
+                    "instructions": [
+                        "numeric.i32.const",
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 2,
+                    "name": "callee.unary",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 3,
+                    "name": "numeric.i32.add.ii",
+                    "instructions": [
+                        "numeric.i32.add.ii",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 4,
+                    "name": "numeric.i32.add.is",
+                    "instructions": [
+                        "numeric.i32.add.is",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 5,
+                    "name": "numeric.i32.add.si",
+                    "instructions": [
+                        "numeric.i32.add.si",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 6,
+                    "name": "numeric.i32.add.ss",
+                    "instructions": [
+                        "numeric.i32.add.ss",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 7,
+                    "name": "parametric.select.iii",
+                    "instructions": [
+                        "parametric.select.iii",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 8,
+                    "name": "parametric.select.sii",
+                    "instructions": [
+                        "parametric.select.sii",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 9,
+                    "name": "parametric.select.iis",
+                    "instructions": [
+                        "parametric.select.iis",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 10,
+                    "name": "parametric.select.sis",
+                    "instructions": [
+                        "parametric.select.sis",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 11,
+                    "name": "parametric.select.isi",
+                    "instructions": [
+                        "parametric.select.isi",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 12,
+                    "name": "parametric.select.ssi",
+                    "instructions": [
+                        "parametric.select.ssi",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 13,
+                    "name": "parametric.select.iss",
+                    "instructions": [
+                        "parametric.select.iss",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 14,
+                    "name": "parametric.select.sss",
+                    "instructions": [
+                        "parametric.select.sss",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 15,
+                    "name": "memory.i32.load.i",
+                    "instructions": [
+                        "memory.i32.load.i",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 16,
+                    "name": "memory.i32.load.s",
+                    "instructions": [
+                        "memory.i32.load.s",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 17,
+                    "name": "memory.i32.store.ii",
+                    "instructions": [
+                        "memory.i32.store.ii",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 18,
+                    "name": "memory.i32.store.is",
+                    "instructions": [
+                        "memory.i32.store.is",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 19,
+                    "name": "memory.i32.store.si",
+                    "instructions": [
+                        "memory.i32.store.si",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 20,
+                    "name": "memory.i32.store.ss",
+                    "instructions": [
+                        "memory.i32.store.ss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 21,
+                    "name": "table.get.i",
+                    "instructions": [
+                        "table.get.i",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 22,
+                    "name": "table.get.s",
+                    "instructions": [
+                        "table.get.s",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 23,
+                    "name": "table.set.si",
+                    "instructions": [
+                        "table.set.si",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 24,
+                    "name": "table.set.ss",
+                    "instructions": [
+                        "table.set.ss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 25,
+                    "name": "memory.copy.iii",
+                    "instructions": [
+                        "memory.copy.iii",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 26,
+                    "name": "memory.copy.iis",
+                    "instructions": [
+                        "memory.copy.iis",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 27,
+                    "name": "memory.copy.isi",
+                    "instructions": [
+                        "memory.copy.isi",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 28,
+                    "name": "memory.copy.iss",
+                    "instructions": [
+                        "memory.copy.iss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 29,
+                    "name": "memory.copy.sii",
+                    "instructions": [
+                        "memory.copy.sii",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 30,
+                    "name": "memory.copy.sis",
+                    "instructions": [
+                        "memory.copy.sis",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 31,
+                    "name": "memory.copy.ssi",
+                    "instructions": [
+                        "memory.copy.ssi",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 32,
+                    "name": "memory.copy.sss",
+                    "instructions": [
+                        "memory.copy.sss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 33,
+                    "name": "table.copy.iii",
+                    "instructions": [
+                        "table.copy.iii",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 34,
+                    "name": "table.copy.iis",
+                    "instructions": [
+                        "table.copy.iis",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 35,
+                    "name": "table.copy.isi",
+                    "instructions": [
+                        "table.copy.isi",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 36,
+                    "name": "table.copy.iss",
+                    "instructions": [
+                        "table.copy.iss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 37,
+                    "name": "table.copy.sii",
+                    "instructions": [
+                        "table.copy.sii",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 38,
+                    "name": "table.copy.sis",
+                    "instructions": [
+                        "table.copy.sis",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 39,
+                    "name": "table.copy.ssi",
+                    "instructions": [
+                        "table.copy.ssi",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 40,
+                    "name": "table.copy.sss",
+                    "instructions": [
+                        "table.copy.sss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 41,
+                    "name": "variable.global_get",
+                    "instructions": [
+                        "variable.global_get",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 42,
+                    "name": "variable.global_set.i",
+                    "instructions": [
+                        "variable.global_set.i",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 43,
+                    "name": "variable.global_set.s",
+                    "instructions": [
+                        "variable.global_set.s",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 44,
+                    "name": "lowering.producer_to_local",
+                    "instructions": [
+                        "numeric.i32.add.ss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 45,
+                    "name": "lowering.producer_to_local_tee",
+                    "instructions": [
+                        "numeric.i32.add.ss",
+                        "numeric.i32.add.si",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 46,
+                    "name": "lowering.local_get_alias",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 47,
+                    "name": "lowering.identity_local_write",
+                    "instructions": [
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 48,
+                    "name": "lowering.preserve_live_local_alias",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "numeric.i32.const",
+                        "numeric.i32.add.si",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 49,
+                    "name": "lowering.no_op_reinterpret",
+                    "instructions": [
+                        "numeric.f32.neg.i",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 50,
+                    "name": "admin.jump_if.i",
+                    "instructions": [
+                        "admin.jump_if.i",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 51,
+                    "name": "admin.jump_if.s",
+                    "instructions": [
+                        "admin.jump_if.s",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 52,
+                    "name": "admin.jump_if_zero.i",
+                    "instructions": [
+                        "admin.jump_if_zero.i",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 53,
+                    "name": "admin.jump_if_zero.s",
+                    "instructions": [
+                        "admin.jump_if_zero.s",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 54,
+                    "name": "admin.jump_if_copy.i",
+                    "instructions": [
+                        "numeric.i32.add.ii",
+                        "admin.jump_if_copy.i",
+                        "numeric.i32.const",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 55,
+                    "name": "admin.jump_if_copy.s",
+                    "instructions": [
+                        "numeric.i32.add.ii",
+                        "admin.jump_if_copy.s",
+                        "numeric.i32.const",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 56,
+                    "name": "lowering.taken_only_branch_copy",
+                    "instructions": [
+                        "admin.jump_if.s",
+                        "numeric.i32.const",
+                        "admin.copy_slot",
+                        "admin.end_function",
+                        "numeric.i32.const",
+                        "admin.jump"
+                    ]
+                },
+                {
+                    "index": 57,
+                    "name": "control.unreachable",
+                    "instructions": [
+                        "control.unreachable",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 58,
+                    "name": "control.call.wasm.no_locals",
+                    "instructions": [
+                        "control.call.wasm.no_locals",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 59,
+                    "name": "control.call.wasm.locals",
+                    "instructions": [
+                        "control.call.wasm.locals",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 60,
+                    "name": "control.return_call.wasm",
+                    "instructions": [
+                        "control.return_call.wasm",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 61,
+                    "name": "control.call_indirect.i",
+                    "instructions": [
+                        "control.call_indirect.i",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 62,
+                    "name": "control.call_indirect.s",
+                    "instructions": [
+                        "control.call_indirect.s",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 63,
+                    "name": "control.call_ref",
+                    "instructions": [
+                        "reference.ref_func",
+                        "control.call_ref",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 64,
+                    "name": "control.return_call_indirect.i",
+                    "instructions": [
+                        "control.return_call_indirect.i",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 65,
+                    "name": "control.return_call_indirect.s",
+                    "instructions": [
+                        "control.return_call_indirect.s",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 66,
+                    "name": "control.return_call_ref",
+                    "instructions": [
+                        "reference.ref_func",
+                        "control.return_call_ref",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 67,
+                    "name": "lowering.indirect_target_staging",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "control.call_indirect.s",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 68,
+                    "name": "lowering.tail_call_operands",
+                    "instructions": [
+                        "control.return_call.wasm",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 69,
+                    "name": "aggregate.ref_cast_struct_get",
+                    "instructions": [
+                        "aggregate.ref_cast_struct_get",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 70,
+                    "name": "aggregate.struct_get_struct_get",
+                    "instructions": [
+                        "aggregate.struct_get_struct_get",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 71,
+                    "name": "aggregate.local_set_struct_get",
+                    "instructions": [
+                        "aggregate.local_set_struct_get",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 72,
+                    "name": "aggregate.array.new.ii",
+                    "instructions": [
+                        "aggregate.array.new.ii",
+                        "admin.pause_if",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 73,
+                    "name": "aggregate.array.new.is",
+                    "instructions": [
+                        "aggregate.array.new.is",
+                        "admin.pause_if",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 74,
+                    "name": "aggregate.array.new.si",
+                    "instructions": [
+                        "aggregate.array.new.si",
+                        "admin.pause_if",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 75,
+                    "name": "aggregate.array.new.ss",
+                    "instructions": [
+                        "aggregate.array.new.ss",
+                        "admin.pause_if",
+                        "admin.copy_slot",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 76,
+                    "name": "aggregate.array.set.ii",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "aggregate.array.set.ii",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 77,
+                    "name": "aggregate.array.set.is",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "aggregate.array.set.is",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 78,
+                    "name": "aggregate.array.set.si",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "aggregate.array.set.si",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 79,
+                    "name": "aggregate.array.set.ss",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "aggregate.array.set.ss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 80,
+                    "name": "aggregate.array.copy.iii",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "aggregate.array.copy.iii",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 81,
+                    "name": "aggregate.array.copy.iis",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "aggregate.array.copy.iis",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 82,
+                    "name": "aggregate.array.copy.isi",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "aggregate.array.copy.isi",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 83,
+                    "name": "aggregate.array.copy.iss",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "aggregate.array.copy.iss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 84,
+                    "name": "aggregate.array.copy.sii",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "aggregate.array.copy.sii",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 85,
+                    "name": "aggregate.array.copy.sis",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "aggregate.array.copy.sis",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 86,
+                    "name": "aggregate.array.copy.ssi",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "aggregate.array.copy.ssi",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 87,
+                    "name": "aggregate.array.copy.sss",
+                    "instructions": [
+                        "admin.copy_slot",
+                        "admin.copy_slot",
+                        "aggregate.array.copy.sss",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 88,
+                    "name": "admin.jump_condition.i32.eqz.s.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.eqz.s.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 89,
+                    "name": "admin.jump_condition.i32.eqz.i.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.eqz.i.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 90,
+                    "name": "admin.jump_condition.i64.eqz.s.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.eqz.s.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 91,
+                    "name": "admin.jump_condition.i64.eqz.i.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.eqz.i.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 92,
+                    "name": "admin.jump_condition.i32.eq.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.eq.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 93,
+                    "name": "admin.jump_condition.i32.eq.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.eq.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 94,
+                    "name": "admin.jump_condition.i64.eq.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.eq.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 95,
+                    "name": "admin.jump_condition.i64.eq.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.eq.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 96,
+                    "name": "admin.jump_condition.i32.ne.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.ne.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 97,
+                    "name": "admin.jump_condition.i32.ne.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.ne.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 98,
+                    "name": "admin.jump_condition.i64.ne.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.ne.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 99,
+                    "name": "admin.jump_condition.i64.ne.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.ne.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 100,
+                    "name": "admin.jump_condition.i32.lt_s.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.lt_s.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 101,
+                    "name": "admin.jump_condition.i32.lt_s.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.lt_s.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 102,
+                    "name": "admin.jump_condition.i64.lt_s.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.lt_s.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 103,
+                    "name": "admin.jump_condition.i64.lt_s.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.lt_s.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 104,
+                    "name": "admin.jump_condition.i32.lt_u.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.lt_u.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 105,
+                    "name": "admin.jump_condition.i32.lt_u.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.lt_u.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 106,
+                    "name": "admin.jump_condition.i64.lt_u.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.lt_u.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 107,
+                    "name": "admin.jump_condition.i64.lt_u.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.lt_u.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 108,
+                    "name": "admin.jump_condition.i32.gt_s.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.gt_s.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 109,
+                    "name": "admin.jump_condition.i32.gt_s.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.gt_s.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 110,
+                    "name": "admin.jump_condition.i64.gt_s.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.gt_s.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 111,
+                    "name": "admin.jump_condition.i64.gt_s.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.gt_s.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 112,
+                    "name": "admin.jump_condition.i32.gt_u.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.gt_u.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 113,
+                    "name": "admin.jump_condition.i32.gt_u.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.gt_u.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 114,
+                    "name": "admin.jump_condition.i64.gt_u.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.gt_u.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 115,
+                    "name": "admin.jump_condition.i64.gt_u.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.gt_u.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 116,
+                    "name": "admin.jump_condition.i32.le_s.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.le_s.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 117,
+                    "name": "admin.jump_condition.i32.le_s.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.le_s.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 118,
+                    "name": "admin.jump_condition.i64.le_s.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.le_s.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 119,
+                    "name": "admin.jump_condition.i64.le_s.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.le_s.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 120,
+                    "name": "admin.jump_condition.i32.le_u.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.le_u.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 121,
+                    "name": "admin.jump_condition.i32.le_u.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.le_u.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 122,
+                    "name": "admin.jump_condition.i64.le_u.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.le_u.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 123,
+                    "name": "admin.jump_condition.i64.le_u.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.le_u.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 124,
+                    "name": "admin.jump_condition.i32.ge_s.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.ge_s.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 125,
+                    "name": "admin.jump_condition.i32.ge_s.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.ge_s.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 126,
+                    "name": "admin.jump_condition.i64.ge_s.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.ge_s.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 127,
+                    "name": "admin.jump_condition.i64.ge_s.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.ge_s.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 128,
+                    "name": "admin.jump_condition.i32.ge_u.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.ge_u.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 129,
+                    "name": "admin.jump_condition.i32.ge_u.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i32.ge_u.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 130,
+                    "name": "admin.jump_condition.i64.ge_u.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.i64.ge_u.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 131,
+                    "name": "admin.jump_condition.i64.ge_u.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.i64.ge_u.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 132,
+                    "name": "admin.jump_condition.f32.eq.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f32.eq.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 133,
+                    "name": "admin.jump_condition.f32.eq.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f32.eq.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 134,
+                    "name": "admin.jump_condition.f64.eq.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f64.eq.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 135,
+                    "name": "admin.jump_condition.f64.eq.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f64.eq.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 136,
+                    "name": "admin.jump_condition.f32.ne.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f32.ne.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 137,
+                    "name": "admin.jump_condition.f32.ne.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f32.ne.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 138,
+                    "name": "admin.jump_condition.f64.ne.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f64.ne.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 139,
+                    "name": "admin.jump_condition.f64.ne.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f64.ne.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 140,
+                    "name": "admin.jump_condition.f32.lt.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f32.lt.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 141,
+                    "name": "admin.jump_condition.f32.lt.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f32.lt.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 142,
+                    "name": "admin.jump_condition.f64.lt.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f64.lt.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 143,
+                    "name": "admin.jump_condition.f64.lt.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f64.lt.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 144,
+                    "name": "admin.jump_condition.f32.gt.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f32.gt.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 145,
+                    "name": "admin.jump_condition.f32.gt.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f32.gt.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 146,
+                    "name": "admin.jump_condition.f64.gt.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f64.gt.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 147,
+                    "name": "admin.jump_condition.f64.gt.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f64.gt.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 148,
+                    "name": "admin.jump_condition.f32.le.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f32.le.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 149,
+                    "name": "admin.jump_condition.f32.le.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f32.le.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 150,
+                    "name": "admin.jump_condition.f64.le.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f64.le.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 151,
+                    "name": "admin.jump_condition.f64.le.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f64.le.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 152,
+                    "name": "admin.jump_condition.f32.ge.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f32.ge.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 153,
+                    "name": "admin.jump_condition.f32.ge.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f32.ge.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 154,
+                    "name": "admin.jump_condition.f64.ge.ss.match",
+                    "instructions": [
+                        "admin.jump_condition.f64.ge.ss.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 155,
+                    "name": "admin.jump_condition.f64.ge.ii.mismatch",
+                    "instructions": [
+                        "admin.jump_condition.f64.ge.ii.mismatch",
+                        "control.nop",
+                        "admin.jump",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 156,
+                    "name": "admin.jump_condition.i32.eq.is.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.eq.is.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 157,
+                    "name": "admin.jump_condition.i32.eq.si.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.eq.si.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                },
+                {
+                    "index": 158,
+                    "name": "admin.jump_condition.i32.eqz.i.match",
+                    "instructions": [
+                        "admin.jump_condition.i32.eqz.i.match",
+                        "control.nop",
+                        "admin.end_function"
+                    ]
+                }
+            ]
+        }
+    ]
+}

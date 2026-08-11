@@ -7,6 +7,16 @@ import io.github.charlietap.chasm.compiler.I32_TYPE
 import io.github.charlietap.chasm.compiler.I64_TYPE
 import io.github.charlietap.chasm.type.ValueType
 
+internal val NumericOpcode.isBitcast: Boolean
+    get() = when (this) {
+        NumericOpcode.I32ReinterpretF32,
+        NumericOpcode.I64ReinterpretF64,
+        NumericOpcode.F32ReinterpretI32,
+        NumericOpcode.F64ReinterpretI64,
+        -> true
+        else -> false
+    }
+
 internal val NumericOpcode.inputArity: Int
     get() = when (this) {
         NumericOpcode.I32Eqz,

@@ -83,5 +83,5 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
     }
-    program.append(ParametricSuperInstructionDispatcher(instruction))
+    emit(instruction, ::ParametricSuperInstructionDispatcher)
 }

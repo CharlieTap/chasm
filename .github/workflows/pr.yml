@@ -21,12 +21,18 @@ jobs:
       runner: ubuntu-24.04-arm
       task: lintKotlin
 
+  baseline:
+    uses: ./.github/workflows/task-runner.yml
+    with:
+      runner: ubuntu-24.04-arm
+      task: checkCompilerBaseline
+
   test:
     strategy:
       matrix:
         include:
           - os: ubuntu-24.04-arm
-            task: jvmTest
+            task: test
           - os: ubuntu-24.04-arm
             task: corpus
           - os: ubuntu-24.04-arm

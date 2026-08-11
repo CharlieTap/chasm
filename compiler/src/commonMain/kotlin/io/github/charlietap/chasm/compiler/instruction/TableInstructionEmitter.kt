@@ -130,7 +130,8 @@ internal fun FunctionCompilationContext.emitTableFill(
 }
 
 internal fun FunctionCompilationContext.emitElementDrop(element: ElementInstance) {
-    program.append(ElemDropDispatcher(RuntimeTableInstruction.ElemDrop(element)))
+    val instruction = RuntimeTableInstruction.ElemDrop(element)
+    emit(instruction, ::ElemDropDispatcher)
 }
 
 private inline fun FunctionCompilationContext.emitTableTernary(
@@ -166,5 +167,5 @@ private inline fun FunctionCompilationContext.emitTableTernary(
 }
 
 private fun FunctionCompilationContext.emitTableInstruction(instruction: TableSuperInstruction) {
-    program.append(TableSuperInstructionDispatcher(instruction))
+    emit(instruction, ::TableSuperInstructionDispatcher)
 }

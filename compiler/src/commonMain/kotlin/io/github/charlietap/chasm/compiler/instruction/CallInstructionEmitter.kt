@@ -18,23 +18,24 @@ internal fun FunctionCompilationContext.emitCall(
     resultSlotBase: Int,
     callFrameSlot: Int,
 ) {
-    val instruction = when (function) {
-        is FunctionInstance.WasmFunction -> CallDispatcher(
-            ControlSuperInstruction.WasmCall(
+    when (function) {
+        is FunctionInstance.WasmFunction -> {
+            val instruction = ControlSuperInstruction.WasmCall(
                 plan = function.callPlan,
                 resultSlotBase = resultSlotBase,
                 callFrameSlot = callFrameSlot,
-            ),
-        )
-        is FunctionInstance.HostFunction -> CallDispatcher(
-            ControlSuperInstruction.HostCall(
+            )
+            emit(instruction, ::CallDispatcher)
+        }
+        is FunctionInstance.HostFunction -> {
+            val instruction = ControlSuperInstruction.HostCall(
                 instance = function,
                 resultSlotBase = resultSlotBase,
                 callFrameSlot = callFrameSlot,
-            ),
-        )
+            )
+            emit(instruction, ::CallDispatcher)
+        }
     }
-    program.append(instruction)
 }
 
 internal fun FunctionCompilationContext.emitCallIndirect(
@@ -44,28 +45,25 @@ internal fun FunctionCompilationContext.emitCallIndirect(
     resultSlotBase: Int,
     callFrameSlot: Int,
 ) {
-    val instruction = if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
-        CallDispatcher(
-            ControlSuperInstruction.CallIndirectI(
-                elementIndex.sourceBits.toInt(),
-                type,
-                table,
-                resultSlotBase,
-                callFrameSlot,
-            ),
+    if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
+        val instruction = ControlSuperInstruction.CallIndirectI(
+            elementIndex.sourceBits.toInt(),
+            type,
+            table,
+            resultSlotBase,
+            callFrameSlot,
         )
+        emit(instruction, ::CallDispatcher)
     } else {
-        CallDispatcher(
-            ControlSuperInstruction.CallIndirectS(
-                elementIndex.sourceBits.toInt(),
-                type,
-                table,
-                resultSlotBase,
-                callFrameSlot,
-            ),
+        val instruction = ControlSuperInstruction.CallIndirectS(
+            elementIndex.sourceBits.toInt(),
+            type,
+            table,
+            resultSlotBase,
+            callFrameSlot,
         )
+        emit(instruction, ::CallDispatcher)
     }
-    program.append(instruction)
 }
 
 internal fun FunctionCompilationContext.emitCallRef(
@@ -73,9 +71,8 @@ internal fun FunctionCompilationContext.emitCallRef(
     resultSlotBase: Int,
     callFrameSlot: Int,
 ) {
-    program.append(
-        CallDispatcher(ControlSuperInstruction.CallRefS(functionSlot, resultSlotBase, callFrameSlot)),
-    )
+    val instruction = ControlSuperInstruction.CallRefS(functionSlot, resultSlotBase, callFrameSlot)
+    emit(instruction, ::CallDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitReturnCall(
@@ -83,15 +80,16 @@ internal fun FunctionCompilationContext.emitReturnCall(
     operands: List<OperandSource>,
 ) {
     val callOperands = operands.toCallOperands()
-    val instruction = when (function) {
-        is FunctionInstance.WasmFunction -> ReturnCallDispatcher(
-            ControlSuperInstruction.ReturnWasmCall(function.callPlan, callOperands),
-        )
-        is FunctionInstance.HostFunction -> ReturnCallDispatcher(
-            ControlSuperInstruction.ReturnHostCall(function, callOperands),
-        )
+    when (function) {
+        is FunctionInstance.WasmFunction -> {
+            val instruction = ControlSuperInstruction.ReturnWasmCall(function.callPlan, callOperands)
+            emit(instruction, ::ReturnCallDispatcher)
+        }
+        is FunctionInstance.HostFunction -> {
+            val instruction = ControlSuperInstruction.ReturnHostCall(function, callOperands)
+            emit(instruction, ::ReturnCallDispatcher)
+        }
     }
-    program.append(instruction)
 }
 
 internal fun FunctionCompilationContext.emitReturnCallIndirect(
@@ -101,30 +99,34 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
     table: TableInstance,
 ) {
     val callOperands = operands.toCallOperands()
-    val instruction = if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
-        ReturnCallDispatcher(
-            ControlSuperInstruction.ReturnCallIndirectI(elementIndex.sourceBits.toInt(), callOperands, type, table),
+    if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
+        val instruction = ControlSuperInstruction.ReturnCallIndirectI(
+            elementIndex.sourceBits.toInt(),
+            callOperands,
+            type,
+            table,
         )
+        emit(instruction, ::ReturnCallDispatcher)
     } else {
-        ReturnCallDispatcher(
-            ControlSuperInstruction.ReturnCallIndirectS(elementIndex.sourceBits.toInt(), callOperands, type, table),
+        val instruction = ControlSuperInstruction.ReturnCallIndirectS(
+            elementIndex.sourceBits.toInt(),
+            callOperands,
+            type,
+            table,
         )
+        emit(instruction, ::ReturnCallDispatcher)
     }
-    program.append(instruction)
 }
 
 internal fun FunctionCompilationContext.emitReturnCallRef(
     functionSlot: Int,
     operands: List<OperandSource>,
 ) {
-    program.append(
-        ReturnCallDispatcher(
-            ControlSuperInstruction.ReturnCallRefS(
-                functionSlot,
-                operands.toCallOperands(),
-            ),
-        ),
+    val instruction = ControlSuperInstruction.ReturnCallRefS(
+        functionSlot,
+        operands.toCallOperands(),
     )
+    emit(instruction, ::ReturnCallDispatcher)
 }
 
 internal fun FunctionCompilationContext.callFrameSlot(): Int {

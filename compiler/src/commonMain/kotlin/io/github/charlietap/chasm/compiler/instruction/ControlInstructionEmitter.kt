@@ -9,9 +9,7 @@ import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
 import io.github.charlietap.chasm.compiler.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
-import io.github.charlietap.chasm.compiler.program.ProgramBuilder
 import io.github.charlietap.chasm.compiler.program.ProgramTarget
-import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotsDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpConditionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpDispatcher
@@ -133,9 +131,12 @@ internal fun FunctionCompilationContext.emitJump(
     handlerPopCount: Int = 0,
 ) {
     check(handlerPopCount >= 0)
-    program.appendCopies(copies)
+    emitCopies(copies)
     repeat(handlerPopCount) { emitPopHandler() }
-    program.append(target) { targetIp -> JumpDispatcher(AdminInstruction.Jump(targetIp)) }
+    program.append(target) { targetIp ->
+        val instruction = AdminInstruction.Jump(targetIp)
+        dispatch(instruction, ::JumpDispatcher)
+    }
 }
 
 internal fun FunctionCompilationContext.emitBranchIf(
@@ -159,26 +160,40 @@ internal fun FunctionCompilationContext.emitBranchIf(
     val conditionBits = condition.sourceBits
     program.append(branchTarget) { targetIp ->
         when {
-            copy && conditionKind.isImmediate -> JumpDispatcher(
+            copy && conditionKind.isImmediate -> dispatch(
                 AdminInstruction.JumpIfCopyI(
                     operand = conditionBits,
                     sourceSlot = copies.sourceSlot(0),
                     destinationSlot = copies.destinationSlot(0),
                     targetIp = targetIp,
                 ),
+                ::JumpDispatcher,
             )
-            copy -> JumpDispatcher(
+            copy -> dispatch(
                 AdminInstruction.JumpIfCopyS(
                     operandSlot = conditionBits.toInt(),
                     sourceSlot = copies.sourceSlot(0),
                     destinationSlot = copies.destinationSlot(0),
                     targetIp = targetIp,
                 ),
+                ::JumpDispatcher,
             )
-            whenZero && conditionKind.isImmediate -> JumpDispatcher(AdminInstruction.JumpIfZeroI(conditionBits, targetIp))
-            whenZero -> JumpDispatcher(AdminInstruction.JumpIfZeroS(conditionBits.toInt(), targetIp))
-            conditionKind.isImmediate -> JumpDispatcher(AdminInstruction.JumpIfI(conditionBits, targetIp))
-            else -> JumpDispatcher(AdminInstruction.JumpIfS(conditionBits.toInt(), targetIp))
+            whenZero && conditionKind.isImmediate -> dispatch(
+                AdminInstruction.JumpIfZeroI(conditionBits, targetIp),
+                ::JumpDispatcher,
+            )
+            whenZero -> dispatch(
+                AdminInstruction.JumpIfZeroS(conditionBits.toInt(), targetIp),
+                ::JumpDispatcher,
+            )
+            conditionKind.isImmediate -> dispatch(
+                AdminInstruction.JumpIfI(conditionBits, targetIp),
+                ::JumpDispatcher,
+            )
+            else -> dispatch(
+                AdminInstruction.JumpIfS(conditionBits.toInt(), targetIp),
+                ::JumpDispatcher,
+            )
         }
     }
 }
@@ -193,7 +208,13 @@ internal fun FunctionCompilationContext.emitBranchIf(
     check(handlerPopCount >= 0)
     val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
     program.append(branchTarget) { targetIp ->
-        JumpConditionDispatcher(condition, targetIp, branchOnMatch)
+        dispatch(JumpConditionDispatcher(condition, targetIp, branchOnMatch)) {
+            if (branchOnMatch) {
+                AdminInstruction.JumpIfCondition(condition, targetIp)
+            } else {
+                AdminInstruction.JumpIfConditionMismatch(condition, targetIp)
+            }
+        }
     }
 }
 
@@ -205,9 +226,11 @@ internal fun FunctionCompilationContext.emitBranchTable(
     val selectorBits = selector.sourceBits
     program.append(targetIndices) { targetIps ->
         if (selectorKind == OperandSourceKind.I32Immediate) {
-            JumpDispatcher(AdminInstruction.JumpTableI(selectorBits.toInt(), targetIps))
+            val instruction = AdminInstruction.JumpTableI(selectorBits.toInt(), targetIps)
+            dispatch(instruction, ::JumpDispatcher)
         } else {
-            JumpDispatcher(AdminInstruction.JumpTableS(selectorBits.toInt(), targetIps))
+            val instruction = AdminInstruction.JumpTableS(selectorBits.toInt(), targetIps)
+            dispatch(instruction, ::JumpDispatcher)
         }
     }
 }
@@ -224,10 +247,10 @@ internal fun FunctionCompilationContext.emitBranchOnNull(
     val operandBits = operand.sourceBits
     program.append(branchTarget) { targetIp ->
         when {
-            onNull && immediate -> JumpDispatcher(AdminInstruction.JumpOnNullI(operandBits, targetIp))
-            onNull -> JumpDispatcher(AdminInstruction.JumpOnNullS(operandBits.toInt(), targetIp))
-            immediate -> JumpDispatcher(AdminInstruction.JumpOnNonNullI(operandBits, targetIp))
-            else -> JumpDispatcher(AdminInstruction.JumpOnNonNullS(operandBits.toInt(), targetIp))
+            onNull && immediate -> dispatch(AdminInstruction.JumpOnNullI(operandBits, targetIp), ::JumpDispatcher)
+            onNull -> dispatch(AdminInstruction.JumpOnNullS(operandBits.toInt(), targetIp), ::JumpDispatcher)
+            immediate -> dispatch(AdminInstruction.JumpOnNonNullI(operandBits, targetIp), ::JumpDispatcher)
+            else -> dispatch(AdminInstruction.JumpOnNonNullS(operandBits.toInt(), targetIp), ::JumpDispatcher)
         }
     }
 }
@@ -246,17 +269,26 @@ internal fun FunctionCompilationContext.emitBranchOnCast(
     val operandBits = operand.sourceBits
     program.append(branchTarget) { targetIp ->
         when {
-            onSuccess && immediate -> JumpDispatcher(
+            onSuccess && immediate -> dispatch(
                 AdminInstruction.JumpOnCastI(operandBits, targetIp, sourceType, destinationType),
+                ::JumpDispatcher,
             )
-            onSuccess -> JumpDispatcher(
+            onSuccess -> dispatch(
                 AdminInstruction.JumpOnCastS(operandBits.toInt(), targetIp, sourceType, destinationType),
+                ::JumpDispatcher,
             )
-            immediate -> JumpDispatcher(
+            immediate -> dispatch(
                 AdminInstruction.JumpOnCastFailI(operandBits, targetIp, sourceType, destinationType),
+                ::JumpDispatcher,
             )
-            else -> JumpDispatcher(
-                AdminInstruction.JumpOnCastFailS(operandBits.toInt(), targetIp, sourceType, destinationType),
+            else -> dispatch(
+                AdminInstruction.JumpOnCastFailS(
+                    operandBits.toInt(),
+                    targetIp,
+                    sourceType,
+                    destinationType,
+                ),
+                ::JumpDispatcher,
             )
         }
     }
@@ -268,23 +300,26 @@ internal fun FunctionCompilationContext.emitPushHandler(
     payloadDestinationSlots: List<IntArray>,
 ) {
     program.append(targetIndices) { continuationIps ->
-        PushHandlerDispatcher(AdminInstruction.PushHandler(handlers, continuationIps, payloadDestinationSlots))
+        val instruction = AdminInstruction.PushHandler(handlers, continuationIps, payloadDestinationSlots)
+        dispatch(instruction, ::PushHandlerDispatcher)
     }
 }
 
 internal fun FunctionCompilationContext.emitPopHandler() {
-    program.append(PopHandlerDispatcher(AdminInstruction.PopHandler))
+    emit(AdminInstruction.PopHandler, ::PopHandlerDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitThrow(
     tagIndex: Index.TagIndex,
     payloadSlots: IntArray,
 ) {
-    program.append(ThrowDispatcher(ControlSuperInstruction.Throw(tagIndex, payloadSlots)))
+    val instruction = ControlSuperInstruction.Throw(tagIndex, payloadSlots)
+    emit(instruction, ::ThrowDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitThrowRef(exceptionSlot: Int) {
-    program.append(ThrowRefDispatcher(ControlSuperInstruction.ThrowRefS(exceptionSlot)))
+    val instruction = ControlSuperInstruction.ThrowRefS(exceptionSlot)
+    emit(instruction, ::ThrowRefDispatcher)
 }
 
 internal fun FunctionCompilationContext.prepareBranchTarget(
@@ -310,7 +345,7 @@ private fun FunctionCompilationContext.deferBranchPath(
 }
 
 internal fun FunctionCompilationContext.emitDeferredBranchPaths() {
-    deferredBranchPaths?.emit(program)
+    deferredBranchPaths?.emit(this)
     deferredBranchPaths = null
 }
 
@@ -340,15 +375,19 @@ internal class DeferredBranchPaths {
         copyPlans.add(copies)
     }
 
-    fun emit(program: ProgramBuilder) {
+    fun emit(context: FunctionCompilationContext) {
+        val program = context.program
         for (index in copyPlans.indices) {
             program.bind(ProgramTarget(tailTargetIndices[index]))
-            program.appendCopies(copyPlans[index])
+            context.emitCopies(copyPlans[index])
             repeat(handlerPopCounts[index]) {
-                program.append(PopHandlerDispatcher(AdminInstruction.PopHandler))
+                context.emitPopHandler()
             }
             val destination = ProgramTarget(destinationTargetIndices[index])
-            program.append(destination) { targetIp -> JumpDispatcher(AdminInstruction.Jump(targetIp)) }
+            program.append(destination) { targetIp ->
+                val instruction = AdminInstruction.Jump(targetIp)
+                context.dispatch(instruction, ::JumpDispatcher)
+            }
         }
     }
 
@@ -366,53 +405,41 @@ internal fun FunctionCompilationContext.planCopies(
     destinationSlots = destinationSlots,
 )
 
-internal fun ProgramBuilder.appendCopies(copies: SlotCopyPlan) {
+private fun FunctionCompilationContext.emitCopies(copies: SlotCopyPlan) {
     for (index in 0 until copies.size) {
         val sourceKind = copies.sourceKind(index)
         val sourceBits = copies.sourceBits(index)
         val sourceSlot = copies.sourceSlot(index)
         when (sourceKind) {
-            OperandSourceKind.I32Immediate -> append(
-                I32ConstDispatcher(
-                    NumericSuperInstruction.I32ConstS(sourceBits.toInt(), sourceSlot),
-                ),
-            )
-            OperandSourceKind.I64Immediate -> append(
-                I64ConstDispatcher(
-                    NumericSuperInstruction.I64ConstS(sourceBits, sourceSlot),
-                ),
-            )
-            OperandSourceKind.F32Immediate -> append(
-                F32ConstDispatcher(
-                    NumericSuperInstruction.F32ConstS(sourceBits.toInt(), sourceSlot),
-                ),
-            )
-            OperandSourceKind.F64Immediate -> append(
-                F64ConstDispatcher(
-                    NumericSuperInstruction.F64ConstS(sourceBits, sourceSlot),
-                ),
-            )
-            OperandSourceKind.Local -> appendCopy(sourceBits.toInt(), sourceSlot)
+            OperandSourceKind.I32Immediate -> {
+                val instruction = NumericSuperInstruction.I32ConstS(sourceBits.toInt(), sourceSlot)
+                emit(instruction, ::I32ConstDispatcher)
+            }
+            OperandSourceKind.I64Immediate -> {
+                val instruction = NumericSuperInstruction.I64ConstS(sourceBits, sourceSlot)
+                emit(instruction, ::I64ConstDispatcher)
+            }
+            OperandSourceKind.F32Immediate -> {
+                val instruction = NumericSuperInstruction.F32ConstS(sourceBits.toInt(), sourceSlot)
+                emit(instruction, ::F32ConstDispatcher)
+            }
+            OperandSourceKind.F64Immediate -> {
+                val instruction = NumericSuperInstruction.F64ConstS(sourceBits, sourceSlot)
+                emit(instruction, ::F64ConstDispatcher)
+            }
+            OperandSourceKind.Local -> emitCopy(sourceBits.toInt(), sourceSlot)
             OperandSourceKind.Frame -> Unit
         }
     }
     if (copies.size == 1) {
-        appendCopy(copies.sourceSlot(0), copies.destinationSlot(0))
+        emitCopy(copies.sourceSlot(0), copies.destinationSlot(0))
     } else if (copies.size > 1) {
         val sourceSlots = copies.sourceSlots()
         val destinationSlots = copies.destinationSlots()
         if (sourceSlots.contentEquals(destinationSlots)) return
-        append(
-            CopySlotsDispatcher(
-                AdminInstruction.CopySlots(sourceSlots, destinationSlots),
-            ),
-        )
+        val instruction = AdminInstruction.CopySlots(sourceSlots, destinationSlots)
+        emit(instruction, ::CopySlotsDispatcher)
     }
-}
-
-private fun ProgramBuilder.appendCopy(sourceSlot: Int, destinationSlot: Int) {
-    if (sourceSlot == destinationSlot) return
-    append(CopySlotDispatcher(sourceSlot, destinationSlot))
 }
 
 private val OperandSourceKind.isImmediate: Boolean

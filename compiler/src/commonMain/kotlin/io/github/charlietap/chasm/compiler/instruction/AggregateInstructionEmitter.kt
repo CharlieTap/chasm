@@ -367,5 +367,5 @@ private inline fun FunctionCompilationContext.emitAggregateTernary(
 }
 
 private fun FunctionCompilationContext.emitAggregate(instruction: AggregateSuperInstruction) {
-    program.append(AggregateSuperInstructionDispatcher(instruction))
+    emit(instruction, ::AggregateSuperInstructionDispatcher)
 }

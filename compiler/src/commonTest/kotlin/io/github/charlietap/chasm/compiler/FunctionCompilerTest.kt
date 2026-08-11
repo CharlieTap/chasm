@@ -227,6 +227,34 @@ class FunctionCompilerTest {
     }
 
     @Test
+    fun eliminatesABitcastOfAMaterializedTemporary() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = Expression(
+                NumericInstruction.F32Const(1f, 1f.toRawBits()),
+                NumericInstruction.F32Neg,
+                NumericInstruction.I32ReinterpretF32,
+            ),
+        )
+
+        val compiled = compileFunction(compilerContext(module), function, baseIp = 0)
+        val vstack = execute(compiled)
+
+        assertEquals((-1f).toRawBits(), vstack.getFrameSlot(0).toInt())
+        assertEquals(3, compiled.instructions.size)
+    }
+
+    @Test
     fun compilesDualResultWideArithmetic() {
         val module = module(
             definedTypes = listOf(

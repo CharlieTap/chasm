@@ -8,6 +8,7 @@ import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.compiler.ModuleCompiler
+import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
@@ -33,7 +34,12 @@ import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.type.RTT
 import kotlin.jvm.JvmName
 
-internal typealias ModuleAllocator = (InstantiationContext, ModuleInstance, LongArray) -> Result<ModuleInstance, ModuleTrapError>
+internal typealias ModuleAllocator = (
+    InstantiationContext,
+    ModuleInstance,
+    LongArray,
+    CompilerDiagnostics?,
+) -> Result<ModuleInstance, ModuleTrapError>
 
 internal typealias ModuleCompiler = (
     RuntimeConfig,
@@ -42,17 +48,20 @@ internal typealias ModuleCompiler = (
     ModuleInstance,
     List<RTT>,
     ModuleTypeResolver,
+    CompilerDiagnostics?,
 ) -> Result<Unit, ModuleTrapError>
 
 internal fun ModuleAllocator(
     context: InstantiationContext,
     instance: ModuleInstance,
     tableInitValues: LongArray,
+    compilerDiagnostics: CompilerDiagnostics?,
 ): Result<ModuleInstance, ModuleTrapError> =
     ModuleAllocator(
         context = context,
         instance = instance,
         tableInitValues = tableInitValues,
+        compilerDiagnostics = compilerDiagnostics,
         constantExpressionEvaluator = ::ConstantExpressionEvaluator,
         tableAllocator = ::TableAllocator,
         memoryAllocator = ::MemoryAllocator,
@@ -68,6 +77,7 @@ internal inline fun ModuleAllocator(
     context: InstantiationContext,
     instance: ModuleInstance,
     tableInitValues: LongArray,
+    compilerDiagnostics: CompilerDiagnostics? = null,
     crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
     crossinline tableAllocator: TableAllocator,
     crossinline memoryAllocator: MemoryAllocator,
@@ -126,7 +136,15 @@ internal inline fun ModuleAllocator(
         instance.addDataAddress(address)
     }
 
-    moduleCompiler(context.config, store, module, instance, context.runtimeTypes, context.types).bind()
+    moduleCompiler(
+        context.config,
+        store,
+        module,
+        instance,
+        context.runtimeTypes,
+        context.types,
+        compilerDiagnostics,
+    ).bind()
 
     module.exports.forEach { export ->
         val externalValue = exportAllocator(context, export.descriptor).bind()

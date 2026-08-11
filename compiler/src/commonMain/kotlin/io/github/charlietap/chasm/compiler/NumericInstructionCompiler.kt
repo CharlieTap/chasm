@@ -3,13 +3,17 @@ package io.github.charlietap.chasm.compiler
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
+import io.github.charlietap.chasm.compiler.instruction.emitCopy
 import io.github.charlietap.chasm.compiler.instruction.emitI64WideInstruction
 import io.github.charlietap.chasm.compiler.instruction.emitNumericInstruction
 import io.github.charlietap.chasm.compiler.instruction.inputArity
+import io.github.charlietap.chasm.compiler.instruction.isBitcast
 import io.github.charlietap.chasm.compiler.instruction.resultArity
 import io.github.charlietap.chasm.compiler.instruction.singleResultType
 import io.github.charlietap.chasm.compiler.operand.Operand
 import io.github.charlietap.chasm.compiler.operand.OperandSource
+import io.github.charlietap.chasm.compiler.operand.isImmediate
+import io.github.charlietap.chasm.compiler.operand.sourceSlot
 
 internal fun compileNumericInstruction(
     state: FunctionCompilationContext,
@@ -17,6 +21,7 @@ internal fun compileNumericInstruction(
     nextInstruction: Instruction?,
 ): Boolean {
     val opcode = instruction.opcode
+    if (opcode.isBitcast) return compileBitcastInstruction(state, instruction, nextInstruction)
     if (opcode.resultArity == 2) {
         compileWideNumericInstruction(state, instruction)
         return false
@@ -37,6 +42,22 @@ internal fun compileNumericInstruction(
         destinationSlot = destination.slot,
     )
     completeDestination(state, opcode.singleResultType, destination)
+    return destination.consumesNextInstruction
+}
+
+private fun compileBitcastInstruction(
+    state: FunctionCompilationContext,
+    instruction: NumericInstruction.Operator,
+    nextInstruction: Instruction?,
+): Boolean {
+    val operand = state.pop()
+    val destination = destination(state, operand, nextInstruction)
+    if (operand.isImmediate) {
+        emitOperand(state, operand, destination.slot)
+    } else {
+        state.emitCopy(operand.sourceSlot, destination.slot)
+    }
+    completeDestination(state, instruction.opcode.singleResultType, destination)
     return destination.consumesNextInstruction
 }
 

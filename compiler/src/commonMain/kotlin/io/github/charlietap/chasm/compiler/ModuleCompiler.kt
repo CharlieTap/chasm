@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.context.CompilerContext
+import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
@@ -23,6 +24,7 @@ fun ModuleCompiler(
     instance: ModuleInstance,
     runtimeTypes: List<RTT>,
     types: ModuleTypeResolver = ModuleTypeResolver(module),
+    diagnostics: CompilerDiagnostics? = null,
 ): Result<Unit, ModuleTrapError> = binding {
     val context = CompilerContext(
         config = config,
@@ -31,6 +33,7 @@ fun ModuleCompiler(
         store = store,
         instance = instance,
         runtimeTypes = runtimeTypes,
+        diagnostics = diagnostics,
     )
 
     for (functionIndex in module.functions.indices) {

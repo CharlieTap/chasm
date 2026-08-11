@@ -369,7 +369,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
         )
         else -> error("numeric opcode does not have two results: $opcode")
     }
-    program.append(NumericSuperInstructionDispatcher(linkedInstruction))
+    emit(linkedInstruction, ::NumericSuperInstructionDispatcher)
 }
 
 private inline fun strictI64Quad(

@@ -7,6 +7,11 @@ sealed interface AdminInstruction : LinkedInstruction {
 
     data object EndFunction : AdminInstruction
 
+    data class CopySlot(
+        val sourceSlot: Int,
+        val destinationSlot: Int,
+    ) : AdminInstruction
+
     data class CopySlots(
         val sourceSlots: IntArray,
         val destinationSlots: IntArray,
@@ -57,6 +62,11 @@ sealed interface AdminInstruction : LinkedInstruction {
     ) : AdminInstruction
 
     data class JumpIfCondition(
+        val condition: NumericCondition,
+        val targetIp: Int,
+    ) : AdminInstruction
+
+    data class JumpIfConditionMismatch(
         val condition: NumericCondition,
         val targetIp: Int,
     ) : AdminInstruction

@@ -15,7 +15,9 @@ internal fun FunctionCompilationContext.emitCopy(
     destinationSlot: Int,
 ) {
     if (sourceSlot == destinationSlot) return
-    program.append(CopySlotDispatcher(sourceSlot, destinationSlot))
+    emit(CopySlotDispatcher(sourceSlot, destinationSlot)) {
+        AdminInstruction.CopySlot(sourceSlot, destinationSlot)
+    }
 }
 
 internal fun FunctionCompilationContext.emitCopies(
@@ -32,31 +34,34 @@ internal fun FunctionCompilationContext.emitCopies(
     }
     if (!changed) return
     if (sourceSlots.size == 1) {
-        program.append(CopySlotDispatcher(sourceSlots[0], destinationSlots[0]))
+        emit(CopySlotDispatcher(sourceSlots[0], destinationSlots[0])) {
+            AdminInstruction.CopySlot(sourceSlots[0], destinationSlots[0])
+        }
         return
     }
-    program.append(
-        CopySlotsDispatcher(
-            AdminInstruction.CopySlots(
-                sourceSlots = sourceSlots,
-                destinationSlots = destinationSlots,
-            ),
-        ),
+    val instruction = AdminInstruction.CopySlots(
+        sourceSlots = sourceSlots,
+        destinationSlots = destinationSlots,
     )
+    emit(instruction, ::CopySlotsDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitI32Constant(value: Int, destinationSlot: Int) {
-    program.append(I32ConstDispatcher(NumericSuperInstruction.I32ConstS(value, destinationSlot)))
+    val instruction = NumericSuperInstruction.I32ConstS(value, destinationSlot)
+    emit(instruction, ::I32ConstDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitI64Constant(value: Long, destinationSlot: Int) {
-    program.append(I64ConstDispatcher(NumericSuperInstruction.I64ConstS(value, destinationSlot)))
+    val instruction = NumericSuperInstruction.I64ConstS(value, destinationSlot)
+    emit(instruction, ::I64ConstDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitF32Constant(bits: Int, destinationSlot: Int) {
-    program.append(F32ConstDispatcher(NumericSuperInstruction.F32ConstS(bits, destinationSlot)))
+    val instruction = NumericSuperInstruction.F32ConstS(bits, destinationSlot)
+    emit(instruction, ::F32ConstDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitF64Constant(bits: Long, destinationSlot: Int) {
-    program.append(F64ConstDispatcher(NumericSuperInstruction.F64ConstS(bits, destinationSlot)))
+    val instruction = NumericSuperInstruction.F64ConstS(bits, destinationSlot)
+    emit(instruction, ::F64ConstDispatcher)
 }

@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.context
 import io.github.charlietap.chasm.ast.module.Export
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.compiler.operand.Operand
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
@@ -20,6 +21,7 @@ internal class CompilerContext(
     val store: Store,
     val instance: ModuleInstance,
     val runtimeTypes: List<RTT>,
+    diagnostics: CompilerDiagnostics? = null,
 ) {
     val operandPool = ArrayList<Operand>()
     val controlPool = ArrayList<BlockContext>()
@@ -28,6 +30,7 @@ internal class CompilerContext(
     private val valueBlockFunctionTypes = ArrayList<FunctionType>()
 
     var containsGcInstructions = false
+    val instructionObserver = diagnostics?.instructionObserver
 
     val exportedFunctions = BooleanArray(instance.functionAddresses.size).also { exportedFunctions ->
         for (index in module.exports.indices) {

@@ -12,11 +12,8 @@ internal fun FunctionCompilationContext.emitGlobalGet(
     global: GlobalInstance,
     destinationSlot: Int,
 ) {
-    program.append(
-        VariableSuperInstructionDispatcher(
-            VariableSuperInstruction.GlobalGetS(global, destinationSlot),
-        ),
-    )
+    val instruction = VariableSuperInstruction.GlobalGetS(global, destinationSlot)
+    emit(instruction, ::VariableSuperInstructionDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitGlobalSet(
@@ -28,5 +25,5 @@ internal fun FunctionCompilationContext.emitGlobalSet(
     } else {
         VariableSuperInstruction.GlobalSetS(source.sourceSlot, global)
     }
-    program.append(VariableSuperInstructionDispatcher(instruction))
+    emit(instruction, ::VariableSuperInstructionDispatcher)
 }

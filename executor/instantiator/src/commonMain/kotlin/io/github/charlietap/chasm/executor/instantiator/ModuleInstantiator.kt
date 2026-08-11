@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.instantiator
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.toInt
+import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
@@ -31,6 +32,30 @@ fun ModuleInstantiator(
         store = store,
         module = module,
         imports = imports,
+        compilerDiagnostics = null,
+        compatibilityChecker = ::CompatibilityChecker,
+        partialAllocator = ::PartialModuleAllocator,
+        allocator = ::ModuleAllocator,
+        typeAllocator = ::TypeAllocator,
+        invoker = ::FunctionInvoker,
+        constantExpressionEvaluator = ::ConstantExpressionEvaluator,
+        tableInitializer = ::TableInitializer,
+        memoryInitializer = ::MemoryInitializer,
+    )
+
+fun ModuleInstantiator(
+    config: RuntimeConfig,
+    store: Store,
+    module: ASTModule,
+    imports: List<Import>,
+    compilerDiagnostics: CompilerDiagnostics,
+): Result<ModuleInstance, ModuleTrapError> =
+    ModuleInstantiator(
+        config = config,
+        store = store,
+        module = module,
+        imports = imports,
+        compilerDiagnostics = compilerDiagnostics,
         compatibilityChecker = ::CompatibilityChecker,
         partialAllocator = ::PartialModuleAllocator,
         allocator = ::ModuleAllocator,
@@ -46,6 +71,7 @@ internal inline fun ModuleInstantiator(
     store: Store,
     module: ASTModule,
     imports: List<Import>,
+    compilerDiagnostics: CompilerDiagnostics?,
     crossinline compatibilityChecker: CompatibilityChecker,
     crossinline partialAllocator: PartialModuleAllocator,
     crossinline allocator: ModuleAllocator,
@@ -68,7 +94,7 @@ internal inline fun ModuleInstantiator(
         constantExpressionEvaluator(store, partialInstance, table.initExpression).bind()
     }
 
-    val instance = allocator(context, partialInstance, tableInitValues).bind()
+    val instance = allocator(context, partialInstance, tableInitValues, compilerDiagnostics).bind()
 
     tableInitializer(context, instance).bind()
     memoryInitializer(context, instance).bind()

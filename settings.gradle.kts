@@ -79,6 +79,8 @@ include(":test:fixture:executor:instantiator")
 include(":test:fixture:runtime")
 include(":test:fixture:type-system")
 
+include(":tools:compiler-baseline")
+
 include(":type-system")
 include(":validator")
 include(":vm")

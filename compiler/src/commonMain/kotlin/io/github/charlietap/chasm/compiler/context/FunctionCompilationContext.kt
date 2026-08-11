@@ -18,6 +18,8 @@ import io.github.charlietap.chasm.compiler.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramBuilder
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.type.ValueType
 
 internal class FunctionCompilationContext(
@@ -35,6 +37,40 @@ internal class FunctionCompilationContext(
     var rootControl: BlockContext? = null
     var reachable = true
     var handlerDepth = 0
+
+    inline fun <T : LinkedInstruction> emit(
+        instruction: T,
+        dispatcher: (T) -> DispatchableInstruction,
+    ) {
+        val dispatchableInstruction = dispatcher(instruction)
+        compiler.instructionObserver?.onInstruction(dispatchableInstruction, instruction)
+        program.append(dispatchableInstruction)
+    }
+
+    inline fun emit(
+        dispatchableInstruction: DispatchableInstruction,
+        instruction: () -> LinkedInstruction,
+    ) {
+        compiler.instructionObserver?.onInstruction(dispatchableInstruction, instruction())
+        program.append(dispatchableInstruction)
+    }
+
+    inline fun <T : LinkedInstruction> dispatch(
+        instruction: T,
+        dispatcher: (T) -> DispatchableInstruction,
+    ): DispatchableInstruction {
+        val dispatchableInstruction = dispatcher(instruction)
+        compiler.instructionObserver?.onInstruction(dispatchableInstruction, instruction)
+        return dispatchableInstruction
+    }
+
+    inline fun dispatch(
+        dispatchableInstruction: DispatchableInstruction,
+        instruction: () -> LinkedInstruction,
+    ): DispatchableInstruction {
+        compiler.instructionObserver?.onInstruction(dispatchableInstruction, instruction())
+        return dispatchableInstruction
+    }
 
     fun pushFrame(type: ValueType?, reservedSlot: Int, sourceSlot: Int = reservedSlot) {
         push(type, reservedSlot, OperandSourceKind.Frame, sourceSlot.toLong())

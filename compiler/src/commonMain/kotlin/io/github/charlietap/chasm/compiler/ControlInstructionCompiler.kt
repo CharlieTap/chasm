@@ -96,10 +96,16 @@ internal fun compileControlInstruction(
 
     when (instruction) {
         ControlInstruction.Unreachable -> {
-            state.program.append(UnreachableDispatcher(RuntimeControlInstruction.Unreachable))
+            state.emit(
+                RuntimeControlInstruction.Unreachable,
+                ::UnreachableDispatcher,
+            )
             state.reachable = false
         }
-        ControlInstruction.Nop -> state.program.append(NopDispatcher(RuntimeControlInstruction.Nop))
+        ControlInstruction.Nop -> state.emit(
+            RuntimeControlInstruction.Nop,
+            ::NopDispatcher,
+        )
         is ControlInstruction.Block -> enterBlock(state, BlockKind.Block, instruction.blockType)
         is ControlInstruction.Loop -> enterBlock(state, BlockKind.Loop, instruction.blockType)
         is ControlInstruction.If -> enterIf(state, instruction)

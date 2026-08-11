@@ -1,7 +1,5 @@
 
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinTargetWithTests.Companion.DEFAULT_TEST_RUN_NAME
-import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 plugins {
@@ -37,19 +35,10 @@ kotlin {
     nativeTargets()
 }
 
-val test = tasks.register("test") {
+tasks.register("test") {
     group = "verification"
     description = "Run JVM tests for the fast development loop"
-}
-
-kotlin.targets.withType(KotlinJvmTarget::class.java).configureEach {
-    val jvmTest = testRuns.getByName(DEFAULT_TEST_RUN_NAME).executionTask
-    jvmTest.configure {
-        exclude("**/WehTest.class")
-    }
-    test.configure {
-        dependsOn(jvmTest)
-    }
+    dependsOn(tasks.named("jvmTest"))
 }
 
 tasks.withType<KotlinNativeLink>().configureEach {

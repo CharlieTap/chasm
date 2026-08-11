@@ -177,7 +177,7 @@ internal fun FunctionCompilationContext.emitNumericInstruction(
         NumericOpcode.I64Sub128,
         -> error("numeric instruction requires dedicated lowering: $opcode")
     }
-    program.append(NumericSuperInstructionDispatcher(linkedInstruction))
+    emit(linkedInstruction, ::NumericSuperInstructionDispatcher)
 }
 
 private fun FunctionCompilationContext.emitI32Comparison(

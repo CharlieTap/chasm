@@ -221,7 +221,7 @@ internal fun FunctionCompiler(
         }
 
         finishFunctionControl(state)
-        state.program.append(EndFunctionDispatcher(AdminInstruction.EndFunction))
+        state.emit(AdminInstruction.EndFunction, ::EndFunctionDispatcher)
 
         state.emitDeferredBranchPaths()
         state.program.finish()
@@ -327,7 +327,7 @@ internal fun completeDestination(
     }
 }
 
-private fun emitOperand(
+internal fun emitOperand(
     state: FunctionCompilationContext,
     operand: Operand,
     destinationSlot: Int,

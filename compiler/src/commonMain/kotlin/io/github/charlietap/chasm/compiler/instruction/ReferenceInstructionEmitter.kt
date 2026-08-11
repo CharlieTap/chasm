@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.type.ReferenceType
 internal fun FunctionCompilationContext.emitReferenceInstruction(
     instruction: ReferenceSuperInstruction,
 ) {
-    program.append(ReferenceSuperInstructionDispatcher(instruction))
+    emit(instruction, ::ReferenceSuperInstructionDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitRefNull(reference: Long, destinationSlot: Int) =

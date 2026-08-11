@@ -45,7 +45,7 @@ internal fun FunctionCompilationContext.emitMemoryLoad(
         is MemoryInstruction.Load.F32.F32Load -> if (immediate) MemorySuperInstruction.F32LoadI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.F32LoadS(sourceSlot, destinationSlot, memory, memArg)
         is MemoryInstruction.Load.F64.F64Load -> if (immediate) MemorySuperInstruction.F64LoadI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.F64LoadS(sourceSlot, destinationSlot, memory, memArg)
     }
-    program.append(MemorySuperInstructionDispatcher(runtimeInstruction))
+    emit(runtimeInstruction, ::MemorySuperInstructionDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitMemoryStore(
@@ -68,11 +68,12 @@ internal fun FunctionCompilationContext.emitMemoryStore(
         is MemoryInstruction.Store.F32.F32Store -> f32Store(value, addressImmediate, addressValue, memory, memArg)
         is MemoryInstruction.Store.F64.F64Store -> f64Store(value, addressImmediate, addressValue, memory, memArg)
     }
-    program.append(MemorySuperInstructionDispatcher(runtimeInstruction))
+    emit(runtimeInstruction, ::MemorySuperInstructionDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitMemorySize(memory: MemoryInstance, destinationSlot: Int) {
-    program.append(MemorySuperInstructionDispatcher(MemorySuperInstruction.MemorySizeS(destinationSlot, memory)))
+    val instruction = MemorySuperInstruction.MemorySizeS(destinationSlot, memory)
+    emit(instruction, ::MemorySuperInstructionDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitMemoryGrow(
@@ -86,7 +87,7 @@ internal fun FunctionCompilationContext.emitMemoryGrow(
     } else {
         MemorySuperInstruction.MemoryGrowS(pages.sourceSlot, destinationSlot, memory, max)
     }
-    program.append(MemorySuperInstructionDispatcher(instruction))
+    emit(instruction, ::MemorySuperInstructionDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitMemoryInit(
@@ -149,7 +150,8 @@ internal fun FunctionCompilationContext.emitMemoryFill(
 )
 
 internal fun FunctionCompilationContext.emitDataDrop(data: DataInstance) {
-    program.append(DataDropDispatcher(RuntimeMemoryInstruction.DataDrop(data)))
+    val instruction = RuntimeMemoryInstruction.DataDrop(data)
+    emit(instruction, ::DataDropDispatcher)
 }
 
 private inline fun FunctionCompilationContext.emitMemoryTernary(
@@ -181,7 +183,7 @@ private inline fun FunctionCompilationContext.emitMemoryTernary(
         ci -> ssi(a, b, c)
         else -> sss(a, b, c)
     }
-    program.append(MemorySuperInstructionDispatcher(instruction))
+    emit(instruction, ::MemorySuperInstructionDispatcher)
 }
 
 private inline fun i32Store(

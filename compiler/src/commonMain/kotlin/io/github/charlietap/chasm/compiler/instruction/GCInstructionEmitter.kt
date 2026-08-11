@@ -5,5 +5,5 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PauseIfDispatc
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 
 internal fun FunctionCompilationContext.emitPauseIf() {
-    program.append(PauseIfDispatcher(AdminInstruction.PauseIf))
+    emit(AdminInstruction.PauseIf, ::PauseIfDispatcher)
 }
