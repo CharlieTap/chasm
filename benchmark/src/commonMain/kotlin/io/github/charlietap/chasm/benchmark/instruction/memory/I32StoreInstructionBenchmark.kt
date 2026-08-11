@@ -58,7 +58,7 @@ class I32StoreInstructionBenchmark {
 
     private val instruction = i32StoreRuntimeInstruction(
         memory = memoryInstance,
-        memArg = runtimeMemArg(0, 0),
+        memArg = runtimeMemArg(0),
     )
 
     private val frame = frame(

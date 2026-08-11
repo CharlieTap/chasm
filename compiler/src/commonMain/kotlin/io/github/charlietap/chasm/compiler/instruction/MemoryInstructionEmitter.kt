@@ -25,25 +25,27 @@ internal fun FunctionCompilationContext.emitMemoryLoad(
     destinationSlot: Int,
     memory: MemoryInstance,
 ) {
-    val memArg = instruction.memArg.toRuntime()
     val immediate = address.sourceKind == OperandSourceKind.I32Immediate
-    val addressValue = address.i32Immediate
+    val memArg = instruction.memArg.toRuntime()
+    val precomputedAddress = if (immediate) precomputedEffectiveAddress(address.i32Immediate, memArg.offset) else null
+    val addressValue = precomputedAddress ?: address.i32Immediate
+    val runtimeMemArg = if (precomputedAddress == null) memArg else RuntimeMemArg(0)
     val sourceSlot = address.sourceSlot
     val runtimeInstruction = when (instruction) {
-        is MemoryInstruction.Load.I32.I32Load -> if (immediate) MemorySuperInstruction.I32LoadI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I32LoadS(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I32.I32Load8S -> if (immediate) MemorySuperInstruction.I32Load8SI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I32Load8SS(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I32.I32Load8U -> if (immediate) MemorySuperInstruction.I32Load8UI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I32Load8US(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I32.I32Load16S -> if (immediate) MemorySuperInstruction.I32Load16SI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I32Load16SS(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I32.I32Load16U -> if (immediate) MemorySuperInstruction.I32Load16UI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I32Load16US(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I64.I64Load -> if (immediate) MemorySuperInstruction.I64LoadI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I64LoadS(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I64.I64Load8S -> if (immediate) MemorySuperInstruction.I64Load8SI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I64Load8SS(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I64.I64Load8U -> if (immediate) MemorySuperInstruction.I64Load8UI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I64Load8US(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I64.I64Load16S -> if (immediate) MemorySuperInstruction.I64Load16SI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I64Load16SS(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I64.I64Load16U -> if (immediate) MemorySuperInstruction.I64Load16UI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I64Load16US(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I64.I64Load32S -> if (immediate) MemorySuperInstruction.I64Load32SI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I64Load32SS(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.I64.I64Load32U -> if (immediate) MemorySuperInstruction.I64Load32UI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.I64Load32US(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.F32.F32Load -> if (immediate) MemorySuperInstruction.F32LoadI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.F32LoadS(sourceSlot, destinationSlot, memory, memArg)
-        is MemoryInstruction.Load.F64.F64Load -> if (immediate) MemorySuperInstruction.F64LoadI(addressValue, destinationSlot, memory, memArg) else MemorySuperInstruction.F64LoadS(sourceSlot, destinationSlot, memory, memArg)
+        is MemoryInstruction.Load.I32.I32Load -> if (immediate) MemorySuperInstruction.I32LoadI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I32LoadS(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I32.I32Load8S -> if (immediate) MemorySuperInstruction.I32Load8SI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I32Load8SS(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I32.I32Load8U -> if (immediate) MemorySuperInstruction.I32Load8UI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I32Load8US(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I32.I32Load16S -> if (immediate) MemorySuperInstruction.I32Load16SI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I32Load16SS(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I32.I32Load16U -> if (immediate) MemorySuperInstruction.I32Load16UI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I32Load16US(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I64.I64Load -> if (immediate) MemorySuperInstruction.I64LoadI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I64LoadS(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I64.I64Load8S -> if (immediate) MemorySuperInstruction.I64Load8SI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I64Load8SS(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I64.I64Load8U -> if (immediate) MemorySuperInstruction.I64Load8UI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I64Load8US(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I64.I64Load16S -> if (immediate) MemorySuperInstruction.I64Load16SI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I64Load16SS(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I64.I64Load16U -> if (immediate) MemorySuperInstruction.I64Load16UI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I64Load16US(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I64.I64Load32S -> if (immediate) MemorySuperInstruction.I64Load32SI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I64Load32SS(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.I64.I64Load32U -> if (immediate) MemorySuperInstruction.I64Load32UI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.I64Load32US(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.F32.F32Load -> if (immediate) MemorySuperInstruction.F32LoadI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.F32LoadS(sourceSlot, destinationSlot, memory, runtimeMemArg)
+        is MemoryInstruction.Load.F64.F64Load -> if (immediate) MemorySuperInstruction.F64LoadI(addressValue, destinationSlot, memory, runtimeMemArg) else MemorySuperInstruction.F64LoadS(sourceSlot, destinationSlot, memory, runtimeMemArg)
     }
     emit(runtimeInstruction, ::MemorySuperInstructionDispatcher)
 }
@@ -54,19 +56,21 @@ internal fun FunctionCompilationContext.emitMemoryStore(
     address: OperandSource,
     memory: MemoryInstance,
 ) {
-    val memArg = instruction.memArg.toRuntime()
     val addressImmediate = address.sourceKind == OperandSourceKind.I32Immediate
-    val addressValue = address.i32Immediate
+    val memArg = instruction.memArg.toRuntime()
+    val precomputedAddress = if (addressImmediate) precomputedEffectiveAddress(address.i32Immediate, memArg.offset) else null
+    val addressValue = precomputedAddress ?: address.i32Immediate
+    val runtimeMemArg = if (precomputedAddress == null) memArg else RuntimeMemArg(0)
     val runtimeInstruction = when (instruction) {
-        is MemoryInstruction.Store.I32.I32Store -> i32Store(value, addressImmediate, addressValue, memory, memArg, MemorySuperInstruction::I32StoreIi, MemorySuperInstruction::I32StoreIs, MemorySuperInstruction::I32StoreSi, MemorySuperInstruction::I32StoreSs)
-        is MemoryInstruction.Store.I32.I32Store8 -> i32Store(value, addressImmediate, addressValue, memory, memArg, MemorySuperInstruction::I32Store8Ii, MemorySuperInstruction::I32Store8Is, MemorySuperInstruction::I32Store8Si, MemorySuperInstruction::I32Store8Ss)
-        is MemoryInstruction.Store.I32.I32Store16 -> i32Store(value, addressImmediate, addressValue, memory, memArg, MemorySuperInstruction::I32Store16Ii, MemorySuperInstruction::I32Store16Is, MemorySuperInstruction::I32Store16Si, MemorySuperInstruction::I32Store16Ss)
-        is MemoryInstruction.Store.I64.I64Store -> i64Store(value, addressImmediate, addressValue, memory, memArg, MemorySuperInstruction::I64StoreIi, MemorySuperInstruction::I64StoreIs, MemorySuperInstruction::I64StoreSi, MemorySuperInstruction::I64StoreSs)
-        is MemoryInstruction.Store.I64.I64Store8 -> i64Store(value, addressImmediate, addressValue, memory, memArg, MemorySuperInstruction::I64Store8Ii, MemorySuperInstruction::I64Store8Is, MemorySuperInstruction::I64Store8Si, MemorySuperInstruction::I64Store8Ss)
-        is MemoryInstruction.Store.I64.I64Store16 -> i64Store(value, addressImmediate, addressValue, memory, memArg, MemorySuperInstruction::I64Store16Ii, MemorySuperInstruction::I64Store16Is, MemorySuperInstruction::I64Store16Si, MemorySuperInstruction::I64Store16Ss)
-        is MemoryInstruction.Store.I64.I64Store32 -> i64Store(value, addressImmediate, addressValue, memory, memArg, MemorySuperInstruction::I64Store32Ii, MemorySuperInstruction::I64Store32Is, MemorySuperInstruction::I64Store32Si, MemorySuperInstruction::I64Store32Ss)
-        is MemoryInstruction.Store.F32.F32Store -> f32Store(value, addressImmediate, addressValue, memory, memArg)
-        is MemoryInstruction.Store.F64.F64Store -> f64Store(value, addressImmediate, addressValue, memory, memArg)
+        is MemoryInstruction.Store.I32.I32Store -> i32Store(value, addressImmediate, addressValue, memory, runtimeMemArg, MemorySuperInstruction::I32StoreIi, MemorySuperInstruction::I32StoreIs, MemorySuperInstruction::I32StoreSi, MemorySuperInstruction::I32StoreSs)
+        is MemoryInstruction.Store.I32.I32Store8 -> i32Store(value, addressImmediate, addressValue, memory, runtimeMemArg, MemorySuperInstruction::I32Store8Ii, MemorySuperInstruction::I32Store8Is, MemorySuperInstruction::I32Store8Si, MemorySuperInstruction::I32Store8Ss)
+        is MemoryInstruction.Store.I32.I32Store16 -> i32Store(value, addressImmediate, addressValue, memory, runtimeMemArg, MemorySuperInstruction::I32Store16Ii, MemorySuperInstruction::I32Store16Is, MemorySuperInstruction::I32Store16Si, MemorySuperInstruction::I32Store16Ss)
+        is MemoryInstruction.Store.I64.I64Store -> i64Store(value, addressImmediate, addressValue, memory, runtimeMemArg, MemorySuperInstruction::I64StoreIi, MemorySuperInstruction::I64StoreIs, MemorySuperInstruction::I64StoreSi, MemorySuperInstruction::I64StoreSs)
+        is MemoryInstruction.Store.I64.I64Store8 -> i64Store(value, addressImmediate, addressValue, memory, runtimeMemArg, MemorySuperInstruction::I64Store8Ii, MemorySuperInstruction::I64Store8Is, MemorySuperInstruction::I64Store8Si, MemorySuperInstruction::I64Store8Ss)
+        is MemoryInstruction.Store.I64.I64Store16 -> i64Store(value, addressImmediate, addressValue, memory, runtimeMemArg, MemorySuperInstruction::I64Store16Ii, MemorySuperInstruction::I64Store16Is, MemorySuperInstruction::I64Store16Si, MemorySuperInstruction::I64Store16Ss)
+        is MemoryInstruction.Store.I64.I64Store32 -> i64Store(value, addressImmediate, addressValue, memory, runtimeMemArg, MemorySuperInstruction::I64Store32Ii, MemorySuperInstruction::I64Store32Is, MemorySuperInstruction::I64Store32Si, MemorySuperInstruction::I64Store32Ss)
+        is MemoryInstruction.Store.F32.F32Store -> f32Store(value, addressImmediate, addressValue, memory, runtimeMemArg)
+        is MemoryInstruction.Store.F64.F64Store -> f64Store(value, addressImmediate, addressValue, memory, runtimeMemArg)
     }
     emit(runtimeInstruction, ::MemorySuperInstructionDispatcher)
 }
@@ -261,7 +265,8 @@ private fun f64Store(
     }
 }
 
-private fun AstMemArg.toRuntime() = RuntimeMemArg(
-    align = align.toInt(),
-    offset = offset.toInt(),
-)
+private fun AstMemArg.toRuntime() = RuntimeMemArg(offset.toInt())
+
+internal fun precomputedEffectiveAddress(address: Int, offset: Int): Int? {
+    return if (address >= 0 && offset >= 0 && address <= Int.MAX_VALUE - offset) address + offset else null
+}

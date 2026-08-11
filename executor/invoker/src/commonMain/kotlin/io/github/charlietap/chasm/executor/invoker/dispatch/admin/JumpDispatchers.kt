@@ -11,8 +11,11 @@ import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 
 fun JumpDispatcher(
     instruction: AdminInstruction.Jump,
-): DispatchableInstruction = DispatchableInstruction { _, _, _, _, _ ->
-    instruction.targetIp
+): DispatchableInstruction {
+    val targetIp = instruction.targetIp
+    return DispatchableInstruction { _, _, _, _, _ ->
+        targetIp
+    }
 }
 
 fun JumpDispatcher(
@@ -53,32 +56,51 @@ fun JumpDispatcher(
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfI,
-): DispatchableInstruction = DispatchableInstruction { _, _, _, _, nextIp ->
-    if (instruction.operand != 0L) instruction.targetIp else nextIp
+): DispatchableInstruction {
+    val operand = instruction.operand
+    val targetIp = instruction.targetIp
+    return DispatchableInstruction { _, _, _, _, nextIp ->
+        if (operand != 0L) targetIp else nextIp
+    }
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfS,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, nextIp ->
-    if (vstack.getFrameSlot(instruction.operandSlot) != 0L) instruction.targetIp else nextIp
+): DispatchableInstruction {
+    val operandSlot = instruction.operandSlot
+    val targetIp = instruction.targetIp
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        if (vstack.getFrameSlot(operandSlot) != 0L) targetIp else nextIp
+    }
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfZeroI,
-): DispatchableInstruction = DispatchableInstruction { _, _, _, _, nextIp ->
-    if (instruction.operand == 0L) instruction.targetIp else nextIp
+): DispatchableInstruction {
+    val operand = instruction.operand
+    val targetIp = instruction.targetIp
+    return DispatchableInstruction { _, _, _, _, nextIp ->
+        if (operand == 0L) targetIp else nextIp
+    }
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfZeroS,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, nextIp ->
-    if (vstack.getFrameSlot(instruction.operandSlot) == 0L) instruction.targetIp else nextIp
+): DispatchableInstruction {
+    val operandSlot = instruction.operandSlot
+    val targetIp = instruction.targetIp
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        if (vstack.getFrameSlot(operandSlot) == 0L) targetIp else nextIp
+    }
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfV,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, nextIp ->
-    if (vstack.pop() != 0L) instruction.targetIp else nextIp
+): DispatchableInstruction {
+    val targetIp = instruction.targetIp
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        if (vstack.pop() != 0L) targetIp else nextIp
+    }
 }
 
 fun JumpDispatcher(

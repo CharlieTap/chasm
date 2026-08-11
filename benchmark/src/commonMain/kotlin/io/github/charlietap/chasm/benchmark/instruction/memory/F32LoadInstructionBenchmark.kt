@@ -58,7 +58,7 @@ class F32LoadInstructionBenchmark {
 
     private val instruction = f32LoadRuntimeInstruction(
         memory = memoryInstance,
-        memArg = runtimeMemArg(0, 0),
+        memArg = runtimeMemArg(0),
     )
 
     private val frame = frame(

@@ -58,7 +58,7 @@ class I64StoreInstructionBenchmark {
 
     private val instruction = i64StoreRuntimeInstruction(
         memory = memoryInstance,
-        memArg = runtimeMemArg(0, 0),
+        memArg = runtimeMemArg(0),
     )
 
     private val frame = frame(

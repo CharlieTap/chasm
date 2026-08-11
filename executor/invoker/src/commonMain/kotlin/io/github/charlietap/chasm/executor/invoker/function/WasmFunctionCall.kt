@@ -82,12 +82,14 @@ internal fun WasmFunctionCall(
     resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
-): Int {
-    val callerFramePointer = vstack.framePointer
-    val valueDepth = vstack.depth()
-    val calleeFramePointer = callerFramePointer + callFrameSlot
-
-    vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
+): Int = wasmFunctionCall(
+    vstack,
+    cstack,
+    plan,
+    resultSlotBase,
+    callFrameSlot,
+    returnIp,
+) { callerFramePointer, calleeFramePointer ->
     copyOperands(
         vstack = vstack,
         currentFramePointer = callerFramePointer,
@@ -95,6 +97,81 @@ internal fun WasmFunctionCall(
         operands = operands.operands,
         order = operands.order,
     )
+}
+
+internal fun WasmFunctionCallWithoutOperandCopy(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    plan: WasmFunctionCallPlan,
+    resultSlotBase: Int,
+    callFrameSlot: Int,
+    returnIp: Int,
+): Int = wasmFunctionCall(
+    vstack,
+    cstack,
+    plan,
+    resultSlotBase,
+    callFrameSlot,
+    returnIp,
+) { _, _ -> }
+
+internal fun WasmFunctionCallWithImmediateOperand(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    plan: WasmFunctionCallPlan,
+    operand: Long,
+    resultSlotBase: Int,
+    callFrameSlot: Int,
+    returnIp: Int,
+): Int = wasmFunctionCall(
+    vstack,
+    cstack,
+    plan,
+    resultSlotBase,
+    callFrameSlot,
+    returnIp,
+) { _, calleeFramePointer ->
+    vstack.setFrameSlot(calleeFramePointer, 0, operand)
+}
+
+internal fun WasmFunctionCallWithSlotOperand(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    plan: WasmFunctionCallPlan,
+    operandSlot: Int,
+    resultSlotBase: Int,
+    callFrameSlot: Int,
+    returnIp: Int,
+): Int = wasmFunctionCall(
+    vstack,
+    cstack,
+    plan,
+    resultSlotBase,
+    callFrameSlot,
+    returnIp,
+) { callerFramePointer, calleeFramePointer ->
+    vstack.setFrameSlot(
+        calleeFramePointer,
+        0,
+        vstack.getFrameSlot(callerFramePointer, operandSlot),
+    )
+}
+
+private inline fun wasmFunctionCall(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    plan: WasmFunctionCallPlan,
+    resultSlotBase: Int,
+    callFrameSlot: Int,
+    returnIp: Int,
+    copyOperands: (callerFramePointer: Int, calleeFramePointer: Int) -> Unit,
+): Int {
+    val callerFramePointer = vstack.framePointer
+    val valueDepth = vstack.depth()
+    val calleeFramePointer = callerFramePointer + callFrameSlot
+
+    vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
+    copyOperands(callerFramePointer, calleeFramePointer)
     plan.locals.forEachIndexed { index, value ->
         vstack.setFrameSlot(calleeFramePointer, plan.interfaceSlots + index, value)
     }
@@ -124,12 +201,14 @@ internal fun WasmFunctionCallWithoutLocals(
     resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
-): Int {
-    val callerFramePointer = vstack.framePointer
-    val valueDepth = vstack.depth()
-    val calleeFramePointer = callerFramePointer + callFrameSlot
-
-    vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
+): Int = wasmFunctionCallWithoutLocals(
+    vstack,
+    cstack,
+    plan,
+    resultSlotBase,
+    callFrameSlot,
+    returnIp,
+) { callerFramePointer, calleeFramePointer ->
     copyOperands(
         vstack = vstack,
         currentFramePointer = callerFramePointer,
@@ -137,6 +216,81 @@ internal fun WasmFunctionCallWithoutLocals(
         operands = operands.operands,
         order = operands.order,
     )
+}
+
+internal fun WasmFunctionCallWithoutLocalsOrOperandCopy(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    plan: WasmFunctionCallPlan,
+    resultSlotBase: Int,
+    callFrameSlot: Int,
+    returnIp: Int,
+): Int = wasmFunctionCallWithoutLocals(
+    vstack,
+    cstack,
+    plan,
+    resultSlotBase,
+    callFrameSlot,
+    returnIp,
+) { _, _ -> }
+
+internal fun WasmFunctionCallWithoutLocalsWithImmediateOperand(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    plan: WasmFunctionCallPlan,
+    operand: Long,
+    resultSlotBase: Int,
+    callFrameSlot: Int,
+    returnIp: Int,
+): Int = wasmFunctionCallWithoutLocals(
+    vstack,
+    cstack,
+    plan,
+    resultSlotBase,
+    callFrameSlot,
+    returnIp,
+) { _, calleeFramePointer ->
+    vstack.setFrameSlot(calleeFramePointer, 0, operand)
+}
+
+internal fun WasmFunctionCallWithoutLocalsWithSlotOperand(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    plan: WasmFunctionCallPlan,
+    operandSlot: Int,
+    resultSlotBase: Int,
+    callFrameSlot: Int,
+    returnIp: Int,
+): Int = wasmFunctionCallWithoutLocals(
+    vstack,
+    cstack,
+    plan,
+    resultSlotBase,
+    callFrameSlot,
+    returnIp,
+) { callerFramePointer, calleeFramePointer ->
+    vstack.setFrameSlot(
+        calleeFramePointer,
+        0,
+        vstack.getFrameSlot(callerFramePointer, operandSlot),
+    )
+}
+
+private inline fun wasmFunctionCallWithoutLocals(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    plan: WasmFunctionCallPlan,
+    resultSlotBase: Int,
+    callFrameSlot: Int,
+    returnIp: Int,
+    copyOperands: (callerFramePointer: Int, calleeFramePointer: Int) -> Unit,
+): Int {
+    val callerFramePointer = vstack.framePointer
+    val valueDepth = vstack.depth()
+    val calleeFramePointer = callerFramePointer + callFrameSlot
+
+    vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
+    copyOperands(callerFramePointer, calleeFramePointer)
     cstack.push(
         ActivationFrame(
             arity = plan.results,

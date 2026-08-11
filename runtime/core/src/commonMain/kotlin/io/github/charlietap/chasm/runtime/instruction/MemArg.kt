@@ -1,3 +1,6 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-data class MemArg(val align: Int, val offset: Int)
+import kotlin.jvm.JvmInline
+
+@JvmInline
+value class MemArg(val offset: Int)

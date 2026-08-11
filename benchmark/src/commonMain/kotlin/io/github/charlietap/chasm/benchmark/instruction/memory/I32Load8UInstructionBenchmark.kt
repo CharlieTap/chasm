@@ -58,7 +58,7 @@ class I32Load8UInstructionBenchmark {
 
     private val instruction = i32Load8URuntimeInstruction(
         memory = memoryInstance,
-        memArg = runtimeMemArg(0, 0),
+        memArg = runtimeMemArg(0),
     )
 
     private val frame = frame(

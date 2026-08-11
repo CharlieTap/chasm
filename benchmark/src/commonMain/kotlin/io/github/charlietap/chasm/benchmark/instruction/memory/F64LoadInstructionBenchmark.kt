@@ -58,7 +58,7 @@ class F64LoadInstructionBenchmark {
 
     private val instruction = f64LoadRuntimeInstruction(
         memory = memoryInstance,
-        memArg = runtimeMemArg(0, 0),
+        memArg = runtimeMemArg(0),
     )
 
     private val frame = frame(

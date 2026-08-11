@@ -76,8 +76,25 @@ internal inline fun ThreadExecutor(
     try {
         var ip = instance.function.body.entryIp
         val instructions = store.program.instructions
-        while (ip != EXIT_IP) {
+        dispatch@ while (true) {
+            // Three may seem arbitrary, but it is intentional. Executing several
+            // instructions per iteration amortises the cost of the jump back to the
+            // top of the loop.
+            // Adding iterations is not free: every slot adds another indirect call site,
+            // exit branch, and more compiled code. On HotSpot these call sites are
+            // megamorphic and also require their own profiling and safepoint metadata.
             ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+            if (ip == EXIT_IP) {
+                break@dispatch
+            }
+            ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+            if (ip == EXIT_IP) {
+                break@dispatch
+            }
+            ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+            if (ip == EXIT_IP) {
+                break@dispatch
+            }
         }
     } catch (exception: InvocationException) {
         Err(exception.error).bind()

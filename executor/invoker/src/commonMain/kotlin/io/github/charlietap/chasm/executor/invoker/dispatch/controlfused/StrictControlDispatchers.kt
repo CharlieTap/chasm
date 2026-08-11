@@ -1,7 +1,13 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.controlfused
 
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithImmediateOperand
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithSlotOperand
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithoutLocals
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithoutLocalsOrOperandCopy
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithoutLocalsWithImmediateOperand
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithoutLocalsWithSlotOperand
+import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithoutOperandCopy
 import io.github.charlietap.chasm.executor.invoker.function.copyOperands
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.CallExecutor
@@ -11,6 +17,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.Thro
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.CopyOperand
+import io.github.charlietap.chasm.runtime.instruction.OperandCopyOrder
 
 fun CallDispatcher(
     instruction: ControlSuperInstruction.WasmCall,
@@ -19,13 +26,48 @@ fun CallDispatcher(
     val operands = instruction.operands
     val resultSlotBase = instruction.resultSlotBase
     val callFrameSlot = instruction.callFrameSlot
+    val operand = operands.operands.singleOrNull()
     return if (plan.locals.isEmpty()) {
-        DispatchableInstruction { vstack, cstack, _, _, nextIp ->
-            WasmFunctionCallWithoutLocals(vstack, cstack, plan, operands, resultSlotBase, callFrameSlot, nextIp)
+        when {
+            operands.order == OperandCopyOrder.None -> DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+                WasmFunctionCallWithoutLocalsOrOperandCopy(vstack, cstack, plan, resultSlotBase, callFrameSlot, nextIp)
+            }
+            operand is CopyOperand.Immediate -> {
+                val value = operand.value
+                DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+                    WasmFunctionCallWithoutLocalsWithImmediateOperand(vstack, cstack, plan, value, resultSlotBase, callFrameSlot, nextIp)
+                }
+            }
+            operand is CopyOperand.Slot -> {
+                val slot = operand.slot
+                DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+                    WasmFunctionCallWithoutLocalsWithSlotOperand(vstack, cstack, plan, slot, resultSlotBase, callFrameSlot, nextIp)
+                }
+            }
+            else -> DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+                WasmFunctionCallWithoutLocals(vstack, cstack, plan, operands, resultSlotBase, callFrameSlot, nextIp)
+            }
         }
     } else {
-        DispatchableInstruction { vstack, cstack, _, _, nextIp ->
-            WasmFunctionCall(vstack, cstack, plan, operands, resultSlotBase, callFrameSlot, nextIp)
+        when {
+            operands.order == OperandCopyOrder.None -> DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+                WasmFunctionCallWithoutOperandCopy(vstack, cstack, plan, resultSlotBase, callFrameSlot, nextIp)
+            }
+            operand is CopyOperand.Immediate -> {
+                val value = operand.value
+                DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+                    WasmFunctionCallWithImmediateOperand(vstack, cstack, plan, value, resultSlotBase, callFrameSlot, nextIp)
+                }
+            }
+            operand is CopyOperand.Slot -> {
+                val slot = operand.slot
+                DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+                    WasmFunctionCallWithSlotOperand(vstack, cstack, plan, slot, resultSlotBase, callFrameSlot, nextIp)
+                }
+            }
+            else -> DispatchableInstruction { vstack, cstack, _, _, nextIp ->
+                WasmFunctionCall(vstack, cstack, plan, operands, resultSlotBase, callFrameSlot, nextIp)
+            }
         }
     }
 }
