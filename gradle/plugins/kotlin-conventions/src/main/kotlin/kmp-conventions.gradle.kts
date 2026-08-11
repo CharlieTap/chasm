@@ -1,6 +1,5 @@
 
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 plugins {
     id("kotlin-conventions")
@@ -39,10 +38,4 @@ tasks.register("test") {
     group = "verification"
     description = "Run JVM tests for the fast development loop"
     dependsOn(tasks.named("jvmTest"))
-}
-
-tasks.withType<KotlinNativeLink>().configureEach {
-    if (name.endsWith("DebugTestMingwX64")) {
-        binary.linkerOpts("-Wl,--stack,33554432")
-    }
 }
