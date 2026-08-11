@@ -234,7 +234,7 @@ internal fun compileAggregateInstruction(
                 is AggregateInstruction.StructGetSigned -> true
                 is AggregateInstruction.StructGetUnsigned -> false
             },
-            addressSlot = state.materialize(address),
+            addressSlot = state.operandSlot(address),
             destinationSlot = destination.slot,
             fieldIndex = fieldIndex.toInt(),
         )
@@ -246,7 +246,7 @@ internal fun compileAggregateInstruction(
         val address = state.pop()
         state.emitStructSet(
             value = value,
-            addressSlot = state.materialize(address),
+            addressSlot = state.operandSlot(address),
             fieldIndex = instruction.fieldIndex.toInt(),
         )
         false
@@ -337,7 +337,7 @@ internal fun compileAggregateInstruction(
                 is AggregateInstruction.ArrayGetSigned -> true
                 is AggregateInstruction.ArrayGetUnsigned -> false
             },
-            addressSlot = state.materialize(address),
+            addressSlot = state.operandSlot(address),
             field = field,
             destinationSlot = destination.slot,
         )
@@ -348,13 +348,13 @@ internal fun compileAggregateInstruction(
         val value = state.pop()
         val field = state.pop()
         val address = state.pop()
-        state.emitArraySet(value, field, state.materialize(address))
+        state.emitArraySet(value, field, state.operandSlot(address))
         false
     }
     AggregateInstruction.ArrayLen -> {
         val address = state.pop()
         val destination = destination(state, address, nextInstruction)
-        state.emitArrayLen(state.materialize(address), destination.slot)
+        state.emitArrayLen(state.operandSlot(address), destination.slot)
         completeDestination(state, I32_TYPE, destination)
         destination.consumesNextInstruction
     }
@@ -363,7 +363,7 @@ internal fun compileAggregateInstruction(
         val value = state.pop()
         val offset = state.pop()
         val address = state.pop()
-        state.emitArrayFill(elements, value, offset, state.materialize(address))
+        state.emitArrayFill(elements, value, offset, state.operandSlot(address))
         false
     }
     is AggregateInstruction.ArrayCopy -> {
@@ -376,8 +376,8 @@ internal fun compileAggregateInstruction(
             elements,
             sourceOffset,
             destinationOffset,
-            state.materialize(sourceAddress),
-            state.materialize(destinationAddress),
+            state.operandSlot(sourceAddress),
+            state.operandSlot(destinationAddress),
         )
         false
     }
@@ -390,7 +390,7 @@ internal fun compileAggregateInstruction(
             elements,
             sourceOffset,
             destinationOffset,
-            state.materialize(address),
+            state.operandSlot(address),
             state.compiler.data(instruction.dataIndex),
             state.compiler.arrayType(instruction.typeIndex),
         )
@@ -405,7 +405,7 @@ internal fun compileAggregateInstruction(
             elements,
             sourceOffset,
             destinationOffset,
-            state.materialize(address),
+            state.operandSlot(address),
             state.compiler.element(instruction.elementIndex),
         )
         false
@@ -422,7 +422,7 @@ internal fun compileAggregateInstruction(
     -> {
         val value = state.pop()
         val destination = destination(state, value, nextInstruction)
-        state.emitI31Get(instruction == AggregateInstruction.I31GetSigned, state.materialize(value), destination.slot)
+        state.emitI31Get(instruction == AggregateInstruction.I31GetSigned, state.operandSlot(value), destination.slot)
         completeDestination(state, I32_TYPE, destination)
         destination.consumesNextInstruction
     }
@@ -438,14 +438,17 @@ internal fun compileAggregateInstruction(
             is ReferenceType.RefNull -> ReferenceType.RefNull(outputHeapType)
         }
         if (instruction == AggregateInstruction.AnyConvertExtern) {
-            state.emitAnyConvertExtern(state.materialize(value), destination.slot)
+            state.emitAnyConvertExtern(state.operandSlot(value), destination.slot)
         } else {
-            state.emitExternConvertAny(state.materialize(value), destination.slot)
+            state.emitExternConvertAny(state.operandSlot(value), destination.slot)
         }
         completeDestination(state, ValueType.Reference(outputReferenceType), destination)
         destination.consumesNextInstruction
     }
 }
+
+private fun FunctionCompilationContext.operandSlot(operand: Operand): Int =
+    if (operand.isImmediate) materialize(operand) else operand.sourceSlot
 
 private fun completeReferenceDestination(
     state: FunctionCompilationContext,

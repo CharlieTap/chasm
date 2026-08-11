@@ -31,6 +31,6 @@ class ModuleCompilerBaselineGeneratorTest {
         assertEquals(1, baseline.schemaVersion)
         assertEquals("coremark", module.name)
         assertEquals(15, module.functions.size)
-        assertTrue(module.functions.all { function -> function.instructions.last() == "admin.end_function" })
+        assertTrue(module.functions.all { function -> "control.return" in function.instructions })
     }
 }

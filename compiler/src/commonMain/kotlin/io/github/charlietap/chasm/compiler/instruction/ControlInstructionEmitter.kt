@@ -15,6 +15,8 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpConditionD
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PopHandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PushHandlerDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.FunctionReturnDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32ConstDispatcher
@@ -23,9 +25,13 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32Cons
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64ConstDispatcher
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.CopyOperand
+import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
 import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction as RuntimeControlInstruction
 
 internal class SlotCopyPlan private constructor(
     val size: Int,
@@ -54,6 +60,18 @@ internal class SlotCopyPlan private constructor(
     fun sourceSlots(): IntArray = checkNotNull(sourceSlots)
 
     fun destinationSlots(): IntArray = checkNotNull(destinationSlots)
+
+    fun isIdentity(): Boolean {
+        for (index in 0 until size) {
+            val sourceSlot = when (sourceKind(index)) {
+                OperandSourceKind.Local -> sourceBits(index).toInt()
+                OperandSourceKind.Frame -> sourceSlot(index)
+                else -> return false
+            }
+            if (sourceSlot != destinationSlot(index)) return false
+        }
+        return true
+    }
 
     companion object {
         val Empty = SlotCopyPlan(
@@ -125,18 +143,62 @@ internal class SlotCopyPlan private constructor(
 
 internal val emptySlotCopyPlan = SlotCopyPlan.Empty
 
+internal enum class BranchOutcome {
+    Always,
+    Never,
+    Dynamic,
+}
+
+internal fun FunctionCompilationContext.emitFunctionReturn(copies: SlotCopyPlan) {
+    if (copies.isIdentity()) {
+        emit(RuntimeControlInstruction.Return, ::ReturnDispatcher)
+        return
+    }
+
+    val destinationSlotBase = copies.destinationSlot(0)
+    val instruction = ControlSuperInstruction.FunctionReturn(copies.operandCopyPlan(destinationSlotBase))
+    emit(instruction, ::FunctionReturnDispatcher)
+}
+
 internal fun FunctionCompilationContext.emitJump(
     target: ProgramTarget,
     copies: SlotCopyPlan = emptySlotCopyPlan,
     handlerPopCount: Int = 0,
 ) {
     check(handlerPopCount >= 0)
-    emitCopies(copies)
+    if (handlerPopCount == 0 && copies.size > 0 && !copies.isIdentity()) {
+        val destinationSlotBase = copies.destinationSlot(0)
+        val operands = copies.operandCopyPlan(destinationSlotBase)
+        program.append(target) { targetIp ->
+            dispatch(AdminInstruction.JumpCopies(operands, destinationSlotBase, targetIp), ::JumpDispatcher)
+        }
+        return
+    }
+
+    if (!copies.isIdentity()) emitCopies(copies)
     repeat(handlerPopCount) { emitPopHandler() }
     program.append(target) { targetIp ->
         val instruction = AdminInstruction.Jump(targetIp)
         dispatch(instruction, ::JumpDispatcher)
     }
+}
+
+private fun SlotCopyPlan.operandCopyPlan(
+    destinationSlotBase: Int,
+): OperandCopyPlan {
+    val operands = Array<CopyOperand>(size) { index ->
+        check(destinationSlot(index) == destinationSlotBase + index)
+        when (sourceKind(index)) {
+            OperandSourceKind.I32Immediate,
+            OperandSourceKind.I64Immediate,
+            OperandSourceKind.F32Immediate,
+            OperandSourceKind.F64Immediate,
+            -> CopyOperand.Immediate(sourceBits(index))
+            OperandSourceKind.Local -> CopyOperand.Slot(sourceBits(index).toInt())
+            OperandSourceKind.Frame -> CopyOperand.Slot(sourceSlot(index))
+        }
+    }
+    return operandCopyPlan(operands, destinationSlotBase)
 }
 
 internal fun FunctionCompilationContext.emitBranchIf(
@@ -145,8 +207,13 @@ internal fun FunctionCompilationContext.emitBranchIf(
     copies: SlotCopyPlan,
     whenZero: Boolean = false,
     handlerPopCount: Int = 0,
-) {
+): BranchOutcome {
     check(handlerPopCount >= 0)
+    if (condition.sourceKind == OperandSourceKind.I32Immediate) {
+        val branch = (condition.sourceBits == 0L) == whenZero
+        if (branch) emitJump(target, copies, handlerPopCount)
+        return if (branch) BranchOutcome.Always else BranchOutcome.Never
+    }
     val copy = copies.size == 1 && copies.sourceKind(0) == OperandSourceKind.Frame &&
         copies.sourceSlot(0) != copies.destinationSlot(0) && !whenZero && handlerPopCount == 0
     val branchTarget = if (copy || copies.size == 0 && handlerPopCount == 0) {
@@ -196,6 +263,7 @@ internal fun FunctionCompilationContext.emitBranchIf(
             )
         }
     }
+    return BranchOutcome.Dynamic
 }
 
 internal fun FunctionCompilationContext.emitBranchIf(
@@ -204,8 +272,14 @@ internal fun FunctionCompilationContext.emitBranchIf(
     copies: SlotCopyPlan,
     branchOnMatch: Boolean = true,
     handlerPopCount: Int = 0,
-) {
+): BranchOutcome {
     check(handlerPopCount >= 0)
+    val conditionMatches = condition.evaluateOrNull()
+    if (conditionMatches != null) {
+        val branch = conditionMatches == branchOnMatch
+        if (branch) emitJump(target, copies, handlerPopCount)
+        return if (branch) BranchOutcome.Always else BranchOutcome.Never
+    }
     val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
     program.append(branchTarget) { targetIp ->
         dispatch(JumpConditionDispatcher(condition, targetIp, branchOnMatch)) {
@@ -216,6 +290,69 @@ internal fun FunctionCompilationContext.emitBranchIf(
             }
         }
     }
+    return BranchOutcome.Dynamic
+}
+
+private fun NumericCondition.evaluateOrNull(): Boolean? = when (this) {
+    is NumericCondition.I32Eqz -> (operand as? FusedOperand.I32Const)?.const?.let { it == 0 }
+    is NumericCondition.I32And -> i32Condition(left, right) { a, b -> (a and b) != 0 }
+    is NumericCondition.I64Eqz -> (operand as? FusedOperand.I64Const)?.const?.let { it == 0L }
+    is NumericCondition.I32Eq -> i32Condition(left, right) { a, b -> a == b }
+    is NumericCondition.I32Ne -> i32Condition(left, right) { a, b -> a != b }
+    is NumericCondition.I32LtS -> i32Condition(left, right) { a, b -> a < b }
+    is NumericCondition.I32LtU -> i32Condition(left, right) { a, b -> a.toUInt() < b.toUInt() }
+    is NumericCondition.I32GtS -> i32Condition(left, right) { a, b -> a > b }
+    is NumericCondition.I32GtU -> i32Condition(left, right) { a, b -> a.toUInt() > b.toUInt() }
+    is NumericCondition.I32LeS -> i32Condition(left, right) { a, b -> a <= b }
+    is NumericCondition.I32LeU -> i32Condition(left, right) { a, b -> a.toUInt() <= b.toUInt() }
+    is NumericCondition.I32GeS -> i32Condition(left, right) { a, b -> a >= b }
+    is NumericCondition.I32GeU -> i32Condition(left, right) { a, b -> a.toUInt() >= b.toUInt() }
+    is NumericCondition.I64Eq -> i64Condition(left, right) { a, b -> a == b }
+    is NumericCondition.I64Ne -> i64Condition(left, right) { a, b -> a != b }
+    is NumericCondition.I64LtS -> i64Condition(left, right) { a, b -> a < b }
+    is NumericCondition.I64LtU -> i64Condition(left, right) { a, b -> a.toULong() < b.toULong() }
+    is NumericCondition.I64GtS -> i64Condition(left, right) { a, b -> a > b }
+    is NumericCondition.I64GtU -> i64Condition(left, right) { a, b -> a.toULong() > b.toULong() }
+    is NumericCondition.I64LeS -> i64Condition(left, right) { a, b -> a <= b }
+    is NumericCondition.I64LeU -> i64Condition(left, right) { a, b -> a.toULong() <= b.toULong() }
+    is NumericCondition.I64GeS -> i64Condition(left, right) { a, b -> a >= b }
+    is NumericCondition.I64GeU -> i64Condition(left, right) { a, b -> a.toULong() >= b.toULong() }
+    is NumericCondition.F32Eq -> f32Condition(left, right) { a, b -> a == b }
+    is NumericCondition.F32Ne -> f32Condition(left, right) { a, b -> a != b }
+    is NumericCondition.F32Lt -> f32Condition(left, right) { a, b -> a < b }
+    is NumericCondition.F32Gt -> f32Condition(left, right) { a, b -> a > b }
+    is NumericCondition.F32Le -> f32Condition(left, right) { a, b -> a <= b }
+    is NumericCondition.F32Ge -> f32Condition(left, right) { a, b -> a >= b }
+    is NumericCondition.F64Eq -> f64Condition(left, right) { a, b -> a == b }
+    is NumericCondition.F64Ne -> f64Condition(left, right) { a, b -> a != b }
+    is NumericCondition.F64Lt -> f64Condition(left, right) { a, b -> a < b }
+    is NumericCondition.F64Gt -> f64Condition(left, right) { a, b -> a > b }
+    is NumericCondition.F64Le -> f64Condition(left, right) { a, b -> a <= b }
+    is NumericCondition.F64Ge -> f64Condition(left, right) { a, b -> a >= b }
+}
+
+private inline fun i32Condition(left: FusedOperand, right: FusedOperand, condition: (Int, Int) -> Boolean): Boolean? {
+    val leftValue = (left as? FusedOperand.I32Const)?.const ?: return null
+    val rightValue = (right as? FusedOperand.I32Const)?.const ?: return null
+    return condition(leftValue, rightValue)
+}
+
+private inline fun i64Condition(left: FusedOperand, right: FusedOperand, condition: (Long, Long) -> Boolean): Boolean? {
+    val leftValue = (left as? FusedOperand.I64Const)?.const ?: return null
+    val rightValue = (right as? FusedOperand.I64Const)?.const ?: return null
+    return condition(leftValue, rightValue)
+}
+
+private inline fun f32Condition(left: FusedOperand, right: FusedOperand, condition: (Float, Float) -> Boolean): Boolean? {
+    val leftValue = (left as? FusedOperand.F32Const)?.const ?: return null
+    val rightValue = (right as? FusedOperand.F32Const)?.const ?: return null
+    return condition(leftValue, rightValue)
+}
+
+private inline fun f64Condition(left: FusedOperand, right: FusedOperand, condition: (Double, Double) -> Boolean): Boolean? {
+    val leftValue = (left as? FusedOperand.F64Const)?.const ?: return null
+    val rightValue = (right as? FusedOperand.F64Const)?.const ?: return null
+    return condition(leftValue, rightValue)
 }
 
 internal fun FunctionCompilationContext.emitBranchTable(
@@ -224,14 +361,10 @@ internal fun FunctionCompilationContext.emitBranchTable(
 ) {
     val selectorKind = selector.sourceKind
     val selectorBits = selector.sourceBits
+    check(selectorKind != OperandSourceKind.I32Immediate)
     program.append(targetIndices) { targetIps ->
-        if (selectorKind == OperandSourceKind.I32Immediate) {
-            val instruction = AdminInstruction.JumpTableI(selectorBits.toInt(), targetIps)
-            dispatch(instruction, ::JumpDispatcher)
-        } else {
-            val instruction = AdminInstruction.JumpTableS(selectorBits.toInt(), targetIps)
-            dispatch(instruction, ::JumpDispatcher)
-        }
+        val instruction = AdminInstruction.JumpTableS(selectorBits.toInt(), targetIps)
+        dispatch(instruction, ::JumpDispatcher)
     }
 }
 

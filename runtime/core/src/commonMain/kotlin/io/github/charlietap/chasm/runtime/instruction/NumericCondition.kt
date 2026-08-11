@@ -4,6 +4,8 @@ sealed interface NumericCondition {
 
     data class I32Eqz(val operand: FusedOperand) : NumericCondition
 
+    data class I32And(val left: FusedOperand, val right: FusedOperand) : NumericCondition
+
     data class I64Eqz(val operand: FusedOperand) : NumericCondition
 
     data class I32Eq(val left: FusedOperand, val right: FusedOperand) : NumericCondition

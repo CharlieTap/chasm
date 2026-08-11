@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
+import io.github.charlietap.chasm.executor.invoker.function.copyOperands
 import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
+import io.github.charlietap.chasm.runtime.instruction.CopyOperand
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 
@@ -11,6 +13,42 @@ fun JumpDispatcher(
     instruction: AdminInstruction.Jump,
 ): DispatchableInstruction = DispatchableInstruction { _, _, _, _, _ ->
     instruction.targetIp
+}
+
+fun JumpDispatcher(
+    instruction: AdminInstruction.JumpCopies,
+): DispatchableInstruction {
+    val destinationSlotBase = instruction.destinationSlotBase
+    val targetIp = instruction.targetIp
+    val operands = instruction.operands
+    val operand = operands.operands.singleOrNull()
+    return when (operand) {
+        is CopyOperand.Immediate -> {
+            val value = operand.value
+            DispatchableInstruction { vstack, _, _, _, _ ->
+                vstack.setFrameSlot(destinationSlotBase, value)
+                targetIp
+            }
+        }
+        is CopyOperand.Slot -> {
+            val sourceSlot = operand.slot
+            DispatchableInstruction { vstack, _, _, _, _ ->
+                vstack.setFrameSlot(destinationSlotBase, vstack.getFrameSlot(sourceSlot))
+                targetIp
+            }
+        }
+        null -> DispatchableInstruction { vstack, _, _, _, _ ->
+            val framePointer = vstack.framePointer
+            copyOperands(
+                vstack = vstack,
+                currentFramePointer = framePointer,
+                destinationFramePointer = framePointer + destinationSlotBase,
+                operands = operands.operands,
+                order = operands.order,
+            )
+            targetIp
+        }
+    }
 }
 
 fun JumpDispatcher(
@@ -94,6 +132,7 @@ fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfCondition,
 ): DispatchableInstruction = when (val condition = instruction.condition) {
     is NumericCondition.I32Eqz -> I32ConditionDispatcher(condition.operand, instruction.targetIp) { operand, targetIp, nextIp -> if (operand == 0) targetIp else nextIp }
+    is NumericCondition.I32And -> I32ConditionDispatcher(condition.left, condition.right, instruction.targetIp) { left, right, targetIp, nextIp -> if ((left and right) != 0) targetIp else nextIp }
     is NumericCondition.I64Eqz -> I64ConditionDispatcher(condition.operand, instruction.targetIp) { operand, targetIp, nextIp -> if (operand == 0L) targetIp else nextIp }
     is NumericCondition.I32Eq -> I32ConditionDispatcher(condition.left, condition.right, instruction.targetIp) { left, right, targetIp, nextIp -> if (left == right) targetIp else nextIp }
     is NumericCondition.I32Ne -> I32ConditionDispatcher(condition.left, condition.right, instruction.targetIp) { left, right, targetIp, nextIp -> if (left != right) targetIp else nextIp }
@@ -144,6 +183,7 @@ private fun JumpConditionMismatchDispatcher(
     targetIp: Int,
 ): DispatchableInstruction = when (condition) {
     is NumericCondition.I32Eqz -> I32ConditionDispatcher(condition.operand, targetIp) { operand, branchIp, nextIp -> if (operand != 0) branchIp else nextIp }
+    is NumericCondition.I32And -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if ((left and right) == 0) branchIp else nextIp }
     is NumericCondition.I64Eqz -> I64ConditionDispatcher(condition.operand, targetIp) { operand, branchIp, nextIp -> if (operand != 0L) branchIp else nextIp }
     is NumericCondition.I32Eq -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left != right) branchIp else nextIp }
     is NumericCondition.I32Ne -> I32ConditionDispatcher(condition.left, condition.right, targetIp) { left, right, branchIp, nextIp -> if (left == right) branchIp else nextIp }

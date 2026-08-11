@@ -9,8 +9,21 @@ import io.github.charlietap.chasm.compiler.operand.f64Immediate
 import io.github.charlietap.chasm.compiler.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
+import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32BitFieldExtractDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.NumericSuperInstructionDispatcher
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
+
+internal fun FunctionCompilationContext.emitI32BitFieldExtract(
+    operandSlot: Int,
+    shift: Int,
+    mask: Int,
+    destinationSlot: Int,
+) {
+    emit(
+        NumericSuperInstruction.I32BitFieldExtractS(operandSlot, shift, mask, destinationSlot),
+        ::I32BitFieldExtractDispatcher,
+    )
+}
 
 internal fun FunctionCompilationContext.emitNumericInstruction(
     opcode: NumericOpcode,

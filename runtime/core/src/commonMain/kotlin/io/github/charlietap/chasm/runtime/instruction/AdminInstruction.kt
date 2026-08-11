@@ -19,6 +19,12 @@ sealed interface AdminInstruction : LinkedInstruction {
 
     data class Jump(val targetIp: Int) : AdminInstruction
 
+    data class JumpCopies(
+        val operands: OperandCopyPlan,
+        val destinationSlotBase: Int,
+        val targetIp: Int,
+    ) : AdminInstruction
+
     data class JumpIfI(
         val operand: Long,
         val targetIp: Int,

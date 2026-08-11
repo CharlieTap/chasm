@@ -16,13 +16,25 @@ import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.bino
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.I32ShrUExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.I32SubExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.I32XorExecutor
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 
 fun I32AddDispatcher(instruction: NumericSuperInstruction.I32AddIi) = dispatchInstruction(instruction, ::I32AddExecutor)
 
 fun I32AddDispatcher(instruction: NumericSuperInstruction.I32AddIs) = dispatchInstruction(instruction, ::I32AddExecutor)
 
-fun I32AddDispatcher(instruction: NumericSuperInstruction.I32AddSi) = dispatchInstruction(instruction, ::I32AddExecutor)
+fun I32AddDispatcher(
+    instruction: NumericSuperInstruction.I32AddSi,
+): DispatchableInstruction {
+    val leftSlot = instruction.leftSlot
+    val right = instruction.right
+    val destinationSlot = instruction.destinationSlot
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        val value = vstack.getFrameSlot(leftSlot).toInt() + right
+        vstack.setFrameSlot(destinationSlot, value.toLong())
+        nextIp
+    }
+}
 
 fun I32AddDispatcher(instruction: NumericSuperInstruction.I32AddSs) = dispatchInstruction(instruction, ::I32AddExecutor)
 
@@ -102,7 +114,18 @@ fun I32ShlDispatcher(instruction: NumericSuperInstruction.I32ShlIi) = dispatchIn
 
 fun I32ShlDispatcher(instruction: NumericSuperInstruction.I32ShlIs) = dispatchInstruction(instruction, ::I32ShlExecutor)
 
-fun I32ShlDispatcher(instruction: NumericSuperInstruction.I32ShlSi) = dispatchInstruction(instruction, ::I32ShlExecutor)
+fun I32ShlDispatcher(
+    instruction: NumericSuperInstruction.I32ShlSi,
+): DispatchableInstruction {
+    val leftSlot = instruction.leftSlot
+    val right = instruction.right
+    val destinationSlot = instruction.destinationSlot
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        val value = vstack.getFrameSlot(leftSlot).toInt() shl right
+        vstack.setFrameSlot(destinationSlot, value.toLong())
+        nextIp
+    }
+}
 
 fun I32ShlDispatcher(instruction: NumericSuperInstruction.I32ShlSs) = dispatchInstruction(instruction, ::I32ShlExecutor)
 
@@ -110,7 +133,18 @@ fun I32ShrSDispatcher(instruction: NumericSuperInstruction.I32ShrSIi) = dispatch
 
 fun I32ShrSDispatcher(instruction: NumericSuperInstruction.I32ShrSIs) = dispatchInstruction(instruction, ::I32ShrSExecutor)
 
-fun I32ShrSDispatcher(instruction: NumericSuperInstruction.I32ShrSSi) = dispatchInstruction(instruction, ::I32ShrSExecutor)
+fun I32ShrSDispatcher(
+    instruction: NumericSuperInstruction.I32ShrSSi,
+): DispatchableInstruction {
+    val leftSlot = instruction.leftSlot
+    val right = instruction.right
+    val destinationSlot = instruction.destinationSlot
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        val value = vstack.getFrameSlot(leftSlot).toInt() shr right
+        vstack.setFrameSlot(destinationSlot, value.toLong())
+        nextIp
+    }
+}
 
 fun I32ShrSDispatcher(instruction: NumericSuperInstruction.I32ShrSSs) = dispatchInstruction(instruction, ::I32ShrSExecutor)
 
@@ -118,7 +152,18 @@ fun I32ShrUDispatcher(instruction: NumericSuperInstruction.I32ShrUIi) = dispatch
 
 fun I32ShrUDispatcher(instruction: NumericSuperInstruction.I32ShrUIs) = dispatchInstruction(instruction, ::I32ShrUExecutor)
 
-fun I32ShrUDispatcher(instruction: NumericSuperInstruction.I32ShrUSi) = dispatchInstruction(instruction, ::I32ShrUExecutor)
+fun I32ShrUDispatcher(
+    instruction: NumericSuperInstruction.I32ShrUSi,
+): DispatchableInstruction {
+    val leftSlot = instruction.leftSlot
+    val right = instruction.right
+    val destinationSlot = instruction.destinationSlot
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        val value = vstack.getFrameSlot(leftSlot).toInt() ushr right
+        vstack.setFrameSlot(destinationSlot, value.toLong())
+        nextIp
+    }
+}
 
 fun I32ShrUDispatcher(instruction: NumericSuperInstruction.I32ShrUSs) = dispatchInstruction(instruction, ::I32ShrUExecutor)
 

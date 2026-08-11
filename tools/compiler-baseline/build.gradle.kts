@@ -69,6 +69,7 @@ fun registerCompilerBaseline(
         group = "verification"
         description = "Check the $displayName compiler baseline"
         dependsOn(generate)
+        mustRunAfter(update)
         baselineFile.set(baseline)
         generatedFile.set(generated)
     }

@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.CopyOperand
 import io.github.charlietap.chasm.runtime.stack.NO_RESULT_SLOT_BASE
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -117,8 +117,8 @@ class WasmFunctionCallTest {
             context = executionContext(cstack, vstack, store, module),
             instance = function,
             operands = listOf(
-                ControlSuperInstruction.CallOperand.Slot(0),
-                ControlSuperInstruction.CallOperand.Slot(1),
+                CopyOperand.Slot(0),
+                CopyOperand.Slot(1),
             ),
         )
 
@@ -152,8 +152,8 @@ class WasmFunctionCallTest {
             context = executionContext(cstack, vstack, store, module),
             instance = function,
             operands = listOf(
-                ControlSuperInstruction.CallOperand.Slot(0),
-                ControlSuperInstruction.CallOperand.Slot(1),
+                CopyOperand.Slot(0),
+                CopyOperand.Slot(1),
             ),
         )
 
@@ -187,8 +187,8 @@ class WasmFunctionCallTest {
             context = executionContext(cstack, vstack, store, module),
             instance = function,
             operands = listOf(
-                ControlSuperInstruction.CallOperand.Slot(0),
-                ControlSuperInstruction.CallOperand.Slot(1),
+                CopyOperand.Slot(0),
+                CopyOperand.Slot(1),
             ),
         )
 
@@ -222,8 +222,8 @@ class WasmFunctionCallTest {
             context = executionContext(cstack, vstack, store, module),
             instance = function,
             operands = listOf(
-                ControlSuperInstruction.CallOperand.Slot(1),
-                ControlSuperInstruction.CallOperand.Slot(0),
+                CopyOperand.Slot(1),
+                CopyOperand.Slot(0),
             ),
         )
 

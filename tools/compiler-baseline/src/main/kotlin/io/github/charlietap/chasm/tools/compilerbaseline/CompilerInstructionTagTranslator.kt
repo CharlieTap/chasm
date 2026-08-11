@@ -53,6 +53,7 @@ class CompilerInstructionTagTranslator {
         is AdminInstruction.CopySlot -> "admin.copy_slot"
         is AdminInstruction.CopySlots -> "admin.copy_slots"
         is AdminInstruction.Jump -> "admin.jump"
+        is AdminInstruction.JumpCopies -> "admin.jump_copies"
         is AdminInstruction.JumpIfI -> "admin.jump_if.i"
         is AdminInstruction.JumpIfS -> "admin.jump_if.s"
         is AdminInstruction.JumpIfV -> "admin.jump_if.v"
@@ -114,6 +115,7 @@ class CompilerInstructionTagTranslator {
         is ControlSuperInstruction.ReturnCallIndirectI -> "control.return_call_indirect.i"
         is ControlSuperInstruction.ReturnCallIndirectS -> "control.return_call_indirect.s"
         is ControlSuperInstruction.ReturnCallRefS -> "control.return_call_ref"
+        is ControlSuperInstruction.FunctionReturn -> "control.return"
         is ControlSuperInstruction.Throw -> "control.throw"
         is ControlSuperInstruction.ThrowRefS -> "control.throw_ref"
     }
@@ -139,6 +141,7 @@ class CompilerInstructionTagTranslator {
     private fun numericCondition(instruction: NumericCondition, polarity: String): String {
         val (condition, operands) = when (instruction) {
             is NumericCondition.I32Eqz -> "i32.eqz" to listOf(instruction.operand)
+            is NumericCondition.I32And -> "i32.and" to listOf(instruction.left, instruction.right)
             is NumericCondition.I64Eqz -> "i64.eqz" to listOf(instruction.operand)
             is NumericCondition.I32Eq -> "i32.eq" to listOf(instruction.left, instruction.right)
             is NumericCondition.I32Ne -> "i32.ne" to listOf(instruction.left, instruction.right)
@@ -240,6 +243,7 @@ private val parametricOperations = listOf(
 
 private val numericOperations = listOf(
     operation("I32Const", "i32.const", 0, 1),
+    operation("I32BitFieldExtract", "i32.bit_field_extract", 1),
     operation("I64Const", "i64.const", 0, 1),
     operation("F32Const", "f32.const", 0, 1),
     operation("F64Const", "f64.const", 0, 1),

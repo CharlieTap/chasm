@@ -7,6 +7,13 @@ sealed interface NumericSuperInstruction : LinkedInstruction {
         val destinationSlot: Int,
     ) : NumericSuperInstruction
 
+    data class I32BitFieldExtractS(
+        val operandSlot: Int,
+        val shift: Int,
+        val mask: Int,
+        val destinationSlot: Int,
+    ) : NumericSuperInstruction
+
     data class I64ConstS(
         val value: Long,
         val destinationSlot: Int,

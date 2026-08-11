@@ -101,6 +101,12 @@ internal fun FunctionCompilationContext.popNumericCondition(
     }
 }
 
+internal fun FunctionCompilationContext.popI32AndCondition(): NumericCondition {
+    val right = pop().toFusedOperand()
+    val left = pop().toFusedOperand()
+    return NumericCondition.I32And(left, right)
+}
+
 private fun OperandSource.toFusedOperand(): FusedOperand = when (sourceKind) {
     OperandSourceKind.I32Immediate -> FusedOperand.I32Const(i32Immediate)
     OperandSourceKind.I64Immediate -> FusedOperand.I64Const(i64Immediate)

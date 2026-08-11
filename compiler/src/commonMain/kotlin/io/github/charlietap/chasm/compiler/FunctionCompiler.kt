@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
+import io.github.charlietap.chasm.ast.instruction.NumericOpcode
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
@@ -38,12 +39,10 @@ import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramBuilder
 import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.default
 import io.github.charlietap.chasm.runtime.function.Expression
-import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.type.ValueType
 import kotlin.jvm.JvmInline
@@ -55,7 +54,7 @@ internal fun FunctionCompiler(
     program: Program,
 ): Result<RuntimeFunction, ModuleTrapError> {
     val baseIp = program.size
-    val result: Result<RuntimeFunction, ModuleTrapError> = run {
+    val result: Result<RuntimeFunction, ModuleTrapError> = run compile@{
         val functionType = context.types.functionType(function.typeIndex)
         val layout = FunctionFrameLayout(
             functionType = functionType,
@@ -73,32 +72,7 @@ internal fun FunctionCompiler(
         while (index < function.body.instructions.size) {
             val instruction = function.body.instructions[index]
             val nextInstruction = function.body.instructions.getOrNull(index + 1)
-            val fusedCondition = instruction as? NumericInstruction.Operator
-            val aggregateAccessChain = if (
-                state.reachable && nextInstruction is AggregateInstruction.StructGet
-            ) {
-                context.containsGcInstructions = true
-                compileAggregateAccessChain(
-                    state = state,
-                    first = instruction,
-                    second = nextInstruction,
-                    nextInstruction = function.body.instructions.getOrNull(index + 2),
-                )
-            } else {
-                null
-            }
-            val consumedInstructionCount = aggregateAccessChain ?: if (
-                state.reachable &&
-                fusedCondition?.opcode?.isCondition == true &&
-                (nextInstruction is ControlInstruction.BrIf || nextInstruction is ControlInstruction.If)
-            ) {
-                val condition = state.popNumericCondition(fusedCondition)
-                when (nextInstruction) {
-                    is ControlInstruction.BrIf -> compileBranchIfCondition(state, nextInstruction, condition)
-                    is ControlInstruction.If -> compileIfCondition(state, nextInstruction, condition)
-                }
-                2
-            } else {
+            val consumedInstructionCount = compileInstructionChain(context, state, function, index) ?: run {
                 val consumesNextInstruction = if (!state.reachable && instruction !is ControlInstruction) {
                     false
                 } else {
@@ -206,11 +180,10 @@ internal fun FunctionCompiler(
                             }
                         }
                         is ControlInstruction -> {
-                            compileControlInstruction(state, instruction)
-                            false
+                            compileControlInstruction(state, instruction, nextInstruction)
                         }
-                        is AtomicMemoryInstruction -> return@run Err(InstantiationError.UnsupportedThreadsModule)
-                        is VectorInstruction -> return@run Err(InstantiationError.UnsupportedSIMDModule)
+                        is AtomicMemoryInstruction -> return@compile Err(InstantiationError.UnsupportedThreadsModule)
+                        is VectorInstruction -> return@compile Err(InstantiationError.UnsupportedSIMDModule)
                     }
                 }
                 if (consumesNextInstruction) 2 else 1
@@ -221,7 +194,6 @@ internal fun FunctionCompiler(
         }
 
         finishFunctionControl(state)
-        state.emit(AdminInstruction.EndFunction, ::EndFunctionDispatcher)
 
         state.emitDeferredBranchPaths()
         state.program.finish()
@@ -242,6 +214,79 @@ internal fun FunctionCompiler(
         program.truncate(baseIp)
     }
     return result
+}
+
+private fun compileInstructionChain(
+    context: CompilerContext,
+    state: FunctionCompilationContext,
+    function: Function,
+    index: Int,
+): Int? {
+    if (!state.reachable) return null
+
+    val instructions = function.body.instructions
+    val instruction = instructions[index]
+    val nextInstruction = instructions.getOrNull(index + 1)
+    if (
+        instruction is NumericInstruction.Operator &&
+        nextInstruction is NumericInstruction.I32Const &&
+        instructions.getOrNull(index + 2) is NumericInstruction.Operator
+    ) {
+        compileNumericChain(
+            state = state,
+            first = instruction,
+            immediate = nextInstruction,
+            second = instructions[index + 2] as NumericInstruction.Operator,
+            nextInstruction = instructions.getOrNull(index + 3),
+        )?.let { return it }
+    }
+
+    if (instruction is ReferenceInstruction.RefFunc) {
+        when (nextInstruction) {
+            is ControlInstruction.CallRef -> {
+                val consumesNextInstruction = compileKnownReferenceCall(
+                    state,
+                    instruction,
+                    nextInstruction,
+                    instructions.getOrNull(index + 2),
+                )
+                return if (consumesNextInstruction) 3 else 2
+            }
+            is ControlInstruction.ReturnCallRef -> {
+                compileKnownReferenceReturnCall(state, instruction, nextInstruction)
+                return 2
+            }
+            else -> Unit
+        }
+    }
+
+    if (nextInstruction is AggregateInstruction.StructGet) {
+        context.containsGcInstructions = true
+        compileAggregateAccessChain(
+            state = state,
+            first = instruction,
+            second = nextInstruction,
+            nextInstruction = instructions.getOrNull(index + 2),
+        )?.let { return it }
+    }
+
+    val conditionInstruction = instruction as? NumericInstruction.Operator ?: return null
+    if (
+        (conditionInstruction.opcode.isCondition || conditionInstruction.opcode == NumericOpcode.I32And) &&
+        (nextInstruction is ControlInstruction.BrIf || nextInstruction is ControlInstruction.If)
+    ) {
+        val condition = if (conditionInstruction.opcode == NumericOpcode.I32And) {
+            state.popI32AndCondition()
+        } else {
+            state.popNumericCondition(conditionInstruction)
+        }
+        when (nextInstruction) {
+            is ControlInstruction.BrIf -> compileBranchIfCondition(state, nextInstruction, condition)
+            is ControlInstruction.If -> compileIfCondition(state, nextInstruction, condition)
+        }
+        return 2
+    }
+    return null
 }
 
 @JvmInline

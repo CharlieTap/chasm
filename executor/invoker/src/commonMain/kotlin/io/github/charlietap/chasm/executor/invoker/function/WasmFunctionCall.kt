@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.function
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
 import io.github.charlietap.chasm.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -59,6 +60,7 @@ internal fun WasmFunctionCall(
     store: Store,
     context: ExecutionContext,
     instance: FunctionInstance.WasmFunction,
+    operands: OperandCopyPlan,
     resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
@@ -66,6 +68,7 @@ internal fun WasmFunctionCall(
     vstack,
     cstack,
     instance.callPlan,
+    operands,
     resultSlotBase,
     callFrameSlot,
     returnIp,
@@ -75,6 +78,7 @@ internal fun WasmFunctionCall(
     vstack: ValueStack,
     cstack: ControlStack,
     plan: WasmFunctionCallPlan,
+    operands: OperandCopyPlan,
     resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
@@ -84,6 +88,13 @@ internal fun WasmFunctionCall(
     val calleeFramePointer = callerFramePointer + callFrameSlot
 
     vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
+    copyOperands(
+        vstack = vstack,
+        currentFramePointer = callerFramePointer,
+        destinationFramePointer = calleeFramePointer,
+        operands = operands.operands,
+        order = operands.order,
+    )
     plan.locals.forEachIndexed { index, value ->
         vstack.setFrameSlot(calleeFramePointer, plan.interfaceSlots + index, value)
     }
@@ -109,6 +120,7 @@ internal fun WasmFunctionCallWithoutLocals(
     vstack: ValueStack,
     cstack: ControlStack,
     plan: WasmFunctionCallPlan,
+    operands: OperandCopyPlan,
     resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
@@ -118,6 +130,13 @@ internal fun WasmFunctionCallWithoutLocals(
     val calleeFramePointer = callerFramePointer + callFrameSlot
 
     vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
+    copyOperands(
+        vstack = vstack,
+        currentFramePointer = callerFramePointer,
+        destinationFramePointer = calleeFramePointer,
+        operands = operands.operands,
+        order = operands.order,
+    )
     cstack.push(
         ActivationFrame(
             arity = plan.results,

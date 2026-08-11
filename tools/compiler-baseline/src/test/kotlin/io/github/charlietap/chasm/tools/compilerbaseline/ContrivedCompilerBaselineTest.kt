@@ -15,11 +15,11 @@ class ContrivedCompilerBaselineTest {
         val functions = module.functions.associateBy(CompilerBaselineFunction::name)
         val instructions = module.functions.flatMap(CompilerBaselineFunction::instructions).toSet()
 
-        module.functions
+        val loweredNamedFunctions = module.functions
             .filter { function -> function.name.substringBefore('.') in tagNamespaces }
-            .forEach { function ->
-                assertTrue(function.name in function.instructions, "${function.name} did not produce its named tag")
-            }
+            .filterNot { function -> function.name in function.instructions }
+            .mapTo(mutableSetOf(), CompilerBaselineFunction::name)
+        assertEquals(expectedLoweredNamedFunctions, loweredNamedFunctions)
 
         assertEquals(
             expectedConditionTags,
@@ -27,8 +27,8 @@ class ContrivedCompilerBaselineTest {
                 tag.startsWith("admin.jump_condition.")
             },
         )
-        assertContainsShapes(instructions, "numeric.i32.add", 2)
-        assertContainsShapes(instructions, "parametric.select", 3)
+        assertTrue(setOf("is", "si", "ss").all { shape -> "numeric.i32.add.$shape" in instructions })
+        assertTrue(setOf("sii", "sis", "ssi", "sss").all { shape -> "parametric.select.$shape" in instructions })
         assertContainsShapes(instructions, "memory.i32.load", 1)
         assertContainsShapes(instructions, "memory.i32.store", 2)
         assertContainsShapes(instructions, "memory.copy", 3)
@@ -44,7 +44,7 @@ class ContrivedCompilerBaselineTest {
         assertTrue("admin.pause_if" in instructions)
 
         assertEquals(
-            listOf("numeric.i32.add.ss", "admin.end_function"),
+            listOf("numeric.i32.add.ss", "control.return"),
             functions.getValue("lowering.producer_to_local").instructions,
         )
         assertFalse(
@@ -53,7 +53,7 @@ class ContrivedCompilerBaselineTest {
             },
         )
         assertEquals(
-            listOf("admin.end_function"),
+            listOf("control.return"),
             functions.getValue("lowering.identity_local_write").instructions,
         )
         assertFalse(
@@ -61,10 +61,7 @@ class ContrivedCompilerBaselineTest {
                 "reinterpret" in tag
             },
         )
-        assertEquals(
-            "admin.copy_slot",
-            functions.getValue("lowering.indirect_target_staging").instructions.first(),
-        )
+        assertEquals("control.call_indirect.s", functions.getValue("lowering.indirect_target_staging").instructions.first())
 
         val takenOnlyBranch = functions.getValue("lowering.taken_only_branch_copy").instructions
         assertTrue(takenOnlyBranch.indexOf("admin.end_function") < takenOnlyBranch.lastIndex)
@@ -109,21 +106,15 @@ private val tagNamespaces = setOf(
 )
 
 private val controlTags = setOf(
-    "admin.jump_if.i",
     "admin.jump_if.s",
-    "admin.jump_if_zero.i",
     "admin.jump_if_zero.s",
-    "admin.jump_if_copy.i",
-    "admin.jump_if_copy.s",
     "control.call.wasm.locals",
     "control.call.wasm.no_locals",
     "control.call_indirect.i",
     "control.call_indirect.s",
-    "control.call_ref",
     "control.return_call.wasm",
     "control.return_call_indirect.i",
     "control.return_call_indirect.s",
-    "control.return_call_ref",
 )
 
 private val aggregateFusionTags = setOf(
@@ -149,10 +140,30 @@ private val numericConditions = buildList {
 private val expectedConditionTags: Set<String> = buildSet {
     numericConditions.forEach { (condition, arity) ->
         add("admin.jump_condition.$condition.${"s".repeat(arity)}.match")
-        add("admin.jump_condition.$condition.${"i".repeat(arity)}.mismatch")
     }
     add("admin.jump_condition.i32.eq.is.match")
     add("admin.jump_condition.i32.eq.si.match")
+}
+
+private val expectedLoweredNamedFunctions: Set<String> = buildSet {
+    add("numeric.i32.add.ii")
+    addAll(
+        listOf(
+            "parametric.select.iii",
+            "parametric.select.iis",
+            "parametric.select.isi",
+            "parametric.select.iss",
+            "admin.jump_if.i",
+            "admin.jump_if_zero.i",
+            "admin.jump_if_copy.i",
+            "admin.jump_if_copy.s",
+            "control.call_ref",
+            "control.return_call_ref",
+        ),
+    )
+    numericConditions.forEach { (condition, arity) ->
+        add("admin.jump_condition.$condition.${"i".repeat(arity)}.mismatch")
+    }
     add("admin.jump_condition.i32.eqz.i.match")
 }
 

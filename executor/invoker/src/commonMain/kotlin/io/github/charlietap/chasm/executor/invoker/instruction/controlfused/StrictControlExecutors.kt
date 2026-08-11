@@ -17,6 +17,8 @@ import io.github.charlietap.chasm.runtime.instance.ExceptionInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.CopyOperand
+import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -38,8 +40,8 @@ internal fun CallExecutor(
         store = store,
         context = context,
         function = instruction.instance,
+        operands = instruction.operands,
         resultSlotBase = instruction.resultSlotBase,
-        callFrameSlot = instruction.callFrameSlot,
     )
     return returnIp
 }
@@ -57,6 +59,7 @@ internal fun CallExecutor(
     store = store,
     context = context,
     elementIndex = instruction.elementIndex,
+    operands = instruction.operands,
     type = instruction.type,
     table = instruction.table,
     resultSlotBase = instruction.resultSlotBase,
@@ -77,6 +80,7 @@ internal fun CallExecutor(
     store = store,
     context = context,
     elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
+    operands = instruction.operands,
     type = instruction.type,
     table = instruction.table,
     resultSlotBase = instruction.resultSlotBase,
@@ -97,6 +101,7 @@ internal fun CallExecutor(
     store = store,
     context = context,
     functionSlot = instruction.functionSlot,
+    operands = instruction.operands,
     resultSlotBase = instruction.resultSlotBase,
     callFrameSlot = instruction.callFrameSlot,
     returnIp = returnIp,
@@ -224,6 +229,7 @@ private fun strictIndirectCall(
     store: Store,
     context: ExecutionContext,
     elementIndex: Int,
+    operands: OperandCopyPlan,
     type: RTT,
     table: TableInstance,
     resultSlotBase: Int,
@@ -237,6 +243,7 @@ private fun strictIndirectCall(
         store = store,
         context = context,
         functionInstance = functionInstance,
+        operands = operands,
         resultSlotBase = resultSlotBase,
         callFrameSlot = callFrameSlot,
         returnIp = returnIp,
@@ -249,6 +256,7 @@ private fun strictReferenceCall(
     store: Store,
     context: ExecutionContext,
     functionSlot: Int,
+    operands: OperandCopyPlan,
     resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
@@ -260,6 +268,7 @@ private fun strictReferenceCall(
         store = store,
         context = context,
         functionInstance = store.function(address),
+        operands = operands,
         resultSlotBase = resultSlotBase,
         callFrameSlot = callFrameSlot,
         returnIp = returnIp,
@@ -272,7 +281,7 @@ private fun strictIndirectReturnCall(
     store: Store,
     context: ExecutionContext,
     elementIndex: Int,
-    operands: List<ControlSuperInstruction.CallOperand>,
+    operands: List<CopyOperand>,
     type: RTT,
     table: TableInstance,
 ): Int {
@@ -293,7 +302,7 @@ private fun strictReferenceReturnCall(
     store: Store,
     context: ExecutionContext,
     functionSlot: Int,
-    operands: List<ControlSuperInstruction.CallOperand>,
+    operands: List<CopyOperand>,
 ): Int {
     val address = vstack.getFrameSlot(functionSlot).toFunctionAddress()
     return strictInvokeReturnFunction(
@@ -327,6 +336,7 @@ private fun strictInvokeFunction(
     store: Store,
     context: ExecutionContext,
     functionInstance: FunctionInstance,
+    operands: OperandCopyPlan,
     resultSlotBase: Int,
     callFrameSlot: Int,
     returnIp: Int,
@@ -338,8 +348,8 @@ private fun strictInvokeFunction(
             store = store,
             context = context,
             function = functionInstance,
+            operands = operands,
             resultSlotBase = resultSlotBase,
-            callFrameSlot = callFrameSlot,
         )
         returnIp
     }
@@ -349,6 +359,7 @@ private fun strictInvokeFunction(
         store = store,
         context = context,
         instance = functionInstance,
+        operands = operands,
         resultSlotBase = resultSlotBase,
         callFrameSlot = callFrameSlot,
         returnIp = returnIp,
@@ -361,7 +372,7 @@ private fun strictInvokeReturnFunction(
     store: Store,
     context: ExecutionContext,
     functionInstance: FunctionInstance,
-    operands: List<ControlSuperInstruction.CallOperand>,
+    operands: List<CopyOperand>,
 ): Int = when (functionInstance) {
     is FunctionInstance.HostFunction -> ReturnHostFunctionCall(
         vstack = vstack,

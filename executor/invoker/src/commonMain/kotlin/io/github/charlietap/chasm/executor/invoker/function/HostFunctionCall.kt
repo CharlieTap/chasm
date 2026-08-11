@@ -8,7 +8,8 @@ import io.github.charlietap.chasm.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.HostFunctionContext
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.CopyOperand
+import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.NO_RESULT_SLOT_BASE
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -85,6 +86,38 @@ internal fun HostFunctionCall(
     }
 }
 
+internal fun HostFunctionCall(
+    vstack: ValueStack,
+    cstack: ControlStack,
+    store: Store,
+    context: ExecutionContext,
+    function: FunctionInstance.HostFunction,
+    operands: OperandCopyPlan,
+    resultSlotBase: Int,
+) {
+    val frame = cstack.peekFrame()
+
+    val functionContext = HostFunctionContext(
+        context.config,
+        store,
+        frame.instance,
+    )
+    val results = try {
+        val framePointer = vstack.framePointer
+        val hostParams = function.functionType.params.types.mapIndexed { idx, expected ->
+            val value = operandValue(vstack, framePointer, operands.operands[idx])
+            value.toExecutionValue(expected)
+        }
+        function.function.invoke(functionContext, hostParams)
+    } catch (e: HostFunctionException) {
+        throw InvocationException(InvocationError.HostFunctionError(e.reason))
+    }
+
+    results.forEachIndexed { index, result ->
+        vstack.setFrameSlot(resultSlotBase + index, result.toLongFromBoxed())
+    }
+}
+
 internal fun ReturnHostFunctionCall(
     vstack: ValueStack,
     cstack: ControlStack,
@@ -129,13 +162,13 @@ internal fun ReturnHostFunctionCall(
     store: Store,
     context: ExecutionContext,
     function: FunctionInstance.HostFunction,
-    operands: List<ControlSuperInstruction.CallOperand>,
+    operands: List<CopyOperand>,
 ): Int {
     val currentFramePointer = vstack.framePointer
     val operandValues = LongArray(operands.size) { index ->
         when (val operand = operands[index]) {
-            is ControlSuperInstruction.CallOperand.Immediate -> operand.value
-            is ControlSuperInstruction.CallOperand.Slot -> vstack.getFrameSlot(currentFramePointer, operand.slot)
+            is CopyOperand.Immediate -> operand.value
+            is CopyOperand.Slot -> vstack.getFrameSlot(currentFramePointer, operand.slot)
         }
     }
 

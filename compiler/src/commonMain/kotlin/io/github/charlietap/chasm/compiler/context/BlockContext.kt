@@ -23,6 +23,8 @@ internal class BlockContext(
     var entryFrameHeight = 0
     var inElse = false
     var thenReachable = false
+    var thenReachableFromCondition = true
+    var elseReachableFromCondition = true
 
     fun reset(
         kind: BlockKind,
@@ -54,6 +56,8 @@ internal class BlockContext(
         entryFrameHeight = 0
         inElse = false
         thenReachable = false
+        thenReachableFromCondition = true
+        elseReachableFromCondition = true
         return this
     }
 

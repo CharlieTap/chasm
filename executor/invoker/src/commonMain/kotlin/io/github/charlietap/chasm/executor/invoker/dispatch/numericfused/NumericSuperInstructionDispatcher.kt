@@ -164,6 +164,7 @@ fun NumericSuperInstructionDispatcher(
     is NumericSuperInstruction.F64SubSs -> F64SubDispatcher(instruction)
     is NumericSuperInstruction.F64TruncI -> F64TruncDispatcher(instruction)
     is NumericSuperInstruction.F64TruncS -> F64TruncDispatcher(instruction)
+    is NumericSuperInstruction.I32BitFieldExtractS -> I32BitFieldExtractDispatcher(instruction)
     is NumericSuperInstruction.I32AddIi -> I32AddDispatcher(instruction)
     is NumericSuperInstruction.I32AddIs -> I32AddDispatcher(instruction)
     is NumericSuperInstruction.I32AddSi -> I32AddDispatcher(instruction)

@@ -101,6 +101,16 @@ internal class FunctionCompilationContext(
         push(type, reservedSlot, OperandSourceKind.F64Immediate, value.toRawBits())
     }
 
+    fun push(operand: Operand) {
+        push(
+            type = operand.type,
+            reservedSlot = operand.reservedSlot,
+            sourceKind = operand.sourceKind,
+            sourceBits = operand.sourceBits,
+            sourceLocalIndex = operand.sourceLocalIndex,
+        )
+    }
+
     private fun push(
         type: ValueType?,
         reservedSlot: Int,
