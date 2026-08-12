@@ -1,7 +1,9 @@
 package io.github.charlietap.chasm.validator.validator.type
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
+import com.github.michaelbull.result.getOrElse
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.validator.CoreTypeValidator
@@ -22,11 +24,20 @@ internal inline fun FunctionTypeValidator(
     context: CoreTypeValidationContext,
     type: FunctionType,
     crossinline valueTypeValidator: CoreTypeValidator<ValueType>,
-): Result<Unit, ModuleValidatorError> = binding {
-    type.params.types.forEach { param ->
-        valueTypeValidator(context, param).bind()
+): Result<Unit, ModuleValidatorError> {
+    var index = 0
+    while (index < type.params.types.size) {
+        valueTypeValidator(context, type.params.types[index]).getOrElse { error ->
+            return Err(error)
+        }
+        index++
     }
-    type.results.types.forEach { result ->
-        valueTypeValidator(context, result).bind()
+    index = 0
+    while (index < type.results.types.size) {
+        valueTypeValidator(context, type.results.types[index]).getOrElse { error ->
+            return Err(error)
+        }
+        index++
     }
+    return Ok(Unit)
 }

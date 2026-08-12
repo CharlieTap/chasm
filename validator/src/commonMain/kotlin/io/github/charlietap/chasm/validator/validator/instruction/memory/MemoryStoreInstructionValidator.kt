@@ -1,48 +1,32 @@
 package io.github.charlietap.chasm.validator.validator.instruction.memory
 
+import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.ast.instruction.MemArg
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.type.NumberType
-import io.github.charlietap.chasm.type.ValueType
-import io.github.charlietap.chasm.validator.ModuleValidator
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
-import io.github.charlietap.chasm.validator.ext.pop
-import io.github.charlietap.chasm.validator.ext.popMemoryAddress
-import io.github.charlietap.chasm.validator.validator.index.MemoryIndexValidator
+import io.github.charlietap.chasm.validator.error.getOrThrowValidation
+import io.github.charlietap.chasm.validator.ext.popF32OrThrow
+import io.github.charlietap.chasm.validator.ext.popF64OrThrow
+import io.github.charlietap.chasm.validator.ext.popI32OrThrow
+import io.github.charlietap.chasm.validator.ext.popI64OrThrow
+import io.github.charlietap.chasm.validator.ext.popMemoryAddressOrThrow
+import io.github.charlietap.chasm.validator.ext.size
 import io.github.charlietap.chasm.validator.validator.instruction.MemArgValidator
 
 internal fun MemoryStoreInstructionValidator(
     context: ModuleValidationContext,
     instruction: MemoryInstruction.Store,
-): Result<Unit, ModuleValidatorError> =
-    MemoryStoreInstructionValidator(
-        context = context,
-        instruction = instruction,
-        memArgValidator = ::MemArgValidator,
-        memoryIndexValidator = ::MemoryIndexValidator,
-    )
+): Result<Unit, ModuleValidatorError> {
 
-internal inline fun MemoryStoreInstructionValidator(
-    context: ModuleValidationContext,
-    instruction: MemoryInstruction.Store,
-    crossinline memArgValidator: ModuleValidator<MemArg>,
-    crossinline memoryIndexValidator: ModuleValidator<Index.MemoryIndex>,
-): Result<Unit, ModuleValidatorError> = binding {
+    MemArgValidator(context, instruction.memArg, instruction.memoryIndex, instruction.size(), false).getOrThrowValidation()
 
-    memArgValidator(context, instruction.memArg).bind()
-    memoryIndexValidator(context, instruction.memoryIndex).bind()
-
-    val valueType = when (instruction) {
-        is MemoryInstruction.Store.I32 -> ValueType.Number(NumberType.I32)
-        is MemoryInstruction.Store.I64 -> ValueType.Number(NumberType.I64)
-        is MemoryInstruction.Store.F32 -> ValueType.Number(NumberType.F32)
-        is MemoryInstruction.Store.F64 -> ValueType.Number(NumberType.F64)
+    when (instruction) {
+        is MemoryInstruction.Store.I32 -> context.popI32OrThrow()
+        is MemoryInstruction.Store.I64 -> context.popI64OrThrow()
+        is MemoryInstruction.Store.F32 -> context.popF32OrThrow()
+        is MemoryInstruction.Store.F64 -> context.popF64OrThrow()
     }
-
-    context.pop(valueType).bind()
-    context.popMemoryAddress(instruction.memoryIndex).bind()
+    context.popMemoryAddressOrThrow(instruction.memoryIndex)
+    return Ok(Unit)
 }

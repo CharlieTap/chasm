@@ -9,9 +9,9 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
 import io.github.charlietap.chasm.validator.ext.branchValues
 import io.github.charlietap.chasm.validator.ext.peek
+import io.github.charlietap.chasm.validator.ext.peekValues
 import io.github.charlietap.chasm.validator.ext.popI32
 import io.github.charlietap.chasm.validator.ext.popValues
-import io.github.charlietap.chasm.validator.ext.pushValues
 import io.github.charlietap.chasm.validator.ext.unreachable
 
 internal fun BreakTableInstructionValidator(
@@ -36,8 +36,7 @@ internal fun BreakTableInstructionValidator(
             Err(TypeValidatorError.TypeMismatch).bind<Unit>()
         }
 
-        val results = context.popValues(outputs.types).bind()
-        context.pushValues(results.asReversed())
+        context.peekValues(outputs.types).bind()
     }
 
     context.popValues(defaultOutputs.types).bind()

@@ -1,10 +1,13 @@
 package io.github.charlietap.chasm.validator
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
 import io.github.charlietap.chasm.validator.context.scope.ModuleValidationScope
+import io.github.charlietap.chasm.validator.error.ModuleValidationException
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.validator.module.ModuleValidator
 
@@ -26,7 +29,11 @@ internal inline fun WasmModuleValidator(
     crossinline moduleValidator: ModuleValidator<Module>,
 ): Result<Module, ModuleValidatorError> {
     val context = ModuleValidationContext(config, module)
-    return WasmModuleValidator(context, config, module, moduleValidator)
+    return try {
+        moduleValidator(context, module).map { module }
+    } catch (exception: ModuleValidationException) {
+        Err(exception.error)
+    }
 }
 
 internal inline fun WasmModuleValidator(
@@ -35,5 +42,9 @@ internal inline fun WasmModuleValidator(
     module: Module,
     crossinline moduleValidator: ModuleValidator<Module>,
 ): Result<Module, ModuleValidatorError> {
-    return ModuleValidationScope(context, config, module, moduleValidator)
+    return try {
+        ModuleValidationScope(context, config, module, moduleValidator)
+    } catch (exception: ModuleValidationException) {
+        Err(exception.error)
+    }
 }

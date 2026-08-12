@@ -37,26 +37,22 @@ class Stack<T>
             top += values.size
         }
 
-        fun popOrNull(): T? = try {
+        fun popOrNull(): T? {
+            if (top == 0) return null
             top--
             val value = elements[top]
             elements[top] = null
-            value
-        } catch (_: Exception) {
-            top++
-            null
+            return value
         }
 
-        fun peekOrNull(): T? = try {
-            elements[top - 1]
-        } catch (_: Exception) {
-            null
+        fun peekOrNull(): T? {
+            if (top == 0) return null
+            return elements[top - 1]
         }
 
-        fun peekNthOrNull(n: Int): T? = try {
-            elements[top - 1 - n]
-        } catch (_: Exception) {
-            null
+        fun peekNthOrNull(n: Int): T? {
+            if (n < 0 || n >= top) return null
+            return elements[top - 1 - n]
         }
 
         fun shrink(preserveTopN: Int, depth: Int) {

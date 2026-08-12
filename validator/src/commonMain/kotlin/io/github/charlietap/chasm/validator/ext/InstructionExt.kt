@@ -6,6 +6,13 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 
 fun Instruction?.size(): Int = when (this) {
+    is AtomicMemoryInstruction -> size()
+    is MemoryInstruction -> size()
+    is VectorInstruction -> size()
+    else -> 0
+}
+
+private fun AtomicMemoryInstruction.size(): Int = when (this) {
 
     is AtomicMemoryInstruction.Notify -> 4
     is AtomicMemoryInstruction.I32Wait -> 4
@@ -90,6 +97,11 @@ fun Instruction?.size(): Int = when (this) {
     is AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange16 -> 2
     is AtomicMemoryInstruction.CompareExchange.I64.I64CompareExchange32 -> 4
 
+    else -> 0
+}
+
+private fun MemoryInstruction.size(): Int = when (this) {
+
     is MemoryInstruction.Load.I32.I32Load -> 4
     is MemoryInstruction.Load.I32.I32Load8S -> 1
     is MemoryInstruction.Load.I32.I32Load8U -> 1
@@ -116,6 +128,11 @@ fun Instruction?.size(): Int = when (this) {
     is MemoryInstruction.Load.F64.F64Load -> 8
     is MemoryInstruction.Store.F32.F32Store -> 4
     is MemoryInstruction.Store.F64.F64Store -> 8
+
+    else -> 0
+}
+
+private fun VectorInstruction.size(): Int = when (this) {
 
     is VectorInstruction.V128Load -> 16
     is VectorInstruction.V128Store -> 16

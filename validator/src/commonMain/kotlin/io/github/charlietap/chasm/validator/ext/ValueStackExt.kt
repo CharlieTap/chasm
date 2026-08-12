@@ -6,7 +6,7 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.get
-import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.stack.peekNth
@@ -22,8 +22,17 @@ import io.github.charlietap.chasm.type.matching.TypeMatcher
 import io.github.charlietap.chasm.type.matching.ValueTypeMatcher
 import io.github.charlietap.chasm.validator.context.Label
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
+import io.github.charlietap.chasm.validator.error.ModuleValidationException
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
+import io.github.charlietap.chasm.validator.error.getOrThrowValidation
+
+private val I32_VALUE_TYPE: ValueType = ValueType.Number(NumberType.I32)
+private val I64_VALUE_TYPE: ValueType = ValueType.Number(NumberType.I64)
+private val F32_VALUE_TYPE: ValueType = ValueType.Number(NumberType.F32)
+private val F64_VALUE_TYPE: ValueType = ValueType.Number(NumberType.F64)
+private val V128_VALUE_TYPE: ValueType = ValueType.Vector(VectorType.V128)
+private val BOTTOM_VALUE_TYPE: ValueType = ValueType.Bottom(BottomType)
 
 internal inline fun ModuleValidationContext.pop(): Result<ValueType, ModuleValidatorError> = binding {
 
@@ -34,7 +43,7 @@ internal inline fun ModuleValidationContext.pop(): Result<ValueType, ModuleValid
     }
 
     if (operands.depth() == label.operandsDepth && label.unreachable) {
-        ValueType.Bottom(BottomType)
+        BOTTOM_VALUE_TYPE
     } else {
         operands
             .popOrNull()
@@ -42,6 +51,27 @@ internal inline fun ModuleValidationContext.pop(): Result<ValueType, ModuleValid
                 TypeValidatorError.TypeMismatch
             }.bind()
     }
+}
+
+internal fun ModuleValidationContext.popOrThrow(): ValueType {
+    val label = labels.peekOrNull() ?: Label.DEFAULT
+    val depth = operands.depth()
+
+    if (depth == label.operandsDepth) {
+        if (label.unreachable) return BOTTOM_VALUE_TYPE
+        throw ModuleValidationException(TypeValidatorError.TypeMismatch)
+    }
+
+    return operands.popOrNull()
+        ?: throw ModuleValidationException(TypeValidatorError.TypeMismatch)
+}
+
+internal fun ModuleValidationContext.popOrThrow(expected: ValueType): ValueType {
+    val actual = popOrThrow()
+    if (!ValueTypeMatcher(actual, expected, this)) {
+        throw ModuleValidationException(TypeValidatorError.TypeMismatch)
+    }
+    return actual
 }
 
 internal inline fun ModuleValidationContext.pop(
@@ -71,25 +101,35 @@ internal inline fun ModuleValidationContext.popReference(): Result<ReferenceType
     }
 }
 
-internal inline fun ModuleValidationContext.popI32(): Result<ValueType, ModuleValidatorError> = pop(ValueType.Number(NumberType.I32))
+internal inline fun ModuleValidationContext.popI32(): Result<ValueType, ModuleValidatorError> = pop(I32_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.popI64(): Result<ValueType, ModuleValidatorError> = pop(ValueType.Number(NumberType.I64))
+internal inline fun ModuleValidationContext.popI64(): Result<ValueType, ModuleValidatorError> = pop(I64_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.popF32(): Result<ValueType, ModuleValidatorError> = pop(ValueType.Number(NumberType.F32))
+internal inline fun ModuleValidationContext.popF32(): Result<ValueType, ModuleValidatorError> = pop(F32_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.popF64(): Result<ValueType, ModuleValidatorError> = pop(ValueType.Number(NumberType.F64))
+internal inline fun ModuleValidationContext.popF64(): Result<ValueType, ModuleValidatorError> = pop(F64_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.pushI32() = operands.push(ValueType.Number(NumberType.I32))
+internal fun ModuleValidationContext.popI32OrThrow(): ValueType = popOrThrow(I32_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.pushI64() = operands.push(ValueType.Number(NumberType.I64))
+internal fun ModuleValidationContext.popI64OrThrow(): ValueType = popOrThrow(I64_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.pushF32() = operands.push(ValueType.Number(NumberType.F32))
+internal fun ModuleValidationContext.popF32OrThrow(): ValueType = popOrThrow(F32_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.pushF64() = operands.push(ValueType.Number(NumberType.F64))
+internal fun ModuleValidationContext.popF64OrThrow(): ValueType = popOrThrow(F64_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.popV128(): Result<ValueType, ModuleValidatorError> = pop(ValueType.Vector(VectorType.V128))
+internal inline fun ModuleValidationContext.pushI32() = operands.push(I32_VALUE_TYPE)
 
-internal inline fun ModuleValidationContext.pushV128() = operands.push(ValueType.Vector(VectorType.V128))
+internal inline fun ModuleValidationContext.pushI64() = operands.push(I64_VALUE_TYPE)
+
+internal inline fun ModuleValidationContext.pushF32() = operands.push(F32_VALUE_TYPE)
+
+internal inline fun ModuleValidationContext.pushF64() = operands.push(F64_VALUE_TYPE)
+
+internal inline fun ModuleValidationContext.popV128(): Result<ValueType, ModuleValidatorError> = pop(V128_VALUE_TYPE)
+
+internal fun ModuleValidationContext.popV128OrThrow(): ValueType = popOrThrow(V128_VALUE_TYPE)
+
+internal inline fun ModuleValidationContext.pushV128() = operands.push(V128_VALUE_TYPE)
 
 internal inline fun ModuleValidationContext.pushRef(
     heapType: HeapType,
@@ -125,6 +165,15 @@ internal inline fun ModuleValidationContext.popMemoryAddress(
     }
 }
 
+internal fun ModuleValidationContext.popMemoryAddressOrThrow(
+    index: Index.MemoryIndex,
+) {
+    when (memoryType(index).getOrThrowValidation().addressType) {
+        AddressType.I32 -> popI32OrThrow()
+        AddressType.I64 -> popI64OrThrow()
+    }
+}
+
 internal inline fun ModuleValidationContext.pushMemoryAddress(
     index: Index.MemoryIndex,
 ): Result<Unit, ModuleValidatorError> = binding {
@@ -155,47 +204,78 @@ internal inline fun ModuleValidationContext.pushTableAddress(
     }
 }
 
-internal inline fun ModuleValidationContext.peekValues(
+internal fun ModuleValidationContext.peekValues(
     expected: List<ValueType>,
-    crossinline typeMatcher: TypeMatcher<ValueType> = ::ValueTypeMatcher,
-): Result<List<ValueType>, ModuleValidatorError> = binding {
-    expected.asReversed().mapIndexed { index, valueType ->
-        val actual = operands
-            .peekNth(index)
-            .mapError {
-                TypeValidatorError.TypeMismatch
-            }.bind()
-
-        if (!typeMatcher(actual, valueType, this@peekValues)) {
-            Err(TypeValidatorError.TypeMismatch).bind<Unit>()
+    typeMatcher: TypeMatcher<ValueType> = ::ValueTypeMatcher,
+): Result<Unit, ModuleValidatorError> {
+    val label = labels.peekOrNull() ?: Label.DEFAULT
+    val available = operands.depth() - label.operandsDepth
+    var depth = 0
+    var index = expected.lastIndex
+    while (index >= 0) {
+        val actual = if (depth < available) {
+            operands.peekNthOrNull(depth) ?: return Err(TypeValidatorError.TypeMismatch)
+        } else {
+            if (!label.unreachable) return Err(TypeValidatorError.TypeMismatch)
+            BOTTOM_VALUE_TYPE
         }
-        actual
+        if (!typeMatcher(actual, expected[index], this)) {
+            return Err(TypeValidatorError.TypeMismatch)
+        }
+        depth++
+        index--
     }
+    return Ok(Unit)
 }
 
-internal inline fun ModuleValidationContext.popValues(
+internal fun ModuleValidationContext.popValues(
     expected: List<ValueType>,
-): Result<List<ValueType>, ModuleValidatorError> = binding {
-    expected.asReversed().map { valueType ->
-        pop(valueType).bind()
+): Result<Unit, ModuleValidatorError> {
+    var index = expected.lastIndex
+    while (index >= 0) {
+        pop(expected[index]).getOrElse { error ->
+            return Err(error)
+        }
+        index--
     }
+    return Ok(Unit)
 }
 
-internal inline fun ModuleValidationContext.pushValues(
+internal fun ModuleValidationContext.pushValues(
     values: List<ValueType>,
-) = values.forEach { valueType ->
-    operands.push(valueType)
+) {
+    var index = 0
+    while (index < values.size) {
+        operands.push(values[index])
+        index++
+    }
 }
 
-internal inline fun ModuleValidationContext.popAndReplaceValues(
+internal fun ModuleValidationContext.popAndReplaceValues(
     expected: List<ValueType>,
-): Result<Unit, ModuleValidatorError> = binding {
-    expected.asReversed().forEach { valueType ->
-        pop(valueType).bind()
+): Result<Unit, ModuleValidatorError> {
+    var index = expected.lastIndex
+    while (index >= 0) {
+        pop(expected[index]).getOrElse { error ->
+            return Err(error)
+        }
+        index--
     }
-    expected.forEach { valueType ->
-        operands.push(valueType)
+    pushValues(expected)
+    return Ok(Unit)
+}
+
+internal fun ModuleValidationContext.popValuesForward(
+    expected: List<ValueType>,
+): Result<Unit, ModuleValidatorError> {
+    var index = 0
+    while (index < expected.size) {
+        pop(expected[index]).getOrElse { error ->
+            return Err(error)
+        }
+        index++
     }
+    return Ok(Unit)
 }
 
 internal inline fun ModuleValidationContext.unreachable() = binding {

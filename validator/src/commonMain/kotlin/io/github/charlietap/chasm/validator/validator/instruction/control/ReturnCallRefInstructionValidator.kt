@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 import io.github.charlietap.chasm.validator.error.TypeValidatorError
 import io.github.charlietap.chasm.validator.ext.functionType
 import io.github.charlietap.chasm.validator.ext.popValues
+import io.github.charlietap.chasm.validator.ext.popValuesForward
 import io.github.charlietap.chasm.validator.ext.pushValues
 import io.github.charlietap.chasm.validator.ext.type
 import io.github.charlietap.chasm.validator.ext.unreachable
@@ -49,6 +50,6 @@ internal inline fun ReturnCallRefInstructionValidator(
         ).bind()
     context.pushValues(functionType.results.types)
 
-    context.popValues(context.result?.types?.asReversed() ?: emptyList()).bind()
+    context.popValuesForward(context.result?.types ?: emptyList()).bind()
     context.unreachable().bind()
 }

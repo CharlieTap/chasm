@@ -27,7 +27,6 @@ internal class ModuleValidationContext(
     val exportContext: ExportContextImpl = ExportContextImpl(),
     val expressionContext: ExpressionContextImpl = ExpressionContextImpl(),
     val functionContext: FunctionContextImpl = FunctionContextImpl(),
-    val instructionContext: InstructionContextImpl = InstructionContextImpl(),
     val refsContext: RefsContextImpl = RefsContextImpl(),
     val typeContext: TypeContextImpl = TypeContextImpl(),
 ) : CoreTypeValidationContext,
@@ -35,7 +34,6 @@ internal class ModuleValidationContext(
     ExportContext by exportContext,
     ExpressionContext by expressionContext,
     FunctionContext by functionContext,
-    InstructionContext by instructionContext,
     RefsContext by refsContext {
 
     var config: ModuleConfig = config
@@ -128,7 +126,6 @@ internal class ModuleValidationContext(
         functionContext.labels.clear()
         functionContext.result = null
         functionContext.operands.clear()
-        instructionContext.instruction = null
         refsContext.clear()
         typeContext.limitsMaximum = ULong.MAX_VALUE
     }
