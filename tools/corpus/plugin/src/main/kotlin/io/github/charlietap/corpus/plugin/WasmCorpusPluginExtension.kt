@@ -59,6 +59,10 @@ open class WasmCorpusPluginExtension
             layout.buildDirectory.dir(DIR_CORPUS_TESTS),
         )
 
+        val corpusResourcesDirectory: DirectoryProperty = objects.directoryProperty().convention(
+            layout.buildDirectory.dir(DIR_CORPUS_RESOURCES),
+        )
+
         val corpusResultsDirectory: DirectoryProperty = objects.directoryProperty().convention(
             layout.buildDirectory.dir(DIR_CORPUS_RESULTS),
         )
@@ -75,6 +79,7 @@ open class WasmCorpusPluginExtension
             const val DIR_CORPUS = "wasm-corpus"
             const val DIR_CORPUS_FIXTURES = "wasm-corpus-fixtures"
             const val DIR_CORPUS_TESTS = "wasm-corpus-tests"
+            const val DIR_CORPUS_RESOURCES = "wasm-corpus-resources"
             const val DIR_CORPUS_RESULTS = "wasm-corpus-results"
             const val DIR_CORPUS_BASELINE = "baselines/corpus"
             const val FILE_CORPUS_REPORT = "reports/corpus/results.json"

@@ -16,6 +16,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlinx.serialization)
+                implementation(libs.kotlinx.test.resources)
             }
         }
 

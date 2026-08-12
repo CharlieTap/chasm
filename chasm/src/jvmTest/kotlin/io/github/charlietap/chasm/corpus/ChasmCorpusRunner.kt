@@ -39,14 +39,13 @@ import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.script.ext.readBytesFromPath
-import io.github.charlietap.chasm.script.ext.readTextFromPath
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.Mutability
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.corpus.lib.CorpusExecution
+import io.github.charlietap.corpus.lib.CorpusFileReader
 import io.github.charlietap.corpus.lib.CorpusPhase
 import io.github.charlietap.corpus.lib.CorpusResult
 import io.github.charlietap.corpus.lib.CorpusRunner
@@ -73,14 +72,15 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.TimeSource
 
 class ChasmCorpusRunner(
+    private val fileReader: CorpusFileReader,
     private val config: Config = Config(
         runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
     ),
 ) : CorpusRunner {
 
-    override fun readText(path: String): String = path.readTextFromPath()
+    override fun readText(path: String): String = fileReader.readText(path)
 
-    override fun readBytes(path: String): ByteArray = path.readBytesFromPath()
+    override fun readBytes(path: String): ByteArray = fileReader.readBytes(path)
 
     override fun execute(
         corpusRoot: String,

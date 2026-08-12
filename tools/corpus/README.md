@@ -27,6 +27,11 @@ The `wasmCorpus.phase` project property overrides the phase configured in the
 `instantiation`, or `invocation`, so a decode-only report can be generated
 without editing the consuming build.
 
+The selected fixture index, metadata, and Wasm binaries are first packaged as
+Kotlin multiplatform test resources. A single generated test reads those
+resources through `ResourceCorpusFileReader`, keeping fixture access portable
+without coupling the runner to JVM filesystem paths.
+
 Each corpus run writes a sorted JSON report to
 `chasm/build/reports/corpus/results.json`. There is one result per fixture with
 the overall outcome and elapsed nanoseconds for decoding, validation,
@@ -54,9 +59,9 @@ reuse the previous test output or a build-cache entry. CLI phase overrides also
 apply to this task. The generated report is retained under `build/reports` so
 Gradle continues to own and track its declared output.
 
-`cleanCorpusTests` removes the generated fixture index, test sources, raw
-fixture results, and aggregate report. The synced corpus checkout is left in
-place so repeated runs do not need to reclone.
+`cleanCorpusTests` removes the generated fixture index, test sources, packaged
+resources, raw fixture results, and aggregate report. The synced corpus
+checkout is left in place so repeated runs do not need to reclone.
 
 ## Plugin Shape
 
@@ -64,7 +69,8 @@ The plugin registers:
 
 - `syncWasmCorpus` to clone/fetch and checkout the pinned corpus ref.
 - `resolveCorpusFixtures` to invoke the corpus repository's Node CLI.
-- `generateCorpusTests` to emit generated Kotlin tests.
+- `prepareCorpusResources` to package the selected fixtures as test resources.
+- `generateCorpusTests` to emit the generated corpus test.
 - `generateCorpusReport` to aggregate per-fixture results into a JSON report.
 - `updateCorpusBaseline` to run the corpus and update its checked-in baseline.
 - `corpusMatrix` to print fixture counts by version.

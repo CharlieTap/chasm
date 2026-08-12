@@ -4,13 +4,13 @@ import io.github.charlietap.corpus.lib.CorpusPhase
 import io.github.charlietap.corpus.plugin.task.CorpusMatrixTask
 import io.github.charlietap.corpus.plugin.task.GenerateCorpusReportTask
 import io.github.charlietap.corpus.plugin.task.GenerateCorpusTestsTask
+import io.github.charlietap.corpus.plugin.task.PrepareCorpusResourcesTask
 import io.github.charlietap.corpus.plugin.task.ResolveCorpusFixturesTask
 import io.github.charlietap.corpus.plugin.task.SyncCorpusRepositoryTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
@@ -64,23 +64,26 @@ class WasmCorpusPlugin : Plugin<Project> {
             group = GROUP
             description = "Generates Kotlin tests from wasm-corpus fixtures"
 
-            fixturesIndex.set(resolveFixtures.flatMap { it.outputFile })
-            corpusDirectoryPath.set(
-                syncCorpus.flatMap { it.outputDirectory }.map { directory ->
-                    projectDirectory.relativize(directory.asFile.toPath()).toString()
-                },
-            )
             corpusRunner.set(extension.corpusRunner)
             testPackageName.set(extension.testPackageName)
             phase.set(effectivePhase)
-            targets.set(extension.targets)
-            excludedTargets.set(extension.excludedTargets)
             resultsDirectoryPath.set(
                 project.providers.provider {
                     projectDirectory.relativize(extension.corpusResultsDirectory.get().asFile.toPath()).toString()
                 },
             )
             outputDirectory.set(extension.corpusTestsDirectory)
+        }
+
+        val prepareResources = project.tasks.register<PrepareCorpusResourcesTask>(TASK_NAME_PREPARE_RESOURCES) {
+            group = GROUP
+            description = "Packages selected wasm-corpus fixtures as test resources"
+
+            corpusDirectory.set(syncCorpus.flatMap { it.outputDirectory })
+            fixturesIndex.set(resolveFixtures.flatMap { it.outputFile })
+            targets.set(extension.targets)
+            excludedTargets.set(extension.excludedTargets)
+            outputDirectory.set(extension.corpusResourcesDirectory)
         }
 
         project.tasks.register<CorpusMatrixTask>(TASK_NAME_MATRIX) {
@@ -122,6 +125,7 @@ class WasmCorpusPlugin : Plugin<Project> {
 
             delete(extension.corpusFixtureDirectory)
             delete(extension.corpusTestsDirectory)
+            delete(extension.corpusResourcesDirectory)
             delete(extension.corpusResultsDirectory)
             delete(extension.corpusReportFile)
         }
@@ -160,6 +164,12 @@ class WasmCorpusPlugin : Plugin<Project> {
                 extension.corpusTestsDirectory
             }
             kotlin.srcDir(corpusTestsDirectory)
+            val corpusResourcesDirectory = if (corpusRequested) {
+                prepareResources.flatMap { it.outputDirectory }
+            } else {
+                extension.corpusResourcesDirectory
+            }
+            resources.srcDir(corpusResourcesDirectory)
         }
 
         val corpus = project.tasks.register(TASK_NAME_CORPUS) {
@@ -167,6 +177,7 @@ class WasmCorpusPlugin : Plugin<Project> {
             description = "Runs wasm-corpus fixtures against the JVM test runtime"
 
             dependsOn(generateTests)
+            dependsOn(prepareResources)
             dependsOn(jvmTest)
             dependsOn(generateCorpusReport)
         }
@@ -188,9 +199,6 @@ class WasmCorpusPlugin : Plugin<Project> {
             if (corpusRequested) {
                 workingDirectory.set(project.layout.projectDirectory)
                 binaryResultsDirectory.set(extension.corpusResultsDirectory)
-                inputs.dir(syncCorpus.flatMap { task -> task.outputDirectory })
-                    .withPropertyName("corpusDirectory")
-                    .withPathSensitivity(PathSensitivity.RELATIVE)
                 inputs.property("corpusMachine", machineMetadata)
                 include("**/corpus/generated/**")
 
@@ -244,6 +252,7 @@ class WasmCorpusPlugin : Plugin<Project> {
         const val TASK_NAME_SYNC_CORPUS = "syncWasmCorpus"
         const val TASK_NAME_RESOLVE_FIXTURES = "resolveCorpusFixtures"
         const val TASK_NAME_GENERATE_TESTS = "generateCorpusTests"
+        const val TASK_NAME_PREPARE_RESOURCES = "prepareCorpusResources"
         const val TASK_NAME_GENERATE_REPORT = "generateCorpusReport"
         const val TASK_NAME_UPDATE_BASELINE = "updateCorpusBaseline"
         const val TASK_NAME_MATRIX = "corpusMatrix"
