@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RTT
 import kotlin.jvm.JvmInline
 
 sealed interface ControlInstruction : LinkedInstruction {

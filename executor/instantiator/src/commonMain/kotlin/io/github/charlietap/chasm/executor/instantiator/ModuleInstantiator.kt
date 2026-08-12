@@ -91,7 +91,7 @@ internal inline fun ModuleInstantiator(
 
     val tableInitValues = LongArray(module.tables.size) { tableIndex ->
         val table = module.tables[tableIndex]
-        constantExpressionEvaluator(store, partialInstance, table.initExpression).bind()
+        constantExpressionEvaluator(store, partialInstance, context.types, table.initExpression).bind()
     }
 
     val instance = allocator(context, partialInstance, tableInitValues, compilerDiagnostics).bind()

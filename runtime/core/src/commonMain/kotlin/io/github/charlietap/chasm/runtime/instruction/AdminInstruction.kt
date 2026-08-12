@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
-import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
 sealed interface AdminInstruction : LinkedInstruction {
 
@@ -118,41 +118,35 @@ sealed interface AdminInstruction : LinkedInstruction {
     data class JumpOnCastI(
         val operand: Long,
         val targetIp: Int,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
     ) : AdminInstruction
 
     data class JumpOnCastS(
         val operandSlot: Int,
         val targetIp: Int,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
     ) : AdminInstruction
 
     data class JumpOnCastV(
         val targetIp: Int,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
     ) : AdminInstruction
 
     data class JumpOnCastFailI(
         val operand: Long,
         val targetIp: Int,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
     ) : AdminInstruction
 
     data class JumpOnCastFailS(
         val operandSlot: Int,
         val targetIp: Int,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
     ) : AdminInstruction
 
     data class JumpOnCastFailV(
         val targetIp: Int,
-        val srcReferenceType: ReferenceType,
-        val dstReferenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
     ) : AdminInstruction
 
     data class PushHandler(

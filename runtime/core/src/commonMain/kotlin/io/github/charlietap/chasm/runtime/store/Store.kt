@@ -13,8 +13,7 @@ import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instance.TagInstance
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.type.DefinedType
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RuntimeTypeRegistry
 
 data class Store(
     val functions: MutableList<FunctionInstance> = [],
@@ -29,6 +28,6 @@ data class Store(
     val structs: MutableList<StructInstance?> = [],
     val arrays: MutableList<ArrayInstance?> = [],
     val hosts: MutableList<HostInstance> = [],
-    val rttCache: MutableMap<DefinedType, RTT> = mutableMapOf(),
+    val runtimeTypes: RuntimeTypeRegistry = RuntimeTypeRegistry(),
     val heap: Heap = Heap(),
 )

@@ -8,9 +8,9 @@ import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.RTT
 
 internal fun ArrayNewFixedExecutor(
     vstack: ValueStack,

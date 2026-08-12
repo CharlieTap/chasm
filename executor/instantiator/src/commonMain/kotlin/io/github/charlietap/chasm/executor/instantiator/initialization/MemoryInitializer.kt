@@ -43,7 +43,7 @@ internal inline fun MemoryInitializer(
             segment.mode is DataSegment.Mode.Active
         }.forEach { segment ->
             val mode = segment.mode as DataSegment.Mode.Active
-            val offset = constantExpressionEvaluator(store, instance, mode.offset).bind().toInt()
+            val offset = constantExpressionEvaluator(store, instance, context.types, mode.offset).bind().toInt()
 
             val memoryAddress = instance.memoryAddress(mode.memoryIndex).bind()
             val memoryInstance = store.memory(memoryAddress)

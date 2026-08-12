@@ -11,9 +11,9 @@ import io.github.charlietap.chasm.runtime.ext.default
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
+import io.github.charlietap.chasm.runtime.type.RTT
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.RTT
-import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.ext.bitWidth
 
@@ -53,13 +53,13 @@ internal fun FunctionCompilationContext.emitStructGet(
 internal fun FunctionCompilationContext.emitRefCastStructGet(
     referenceSlot: Int,
     destinationSlot: Int,
-    referenceType: ReferenceType,
+    typeTest: ReferenceTypeTest,
     fieldIndex: Int,
 ) = emitAggregate(
     AggregateSuperInstruction.RefCastStructGetS(
         referenceSlot = referenceSlot,
         destinationSlot = destinationSlot,
-        referenceType = referenceType,
+        typeTest = typeTest,
         fieldIndex = fieldIndex,
     ),
 )

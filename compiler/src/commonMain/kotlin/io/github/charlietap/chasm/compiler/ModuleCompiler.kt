@@ -15,14 +15,14 @@ import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
 fun ModuleCompiler(
     config: RuntimeConfig,
     store: Store,
     module: Module,
     instance: ModuleInstance,
-    runtimeTypes: List<RTT>,
+    runtimeTypes: RuntimeTypeMap,
     types: ModuleTypeResolver = ModuleTypeResolver(module),
     diagnostics: CompilerDiagnostics? = null,
 ): Result<Unit, ModuleTrapError> = binding {

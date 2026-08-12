@@ -4,11 +4,11 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.fixture.ast.module.typeIndex
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.type.rtt
+import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RTT
 
 fun controlRuntimeInstruction(): ControlInstruction = unreachableRuntimeInstruction()
 

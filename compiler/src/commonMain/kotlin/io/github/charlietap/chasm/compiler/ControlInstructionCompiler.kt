@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.compiler.context.BlockContext
 import io.github.charlietap.chasm.compiler.context.BlockKind
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.compiler.context.function
-import io.github.charlietap.chasm.compiler.context.runtimeType
+import io.github.charlietap.chasm.compiler.context.rtt
 import io.github.charlietap.chasm.compiler.context.table
 import io.github.charlietap.chasm.compiler.context.tag
 import io.github.charlietap.chasm.compiler.emptyIntArray
@@ -44,6 +44,7 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDis
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.UnreachableDispatcher
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction as RuntimeControlInstruction
 
 internal fun beginFunctionControl(state: FunctionCompilationContext) {
@@ -554,17 +555,9 @@ private fun compileBranchOnCast(
     instruction: ControlInstruction,
     onSuccess: Boolean,
 ) {
-    val (labelIndex, sourceType, destinationType) = when (instruction) {
-        is ControlInstruction.BrOnCast -> Triple(
-            instruction.labelIndex,
-            instruction.srcReferenceType,
-            instruction.dstReferenceType,
-        )
-        is ControlInstruction.BrOnCastFail -> Triple(
-            instruction.labelIndex,
-            instruction.srcReferenceType,
-            instruction.dstReferenceType,
-        )
+    val (labelIndex, destinationType) = when (instruction) {
+        is ControlInstruction.BrOnCast -> instruction.labelIndex to instruction.dstReferenceType
+        is ControlInstruction.BrOnCastFail -> instruction.labelIndex to instruction.dstReferenceType
         else -> error("not a cast branch: $instruction")
     }
     val operand = state.operands.last()
@@ -573,8 +566,7 @@ private fun compileBranchOnCast(
         operand = operand,
         target = target.branchTarget,
         copies = state.planCopies(target.branchSlots),
-        sourceType = sourceType,
-        destinationType = destinationType,
+        typeTest = ReferenceTypeTest.from(destinationType, state.compiler.runtimeTypes),
         onSuccess = onSuccess,
         handlerPopCount = state.handlerDepth - target.handlerDepth,
     )
@@ -638,7 +630,7 @@ private fun compileCallIndirect(
     state.emitCallIndirect(
         elementIndex = elementIndex,
         operands = operands,
-        type = state.compiler.runtimeType(instruction.typeIndex),
+        type = state.compiler.rtt(instruction.typeIndex),
         table = state.compiler.table(instruction.tableIndex),
         resultSlotBase = destination?.slot ?: callFrameSlot,
         callFrameSlot = callFrameSlot,
@@ -711,7 +703,7 @@ private fun compileReturnCallIndirect(
     state.emitReturnCallIndirect(
         elementIndex = elementIndex,
         operands = operands,
-        type = state.compiler.runtimeType(instruction.typeIndex),
+        type = state.compiler.rtt(instruction.typeIndex),
         table = state.compiler.table(instruction.tableIndex),
     )
     state.reachable = false

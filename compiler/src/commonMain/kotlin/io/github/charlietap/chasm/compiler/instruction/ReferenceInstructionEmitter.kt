@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.compiler.instruction
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.ReferenceSuperInstructionDispatcher
 import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
-import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
 internal fun FunctionCompilationContext.emitReferenceInstruction(
     instruction: ReferenceSuperInstruction,
@@ -29,11 +29,11 @@ internal fun FunctionCompilationContext.emitRefEq(firstSlot: Int, secondSlot: In
 internal fun FunctionCompilationContext.emitRefTest(
     sourceSlot: Int,
     destinationSlot: Int,
-    type: ReferenceType,
-) = emitReferenceInstruction(ReferenceSuperInstruction.RefTestS(sourceSlot, destinationSlot, type))
+    typeTest: ReferenceTypeTest,
+) = emitReferenceInstruction(ReferenceSuperInstruction.RefTestS(sourceSlot, destinationSlot, typeTest))
 
 internal fun FunctionCompilationContext.emitRefCast(
     sourceSlot: Int,
     destinationSlot: Int,
-    type: ReferenceType,
-) = emitReferenceInstruction(ReferenceSuperInstruction.RefCastS(sourceSlot, destinationSlot, type))
+    typeTest: ReferenceTypeTest,
+) = emitReferenceInstruction(ReferenceSuperInstruction.RefCastS(sourceSlot, destinationSlot, typeTest))

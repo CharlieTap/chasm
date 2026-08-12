@@ -484,7 +484,7 @@ fun JumpDispatcher(
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnCastI,
 ): DispatchableInstruction = DispatchableInstruction { _, cstack, store, _, nextIp ->
-    val matches = Caster(instruction.operand, instruction.dstReferenceType, cstack.peekFrame().instance, store)
+    val matches = Caster(instruction.operand, instruction.typeTest, store)
     if (matches) instruction.targetIp else nextIp
 }
 
@@ -492,21 +492,21 @@ fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnCastS,
 ): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, _, nextIp ->
     val operand = vstack.getFrameSlot(instruction.operandSlot)
-    val matches = Caster(operand, instruction.dstReferenceType, cstack.peekFrame().instance, store)
+    val matches = Caster(operand, instruction.typeTest, store)
     if (matches) instruction.targetIp else nextIp
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnCastV,
 ): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, _, nextIp ->
-    val matches = Caster(vstack.peek(), instruction.dstReferenceType, cstack.peekFrame().instance, store)
+    val matches = Caster(vstack.peek(), instruction.typeTest, store)
     if (matches) instruction.targetIp else nextIp
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnCastFailI,
 ): DispatchableInstruction = DispatchableInstruction { _, cstack, store, _, nextIp ->
-    val matches = Caster(instruction.operand, instruction.dstReferenceType, cstack.peekFrame().instance, store)
+    val matches = Caster(instruction.operand, instruction.typeTest, store)
     if (!matches) instruction.targetIp else nextIp
 }
 
@@ -514,13 +514,13 @@ fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnCastFailS,
 ): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, _, nextIp ->
     val operand = vstack.getFrameSlot(instruction.operandSlot)
-    val matches = Caster(operand, instruction.dstReferenceType, cstack.peekFrame().instance, store)
+    val matches = Caster(operand, instruction.typeTest, store)
     if (!matches) instruction.targetIp else nextIp
 }
 
 fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnCastFailV,
 ): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, _, nextIp ->
-    val matches = Caster(vstack.peek(), instruction.dstReferenceType, cstack.peekFrame().instance, store)
+    val matches = Caster(vstack.peek(), instruction.typeTest, store)
     if (!matches) instruction.targetIp else nextIp
 }

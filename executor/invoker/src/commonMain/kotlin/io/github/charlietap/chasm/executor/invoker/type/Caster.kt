@@ -1,112 +1,54 @@
 package io.github.charlietap.chasm.executor.invoker.type
 
-import io.github.charlietap.chasm.runtime.ext.array
-import io.github.charlietap.chasm.runtime.ext.function
-import io.github.charlietap.chasm.runtime.ext.isArrayReference
-import io.github.charlietap.chasm.runtime.ext.isExceptionReference
-import io.github.charlietap.chasm.runtime.ext.isExternReference
-import io.github.charlietap.chasm.runtime.ext.isFunctionReference
-import io.github.charlietap.chasm.runtime.ext.isHostReference
-import io.github.charlietap.chasm.runtime.ext.isI31Reference
-import io.github.charlietap.chasm.runtime.ext.isNullableReference
-import io.github.charlietap.chasm.runtime.ext.isStructReference
-import io.github.charlietap.chasm.runtime.ext.struct
-import io.github.charlietap.chasm.runtime.ext.toArrayAddress
-import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
-import io.github.charlietap.chasm.runtime.ext.toStructAddress
-import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_FUNCTION
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_MASK
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.type.AbstractHeapType
-import io.github.charlietap.chasm.type.ConcreteHeapType
-import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.runtime.type.RTT
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
-typealias Caster = (Long, ReferenceType, ModuleInstance, Store) -> Boolean
+internal typealias Caster = (Long, ReferenceTypeTest, Store) -> Boolean
 
 internal inline fun Caster(
     referenceValue: Long,
-    referenceType: ReferenceType,
-    moduleInstance: ModuleInstance,
+    typeTest: ReferenceTypeTest,
     store: Store,
 ): Boolean {
 
-    if (referenceValue.isNullableReference()) {
-        return when (referenceType) {
-            is ReferenceType.Ref -> false
-            is ReferenceType.RefNull -> true
-        }
+    val referenceTag = (referenceValue and RV_TYPE_MASK).toInt()
+    if (referenceTag == RV_TYPE_NULL.toInt()) {
+        return typeTest.nullable
     }
 
-    val heapType = referenceType.heapType
-    return when (heapType) {
-        is AbstractHeapType -> referenceValue.isTypeOf(heapType)
-        is ConcreteHeapType -> {
-            when (heapType) {
-                is ConcreteHeapType.TypeIndex -> referenceValue.isInstanceOf(heapType, moduleInstance, store)
-                is ConcreteHeapType.Defined,
-                is ConcreteHeapType.RecursiveTypeIndex,
-                -> false
-            }
-        }
+    return if (typeTest.isDefined) {
+        referenceValue.isInstanceOf(referenceTag, typeTest.rtt, store)
+    } else {
+        typeTest.acceptedReferenceTags and (1 shl referenceTag) != 0
     }
 }
 
-private inline fun Long.isTypeOf(
-    heapType: AbstractHeapType,
-): Boolean = when (heapType) {
-    AbstractHeapType.Func -> isFunctionReference()
-    AbstractHeapType.Extern -> isExternReference()
-    AbstractHeapType.Any ->
-        isI31Reference() ||
-            isArrayReference() ||
-            isStructReference() ||
-            isHostReference()
-
-    AbstractHeapType.Eq ->
-        isI31Reference() ||
-            isArrayReference() ||
-            isStructReference()
-
-    AbstractHeapType.I31 -> isI31Reference()
-    AbstractHeapType.Array -> isArrayReference()
-    AbstractHeapType.Struct -> isStructReference()
-    AbstractHeapType.Exception -> isExceptionReference()
-    AbstractHeapType.NoException,
-    is AbstractHeapType.Bottom,
-    AbstractHeapType.NoExtern,
-    AbstractHeapType.NoFunc,
-    AbstractHeapType.None,
-    -> false
-}
-
-private inline fun Long.isInstanceOf(
-    typeIndex: ConcreteHeapType.TypeIndex,
-    moduleInstance: ModuleInstance,
+private fun Long.isInstanceOf(
+    referenceTag: Int,
+    castRuntimeType: RTT,
     store: Store,
 ): Boolean {
-
-    val castRuntimeType = moduleInstance.runtimeTypes.getOrNull(typeIndex.index) ?: return false
-
-    val actualRuntimeType = when {
-        isStructReference() -> {
-            store.struct(toStructAddress()).rtt
+    val address = (this shr RV_SHIFT_BITS).toInt()
+    return when (referenceTag) {
+        RV_TYPE_STRUCT.toInt() -> {
+            val instance = store.structs.getOrNull(address) ?: return false
+            store.runtimeTypes.matches(instance.rtt, castRuntimeType)
         }
-
-        isArrayReference() -> {
-            store.array(toArrayAddress()).rtt
+        RV_TYPE_ARRAY.toInt() -> {
+            val instance = store.arrays.getOrNull(address) ?: return false
+            store.runtimeTypes.matches(instance.rtt, castRuntimeType)
         }
-
-        isFunctionReference() -> {
-            store.function(toFunctionAddress()).rtt
+        RV_TYPE_FUNCTION.toInt() -> {
+            val instance = store.functions.getOrNull(address) ?: return false
+            store.runtimeTypes.matches(instance.rtt, castRuntimeType)
         }
         else -> return false
-    }
-
-    return when {
-        actualRuntimeType === castRuntimeType -> true
-        else -> {
-            actualRuntimeType.superTypes.any { superType ->
-                superType === castRuntimeType
-            }
-        }
     }
 }

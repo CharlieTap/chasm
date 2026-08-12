@@ -1,13 +1,13 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
 sealed interface ReferenceSuperInstruction : LinkedInstruction {
 
     data class RefCastS(
         val referenceSlot: Int,
         val destinationSlot: Int,
-        val referenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
     ) : ReferenceSuperInstruction
 
     data class RefEqSs(
@@ -39,6 +39,6 @@ sealed interface ReferenceSuperInstruction : LinkedInstruction {
     data class RefTestS(
         val referenceSlot: Int,
         val destinationSlot: Int,
-        val referenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
     ) : ReferenceSuperInstruction
 }

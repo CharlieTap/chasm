@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.runtime.instance
 
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.StructType
 
 data class StructInstance(

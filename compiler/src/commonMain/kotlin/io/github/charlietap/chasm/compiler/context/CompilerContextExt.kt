@@ -16,8 +16,8 @@ import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instance.TagInstance
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.ext.arrayType
 import io.github.charlietap.chasm.type.ext.structType
@@ -43,12 +43,12 @@ internal fun CompilerContext.element(index: Index.ElementIndex): ElementInstance
 internal fun CompilerContext.data(index: Index.DataIndex): DataInstance =
     store.data(instance.dataAddresses[index.toInt()])
 
-internal fun CompilerContext.runtimeType(index: Index.TypeIndex): RTT = runtimeTypes[index.toInt()]
+internal fun CompilerContext.rtt(index: Index.TypeIndex): RTT = runtimeTypes[index.toInt()]
 
 internal fun CompilerContext.arrayType(index: Index.TypeIndex): ArrayType =
-    runtimeType(index).type.asSubType.compositeType.arrayType()
+    module.definedTypes[index.toInt()].asSubType.compositeType.arrayType()
         ?: error("type ${index.idx} is not an array type")
 
 internal fun CompilerContext.structType(index: Index.TypeIndex): StructType =
-    runtimeType(index).type.asSubType.compositeType.structType()
+    module.definedTypes[index.toInt()].asSubType.compositeType.structType()
         ?: error("type ${index.idx} is not a struct type")

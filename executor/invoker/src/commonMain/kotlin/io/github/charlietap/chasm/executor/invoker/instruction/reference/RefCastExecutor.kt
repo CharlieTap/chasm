@@ -32,11 +32,8 @@ internal inline fun RefCastExecutor(
     instruction: ReferenceInstruction.RefCast,
     crossinline caster: Caster,
 ) {
-    val frame = cstack.peekFrame()
-    val moduleInstance = frame.instance
-
     val referenceValue = vstack.pop()
-    val casted = caster(referenceValue, instruction.referenceType, moduleInstance, store)
+    val casted = caster(referenceValue, instruction.typeTest, store)
 
     if (casted) {
         vstack.push(referenceValue)

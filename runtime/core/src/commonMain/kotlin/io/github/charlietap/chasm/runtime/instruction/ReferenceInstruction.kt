@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import kotlin.jvm.JvmInline
 
 sealed interface ReferenceInstruction : LinkedInstruction {
@@ -17,8 +17,8 @@ sealed interface ReferenceInstruction : LinkedInstruction {
     data object RefEq : ReferenceInstruction
 
     @JvmInline
-    value class RefTest(val referenceType: ReferenceType) : ReferenceInstruction
+    value class RefTest(val typeTest: ReferenceTypeTest) : ReferenceInstruction
 
     @JvmInline
-    value class RefCast(val referenceType: ReferenceType) : ReferenceInstruction
+    value class RefCast(val typeTest: ReferenceTypeTest) : ReferenceInstruction
 }

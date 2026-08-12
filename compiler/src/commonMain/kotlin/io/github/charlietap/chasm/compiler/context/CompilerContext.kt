@@ -9,9 +9,9 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
+import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.type.BlockType
 import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.ValueType
 
 internal class CompilerContext(
@@ -20,7 +20,7 @@ internal class CompilerContext(
     val types: ModuleTypeResolver,
     val store: Store,
     val instance: ModuleInstance,
-    val runtimeTypes: List<RTT>,
+    val runtimeTypes: RuntimeTypeMap,
     diagnostics: CompilerDiagnostics? = null,
 ) {
     val operandPool = ArrayList<Operand>()

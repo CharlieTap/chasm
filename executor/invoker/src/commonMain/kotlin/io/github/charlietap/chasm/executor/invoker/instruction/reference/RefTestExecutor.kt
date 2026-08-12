@@ -30,10 +30,7 @@ internal inline fun RefTestExecutor(
     instruction: ReferenceInstruction.RefTest,
     crossinline caster: Caster,
 ) {
-    val frame = cstack.peekFrame()
-    val moduleInstance = frame.instance
-
-    if (caster(vstack.pop(), instruction.referenceType, moduleInstance, store)) {
+    if (caster(vstack.pop(), instruction.typeTest, store)) {
         vstack.push(1L)
     } else {
         vstack.push(0L)

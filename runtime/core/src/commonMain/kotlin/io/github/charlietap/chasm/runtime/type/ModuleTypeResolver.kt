@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.type
 
+import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.ast.module.toInt
@@ -23,11 +24,17 @@ class ModuleTypeResolver(
 ) {
 
     private val substitution = Substitution.TypeIndexToDefinedType(module.definedTypes)
+    private val functionTypeIndices = module.imports.mapNotNull { import ->
+        (import.descriptor as? Import.Descriptor.Function)?.typeIndex
+    } + module.functions.map { it.typeIndex }
 
     fun definedType(index: Index.TypeIndex): DefinedType = module.definedTypes[index.toInt()]
 
     fun functionType(index: Index.TypeIndex): FunctionType = definedType(index).functionType()
         ?: error("type ${index.idx} is not a function type")
+
+    fun functionType(index: Index.FunctionIndex): DefinedType =
+        definedType(functionTypeIndices[index.toInt()])
 
     fun blockType(type: BlockType): FunctionType = LegacyBlockTypeExpander(module.definedTypes, type)
         ?: error("block type is not a function type: $type")

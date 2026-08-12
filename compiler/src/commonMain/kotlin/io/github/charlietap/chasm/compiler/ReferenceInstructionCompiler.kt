@@ -16,6 +16,7 @@ import io.github.charlietap.chasm.compiler.instruction.emitRefIsNull
 import io.github.charlietap.chasm.compiler.instruction.emitRefNull
 import io.github.charlietap.chasm.compiler.instruction.emitRefTest
 import io.github.charlietap.chasm.runtime.ext.toLong
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.ReferenceType
@@ -49,8 +50,9 @@ internal fun compileReferenceInstruction(
             state.emitRefNull(ReferenceValue.Null(instruction.type).toLong(), destination.slot)
         }
         is ReferenceInstruction.RefFunc -> {
-            val function = state.compiler.function(instruction.funcIdx)
-            resultType = ValueType.Reference(ReferenceType.Ref(ConcreteHeapType.Defined(function.rtt.type)))
+            resultType = ValueType.Reference(
+                ReferenceType.Ref(ConcreteHeapType.Defined(state.compiler.types.functionType(instruction.funcIdx))),
+            )
             destination = destination(state, null, nextInstruction)
             val address = state.compiler.instance.functionAddresses[instruction.funcIdx.toInt()]
             state.emitRefFunc(ReferenceValue.Function(address).toLong(), destination.slot)
@@ -79,28 +81,24 @@ internal fun compileReferenceInstruction(
             val operand = state.pop()
             resultType = i32Type
             destination = destination(state, operand, nextInstruction)
-            hydrateReferenceType(state, instruction.referenceType)
-            state.emitRefTest(state.materialize(operand), destination.slot, instruction.referenceType)
+            state.emitRefTest(
+                state.materialize(operand),
+                destination.slot,
+                ReferenceTypeTest.from(instruction.referenceType, state.compiler.runtimeTypes),
+            )
         }
         is ReferenceInstruction.RefCast -> {
             val operand = state.pop()
             resultType = ValueType.Reference(instruction.referenceType)
             destination = destination(state, operand, nextInstruction)
-            hydrateReferenceType(state, instruction.referenceType)
-            state.emitRefCast(state.materialize(operand), destination.slot, instruction.referenceType)
+            state.emitRefCast(
+                state.materialize(operand),
+                destination.slot,
+                ReferenceTypeTest.from(instruction.referenceType, state.compiler.runtimeTypes),
+            )
         }
     }
 
     completeDestination(state, resultType, destination)
     return destination.consumesNextInstruction
-}
-
-internal fun hydrateReferenceType(
-    state: FunctionCompilationContext,
-    type: ReferenceType,
-) {
-    val heapType = type.heapType
-    if (heapType is ConcreteHeapType.TypeIndex) {
-        state.compiler.runtimeTypes[heapType.index].hydrate()
-    }
 }

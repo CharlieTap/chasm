@@ -275,7 +275,6 @@ public final class io/github/charlietap/chasm/type/DefinedType {
 	public static synthetic fun copy$default (Lio/github/charlietap/chasm/type/DefinedType;Lio/github/charlietap/chasm/type/RecursiveType;IIILjava/lang/Object;)Lio/github/charlietap/chasm/type/DefinedType;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAsSubType ()Lio/github/charlietap/chasm/type/SubType;
-	public final fun getParent ()Lio/github/charlietap/chasm/type/DefinedType;
 	public final fun getRecursiveType ()Lio/github/charlietap/chasm/type/RecursiveType;
 	public final fun getRecursiveTypeIndex ()I
 	public final fun getTypeIndex ()I
@@ -428,14 +427,6 @@ public final class io/github/charlietap/chasm/type/PackedType$I8 : io/github/cha
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/charlietap/chasm/type/RTT {
-	public fun <init> (Lio/github/charlietap/chasm/type/DefinedType;Ljava/util/Map;)V
-	public final fun getCache ()Ljava/util/Map;
-	public final fun getSuperTypes ()Ljava/util/List;
-	public final fun getType ()Lio/github/charlietap/chasm/type/DefinedType;
-	public final fun hydrate ()V
 }
 
 public final class io/github/charlietap/chasm/type/RecursiveType : io/github/charlietap/chasm/type/Type {
@@ -1558,7 +1549,6 @@ public final class io/github/charlietap/chasm/type/differ/ReferenceTypeDifferKt 
 }
 
 public final class io/github/charlietap/chasm/type/expansion/BlockTypeExpanderKt {
-	public static final fun BlockTypeExpander (Ljava/util/List;Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/FunctionType;
 	public static final fun LegacyBlockTypeExpander (Ljava/util/List;Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/FunctionType;
 }
 
@@ -1611,10 +1601,6 @@ public final class io/github/charlietap/chasm/type/extremas/TopOfHeapTypeKt {
 
 public final class io/github/charlietap/chasm/type/factory/DefinedTypeFactoryKt {
 	public static final fun DefinedTypeFactory (Ljava/util/List;)Ljava/util/List;
-}
-
-public final class io/github/charlietap/chasm/type/factory/RTTFactoryKt {
-	public static final fun RTTFactory (Lio/github/charlietap/chasm/type/DefinedType;Ljava/util/Map;)Lio/github/charlietap/chasm/type/RTT;
 }
 
 public final class io/github/charlietap/chasm/type/matching/CompositeTypeMatcherKt {

@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.CopyOperand
 import io.github.charlietap.chasm.runtime.instruction.OperandCopyOrder
 import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RTT
 
 internal fun FunctionCompilationContext.emitCall(
     function: FunctionInstance,

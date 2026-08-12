@@ -19,12 +19,5 @@ internal inline fun TagImportMatcher(
     val tag = store.tag(import.address)
     val descriptorRtt = context.runtimeTypes[context.types.resolve(descriptor.type).typeIndex]
 
-    when {
-        tag.rtt === descriptorRtt -> true
-        else -> {
-            tag.rtt.superTypes.any { superType ->
-                superType === descriptorRtt
-            }
-        }
-    }
+    store.runtimeTypes.matches(tag.rtt, descriptorRtt)
 }

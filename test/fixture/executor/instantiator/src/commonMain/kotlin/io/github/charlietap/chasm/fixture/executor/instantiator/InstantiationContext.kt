@@ -8,13 +8,13 @@ import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
 fun instantiationContext(
     store: Store = store(),
     module: Module = module(),
     config: RuntimeConfig = runtimeConfig(),
-    runtimeTypes: List<RTT> = [],
+    runtimeTypes: RuntimeTypeMap = store.runtimeTypes.register(module.definedTypes),
     instance: ModuleInstance? = null,
 ): InstantiationContext = InstantiationContext(
     store = store,

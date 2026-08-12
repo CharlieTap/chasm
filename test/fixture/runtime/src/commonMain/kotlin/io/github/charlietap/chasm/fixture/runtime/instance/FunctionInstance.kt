@@ -1,16 +1,16 @@
 package io.github.charlietap.chasm.fixture.runtime.instance
 
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
+import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionType
-import io.github.charlietap.chasm.fixture.type.rtt
 import io.github.charlietap.chasm.runtime.function.Function
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.HostFunction
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.type.RTT
 
 fun functionInstance(): FunctionInstance = hostFunctionInstance()
 

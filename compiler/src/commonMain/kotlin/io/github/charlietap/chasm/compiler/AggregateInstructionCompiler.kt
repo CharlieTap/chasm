@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.compiler.context.arrayType
 import io.github.charlietap.chasm.compiler.context.data
 import io.github.charlietap.chasm.compiler.context.element
-import io.github.charlietap.chasm.compiler.context.runtimeType
+import io.github.charlietap.chasm.compiler.context.rtt
 import io.github.charlietap.chasm.compiler.context.structType
 import io.github.charlietap.chasm.compiler.ext.valueType
 import io.github.charlietap.chasm.compiler.instruction.emitAnyConvertExtern
@@ -40,6 +40,7 @@ import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
 import io.github.charlietap.chasm.compiler.operand.isImmediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.ReferenceType
@@ -118,13 +119,12 @@ private fun compileRefCastStructGet(
     val reference = state.pop()
     val resultType = state.compiler.structType(get.typeIndex).fields[get.fieldIndex.toInt()].valueType()
     val destination = destination(state, reference, nextInstruction)
-    hydrateReferenceType(state, cast.referenceType)
     state.emitRefCastStructGet(
         referenceSlot = reference.let { source ->
             if (source.isImmediate) state.materialize(reference) else source.sourceSlot
         },
         destinationSlot = destination.slot,
-        referenceType = cast.referenceType,
+        typeTest = ReferenceTypeTest.from(cast.referenceType, state.compiler.runtimeTypes),
         fieldIndex = get.fieldIndex.toInt(),
     )
     completeDestination(state, resultType, destination)
@@ -195,7 +195,7 @@ internal fun compileAggregateInstruction(
         state.emitStructNew(
             fieldSlots = fields.map(state::materialize),
             destinationSlot = destination.slot,
-            rtt = state.compiler.runtimeType(instruction.typeIndex),
+            rtt = state.compiler.rtt(instruction.typeIndex),
             type = type,
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
@@ -205,7 +205,7 @@ internal fun compileAggregateInstruction(
         val destination = destination(state, null, nextInstruction)
         state.emitStructNewDefault(
             destinationSlot = destination.slot,
-            rtt = state.compiler.runtimeType(instruction.typeIndex),
+            rtt = state.compiler.rtt(instruction.typeIndex),
             type = state.compiler.structType(instruction.typeIndex),
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
@@ -259,7 +259,7 @@ internal fun compileAggregateInstruction(
             size = size,
             value = value,
             destinationSlot = destination.slot,
-            rtt = state.compiler.runtimeType(instruction.typeIndex),
+            rtt = state.compiler.rtt(instruction.typeIndex),
             type = state.compiler.arrayType(instruction.typeIndex),
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
@@ -271,7 +271,7 @@ internal fun compileAggregateInstruction(
         state.emitArrayNewFixed(
             valueSlots = values.map(state::materialize),
             destinationSlot = destination.slot,
-            rtt = state.compiler.runtimeType(instruction.typeIndex),
+            rtt = state.compiler.rtt(instruction.typeIndex),
             type = state.compiler.arrayType(instruction.typeIndex),
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
@@ -283,7 +283,7 @@ internal fun compileAggregateInstruction(
         state.emitArrayNewDefault(
             size = size,
             destinationSlot = destination.slot,
-            rtt = state.compiler.runtimeType(instruction.typeIndex),
+            rtt = state.compiler.rtt(instruction.typeIndex),
             type = state.compiler.arrayType(instruction.typeIndex),
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
@@ -297,7 +297,7 @@ internal fun compileAggregateInstruction(
             sourceOffset = sourceOffset,
             length = length,
             destinationSlot = destination.slot,
-            rtt = state.compiler.runtimeType(instruction.typeIndex),
+            rtt = state.compiler.rtt(instruction.typeIndex),
             type = state.compiler.arrayType(instruction.typeIndex),
             data = state.compiler.data(instruction.dataIndex),
         )
@@ -312,7 +312,7 @@ internal fun compileAggregateInstruction(
             sourceOffset = sourceOffset,
             length = length,
             destinationSlot = destination.slot,
-            rtt = state.compiler.runtimeType(instruction.typeIndex),
+            rtt = state.compiler.rtt(instruction.typeIndex),
             type = state.compiler.arrayType(instruction.typeIndex),
             element = state.compiler.element(instruction.elementIndex),
         )
@@ -457,7 +457,7 @@ private fun completeReferenceDestination(
 ) {
     completeDestination(
         state,
-        ValueType.Reference(ReferenceType.Ref(ConcreteHeapType.Defined(state.compiler.runtimeTypes[typeIndex].type))),
+        ValueType.Reference(ReferenceType.Ref(ConcreteHeapType.Defined(state.compiler.module.definedTypes[typeIndex]))),
         destination,
     )
 }

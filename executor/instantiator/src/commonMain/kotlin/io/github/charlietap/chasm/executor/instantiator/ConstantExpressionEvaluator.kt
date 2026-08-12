@@ -34,22 +34,25 @@ import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.expansion.DefinedTypeExpander
 import io.github.charlietap.chasm.type.ext.asArrayType
 import io.github.charlietap.chasm.type.ext.asStructType
 
-typealias ConstantExpressionEvaluator = (Store, ModuleInstance, Expression) -> Result<Long, InvocationError>
+typealias ConstantExpressionEvaluator = (Store, ModuleInstance, ModuleTypeResolver, Expression) -> Result<Long, InvocationError>
 
 fun ConstantExpressionEvaluator(
     store: Store,
     instance: ModuleInstance,
+    types: ModuleTypeResolver,
     expression: Expression,
 ): Result<Long, InvocationError> =
     ConstantExpressionEvaluator(
         store = store,
         instance = instance,
+        types = types,
         expression = expression,
         stack = ValueStack(),
     )
@@ -57,6 +60,7 @@ fun ConstantExpressionEvaluator(
 internal fun ConstantExpressionEvaluator(
     store: Store,
     instance: ModuleInstance,
+    types: ModuleTypeResolver,
     expression: Expression,
     stack: ValueStack,
 ): Result<Long, InvocationError> {
@@ -115,7 +119,7 @@ internal fun ConstantExpressionEvaluator(
             is AggregateInstruction.StructNew -> {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
-                val structType = DefinedTypeExpander(rtt.type).asStructType()
+                val structType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asStructType()
                 val size = structType.fields.size
                 val fields = LongArray(size)
                 for (i in size - 1 downTo 0) {
@@ -128,7 +132,7 @@ internal fun ConstantExpressionEvaluator(
             is AggregateInstruction.StructNewDefault -> {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
-                val structType = DefinedTypeExpander(rtt.type).asStructType()
+                val structType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asStructType()
                 val fields = LongArray(structType.fields.size) { idx ->
                     structType.fields[idx].default()
                 }
@@ -139,7 +143,7 @@ internal fun ConstantExpressionEvaluator(
             is AggregateInstruction.ArrayNew -> {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
-                val arrayType = DefinedTypeExpander(rtt.type).asArrayType()
+                val arrayType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asArrayType()
                 val size = stack.popI32()
                 val value = stack.pop()
                 val fields = LongArray(size) { value }
@@ -150,7 +154,7 @@ internal fun ConstantExpressionEvaluator(
             is AggregateInstruction.ArrayNewDefault -> {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
-                val arrayType = DefinedTypeExpander(rtt.type).asArrayType()
+                val arrayType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asArrayType()
                 val size = stack.popI32()
                 val defaultValue = arrayType.fieldType.default()
                 val fields = LongArray(size) { defaultValue }
@@ -161,7 +165,7 @@ internal fun ConstantExpressionEvaluator(
             is AggregateInstruction.ArrayNewFixed -> {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
-                val arrayType = DefinedTypeExpander(rtt.type).asArrayType()
+                val arrayType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asArrayType()
                 val length = instruction.size.toInt()
                 val fields = LongArray(length)
                 for (i in length - 1 downTo 0) {

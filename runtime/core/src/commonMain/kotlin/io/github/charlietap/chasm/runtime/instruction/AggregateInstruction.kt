@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.runtime.instruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.StructType
 import kotlin.jvm.JvmInline
 

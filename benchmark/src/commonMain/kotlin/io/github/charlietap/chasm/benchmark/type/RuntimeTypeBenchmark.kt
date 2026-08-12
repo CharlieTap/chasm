@@ -2,18 +2,19 @@ package io.github.charlietap.chasm.benchmark.type
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
+import io.github.charlietap.chasm.runtime.type.RTT
+import io.github.charlietap.chasm.runtime.type.RuntimeTypeRegistry
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.NumberType
-import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.SubType
 import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
-import io.github.charlietap.chasm.type.factory.RTTFactory
+import io.github.charlietap.chasm.type.rolling.DefinedTypeUnroller
 import kotlinx.benchmark.Benchmark
 import kotlinx.benchmark.BenchmarkMode
 import kotlinx.benchmark.BenchmarkTimeUnit
@@ -37,30 +38,49 @@ class RuntimeTypeBenchmark : StabilizedBenchmark() {
     @Param("1", "8", "64")
     var chainDepth: Int = 0
 
+    private lateinit var originalTypes: List<DefinedType>
     private lateinit var equivalentTypes: List<DefinedType>
-    private lateinit var currentRoot: RTT
-    private lateinit var currentLeaf: RTT
-    private lateinit var currentMiss: RTT
-    private lateinit var currentCache: MutableMap<DefinedType, RTT>
+    private lateinit var currentRoot: BaselineRTT
+    private lateinit var currentLeaf: BaselineRTT
+    private lateinit var currentMiss: BaselineRTT
+    private lateinit var currentCache: MutableMap<DefinedType, BaselineRTT>
+    private lateinit var originalParents: List<DefinedType?>
     private lateinit var displayRoot: DisplayRTT
     private lateinit var displayLeaf: DisplayRTT
     private lateinit var displayMiss: DisplayRTT
+    private lateinit var registry: RuntimeTypeRegistry
+    private var registryRoot = RTT(-1)
+    private var registryLeaf = RTT(-1)
+    private var registryMiss = RTT(-1)
 
     @Setup
     fun setup() {
-        val originalTypes = definedTypeChain(chainDepth)
+        originalTypes = definedTypeChain(chainDepth)
         equivalentTypes = definedTypeChain(chainDepth)
+        originalParents = originalTypes.map(::baselineParent)
         currentCache = mutableMapOf()
-        val currentTypes = originalTypes.map { type -> RTTFactory(type, currentCache) }
-        currentTypes.forEach(RTT::hydrate)
+        val currentTypes = originalTypes.mapIndexed { index, type ->
+            baselineRuntimeType(type, originalParents[index], currentCache)
+        }
+        currentTypes.forEach(BaselineRTT::hydrate)
         currentRoot = currentTypes.first()
         currentLeaf = currentTypes.last()
-        currentMiss = RTTFactory(definedTypeChain(1, paramCount = 1).single(), currentCache)
+        currentMiss = baselineRuntimeType(
+            type = definedTypeChain(1, paramCount = 1).single(),
+            parent = null,
+            cache = currentCache,
+        )
 
         val displayTypes = displayTypeChain(chainDepth)
         displayRoot = displayTypes.first()
         displayLeaf = displayTypes.last()
         displayMiss = displayTypeChain(1).single()
+
+        registry = RuntimeTypeRegistry()
+        val registryTypes = registry.register(originalTypes)
+        registryRoot = registryTypes[0]
+        registryLeaf = registryTypes[registryTypes.size - 1]
+        registryMiss = registry.register(definedTypeChain(1, paramCount = 1))[0]
     }
 
     @Benchmark
@@ -84,6 +104,16 @@ class RuntimeTypeBenchmark : StabilizedBenchmark() {
     }
 
     @Benchmark
+    fun registryRootSubtypeCheck(blackhole: Blackhole) {
+        blackhole.consume(registry.matches(registryLeaf, registryRoot))
+    }
+
+    @Benchmark
+    fun registrySubtypeMiss(blackhole: Blackhole) {
+        blackhole.consume(registry.matches(registryLeaf, registryMiss))
+    }
+
+    @Benchmark
     fun currentEquivalentTypeHash(blackhole: Blackhole) {
         blackhole.consume(equivalentTypes.last().hashCode())
     }
@@ -91,8 +121,37 @@ class RuntimeTypeBenchmark : StabilizedBenchmark() {
     @Benchmark
     fun currentEquivalentModuleCacheLookup(blackhole: Blackhole) {
         for (type in equivalentTypes) {
-            blackhole.consume(RTTFactory(type, currentCache))
+            blackhole.consume(baselineRuntimeType(type, originalParents[type.typeIndex], currentCache))
         }
+    }
+
+    @Benchmark
+    fun currentEquivalentModuleTypeAllocation(blackhole: Blackhole) {
+        blackhole.consume(
+            equivalentTypes.map { type ->
+                baselineRuntimeType(type, originalParents[type.typeIndex], currentCache)
+            },
+        )
+    }
+
+    @Benchmark
+    fun currentColdModuleTypeAllocation(blackhole: Blackhole) {
+        val cache = mutableMapOf<DefinedType, BaselineRTT>()
+        val runtimeTypes = originalTypes.mapIndexed { index, type ->
+            baselineRuntimeType(type, originalParents[index], cache)
+        }
+        runtimeTypes.forEach(BaselineRTT::hydrate)
+        blackhole.consume(runtimeTypes)
+    }
+
+    @Benchmark
+    fun registryEquivalentModuleTypeAllocation(blackhole: Blackhole) {
+        blackhole.consume(registry.register(equivalentTypes))
+    }
+
+    @Benchmark
+    fun registryColdModuleTypeAllocation(blackhole: Blackhole) {
+        blackhole.consume(RuntimeTypeRegistry().register(originalTypes))
     }
 
     private class DisplayRTT(
@@ -106,7 +165,38 @@ class RuntimeTypeBenchmark : StabilizedBenchmark() {
         }
     }
 
+    private class BaselineRTT(
+        val type: DefinedType,
+        val parent: DefinedType?,
+        val cache: Map<DefinedType, BaselineRTT>,
+    ) {
+        val superTypes by lazy {
+            var superType = parent
+            buildList {
+                while (true) {
+                    val current = superType ?: break
+                    val rtt = cache.getValue(current)
+                    add(rtt)
+                    superType = rtt.parent
+                }
+            }
+        }
+
+        fun hydrate() {
+            check(superTypes.isNotEmpty() || superTypes.isEmpty())
+        }
+    }
+
     private companion object {
+        fun baselineRuntimeType(
+            type: DefinedType,
+            parent: DefinedType?,
+            cache: MutableMap<DefinedType, BaselineRTT>,
+        ): BaselineRTT = cache.getOrPut(type) { BaselineRTT(type, parent, cache) }
+
+        fun baselineParent(type: DefinedType): DefinedType? =
+            (DefinedTypeUnroller(type).superTypes.firstOrNull() as? ConcreteHeapType.Defined)?.definedType
+
         fun definedTypeChain(
             depth: Int,
             paramCount: Int = 0,

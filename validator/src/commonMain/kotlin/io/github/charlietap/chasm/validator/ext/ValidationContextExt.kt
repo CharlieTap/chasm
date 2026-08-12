@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
-import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 import io.github.charlietap.chasm.type.expansion.LegacyBlockTypeExpander
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.validator.context.CoreTypeValidationContext

@@ -38,7 +38,6 @@ import io.github.charlietap.chasm.fixture.type.refNonNullReferenceType
 import io.github.charlietap.chasm.fixture.type.refNullReferenceType
 import io.github.charlietap.chasm.fixture.type.referenceValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.fixture.type.rtt
 import io.github.charlietap.chasm.fixture.type.structCompositeType
 import io.github.charlietap.chasm.fixture.type.structType
 import io.github.charlietap.chasm.fixture.type.valueStorageType
@@ -960,15 +959,16 @@ private fun compilerContext(
     module: io.github.charlietap.chasm.ast.module.Module,
     config: RuntimeConfig = runtimeConfig(),
 ): CompilerContext {
+    val store = store()
     return CompilerContext(
         config = config,
         module = module,
         types = ModuleTypeResolver(module),
-        store = store(),
+        store = store,
         instance = moduleInstance(
             functionAddresses = MutableList(module.functions.size) { index -> Address.Function(index) },
         ),
-        runtimeTypes = module.definedTypes.map { type -> rtt(type) },
+        runtimeTypes = store.runtimeTypes.register(module.definedTypes),
     )
 }
 

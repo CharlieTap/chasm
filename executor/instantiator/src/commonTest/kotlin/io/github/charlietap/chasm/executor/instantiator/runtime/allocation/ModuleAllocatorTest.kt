@@ -38,7 +38,7 @@ class ModuleAllocatorTest {
             context = context,
             instance = instance,
             tableInitValues = longArrayOf(),
-            constantExpressionEvaluator = { _, _, _ -> Ok((++evaluationCount).toLong()) },
+            constantExpressionEvaluator = { _, _, _, _ -> Ok((++evaluationCount).toLong()) },
             tableAllocator = { _, _, _ -> error("unexpected table allocation") },
             memoryAllocator = { _, _ -> error("unexpected memory allocation") },
             tagAllocator = { _, _, _ -> error("unexpected tag allocation") },

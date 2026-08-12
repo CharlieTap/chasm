@@ -19,15 +19,5 @@ internal inline fun FunctionImportMatcher(
 
     val store = context.store
     val actualFunction = store.function(import.address)
-    val actualFunctionRtt = actualFunction.rtt
-    val descriptorFunctionRtt = context.runtimeTypes[descriptor.typeIndex.toInt()]
-
-    when {
-        actualFunctionRtt === descriptorFunctionRtt -> true
-        else -> {
-            actualFunctionRtt.superTypes.any { superType ->
-                superType === descriptorFunctionRtt
-            }
-        }
-    }
+    store.runtimeTypes.matches(actualFunction.rtt, context.runtimeTypes[descriptor.typeIndex.toInt()])
 }

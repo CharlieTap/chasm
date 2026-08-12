@@ -20,9 +20,9 @@ import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.type.StructType
 
 internal inline fun ArrayCopyExecutor(
@@ -580,7 +580,7 @@ internal inline fun RefCastStructGetExecutor(
     instruction: AggregateSuperInstruction.RefCastStructGetS,
 ) {
     val reference = vstack.getFrameSlot(instruction.referenceSlot)
-    if (!Caster(reference, instruction.referenceType, cstack.peekFrame().instance, store)) {
+    if (!Caster(reference, instruction.typeTest, store)) {
         throw InvocationException(InvocationError.FailedToCastReference)
     }
     vstack.setFrameSlot(

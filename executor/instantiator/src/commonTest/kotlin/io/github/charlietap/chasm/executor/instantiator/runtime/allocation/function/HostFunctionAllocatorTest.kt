@@ -5,11 +5,9 @@ import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
-import io.github.charlietap.chasm.fixture.type.rtt
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.HostFunction
 import io.github.charlietap.chasm.type.ext.definedType
-import io.github.charlietap.chasm.type.factory.RTTFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -26,10 +24,7 @@ class HostFunctionAllocatorTest {
         val functionType = functionType()
         val hostFunction: HostFunction = { emptyList() }
 
-        val rtt = rtt()
-        val rttFactory: RTTFactory = { _, _ ->
-            rtt
-        }
+        val rtt = store.runtimeTypes.register(functionType.definedType())
 
         val expectedInstance = FunctionInstance.HostFunction(
             rtt = rtt,
@@ -44,7 +39,6 @@ class HostFunctionAllocatorTest {
             store = store,
             functionType = functionType,
             function = hostFunction,
-            rttFactory = rttFactory,
         )
 
         assertEquals(expected, actual)

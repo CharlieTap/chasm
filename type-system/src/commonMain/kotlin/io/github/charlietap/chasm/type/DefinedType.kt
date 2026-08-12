@@ -7,13 +7,10 @@ data class DefinedType(
     val recursiveTypeIndex: Int,
     val typeIndex: Int = -1,
 ) {
-    val asSubType by lazy {
-        DefinedTypeUnroller(this)
-    }
+    private var expandedSubType: SubType? = null
 
-    val parent by lazy {
-        (asSubType.superTypes.firstOrNull() as? ConcreteHeapType.Defined)?.definedType
-    }
+    val asSubType: SubType
+        get() = expandedSubType ?: DefinedTypeUnroller(this).also { expandedSubType = it }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

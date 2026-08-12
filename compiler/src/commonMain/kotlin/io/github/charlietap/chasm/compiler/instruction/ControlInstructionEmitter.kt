@@ -30,7 +30,7 @@ import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
-import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction as RuntimeControlInstruction
 
 internal class SlotCopyPlan private constructor(
@@ -392,8 +392,7 @@ internal fun FunctionCompilationContext.emitBranchOnCast(
     operand: OperandSource,
     target: ProgramTarget,
     copies: SlotCopyPlan,
-    sourceType: ReferenceType,
-    destinationType: ReferenceType,
+    typeTest: ReferenceTypeTest,
     onSuccess: Boolean,
     handlerPopCount: Int,
 ) {
@@ -403,23 +402,22 @@ internal fun FunctionCompilationContext.emitBranchOnCast(
     program.append(branchTarget) { targetIp ->
         when {
             onSuccess && immediate -> dispatch(
-                AdminInstruction.JumpOnCastI(operandBits, targetIp, sourceType, destinationType),
+                AdminInstruction.JumpOnCastI(operandBits, targetIp, typeTest),
                 ::JumpDispatcher,
             )
             onSuccess -> dispatch(
-                AdminInstruction.JumpOnCastS(operandBits.toInt(), targetIp, sourceType, destinationType),
+                AdminInstruction.JumpOnCastS(operandBits.toInt(), targetIp, typeTest),
                 ::JumpDispatcher,
             )
             immediate -> dispatch(
-                AdminInstruction.JumpOnCastFailI(operandBits, targetIp, sourceType, destinationType),
+                AdminInstruction.JumpOnCastFailI(operandBits, targetIp, typeTest),
                 ::JumpDispatcher,
             )
             else -> dispatch(
                 AdminInstruction.JumpOnCastFailS(
                     operandBits.toInt(),
                     targetIp,
-                    sourceType,
-                    destinationType,
+                    typeTest,
                 ),
                 ::JumpDispatcher,
             )

@@ -39,7 +39,7 @@ internal inline fun TableInitializer(
             segment.mode is ElementSegment.Mode.Active
         }.forEach { segment ->
             val mode = segment.mode as ElementSegment.Mode.Active
-            val offset = constantExpressionEvaluator(store, instance, mode.offsetExpr).bind().toInt()
+            val offset = constantExpressionEvaluator(store, instance, context.types, mode.offsetExpr).bind().toInt()
 
             val tableAddress = instance.tableAddress(mode.tableIndex).bind()
             val tableInstance = store.table(tableAddress)

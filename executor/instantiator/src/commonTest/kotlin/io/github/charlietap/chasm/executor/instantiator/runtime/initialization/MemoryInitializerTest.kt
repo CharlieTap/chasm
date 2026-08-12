@@ -65,7 +65,7 @@ class MemoryInitializerTest {
             instance = instance,
         )
 
-        val constantExpressionEvaluator: ConstantExpressionEvaluator = { _store, _instance, _expression ->
+        val constantExpressionEvaluator: ConstantExpressionEvaluator = { _store, _instance, _, _expression ->
             assertEquals(store, _store)
             assertEquals(instance, _instance)
             assertEquals(activeOffsetExpression, _expression)

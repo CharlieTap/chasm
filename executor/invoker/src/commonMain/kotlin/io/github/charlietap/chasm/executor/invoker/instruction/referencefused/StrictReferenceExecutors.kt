@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
 internal inline fun RefEqExecutor(
     vstack: ValueStack,
@@ -94,10 +94,9 @@ internal inline fun RefTestExecutor(
     crossinline caster: Caster,
 ) = executeRefTest(
     vstack = vstack,
-    cstack = cstack,
     store = store,
     referenceValue = vstack.getFrameSlot(instruction.referenceSlot),
-    referenceType = instruction.referenceType,
+    typeTest = instruction.typeTest,
     destinationSlot = instruction.destinationSlot,
     caster = caster,
 )
@@ -126,10 +125,9 @@ internal inline fun RefCastExecutor(
     crossinline caster: Caster,
 ) = executeRefCast(
     vstack = vstack,
-    cstack = cstack,
     store = store,
     referenceValue = vstack.getFrameSlot(instruction.referenceSlot),
-    referenceType = instruction.referenceType,
+    typeTest = instruction.typeTest,
     destinationSlot = instruction.destinationSlot,
     caster = caster,
 )
@@ -162,15 +160,13 @@ private inline fun executeRefIsNull(
 
 private inline fun executeRefTest(
     vstack: ValueStack,
-    cstack: ControlStack,
     store: Store,
     referenceValue: Long,
-    referenceType: ReferenceType,
+    typeTest: ReferenceTypeTest,
     destinationSlot: Int,
     crossinline caster: Caster,
 ) {
-    val moduleInstance = cstack.peekFrame().instance
-    if (caster(referenceValue, referenceType, moduleInstance, store)) {
+    if (caster(referenceValue, typeTest, store)) {
         vstack.setFrameSlot(destinationSlot, 1L)
     } else {
         vstack.setFrameSlot(destinationSlot, 0L)
@@ -179,15 +175,13 @@ private inline fun executeRefTest(
 
 private inline fun executeRefCast(
     vstack: ValueStack,
-    cstack: ControlStack,
     store: Store,
     referenceValue: Long,
-    referenceType: ReferenceType,
+    typeTest: ReferenceTypeTest,
     destinationSlot: Int,
     crossinline caster: Caster,
 ) {
-    val moduleInstance = cstack.peekFrame().instance
-    if (caster(referenceValue, referenceType, moduleInstance, store)) {
+    if (caster(referenceValue, typeTest, store)) {
         vstack.setFrameSlot(destinationSlot, referenceValue)
     } else {
         throw InvocationException(InvocationError.FailedToCastReference)

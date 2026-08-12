@@ -31,7 +31,7 @@ import io.github.charlietap.chasm.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import kotlin.jvm.JvmName
 
 internal typealias ModuleAllocator = (
@@ -46,7 +46,7 @@ internal typealias ModuleCompiler = (
     Store,
     Module,
     ModuleInstance,
-    List<RTT>,
+    RuntimeTypeMap,
     ModuleTypeResolver,
     CompilerDiagnostics?,
 ) -> Result<Unit, ModuleTrapError>
@@ -110,7 +110,7 @@ internal inline fun ModuleAllocator(
     }
 
     module.globals.forEach { global ->
-        val value = constantExpressionEvaluator(store, instance, global.initExpression).bind()
+        val value = constantExpressionEvaluator(store, instance, context.types, global.initExpression).bind()
         val address = globalAllocator(store, context.types.resolve(global.type), value)
         instance.addGlobalAddress(address)
     }
@@ -120,6 +120,7 @@ internal inline fun ModuleAllocator(
             constantExpressionEvaluator(
                 store,
                 instance,
+                context.types,
                 elementSegment.initExpressions[initExpressionIndex],
             ).bind()
         }

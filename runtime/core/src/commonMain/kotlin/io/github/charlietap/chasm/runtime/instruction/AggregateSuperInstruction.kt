@@ -1,8 +1,8 @@
 package io.github.charlietap.chasm.runtime.instruction
 
+import io.github.charlietap.chasm.runtime.type.RTT
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.RTT
-import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.StructType
 
 sealed interface AggregateSuperInstruction : LinkedInstruction {
@@ -511,7 +511,7 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
     data class RefCastStructGetS(
         val referenceSlot: Int,
         val destinationSlot: Int,
-        val referenceType: ReferenceType,
+        val typeTest: ReferenceTypeTest,
         val fieldIndex: Int,
     ) : AggregateSuperInstruction
 

@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RTT
 
 internal fun CallIndirectExecutor(
     vstack: ValueStack,
@@ -50,14 +50,8 @@ internal inline fun CallIndirectExecutor(
     val address = table.element(elementIndex).toFunctionAddress()
 
     val functionInstance = store.function(address)
-    val actualType = functionInstance.rtt
-    if (actualType !== type) {
-        if (actualType.superTypes.none { superType ->
-                superType === type
-            }
-        ) {
-            throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
-        }
+    if (!store.runtimeTypes.matches(functionInstance.rtt, type)) {
+        throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
 
     return when (functionInstance) {

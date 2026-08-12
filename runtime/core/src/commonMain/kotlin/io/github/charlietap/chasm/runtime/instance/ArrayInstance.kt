@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.RTT
 
 data class ArrayInstance(
     val rtt: RTT,

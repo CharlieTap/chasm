@@ -22,8 +22,8 @@ import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.type.RTT
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor as ControlThrowRefExecutor
 
 internal fun CallExecutor(
@@ -323,8 +323,7 @@ private fun strictResolveIndirectFunction(
 ): FunctionInstance {
     val address = table.element(elementIndex).toFunctionAddress()
     val functionInstance = store.function(address)
-    val actualType = functionInstance.rtt
-    if (actualType !== type && actualType.superTypes.none { superType -> superType === type }) {
+    if (!store.runtimeTypes.matches(functionInstance.rtt, type)) {
         throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
     return functionInstance

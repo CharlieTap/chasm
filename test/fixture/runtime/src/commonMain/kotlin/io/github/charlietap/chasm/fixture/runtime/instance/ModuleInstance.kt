@@ -3,11 +3,11 @@ package io.github.charlietap.chasm.fixture.runtime.instance
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.instance.ExportInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.type.DefinedType
-import io.github.charlietap.chasm.type.RTT
 
 fun moduleInstance(
-    runtimeTypes: List<RTT> = [],
+    runtimeTypes: RuntimeTypeMap = RuntimeTypeMap.Empty,
     functionAddresses: MutableList<Address.Function> = [],
     tableAddresses: MutableList<Address.Table> = [],
     memAddresses: MutableList<Address.Memory> = [],

@@ -1,11 +1,10 @@
 package io.github.charlietap.chasm.runtime.instance
 
 import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.type.DefinedType
-import io.github.charlietap.chasm.type.RTT
+import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
 data class ModuleInstance(
-    val runtimeTypes: List<RTT>,
+    val runtimeTypes: RuntimeTypeMap,
     val functionAddresses: MutableList<Address.Function> = [],
     val tableAddresses: MutableList<Address.Table> = [],
     val memAddresses: MutableList<Address.Memory> = [],
