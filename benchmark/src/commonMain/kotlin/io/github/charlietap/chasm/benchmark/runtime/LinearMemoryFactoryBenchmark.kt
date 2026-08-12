@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.benchmark.runtime
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
+import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
 import io.github.charlietap.chasm.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import kotlinx.benchmark.Benchmark
@@ -19,7 +20,7 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class LinearMemoryFactoryBenchmark {
+class LinearMemoryFactoryBenchmark : StabilizedBenchmark() {
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
         val factory = LinearMemoryFactory(LinearMemory.Pages(200u))

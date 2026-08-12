@@ -39,6 +39,7 @@ kotlin {
             dependencies {
                 implementation(projects.chasm)
                 implementation(projects.executor.invoker)
+                implementation(projects.libs.benchmark)
                 implementation(projects.memory)
                 implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.runtime)
@@ -61,6 +62,12 @@ tasks.register<JavaExec>("coremark") {
     description = "Run the Coremark benchmark"
     classpath = kotlin.jvm().compilations["main"].run { runtimeDependencyFiles + output.allOutputs }
     mainClass.set("io.github.charlietap.chasm.benchmark.coremark.CoremarkBenchmarkKt")
+}
+
+tasks.withType<JavaExec>().configureEach {
+    if (JavaVersion.current() >= JavaVersion.VERSION_24) {
+        jvmArgs("--enable-native-access=ALL-UNNAMED")
+    }
 }
 
 tasks.withType<ConfigurableKtLintTask>().configureEach {

@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.benchmark.instruction.memory
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
+import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
 import io.github.charlietap.chasm.executor.invoker.instruction.memory.store.I64StoreExecutor
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
@@ -35,7 +36,7 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class I64StoreInstructionBenchmark {
+class I64StoreInstructionBenchmark : StabilizedBenchmark() {
 
     private val vstack = vstack()
     private val cstack = cstack()

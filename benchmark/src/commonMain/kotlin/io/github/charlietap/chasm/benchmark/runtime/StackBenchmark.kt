@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.benchmark.runtime
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
+import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.value.executionValue
 import io.github.charlietap.chasm.stack.stackOf
@@ -21,7 +22,7 @@ import kotlinx.benchmark.Warmup
 @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
 @Warmup(iterations = BenchmarkConfig.WARMUP_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
 @Measurement(iterations = BenchmarkConfig.MEASUREMENT_ITERATIONS, time = BenchmarkConfig.ITERATION_TIME)
-class StackBenchmark {
+class StackBenchmark : StabilizedBenchmark() {
 
     private val stack = stackOf<Any>()
 

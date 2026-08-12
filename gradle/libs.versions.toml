@@ -41,6 +41,7 @@ hilt-integrations = "1.2.0"
 idea-ext-plugin = "1.1.10"
 
 junit = "4.13.2"
+jna = "5.19.1"
 
 kotlin = "2.4.0"
 k-poet = "2.2.0"
@@ -121,6 +122,7 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dag
 hilt-integrations-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-integrations"}
 
 junit = { module = "junit:junit", version.ref = "junit"}
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna"}
 
 kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin"}
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "k-poet"}

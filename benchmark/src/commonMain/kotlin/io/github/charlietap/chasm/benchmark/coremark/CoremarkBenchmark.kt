@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.benchmark.coremark
 
 import com.goncalossilva.resources.Resource
+import io.github.charlietap.chasm.benchmark.BenchmarkMode
+import io.github.charlietap.chasm.benchmark.BenchmarkStabilizer
 import io.github.charlietap.chasm.embedding.dsl.imports
 import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
@@ -13,8 +15,24 @@ import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.time.Clock
 
 fun main() {
+    val topology = BenchmarkStabilizer.topology()
+    val application = BenchmarkStabilizer.enter(BenchmarkMode.PREFER_FASTEST, topology)
+    val effectiveTopology = if (application.isSupported) topology else topology.copy(fastestCpuIds = emptySet())
+    val start = BenchmarkStabilizer.awaitFastestCore(topology = effectiveTopology)
+    check(application.canProceed) {
+        application.message ?: "Could not request fastest-core placement"
+    }
+    check(!effectiveTopology.isPlacementSupported || start.isFastest == true) {
+        "CoreMark started on logical CPU ${start.cpuId}, outside the fastest class"
+    }
+
     val benchmark = CoremarkBenchmark()
     benchmark.run()
+
+    val placement = BenchmarkStabilizer.finishTrial(start, effectiveTopology)
+    check(placement.isValid) {
+        "CoreMark placement was invalid: ${placement.start.cpuId} -> ${placement.end.cpuId}"
+    }
 }
 
 class CoremarkBenchmark {
