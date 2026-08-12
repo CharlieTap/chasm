@@ -21,6 +21,12 @@ allOpen {
 }
 
 benchmark {
+    configurations {
+        register("runtimeType") {
+            include(".*RuntimeTypeBenchmark.*")
+        }
+    }
+
     targets {
         register("jvm")
         if (isMacOsArm64Host) {

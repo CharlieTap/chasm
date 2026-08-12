@@ -9,5 +9,7 @@ internal interface CoreTypeValidationContext : TypeMatcherContext {
 
     var limitsMaximum: ULong
 
+    val definedTypeCount: Int
+
     fun definedType(index: Int): Result<DefinedType, ModuleValidatorError>
 }

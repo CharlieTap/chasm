@@ -59,6 +59,9 @@ internal class ModuleValidationContext(
     val validTypeIndices: IntRange
         get() = 0 until definedTypesValidated
 
+    override val definedTypeCount: Int
+        get() = definedTypesValidated
+
     override var limitsMaximum: ULong
         get() = typeContext.limitsMaximum
         set(value) {

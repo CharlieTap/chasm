@@ -18,10 +18,12 @@ import io.github.charlietap.chasm.validator.ext.type
 internal fun SubTypeValidator(
     context: CoreTypeValidationContext,
     type: SubType,
+    typeIndex: Int,
 ): Result<Unit, ModuleValidatorError> =
     SubTypeValidator(
         context = context,
         type = type,
+        typeIndex = typeIndex,
         compositeTypeMatcher = ::CompositeTypeMatcher,
         compositeTypeValidator = ::CompositeTypeValidator,
         heapTypeValidator = ::HeapTypeValidator,
@@ -30,15 +32,22 @@ internal fun SubTypeValidator(
 internal inline fun SubTypeValidator(
     context: CoreTypeValidationContext,
     type: SubType,
+    typeIndex: Int,
     crossinline compositeTypeMatcher: TypeMatcher<CompositeType>,
     crossinline compositeTypeValidator: CoreTypeValidator<CompositeType>,
     crossinline heapTypeValidator: CoreTypeValidator<HeapType>,
 ): Result<Unit, ModuleValidatorError> = binding {
     compositeTypeValidator(context, type.compositeType).bind()
+    if (type.superTypes.size > 1) {
+        Err(TypeValidatorError.TypeMismatch).bind()
+    }
     type.superTypes.forEach { superType ->
         heapTypeValidator(context, superType).bind()
         when (superType) {
             is ConcreteHeapType.TypeIndex -> {
+                if (superType.index >= typeIndex) {
+                    Err(TypeValidatorError.TypeMismatch).bind()
+                }
                 val definedType = context.type(superType.index).bind()
                 val subType = definedType.asSubType
                 if (subType is SubType.Final) {

@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.type
 import io.github.charlietap.chasm.runtime.ext.array
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.isArrayReference
+import io.github.charlietap.chasm.runtime.ext.isExceptionReference
 import io.github.charlietap.chasm.runtime.ext.isExternReference
 import io.github.charlietap.chasm.runtime.ext.isFunctionReference
 import io.github.charlietap.chasm.runtime.ext.isHostReference
@@ -68,7 +69,7 @@ private inline fun Long.isTypeOf(
     AbstractHeapType.I31 -> isI31Reference()
     AbstractHeapType.Array -> isArrayReference()
     AbstractHeapType.Struct -> isStructReference()
-    AbstractHeapType.Exception,
+    AbstractHeapType.Exception -> isExceptionReference()
     AbstractHeapType.NoException,
     is AbstractHeapType.Bottom,
     AbstractHeapType.NoExtern,

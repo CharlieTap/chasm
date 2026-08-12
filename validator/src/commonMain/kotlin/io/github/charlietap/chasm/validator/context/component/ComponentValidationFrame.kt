@@ -73,6 +73,9 @@ internal class ComponentValidationFrame : CoreTypeValidationContext {
 
     override var limitsMaximum: ULong = ULong.MAX_VALUE
 
+    override val definedTypeCount: Int
+        get() = coreTypes.size
+
     override val lookup: DefinedTypeLookup = { index ->
         (coreTypes.getOrNull(index) as? CoreType.Defined)?.type
     }
