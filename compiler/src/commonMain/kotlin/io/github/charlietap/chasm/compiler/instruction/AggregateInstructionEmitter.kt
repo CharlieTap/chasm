@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.ext.bitWidth
 
@@ -39,14 +40,15 @@ internal fun FunctionCompilationContext.emitStructNewDefault(
 
 internal fun FunctionCompilationContext.emitStructGet(
     signed: Boolean?,
+    packedType: PackedType?,
     addressSlot: Int,
     destinationSlot: Int,
     fieldIndex: Int,
 ) = emitAggregate(
     when (signed) {
         null -> AggregateSuperInstruction.StructGetS(addressSlot, destinationSlot, fieldIndex)
-        true -> AggregateSuperInstruction.StructGetSignedS(addressSlot, destinationSlot, fieldIndex)
-        false -> AggregateSuperInstruction.StructGetUnsignedS(addressSlot, destinationSlot, fieldIndex)
+        true -> AggregateSuperInstruction.StructGetSignedS(addressSlot, destinationSlot, fieldIndex, packedType)
+        false -> AggregateSuperInstruction.StructGetUnsignedS(addressSlot, destinationSlot, fieldIndex, packedType)
     },
 )
 
@@ -186,6 +188,7 @@ internal fun FunctionCompilationContext.emitArrayNewFixed(
 
 internal fun FunctionCompilationContext.emitArrayGet(
     signed: Boolean?,
+    packedType: PackedType?,
     addressSlot: Int,
     field: OperandSource,
     destinationSlot: Int,
@@ -194,8 +197,8 @@ internal fun FunctionCompilationContext.emitArrayGet(
     emitAggregate(
         when (signed) {
             null -> if (immediate) AggregateSuperInstruction.ArrayGetI(addressSlot, field.i32Immediate, destinationSlot) else AggregateSuperInstruction.ArrayGetS(addressSlot, field.sourceSlot, destinationSlot)
-            true -> if (immediate) AggregateSuperInstruction.ArrayGetSignedI(addressSlot, field.i32Immediate, destinationSlot) else AggregateSuperInstruction.ArrayGetSignedS(addressSlot, field.sourceSlot, destinationSlot)
-            false -> if (immediate) AggregateSuperInstruction.ArrayGetUnsignedI(addressSlot, field.i32Immediate, destinationSlot) else AggregateSuperInstruction.ArrayGetUnsignedS(addressSlot, field.sourceSlot, destinationSlot)
+            true -> if (immediate) AggregateSuperInstruction.ArrayGetSignedI(addressSlot, field.i32Immediate, destinationSlot, packedType) else AggregateSuperInstruction.ArrayGetSignedS(addressSlot, field.sourceSlot, destinationSlot, packedType)
+            false -> if (immediate) AggregateSuperInstruction.ArrayGetUnsignedI(addressSlot, field.i32Immediate, destinationSlot, packedType) else AggregateSuperInstruction.ArrayGetUnsignedS(addressSlot, field.sourceSlot, destinationSlot, packedType)
         },
     )
 }

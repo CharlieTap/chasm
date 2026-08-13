@@ -57,13 +57,13 @@ fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetI) = dispa
 
 fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetS) = dispatchInstruction(instruction, ::ArrayGetExecutor)
 
-fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedI) = dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
+fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedI) = PackedArrayGetSignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
 
-fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedS) = dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
+fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedS) = PackedArrayGetSignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
 
-fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedI) = dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
+fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedI) = PackedArrayGetUnsignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
 
-fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedS) = dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
+fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedS) = PackedArrayGetUnsignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
 
 fun ArrayLenDispatcher(instruction: AggregateSuperInstruction.ArrayLenS) = dispatchInstruction(instruction, ::ArrayLenExecutor)
 
@@ -87,9 +87,9 @@ fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetSs) = disp
 
 fun StructGetDispatcher(instruction: AggregateSuperInstruction.StructGetS) = dispatchInstruction(instruction, ::StructGetExecutor)
 
-fun StructGetSignedDispatcher(instruction: AggregateSuperInstruction.StructGetSignedS) = dispatchInstruction(instruction, ::StructGetSignedExecutor)
+fun StructGetSignedDispatcher(instruction: AggregateSuperInstruction.StructGetSignedS) = PackedStructGetSignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::StructGetSignedExecutor)
 
-fun StructGetUnsignedDispatcher(instruction: AggregateSuperInstruction.StructGetUnsignedS) = dispatchInstruction(instruction, ::StructGetUnsignedExecutor)
+fun StructGetUnsignedDispatcher(instruction: AggregateSuperInstruction.StructGetUnsignedS) = PackedStructGetUnsignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::StructGetUnsignedExecutor)
 
 fun RefCastStructGetDispatcher(instruction: AggregateSuperInstruction.RefCastStructGetS) = dispatchInstruction(instruction, ::RefCastStructGetExecutor)
 

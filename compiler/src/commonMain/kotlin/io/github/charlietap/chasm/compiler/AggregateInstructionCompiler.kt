@@ -44,6 +44,7 @@ import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
 
 internal fun AggregateInstruction.isAllocating(): Boolean = when (this) {
@@ -226,7 +227,8 @@ internal fun compileAggregateInstruction(
             is AggregateInstruction.StructGetSigned -> instruction.fieldIndex
             is AggregateInstruction.StructGetUnsigned -> instruction.fieldIndex
         }
-        val resultType = state.compiler.structType(typeIndex).fields[fieldIndex.toInt()].valueType()
+        val fieldType = state.compiler.structType(typeIndex).fields[fieldIndex.toInt()]
+        val resultType = fieldType.valueType()
         val destination = destination(state, address, nextInstruction)
         state.emitStructGet(
             signed = when (instruction) {
@@ -234,6 +236,7 @@ internal fun compileAggregateInstruction(
                 is AggregateInstruction.StructGetSigned -> true
                 is AggregateInstruction.StructGetUnsigned -> false
             },
+            packedType = (fieldType.storageType as? StorageType.Packed)?.type,
             addressSlot = state.operandSlot(address),
             destinationSlot = destination.slot,
             fieldIndex = fieldIndex.toInt(),
@@ -331,17 +334,19 @@ internal fun compileAggregateInstruction(
             is AggregateInstruction.ArrayGetUnsigned -> instruction.typeIndex
         }
         val destination = destination(state, address, nextInstruction)
+        val fieldType = state.compiler.arrayType(typeIndex).fieldType
         state.emitArrayGet(
             signed = when (instruction) {
                 is AggregateInstruction.ArrayGet -> null
                 is AggregateInstruction.ArrayGetSigned -> true
                 is AggregateInstruction.ArrayGetUnsigned -> false
             },
+            packedType = (fieldType.storageType as? StorageType.Packed)?.type,
             addressSlot = state.operandSlot(address),
             field = field,
             destinationSlot = destination.slot,
         )
-        completeDestination(state, state.compiler.arrayType(typeIndex).fieldType.valueType(), destination)
+        completeDestination(state, fieldType.valueType(), destination)
         destination.consumesNextInstruction
     }
     is AggregateInstruction.ArraySet -> {

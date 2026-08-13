@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.runtime.instruction
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.ArrayType
+import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.StructType
 
 sealed interface AggregateSuperInstruction : LinkedInstruction {
@@ -143,24 +144,28 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val addressSlot: Int,
         val field: Int,
         val destinationSlot: Int,
+        val packedType: PackedType? = null,
     ) : AggregateSuperInstruction
 
     data class ArrayGetSignedS(
         val addressSlot: Int,
         val fieldSlot: Int,
         val destinationSlot: Int,
+        val packedType: PackedType? = null,
     ) : AggregateSuperInstruction
 
     data class ArrayGetUnsignedI(
         val addressSlot: Int,
         val field: Int,
         val destinationSlot: Int,
+        val packedType: PackedType? = null,
     ) : AggregateSuperInstruction
 
     data class ArrayGetUnsignedS(
         val addressSlot: Int,
         val fieldSlot: Int,
         val destinationSlot: Int,
+        val packedType: PackedType? = null,
     ) : AggregateSuperInstruction
 
     data class ArrayLenS(
@@ -500,12 +505,14 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val addressSlot: Int,
         val destinationSlot: Int,
         val fieldIndex: Int,
+        val packedType: PackedType? = null,
     ) : AggregateSuperInstruction
 
     data class StructGetUnsignedS(
         val addressSlot: Int,
         val destinationSlot: Int,
         val fieldIndex: Int,
+        val packedType: PackedType? = null,
     ) : AggregateSuperInstruction
 
     data class RefCastStructGetS(
