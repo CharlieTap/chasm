@@ -13,6 +13,23 @@ fun CopySlotDispatcher(
     nextIp
 }
 
+fun CopySlotSequenceDispatcher(
+    sourceSlots: IntArray,
+    destinationSlots: IntArray,
+): DispatchableInstruction {
+    require(sourceSlots.size == destinationSlots.size)
+    if (sourceSlots.size == 1) {
+        return CopySlotDispatcher(sourceSlots[0], destinationSlots[0])
+    }
+
+    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+        for (index in sourceSlots.indices) {
+            vstack.setFrameSlot(destinationSlots[index], vstack.getFrameSlot(sourceSlots[index]))
+        }
+        nextIp
+    }
+}
+
 fun CopySlotsDispatcher(
     instruction: AdminInstruction.CopySlots,
 ) = CopySlotsDispatcher(

@@ -15,9 +15,7 @@ internal fun FunctionCompilationContext.emitCopy(
     destinationSlot: Int,
 ) {
     if (sourceSlot == destinationSlot) return
-    emit(CopySlotDispatcher(sourceSlot, destinationSlot)) {
-        AdminInstruction.CopySlot(sourceSlot, destinationSlot)
-    }
+    appendCopy(sourceSlot, destinationSlot)
 }
 
 internal fun FunctionCompilationContext.emitCopies(

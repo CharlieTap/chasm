@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.compiler.context
 
 import io.github.charlietap.chasm.compiler.emptyIntArray
+import io.github.charlietap.chasm.compiler.instruction.CopyInstructionBuffer
 import io.github.charlietap.chasm.compiler.instruction.DeferredBranchPaths
 import io.github.charlietap.chasm.compiler.instruction.emitCopies
 import io.github.charlietap.chasm.compiler.instruction.emitCopy
@@ -18,6 +19,8 @@ import io.github.charlietap.chasm.compiler.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramBuilder
+import io.github.charlietap.chasm.compiler.program.ProgramTarget
+import io.github.charlietap.chasm.compiler.program.TargetInstructionFactory
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.type.ValueType
@@ -31,6 +34,7 @@ internal class FunctionCompilationContext(
 
     val operands = OperandStack(compiler.operandPool)
     private val poppedOperands = PoppedOperands(operands)
+    private var copyInstructionBuffer: CopyInstructionBuffer? = null
     internal var deferredBranchPaths: DeferredBranchPaths? = null
     val localAliases = arrayOfNulls<Operand>(layout.localCount)
     val controls = ControlStack(compiler.controlPool)
@@ -42,6 +46,7 @@ internal class FunctionCompilationContext(
         instruction: T,
         dispatcher: (T) -> DispatchableInstruction,
     ) {
+        flushCopies()
         val dispatchableInstruction = dispatcher(instruction)
         compiler.instructionObserver?.onInstruction(dispatchableInstruction, instruction)
         program.append(dispatchableInstruction)
@@ -51,6 +56,7 @@ internal class FunctionCompilationContext(
         dispatchableInstruction: DispatchableInstruction,
         instruction: () -> LinkedInstruction,
     ) {
+        flushCopies()
         compiler.instructionObserver?.onInstruction(dispatchableInstruction, instruction())
         program.append(dispatchableInstruction)
     }
@@ -70,6 +76,43 @@ internal class FunctionCompilationContext(
     ): DispatchableInstruction {
         compiler.instructionObserver?.onInstruction(dispatchableInstruction, instruction())
         return dispatchableInstruction
+    }
+
+    fun appendCopy(sourceSlot: Int, destinationSlot: Int) {
+        val buffer = copyInstructionBuffer ?: CopyInstructionBuffer(
+            program = program,
+            instructionObserver = compiler.instructionObserver,
+        ).also {
+            copyInstructionBuffer = it
+        }
+        buffer.append(sourceSlot, destinationSlot)
+    }
+
+    fun bind(target: ProgramTarget) {
+        flushCopies()
+        program.bind(target)
+    }
+
+    fun append(target: ProgramTarget, instruction: TargetInstructionFactory): Int {
+        flushCopies()
+        return program.append(target, instruction)
+    }
+
+    fun append(
+        targetIndices: IntArray,
+        instruction: (IntArray) -> DispatchableInstruction,
+    ): Int {
+        flushCopies()
+        return program.append(targetIndices, instruction)
+    }
+
+    fun finishProgram() {
+        flushCopies()
+        program.finish()
+    }
+
+    private fun flushCopies() {
+        copyInstructionBuffer?.flush()
     }
 
     fun pushFrame(type: ValueType?, reservedSlot: Int, sourceSlot: Int = reservedSlot) {

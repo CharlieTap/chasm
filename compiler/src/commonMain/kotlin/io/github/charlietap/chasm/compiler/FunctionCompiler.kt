@@ -196,7 +196,7 @@ internal fun FunctionCompiler(
         finishFunctionControl(state)
 
         state.emitDeferredBranchPaths()
-        state.program.finish()
+        state.finishProgram()
         Ok(
             RuntimeFunction(
                 idx = function.idx,

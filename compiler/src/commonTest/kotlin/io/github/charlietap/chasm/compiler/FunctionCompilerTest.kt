@@ -532,7 +532,7 @@ class FunctionCompilerTest {
 
         val compiled = compileFunction(compilerContext(module), function, baseIp = 0)
 
-        assertEquals(aliasCount + 2, compiled.instructions.size)
+        assertEquals(3, compiled.instructions.size)
     }
 
     @Test

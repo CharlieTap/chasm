@@ -169,7 +169,7 @@ internal fun FunctionCompilationContext.emitJump(
     if (handlerPopCount == 0 && copies.size > 0 && !copies.isIdentity()) {
         val destinationSlotBase = copies.destinationSlot(0)
         val operands = copies.operandCopyPlan(destinationSlotBase)
-        program.append(target) { targetIp ->
+        append(target) { targetIp ->
             dispatch(AdminInstruction.JumpCopies(operands, destinationSlotBase, targetIp), ::JumpDispatcher)
         }
         return
@@ -177,7 +177,7 @@ internal fun FunctionCompilationContext.emitJump(
 
     if (!copies.isIdentity()) emitCopies(copies)
     repeat(handlerPopCount) { emitPopHandler() }
-    program.append(target) { targetIp ->
+    append(target) { targetIp ->
         val instruction = AdminInstruction.Jump(targetIp)
         dispatch(instruction, ::JumpDispatcher)
     }
@@ -225,7 +225,7 @@ internal fun FunctionCompilationContext.emitBranchIf(
     }
     val conditionKind = condition.sourceKind
     val conditionBits = condition.sourceBits
-    program.append(branchTarget) { targetIp ->
+    append(branchTarget) { targetIp ->
         when {
             copy && conditionKind.isImmediate -> dispatch(
                 AdminInstruction.JumpIfCopyI(
@@ -281,7 +281,7 @@ internal fun FunctionCompilationContext.emitBranchIf(
         return if (branch) BranchOutcome.Always else BranchOutcome.Never
     }
     val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
-    program.append(branchTarget) { targetIp ->
+    append(branchTarget) { targetIp ->
         dispatch(JumpConditionDispatcher(condition, targetIp, branchOnMatch)) {
             if (branchOnMatch) {
                 AdminInstruction.JumpIfCondition(condition, targetIp)
@@ -362,7 +362,7 @@ internal fun FunctionCompilationContext.emitBranchTable(
     val selectorKind = selector.sourceKind
     val selectorBits = selector.sourceBits
     check(selectorKind != OperandSourceKind.I32Immediate)
-    program.append(targetIndices) { targetIps ->
+    append(targetIndices) { targetIps ->
         val instruction = AdminInstruction.JumpTableS(selectorBits.toInt(), targetIps)
         dispatch(instruction, ::JumpDispatcher)
     }
@@ -378,7 +378,7 @@ internal fun FunctionCompilationContext.emitBranchOnNull(
     val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
     val immediate = operand.sourceKind.isImmediate
     val operandBits = operand.sourceBits
-    program.append(branchTarget) { targetIp ->
+    append(branchTarget) { targetIp ->
         when {
             onNull && immediate -> dispatch(AdminInstruction.JumpOnNullI(operandBits, targetIp), ::JumpDispatcher)
             onNull -> dispatch(AdminInstruction.JumpOnNullS(operandBits.toInt(), targetIp), ::JumpDispatcher)
@@ -399,7 +399,7 @@ internal fun FunctionCompilationContext.emitBranchOnCast(
     val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
     val immediate = operand.sourceKind.isImmediate
     val operandBits = operand.sourceBits
-    program.append(branchTarget) { targetIp ->
+    append(branchTarget) { targetIp ->
         when {
             onSuccess && immediate -> dispatch(
                 AdminInstruction.JumpOnCastI(operandBits, targetIp, typeTest),
@@ -430,7 +430,7 @@ internal fun FunctionCompilationContext.emitPushHandler(
     targetIndices: IntArray,
     payloadDestinationSlots: List<IntArray>,
 ) {
-    program.append(targetIndices) { continuationIps ->
+    append(targetIndices) { continuationIps ->
         val instruction = AdminInstruction.PushHandler(handlers, continuationIps, payloadDestinationSlots)
         dispatch(instruction, ::PushHandlerDispatcher)
     }
@@ -507,15 +507,14 @@ internal class DeferredBranchPaths {
     }
 
     fun emit(context: FunctionCompilationContext) {
-        val program = context.program
         for (index in copyPlans.indices) {
-            program.bind(ProgramTarget(tailTargetIndices[index]))
+            context.bind(ProgramTarget(tailTargetIndices[index]))
             context.emitCopies(copyPlans[index])
             repeat(handlerPopCounts[index]) {
                 context.emitPopHandler()
             }
             val destination = ProgramTarget(destinationTargetIndices[index])
-            program.append(destination) { targetIp ->
+            context.append(destination) { targetIp ->
                 val instruction = AdminInstruction.Jump(targetIp)
                 context.dispatch(instruction, ::JumpDispatcher)
             }

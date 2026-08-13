@@ -81,20 +81,20 @@ internal fun finishFunctionControl(state: FunctionCompilationContext) {
         val copies = state.planCopies(root.resultSlots)
         if (root.reachedByBranch) {
             if (copies.isIdentity()) {
-                state.program.bind(root.continuationTarget)
+                state.bind(root.continuationTarget)
                 state.emit(AdminInstruction.EndFunction, ::EndFunctionDispatcher)
                 return
             }
             state.emitFunctionReturn(copies)
-            state.program.bind(root.continuationTarget)
+            state.bind(root.continuationTarget)
             state.emit(AdminInstruction.EndFunction, ::EndFunctionDispatcher)
             return
         }
-        state.program.bind(root.continuationTarget)
+        state.bind(root.continuationTarget)
         state.emitFunctionReturn(copies)
         return
     }
-    state.program.bind(root.continuationTarget)
+    state.bind(root.continuationTarget)
     if (root.reachedByBranch) {
         state.emit(AdminInstruction.EndFunction, ::EndFunctionDispatcher)
     }
@@ -191,7 +191,7 @@ private fun enterBlock(
     } else {
         resultSlots
     }
-    if (kind == BlockKind.Loop) state.program.bind(branchTarget)
+    if (kind == BlockKind.Loop) state.bind(branchTarget)
 
     state.controls.push(
         kind = kind,
@@ -338,7 +338,7 @@ private fun transitionToElse(
     if (frame.thenReachable) {
         state.emitJump(frame.continuationTarget)
     }
-    state.program.bind(frame.elseTarget)
+    state.bind(frame.elseTarget)
     state.unwindToHeight(frame.baseHeight)
     state.frame.restore(frame.entryFrameHeight)
     for (index in frame.parameterTypes.indices) {
@@ -369,7 +369,7 @@ private fun exitStructured(
     if (!state.reachable && continuesFromBranch) {
         restoreBlockResults(state, block)
     }
-    state.program.bind(block.continuationTarget)
+    state.bind(block.continuationTarget)
     if (block.kind == BlockKind.TryTable) {
         state.emitPopHandler()
         state.handlerDepth--
@@ -390,7 +390,7 @@ private fun exitIf(
         frame.reachedByBranch -> restoreBlockResults(state, frame)
         else -> state.reachable = false
     }
-    state.program.bind(frame.continuationTarget)
+    state.bind(frame.continuationTarget)
     state.rewindFrame()
 }
 
