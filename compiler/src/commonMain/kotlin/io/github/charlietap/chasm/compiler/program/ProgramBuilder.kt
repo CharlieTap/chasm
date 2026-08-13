@@ -6,6 +6,7 @@ import io.github.charlietap.chasm.runtime.program.Program
 
 internal class ProgramBuilder(
     private val program: Program,
+    private val recordRelocations: Boolean = false,
 ) {
 
     private var targetIps = IntArray(INITIAL_TARGET_CAPACITY)
@@ -22,6 +23,10 @@ internal class ProgramBuilder(
     private var unboundTargetCount = 0
     private var unresolvedInstructionCount = 0
     private var finished = false
+    private var relocationInstructionIndices = emptyIntArray
+    private var relocationTargetIps = emptyIntArray
+    private val relocationFactories = ArrayList<TargetInstructionFactory>()
+    private var multiTargetRelocations: MutableList<MultiTargetRelocation>? = null
 
     val baseIp: Int = program.size
 
@@ -72,6 +77,7 @@ internal class ProgramBuilder(
         val targetIp = targetIps[target.index]
         if (targetIp != UNBOUND_IP) {
             program.append(instruction.create(targetIp))
+            recordRelocation(index, targetIp, instruction)
             return index
         }
         program.append(unresolvedInstruction)
@@ -101,7 +107,9 @@ internal class ProgramBuilder(
             if (targetIps[targetIndex] == UNBOUND_IP) remainingTargetCount++
         }
         if (remainingTargetCount == 0) {
-            program.append(instruction(resolveTargetIpsInPlace(targetIndices)))
+            val targetIps = resolveTargetIpsInPlace(targetIndices)
+            program.append(instruction(targetIps))
+            recordMultiTargetRelocation(index, targetIps, instruction)
             return index
         }
         program.append(unresolvedInstruction)
@@ -156,6 +164,7 @@ internal class ProgramBuilder(
             val patchIndex = patch - 1
             val factory = checkNotNull(patchFactories[patchIndex])
             program.replace(patchInstructionIndices[patchIndex], factory.create(targetIp))
+            recordRelocation(patchInstructionIndices[patchIndex], targetIp, factory)
             unresolvedInstructionCount--
             patchFactories[patchIndex] = null
             patch = nextPatchIndices[patchIndex]
@@ -172,11 +181,63 @@ internal class ProgramBuilder(
             val patch = checkNotNull(multiTargetPatches)[patchIndex]
             patch.remainingTargetCount--
             if (patch.remainingTargetCount == 0) {
-                program.replace(patch.instructionIndex, patch.instruction(resolveTargetIpsInPlace(patch.targetIndices)))
+                val targetIps = resolveTargetIpsInPlace(patch.targetIndices)
+                program.replace(patch.instructionIndex, patch.instruction(targetIps))
+                recordMultiTargetRelocation(patch.instructionIndex, targetIps, patch.instruction)
                 unresolvedInstructionCount--
             }
             dependency = nextMultiTargetPatchDependencies[dependencyIndex]
         }
+    }
+
+    fun fragment(): ProgramFragment {
+        check(finished) {
+            "program must be finished before creating a fragment"
+        }
+        check(recordRelocations) {
+            "program builder is not recording relocations"
+        }
+        check(baseIp == 0) {
+            "program fragments must use function-local instruction pointers"
+        }
+        @Suppress("UNCHECKED_CAST")
+        val instructions = program.instructions.copyOf(program.size) as Array<DispatchableInstruction>
+        return ProgramFragment(
+            instructions = instructions,
+            relocationInstructionIndices = relocationInstructionIndices.copyOf(relocationFactories.size),
+            relocationTargetIps = relocationTargetIps.copyOf(relocationFactories.size),
+            relocationFactories = relocationFactories.toTypedArray(),
+            multiTargetRelocations = multiTargetRelocations?.toTypedArray() ?: emptyArray(),
+        )
+    }
+
+    private fun recordRelocation(
+        instructionIndex: Int,
+        targetIp: Int,
+        instruction: TargetInstructionFactory,
+    ) {
+        if (!recordRelocations) return
+        val index = relocationFactories.size
+        if (index == relocationInstructionIndices.size) {
+            val capacity = maxOf(INITIAL_PATCH_CAPACITY, relocationInstructionIndices.size * 2)
+            relocationInstructionIndices = relocationInstructionIndices.copyOf(capacity)
+            relocationTargetIps = relocationTargetIps.copyOf(capacity)
+        }
+        relocationInstructionIndices[index] = instructionIndex
+        relocationTargetIps[index] = targetIp
+        relocationFactories.add(instruction)
+    }
+
+    private fun recordMultiTargetRelocation(
+        instructionIndex: Int,
+        targetIps: IntArray,
+        instruction: (IntArray) -> DispatchableInstruction,
+    ) {
+        if (!recordRelocations) return
+        val relocations = multiTargetRelocations ?: mutableListOf<MultiTargetRelocation>().also {
+            multiTargetRelocations = it
+        }
+        relocations.add(MultiTargetRelocation(instructionIndex, targetIps, instruction))
     }
 
     private fun addMultiTargetPatchDependency(targetIndex: Int, patchIndex: Int) {
@@ -203,6 +264,12 @@ internal class ProgramBuilder(
         val targetIndices: IntArray,
         val instruction: (IntArray) -> DispatchableInstruction,
         var remainingTargetCount: Int,
+    )
+
+    internal class MultiTargetRelocation(
+        val instructionIndex: Int,
+        val targetIps: IntArray,
+        val instruction: (IntArray) -> DispatchableInstruction,
     )
 
     private companion object {

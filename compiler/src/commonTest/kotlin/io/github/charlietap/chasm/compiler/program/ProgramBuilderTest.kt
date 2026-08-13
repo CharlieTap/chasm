@@ -67,6 +67,54 @@ class ProgramBuilderTest {
     }
 
     @Test
+    fun relocatesFunctionLocalTargetsWhenLinkingAFragment() {
+        val localProgram = Program(1)
+        val builder = ProgramBuilder(localProgram, recordRelocations = true)
+        val target = builder.target()
+        var targetIp = -1
+
+        builder.append(target) { resolvedTargetIp ->
+            targetIp = resolvedTargetIp
+            noOpInstruction
+        }
+        builder.append(noOpInstruction)
+        builder.bind(target)
+        builder.finish()
+
+        val program = programWithSize(41)
+        val entryIp = builder.fragment().appendTo(program)
+
+        assertEquals(41, entryIp)
+        assertEquals(43, targetIp)
+        assertEquals(43, program.size)
+    }
+
+    @Test
+    fun relocatesFunctionLocalTargetListsWhenLinkingAFragment() {
+        val localProgram = Program(1)
+        val builder = ProgramBuilder(localProgram, recordRelocations = true)
+        val first = builder.target()
+        val second = builder.target()
+        var targetIps = intArrayOf()
+
+        builder.append(intArrayOf(first.index, second.index)) { resolvedTargetIps ->
+            targetIps = resolvedTargetIps
+            noOpInstruction
+        }
+        builder.bind(first)
+        builder.append(noOpInstruction)
+        builder.bind(second)
+        builder.finish()
+
+        val program = programWithSize(5)
+        val entryIp = builder.fragment().appendTo(program)
+
+        assertEquals(5, entryIp)
+        assertEquals(listOf(6, 7), targetIps.toList())
+        assertEquals(7, program.size)
+    }
+
+    @Test
     fun rejectsUnboundTargets() {
         val builder = ProgramBuilder(programWithSize(0))
         builder.target()

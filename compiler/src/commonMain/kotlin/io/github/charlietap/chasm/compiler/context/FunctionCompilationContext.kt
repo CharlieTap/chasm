@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.context
 
+import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserver
 import io.github.charlietap.chasm.compiler.emptyIntArray
 import io.github.charlietap.chasm.compiler.instruction.CopyInstructionBuffer
 import io.github.charlietap.chasm.compiler.instruction.DeferredBranchPaths
@@ -20,27 +21,30 @@ import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramBuilder
 import io.github.charlietap.chasm.compiler.program.ProgramTarget
-import io.github.charlietap.chasm.compiler.program.TargetInstructionFactory
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.type.ValueType
 
 internal class FunctionCompilationContext(
     val compiler: CompilerContext,
+    val workspace: FunctionCompilerWorkspace,
     val layout: FunctionFrameLayout,
     val frame: FrameAllocator,
     val program: ProgramBuilder,
 ) {
 
-    val operands = OperandStack(compiler.operandPool)
+    val operands = OperandStack(workspace.operandPool)
     private val poppedOperands = PoppedOperands(operands)
     private var copyInstructionBuffer: CopyInstructionBuffer? = null
     internal var deferredBranchPaths: DeferredBranchPaths? = null
     val localAliases = arrayOfNulls<Operand>(layout.localCount)
-    val controls = ControlStack(compiler.controlPool)
+    val controls = ControlStack(workspace.controlPool)
     var rootControl: BlockContext? = null
     var reachable = true
     var handlerDepth = 0
+
+    fun blockType(type: io.github.charlietap.chasm.type.BlockType): io.github.charlietap.chasm.type.FunctionType =
+        workspace.blockType(compiler, type)
 
     inline fun <T : LinkedInstruction> emit(
         instruction: T,
@@ -93,17 +97,57 @@ internal class FunctionCompilationContext(
         program.bind(target)
     }
 
-    fun append(target: ProgramTarget, instruction: TargetInstructionFactory): Int {
-        flushCopies()
-        return program.append(target, instruction)
-    }
-
-    fun append(
-        targetIndices: IntArray,
-        instruction: (IntArray) -> DispatchableInstruction,
+    inline fun <T : LinkedInstruction> append(
+        target: ProgramTarget,
+        crossinline instruction: (Int) -> T,
+        crossinline dispatcher: (T) -> DispatchableInstruction,
     ): Int {
         flushCopies()
-        return program.append(targetIndices, instruction)
+        val observer = compiler.instructionObserver
+        return program.append(target) { targetIp ->
+            val linkedInstruction = instruction(targetIp)
+            val dispatchableInstruction = dispatcher(linkedInstruction)
+            observer?.onInstruction(dispatchableInstruction, linkedInstruction)
+            dispatchableInstruction
+        }
+    }
+
+    inline fun append(
+        target: ProgramTarget,
+        crossinline instruction: (Int, CompilerInstructionObserver?) -> DispatchableInstruction,
+    ): Int {
+        flushCopies()
+        val observer = compiler.instructionObserver
+        return program.append(target) { targetIp -> instruction(targetIp, observer) }
+    }
+
+    inline fun appendDispatched(
+        target: ProgramTarget,
+        crossinline dispatchableInstruction: (Int) -> DispatchableInstruction,
+        crossinline instruction: (Int) -> LinkedInstruction,
+    ): Int {
+        flushCopies()
+        val observer = compiler.instructionObserver
+        return program.append(target) { targetIp ->
+            val dispatchable = dispatchableInstruction(targetIp)
+            observer?.onInstruction(dispatchable, instruction(targetIp))
+            dispatchable
+        }
+    }
+
+    inline fun <T : LinkedInstruction> append(
+        targetIndices: IntArray,
+        crossinline instruction: (IntArray) -> T,
+        crossinline dispatcher: (T) -> DispatchableInstruction,
+    ): Int {
+        flushCopies()
+        val observer = compiler.instructionObserver
+        return program.append(targetIndices) { targetIps ->
+            val linkedInstruction = instruction(targetIps)
+            val dispatchableInstruction = dispatcher(linkedInstruction)
+            observer?.onInstruction(dispatchableInstruction, linkedInstruction)
+            dispatchableInstruction
+        }
     }
 
     fun finishProgram() {

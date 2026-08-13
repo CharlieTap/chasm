@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.compiler.instruction.emitRefFunc
 import io.github.charlietap.chasm.compiler.instruction.emitRefIsNull
 import io.github.charlietap.chasm.compiler.instruction.emitRefNull
 import io.github.charlietap.chasm.compiler.instruction.emitRefTest
+import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
@@ -54,7 +55,7 @@ internal fun compileReferenceInstruction(
                 ReferenceType.Ref(ConcreteHeapType.Defined(state.compiler.types.functionType(instruction.funcIdx))),
             )
             destination = destination(state, null, nextInstruction)
-            val address = state.compiler.instance.functionAddresses[instruction.funcIdx.toInt()]
+            val address = Address.Function(state.compiler.functionAddresses[instruction.funcIdx.toInt()])
             state.emitRefFunc(ReferenceValue.Function(address).toLong(), destination.slot)
         }
         ReferenceInstruction.RefIsNull -> {

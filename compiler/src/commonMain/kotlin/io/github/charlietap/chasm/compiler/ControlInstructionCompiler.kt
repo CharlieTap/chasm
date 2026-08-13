@@ -164,7 +164,7 @@ private fun enterBlock(
         return
     }
 
-    val type = state.compiler.blockType(blockType)
+    val type = state.blockType(blockType)
     val parameterCount = type.params.types.size
     val baseHeight = state.operands.size - parameterCount
     check(baseHeight >= 0)
@@ -238,7 +238,7 @@ private inline fun enterIf(
     instruction: ControlInstruction.If,
     emitCondition: (ProgramTarget) -> BranchOutcome,
 ) {
-    val type = state.compiler.blockType(instruction.blockType)
+    val type = state.blockType(instruction.blockType)
     val parameterCount = type.params.types.size
     val baseHeight = state.operands.size - parameterCount
     check(baseHeight >= 0)

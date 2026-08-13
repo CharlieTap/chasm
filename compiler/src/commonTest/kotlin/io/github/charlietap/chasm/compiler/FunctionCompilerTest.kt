@@ -21,7 +21,6 @@ import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
-import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
@@ -41,7 +40,6 @@ import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.structCompositeType
 import io.github.charlietap.chasm.fixture.type.structType
 import io.github.charlietap.chasm.fixture.type.valueStorageType
-import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
@@ -964,10 +962,6 @@ private fun compilerContext(
         config = config,
         module = module,
         types = ModuleTypeResolver(module),
-        store = store,
-        instance = moduleInstance(
-            functionAddresses = MutableList(module.functions.size) { index -> Address.Function(index) },
-        ),
         runtimeTypes = store.runtimeTypes.register(module.definedTypes),
     )
 }

@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler.instruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
+import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserver
 import io.github.charlietap.chasm.compiler.operand.Operand
 import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
@@ -23,10 +24,12 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32Cons
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64ConstDispatcher
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.CopyOperand
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
+import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
@@ -169,18 +172,17 @@ internal fun FunctionCompilationContext.emitJump(
     if (handlerPopCount == 0 && copies.size > 0 && !copies.isIdentity()) {
         val destinationSlotBase = copies.destinationSlot(0)
         val operands = copies.operandCopyPlan(destinationSlotBase)
-        append(target) { targetIp ->
-            dispatch(AdminInstruction.JumpCopies(operands, destinationSlotBase, targetIp), ::JumpDispatcher)
-        }
+        append(
+            target = target,
+            instruction = { targetIp -> AdminInstruction.JumpCopies(operands, destinationSlotBase, targetIp) },
+            dispatcher = ::JumpDispatcher,
+        )
         return
     }
 
     if (!copies.isIdentity()) emitCopies(copies)
     repeat(handlerPopCount) { emitPopHandler() }
-    append(target) { targetIp ->
-        val instruction = AdminInstruction.Jump(targetIp)
-        dispatch(instruction, ::JumpDispatcher)
-    }
+    append(target, AdminInstruction::Jump, ::JumpDispatcher)
 }
 
 private fun SlotCopyPlan.operandCopyPlan(
@@ -225,9 +227,10 @@ internal fun FunctionCompilationContext.emitBranchIf(
     }
     val conditionKind = condition.sourceKind
     val conditionBits = condition.sourceBits
-    append(branchTarget) { targetIp ->
+    append(branchTarget) { targetIp, observer ->
         when {
             copy && conditionKind.isImmediate -> dispatch(
+                observer,
                 AdminInstruction.JumpIfCopyI(
                     operand = conditionBits,
                     sourceSlot = copies.sourceSlot(0),
@@ -237,6 +240,7 @@ internal fun FunctionCompilationContext.emitBranchIf(
                 ::JumpDispatcher,
             )
             copy -> dispatch(
+                observer,
                 AdminInstruction.JumpIfCopyS(
                     operandSlot = conditionBits.toInt(),
                     sourceSlot = copies.sourceSlot(0),
@@ -246,18 +250,22 @@ internal fun FunctionCompilationContext.emitBranchIf(
                 ::JumpDispatcher,
             )
             whenZero && conditionKind.isImmediate -> dispatch(
+                observer,
                 AdminInstruction.JumpIfZeroI(conditionBits, targetIp),
                 ::JumpDispatcher,
             )
             whenZero -> dispatch(
+                observer,
                 AdminInstruction.JumpIfZeroS(conditionBits.toInt(), targetIp),
                 ::JumpDispatcher,
             )
             conditionKind.isImmediate -> dispatch(
+                observer,
                 AdminInstruction.JumpIfI(conditionBits, targetIp),
                 ::JumpDispatcher,
             )
             else -> dispatch(
+                observer,
                 AdminInstruction.JumpIfS(conditionBits.toInt(), targetIp),
                 ::JumpDispatcher,
             )
@@ -281,15 +289,17 @@ internal fun FunctionCompilationContext.emitBranchIf(
         return if (branch) BranchOutcome.Always else BranchOutcome.Never
     }
     val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
-    append(branchTarget) { targetIp ->
-        dispatch(JumpConditionDispatcher(condition, targetIp, branchOnMatch)) {
+    appendDispatched(
+        target = branchTarget,
+        dispatchableInstruction = { targetIp -> JumpConditionDispatcher(condition, targetIp, branchOnMatch) },
+        instruction = { targetIp ->
             if (branchOnMatch) {
                 AdminInstruction.JumpIfCondition(condition, targetIp)
             } else {
                 AdminInstruction.JumpIfConditionMismatch(condition, targetIp)
             }
-        }
-    }
+        },
+    )
     return BranchOutcome.Dynamic
 }
 
@@ -362,10 +372,11 @@ internal fun FunctionCompilationContext.emitBranchTable(
     val selectorKind = selector.sourceKind
     val selectorBits = selector.sourceBits
     check(selectorKind != OperandSourceKind.I32Immediate)
-    append(targetIndices) { targetIps ->
-        val instruction = AdminInstruction.JumpTableS(selectorBits.toInt(), targetIps)
-        dispatch(instruction, ::JumpDispatcher)
-    }
+    append(
+        targetIndices = targetIndices,
+        instruction = { targetIps -> AdminInstruction.JumpTableS(selectorBits.toInt(), targetIps) },
+        dispatcher = ::JumpDispatcher,
+    )
 }
 
 internal fun FunctionCompilationContext.emitBranchOnNull(
@@ -378,12 +389,28 @@ internal fun FunctionCompilationContext.emitBranchOnNull(
     val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
     val immediate = operand.sourceKind.isImmediate
     val operandBits = operand.sourceBits
-    append(branchTarget) { targetIp ->
+    append(branchTarget) { targetIp, observer ->
         when {
-            onNull && immediate -> dispatch(AdminInstruction.JumpOnNullI(operandBits, targetIp), ::JumpDispatcher)
-            onNull -> dispatch(AdminInstruction.JumpOnNullS(operandBits.toInt(), targetIp), ::JumpDispatcher)
-            immediate -> dispatch(AdminInstruction.JumpOnNonNullI(operandBits, targetIp), ::JumpDispatcher)
-            else -> dispatch(AdminInstruction.JumpOnNonNullS(operandBits.toInt(), targetIp), ::JumpDispatcher)
+            onNull && immediate -> dispatch(
+                observer,
+                AdminInstruction.JumpOnNullI(operandBits, targetIp),
+                ::JumpDispatcher,
+            )
+            onNull -> dispatch(
+                observer,
+                AdminInstruction.JumpOnNullS(operandBits.toInt(), targetIp),
+                ::JumpDispatcher,
+            )
+            immediate -> dispatch(
+                observer,
+                AdminInstruction.JumpOnNonNullI(operandBits, targetIp),
+                ::JumpDispatcher,
+            )
+            else -> dispatch(
+                observer,
+                AdminInstruction.JumpOnNonNullS(operandBits.toInt(), targetIp),
+                ::JumpDispatcher,
+            )
         }
     }
 }
@@ -399,26 +426,26 @@ internal fun FunctionCompilationContext.emitBranchOnCast(
     val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
     val immediate = operand.sourceKind.isImmediate
     val operandBits = operand.sourceBits
-    append(branchTarget) { targetIp ->
+    append(branchTarget) { targetIp, observer ->
         when {
             onSuccess && immediate -> dispatch(
+                observer,
                 AdminInstruction.JumpOnCastI(operandBits, targetIp, typeTest),
                 ::JumpDispatcher,
             )
             onSuccess -> dispatch(
+                observer,
                 AdminInstruction.JumpOnCastS(operandBits.toInt(), targetIp, typeTest),
                 ::JumpDispatcher,
             )
             immediate -> dispatch(
+                observer,
                 AdminInstruction.JumpOnCastFailI(operandBits, targetIp, typeTest),
                 ::JumpDispatcher,
             )
             else -> dispatch(
-                AdminInstruction.JumpOnCastFailS(
-                    operandBits.toInt(),
-                    targetIp,
-                    typeTest,
-                ),
+                observer,
+                AdminInstruction.JumpOnCastFailS(operandBits.toInt(), targetIp, typeTest),
                 ::JumpDispatcher,
             )
         }
@@ -430,10 +457,11 @@ internal fun FunctionCompilationContext.emitPushHandler(
     targetIndices: IntArray,
     payloadDestinationSlots: List<IntArray>,
 ) {
-    append(targetIndices) { continuationIps ->
-        val instruction = AdminInstruction.PushHandler(handlers, continuationIps, payloadDestinationSlots)
-        dispatch(instruction, ::PushHandlerDispatcher)
-    }
+    append(
+        targetIndices = targetIndices,
+        instruction = { continuationIps -> AdminInstruction.PushHandler(handlers, continuationIps, payloadDestinationSlots) },
+        dispatcher = ::PushHandlerDispatcher,
+    )
 }
 
 internal fun FunctionCompilationContext.emitPopHandler() {
@@ -514,10 +542,7 @@ internal class DeferredBranchPaths {
                 context.emitPopHandler()
             }
             val destination = ProgramTarget(destinationTargetIndices[index])
-            context.append(destination) { targetIp ->
-                val instruction = AdminInstruction.Jump(targetIp)
-                context.dispatch(instruction, ::JumpDispatcher)
-            }
+            context.append(destination, AdminInstruction::Jump, ::JumpDispatcher)
         }
     }
 
@@ -534,6 +559,16 @@ internal fun FunctionCompilationContext.planCopies(
     operandStartIndex = operands.size - excludedTopCount - destinationSlots.size,
     destinationSlots = destinationSlots,
 )
+
+private inline fun <T : LinkedInstruction> dispatch(
+    observer: CompilerInstructionObserver?,
+    instruction: T,
+    dispatcher: (T) -> DispatchableInstruction,
+): DispatchableInstruction {
+    val dispatchableInstruction = dispatcher(instruction)
+    observer?.onInstruction(dispatchableInstruction, instruction)
+    return dispatchableInstruction
+}
 
 private fun FunctionCompilationContext.emitCopies(copies: SlotCopyPlan) {
     for (index in 0 until copies.size) {

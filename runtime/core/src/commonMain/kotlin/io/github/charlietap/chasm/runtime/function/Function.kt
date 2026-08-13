@@ -7,7 +7,7 @@ data class Function(
     val idx: FunctionIndex,
     val typeIndex: TypeIndex,
     val locals: LongArray,
-    val body: Expression,
+    var body: Expression,
     val frameSlots: Int,
     val returnSlots: IntArray,
     var collectGarbageAfterInvocation: Boolean = false,

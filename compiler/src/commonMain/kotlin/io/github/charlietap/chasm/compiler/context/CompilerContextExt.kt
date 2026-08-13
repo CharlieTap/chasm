@@ -2,13 +2,6 @@ package io.github.charlietap.chasm.compiler.context
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.toInt
-import io.github.charlietap.chasm.runtime.ext.data
-import io.github.charlietap.chasm.runtime.ext.element
-import io.github.charlietap.chasm.runtime.ext.function
-import io.github.charlietap.chasm.runtime.ext.global
-import io.github.charlietap.chasm.runtime.ext.memory
-import io.github.charlietap.chasm.runtime.ext.table
-import io.github.charlietap.chasm.runtime.ext.tag
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -23,25 +16,25 @@ import io.github.charlietap.chasm.type.ext.arrayType
 import io.github.charlietap.chasm.type.ext.structType
 
 internal fun CompilerContext.function(index: Index.FunctionIndex): FunctionInstance =
-    store.function(instance.functionAddresses[index.toInt()])
+    functions[index.toInt()]
 
 internal fun CompilerContext.table(index: Index.TableIndex): TableInstance =
-    store.table(instance.tableAddresses[index.toInt()])
+    tables[index.toInt()]
 
 internal fun CompilerContext.memory(index: Index.MemoryIndex): MemoryInstance =
-    store.memory(instance.memAddresses[index.toInt()])
+    memories[index.toInt()]
 
 internal fun CompilerContext.tag(index: Index.TagIndex): TagInstance =
-    store.tag(instance.tagAddresses[index.toInt()])
+    tags[index.toInt()]
 
 internal fun CompilerContext.global(index: Index.GlobalIndex): GlobalInstance =
-    store.global(instance.globalAddresses[index.toInt()])
+    globals[index.toInt()]
 
 internal fun CompilerContext.element(index: Index.ElementIndex): ElementInstance =
-    store.element(instance.elemAddresses[index.toInt()])
+    elements[index.toInt()]
 
 internal fun CompilerContext.data(index: Index.DataIndex): DataInstance =
-    store.data(instance.dataAddresses[index.toInt()])
+    data[index.toInt()]
 
 internal fun CompilerContext.rtt(index: Index.TypeIndex): RTT = runtimeTypes[index.toInt()]
 

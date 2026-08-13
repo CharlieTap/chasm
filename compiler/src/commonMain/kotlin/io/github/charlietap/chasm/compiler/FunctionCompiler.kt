@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
@@ -18,6 +19,7 @@ import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
+import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.global
 import io.github.charlietap.chasm.compiler.instruction.emitCopy
 import io.github.charlietap.chasm.compiler.instruction.emitDeferredBranchPaths
@@ -38,6 +40,7 @@ import io.github.charlietap.chasm.compiler.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramBuilder
+import io.github.charlietap.chasm.compiler.program.ProgramFragment
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
@@ -52,7 +55,10 @@ internal fun FunctionCompiler(
     context: CompilerContext,
     function: Function,
     program: Program,
+    workspace: FunctionCompilerWorkspace = FunctionCompilerWorkspace(),
+    programBuilder: ProgramBuilder = ProgramBuilder(program),
 ): Result<RuntimeFunction, ModuleTrapError> {
+    workspace.beginFunction()
     val baseIp = program.size
     val result: Result<RuntimeFunction, ModuleTrapError> = run compile@{
         val functionType = context.types.functionType(function.typeIndex)
@@ -62,9 +68,10 @@ internal fun FunctionCompiler(
         )
         val state = FunctionCompilationContext(
             compiler = context,
+            workspace = workspace,
             layout = layout,
             frame = FrameAllocator(layout.temporarySlotBase),
-            program = ProgramBuilder(program),
+            program = programBuilder,
         )
         beginFunctionControl(state)
 
@@ -168,7 +175,7 @@ internal fun FunctionCompiler(
                             nextInstruction = nextInstruction,
                         )
                         is AggregateInstruction -> {
-                            context.containsGcInstructions = true
+                            workspace.markGcInstructions()
                             compileAggregateInstruction(
                                 state = state,
                                 instruction = instruction,
@@ -216,6 +223,27 @@ internal fun FunctionCompiler(
     return result
 }
 
+internal fun FunctionCompiler(
+    context: CompilerContext,
+    function: Function,
+    workspace: FunctionCompilerWorkspace,
+): Result<FunctionCompilation, ModuleTrapError> = binding {
+    val program = Program(maxOf(function.body.instructions.size, 1))
+    val builder = ProgramBuilder(program, recordRelocations = true)
+    val compiled = FunctionCompiler(context, function, program, workspace, builder).bind()
+    FunctionCompilation(
+        function = compiled,
+        program = builder.fragment(),
+        containsGcInstructions = workspace.containsGcInstructions,
+    )
+}
+
+internal class FunctionCompilation(
+    val function: RuntimeFunction,
+    val program: ProgramFragment,
+    val containsGcInstructions: Boolean,
+)
+
 private fun compileInstructionChain(
     context: CompilerContext,
     state: FunctionCompilationContext,
@@ -261,7 +289,7 @@ private fun compileInstructionChain(
     }
 
     if (nextInstruction is AggregateInstruction.StructGet) {
-        context.containsGcInstructions = true
+        state.workspace.markGcInstructions()
         compileAggregateAccessChain(
             state = state,
             first = instruction,
