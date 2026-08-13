@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
-import io.github.charlietap.chasm.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -35,15 +34,13 @@ internal fun WasmFunctionCall(
 ): Int {
     val valueDepth = vstack.depth() - plan.params
 
-    cstack.push(
-        ActivationFrame(
-            arity = plan.results,
-            handlerDepth = cstack.handlersDepth(),
-            valueDepth = valueDepth,
-            instance = plan.module,
-            previousFramePointer = vstack.framePointer,
-            returnIp = returnIp,
-        ),
+    cstack.pushFrame(
+        arity = plan.results,
+        handlerDepth = cstack.handlersDepth(),
+        valueDepth = valueDepth,
+        instance = plan.module,
+        previousFramePointer = vstack.framePointer,
+        returnIp = returnIp,
     )
 
     vstack.framePointer = valueDepth
@@ -176,16 +173,14 @@ private inline fun wasmFunctionCall(
         vstack.setFrameSlot(calleeFramePointer, plan.interfaceSlots + index, value)
     }
 
-    cstack.push(
-        ActivationFrame(
-            arity = plan.results,
-            handlerDepth = cstack.handlersDepth(),
-            valueDepth = valueDepth,
-            instance = plan.module,
-            previousFramePointer = callerFramePointer,
-            resultSlotBase = resultSlotBase,
-            returnIp = returnIp,
-        ),
+    cstack.pushFrame(
+        arity = plan.results,
+        handlerDepth = cstack.handlersDepth(),
+        valueDepth = valueDepth,
+        instance = plan.module,
+        previousFramePointer = callerFramePointer,
+        resultSlotBase = resultSlotBase,
+        returnIp = returnIp,
     )
 
     vstack.framePointer = calleeFramePointer
@@ -291,16 +286,14 @@ private inline fun wasmFunctionCallWithoutLocals(
 
     vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
     copyOperands(callerFramePointer, calleeFramePointer)
-    cstack.push(
-        ActivationFrame(
-            arity = plan.results,
-            handlerDepth = cstack.handlersDepth(),
-            valueDepth = valueDepth,
-            instance = plan.module,
-            previousFramePointer = callerFramePointer,
-            resultSlotBase = resultSlotBase,
-            returnIp = returnIp,
-        ),
+    cstack.pushFrame(
+        arity = plan.results,
+        handlerDepth = cstack.handlersDepth(),
+        valueDepth = valueDepth,
+        instance = plan.module,
+        previousFramePointer = callerFramePointer,
+        resultSlotBase = resultSlotBase,
+        returnIp = returnIp,
     )
 
     vstack.framePointer = calleeFramePointer

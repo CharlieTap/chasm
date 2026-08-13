@@ -15,6 +15,8 @@ import io.github.charlietap.chasm.runtime.stack.ControlStack
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 
 class StackExtTest {
 
@@ -30,6 +32,38 @@ class StackExtTest {
 
         val frameEntry = stack.popFrame()
         assertEquals(frame, frameEntry)
+    }
+
+    @Test
+    fun `can replace and discard the current stack frame`() {
+
+        val stack = cstack()
+        val original = frame()
+        val replacement = frame().instance
+
+        stack.pushFrame(
+            arity = original.arity,
+            handlerDepth = original.handlerDepth,
+            valueDepth = original.valueDepth,
+            instance = original.instance,
+            previousFramePointer = original.previousFramePointer,
+            resultSlotBase = original.resultSlotBase,
+            returnIp = original.returnIp,
+        )
+        stack.replaceFrameInstance(replacement)
+
+        assertNotSame(original.instance, replacement)
+        assertEquals(original.arity, stack.frameArity())
+        assertEquals(original.handlerDepth, stack.frameHandlerDepth())
+        assertEquals(original.valueDepth, stack.frameValueDepth())
+        assertSame(replacement, stack.frameInstance())
+        assertEquals(original.previousFramePointer, stack.framePreviousFramePointer())
+        assertEquals(original.resultSlotBase, stack.frameResultSlotBase())
+        assertEquals(original.returnIp, stack.frameReturnIp())
+
+        stack.discardFrame()
+
+        assertEquals(0, stack.framesDepth())
     }
 
     @Test

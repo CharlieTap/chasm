@@ -17,8 +17,7 @@ internal fun ThrowExecutor(
     store: Store,
     instruction: ControlInstruction.Throw,
 ): Int {
-    val frame = cstack.peekFrame()
-    val address = frame.instance
+    val address = cstack.frameInstance()
         .tagAddress(instruction.tagIndex)
 
     val instance = store.tag(address)

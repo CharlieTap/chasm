@@ -1,26 +1,24 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import io.github.charlietap.chasm.runtime.stack.ActivationFrame
 import io.github.charlietap.chasm.runtime.stack.NO_RESULT_SLOT_BASE
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal fun FinishFrameSlotCallResult(
     vstack: ValueStack,
-    frame: ActivationFrame,
+    resultArity: Int,
+    valueDepth: Int,
+    callerFramePointer: Int,
+    resultSlotBase: Int,
 ) {
     val currentFramePointer = vstack.framePointer
-    val callerFramePointer = frame.previousFramePointer
-    val resultArity = frame.arity
     if (resultArity == 0) {
         vstack.framePointer = callerFramePointer
         vstack.shrink(
             preserveTopN = 0,
-            depth = frame.valueDepth,
+            depth = valueDepth,
         )
         return
     }
-
-    val resultSlotBase = frame.resultSlotBase
 
     if (resultSlotBase != NO_RESULT_SLOT_BASE) {
         val resultsAlreadyInPlace = currentFramePointer == callerFramePointer + resultSlotBase
@@ -29,7 +27,7 @@ internal fun FinishFrameSlotCallResult(
             vstack.framePointer = callerFramePointer
             vstack.shrink(
                 preserveTopN = 0,
-                depth = frame.valueDepth,
+                depth = valueDepth,
             )
             return
         }
@@ -44,14 +42,14 @@ internal fun FinishFrameSlotCallResult(
         }
         vstack.shrink(
             preserveTopN = 0,
-            depth = frame.valueDepth,
+            depth = valueDepth,
         )
         return
     }
 
     vstack.shrinkFromFrameSlots(
         slots = List(resultArity, ::identity),
-        depth = frame.valueDepth,
+        depth = valueDepth,
     )
     vstack.framePointer = callerFramePointer
 }

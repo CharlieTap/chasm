@@ -44,7 +44,7 @@ internal fun ThrowRefValueExecutor(
         vstack.framePointer = handler.framePointer
         vstack.shrink(0, handler.valueDepth)
 
-        val moduleInstance = cstack.peekFrame().instance
+        val moduleInstance = cstack.frameInstance()
         handler.handlers.forEachIndexed { index, catchHandler ->
             val tagMatches = when (catchHandler) {
                 is CatchHandler.Catch -> exception.tagAddress == moduleInstance.tagAddress(catchHandler.tagIndex)

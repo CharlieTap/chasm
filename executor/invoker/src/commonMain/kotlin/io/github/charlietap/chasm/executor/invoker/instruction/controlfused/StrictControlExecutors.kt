@@ -190,8 +190,7 @@ internal fun ThrowExecutor(
     store: Store,
     instruction: ControlSuperInstruction.Throw,
 ): Int {
-    val frame = cstack.peekFrame()
-    val address = frame.instance.tagAddress(instruction.tagIndex)
+    val address = cstack.frameInstance().tagAddress(instruction.tagIndex)
     val params = LongArray(instruction.payloadSlots.size) { index ->
         val sourceIndex = instruction.payloadSlots.lastIndex - index
         vstack.getFrameSlot(instruction.payloadSlots[sourceIndex])

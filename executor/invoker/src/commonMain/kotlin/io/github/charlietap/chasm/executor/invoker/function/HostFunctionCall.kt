@@ -24,7 +24,6 @@ internal fun HostFunctionCall(
     context: ExecutionContext,
     function: FunctionInstance.HostFunction,
 ) {
-    val frame = cstack.peekFrame()
     val type = function.functionType
 
     val params = List(type.params.types.size) {
@@ -34,7 +33,7 @@ internal fun HostFunctionCall(
     val functionContext = HostFunctionContext(
         context.config,
         store,
-        frame.instance,
+        cstack.frameInstance(),
     )
     val results = try {
         val hostParams = params.mapIndexed { idx, param ->
@@ -64,12 +63,10 @@ internal fun HostFunctionCall(
     resultSlotBase: Int,
     callFrameSlot: Int,
 ) {
-    val frame = cstack.peekFrame()
-
     val functionContext = HostFunctionContext(
         context.config,
         store,
-        frame.instance,
+        cstack.frameInstance(),
     )
     val results = try {
         val hostParams = function.functionType.params.types.mapIndexed { idx, expected ->
@@ -95,12 +92,10 @@ internal fun HostFunctionCall(
     operands: OperandCopyPlan,
     resultSlotBase: Int,
 ) {
-    val frame = cstack.peekFrame()
-
     val functionContext = HostFunctionContext(
         context.config,
         store,
-        frame.instance,
+        cstack.frameInstance(),
     )
     val results = try {
         val framePointer = vstack.framePointer
@@ -128,12 +123,18 @@ internal fun ReturnHostFunctionCall(
     val params = List(function.functionType.params.types.size) {
         vstack.pop()
     }.asReversed()
-    val frame = cstack.popFrame()
-    cstack.shrinkHandlers(frame.handlerDepth)
-    vstack.shrink(0, frame.valueDepth)
-    vstack.framePointer = frame.previousFramePointer
+    val handlerDepth = cstack.frameHandlerDepth()
+    val valueDepth = cstack.frameValueDepth()
+    val instance = cstack.frameInstance()
+    val previousFramePointer = cstack.framePreviousFramePointer()
+    val resultSlotBase = cstack.frameResultSlotBase()
+    val returnIp = cstack.frameReturnIp()
+    cstack.discardFrame()
+    cstack.shrinkHandlers(handlerDepth)
+    vstack.shrink(0, valueDepth)
+    vstack.framePointer = previousFramePointer
 
-    val functionContext = HostFunctionContext(context.config, store, frame.instance)
+    val functionContext = HostFunctionContext(context.config, store, instance)
     val results = try {
         val hostParams = params.mapIndexed { index, param ->
             param.toExecutionValue(function.functionType.params.types[index])
@@ -143,7 +144,6 @@ internal fun ReturnHostFunctionCall(
         throw InvocationException(InvocationError.HostFunctionError(e.reason))
     }
 
-    val resultSlotBase = frame.resultSlotBase
     if (resultSlotBase != NO_RESULT_SLOT_BASE) {
         results.forEachIndexed { index, result ->
             vstack.setFrameSlot(resultSlotBase + index, result.toLongFromBoxed())
@@ -153,7 +153,7 @@ internal fun ReturnHostFunctionCall(
             vstack.push(result.toLongFromBoxed())
         }
     }
-    return frame.returnIp
+    return returnIp
 }
 
 internal fun ReturnHostFunctionCall(
@@ -172,15 +172,21 @@ internal fun ReturnHostFunctionCall(
         }
     }
 
-    val frame = cstack.popFrame()
-    cstack.shrinkHandlers(frame.handlerDepth)
-    vstack.shrink(0, frame.valueDepth)
-    vstack.framePointer = frame.previousFramePointer
+    val handlerDepth = cstack.frameHandlerDepth()
+    val valueDepth = cstack.frameValueDepth()
+    val instance = cstack.frameInstance()
+    val previousFramePointer = cstack.framePreviousFramePointer()
+    val resultSlotBase = cstack.frameResultSlotBase()
+    val returnIp = cstack.frameReturnIp()
+    cstack.discardFrame()
+    cstack.shrinkHandlers(handlerDepth)
+    vstack.shrink(0, valueDepth)
+    vstack.framePointer = previousFramePointer
 
     val functionContext = HostFunctionContext(
         context.config,
         store,
-        frame.instance,
+        instance,
     )
     val results = try {
         val hostParams = operandValues.mapIndexed { idx, value ->
@@ -197,7 +203,6 @@ internal fun ReturnHostFunctionCall(
         throw InvocationException(InvocationError.HostFunctionError(e.reason))
     }
 
-    val resultSlotBase = frame.resultSlotBase
     if (resultSlotBase != NO_RESULT_SLOT_BASE) {
         results.forEachIndexed { index, result ->
             vstack.setFrameSlot(resultSlotBase + index, result.toLongFromBoxed())
@@ -207,5 +212,5 @@ internal fun ReturnHostFunctionCall(
             vstack.push(result.toLongFromBoxed())
         }
     }
-    return frame.returnIp
+    return returnIp
 }

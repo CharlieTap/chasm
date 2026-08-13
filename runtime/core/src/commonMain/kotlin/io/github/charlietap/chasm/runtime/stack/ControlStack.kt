@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.stack
 
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 
 data class ControlStack(
     private val frames: FrameStack = FrameStack(),
@@ -16,13 +17,49 @@ data class ControlStack(
 
     fun push(frame: ActivationFrame) = frames.push(frame)
 
+    fun pushFrame(
+        arity: Int,
+        handlerDepth: Int,
+        valueDepth: Int,
+        instance: ModuleInstance,
+        previousFramePointer: Int = 0,
+        resultSlotBase: Int = NO_RESULT_SLOT_BASE,
+        returnIp: Int,
+    ) = frames.push(
+        arity = arity,
+        handlerDepth = handlerDepth,
+        valueDepth = valueDepth,
+        instance = instance,
+        previousFramePointer = previousFramePointer,
+        resultSlotBase = resultSlotBase,
+        returnIp = returnIp,
+    )
+
     fun push(handler: ExceptionHandler) = handlers.push(handler)
 
     fun popFrame(): ActivationFrame = frames.pop()
 
+    fun discardFrame() = frames.discard()
+
     fun popHandler(): ExceptionHandler = handlers.pop()
 
     fun peekFrame(): ActivationFrame = frames.peek()
+
+    fun frameArity(): Int = frames.peekArity()
+
+    fun frameHandlerDepth(): Int = frames.peekHandlerDepth()
+
+    fun frameValueDepth(): Int = frames.peekValueDepth()
+
+    fun frameInstance(): ModuleInstance = frames.peekInstance()
+
+    fun framePreviousFramePointer(): Int = frames.peekPreviousFramePointer()
+
+    fun frameResultSlotBase(): Int = frames.peekResultSlotBase()
+
+    fun frameReturnIp(): Int = frames.peekReturnIp()
+
+    fun replaceFrameInstance(instance: ModuleInstance) = frames.replaceInstance(instance)
 
     fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNth(n)
 

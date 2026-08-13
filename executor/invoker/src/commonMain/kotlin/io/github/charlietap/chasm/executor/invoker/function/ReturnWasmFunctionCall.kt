@@ -21,16 +21,17 @@ internal fun ReturnWasmFunctionCall(
     cstack: ControlStack,
     plan: WasmFunctionCallPlan,
 ): Int {
-    val frame = cstack.popFrame()
+    val handlerDepth = cstack.frameHandlerDepth()
+    val valueDepth = cstack.frameValueDepth()
 
-    cstack.shrinkHandlers(frame.handlerDepth)
-    vstack.shrink(plan.params, frame.valueDepth)
-    vstack.framePointer = frame.valueDepth
+    cstack.shrinkHandlers(handlerDepth)
+    vstack.shrink(plan.params, valueDepth)
+    vstack.framePointer = valueDepth
     vstack.reserveFrame(plan.frameSlots)
     plan.locals.forEachIndexed { index, value ->
         vstack.setFrameSlot(plan.interfaceSlots + index, value)
     }
-    cstack.push(frame.copy(instance = plan.module))
+    cstack.replaceFrameInstance(plan.module)
     return plan.entryIp
 }
 
@@ -50,9 +51,9 @@ internal fun ReturnWasmFunctionCall(
     operands: List<CopyOperand>,
 ): Int {
     val currentFramePointer = vstack.framePointer
-    val frame = cstack.popFrame()
-    cstack.shrinkHandlers(frame.handlerDepth)
-    val calleeFramePointer = frame.valueDepth
+    val handlerDepth = cstack.frameHandlerDepth()
+    val calleeFramePointer = cstack.frameValueDepth()
+    cstack.shrinkHandlers(handlerDepth)
     vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
     copyTailCallOperands(
         vstack = vstack,
@@ -68,7 +69,7 @@ internal fun ReturnWasmFunctionCall(
 
     vstack.framePointer = calleeFramePointer
     vstack.reserveFrame(plan.frameSlots)
-    cstack.push(frame.copy(instance = plan.module))
+    cstack.replaceFrameInstance(plan.module)
     return plan.entryIp
 }
 
