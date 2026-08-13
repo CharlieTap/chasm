@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
 import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.ext.functionType
 
-typealias ImportMapper = (Module, Import) -> ImportDefinition
+internal typealias ImportMapper = (Module, Import) -> ImportDefinition
 
-fun ImportMapper(
+internal fun ImportMapper(
     module: Module,
     input: Import,
 ): ImportDefinition {

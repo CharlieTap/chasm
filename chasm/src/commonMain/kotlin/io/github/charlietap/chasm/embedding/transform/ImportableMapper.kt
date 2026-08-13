@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.embedding.shapes.Table
 import io.github.charlietap.chasm.embedding.shapes.Tag
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 
-object ImportableMapper : BidirectionalMapper<Importable, ExternalValue> {
+internal object ImportableMapper : BidirectionalMapper<Importable, ExternalValue> {
     override fun map(input: Importable): ExternalValue = when (input) {
         is Function -> input.reference
         is Global -> input.reference

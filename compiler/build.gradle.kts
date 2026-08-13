@@ -19,6 +19,7 @@ kotlin {
                 api(projects.ast)
                 api(projects.config)
                 api(projects.runtime.core)
+                api(libs.result)
 
                 implementation(projects.executor.invoker)
             }

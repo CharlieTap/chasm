@@ -49,8 +49,8 @@ kotlin {
                 implementation(projects.chasm)
                 implementation(projects.executor.invoker)
                 implementation(projects.libs.benchmark)
+                implementation(projects.libs.stack)
                 implementation(projects.memory)
-                implementation(projects.test.fixture.ast)
                 implementation(projects.test.fixture.runtime)
 
                 implementation(libs.kotlinx.benchmark)

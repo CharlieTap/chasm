@@ -9,7 +9,6 @@ kotlin {
        commonMain {
             dependencies {
                 api(projects.runtime.core)
-                api(libs.result)
             }
         }
 
