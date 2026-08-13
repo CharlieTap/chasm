@@ -32,14 +32,14 @@ internal fun FinishFrameSlotCallResult(
             return
         }
 
-        val resultValues = LongArray(resultArity) { index ->
-            vstack.getFrameSlot(index)
-        }
-
+        vstack.copyFrameSlots(
+            sourceFramePointer = currentFramePointer,
+            destinationFramePointer = callerFramePointer,
+            sourceSlot = 0,
+            destinationSlot = resultSlotBase,
+            count = resultArity,
+        )
         vstack.framePointer = callerFramePointer
-        resultValues.forEachIndexed { index, value ->
-            vstack.setFrameSlot(resultSlotBase + index, value)
-        }
         vstack.shrink(
             preserveTopN = 0,
             depth = valueDepth,
@@ -48,10 +48,9 @@ internal fun FinishFrameSlotCallResult(
     }
 
     vstack.shrinkFromFrameSlots(
-        slots = List(resultArity, ::identity),
+        slot = 0,
+        count = resultArity,
         depth = valueDepth,
     )
     vstack.framePointer = callerFramePointer
 }
-
-private fun identity(index: Int): Int = index

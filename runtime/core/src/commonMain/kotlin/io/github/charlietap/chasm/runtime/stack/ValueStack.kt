@@ -43,6 +43,21 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         elements[framePointer + slot] = value
     }
 
+    fun copyFrameSlots(
+        sourceFramePointer: Int,
+        destinationFramePointer: Int,
+        sourceSlot: Int,
+        destinationSlot: Int,
+        count: Int,
+    ) {
+        elements.copyInto(
+            destination = elements,
+            destinationOffset = destinationFramePointer + destinationSlot,
+            startIndex = sourceFramePointer + sourceSlot,
+            endIndex = sourceFramePointer + sourceSlot + count,
+        )
+    }
+
     fun setFrameSlot(
         framePointer: Int,
         slot: Int,
@@ -182,6 +197,20 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
             destinationOffset = depth,
         )
         top = depth + values.size
+    }
+
+    fun shrinkFromFrameSlots(
+        slot: Int,
+        count: Int,
+        depth: Int,
+    ) {
+        elements.copyInto(
+            destination = elements,
+            destinationOffset = depth,
+            startIndex = framePointer + slot,
+            endIndex = framePointer + slot + count,
+        )
+        top = depth + count
     }
 
     fun spillTopToFrameSlots(
