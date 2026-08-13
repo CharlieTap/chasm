@@ -12,6 +12,52 @@ class VirtualMachineTest {
     private val f32ResultTypes = listOf(ValueType.Number(NumberType.F32))
     private val f64ResultTypes = listOf(ValueType.Number(NumberType.F64))
     private val i32I32ResultTypes = listOf(ValueType.Number(NumberType.I32), ValueType.Number(NumberType.I32))
+    private val i32I64ResultTypes = listOf(ValueType.Number(NumberType.I32), ValueType.Number(NumberType.I64))
+
+    @Test
+    fun `can prepare and repeatedly invoke a wasm function`() {
+        val vm = virtualMachineFactory()
+        val bytes = Resource(FILE_DIR + "test.wasm").readBytes()
+        val store = vm.storeInit()
+        val module = vm.moduleDecode(bytes).expect("Failed to decode module")
+        val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
+        val function = vm.prepareFunction(store, instance, "multiple_param_function", f64ResultTypes)
+            .expect("Failed to prepare function")
+
+        val first = function(listOf(WasmVirtualMachine.Value.I32(2), WasmVirtualMachine.Value.F64(3.0))).expectFirstDouble()
+        val second = function(listOf(WasmVirtualMachine.Value.I32(4), WasmVirtualMachine.Value.F64(5.0))).expectFirstDouble()
+
+        assertEquals(6.0, first)
+        assertEquals(20.0, second)
+    }
+
+    @Test
+    fun `prepared function maps multiple results`() {
+        val vm = virtualMachineFactory()
+        val bytes = Resource(FILE_DIR + "test.wasm").readBytes()
+        val store = vm.storeInit()
+        val module = vm.moduleDecode(bytes).expect("Failed to decode module")
+        val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
+        val function = vm.prepareFunction(store, instance, "multiple_return_function", i32I64ResultTypes)
+            .expect("Failed to prepare function")
+
+        val actual = function().expect("Failed to invoke prepared function")
+
+        assertEquals(listOf(WasmVirtualMachine.Value.I32(117), WasmVirtualMachine.Value.I64(118)), actual)
+    }
+
+    @Test
+    fun `cannot prepare a missing function`() {
+        val vm = virtualMachineFactory()
+        val bytes = Resource(FILE_DIR + "test.wasm").readBytes()
+        val store = vm.storeInit()
+        val module = vm.moduleDecode(bytes).expect("Failed to decode module")
+        val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
+
+        val actual = vm.prepareFunction(store, instance, "missing", emptyList())
+
+        assertEquals(true, actual is WasmVirtualMachine.Result.Error)
+    }
 
     @Test
     fun `can invoke a wasm function and return an int`() {

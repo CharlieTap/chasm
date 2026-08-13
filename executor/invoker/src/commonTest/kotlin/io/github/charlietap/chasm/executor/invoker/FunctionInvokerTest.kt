@@ -52,7 +52,7 @@ class FunctionInvokerTest {
             config = config,
             store = store,
             instance = moduleInstance,
-            address = address,
+            function = functionInstance,
             values = params,
             threadExecutor = threadExecutor,
         )
@@ -96,6 +96,35 @@ class FunctionInvokerTest {
             store = runtimeStore,
             instance = moduleInstance,
             address = address,
+            values = params,
+            threadExecutor = threadExecutor,
+        )
+
+        assertEquals(Ok(listOf(i32(118))), actual)
+    }
+
+    @Test
+    fun `can directly invoke a resolved host function`() {
+        val config = runtimeConfig()
+        val params = listOf<ExecutionValue>(i32(117))
+        val moduleInstance = moduleInstance()
+        val runtimeStore = store()
+        val functionInstance = hostFunctionInstance { args ->
+            assertEquals(config, this.config)
+            assertEquals(runtimeStore, this.store)
+            assertEquals(moduleInstance, this.instance)
+            assertEquals(params, args)
+            listOf(i32(118))
+        }
+        val threadExecutor: ThreadExecutor = { _, _, _, _ ->
+            error("thread executor should not be called for host functions")
+        }
+
+        val actual = FunctionInvoker(
+            config = config,
+            store = runtimeStore,
+            instance = moduleInstance,
+            function = functionInstance,
             values = params,
             threadExecutor = threadExecutor,
         )

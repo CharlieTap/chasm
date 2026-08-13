@@ -188,6 +188,7 @@ public final class io/github/charlietap/chasm/vm/NonJsVirtualMachine : io/github
 	public fun memoryWriteUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun moduleDecode ([B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun moduleInstantiate (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Module;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun prepareFunction (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun storeInit ()Lio/github/charlietap/chasm/vm/Store;
 }
 
@@ -204,6 +205,11 @@ public final class io/github/charlietap/chasm/vm/NumberType : java/lang/Enum {
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/vm/NumberType;
 	public static fun values ()[Lio/github/charlietap/chasm/vm/NumberType;
+}
+
+public final class io/github/charlietap/chasm/vm/PreparedFunction {
+	public final fun invoke (Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static synthetic fun invoke$default (Lio/github/charlietap/chasm/vm/PreparedFunction;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 }
 
 public abstract interface class io/github/charlietap/chasm/vm/ReferenceType {
@@ -341,6 +347,7 @@ public abstract interface class io/github/charlietap/chasm/vm/WasmVirtualMachine
 	public fun memoryWriteUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun moduleDecode ([B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun moduleInstantiate (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Module;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun prepareFunction (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun storeInit ()Lio/github/charlietap/chasm/vm/Store;
 }
 
@@ -357,6 +364,7 @@ public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$DefaultImpls
 	public static fun memoryWriteLong (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IJ)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryWriteNullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryWriteUtf8String (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun prepareFunction (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 }
 
 public abstract class io/github/charlietap/chasm/vm/WasmVirtualMachine$Result {

@@ -9,6 +9,7 @@ import io.github.charlietap.chasm.vm.Instance
 import io.github.charlietap.chasm.vm.Memory
 import io.github.charlietap.chasm.vm.Module
 import io.github.charlietap.chasm.vm.NumberType
+import io.github.charlietap.chasm.vm.PreparedFunction
 import io.github.charlietap.chasm.vm.Store
 import io.github.charlietap.chasm.vm.ValueType
 import io.github.charlietap.chasm.vm.WasmVirtualMachine
@@ -19,6 +20,7 @@ internal val STORE_CLASS_NAME = Store::class.asClassName()
 internal val MODULE_CLASS_NAME = Module::class.asClassName()
 internal val INSTANCE_CLASS_NAME = Instance::class.asClassName()
 internal val MEMORY_CLASS_NAME = Memory::class.asClassName()
+internal val PREPARED_FUNCTION_CLASS_NAME = PreparedFunction::class.asClassName()
 internal val VALUE_TYPE_CLASS_NAME = ValueType::class.asClassName()
 internal val VALUE_TYPE_LIST_CLASS_NAME = List::class.asClassName().parameterizedBy(VALUE_TYPE_CLASS_NAME)
 internal val VALUE_TYPE_NUMBER_CLASS_NAME = ClassName("io.github.charlietap.chasm.vm", "ValueType", "Number")
@@ -35,6 +37,7 @@ internal val IMPORT_FACTORY_CLASS_NAME = MemberName("io.github.charlietap.chasm.
 internal const val CREATE_STORE_FUNCTION = "storeInit"
 internal const val CREATE_MODULE_FUNCTION = "moduleDecode"
 internal const val CREATE_INSTANCE_FUNCTION = "moduleInstantiate"
+internal const val PREPARE_FUNCTION = "prepareFunction"
 internal const val INVOKE_TYPED_FUNCTION = "functionInvokeTyped"
 
 internal const val EXPORT_FUNCTION = "exportFunction"

@@ -25,12 +25,26 @@ fun FunctionInvoker(
     instance: ModuleInstance,
     address: Address.Function,
     values: List<ExecutionValue>,
+): Result<List<ExecutionValue>, InvocationError> = FunctionInvoker(
+    config = config,
+    store = store,
+    instance = instance,
+    function = store.function(address),
+    values = values,
+)
+
+fun FunctionInvoker(
+    config: RuntimeConfig,
+    store: Store,
+    instance: ModuleInstance,
+    function: FunctionInstance,
+    values: List<ExecutionValue>,
 ): Result<List<ExecutionValue>, InvocationError> =
     FunctionInvoker(
         config = config,
         store = store,
         instance = instance,
-        address = address,
+        function = function,
         values = values,
         threadExecutor = ::ThreadExecutor,
     )
@@ -42,7 +56,23 @@ internal inline fun FunctionInvoker(
     address: Address.Function,
     values: List<ExecutionValue>,
     crossinline threadExecutor: ThreadExecutor,
-): Result<List<ExecutionValue>, InvocationError> = when (val function = store.function(address)) {
+): Result<List<ExecutionValue>, InvocationError> = FunctionInvoker(
+    config = config,
+    store = store,
+    instance = instance,
+    function = store.function(address),
+    values = values,
+    threadExecutor = threadExecutor,
+)
+
+internal inline fun FunctionInvoker(
+    config: RuntimeConfig,
+    store: Store,
+    instance: ModuleInstance,
+    function: FunctionInstance,
+    values: List<ExecutionValue>,
+    crossinline threadExecutor: ThreadExecutor,
+): Result<List<ExecutionValue>, InvocationError> = when (function) {
     is FunctionInstance.HostFunction -> {
         val context = HostFunctionContext(config, store, instance)
         try {

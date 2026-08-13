@@ -75,6 +75,24 @@ internal object WebVirtualMachine : WasmVirtualMachine {
         Table(webTableReference(exported))
     }
 
+    override fun prepareFunction(
+        store: Store,
+        instance: Instance,
+        functionName: String,
+        resultTypes: List<ValueType>,
+    ): WasmVirtualMachine.Result<PreparedFunction> = webCatch {
+        val exported = export(instance, functionName)
+        if (!webIsFunction(exported)) {
+            throw IllegalArgumentException("Export '$functionName' is not a function")
+        }
+        val preparedResultTypes = resultTypes.toList()
+        PreparedFunction { args ->
+            webCatch {
+                invokeWebFunction(exported, functionName, args, preparedResultTypes)
+            }
+        }
+    }
+
     override fun functionInvoke(
         store: Store,
         instance: Instance,
@@ -96,18 +114,28 @@ internal object WebVirtualMachine : WasmVirtualMachine {
             throw IllegalArgumentException("Export '$functionName' is not a function")
         }
 
+        invokeWebFunction(exported, functionName, args, resultTypes)
+    }
+
+    private fun invokeWebFunction(
+        function: WebValue,
+        functionName: String,
+        args: List<WasmVirtualMachine.Value>,
+        resultTypes: List<ValueType>,
+    ): List<WasmVirtualMachine.Value> {
+
         val webArgs = webArrayOf(args.map(WebValueMapper::from))
-        val results = webApply(exported, webUndefined(), webArgs)
+        val results = webApply(function, webUndefined(), webArgs)
 
         if (webIsNullOrUndefined(results)) {
             if (resultTypes.isNotEmpty()) {
                 throw IllegalArgumentException("Function '$functionName' returned no values but ${resultTypes.size} result types were provided")
             }
-            return@webCatch emptyList()
+            return emptyList()
         }
 
-        val nonNullResults = results ?: return@webCatch emptyList()
-        WebValueMapper.mapWasmValuesUsingTypes(nonNullResults, resultTypes)
+        val nonNullResults = results ?: return emptyList()
+        return WebValueMapper.mapWasmValuesUsingTypes(nonNullResults, resultTypes)
     }
 
     override fun globalRead(

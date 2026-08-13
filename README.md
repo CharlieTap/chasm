@@ -109,6 +109,29 @@ module:
 val result = invoke(store, instance, "fibonacci")
 ```
 
+Preparing a function resolves the named export and its runtime function up
+front, making invocation faster because it no longer has to resolve the
+function. This is useful when either:
+
+- the same function will be called repeatedly, so the preparation cost is
+  amortized across those calls; or
+- the function is known ahead of time and can be prepared during setup or
+  instantiation, moving resolution work out of a later invocation.
+
+Prepare the function once and retain the returned handle:
+
+```kotlin
+val fibonacci = prepareFunction(store, instance, "fibonacci")
+    .expect("Failed to prepare fibonacci")
+
+val result = fibonacci(listOf(NumberValue.I32(10)))
+```
+
+Prepared functions remain tied to the store and instance used to create them.
+Invoking one after either has been dropped returns an execution error.
+Ordinary `invoke` remains useful when the export is selected dynamically or
+there is no useful opportunity to prepare it ahead of invocation.
+
 ### Imports
 
 Modules often depend on [imports](chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/shapes/Import.kt). Imports can be one of the

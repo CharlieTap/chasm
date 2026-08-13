@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.memory.readNullTerminatedUtf8String
 import io.github.charlietap.chasm.embedding.memory.writeBytes
 import io.github.charlietap.chasm.embedding.module
+import io.github.charlietap.chasm.embedding.prepareFunction
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.map
@@ -105,6 +106,21 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         val export = instance.reference.exports.firstOrNull { it.name == name }
         val table = (export?.value as? ChasmTable)?.let(::Table)
         return table?.let(::Ok) ?: Result.Error("Failed to find table export with name $name")
+    }
+
+    override fun prepareFunction(
+        store: Store,
+        instance: Instance,
+        functionName: String,
+        resultTypes: List<ValueType>,
+    ): Result<PreparedFunction> {
+        return prepareFunction(store.reference, instance.reference, functionName).let(ResultFactory::new).map { function ->
+            PreparedFunction { args ->
+                function(args.map(ValueMapper::from)).map { values ->
+                    values.map(ValueMapper::to)
+                }.let(ResultFactory::new)
+            }
+        }
     }
 
     override fun functionInvoke(

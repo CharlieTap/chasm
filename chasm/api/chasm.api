@@ -56,6 +56,10 @@ public final class io/github/charlietap/chasm/embedding/ModuleKt {
 	public static synthetic fun module$default ([BLio/github/charlietap/chasm/config/ModuleConfig;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
+public final class io/github/charlietap/chasm/embedding/PrepareFunctionKt {
+	public static final fun prepareFunction (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Instance;Ljava/lang/String;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
 public final class io/github/charlietap/chasm/embedding/StoreKt {
 	public static final fun store ()Lio/github/charlietap/chasm/embedding/shapes/Store;
 }
@@ -595,6 +599,11 @@ public final class io/github/charlietap/chasm/embedding/shapes/ModuleInfo {
 }
 
 public abstract interface class io/github/charlietap/chasm/embedding/shapes/NameData {
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/PreparedFunction {
+	public final fun invoke (Ljava/util/List;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun invoke$default (Lio/github/charlietap/chasm/embedding/shapes/PreparedFunction;Ljava/util/List;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/Store {

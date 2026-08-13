@@ -54,6 +54,15 @@ object JsVirtualMachine : WasmVirtualMachine {
         return WebVirtualMachine.exportTable(instance, name)
     }
 
+    override fun prepareFunction(
+        store: Store,
+        instance: Instance,
+        functionName: String,
+        resultTypes: List<ValueType>,
+    ): WasmVirtualMachine.Result<PreparedFunction> {
+        return WebVirtualMachine.prepareFunction(store, instance, functionName, resultTypes)
+    }
+
     override fun functionInvoke(
         store: Store,
         instance: Instance,

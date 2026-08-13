@@ -25,6 +25,9 @@ benchmark {
         register("runtimeType") {
             include(".*RuntimeTypeBenchmark.*")
         }
+        register("preparedFunction") {
+            include(".*PreparedFunctionBenchmark.*")
+        }
     }
 
     targets {

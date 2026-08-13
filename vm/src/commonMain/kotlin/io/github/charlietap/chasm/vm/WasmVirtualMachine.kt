@@ -62,6 +62,23 @@ interface WasmVirtualMachine {
         name: String,
     ): Result<Table>
 
+    fun prepareFunction(
+        store: Store,
+        instance: Instance,
+        functionName: String,
+        resultTypes: List<ValueType>,
+    ): Result<PreparedFunction> {
+        val preparedResultTypes = resultTypes.toList()
+        return when (val function = exportFunction(instance, functionName)) {
+            is Result.Ok -> Result.Ok(
+                PreparedFunction { args ->
+                    functionInvokeTyped(store, instance, functionName, args, preparedResultTypes)
+                },
+            )
+            is Result.Error -> function
+        }
+    }
+
     fun functionInvoke(
         store: Store,
         instance: Instance,

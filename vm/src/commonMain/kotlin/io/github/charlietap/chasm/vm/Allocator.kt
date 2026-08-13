@@ -14,16 +14,21 @@ class Wasm32Allocator(
     private val virtualMachine: WasmVirtualMachine,
     private val store: Store,
     private val instance: Instance,
-    private val allocFunction: String,
-    private val freeFunction: String,
+    allocFunction: String,
+    freeFunction: String,
 ) : Allocator<Int> {
+    private val preparedAllocFunction = virtualMachine.prepareFunction(store, instance, allocFunction, i32ResultTypes)
+        .expect("Failed to prepare allocation function $allocFunction")
+    private val preparedFreeFunction = virtualMachine.prepareFunction(store, instance, freeFunction, emptyList())
+        .expect("Failed to prepare deallocation function $freeFunction")
+
     override fun alloc(size: Int): Int {
-        val result = virtualMachine.functionInvokeTyped(store, instance, allocFunction, listOf(Value.I32(size)), i32ResultTypes)
-        return result.expectFirstInt("Failed to allocate $size bytes using function $allocFunction")
+        val result = preparedAllocFunction(listOf(Value.I32(size)))
+        return result.expectFirstInt("Failed to allocate $size bytes")
     }
 
     override fun free(address: Int) {
-        val result = virtualMachine.functionInvokeTyped(store, instance, freeFunction, listOf(Value.I32(address)), emptyList())
-        result.expect("Failed to free address $address using function $freeFunction")
+        val result = preparedFreeFunction(listOf(Value.I32(address)))
+        result.expect("Failed to free address $address")
     }
 }

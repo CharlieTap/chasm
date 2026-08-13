@@ -175,12 +175,10 @@ internal class PropertyImplementationGenerator(
 
 private fun FunSpec.Builder.addReturn(
     function: Function,
-    proxy: FunctionProxy,
     returnType: TypeName,
     returnGenerator: FunctionReturnImplementationGenerator,
-    resultTypes: CodeBlock,
     freeAllocs: List<String> = [],
-) = returnGenerator(this, function, proxy, returnType, resultTypes, freeAllocs)
+) = returnGenerator(this, function, returnType, freeAllocs)
 
 private fun resultTypesPropertyName(function: Function): String {
     return function.name + "ResultTypes"
@@ -194,13 +192,16 @@ private fun resultTypesExpression(function: Function): CodeBlock {
     }
 }
 
+internal fun preparedFunctionPropertyName(function: Function): String {
+    return function.name + "PreparedFunction"
+}
+
 internal class FunctionProxyImplementationGenerator(
     private val returnImplementationGenerator: FunctionReturnImplementationGenerator = FunctionReturnImplementationGenerator(),
 ) {
     operator fun invoke(
         builder: FunSpec.Builder,
         function: Function,
-        proxy: FunctionProxy,
         returnType: ClassName,
     ) = builder.apply {
         val stringParams = function.params.filter { it.type == Scalar.String }
@@ -277,10 +278,8 @@ internal class FunctionProxyImplementationGenerator(
 
         addReturn(
             function = function,
-            proxy = proxy,
             returnType = returnType,
             returnGenerator = returnImplementationGenerator,
-            resultTypes = resultTypesExpression(function),
             freeAllocs = allocationsToFree,
         )
     }
@@ -371,7 +370,6 @@ internal class FunctionImplementationGenerator(
                 proxyImplementationGenerator(
                     this,
                     function,
-                    implementation,
                     returnType,
                 )
             }
@@ -427,6 +425,24 @@ internal class ClassPropertiesGenerator(
         add(moduleProperty)
         add(allocatedImportsProperty)
         add(instanceProperty)
+
+        wasmInterface.functions.forEach { function ->
+            val proxy = function.implementation as FunctionProxy
+            add(
+                PropertySpec.builder(preparedFunctionPropertyName(function), PREPARED_FUNCTION_CLASS_NAME)
+                    .addModifiers(KModifier.PRIVATE)
+                    .initializer(
+                        CodeBlock.of(
+                            "virtualMachine.%L(store, instance, %S, %L).%M(%S)",
+                            PREPARE_FUNCTION,
+                            proxy.name,
+                            resultTypesExpression(function),
+                            EXPECT_RESULT_FUNCTION,
+                            "Failed to prepare function ${proxy.name}",
+                        ),
+                    ).build(),
+            )
+        }
 
         val requiresMemory = wasmInterface.functions.any { fn ->
             fn.params.any { it.type == Scalar.String } || fn.returns.type == Scalar.String
