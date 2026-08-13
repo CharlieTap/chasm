@@ -1,3 +1,6 @@
+public abstract interface annotation class io/github/charlietap/chasm/InternalChasmApi : java/lang/annotation/Annotation {
+}
+
 public final class io/github/charlietap/chasm/embedding/ComponentKt {
 	public static final fun component (Lio/github/charlietap/chasm/stream/SourceReader;Lio/github/charlietap/chasm/config/ComponentConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 	public static final fun component ([BLio/github/charlietap/chasm/config/ComponentConfig;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
@@ -332,6 +335,10 @@ public final class io/github/charlietap/chasm/embedding/global/ReadGlobalKt {
 
 public final class io/github/charlietap/chasm/embedding/global/WriteGlobalKt {
 	public static final fun writeGlobal (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Global;Lio/github/charlietap/chasm/runtime/value/ExecutionValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
+public final class io/github/charlietap/chasm/embedding/internal/InstanceKt {
+	public static final fun _instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/compiler/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/charlietap/chasm/embedding/memory/GrowMemoryKt {

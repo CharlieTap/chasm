@@ -105,6 +105,7 @@ kotlin {
                 api(projects.stream)
 
                 implementation(projects.ast)
+                implementation(projects.compiler)
                 implementation(projects.decoder)
                 implementation(projects.executor.instantiator)
                 implementation(projects.executor.invoker)
@@ -127,6 +128,7 @@ kotlin {
                 implementation(projects.test.fixture.runtime)
 
                 implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.kotlinx.test.resources)
                 implementation(libs.sweet.lib)
                 implementation(libs.kotlinx.serialization)

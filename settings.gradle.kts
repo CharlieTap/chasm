@@ -40,6 +40,7 @@ dependencyResolutionManagement {
 include(":ast")
 include(":benchmark")
 include(":chasm")
+include(":chasm-coroutines")
 include(":chasm-gradle-plugin")
 include(":chasm-gradle-plugin-api")
 include(":chasm-gradle-plugin-compat")

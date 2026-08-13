@@ -4,7 +4,6 @@ package io.github.charlietap.chasm.executor.instantiator.allocation
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.compiler.ModuleCompiler
@@ -88,6 +87,43 @@ internal inline fun ModuleAllocator(
     crossinline moduleCompiler: ModuleCompiler,
     crossinline exportAllocator: ExportAllocator,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
+    AllocateModuleContents(
+        context = context,
+        instance = instance,
+        tableInitValues = tableInitValues,
+        constantExpressionEvaluator = constantExpressionEvaluator,
+        tableAllocator = tableAllocator,
+        memoryAllocator = memoryAllocator,
+        tagAllocator = tagAllocator,
+        globalAllocator = globalAllocator,
+        elementAllocator = elementAllocator,
+        dataAllocator = dataAllocator,
+    ).bind()
+    moduleCompiler(
+        context.config,
+        context.store,
+        context.module,
+        instance,
+        context.runtimeTypes,
+        context.types,
+        compilerDiagnostics,
+    ).bind()
+    AllocateModuleExports(context, instance, exportAllocator).bind()
+    instance
+}
+
+internal inline fun AllocateModuleContents(
+    context: InstantiationContext,
+    instance: ModuleInstance,
+    tableInitValues: LongArray,
+    crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
+    crossinline tableAllocator: TableAllocator,
+    crossinline memoryAllocator: MemoryAllocator,
+    crossinline tagAllocator: TagAllocator,
+    crossinline globalAllocator: GlobalAllocator,
+    crossinline elementAllocator: ElementAllocator,
+    crossinline dataAllocator: DataAllocator,
+): Result<Unit, ModuleTrapError> = binding {
 
     val store = context.store
     val module = context.module
@@ -136,21 +172,15 @@ internal inline fun ModuleAllocator(
         val address = dataAllocator(store, dataSegment.initData)
         instance.addDataAddress(address)
     }
+}
 
-    moduleCompiler(
-        context.config,
-        store,
-        module,
-        instance,
-        context.runtimeTypes,
-        context.types,
-        compilerDiagnostics,
-    ).bind()
-
-    module.exports.forEach { export ->
+internal inline fun AllocateModuleExports(
+    context: InstantiationContext,
+    instance: ModuleInstance,
+    crossinline exportAllocator: ExportAllocator,
+): Result<Unit, ModuleTrapError> = binding {
+    context.module.exports.forEach { export ->
         val externalValue = exportAllocator(context, export.descriptor).bind()
         instance.addExport(ExportInstance(export.name, externalValue))
     }
-
-    instance
 }

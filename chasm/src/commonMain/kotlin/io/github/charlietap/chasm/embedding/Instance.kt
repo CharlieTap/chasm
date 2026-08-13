@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.embedding
 
+import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
@@ -19,6 +20,7 @@ import io.github.charlietap.chasm.executor.instantiator.ModuleInstantiator
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.Import as RuntimeImport
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance as RuntimeModuleInstance
 
 fun instance(
     store: Store,
@@ -45,15 +47,26 @@ internal fun instance(
     importableMapper: Mapper<Importable, ExternalValue>,
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
 
-    val mappedImports = imports.map { import ->
-        RuntimeImport(
-            import.moduleName,
-            import.entityName,
-            importableMapper.map(import.value),
-        )
-    }
+    val mappedImports = imports.mapImports(importableMapper)
 
     return instantiator(config, store.store, module.module, mappedImports)
+        .toChasmResult(config)
+}
+
+internal fun List<Import>.mapImports(
+    importableMapper: Mapper<Importable, ExternalValue> = ImportableMapper,
+): List<RuntimeImport> = map { import ->
+    RuntimeImport(
+        import.moduleName,
+        import.entityName,
+        importableMapper.map(import.value),
+    )
+}
+
+internal fun Result<RuntimeModuleInstance, ModuleTrapError>.toChasmResult(
+    config: RuntimeConfig,
+): ChasmResult<Instance, ChasmError.ExecutionError> =
+    this
         .mapError(ModuleTrapError::toString)
         .mapError(ChasmError::ExecutionError)
         .map { internal ->
@@ -62,4 +75,3 @@ internal fun instance(
                 instance = internal,
             )
         }.fold(::Success, ::Error)
-}

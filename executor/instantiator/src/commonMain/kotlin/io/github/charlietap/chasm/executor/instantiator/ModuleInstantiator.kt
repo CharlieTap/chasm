@@ -81,6 +81,42 @@ internal inline fun ModuleInstantiator(
     crossinline tableInitializer: TableInitializer,
     crossinline memoryInitializer: MemoryInitializer,
 ): Result<ModuleInstance, ModuleTrapError> = binding {
+    val preparation = PrepareModuleInstantiation(
+        config = config,
+        store = store,
+        module = module,
+        imports = imports,
+        compatibilityChecker = compatibilityChecker,
+        partialAllocator = partialAllocator,
+        typeAllocator = typeAllocator,
+        constantExpressionEvaluator = constantExpressionEvaluator,
+    ).bind()
+    val instance = allocator(
+        preparation.context,
+        preparation.partialInstance,
+        preparation.tableInitValues,
+        compilerDiagnostics,
+    ).bind()
+    CompleteModuleInstantiation(
+        preparation.context,
+        instance,
+        invoker,
+        tableInitializer,
+        memoryInitializer,
+    ).bind()
+    instance
+}
+
+internal inline fun PrepareModuleInstantiation(
+    config: RuntimeConfig,
+    store: Store,
+    module: ASTModule,
+    imports: List<Import>,
+    crossinline compatibilityChecker: CompatibilityChecker,
+    crossinline partialAllocator: PartialModuleAllocator,
+    crossinline typeAllocator: TypeAllocator,
+    crossinline constantExpressionEvaluator: ConstantExpressionEvaluator,
+): Result<ModuleInstantiationPreparation, ModuleTrapError> = binding {
 
     compatibilityChecker(module).bind()
 
@@ -94,15 +130,27 @@ internal inline fun ModuleInstantiator(
         constantExpressionEvaluator(store, partialInstance, context.types, table.initExpression).bind()
     }
 
-    val instance = allocator(context, partialInstance, tableInitValues, compilerDiagnostics).bind()
+    ModuleInstantiationPreparation(context, partialInstance, tableInitValues)
+}
 
+internal inline fun CompleteModuleInstantiation(
+    context: InstantiationContext,
+    instance: ModuleInstance,
+    crossinline invoker: FunctionInvoker,
+    crossinline tableInitializer: TableInitializer,
+    crossinline memoryInitializer: MemoryInitializer,
+): Result<Unit, ModuleTrapError> = binding {
     tableInitializer(context, instance).bind()
     memoryInitializer(context, instance).bind()
 
-    module.startFunction?.let { function ->
+    context.module.startFunction?.let { function ->
         val address = instance.functionAddresses[function.idx.toInt()]
-        invoker(config, store, instance, address, emptyList()).bind()
+        invoker(context.config, context.store, instance, address, emptyList()).bind()
     }
-
-    instance
 }
+
+internal class ModuleInstantiationPreparation(
+    val context: InstantiationContext,
+    val partialInstance: ModuleInstance,
+    val tableInitValues: LongArray,
+)
