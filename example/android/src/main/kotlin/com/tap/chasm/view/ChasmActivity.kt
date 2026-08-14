@@ -3,14 +3,18 @@ package com.tap.chasm.view
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Button
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
@@ -31,7 +35,7 @@ import dev.zacsweers.metrox.android.ActivityKey
 import kotlinx.coroutines.launch
 
 @ContributesIntoMap(AppScope::class, binding<Activity>())
-@ActivityKey(ChasmActivity::class)
+@ActivityKey
 @Inject
 class ChasmActivity(
     private val viewModelFactory: ChasmViewModelFactory,
@@ -50,6 +54,7 @@ class ChasmActivity(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
 
             val state = viewModel.state.collectAsState()
@@ -58,6 +63,7 @@ class ChasmActivity(
                 Modifier
                     .background(Color.White)
                     .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
                     .padding(8.dp),
             ) {
                 Spacer(modifier = Modifier.height(24.dp))

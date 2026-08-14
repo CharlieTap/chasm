@@ -8,7 +8,7 @@
 
     <application
         android:name=".app.ChasmApplication"
-        android:theme="@style/Theme.AppCompat"
+        android:theme="@style/Theme.AppCompat.NoActionBar"
         android:allowBackup="false"
         android:label="Chasm"
         android:supportsRtl="true"

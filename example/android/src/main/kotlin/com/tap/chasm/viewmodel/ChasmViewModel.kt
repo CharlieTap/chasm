@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @ContributesIntoMap(AppScope::class, binding<ViewModel>())
-@ViewModelKey(ChasmViewModel::class)
+@ViewModelKey
 @Inject
 class ChasmViewModel(
     private val factorialService: FactorialService,
