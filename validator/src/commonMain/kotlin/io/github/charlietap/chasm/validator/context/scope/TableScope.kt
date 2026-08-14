@@ -12,15 +12,13 @@ internal fun TableScope(
     table: Table,
     block: (ModuleValidationContext) -> Result<Unit, ModuleValidatorError>,
 ): Result<Unit, ModuleValidatorError> {
-    val previousGlobals = context.globals.toList()
+    val previousVisibleGlobalCount = context.visibleGlobalCount
     val previousResultType = context.expressionResultType
-    context.globals.clear()
-    context.globals.addAll(previousGlobals.take(context.importedGlobalCount))
+    context.visibleGlobalCount = context.importedGlobalCount
     context.expressionResultType = ResultType(listOf(ValueType.Reference(table.type.referenceType)))
 
     val result = block(context)
-    context.globals.clear()
-    context.globals.addAll(previousGlobals)
+    context.visibleGlobalCount = previousVisibleGlobalCount
     context.expressionResultType = previousResultType
     return result
 }

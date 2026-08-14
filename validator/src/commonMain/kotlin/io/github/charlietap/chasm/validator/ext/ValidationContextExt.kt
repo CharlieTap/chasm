@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.validator.ext
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.toResultOr
@@ -74,9 +76,9 @@ internal inline fun ModuleValidationContext.functionType(
 internal inline fun ModuleValidationContext.globalType(
     index: Index.GlobalIndex,
 ): Result<GlobalType, ModuleValidatorError> {
-    return globals.getOrNull(index.idx.toInt()).toResultOr {
-        InstructionValidatorError.UnknownGlobal
-    }
+    val globalIndex = index.idx.toInt()
+    if (globalIndex < 0 || globalIndex >= visibleGlobalCount) return Err(InstructionValidatorError.UnknownGlobal)
+    return Ok(globals[globalIndex])
 }
 
 internal inline fun ModuleValidationContext.memoryType(

@@ -57,7 +57,7 @@ internal class ComponentValidationContext(
         frames.forEach(ComponentValidationFrame::clear)
         depth = 0
         frame.reset(ComponentScopeKind.Component)
-        moduleContext?.clear()
+        moduleContext?.clearLocalState()
         identities.clear()
     }
 }

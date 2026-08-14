@@ -14,7 +14,8 @@ import io.github.charlietap.chasm.embedding.internal._module as internalModule
  * serially or in parallel. It estimates the work from the number and encoded
  * sizes of the module's function bodies. When parallel decoding is expected to
  * repay its coordination cost, those bodies are balanced across a bounded
- * number of workers while the remaining sections are decoded serially.
+ * number of workers on [kotlinx.coroutines.Dispatchers.Default], while the
+ * remaining sections are decoded serially.
  *
  * The heuristic cannot predict the exact cost of every module. In particular,
  * total module size is not a reliable measure of parallel decoding work. Data,

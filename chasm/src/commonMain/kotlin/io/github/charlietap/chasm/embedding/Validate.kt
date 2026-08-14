@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.embedding
 
+import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.fold
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.mapError
@@ -44,7 +45,14 @@ internal fun validate(
     module: Module,
     validator: WasmModuleValidator,
 ): ChasmResult<Module, ValidationError> {
-    return validator(module.config, module.module)
+    return validate(module, validator(module.config, module.module))
+}
+
+internal fun validate(
+    module: Module,
+    result: Result<io.github.charlietap.chasm.ast.module.Module, ModuleValidatorError>,
+): ChasmResult<Module, ValidationError> {
+    return result
         .mapError(ModuleValidatorError::toString)
         .mapError(::ValidationError)
         .map { internal ->

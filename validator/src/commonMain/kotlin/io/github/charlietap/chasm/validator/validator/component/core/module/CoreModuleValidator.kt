@@ -37,6 +37,6 @@ internal inline fun CoreModuleValidator(
         val moduleType = moduleTypeDeriver(moduleContext, astModule).bind()
         context.frame.coreModules += moduleType
     }
-    moduleContext.clear()
+    moduleContext.clearLocalState()
     return result
 }

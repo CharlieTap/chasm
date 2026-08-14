@@ -11,15 +11,13 @@ internal fun GlobalScope(
     global: Global,
     block: (ModuleValidationContext) -> Result<Unit, ModuleValidatorError>,
 ): Result<Unit, ModuleValidatorError> {
-    val previousGlobals = context.globals.toList()
+    val previousVisibleGlobalCount = context.visibleGlobalCount
     val previousResultType = context.expressionResultType
-    context.globals.clear()
-    context.globals.addAll(previousGlobals.take(global.idx.idx.toInt()))
+    context.visibleGlobalCount = global.idx.idx.toInt()
     context.expressionResultType = ResultType(listOf(global.type.valueType))
 
     val result = block(context)
-    context.globals.clear()
-    context.globals.addAll(previousGlobals)
+    context.visibleGlobalCount = previousVisibleGlobalCount
     context.expressionResultType = previousResultType
     return result
 }

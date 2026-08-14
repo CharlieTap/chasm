@@ -2,59 +2,76 @@ package io.github.charlietap.chasm.validator.context
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.toResultOr
-import io.github.charlietap.chasm.ast.module.DataSegment
-import io.github.charlietap.chasm.ast.module.ElementSegment
-import io.github.charlietap.chasm.ast.module.Global
-import io.github.charlietap.chasm.ast.module.Import
-import io.github.charlietap.chasm.ast.module.Memory
+import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Module
-import io.github.charlietap.chasm.ast.module.Table
-import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.MemoryType
+import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.matching.DefinedTypeLookup
 import io.github.charlietap.chasm.validator.error.FunctionValidatorError
 import io.github.charlietap.chasm.validator.error.ModuleValidatorError
 
-internal class ModuleValidationContext(
-    config: ModuleConfig,
-    module: Module,
-    val elementSegmentContext: ElementSegmentContextImpl = ElementSegmentContextImpl(),
-    val exportContext: ExportContextImpl = ExportContextImpl(),
-    val expressionContext: ExpressionContextImpl = ExpressionContextImpl(),
-    val functionContext: FunctionContextImpl = FunctionContextImpl(),
-    val refsContext: RefsContextImpl = RefsContextImpl(),
-    val typeContext: TypeContextImpl = TypeContextImpl(),
+internal class ModuleValidationContext private constructor(
+    immutableContext: ImmutableModuleValidationContext,
+    definedTypesValidated: Int,
+    val elementSegmentContext: ElementSegmentContextImpl,
+    val exportContext: ExportContextImpl,
+    val expressionContext: ExpressionContextImpl,
+    val functionContext: FunctionContextImpl,
+    val typeContext: TypeContextImpl,
 ) : CoreTypeValidationContext,
     ElementSegmentContext by elementSegmentContext,
     ExportContext by exportContext,
     ExpressionContext by expressionContext,
     FunctionContext by functionContext,
-    RefsContext by refsContext {
+    RefsContext {
 
-    var config: ModuleConfig = config
+    var immutableContext: ImmutableModuleValidationContext = immutableContext
         private set
 
-    var module: Module = module
+    var config: ModuleConfig = immutableContext.config
         private set
 
-    val types = mutableListOf<DefinedType>()
-    var definedTypesValidated: Int = 0
-
-    val functions = mutableListOf<DefinedType>()
-    val globals = mutableListOf<GlobalType>()
-    val memories = mutableListOf<MemoryType>()
-    val tables = mutableListOf<TableType>()
-    val tags = mutableListOf<TagType>()
-    val datas = mutableListOf<io.github.charlietap.chasm.ast.module.Index.DataIndex>()
-    val elems = mutableListOf<io.github.charlietap.chasm.type.ReferenceType>()
-
-    var importedGlobalCount: Int = 0
+    var module: Module = immutableContext.module
         private set
+
+    var types: List<DefinedType> = immutableContext.types
+        private set
+
+    var functions: List<DefinedType> = immutableContext.functions
+        private set
+
+    var globals: List<GlobalType> = immutableContext.globals
+        private set
+
+    var memories: List<MemoryType> = immutableContext.memories
+        private set
+
+    var tables: List<TableType> = immutableContext.tables
+        private set
+
+    var tags: List<TagType> = immutableContext.tags
+        private set
+
+    var datas: List<Index.DataIndex> = immutableContext.datas
+        private set
+
+    var elems: List<ReferenceType> = immutableContext.elems
+        private set
+
+    override var refs: Set<Index.FunctionIndex> = immutableContext.refs
+        private set
+
+    var importedGlobalCount: Int = immutableContext.importedGlobalCount
+        private set
+
+    var definedTypesValidated: Int = definedTypesValidated
+
+    var visibleGlobalCount: Int = immutableContext.globals.size
 
     val validTypeIndices: IntRange
         get() = 0 until definedTypesValidated
@@ -72,55 +89,71 @@ internal class ModuleValidationContext(
         types.getOrNull(index)
     }
 
-    init {
-        reset(config, module)
-    }
+    constructor(
+        config: ModuleConfig,
+        module: Module,
+        elementSegmentContext: ElementSegmentContextImpl = ElementSegmentContextImpl(),
+        exportContext: ExportContextImpl = ExportContextImpl(),
+        expressionContext: ExpressionContextImpl = ExpressionContextImpl(),
+        functionContext: FunctionContextImpl = FunctionContextImpl(),
+        typeContext: TypeContextImpl = TypeContextImpl(),
+    ) : this(
+        immutableContext = ImmutableModuleValidationContext(config, module),
+        definedTypesValidated = 0,
+        elementSegmentContext = elementSegmentContext,
+        exportContext = exportContext,
+        expressionContext = expressionContext,
+        functionContext = functionContext,
+        typeContext = typeContext,
+    )
+
+    internal constructor(
+        immutableContext: ImmutableModuleValidationContext,
+        definedTypesValidated: Int,
+    ) : this(
+        immutableContext = immutableContext,
+        definedTypesValidated = definedTypesValidated,
+        elementSegmentContext = ElementSegmentContextImpl(),
+        exportContext = ExportContextImpl(),
+        expressionContext = ExpressionContextImpl(),
+        functionContext = FunctionContextImpl(),
+        typeContext = TypeContextImpl(),
+    )
 
     fun reset(
         config: ModuleConfig,
         module: Module,
     ) {
-        clear()
-        this.config = config
-        this.module = module
-
-        types += module.definedTypes
-
-        module.imports.forEach { import ->
-            when (val descriptor = import.descriptor) {
-                is Import.Descriptor.Function -> types.getOrNull(descriptor.typeIndex.idx.toInt())?.let(functions::add)
-                is Import.Descriptor.Global -> globals += descriptor.type
-                is Import.Descriptor.Memory -> memories += descriptor.type
-                is Import.Descriptor.Table -> tables += descriptor.type
-                is Import.Descriptor.Tag -> tags += descriptor.type
-            }
-        }
-        importedGlobalCount = globals.size
-
-        module.functions.mapNotNullTo(functions) { function ->
-            types.getOrNull(function.typeIndex.idx.toInt())
-        }
-        module.globals.mapTo(globals, Global::type)
-        module.memories.mapTo(memories, Memory::type)
-        module.tables.mapTo(tables, Table::type)
-        module.tags.mapTo(tags, Tag::type)
-        module.dataSegments.mapTo(datas, DataSegment::idx)
-        module.elementSegments.mapTo(elems, ElementSegment::type)
-        refsContext.reset(module)
+        clearMutableState()
+        setImmutableContext(ImmutableModuleValidationContext(config, module))
+        visibleGlobalCount = globals.size
+        definedTypesValidated = 0
     }
 
-    fun clear() {
-        types.clear()
-        functions.clear()
-        globals.clear()
-        memories.clear()
-        tables.clear()
-        tags.clear()
-        datas.clear()
-        elems.clear()
-        importedGlobalCount = 0
+    fun clearLocalState() {
+        visibleGlobalCount = 0
         definedTypesValidated = 0
 
+        clearMutableState()
+    }
+
+    private fun setImmutableContext(context: ImmutableModuleValidationContext) {
+        immutableContext = context
+        config = context.config
+        module = context.module
+        types = context.types
+        functions = context.functions
+        globals = context.globals
+        memories = context.memories
+        tables = context.tables
+        tags = context.tags
+        datas = context.datas
+        elems = context.elems
+        importedGlobalCount = context.importedGlobalCount
+        refs = context.refs
+    }
+
+    private fun clearMutableState() {
         elementSegmentContext.elementSegmentType = null
         exportContext.exportNames.clear()
         expressionContext.expressionResultType = null
@@ -129,7 +162,6 @@ internal class ModuleValidationContext(
         functionContext.labels.clear()
         functionContext.result = null
         functionContext.operands.clear()
-        refsContext.clear()
         typeContext.limitsMaximum = ULong.MAX_VALUE
     }
 

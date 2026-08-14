@@ -10,6 +10,7 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.config)
+                api(projects.libs.parallel)
                 api(libs.result)
 
                 api(projects.typeSystem)
@@ -20,6 +21,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
                 implementation(projects.test.fixture.ast)
             }
         }

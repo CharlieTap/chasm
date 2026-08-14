@@ -12,27 +12,12 @@ internal interface RefsContext {
     val refs: Set<Index.FunctionIndex>
 }
 
-internal class RefsContextImpl : RefsContext {
-
-    private val functionReferences = mutableSetOf<Index.FunctionIndex>()
-
-    override val refs: Set<Index.FunctionIndex>
-        get() = functionReferences
-
-    internal fun reset(module: Module) {
-        functionReferences.clear()
-        collectReferences(module)
-    }
-
-    internal fun clear() {
-        functionReferences.clear()
-    }
-
-    private fun collectReferences(module: Module) {
+internal fun collectDeclaredFunctionReferences(module: Module): Set<Index.FunctionIndex> {
+    return buildSet {
         module.exports.forEach { export ->
             val descriptor = export.descriptor
             if (descriptor is Export.Descriptor.Function) {
-                functionReferences += descriptor.functionIndex
+                add(descriptor.functionIndex)
             }
         }
 
@@ -58,12 +43,12 @@ internal class RefsContextImpl : RefsContext {
             }
         }
     }
+}
 
-    private fun collectReferences(instructions: List<Instruction>) {
-        instructions.forEach { instruction ->
-            if (instruction is ReferenceInstruction.RefFunc) {
-                functionReferences += instruction.funcIdx
-            }
+private fun MutableSet<Index.FunctionIndex>.collectReferences(instructions: List<Instruction>) {
+    instructions.forEach { instruction ->
+        if (instruction is ReferenceInstruction.RefFunc) {
+            add(instruction.funcIdx)
         }
     }
 }

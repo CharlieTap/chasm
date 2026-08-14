@@ -345,6 +345,10 @@ public final class io/github/charlietap/chasm/embedding/internal/ModuleKt {
 	public static final fun _module ([BLio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class io/github/charlietap/chasm/embedding/internal/ValidateKt {
+	public static final fun _validate (Lio/github/charlietap/chasm/embedding/shapes/Module;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class io/github/charlietap/chasm/embedding/memory/GrowMemoryKt {
 	public static final fun growMemory (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Memory;I)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }

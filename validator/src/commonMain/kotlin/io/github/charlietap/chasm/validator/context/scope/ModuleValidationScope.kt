@@ -16,6 +16,6 @@ internal inline fun ModuleValidationScope(
 ): Result<Module, ModuleValidatorError> {
     context.reset(config, module)
     val result = validator(context, module).map { module }
-    context.clear()
+    context.clearLocalState()
     return result
 }

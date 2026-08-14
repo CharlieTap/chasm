@@ -8,3 +8,7 @@ public final class io/github/charlietap/chasm/coroutines/ModuleKt {
 	public static synthetic fun module$default ([BLio/github/charlietap/chasm/config/ModuleConfig;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class io/github/charlietap/chasm/coroutines/ValidateKt {
+	public static final fun validate (Lio/github/charlietap/chasm/embedding/shapes/Module;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
