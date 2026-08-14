@@ -60,10 +60,18 @@ kotlin {
     }
 
     sourceSets {
+        commonMain {
+            dependencies {
+                api(libs.kotlinx.coroutines.core)
+            }
+        }
+
         getByName("nonJsMain") {
             kotlin.srcDir("src/nonJsTargetsMain/kotlin")
             dependencies {
                 implementation(projects.chasm)
+                implementation(projects.chasmCoroutines)
+                implementation(projects.libs.parallel)
             }
         }
 
@@ -75,6 +83,9 @@ kotlin {
         }
         getByName("nonJsTest") {
             kotlin.srcDir("src/nonJsTargetsTest/kotlin")
+            dependencies {
+                implementation(libs.kotlinx.coroutines.test)
+            }
         }
     }
 }

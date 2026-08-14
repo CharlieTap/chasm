@@ -29,6 +29,8 @@ artifacts.add(
 )
 
 chasm {
+    generateSuspendingFactories = true
+
     modules {
         create("FactorialService") {
             binary = layout.projectDirectory.file("src/commonMain/resources/factorial.wasm")
@@ -95,6 +97,12 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(projects.binary)
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
     }

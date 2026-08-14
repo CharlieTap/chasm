@@ -3,6 +3,7 @@ public abstract interface annotation class io/github/charlietap/chasm/gradle/Cha
 
 public class io/github/charlietap/chasm/gradle/ChasmExtension {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public final fun getGenerateSuspendingFactories ()Lorg/gradle/api/provider/Property;
 	public final fun getMode ()Lorg/gradle/api/provider/Property;
 	public final fun getModules ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public final fun getRuntimeDependencyConfiguration ()Lorg/gradle/api/provider/Property;

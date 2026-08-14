@@ -22,7 +22,13 @@ class Agp9AndroidConfigurer : AndroidConfigurer {
                     return@configureEach
                 }
 
-                val task = registerCodegenTask(context.project, module, variant.name, context.workerClasspath)
+                val task = registerCodegenTask(
+                    context.project,
+                    module,
+                    variant.name,
+                    context.workerClasspath,
+                    context.extension.generateSuspendingFactories,
+                )
                 variant.sources.java?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
                 variant.sources.kotlin?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
             }

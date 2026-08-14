@@ -21,6 +21,7 @@ interface CodegenWorkParameters : WorkParameters {
     val packageName: Property<String>
     val interfaceVisibility: Property<String>
     val implementationVisibility: Property<String>
+    val generateSuspendingFactories: Property<Boolean>
     val configGenerateTypesafeGlobalProperties: Property<Boolean>
     val allocatorAllocationFunction: Property<String>
     val allocatorDeallocationFunction: Property<String>
@@ -96,7 +97,12 @@ abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
             logger = pluginLogger,
         )
 
-        val specs = generator(interfaceVisibility, implementationVisibility, data)
+        val specs = generator(
+            interfaceVisibility = interfaceVisibility,
+            implementationVisibility = implementationVisibility,
+            wasmInterface = data,
+            generateSuspendingFactories = params.generateSuspendingFactories.get(),
+        )
 
         val outputDir = File(params.outputDirectoryPath.get())
         specs.forEach { spec ->

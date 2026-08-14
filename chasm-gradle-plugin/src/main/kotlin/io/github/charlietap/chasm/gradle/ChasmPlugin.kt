@@ -36,7 +36,13 @@ class ChasmPlugin : Plugin<Project> {
                             val commonMainSourceSet = mpp.sourceSets.getByName("commonMain")
                             addVMRuntimeForKmp(project, extension.runtimeDependencyConfiguration.get(), commonMainSourceSet)
 
-                            val task = registerCodegenTask(project, module, "commonMain", workerClasspath)
+                            val task = registerCodegenTask(
+                                project,
+                                module,
+                                "commonMain",
+                                workerClasspath,
+                                extension.generateSuspendingFactories,
+                            )
                             commonMainSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
                         }
                         Mode.PRODUCER -> {
@@ -60,7 +66,13 @@ class ChasmPlugin : Plugin<Project> {
                         return@configureEach
                     }
 
-                    val task = registerCodegenTask(project, module, MAIN_COMPILATION_NAME, workerClasspath)
+                    val task = registerCodegenTask(
+                        project,
+                        module,
+                        MAIN_COMPILATION_NAME,
+                        workerClasspath,
+                        extension.generateSuspendingFactories,
+                    )
                     mainCompilation.defaultSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
                 }
             }
@@ -132,7 +144,13 @@ class ChasmPlugin : Plugin<Project> {
                     file.resolveSibling(file.nameWithoutExtension + ".wasm")
                 },
             )
-            val codegen = registerCodegenTask(project, module, target.name, workerClasspath).apply {
+            val codegen = registerCodegenTask(
+                project,
+                module,
+                target.name,
+                workerClasspath,
+                extension.generateSuspendingFactories,
+            ).apply {
                 configure { task ->
                     task.binary.set(wasmFile)
                     task.dependsOn(linkedBinary.linkTask)

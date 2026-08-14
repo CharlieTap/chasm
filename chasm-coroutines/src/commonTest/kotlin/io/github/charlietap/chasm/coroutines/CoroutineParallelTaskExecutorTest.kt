@@ -1,8 +1,11 @@
 package io.github.charlietap.chasm.coroutines
 
+import io.github.charlietap.chasm.InternalChasmApi
+import io.github.charlietap.chasm.coroutines.internal._coroutineParallelTaskExecutor
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -10,7 +13,9 @@ import kotlin.test.assertEquals
 class CoroutineParallelTaskExecutorTest {
 
     @Test
+    @OptIn(InternalChasmApi::class)
     fun `executes tasks and preserves their order`() = runTest {
+        val executor = _coroutineParallelTaskExecutor(StandardTestDispatcher(testScheduler))
         val tasks: List<ParallelTaskScope.() -> Int> = List(4) { index ->
             {
                 ensureActive()
@@ -18,7 +23,7 @@ class CoroutineParallelTaskExecutorTest {
             }
         }
 
-        val results = CoroutineParallelTaskExecutor.execute(tasks)
+        val results = executor.execute(tasks)
 
         assertEquals(listOf(0, 1, 2, 3), results)
     }

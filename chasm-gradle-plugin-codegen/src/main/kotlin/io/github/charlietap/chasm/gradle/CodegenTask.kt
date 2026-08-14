@@ -55,6 +55,9 @@ abstract class CodegenTask
         abstract val implementationVisibility: Property<TypeVisibility>
 
         @get:Input
+        abstract val generateSuspendingFactories: Property<Boolean>
+
+        @get:Input
         abstract val initializers: SetProperty<String>
 
         @get:Input
@@ -74,6 +77,7 @@ abstract class CodegenTask
             val packageNameValue = packageName.get()
             val interfaceVisibilityValue = interfaceVisibility.get()
             val implementationVisibilityValue = implementationVisibility.get()
+            val generateSuspendingFactoriesValue = generateSuspendingFactories.get()
             val codegenConfigValue = config.get()
             val allocatorValue = allocator.orNull
             val initializerNames = initializers.get()
@@ -92,6 +96,7 @@ abstract class CodegenTask
                 workParameters.packageName.set(packageNameValue)
                 workParameters.interfaceVisibility.set(interfaceVisibilityValue.name)
                 workParameters.implementationVisibility.set(implementationVisibilityValue.name)
+                workParameters.generateSuspendingFactories.set(generateSuspendingFactoriesValue)
 
                 workParameters.configGenerateTypesafeGlobalProperties.set(codegenConfigValue.generateTypesafeGlobalProperties)
 

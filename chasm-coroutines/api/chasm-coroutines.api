@@ -12,3 +12,7 @@ public final class io/github/charlietap/chasm/coroutines/ValidateKt {
 	public static final fun validate (Lio/github/charlietap/chasm/embedding/shapes/Module;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class io/github/charlietap/chasm/coroutines/internal/CoroutineParallelTaskExecutorKt {
+	public static final fun _coroutineParallelTaskExecutor (Lkotlinx/coroutines/CoroutineDispatcher;)Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;
+}
+

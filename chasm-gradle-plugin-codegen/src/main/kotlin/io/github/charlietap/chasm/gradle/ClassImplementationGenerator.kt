@@ -24,36 +24,87 @@ import io.github.charlietap.chasm.type.ValueType as WasmValueType
 internal class PrimaryConstructorGenerator {
     operator fun invoke(
         builder: TypeSpec.Builder,
+        generateSuspendingFactory: Boolean,
     ) = builder.apply {
-        primaryConstructor(
-            FunSpec.constructorBuilder().apply {
-                addParameter("binary", ByteArray::class)
-                addParameter(
-                    ParameterSpec.builder(
+        val constructor = FunSpec.constructorBuilder().apply {
+            addParameter("binary", ByteArray::class)
+            addParameter(
+                ParameterSpec.builder(
+                    "imports",
+                    CODEGEN_IMPORT_LIST_CLASS_NAME,
+                ).apply {
+                    if (!generateSuspendingFactory) {
+                        defaultValue(CodeBlock.of("emptyList()"))
+                    }
+                }.build(),
+            )
+            addParameter(
+                ParameterSpec.builder(
+                    "virtualMachine",
+                    WASM_VIRTUAL_MACHINE_CLASS_NAME,
+                ).apply {
+                    if (!generateSuspendingFactory) {
+                        defaultValue(CodeBlock.of("%M()", VM_FACTORY_CLASS_NAME))
+                    }
+                }.build(),
+            )
+            addParameter(
+                ParameterSpec.builder(
+                    "moduleFactory",
+                    MODULE_FACTORY_CLASS_NAME.copy(true),
+                ).apply {
+                    if (!generateSuspendingFactory) {
+                        defaultValue("null")
+                    }
+                }.build(),
+            )
+            addParameter(
+                ParameterSpec.builder(
+                    "instanceFactory",
+                    INSTANCE_FACTORY_CLASS_NAME.copy(true),
+                ).apply {
+                    if (!generateSuspendingFactory) {
+                        defaultValue("null")
+                    }
+                }.build(),
+            )
+            if (generateSuspendingFactory) {
+                addModifiers(KModifier.PRIVATE)
+                addParameter("runtimeState", ClassName("", "RuntimeState").copy(nullable = true))
+            }
+        }.build()
+        primaryConstructor(constructor)
+
+        if (generateSuspendingFactory) {
+            addFunction(
+                FunSpec.constructorBuilder()
+                    .addParameter("binary", ByteArray::class)
+                    .addParameter(
+                        ParameterSpec.builder("imports", CODEGEN_IMPORT_LIST_CLASS_NAME)
+                            .defaultValue("emptyList()")
+                            .build(),
+                    ).addParameter(
+                        ParameterSpec.builder("virtualMachine", WASM_VIRTUAL_MACHINE_CLASS_NAME)
+                            .defaultValue("%M()", VM_FACTORY_CLASS_NAME)
+                            .build(),
+                    ).addParameter(
+                        ParameterSpec.builder("moduleFactory", MODULE_FACTORY_CLASS_NAME.copy(nullable = true))
+                            .defaultValue("null")
+                            .build(),
+                    ).addParameter(
+                        ParameterSpec.builder("instanceFactory", INSTANCE_FACTORY_CLASS_NAME.copy(nullable = true))
+                            .defaultValue("null")
+                            .build(),
+                    ).callThisConstructor(
+                        "binary",
                         "imports",
-                        CODEGEN_IMPORT_LIST_CLASS_NAME,
-                    ).defaultValue(CodeBlock.of("emptyList()")).build(),
-                )
-                addParameter(
-                    ParameterSpec.builder(
                         "virtualMachine",
-                        WASM_VIRTUAL_MACHINE_CLASS_NAME,
-                    ).defaultValue(CodeBlock.of("%M()", VM_FACTORY_CLASS_NAME)).build(),
-                )
-                addParameter(
-                    ParameterSpec.builder(
                         "moduleFactory",
-                        MODULE_FACTORY_CLASS_NAME.copy(true),
-                    ).defaultValue("null").build(),
-                )
-                addParameter(
-                    ParameterSpec.builder(
                         "instanceFactory",
-                        INSTANCE_FACTORY_CLASS_NAME.copy(true),
-                    ).defaultValue("null").build(),
-                )
-            }.build(),
-        )
+                        "null",
+                    ).build(),
+            )
+        }
 
         addProperty(
             PropertySpec.builder("binary", ByteArray::class)
@@ -91,12 +142,18 @@ internal class PrimaryConstructorGenerator {
 internal class ConstructorGenerator(
     private val primaryConstructorGenerator: PrimaryConstructorGenerator = PrimaryConstructorGenerator(),
 ) {
-    operator fun invoke(builder: TypeSpec.Builder) = builder.apply {
-        primaryConstructorGenerator(builder)
+    operator fun invoke(
+        builder: TypeSpec.Builder,
+        generateSuspendingFactory: Boolean,
+    ) = builder.apply {
+        primaryConstructorGenerator(builder, generateSuspendingFactory)
     }
 }
 
-private fun TypeSpec.Builder.addConstructor(generator: ConstructorGenerator) = generator(this)
+private fun TypeSpec.Builder.addConstructor(
+    generator: ConstructorGenerator,
+    generateSuspendingFactory: Boolean,
+) = generator(this, generateSuspendingFactory)
 
 internal class InitializerBlockGenerator() {
     operator fun invoke(
@@ -381,44 +438,42 @@ internal class ClassPropertiesGenerator(
     private val propertyImplementationGenerator: PropertyImplementationGenerator = PropertyImplementationGenerator(),
 ) {
     operator fun invoke(
-        name: String,
         wasmInterface: WasmInterface,
+        generateSuspendingFactory: Boolean,
     ) = buildList {
 
+        val createStore = CodeBlock.of("virtualMachine.%L()", CREATE_STORE_FUNCTION)
         val storeProperty = PropertySpec.builder("store", STORE_CLASS_NAME)
             .addModifiers(KModifier.PRIVATE)
-            .initializer(CodeBlock.of("virtualMachine.%L()", CREATE_STORE_FUNCTION))
+            .initializer(runtimeStateOr("store", createStore, generateSuspendingFactory))
             .build()
+        val createModule = CodeBlock.of(
+            "moduleFactory?.invoke(binary) ?: virtualMachine.%L(binary).%M(%S)",
+            CREATE_MODULE_FUNCTION,
+            EXPECT_RESULT_FUNCTION,
+            "Failed to decode binary",
+        )
         val moduleProperty = PropertySpec.builder("module", MODULE_CLASS_NAME)
             .addModifiers(KModifier.PRIVATE)
-            .initializer(
-                CodeBlock.of(
-                    "moduleFactory?.invoke(binary) ?: virtualMachine.%L(binary).%M(%S)",
-                    CREATE_MODULE_FUNCTION,
-                    EXPECT_RESULT_FUNCTION,
-                    "Failed to decode binary",
-                ),
-            )
+            .initializer(runtimeStateOr("module", createModule, generateSuspendingFactory))
             .build()
+        val createImports = CodeBlock.of(
+            "virtualMachine.%M(store, imports)",
+            IMPORT_FACTORY_CLASS_NAME,
+        )
         val allocatedImportsProperty = PropertySpec.builder("allocatedImports", IMPORT_LIST_CLASS_NAME)
             .addModifiers(KModifier.PRIVATE)
-            .initializer(
-                CodeBlock.of(
-                    "virtualMachine.%M(store, imports)",
-                    IMPORT_FACTORY_CLASS_NAME,
-                ),
-            )
+            .initializer(runtimeStateOr("allocatedImports", createImports, generateSuspendingFactory))
             .build()
+        val createInstance = CodeBlock.of(
+            "instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.%L(store, module, allocatedImports).%M(%S)",
+            CREATE_INSTANCE_FUNCTION,
+            EXPECT_RESULT_FUNCTION,
+            "Failed to instantiate module",
+        )
         val instanceProperty = PropertySpec.builder("instance", INSTANCE_CLASS_NAME)
             .addModifiers(KModifier.PRIVATE)
-            .initializer(
-                CodeBlock.of(
-                    "instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.%L(store, module, allocatedImports).%M(%S)",
-                    CREATE_INSTANCE_FUNCTION,
-                    EXPECT_RESULT_FUNCTION,
-                    "Failed to instantiate module",
-                ),
-            )
+            .initializer(runtimeStateOr("instance", createInstance, generateSuspendingFactory))
             .build()
 
         add(storeProperty)
@@ -480,6 +535,96 @@ internal class ClassPropertiesGenerator(
             add(propertyImplementationGenerator(property))
         }
     }
+
+    private fun runtimeStateOr(
+        property: String,
+        fallback: CodeBlock,
+        generateSuspendingFactory: Boolean,
+    ): CodeBlock {
+        return if (generateSuspendingFactory) {
+            CodeBlock.of("runtimeState?.%L ?: %L", property, fallback)
+        } else {
+            fallback
+        }
+    }
+}
+
+internal class RuntimeStateGenerator {
+    operator fun invoke(): TypeSpec {
+        val constructor = FunSpec.constructorBuilder()
+            .addParameter("store", STORE_CLASS_NAME)
+            .addParameter("module", MODULE_CLASS_NAME)
+            .addParameter("allocatedImports", IMPORT_LIST_CLASS_NAME)
+            .addParameter("instance", INSTANCE_CLASS_NAME)
+            .build()
+
+        return TypeSpec.classBuilder("RuntimeState")
+            .addModifiers(KModifier.PRIVATE)
+            .primaryConstructor(constructor)
+            .addProperty(
+                PropertySpec.builder("store", STORE_CLASS_NAME)
+                    .initializer("store")
+                    .build(),
+            ).addProperty(
+                PropertySpec.builder("module", MODULE_CLASS_NAME)
+                    .initializer("module")
+                    .build(),
+            ).addProperty(
+                PropertySpec.builder("allocatedImports", IMPORT_LIST_CLASS_NAME)
+                    .initializer("allocatedImports")
+                    .build(),
+            ).addProperty(
+                PropertySpec.builder("instance", INSTANCE_CLASS_NAME)
+                    .initializer("instance")
+                    .build(),
+            ).build()
+    }
+}
+
+internal class SuspendingFactoryGenerator {
+    operator fun invoke(
+        packageName: String,
+        interfaceName: String,
+    ): FunSpec = FunSpec.builder("create")
+        .addModifiers(KModifier.SUSPEND)
+        .addParameter("binary", ByteArray::class)
+        .addParameter(
+            ParameterSpec.builder("imports", CODEGEN_IMPORT_LIST_CLASS_NAME)
+                .defaultValue("emptyList()")
+                .build(),
+        ).addParameter(
+            ParameterSpec.builder("virtualMachine", SUSPENDING_WASM_VIRTUAL_MACHINE_CLASS_NAME)
+                .defaultValue("%M()", SUSPENDING_VM_FACTORY_CLASS_NAME)
+                .build(),
+        ).addParameter(
+            ParameterSpec.builder("moduleFactory", MODULE_FACTORY_CLASS_NAME.copy(nullable = true))
+                .defaultValue("null")
+                .build(),
+        ).addParameter(
+            ParameterSpec.builder("instanceFactory", INSTANCE_FACTORY_CLASS_NAME.copy(nullable = true))
+                .defaultValue("null")
+                .build(),
+        ).returns(ClassName(packageName, interfaceName + "Impl"))
+        .addStatement("val store = virtualMachine.%L()", CREATE_STORE_FUNCTION)
+        .addStatement(
+            "val module = moduleFactory?.invoke(binary) ?: virtualMachine.%L(binary).%M(%S)",
+            CREATE_MODULE_SUSPENDING_FUNCTION,
+            EXPECT_RESULT_FUNCTION,
+            "Failed to decode binary",
+        ).addStatement(
+            "val allocatedImports = virtualMachine.%M(store, imports)",
+            IMPORT_FACTORY_CLASS_NAME,
+        ).addStatement(
+            "val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: " +
+                "virtualMachine.%L(store, module, allocatedImports).%M(%S)",
+            CREATE_INSTANCE_SUSPENDING_FUNCTION,
+            EXPECT_RESULT_FUNCTION,
+            "Failed to instantiate module",
+        ).addStatement(
+            "return %T(binary, imports, virtualMachine, moduleFactory, instanceFactory, " +
+                "RuntimeState(store, module, allocatedImports, instance))",
+            ClassName(packageName, interfaceName + "Impl"),
+        ).build()
 }
 
 internal class ClassImplementationGenerator(
@@ -488,12 +633,15 @@ internal class ClassImplementationGenerator(
     private val functionImplementationGenerator: FunctionImplementationGenerator = FunctionImplementationGenerator(),
     private val propertiesGenerator: ClassPropertiesGenerator = ClassPropertiesGenerator(),
     private val resultTypePropertiesGenerator: ResultTypePropertiesGenerator = ResultTypePropertiesGenerator(),
+    private val runtimeStateGenerator: RuntimeStateGenerator = RuntimeStateGenerator(),
+    private val suspendingFactoryGenerator: SuspendingFactoryGenerator = SuspendingFactoryGenerator(),
 ) {
     operator fun invoke(
         packageName: String,
         interfaceName: String,
         visibility: TypeVisibility,
         wasmInterface: WasmInterface,
+        generateSuspendingFactory: Boolean = false,
     ): TypeSpec = TypeSpec.classBuilder(interfaceName + "Impl").apply {
 
         val visibilityModifier = when (visibility) {
@@ -504,9 +652,9 @@ internal class ClassImplementationGenerator(
 
         addSuperinterface(ClassName(packageName, interfaceName))
 
-        addConstructor(constructorGenerator)
+        addConstructor(constructorGenerator, generateSuspendingFactory)
 
-        val properties = propertiesGenerator(interfaceName, wasmInterface)
+        val properties = propertiesGenerator(wasmInterface, generateSuspendingFactory)
         properties.forEach { property ->
             addProperty(property)
         }
@@ -515,7 +663,18 @@ internal class ClassImplementationGenerator(
             addInitializerBlock(initializerBlockGenerator(wasmInterface.initializers))
         }
 
-        resultTypePropertiesGenerator(wasmInterface)?.let(::addType)
+        val resultTypeProperties = resultTypePropertiesGenerator(wasmInterface)
+        if (generateSuspendingFactory) {
+            addType(runtimeStateGenerator())
+            addType(
+                TypeSpec.companionObjectBuilder().apply {
+                    addFunction(suspendingFactoryGenerator(packageName, interfaceName))
+                    resultTypeProperties?.propertySpecs?.forEach(::addProperty)
+                }.build(),
+            )
+        } else {
+            resultTypeProperties?.let(::addType)
+        }
 
         wasmInterface.functions.forEach { function ->
             addFunction(functionImplementationGenerator(packageName, function))

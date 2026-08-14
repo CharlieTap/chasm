@@ -14,23 +14,23 @@ import dev.zacsweers.metro.Provides
 @ContributesTo(AppScope::class)
 interface ConsumerProvider {
     @Provides
-    fun factorialService(): FactorialService {
+    fun factorialService(): FactorialService = runBlocking {
         val loader = binaryLoaderFactory()
         val bytes = loader.load("factorial.wasm")
-        return FactorialServiceImpl(bytes)
+        FactorialServiceImpl.create(bytes)
     }
 
     @Provides
-    fun stringService(): StringService {
+    fun stringService(): StringService = runBlocking {
         val loader = binaryLoaderFactory()
         val bytes = loader.load("truncate.wasm")
-        return StringServiceImpl(bytes)
+        StringServiceImpl.create(bytes)
     }
 
     @Provides
-    fun interopService(): InteropService {
+    fun interopService(): InteropService = runBlocking {
         val loader = binaryLoaderFactory()
         val bytes = loader.load("interop.wasm")
-        return InteropServiceImpl(bytes)
+        InteropServiceImpl.create(bytes)
     }
 }

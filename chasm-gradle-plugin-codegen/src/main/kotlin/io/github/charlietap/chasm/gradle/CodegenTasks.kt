@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.gradle
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
@@ -10,6 +11,7 @@ fun registerCodegenTask(
     module: WasmModule,
     sourceSetName: String,
     classpath: Configuration,
+    generateSuspendingFactories: Provider<Boolean>,
     moduleBinary: File? = null,
 ): TaskProvider<CodegenTask> {
     val capitalizedSourceName = sourceSetName.replaceFirstChar { it.uppercase() }
@@ -28,6 +30,7 @@ fun registerCodegenTask(
         task.packageName.set(module.packageName)
         task.interfaceVisibility.set(module.interfaceVisibility)
         task.implementationVisibility.set(module.implementationVisibility)
+        task.generateSuspendingFactories.set(generateSuspendingFactories)
         task.initializers.set(module.initializers)
         task.functions.set(module.functions)
         task.ignoredExports.set(module.ignoredExports)

@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.coroutines
 
 import io.github.charlietap.chasm.InternalChasmApi
 import io.github.charlietap.chasm.config.ModuleConfig
+import io.github.charlietap.chasm.coroutines.internal.DefaultCoroutineParallelTaskExecutor
 import io.github.charlietap.chasm.embedding.error.ChasmError.DecodeError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Module
@@ -36,5 +37,5 @@ suspend fun module(
     internalModule(
         bytes = bytes,
         config = config,
-        taskExecutor = CoroutineParallelTaskExecutor,
+        taskExecutor = DefaultCoroutineParallelTaskExecutor,
     )

@@ -41,6 +41,7 @@ internal class WasmInterfaceGenerator(
         interfaceVisibility: TypeVisibility,
         implementationVisibility: TypeVisibility,
         wasmInterface: WasmInterface,
+        generateSuspendingFactories: Boolean = false,
     ): List<FileSpec> {
 
         val interfaceFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName).apply {
@@ -51,7 +52,15 @@ internal class WasmInterfaceGenerator(
         }.build()
 
         val implementationFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName + "Impl").apply {
-            addType(classImplementationGenerator(wasmInterface.packageName, wasmInterface.interfaceName, implementationVisibility, wasmInterface))
+            addType(
+                classImplementationGenerator(
+                    packageName = wasmInterface.packageName,
+                    interfaceName = wasmInterface.interfaceName,
+                    visibility = implementationVisibility,
+                    wasmInterface = wasmInterface,
+                    generateSuspendingFactory = generateSuspendingFactories,
+                ),
+            )
         }.build()
 
         return listOf(interfaceFile, implementationFile)

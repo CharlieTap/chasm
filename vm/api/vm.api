@@ -247,6 +247,31 @@ public final class io/github/charlietap/chasm/vm/ReferenceType$RefNull : io/gith
 public final class io/github/charlietap/chasm/vm/Store {
 }
 
+public final class io/github/charlietap/chasm/vm/SuspendingVirtualMachineFactoryKt {
+	public static final fun suspendingVirtualMachineFactory (Lkotlinx/coroutines/CoroutineDispatcher;)Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;
+	public static synthetic fun suspendingVirtualMachineFactory$default (Lkotlinx/coroutines/CoroutineDispatcher;ILjava/lang/Object;)Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;
+}
+
+public abstract interface class io/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine : io/github/charlietap/chasm/vm/WasmVirtualMachine {
+	public abstract fun moduleDecodeSuspending ([BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun moduleInstantiateSuspending (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Module;Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine$DefaultImpls {
+	public static fun memoryReadDouble (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadFloat (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadInt (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadLong (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteInt (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteLong (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IJ)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteNullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteUtf8String (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ILjava/lang/String;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun prepareFunction (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Instance;Ljava/lang/String;Ljava/util/List;)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+}
+
 public final class io/github/charlietap/chasm/vm/Table {
 }
 

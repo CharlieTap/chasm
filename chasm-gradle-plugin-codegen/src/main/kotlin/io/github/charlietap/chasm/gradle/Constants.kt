@@ -16,6 +16,8 @@ import io.github.charlietap.chasm.vm.WasmVirtualMachine
 import io.github.charlietap.chasm.vm.codegen.CodegenImport
 
 internal val WASM_VIRTUAL_MACHINE_CLASS_NAME = WasmVirtualMachine::class.asClassName()
+internal val SUSPENDING_WASM_VIRTUAL_MACHINE_CLASS_NAME =
+    ClassName("io.github.charlietap.chasm.vm", "SuspendingWasmVirtualMachine")
 internal val STORE_CLASS_NAME = Store::class.asClassName()
 internal val MODULE_CLASS_NAME = Module::class.asClassName()
 internal val INSTANCE_CLASS_NAME = Instance::class.asClassName()
@@ -32,11 +34,15 @@ internal val IMPORT_LIST_CLASS_NAME = List::class.asClassName().parameterizedBy(
 internal val MODULE_FACTORY_CLASS_NAME = ClassName("io.github.charlietap.chasm.vm", "ModuleFactory")
 internal val INSTANCE_FACTORY_CLASS_NAME = ClassName("io.github.charlietap.chasm.vm", "InstanceFactory")
 internal val VM_FACTORY_CLASS_NAME = MemberName("io.github.charlietap.chasm.vm", "virtualMachineFactory")
+internal val SUSPENDING_VM_FACTORY_CLASS_NAME =
+    MemberName("io.github.charlietap.chasm.vm", "suspendingVirtualMachineFactory")
 internal val IMPORT_FACTORY_CLASS_NAME = MemberName("io.github.charlietap.chasm.vm", "importFactory")
 
 internal const val CREATE_STORE_FUNCTION = "storeInit"
 internal const val CREATE_MODULE_FUNCTION = "moduleDecode"
 internal const val CREATE_INSTANCE_FUNCTION = "moduleInstantiate"
+internal const val CREATE_MODULE_SUSPENDING_FUNCTION = "moduleDecodeSuspending"
+internal const val CREATE_INSTANCE_SUSPENDING_FUNCTION = "moduleInstantiateSuspending"
 internal const val PREPARE_FUNCTION = "prepareFunction"
 internal const val INVOKE_TYPED_FUNCTION = "functionInvokeTyped"
 

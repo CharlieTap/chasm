@@ -38,5 +38,25 @@ class WasmInterfaceGeneratorTest {
         assertContains(spec, "\"answer_export\"")
         assertContains(spec, "answerPreparedFunction(args)")
         assertFalse(spec.contains("functionInvokeTyped("))
+        assertFalse(spec.contains("suspend fun create("))
+    }
+
+    @Test
+    fun `implementation can expose a suspending factory without replacing its constructor`() {
+        val spec = WasmInterfaceGenerator()(
+            interfaceVisibility = TypeVisibility.PUBLIC,
+            implementationVisibility = TypeVisibility.PUBLIC,
+            wasmInterface = wasmInterface(
+                interfaceName = "AnswerService",
+                packageName = "com.example",
+            ),
+            generateSuspendingFactories = true,
+        ).last().toString()
+
+        assertContains(spec, "public constructor(")
+        assertContains(spec, "public suspend fun create(")
+        assertContains(spec, "virtualMachine.moduleDecodeSuspending(binary)")
+        assertContains(spec, "virtualMachine.moduleInstantiateSuspending(")
+        assertContains(spec, "RuntimeState(store, module, allocatedImports, instance)")
     }
 }
