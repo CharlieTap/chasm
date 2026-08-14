@@ -13,17 +13,18 @@ import at.released.weh.host.clock.MonotonicClock
 import io.github.charlietap.chasm.config.Config
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.coroutines.instance
+import io.github.charlietap.chasm.coroutines.module
+import io.github.charlietap.chasm.coroutines.validate
 import io.github.charlietap.chasm.embedding.function
 import io.github.charlietap.chasm.embedding.global
 import io.github.charlietap.chasm.embedding.global.readGlobal
 import io.github.charlietap.chasm.embedding.global.writeGlobal
-import io.github.charlietap.chasm.embedding.instance
 import io.github.charlietap.chasm.embedding.invoke
 import io.github.charlietap.chasm.embedding.memory
 import io.github.charlietap.chasm.embedding.memory.growMemory
 import io.github.charlietap.chasm.embedding.memory.readBytes
 import io.github.charlietap.chasm.embedding.memory.writeBytes
-import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Import
@@ -32,7 +33,6 @@ import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.embedding.store
-import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.type.ExternalType
@@ -55,6 +55,7 @@ import io.github.charlietap.corpus.lib.fixture.FixtureBytes
 import io.github.charlietap.corpus.lib.fixture.FixtureImport
 import io.github.charlietap.corpus.lib.fixture.FixtureTest
 import io.github.charlietap.corpus.lib.fixture.FixtureWasiPreview1Host
+import kotlinx.coroutines.runBlocking
 import kotlinx.io.Buffer
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -86,11 +87,11 @@ class ChasmCorpusRunner(
         corpusRoot: String,
         fixture: Fixture,
         phase: CorpusPhase,
-    ): CorpusExecution {
+    ): CorpusExecution = runBlocking {
         val timings = CorpusTimingRecorder()
         val totalStart = TimeSource.Monotonic.markNow()
         val result = executeFixture(corpusRoot, fixture, phase, timings)
-        return CorpusExecution(
+        CorpusExecution(
             result = result,
             timings = timings.snapshot(totalStart.elapsedNow().inWholeNanoseconds),
             binarySizeBytes = timings.binarySizeBytes,
@@ -98,7 +99,7 @@ class ChasmCorpusRunner(
         )
     }
 
-    private fun executeFixture(
+    private suspend fun executeFixture(
         corpusRoot: String,
         fixture: Fixture,
         phase: CorpusPhase,
@@ -177,7 +178,7 @@ class ChasmCorpusRunner(
         return CorpusResult.Success
     }
 
-    private fun instantiate(
+    private suspend fun instantiate(
         fixture: Fixture,
         store: Store,
         module: Module,
@@ -917,11 +918,11 @@ class ChasmCorpusRunner(
         private var instantiateNanos: Long = 0
         private var executeNanos: Long = 0
 
-        fun <T> decode(block: () -> T): T = measure(block) { elapsed -> decodeNanos += elapsed }
+        suspend fun <T> decode(block: suspend () -> T): T = measureSuspending(block) { elapsed -> decodeNanos += elapsed }
 
-        fun <T> validate(block: () -> T): T = measure(block) { elapsed -> validateNanos += elapsed }
+        suspend fun <T> validate(block: suspend () -> T): T = measureSuspending(block) { elapsed -> validateNanos += elapsed }
 
-        fun <T> instantiate(block: () -> T): T = measure(block) { elapsed -> instantiateNanos += elapsed }
+        suspend fun <T> instantiate(block: suspend () -> T): T = measureSuspending(block) { elapsed -> instantiateNanos += elapsed }
 
         fun <T> execute(block: () -> T): T = measure(block) { elapsed -> executeNanos += elapsed }
 
@@ -932,6 +933,18 @@ class ChasmCorpusRunner(
             instantiateNanos = instantiateNanos,
             executeNanos = executeNanos,
         )
+
+        private suspend fun <T> measureSuspending(
+            block: suspend () -> T,
+            record: (Long) -> Unit,
+        ): T {
+            val start = TimeSource.Monotonic.markNow()
+            return try {
+                block()
+            } finally {
+                record(start.elapsedNow().inWholeNanoseconds)
+            }
+        }
 
         private fun <T> measure(
             block: () -> T,

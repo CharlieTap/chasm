@@ -139,6 +139,7 @@ kotlin {
 
         jvmTest {
             dependencies {
+                implementation(projects.chasmCoroutines)
                 implementation(libs.corpus.lib)
                 implementation(libs.wasi.emscripten.host.chasm.emscripten)
                 implementation(libs.wasi.emscripten.host.chasm.wasip1)
