@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.asErr
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.map
-import io.github.charlietap.chasm.compiler.ParallelTaskExecutor
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.ParallelModuleAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.PartialModuleAllocator
@@ -13,6 +12,7 @@ import io.github.charlietap.chasm.executor.instantiator.compat.CompatibilityChec
 import io.github.charlietap.chasm.executor.instantiator.initialization.MemoryInitializer
 import io.github.charlietap.chasm.executor.instantiator.initialization.TableInitializer
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
+import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance

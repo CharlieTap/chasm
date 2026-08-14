@@ -18,7 +18,6 @@ import io.github.charlietap.chasm.ast.module.Table
 import io.github.charlietap.chasm.ast.module.Tag
 import io.github.charlietap.chasm.ast.module.Type
 import io.github.charlietap.chasm.ast.module.Version
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
 import io.github.charlietap.chasm.decoder.decoder.section.code.FunctionBody
 import io.github.charlietap.chasm.decoder.decoder.section.function.FunctionHeader
 import io.github.charlietap.chasm.decoder.error.ModuleDecodeError
@@ -77,7 +76,7 @@ internal class ModuleBuilder(private val version: Version) {
 
     fun dataCount(count: UInt) = apply { dataCount = count }
 
-    fun build(context: ModuleDecoderContext): Result<Module, WasmDecodeError> = binding {
+    fun build(requiresDataCount: Boolean): Result<Module, WasmDecodeError> = binding {
 
         if (functionHeaders.size != functionBodies.size) {
             Err(ModuleDecodeError.ModuleMalformed).bind<Unit>()
@@ -87,7 +86,7 @@ internal class ModuleBuilder(private val version: Version) {
             Err(SectionDecodeError.MultipleStartFunctions).bind<Unit>()
         }
 
-        if (context.requiresDataCount && dataCount == null) {
+        if (requiresDataCount && dataCount == null) {
             Err(SectionDecodeError.DataCountRequired).bind<Unit>()
         }
 

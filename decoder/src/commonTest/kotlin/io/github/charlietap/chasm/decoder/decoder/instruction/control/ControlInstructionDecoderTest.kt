@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.BLOCK
 import io.github.charlietap.chasm.decoder.decoder.instruction.BR
 import io.github.charlietap.chasm.decoder.decoder.instruction.BR_IF
@@ -25,8 +25,8 @@ import io.github.charlietap.chasm.decoder.decoder.instruction.THROW
 import io.github.charlietap.chasm.decoder.decoder.instruction.THROW_REF
 import io.github.charlietap.chasm.decoder.decoder.instruction.TRY_TABLE
 import io.github.charlietap.chasm.decoder.decoder.instruction.UNREACHABLE
+import io.github.charlietap.chasm.decoder.decoder.vector.CodeBodyVectorDecoder
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
@@ -76,7 +76,7 @@ class ControlInstructionDecoderTest {
         val expectedBlockType = BlockType.Empty
         val expected = Ok(ControlInstruction.Block(expectedBlockType))
 
-        val blockTypeDecoder: Decoder<BlockType> = { _ ->
+        val blockTypeDecoder: CodeBodyDecoder<BlockType> = { _ ->
             Ok(expectedBlockType)
         }
 
@@ -106,7 +106,7 @@ class ControlInstructionDecoderTest {
         val expectedBlockType = BlockType.Empty
         val expected = Ok(ControlInstruction.Loop(expectedBlockType))
 
-        val blockTypeDecoder: Decoder<BlockType> = { _ ->
+        val blockTypeDecoder: CodeBodyDecoder<BlockType> = { _ ->
             Ok(expectedBlockType)
         }
 
@@ -136,7 +136,7 @@ class ControlInstructionDecoderTest {
         val expectedBlockType = BlockType.Empty
         val expected = Ok(ControlInstruction.If(expectedBlockType))
 
-        val blockTypeDecoder: Decoder<BlockType> = { _ ->
+        val blockTypeDecoder: CodeBodyDecoder<BlockType> = { _ ->
             Ok(expectedBlockType)
         }
 
@@ -166,7 +166,7 @@ class ControlInstructionDecoderTest {
         val expectedLabelIndex = Index.LabelIndex(117u)
         val expected = Ok(ControlInstruction.Br(expectedLabelIndex))
 
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = { _ ->
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _ ->
             Ok(expectedLabelIndex)
         }
 
@@ -196,7 +196,7 @@ class ControlInstructionDecoderTest {
         val expectedLabelIndex = Index.LabelIndex(117u)
         val expected = Ok(ControlInstruction.BrIf(expectedLabelIndex))
 
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = { _ ->
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _ ->
             Ok(expectedLabelIndex)
         }
 
@@ -227,11 +227,11 @@ class ControlInstructionDecoderTest {
         val expectedDefaultLabelIndex = Index.LabelIndex(117u)
         val expected = Ok(ControlInstruction.BrTable(expectedLabelVec, expectedDefaultLabelIndex))
 
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = { _ ->
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _ ->
             Ok(expectedDefaultLabelIndex)
         }
 
-        val vectorDecoder: VectorDecoder<Index.LabelIndex> = { _, _ ->
+        val vectorDecoder: CodeBodyVectorDecoder<Index.LabelIndex> = { _, _ ->
             Ok(Vector(expectedLabelVec))
         }
 
@@ -286,7 +286,7 @@ class ControlInstructionDecoderTest {
         val expectedFunctionIndex = Index.FunctionIndex(117u)
         val expected = Ok(ControlInstruction.Call(expectedFunctionIndex))
 
-        val functionIndexDecoder: Decoder<Index.FunctionIndex> = { _ ->
+        val functionIndexDecoder: CodeBodyDecoder<Index.FunctionIndex> = { _ ->
             Ok(expectedFunctionIndex)
         }
 
@@ -317,11 +317,11 @@ class ControlInstructionDecoderTest {
         val expectedTableIndex = Index.TableIndex(118u)
         val expected = Ok(ControlInstruction.CallIndirect(expectedTypeIndex, expectedTableIndex))
 
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _ ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _ ->
             Ok(expectedTypeIndex)
         }
 
-        val tableIndexDecoder: Decoder<Index.TableIndex> = { _ ->
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = { _ ->
             Ok(expectedTableIndex)
         }
 
@@ -351,7 +351,7 @@ class ControlInstructionDecoderTest {
         val expectedFunctionIndex = Index.FunctionIndex(117u)
         val expected = Ok(ControlInstruction.ReturnCall(expectedFunctionIndex))
 
-        val functionIndexDecoder: Decoder<Index.FunctionIndex> = { _ ->
+        val functionIndexDecoder: CodeBodyDecoder<Index.FunctionIndex> = { _ ->
             Ok(expectedFunctionIndex)
         }
 
@@ -382,11 +382,11 @@ class ControlInstructionDecoderTest {
         val expectedTableIndex = Index.TableIndex(118u)
         val expected = Ok(ControlInstruction.ReturnCallIndirect(expectedTypeIndex, expectedTableIndex))
 
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _ ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _ ->
             Ok(expectedTypeIndex)
         }
 
-        val tableIndexDecoder: Decoder<Index.TableIndex> = { _ ->
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = { _ ->
             Ok(expectedTableIndex)
         }
 
@@ -416,7 +416,7 @@ class ControlInstructionDecoderTest {
         val expectedTypeIndex = typeIndex()
         val expected = Ok(ControlInstruction.CallRef(expectedTypeIndex))
 
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _ ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _ ->
             Ok(expectedTypeIndex)
         }
 
@@ -446,7 +446,7 @@ class ControlInstructionDecoderTest {
         val expectedTypeIndex = typeIndex()
         val expected = Ok(ControlInstruction.ReturnCallRef(expectedTypeIndex))
 
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _ ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _ ->
             Ok(expectedTypeIndex)
         }
 
@@ -476,7 +476,7 @@ class ControlInstructionDecoderTest {
         val expectedLabelIndex = labelIndex()
         val expected = Ok(ControlInstruction.BrOnNull(expectedLabelIndex))
 
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = { _ ->
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _ ->
             Ok(expectedLabelIndex)
         }
 
@@ -506,7 +506,7 @@ class ControlInstructionDecoderTest {
         val expectedLabelIndex = labelIndex()
         val expected = Ok(ControlInstruction.BrOnNonNull(expectedLabelIndex))
 
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = { _ ->
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _ ->
             Ok(expectedLabelIndex)
         }
 
@@ -535,7 +535,7 @@ class ControlInstructionDecoderTest {
         )
 
         val tagIndex = tagIndex()
-        val tagIndexDecoder: Decoder<Index.TagIndex> = { _ ->
+        val tagIndexDecoder: CodeBodyDecoder<Index.TagIndex> = { _ ->
             Ok(tagIndex)
         }
 
@@ -592,12 +592,12 @@ class ControlInstructionDecoderTest {
         )
 
         val blockType = blockType()
-        val blockTypeDecoder: Decoder<BlockType> = { _ ->
+        val blockTypeDecoder: CodeBodyDecoder<BlockType> = { _ ->
             Ok(blockType)
         }
 
         val handlers = listOf(catchHandler())
-        val handlersDecoder: VectorDecoder<ControlInstruction.CatchHandler> = { _, _ ->
+        val handlersDecoder: CodeBodyVectorDecoder<ControlInstruction.CatchHandler> = { _, _ ->
             Ok(Vector(handlers))
         }
 
@@ -640,31 +640,31 @@ class ControlInstructionDecoderTest {
     }
 
     private companion object {
-        private val neverBlockTypeDecoder: Decoder<BlockType> = { _ ->
+        private val neverBlockTypeDecoder: CodeBodyDecoder<BlockType> = { _ ->
             fail("block type decoder should not run in this scenario")
         }
-        private val neverHandlerDecoder: Decoder<ControlInstruction.CatchHandler> = { _ ->
+        private val neverHandlerDecoder: CodeBodyDecoder<ControlInstruction.CatchHandler> = { _ ->
             fail("catch handler decoder should not run in this scenario")
         }
-        private val neverLabelIndexDecoder: Decoder<Index.LabelIndex> = { _ ->
+        private val neverLabelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _ ->
             fail("label index decoder should not run in this scenario")
         }
-        private val neverFunctionIndexDecoder: Decoder<Index.FunctionIndex> = { _ ->
+        private val neverFunctionIndexDecoder: CodeBodyDecoder<Index.FunctionIndex> = { _ ->
             fail("function index decoder should not run in this scenario")
         }
-        private val neverTypeIndexDecoder: Decoder<Index.TypeIndex> = { _ ->
+        private val neverTypeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _ ->
             fail("type index decoder should not run in this scenario")
         }
-        private val neverTableIndexDecoder: Decoder<Index.TableIndex> = { _ ->
+        private val neverTableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = { _ ->
             fail("table index decoder should not run in this scenario")
         }
-        private val neverTagIndexDecoder: Decoder<Index.TagIndex> = { _ ->
+        private val neverTagIndexDecoder: CodeBodyDecoder<Index.TagIndex> = { _ ->
             fail("tag index decoder should not run in this scenario")
         }
-        private val neverLabelVectorDecoder: VectorDecoder<Index.LabelIndex> = { _, _ ->
+        private val neverLabelVectorDecoder: CodeBodyVectorDecoder<Index.LabelIndex> = { _, _ ->
             fail("label vector decoder should not run in this scenario")
         }
-        private val neverHandlerVectorDecoder: VectorDecoder<ControlInstruction.CatchHandler> = { _, _ ->
+        private val neverHandlerVectorDecoder: CodeBodyVectorDecoder<ControlInstruction.CatchHandler> = { _, _ ->
             fail("catch handler vector decoder should not run in this scenario")
         }
     }

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.coroutines
 
-import io.github.charlietap.chasm.compiler.ParallelTaskExecutor
-import io.github.charlietap.chasm.compiler.ParallelTaskScope
+import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
+import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

@@ -13,27 +13,26 @@ import io.github.charlietap.chasm.embedding.internal._instance as internalInstan
 /**
  * Instantiates a Wasm module with potential parallelism.
  *
- * This function can parallelise the compilation stage of instantiation by
- * compiling independent Wasm functions on
+ * This function uses a heuristic to decide whether the compilation stage of
+ * instantiation should run serially or in parallel. It estimates the work from
+ * the module's function and instruction counts. When parallel compilation is
+ * expected to repay its coordination cost, the largest functions are balanced
+ * across a bounded number of workers on
  * [kotlinx.coroutines.Dispatchers.Default]. Allocation, linking, and
  * initialisation remain serial, and compilation errors are reported in module
  * order.
  *
- * The compiler estimates work from function and instruction counts, balances
- * the largest functions across a bounded number of workers, and compiles in
- * parallel only when its estimated saving is greater than the coordination
- * cost. This is a heuristic and cannot account perfectly for the cost of every
- * instruction or the current load on the host.
+ * The heuristic cannot predict the exact cost of every module or instruction.
+ * In particular, total module size is not a reliable measure of compilation
+ * work. Data segments, types, and other non-code sections can increase the size
+ * of a module without increasing the function compilation work that can be
+ * parallelised.
  *
- * Small modules generally contain too little compilation work to repay the
- * cost of coroutine scheduling, so the automatic policy keeps their
- * compilation serial. As a rough rule of thumb, modules smaller than 4 KiB may
- * be faster to instantiate with the non-suspending
- * [io.github.charlietap.chasm.embedding.instance] function.
- *
- * Module size is only an approximation of compilation work. Data segments,
- * types, and other non-code sections can increase the size of a module without
- * increasing the function compilation work that this function parallelises.
+ * When the calling context can suspend, this function is generally the
+ * preferred API. If the amount of function code in a module is sufficiently
+ * small, it may be worth benchmarking it against the non-suspending
+ * [io.github.charlietap.chasm.embedding.instance] function to ascertain which
+ * is faster.
  */
 @OptIn(InternalChasmApi::class)
 suspend fun instance(

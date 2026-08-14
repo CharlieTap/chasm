@@ -3,12 +3,12 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.control
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun CastFlagsDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<CastFlags, WasmDecodeError> = binding {
     when (val flagsByte = context.reader.ubyte()) {
         NON_NULL_BOTH_CAST_FLAGS -> CastFlags(Nullability.NON_NULL, Nullability.NON_NULL)

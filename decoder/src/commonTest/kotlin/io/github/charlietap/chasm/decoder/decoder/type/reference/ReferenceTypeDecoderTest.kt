@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.decoder.decoder.type.reference
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.heap.ABSTRACT_HEAP_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
@@ -27,12 +27,12 @@ class ReferenceTypeDecoderTest {
         )
         val context = decoderContext(reader)
 
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(AbstractHeapType.Func)
         }
 
-        val abstractHeapTypeDecoder: Decoder<AbstractHeapType> = { _ ->
+        val abstractHeapTypeDecoder: CodeBodyDecoder<AbstractHeapType> = { _ ->
             fail("AbstractHeapTypeDecoder should not be called in this scenario")
         }
 
@@ -55,12 +55,12 @@ class ReferenceTypeDecoderTest {
         )
         val context = decoderContext(reader)
 
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(AbstractHeapType.Func)
         }
 
-        val abstractHeapTypeDecoder: Decoder<AbstractHeapType> = { _ ->
+        val abstractHeapTypeDecoder: CodeBodyDecoder<AbstractHeapType> = { _ ->
             fail("AbstractHeapTypeDecoder should not be called in this scenario")
         }
 
@@ -86,11 +86,11 @@ class ReferenceTypeDecoderTest {
         )
         val context = decoderContext(reader)
 
-        val heapTypeDecoder: Decoder<HeapType> = { _ ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _ ->
             fail("HeapTypeDecoder should not be called in this scenario")
         }
 
-        val abstractHeapTypeDecoder: Decoder<AbstractHeapType> = { _ ->
+        val abstractHeapTypeDecoder: CodeBodyDecoder<AbstractHeapType> = { _ ->
             Ok(AbstractHeapType.Func)
         }
 

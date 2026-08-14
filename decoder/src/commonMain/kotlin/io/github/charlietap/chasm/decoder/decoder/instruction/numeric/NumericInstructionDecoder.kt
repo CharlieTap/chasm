@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
 import io.github.charlietap.chasm.decoder.decoder.instruction.F32_ABS
 import io.github.charlietap.chasm.decoder.decoder.instruction.F32_ADD
 import io.github.charlietap.chasm.decoder.decoder.instruction.F32_CEIL
@@ -141,7 +141,7 @@ import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun NumericInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<NumericInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte()) {
         I32_CONST -> {

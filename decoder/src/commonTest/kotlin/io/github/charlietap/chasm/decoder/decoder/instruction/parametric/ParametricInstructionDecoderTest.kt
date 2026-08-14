@@ -3,12 +3,12 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.parametric
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.DROP
 import io.github.charlietap.chasm.decoder.decoder.instruction.SELECT
 import io.github.charlietap.chasm.decoder.decoder.instruction.SELECT_W_TYPE
+import io.github.charlietap.chasm.decoder.decoder.vector.CodeBodyVectorDecoder
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
@@ -61,12 +61,12 @@ class ParametricInstructionDecoderTest {
         }
         val context = decoderContext(reader)
 
-        val valueTypeDecoder: Decoder<ValueType> = {
+        val valueTypeDecoder: CodeBodyDecoder<ValueType> = {
             fail("Value type decoder should never be called")
         }
 
         val expectedValueTypes = listOf(i32ValueType())
-        val vectorDecoder: VectorDecoder<ValueType> = { _, _ ->
+        val vectorDecoder: CodeBodyVectorDecoder<ValueType> = { _, _ ->
             Ok(Vector(expectedValueTypes))
         }
         val expected = Ok(ParametricInstruction.SelectWithType(expectedValueTypes))

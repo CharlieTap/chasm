@@ -3,15 +3,15 @@ package io.github.charlietap.chasm.decoder.decoder.type.heap
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.HeapType
 
 internal fun HeapTypeDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<HeapType, WasmDecodeError> =
     HeapTypeDecoder(
         context = context,
@@ -19,8 +19,8 @@ internal fun HeapTypeDecoder(
     )
 
 internal inline fun HeapTypeDecoder(
-    context: ModuleDecoderContext,
-    crossinline abstractHeapTypeDecoder: Decoder<AbstractHeapType>,
+    context: CodeBodyDecoderContext,
+    crossinline abstractHeapTypeDecoder: CodeBodyDecoder<AbstractHeapType>,
 ): Result<HeapType, WasmDecodeError> = binding {
     when (
         context.reader

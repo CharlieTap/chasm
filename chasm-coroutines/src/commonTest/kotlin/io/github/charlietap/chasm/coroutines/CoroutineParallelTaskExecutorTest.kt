@@ -1,9 +1,8 @@
 package io.github.charlietap.chasm.coroutines
 
-import io.github.charlietap.chasm.compiler.ParallelTaskScope
-import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

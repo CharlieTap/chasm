@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUIntReader
@@ -59,11 +59,11 @@ class PrefixFCInstructionDecoderTest {
         val opcode = MEMORY_INIT
 
         val expectedDataIndex = Index.DataIndex(117u)
-        val dataIndexDecoder: Decoder<Index.DataIndex> = { _ ->
+        val dataIndexDecoder: CodeBodyDecoder<Index.DataIndex> = { _ ->
             Ok(expectedDataIndex)
         }
         val expectedMemoryIndex = memoryIndex()
-        val memoryIndexDecoder: Decoder<Index.MemoryIndex> = {
+        val memoryIndexDecoder: CodeBodyDecoder<Index.MemoryIndex> = {
             Ok(expectedMemoryIndex)
         }
         val reader = FakeWasmBinaryReader(
@@ -94,7 +94,7 @@ class PrefixFCInstructionDecoderTest {
 
         val expectedDataIndex = Index.DataIndex(117u)
 
-        val dataIndexDecoder: Decoder<Index.DataIndex> = { _ ->
+        val dataIndexDecoder: CodeBodyDecoder<Index.DataIndex> = { _ ->
             Ok(expectedDataIndex)
         }
 
@@ -127,7 +127,7 @@ class PrefixFCInstructionDecoderTest {
         val srcMemoryIndex = memoryIndex(117u)
         val dstMemoryIndex = memoryIndex(118u)
         val indices = sequenceOf(dstMemoryIndex, srcMemoryIndex).iterator()
-        val memoryIndexDecoder: Decoder<Index.MemoryIndex> = {
+        val memoryIndexDecoder: CodeBodyDecoder<Index.MemoryIndex> = {
             Ok(indices.next())
         }
         val context = decoderContext(reader)
@@ -151,7 +151,7 @@ class PrefixFCInstructionDecoderTest {
         val opcode = MEMORY_FILL
 
         val expectedMemoryIndex = memoryIndex()
-        val memoryIndexDecoder: Decoder<Index.MemoryIndex> = {
+        val memoryIndexDecoder: CodeBodyDecoder<Index.MemoryIndex> = {
             Ok(expectedMemoryIndex)
         }
 
@@ -184,12 +184,12 @@ class PrefixFCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val expectedElementIndex = Index.ElementIndex(117u)
-        val elementIndexDecoder: Decoder<Index.ElementIndex> = { _ ->
+        val elementIndexDecoder: CodeBodyDecoder<Index.ElementIndex> = { _ ->
             Ok(expectedElementIndex)
         }
 
         val expectedTableIndex = Index.TableIndex(118u)
-        val tableIndexDecoder: Decoder<Index.TableIndex> = {
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = {
             Ok(expectedTableIndex)
         }
 
@@ -215,7 +215,7 @@ class PrefixFCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val expectedElementIndex = Index.ElementIndex(117u)
-        val elementIndexDecoder: Decoder<Index.ElementIndex> = { _ ->
+        val elementIndexDecoder: CodeBodyDecoder<Index.ElementIndex> = { _ ->
             Ok(expectedElementIndex)
         }
 
@@ -243,7 +243,7 @@ class PrefixFCInstructionDecoderTest {
         val expectedSrcTableIndex = Index.TableIndex(117u)
         val expectedDestTableIndex = Index.TableIndex(118u)
         val tableIndexIter = sequenceOf(expectedDestTableIndex, expectedSrcTableIndex).iterator()
-        val tableIndexDecoder: Decoder<Index.TableIndex> = {
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = {
             Ok(tableIndexIter.next())
         }
 
@@ -269,7 +269,7 @@ class PrefixFCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val expectedTableIndex = Index.TableIndex(117u)
-        val tableIndexDecoder: Decoder<Index.TableIndex> = {
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = {
             Ok(expectedTableIndex)
         }
 
@@ -295,7 +295,7 @@ class PrefixFCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val expectedTableIndex = Index.TableIndex(117u)
-        val tableIndexDecoder: Decoder<Index.TableIndex> = {
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = {
             Ok(expectedTableIndex)
         }
 
@@ -321,7 +321,7 @@ class PrefixFCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val expectedTableIndex = Index.TableIndex(117u)
-        val tableIndexDecoder: Decoder<Index.TableIndex> = {
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = {
             Ok(expectedTableIndex)
         }
 
@@ -354,16 +354,16 @@ class PrefixFCInstructionDecoderTest {
     }
 
     private companion object {
-        private val neverDataIndexDecoder: Decoder<Index.DataIndex> = { _ ->
+        private val neverDataIndexDecoder: CodeBodyDecoder<Index.DataIndex> = { _ ->
             fail("data index decoder should not run in this scenario")
         }
-        private val neverElementIndexDecoder: Decoder<Index.ElementIndex> = { _ ->
+        private val neverElementIndexDecoder: CodeBodyDecoder<Index.ElementIndex> = { _ ->
             fail("element index decoder should not run in this scenario")
         }
-        private val neverMemoryIndexDecoder: Decoder<Index.MemoryIndex> = { _ ->
+        private val neverMemoryIndexDecoder: CodeBodyDecoder<Index.MemoryIndex> = { _ ->
             fail("memory index decoder should not run in this scenario")
         }
-        private val neverTableIndexDecoder: Decoder<Index.TableIndex> = { _ ->
+        private val neverTableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = { _ ->
             fail("table index decoder should not run in this scenario")
         }
     }

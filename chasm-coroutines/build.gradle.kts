@@ -15,7 +15,7 @@ kotlin {
             dependencies {
                 api(projects.chasm)
 
-                implementation(projects.compiler)
+                implementation(projects.libs.parallel)
                 implementation(libs.kotlinx.coroutines.core)
             }
         }

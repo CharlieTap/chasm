@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_GET
 import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_SET
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
@@ -27,7 +27,7 @@ class TableInstructionDecoderTest {
         val expectedIndex = Index.TableIndex(117u)
         val expected = Ok(TableInstruction.TableGet(expectedIndex))
 
-        val tableIndexDecoder: Decoder<Index.TableIndex> = {
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = {
             Ok(expectedIndex)
         }
 
@@ -51,7 +51,7 @@ class TableInstructionDecoderTest {
         val expectedIndex = Index.TableIndex(117u)
         val expected = Ok(TableInstruction.TableSet(expectedIndex))
 
-        val tableIndexDecoder: Decoder<Index.TableIndex> = {
+        val tableIndexDecoder: CodeBodyDecoder<Index.TableIndex> = {
             Ok(expectedIndex)
         }
 

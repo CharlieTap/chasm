@@ -11,8 +11,8 @@ import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.ControlInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.memory.MemoryInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.numeric.NumericInstructionDecoder
@@ -29,7 +29,7 @@ import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun InstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<Instruction, WasmDecodeError> = InstructionDecoder(
     context = context,
     numericInstructionDecoder = ::NumericInstructionDecoder,
@@ -43,15 +43,15 @@ internal fun InstructionDecoder(
 )
 
 internal inline fun InstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline numericInstructionDecoder: Decoder<NumericInstruction>,
-    crossinline referenceInstructionDecoder: Decoder<ReferenceInstruction>,
-    crossinline parametricInstructionDecoder: Decoder<ParametricInstruction>,
-    crossinline variableInstructionDecoder: Decoder<VariableInstruction>,
-    crossinline tableInstructionDecoder: Decoder<TableInstruction>,
-    crossinline memoryInstructionDecoder: Decoder<MemoryInstruction>,
-    crossinline controlInstructionDecoder: Decoder<ControlInstruction>,
-    crossinline prefixInstructionDecoder: Decoder<Instruction>,
+    context: CodeBodyDecoderContext,
+    crossinline numericInstructionDecoder: CodeBodyDecoder<NumericInstruction>,
+    crossinline referenceInstructionDecoder: CodeBodyDecoder<ReferenceInstruction>,
+    crossinline parametricInstructionDecoder: CodeBodyDecoder<ParametricInstruction>,
+    crossinline variableInstructionDecoder: CodeBodyDecoder<VariableInstruction>,
+    crossinline tableInstructionDecoder: CodeBodyDecoder<TableInstruction>,
+    crossinline memoryInstructionDecoder: CodeBodyDecoder<MemoryInstruction>,
+    crossinline controlInstructionDecoder: CodeBodyDecoder<ControlInstruction>,
+    crossinline prefixInstructionDecoder: CodeBodyDecoder<Instruction>,
 ): Result<Instruction, WasmDecodeError> = binding {
     val opcode = context.reader
         .peekUByte()

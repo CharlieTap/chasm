@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.ast.instruction.AggregateInstruction
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.CastFlags
 import io.github.charlietap.chasm.decoder.decoder.instruction.control.Nullability
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
@@ -35,19 +35,19 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val labelIndex = labelIndex()
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = { _context ->
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _context ->
             assertEquals(context, _context)
             Ok(labelIndex)
         }
 
         val castFlags = CastFlags(Nullability.NULL, Nullability.NON_NULL)
-        val castFlagsDecoder: Decoder<CastFlags> = { _context ->
+        val castFlagsDecoder: CodeBodyDecoder<CastFlags> = { _context ->
             assertEquals(context, _context)
             Ok(castFlags)
         }
 
         val heapType = heapType()
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(heapType)
         }
@@ -80,19 +80,19 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val labelIndex = labelIndex()
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = { _context ->
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _context ->
             assertEquals(context, _context)
             Ok(labelIndex)
         }
 
         val castFlags = CastFlags(Nullability.NULL, Nullability.NON_NULL)
-        val castFlagsDecoder: Decoder<CastFlags> = { _context ->
+        val castFlagsDecoder: CodeBodyDecoder<CastFlags> = { _context ->
             assertEquals(context, _context)
             Ok(castFlags)
         }
 
         val heapType = heapType()
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(heapType)
         }
@@ -140,7 +140,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -169,7 +169,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -198,13 +198,13 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
 
         val fieldIndex = fieldIndex()
-        val fieldIndexDecoder: Decoder<Index.FieldIndex> = { _context ->
+        val fieldIndexDecoder: CodeBodyDecoder<Index.FieldIndex> = { _context ->
             assertEquals(context, _context)
             Ok(fieldIndex)
         }
@@ -233,13 +233,13 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
 
         val fieldIndex = fieldIndex()
-        val fieldIndexDecoder: Decoder<Index.FieldIndex> = { _context ->
+        val fieldIndexDecoder: CodeBodyDecoder<Index.FieldIndex> = { _context ->
             assertEquals(context, _context)
             Ok(fieldIndex)
         }
@@ -268,13 +268,13 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
 
         val fieldIndex = fieldIndex()
-        val fieldIndexDecoder: Decoder<Index.FieldIndex> = { _context ->
+        val fieldIndexDecoder: CodeBodyDecoder<Index.FieldIndex> = { _context ->
             assertEquals(context, _context)
             Ok(fieldIndex)
         }
@@ -303,13 +303,13 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
 
         val fieldIndex = fieldIndex()
-        val fieldIndexDecoder: Decoder<Index.FieldIndex> = { _context ->
+        val fieldIndexDecoder: CodeBodyDecoder<Index.FieldIndex> = { _context ->
             assertEquals(context, _context)
             Ok(fieldIndex)
         }
@@ -338,7 +338,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -367,7 +367,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -398,7 +398,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -427,13 +427,13 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
 
         val dataIndex = dataIndex()
-        val dataIndexDecoder: Decoder<Index.DataIndex> = { _context ->
+        val dataIndexDecoder: CodeBodyDecoder<Index.DataIndex> = { _context ->
             assertEquals(context, _context)
             Ok(dataIndex)
         }
@@ -462,13 +462,13 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
 
         val elementIndex = elementIndex()
-        val elementIndexDecoder: Decoder<Index.ElementIndex> = { _context ->
+        val elementIndexDecoder: CodeBodyDecoder<Index.ElementIndex> = { _context ->
             assertEquals(context, _context)
             Ok(elementIndex)
         }
@@ -497,7 +497,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -526,7 +526,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -555,7 +555,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -584,7 +584,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -613,7 +613,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -642,7 +642,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -671,7 +671,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
@@ -700,13 +700,13 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
 
         val dataIndex = dataIndex()
-        val dataIndexDecoder: Decoder<Index.DataIndex> = { _context ->
+        val dataIndexDecoder: CodeBodyDecoder<Index.DataIndex> = { _context ->
             assertEquals(context, _context)
             Ok(dataIndex)
         }
@@ -735,13 +735,13 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val typeIndex = typeIndex()
-        val typeIndexDecoder: Decoder<Index.TypeIndex> = { _context ->
+        val typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _context ->
             assertEquals(context, _context)
             Ok(typeIndex)
         }
 
         val elementIndex = elementIndex()
-        val elementIndexDecoder: Decoder<Index.ElementIndex> = { _context ->
+        val elementIndexDecoder: CodeBodyDecoder<Index.ElementIndex> = { _context ->
             assertEquals(context, _context)
             Ok(elementIndex)
         }
@@ -770,7 +770,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val heapType = heapType()
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(heapType)
         }
@@ -801,7 +801,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val heapType = heapType()
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(heapType)
         }
@@ -832,7 +832,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val heapType = heapType()
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(heapType)
         }
@@ -863,7 +863,7 @@ class GCInstructionDecoderTest {
         val context = decoderContext(reader)
 
         val heapType = heapType()
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(heapType)
         }
@@ -921,25 +921,25 @@ class GCInstructionDecoderTest {
     }
 
     private companion object {
-        private val neverCastFlagsDecoder: Decoder<CastFlags> = { _ ->
+        private val neverCastFlagsDecoder: CodeBodyDecoder<CastFlags> = { _ ->
             fail("data index decoder should not run in this scenario")
         }
-        private val neverDataIndexDecoder: Decoder<Index.DataIndex> = { _ ->
+        private val neverDataIndexDecoder: CodeBodyDecoder<Index.DataIndex> = { _ ->
             fail("data index decoder should not run in this scenario")
         }
-        private val neverElementIndexDecoder: Decoder<Index.ElementIndex> = { _ ->
+        private val neverElementIndexDecoder: CodeBodyDecoder<Index.ElementIndex> = { _ ->
             fail("element index decoder should not run in this scenario")
         }
-        private val neverFieldIndexDecoder: Decoder<Index.FieldIndex> = { _ ->
+        private val neverFieldIndexDecoder: CodeBodyDecoder<Index.FieldIndex> = { _ ->
             fail("field index decoder should not run in this scenario")
         }
-        private val neverHeapTypeDecoder: Decoder<HeapType> = { _ ->
+        private val neverHeapTypeDecoder: CodeBodyDecoder<HeapType> = { _ ->
             fail("field index decoder should not run in this scenario")
         }
-        private val neverLabelIndexDecoder: Decoder<Index.LabelIndex> = { _ ->
+        private val neverLabelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = { _ ->
             fail("label index decoder should not run in this scenario")
         }
-        private val neverTypeIndexDecoder: Decoder<Index.TypeIndex> = { _ ->
+        private val neverTypeIndexDecoder: CodeBodyDecoder<Index.TypeIndex> = { _ ->
             fail("table index decoder should not run in this scenario")
         }
     }

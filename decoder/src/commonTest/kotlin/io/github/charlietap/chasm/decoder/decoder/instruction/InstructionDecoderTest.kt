@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
@@ -37,7 +37,7 @@ class InstructionDecoderTest {
             ),
         )
 
-        val numericInstructionDecoder: Decoder<NumericInstruction> = { ctx ->
+        val numericInstructionDecoder: CodeBodyDecoder<NumericInstruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(NumericInstruction.I32Eq)
         }
@@ -80,7 +80,7 @@ class InstructionDecoderTest {
             ),
         )
 
-        val referenceInstructionDecoder: Decoder<ReferenceInstruction> = { ctx ->
+        val referenceInstructionDecoder: CodeBodyDecoder<ReferenceInstruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(ReferenceInstruction.RefIsNull)
         }
@@ -123,7 +123,7 @@ class InstructionDecoderTest {
             ),
         )
 
-        val parametricInstructionDecoder: Decoder<ParametricInstruction> = { ctx ->
+        val parametricInstructionDecoder: CodeBodyDecoder<ParametricInstruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(ParametricInstruction.Drop)
         }
@@ -167,7 +167,7 @@ class InstructionDecoderTest {
         )
 
         val expected = VariableInstruction.LocalGet(Index.LocalIndex(117u))
-        val variableInstructionDecoder: Decoder<VariableInstruction> = { ctx ->
+        val variableInstructionDecoder: CodeBodyDecoder<VariableInstruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(expected)
         }
@@ -211,7 +211,7 @@ class InstructionDecoderTest {
         )
 
         val expected = TableInstruction.TableGet(Index.TableIndex(117u))
-        val tableInstructionDecoder: Decoder<TableInstruction> = { ctx ->
+        val tableInstructionDecoder: CodeBodyDecoder<TableInstruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(expected)
         }
@@ -255,7 +255,7 @@ class InstructionDecoderTest {
         )
 
         val expected = memorySizeInstruction()
-        val memoryInstructionDecoder: Decoder<MemoryInstruction> = { ctx ->
+        val memoryInstructionDecoder: CodeBodyDecoder<MemoryInstruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(expected)
         }
@@ -299,7 +299,7 @@ class InstructionDecoderTest {
         )
 
         val expected = ControlInstruction.Nop
-        val controlInstructionDecoder: Decoder<ControlInstruction> = { ctx ->
+        val controlInstructionDecoder: CodeBodyDecoder<ControlInstruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(expected)
         }
@@ -343,7 +343,7 @@ class InstructionDecoderTest {
         )
 
         val expected = memoryFillInstruction()
-        val prefixInstructionDecoder: Decoder<Instruction> = { ctx ->
+        val prefixInstructionDecoder: CodeBodyDecoder<Instruction> = { ctx ->
             assertEquals(context, ctx)
             Ok(expected)
         }
@@ -433,35 +433,35 @@ class InstructionDecoderTest {
     }
 
     companion object {
-        private val neverNumericInstructionDecoder: Decoder<NumericInstruction> = {
+        private val neverNumericInstructionDecoder: CodeBodyDecoder<NumericInstruction> = {
             error("NumericInstructionDecoder should not be called in this scenario")
         }
 
-        private val neverReferenceInstructionDecoder: Decoder<ReferenceInstruction> = {
+        private val neverReferenceInstructionDecoder: CodeBodyDecoder<ReferenceInstruction> = {
             error("ReferenceInstructionDecoder should not be called in this scenario")
         }
 
-        private val neverParametricInstructionDecoder: Decoder<ParametricInstruction> = {
+        private val neverParametricInstructionDecoder: CodeBodyDecoder<ParametricInstruction> = {
             error("ParametricInstructionDecoder should not be called in this scenario")
         }
 
-        private val neverVariableInstructionDecoder: Decoder<VariableInstruction> = {
+        private val neverVariableInstructionDecoder: CodeBodyDecoder<VariableInstruction> = {
             error("VariableInstructionDecoder should not be called in this scenario")
         }
 
-        private val neverTableInstructionDecoder: Decoder<TableInstruction> = {
+        private val neverTableInstructionDecoder: CodeBodyDecoder<TableInstruction> = {
             error("TableInstructionDecoder should not be called in this scenario")
         }
 
-        private val neverMemoryInstructionDecoder: Decoder<MemoryInstruction> = {
+        private val neverMemoryInstructionDecoder: CodeBodyDecoder<MemoryInstruction> = {
             error("MemoryInstructionDecoder should not be called in this scenario")
         }
 
-        private val neverControlInstructionDecoder: Decoder<ControlInstruction> = {
+        private val neverControlInstructionDecoder: CodeBodyDecoder<ControlInstruction> = {
             error("ControlInstructionDecoder should not be called in this scenario")
         }
 
-        private val neverPrefixInstructionDecoder: Decoder<Instruction> = {
+        private val neverPrefixInstructionDecoder: CodeBodyDecoder<Instruction> = {
             error("PrefixInstructionDecoder should not be called in this scenario")
         }
     }

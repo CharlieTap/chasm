@@ -18,6 +18,7 @@ kotlin {
 
                 api(projects.ast)
                 api(projects.config)
+                api(projects.libs.parallel)
                 api(projects.stream)
 
                 api(libs.result)
@@ -33,6 +34,7 @@ kotlin {
                 implementation(projects.test.fake.decoder)
 
                 implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.kotlinx.test.resources)
             }
         }

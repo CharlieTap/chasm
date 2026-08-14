@@ -18,6 +18,7 @@ kotlin {
             dependencies {
                 api(projects.ast)
                 api(projects.config)
+                api(projects.libs.parallel)
                 api(projects.runtime.core)
                 api(libs.result)
 

@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.GLOBAL_GET
 import io.github.charlietap.chasm.decoder.decoder.instruction.GLOBAL_SET
 import io.github.charlietap.chasm.decoder.decoder.instruction.LOCAL_GET
@@ -31,11 +31,11 @@ class VariableInstructionDecoderTest {
         val expectedIndex = Index.LocalIndex(117u)
         val expected = Ok(VariableInstruction.LocalGet(expectedIndex))
 
-        val localIndexDecoder: Decoder<Index.LocalIndex> = {
+        val localIndexDecoder: CodeBodyDecoder<Index.LocalIndex> = {
             Ok(expectedIndex)
         }
 
-        val globalIndexDecoder: Decoder<Index.GlobalIndex> = {
+        val globalIndexDecoder: CodeBodyDecoder<Index.GlobalIndex> = {
             fail("Global index decoder should not be called when decoding local index")
         }
 
@@ -56,11 +56,11 @@ class VariableInstructionDecoderTest {
         val expectedIndex = Index.LocalIndex(117u)
         val expected = Ok(VariableInstruction.LocalSet(expectedIndex))
 
-        val localIndexDecoder: Decoder<Index.LocalIndex> = {
+        val localIndexDecoder: CodeBodyDecoder<Index.LocalIndex> = {
             Ok(expectedIndex)
         }
 
-        val globalIndexDecoder: Decoder<Index.GlobalIndex> = {
+        val globalIndexDecoder: CodeBodyDecoder<Index.GlobalIndex> = {
             fail("Global index decoder should not be called when decoding local index")
         }
 
@@ -81,11 +81,11 @@ class VariableInstructionDecoderTest {
         val expectedIndex = Index.LocalIndex(117u)
         val expected = Ok(VariableInstruction.LocalTee(expectedIndex))
 
-        val localIndexDecoder: Decoder<Index.LocalIndex> = {
+        val localIndexDecoder: CodeBodyDecoder<Index.LocalIndex> = {
             Ok(expectedIndex)
         }
 
-        val globalIndexDecoder: Decoder<Index.GlobalIndex> = {
+        val globalIndexDecoder: CodeBodyDecoder<Index.GlobalIndex> = {
             fail("Global index decoder should not be called when decoding local index")
         }
 
@@ -106,11 +106,11 @@ class VariableInstructionDecoderTest {
         val expectedIndex = Index.GlobalIndex(117u)
         val expected = Ok(VariableInstruction.GlobalGet(expectedIndex))
 
-        val localIndexDecoder: Decoder<Index.LocalIndex> = {
+        val localIndexDecoder: CodeBodyDecoder<Index.LocalIndex> = {
             fail("Local index decoder should not be called when decoding global index")
         }
 
-        val globalIndexDecoder: Decoder<Index.GlobalIndex> = {
+        val globalIndexDecoder: CodeBodyDecoder<Index.GlobalIndex> = {
             Ok(expectedIndex)
         }
 
@@ -131,11 +131,11 @@ class VariableInstructionDecoderTest {
         val expectedIndex = Index.GlobalIndex(117u)
         val expected = Ok(VariableInstruction.GlobalSet(expectedIndex))
 
-        val localIndexDecoder: Decoder<Index.LocalIndex> = {
+        val localIndexDecoder: CodeBodyDecoder<Index.LocalIndex> = {
             fail("Local index decoder should not be called when decoding global index")
         }
 
-        val globalIndexDecoder: Decoder<Index.GlobalIndex> = {
+        val globalIndexDecoder: CodeBodyDecoder<Index.GlobalIndex> = {
             Ok(expectedIndex)
         }
 

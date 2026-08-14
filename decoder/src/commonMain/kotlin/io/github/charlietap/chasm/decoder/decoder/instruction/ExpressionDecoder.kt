@@ -6,12 +6,12 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.decoder.builder.InstructionBlockBuilder
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun ExpressionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<Expression, WasmDecodeError> =
     ExpressionDecoder(
         context,
@@ -19,8 +19,8 @@ internal fun ExpressionDecoder(
     )
 
 internal inline fun ExpressionDecoder(
-    context: ModuleDecoderContext,
-    crossinline instructionDecoder: Decoder<Instruction>,
+    context: CodeBodyDecoderContext,
+    crossinline instructionDecoder: CodeBodyDecoder<Instruction>,
 ): Result<Expression, WasmDecodeError> = binding {
     val builder = InstructionBlockBuilder()
     var depth = 0

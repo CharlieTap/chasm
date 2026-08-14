@@ -5,8 +5,8 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_GET
 import io.github.charlietap.chasm.decoder.decoder.instruction.TABLE_SET
 import io.github.charlietap.chasm.decoder.decoder.section.index.TableIndexDecoder
@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun TableInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<TableInstruction, WasmDecodeError> =
     TableInstructionDecoder(
         context = context,
@@ -22,8 +22,8 @@ internal fun TableInstructionDecoder(
     )
 
 internal inline fun TableInstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline tableIndexDecoder: Decoder<Index.TableIndex>,
+    context: CodeBodyDecoderContext,
+    crossinline tableIndexDecoder: CodeBodyDecoder<Index.TableIndex>,
 ): Result<TableInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte()) {
         TABLE_GET -> {

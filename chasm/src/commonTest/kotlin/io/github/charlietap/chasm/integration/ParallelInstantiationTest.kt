@@ -7,8 +7,6 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.compiler.ParallelTaskExecutor
-import io.github.charlietap.chasm.compiler.ParallelTaskScope
 import io.github.charlietap.chasm.config.ModuleConfig
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.embedding.error.ChasmError
@@ -22,6 +20,8 @@ import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
+import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
+import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.value.ExecutionValue

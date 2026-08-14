@@ -4,13 +4,13 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.MemoryIndexDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun MemorySizeInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<MemoryInstruction.MemorySize, WasmDecodeError> =
     MemorySizeInstructionDecoder(
         context = context,
@@ -18,8 +18,8 @@ internal fun MemorySizeInstructionDecoder(
     )
 
 internal inline fun MemorySizeInstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline memoryIndexDecoder: Decoder<Index.MemoryIndex>,
+    context: CodeBodyDecoderContext,
+    crossinline memoryIndexDecoder: CodeBodyDecoder<Index.MemoryIndex>,
 ): Result<MemoryInstruction.MemorySize, WasmDecodeError> = binding {
     val index = memoryIndexDecoder(context).bind()
     MemoryInstruction.MemorySize(index)

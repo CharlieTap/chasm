@@ -1,11 +1,12 @@
 package io.github.charlietap.chasm.compiler
 
 import io.github.charlietap.chasm.ast.module.Function
+import io.github.charlietap.chasm.parallel.availableParallelProcessors
 
 internal fun CompilationPlanner(
     functions: List<Function>,
     mode: CompilationMode,
-    availableProcessors: Int = availableCompilerProcessors(),
+    availableProcessors: Int = availableParallelProcessors(),
 ): CompilationPlan {
     val workerLimit = minOf(
         functions.size,

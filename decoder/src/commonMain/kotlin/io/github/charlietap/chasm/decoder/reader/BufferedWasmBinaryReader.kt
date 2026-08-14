@@ -17,14 +17,27 @@ internal class BufferedWasmBinaryReader private constructor(
 ) : WasmBinaryReader {
 
     constructor(bytes: ByteArray) : this(
+        bytes = bytes,
+        start = 0,
+        end = bytes.size,
+    )
+
+    constructor(
+        bytes: ByteArray,
+        start: Int,
+        end: Int,
+    ) : this(
         source = null,
         buffer = bytes,
-        cursor = 0,
-        end = bytes.size,
+        cursor = start,
+        end = end,
         bufferOffset = 0u,
-        logicalLimit = ULong.MAX_VALUE,
+        logicalLimit = end.toULong(),
         sourceExhausted = true,
-    )
+    ) {
+        require(start in 0..end)
+        require(end <= bytes.size)
+    }
 
     constructor(
         source: ByteSource,
@@ -134,6 +147,12 @@ internal class BufferedWasmBinaryReader private constructor(
 
     override fun restoreLimit(limit: ULong) {
         logicalLimit = limit
+    }
+
+    fun skip(amount: Int) {
+        require(source == null)
+        if (amount < 0 || amount > contiguousAvailable()) noMoreElements()
+        cursor += amount
     }
 
     private fun byteSlow(): Byte {

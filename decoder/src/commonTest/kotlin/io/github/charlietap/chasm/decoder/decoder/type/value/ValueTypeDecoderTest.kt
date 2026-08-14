@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.decoder.decoder.type.value
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.vector.VECTOR_TYPE_128
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
@@ -27,7 +27,7 @@ class ValueTypeDecoderTest {
 
         val numberTypes = NUMBER_TYPE_RANGE.map(UInt::toUByte)
 
-        val referenceTypeDecoder: Decoder<ReferenceType> = { _ ->
+        val referenceTypeDecoder: CodeBodyDecoder<ReferenceType> = { _ ->
             fail("ReferenceTypeDecoder should not be called in this scenario")
         }
 
@@ -38,7 +38,7 @@ class ValueTypeDecoderTest {
 
             byte = numberTypeByte
 
-            val numberTypeDecoder: Decoder<NumberType> = { _context ->
+            val numberTypeDecoder: CodeBodyDecoder<NumberType> = { _context ->
                 assertEquals(context, _context)
 
                 Ok(expectedNumberType)
@@ -66,11 +66,11 @@ class ValueTypeDecoderTest {
         )
         val context = decoderContext(reader)
 
-        val numberTypeDecoder: Decoder<NumberType> = { _ ->
+        val numberTypeDecoder: CodeBodyDecoder<NumberType> = { _ ->
             fail("NumberTypeDecoder should not be called in this scenario")
         }
 
-        val referenceTypeDecoder: Decoder<ReferenceType> = { _ ->
+        val referenceTypeDecoder: CodeBodyDecoder<ReferenceType> = { _ ->
             fail("ReferenceTypeDecoder should not be called in this scenario")
         }
 
@@ -90,7 +90,7 @@ class ValueTypeDecoderTest {
 
         val referenceTypes = REFERENCE_TYPE_RANGE.map(UInt::toUByte)
 
-        val numberTypeDecoder: Decoder<NumberType> = { _ ->
+        val numberTypeDecoder: CodeBodyDecoder<NumberType> = { _ ->
             fail("NumberTypeDecoder should not be called in this scenario")
         }
 
@@ -106,7 +106,7 @@ class ValueTypeDecoderTest {
 
             byte = referenceTypeByte
 
-            val referenceTypeDecoder: Decoder<ReferenceType> = { _context ->
+            val referenceTypeDecoder: CodeBodyDecoder<ReferenceType> = { _context ->
                 assertEquals(context, _context)
 
                 Ok(expectedReferenceType)

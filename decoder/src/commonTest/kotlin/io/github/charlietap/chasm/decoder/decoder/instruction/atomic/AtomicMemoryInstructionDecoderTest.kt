@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.atomic
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.memory.MemArgWithIndex
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
@@ -182,7 +182,7 @@ class AtomicMemoryInstructionDecoderTest {
             I64_ATOMIC_RMW32_CMPXCHG_U to i64AtomicCompareExchange32Instruction(expectedMemoryIndex, expectedMemArg),
         )
 
-        val memArgWithIndexDecoder: Decoder<MemArgWithIndex> = {
+        val memArgWithIndexDecoder: CodeBodyDecoder<MemArgWithIndex> = {
             Ok(MemArgWithIndex(expectedMemoryIndex, expectedMemArg))
         }
 
@@ -220,7 +220,7 @@ class AtomicMemoryInstructionDecoderTest {
     }
 
     private companion object {
-        private val neverMemArgWithIndexDecoder: Decoder<MemArgWithIndex> = { _ ->
+        private val neverMemArgWithIndexDecoder: CodeBodyDecoder<MemArgWithIndex> = { _ ->
             fail("memarg with index decoder should not run in this scenario")
         }
     }

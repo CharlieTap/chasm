@@ -3,8 +3,8 @@ package io.github.charlietap.chasm.decoder.decoder.type.value
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.heap.HEAP_TYPE_NO_EXCEPTION
 import io.github.charlietap.chasm.decoder.decoder.type.number.NUMBER_TYPE_F64
 import io.github.charlietap.chasm.decoder.decoder.type.number.NUMBER_TYPE_I32
@@ -20,7 +20,7 @@ import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.VectorType
 
 internal fun ValueTypeDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<ValueType, WasmDecodeError> =
     ValueTypeDecoder(
         context = context,
@@ -29,9 +29,9 @@ internal fun ValueTypeDecoder(
     )
 
 internal inline fun ValueTypeDecoder(
-    context: ModuleDecoderContext,
-    crossinline numberTypeDecoder: Decoder<NumberType>,
-    crossinline referenceTypeDecoder: Decoder<ReferenceType>,
+    context: CodeBodyDecoderContext,
+    crossinline numberTypeDecoder: CodeBodyDecoder<NumberType>,
+    crossinline referenceTypeDecoder: CodeBodyDecoder<ReferenceType>,
 ): Result<ValueType, WasmDecodeError> = binding {
     when (
         val byte = context.reader

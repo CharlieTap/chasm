@@ -10,6 +10,8 @@ import io.github.charlietap.chasm.compiler.context.createCompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
+import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.function.Expression
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance

@@ -4,30 +4,30 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ParametricInstruction
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.DROP
 import io.github.charlietap.chasm.decoder.decoder.instruction.SELECT
 import io.github.charlietap.chasm.decoder.decoder.instruction.SELECT_W_TYPE
 import io.github.charlietap.chasm.decoder.decoder.type.value.ValueTypeDecoder
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
+import io.github.charlietap.chasm.decoder.decoder.vector.CodeBodyVectorDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.type.ValueType
 
 internal fun ParametricInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<ParametricInstruction, WasmDecodeError> =
     ParametricInstructionDecoder(
         context = context,
-        vectorDecoder = ::VectorDecoder,
+        vectorDecoder = ::CodeBodyVectorDecoder,
         valueTypeDecoder = ::ValueTypeDecoder,
     )
 
 internal inline fun ParametricInstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline vectorDecoder: VectorDecoder<ValueType>,
-    noinline valueTypeDecoder: Decoder<ValueType>,
+    context: CodeBodyDecoderContext,
+    crossinline vectorDecoder: CodeBodyVectorDecoder<ValueType>,
+    noinline valueTypeDecoder: CodeBodyDecoder<ValueType>,
 ): Result<ParametricInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte()) {
         DROP -> {

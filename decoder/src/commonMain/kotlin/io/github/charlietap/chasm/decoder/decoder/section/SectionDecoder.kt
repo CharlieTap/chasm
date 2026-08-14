@@ -42,10 +42,16 @@ import io.github.charlietap.chasm.decoder.section.TypeSection
 internal fun SectionDecoder(
     context: ModuleDecoderContext,
 ): Result<Section, WasmDecodeError> =
+    SectionDecoder(context, ::CodeSectionDecoder)
+
+internal fun SectionDecoder(
+    context: ModuleDecoderContext,
+    codeSectionDecoder: Decoder<CodeSection>,
+): Result<Section, WasmDecodeError> =
     SectionDecoder(
         context = context,
         customSectionDecoder = ::CustomSectionDecoder,
-        codeSectionDecoder = ::CodeSectionDecoder,
+        codeSectionDecoder = codeSectionDecoder,
         dataSectionDecoder = ::DataSectionDecoder,
         dataCountSectionDecoder = ::DataCountSectionDecoder,
         elementSectionDecoder = ::ElementSectionDecoder,

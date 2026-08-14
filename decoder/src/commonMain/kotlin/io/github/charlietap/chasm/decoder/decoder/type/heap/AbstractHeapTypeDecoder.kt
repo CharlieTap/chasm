@@ -3,13 +3,13 @@ package io.github.charlietap.chasm.decoder.decoder.type.heap
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
 import io.github.charlietap.chasm.decoder.error.TypeDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.type.AbstractHeapType
 
 internal fun AbstractHeapTypeDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<AbstractHeapType, WasmDecodeError> = binding {
     when (val encoded = context.reader.ubyte()) {
         HEAP_TYPE_EXCEPTION -> AbstractHeapType.Exception

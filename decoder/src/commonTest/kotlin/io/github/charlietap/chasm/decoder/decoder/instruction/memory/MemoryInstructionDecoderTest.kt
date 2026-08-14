@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.F32_LOAD
 import io.github.charlietap.chasm.decoder.decoder.instruction.F32_STORE
 import io.github.charlietap.chasm.decoder.decoder.instruction.F64_LOAD
@@ -51,7 +51,7 @@ class MemoryInstructionDecoderTest {
         val opcode = MEMORY_SIZE
         val expected = Ok(memorySizeInstruction())
 
-        val memorySizeDecoder: Decoder<MemoryInstruction.MemorySize> = {
+        val memorySizeDecoder: CodeBodyDecoder<MemoryInstruction.MemorySize> = {
             Ok(memorySizeInstruction())
         }
 
@@ -79,7 +79,7 @@ class MemoryInstructionDecoderTest {
         val opcode = MEMORY_GROW
         val expected = Ok(memoryGrowInstruction())
 
-        val memoryGrowDecoder: Decoder<MemoryInstruction.MemoryGrow> = {
+        val memoryGrowDecoder: CodeBodyDecoder<MemoryInstruction.MemoryGrow> = {
             Ok(memoryGrowInstruction())
         }
 
@@ -133,7 +133,7 @@ class MemoryInstructionDecoderTest {
             I64_STORE32 to MemoryInstruction.Store.I64.I64Store32(expectedMemoryIndex, expectedMemArg),
         )
 
-        val memArgWithIndexDecoder: Decoder<MemArgWithIndex> = {
+        val memArgWithIndexDecoder: CodeBodyDecoder<MemArgWithIndex> = {
             Ok(MemArgWithIndex(expectedMemoryIndex, expectedMemArg))
         }
 
@@ -174,13 +174,13 @@ class MemoryInstructionDecoderTest {
     }
 
     private companion object {
-        private val neverMemArgWithIndexDecoder: Decoder<MemArgWithIndex> = { _ ->
+        private val neverMemArgWithIndexDecoder: CodeBodyDecoder<MemArgWithIndex> = { _ ->
             fail("memarg with index decoder should not run in this scenario")
         }
-        private val neverMemoryGrowDecoder: Decoder<MemoryInstruction.MemoryGrow> = { _ ->
+        private val neverMemoryGrowDecoder: CodeBodyDecoder<MemoryInstruction.MemoryGrow> = { _ ->
             fail("memory grow decoder should not run in this scenario")
         }
-        private val neverMemorySizeDecoder: Decoder<MemoryInstruction.MemorySize> = { _ ->
+        private val neverMemorySizeDecoder: CodeBodyDecoder<MemoryInstruction.MemorySize> = { _ ->
             fail("memory size decoder should not run in this scenario")
         }
     }

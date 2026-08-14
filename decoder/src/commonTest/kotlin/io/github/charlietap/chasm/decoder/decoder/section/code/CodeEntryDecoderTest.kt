@@ -4,13 +4,13 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.Expression
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Local
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
+import io.github.charlietap.chasm.decoder.decoder.vector.CodeBodyVectorDecoder
 import io.github.charlietap.chasm.decoder.decoder.vector.Vector
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
 import io.github.charlietap.chasm.decoder.fixture.assertWasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.fixture.ioError
-import io.github.charlietap.chasm.decoder.reader.FakeUIntReader
+import io.github.charlietap.chasm.decoder.reader.BinaryReader
 import io.github.charlietap.chasm.decoder.reader.IOErrorWasmFileReader
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
@@ -23,7 +23,7 @@ class CodeEntryDecoderTest {
     @Test
     fun `can decode a code entry`() {
 
-        val size = 117u
+        val size = 0u
         val localEntries = listOf(
             LocalEntry(3u, i32ValueType()),
             LocalEntry(2u, i64ValueType()),
@@ -39,20 +39,18 @@ class CodeEntryDecoderTest {
 
         val expected = Ok(CodeEntry(size, locals, expression))
 
-        val reader = FakeUIntReader {
-            Ok(size)
-        }
+        val reader = BinaryReader(byteArrayOf(0))
         val context = decoderContext(reader)
 
-        val localEntryDecoder: Decoder<LocalEntry> = { _ ->
+        val localEntryDecoder: CodeBodyDecoder<LocalEntry> = { _ ->
             fail("Local decoder shouldn't be called directly")
         }
 
-        val expressionDecoder: Decoder<Expression> = { _ ->
+        val expressionDecoder: CodeBodyDecoder<Expression> = { _ ->
             Ok(expression)
         }
 
-        val vectorDecoder: VectorDecoder<LocalEntry> = { _, _ ->
+        val vectorDecoder: CodeBodyVectorDecoder<LocalEntry> = { _, _ ->
             Ok(Vector(localEntries))
         }
 

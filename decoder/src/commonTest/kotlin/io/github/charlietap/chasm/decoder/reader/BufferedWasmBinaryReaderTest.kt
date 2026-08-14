@@ -59,6 +59,29 @@ class BufferedWasmBinaryReaderTest {
     }
 
     @Test
+    fun `reads a bounded byte array range without copying`() {
+        val bytes = byteArrayOf(1, 2, 3, 4)
+        val reader = BufferedWasmBinaryReader(bytes, 1, 3)
+
+        bytes[1] = 5
+
+        assertEquals(1u, reader.position())
+        assertEquals(5, reader.byte())
+        assertEquals(3, reader.byte())
+        assertEquals(true, reader.exhausted())
+        assertFailsWith<NoSuchElementException> { reader.byte() }
+    }
+
+    @Test
+    fun `rejects invalid byte array ranges`() {
+        val bytes = byteArrayOf(1, 2, 3)
+
+        assertFailsWith<IllegalArgumentException> { BufferedWasmBinaryReader(bytes, -1, 2) }
+        assertFailsWith<IllegalArgumentException> { BufferedWasmBinaryReader(bytes, 2, 1) }
+        assertFailsWith<IllegalArgumentException> { BufferedWasmBinaryReader(bytes, 0, 4) }
+    }
+
+    @Test
     fun `reads bulk and fixed width values across short source refills`() {
         val bytes = byteArrayOf(
             1,

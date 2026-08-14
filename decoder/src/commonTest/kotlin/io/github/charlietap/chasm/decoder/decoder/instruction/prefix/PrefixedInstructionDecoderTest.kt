@@ -6,7 +6,7 @@ import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
@@ -39,7 +39,7 @@ class PrefixedInstructionDecoderTest {
         val context = decoderContext(reader)
         val instruction = instruction()
 
-        val gcInstructionDecoder: Decoder<Instruction> = { _context ->
+        val gcInstructionDecoder: CodeBodyDecoder<Instruction> = { _context ->
             assertEquals(context, _context)
             Ok(instruction)
         }
@@ -73,7 +73,7 @@ class PrefixedInstructionDecoderTest {
         val context = decoderContext(reader)
         val instruction = instruction()
 
-        val prefixFCInstructionDecoder: Decoder<Instruction> = { _context ->
+        val prefixFCInstructionDecoder: CodeBodyDecoder<Instruction> = { _context ->
             assertEquals(context, _context)
             Ok(instruction)
         }
@@ -107,7 +107,7 @@ class PrefixedInstructionDecoderTest {
         val context = decoderContext(reader)
         val instruction = vectorInstruction()
 
-        val vectorInstructionDecoder: Decoder<VectorInstruction> = { _context ->
+        val vectorInstructionDecoder: CodeBodyDecoder<VectorInstruction> = { _context ->
             assertEquals(context, _context)
             Ok(instruction)
         }
@@ -141,7 +141,7 @@ class PrefixedInstructionDecoderTest {
         val context = decoderContext(reader)
         val instruction = atomicMemoryInstruction()
 
-        val atomicMemoryInstructionDecoder: Decoder<AtomicMemoryInstruction> = { _context ->
+        val atomicMemoryInstructionDecoder: CodeBodyDecoder<AtomicMemoryInstruction> = { _context ->
             assertEquals(context, _context)
             Ok(instruction)
         }
@@ -186,16 +186,16 @@ class PrefixedInstructionDecoderTest {
     }
 
     companion object {
-        private val neverAtomicInstructionDecoder: Decoder<AtomicMemoryInstruction> = { _ ->
+        private val neverAtomicInstructionDecoder: CodeBodyDecoder<AtomicMemoryInstruction> = { _ ->
             fail("AtomicMemoryInstructionDecoder should not be used in this context")
         }
-        private val neverGCInstructionDecoder: Decoder<Instruction> = { _ ->
+        private val neverGCInstructionDecoder: CodeBodyDecoder<Instruction> = { _ ->
             fail("FBInstructionDecoder should not be used in this context")
         }
-        private val neverFCInstructionDecoder: Decoder<Instruction> = { _ ->
+        private val neverFCInstructionDecoder: CodeBodyDecoder<Instruction> = { _ ->
             fail("FBInstructionDecoder should not be used in this context")
         }
-        private val neverVectorInstructionDecoder: Decoder<VectorInstruction> = { _ ->
+        private val neverVectorInstructionDecoder: CodeBodyDecoder<VectorInstruction> = { _ ->
             fail("VectorDecoder should not be used in this context")
         }
     }

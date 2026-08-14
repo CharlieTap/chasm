@@ -5,7 +5,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.numeric.NumericInstructionDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
@@ -27,7 +27,7 @@ class ReferenceInstructionDecoderTest {
             Ok(opcode)
         }
         val context = decoderContext(reader)
-        val heapTypeDecoder: Decoder<HeapType> = { _context ->
+        val heapTypeDecoder: CodeBodyDecoder<HeapType> = { _context ->
             assertEquals(context, _context)
             Ok(AbstractHeapType.Func)
         }

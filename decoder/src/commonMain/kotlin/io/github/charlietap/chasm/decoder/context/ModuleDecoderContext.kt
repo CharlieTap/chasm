@@ -9,22 +9,21 @@ import io.github.charlietap.chasm.decoder.section.SectionType
 import io.github.charlietap.chasm.type.DefinedType
 
 internal class ModuleDecoderContext(
-    val config: ModuleConfig,
-    override var reader: WasmBinaryReader,
+    config: ModuleConfig,
+    reader: WasmBinaryReader,
     override var imports: List<Import> = emptyList(),
-    override var requiresDataCount: Boolean = false,
+    requiresDataCount: Boolean = false,
     override var nameSectionSize: UInt = 0u,
     override var sectionSize: SectionSize = SectionSize(0u),
     override var sectionType: SectionType = SectionType.Custom,
     override val types: MutableList<Type> = mutableListOf(),
     override val definedTypes: MutableList<DefinedType> = mutableListOf(),
-    override var index: Int = 0,
-) : ReaderContext,
+    index: Int = 0,
+) : CodeBodyDecoderContext(config, reader, requiresDataCount, index),
     ModuleContext,
     NameSectionContext,
     SectionContext,
-    TypeContext,
-    VectorContext {
+    TypeContext {
 
     internal fun reset() {
         imports = emptyList()

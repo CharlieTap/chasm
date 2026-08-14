@@ -6,15 +6,15 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.VectorInstruction
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.atomic.AtomicMemoryInstructionDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.vector.VectorInstructionDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun PrefixedInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<Instruction, WasmDecodeError> =
     PrefixedInstructionDecoder(
         context = context,
@@ -25,11 +25,11 @@ internal fun PrefixedInstructionDecoder(
     )
 
 internal inline fun PrefixedInstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline prefixFCInstructionDecoder: Decoder<Instruction>,
-    crossinline atomicMemoryInstructionDecoder: Decoder<AtomicMemoryInstruction>,
-    crossinline gcInstructionDecoder: Decoder<Instruction>,
-    crossinline vectorInstructionDecoder: Decoder<VectorInstruction>,
+    context: CodeBodyDecoderContext,
+    crossinline prefixFCInstructionDecoder: CodeBodyDecoder<Instruction>,
+    crossinline atomicMemoryInstructionDecoder: CodeBodyDecoder<AtomicMemoryInstruction>,
+    crossinline gcInstructionDecoder: CodeBodyDecoder<Instruction>,
+    crossinline vectorInstructionDecoder: CodeBodyDecoder<VectorInstruction>,
 ): Result<Instruction, WasmDecodeError> = binding {
 
     val prefix = context.reader.ubyte()

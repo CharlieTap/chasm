@@ -4,15 +4,15 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.AtomicMemoryInstruction
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.memory.MemArgWithIndex
 import io.github.charlietap.chasm.decoder.decoder.instruction.memory.MemArgWithIndexDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun AtomicMemoryInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<AtomicMemoryInstruction, WasmDecodeError> =
     AtomicMemoryInstructionDecoder(
         context = context,
@@ -20,8 +20,8 @@ internal fun AtomicMemoryInstructionDecoder(
     )
 
 internal inline fun AtomicMemoryInstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline memArgWithIndexDecoder: Decoder<MemArgWithIndex>,
+    context: CodeBodyDecoderContext,
+    crossinline memArgWithIndexDecoder: CodeBodyDecoder<MemArgWithIndex>,
 ): Result<AtomicMemoryInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.uint()) {
         ATOMIC_NOTIFY -> {

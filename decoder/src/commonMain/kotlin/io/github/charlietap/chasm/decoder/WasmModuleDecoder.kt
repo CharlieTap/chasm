@@ -95,30 +95,15 @@ internal fun WasmModuleDecoder(
 
     return try {
         binding {
-            magicNumberValidator(context.reader).bind()
-
-            val version = versionDecoder(context).bind()
-            val builder = ModuleBuilder(version)
-            var previousSectionType = SectionType.Custom
-
-            while (context.reader.exhausted().not()) {
-
-                val sectionType = sectionTypeDecoder(context).bind()
-                if (sectionType.ordinal <= previousSectionType.ordinal && sectionType != SectionType.Custom) {
-                    Err(ModuleDecodeError.ModuleMalformed).bind()
-                }
-                val sectionSize = SectionSize(context.reader.uint())
-                val section = scope(
-                    context,
-                    sectionSize to sectionType,
-                    sectionDecoder,
-                ).bind()
-
-                builder.section(section)
-                previousSectionType = sectionType
-            }
-
-            builder.build(context).bind()
+            val builder = ModuleSectionsDecoder(
+                context = context,
+                magicNumberValidator = magicNumberValidator,
+                versionDecoder = versionDecoder,
+                sectionTypeDecoder = sectionTypeDecoder,
+                sectionDecoder = sectionDecoder,
+                scope = scope,
+            ).bind()
+            builder.build(context.requiresDataCount).bind()
         }
     } catch (error: WasmDecodeException) {
         Err(error.error)
@@ -127,4 +112,37 @@ internal fun WasmModuleDecoder(
     } finally {
         context.reset()
     }
+}
+
+internal fun ModuleSectionsDecoder(
+    context: ModuleDecoderContext,
+    magicNumberValidator: MagicNumberValidator = ::BinaryMagicNumberValidator,
+    versionDecoder: Decoder<Version> = ::VersionDecoder,
+    sectionTypeDecoder: Decoder<SectionType> = ::SectionTypeDecoder,
+    sectionDecoder: Decoder<Section> = ::SectionDecoder,
+    scope: ScopedDecoder<Pair<SectionSize, SectionType>, Section> = ::SectionScope,
+): Result<ModuleBuilder, WasmDecodeError> = binding {
+    magicNumberValidator(context.reader).bind()
+
+    val version = versionDecoder(context).bind()
+    val builder = ModuleBuilder(version)
+    var previousSectionType = SectionType.Custom
+
+    while (context.reader.exhausted().not()) {
+        val sectionType = sectionTypeDecoder(context).bind()
+        if (sectionType.ordinal <= previousSectionType.ordinal && sectionType != SectionType.Custom) {
+            Err(ModuleDecodeError.ModuleMalformed).bind<Unit>()
+        }
+        val sectionSize = SectionSize(context.reader.uint())
+        val section = scope(
+            context,
+            sectionSize to sectionType,
+            sectionDecoder,
+        ).bind()
+
+        builder.section(section)
+        previousSectionType = sectionType
+    }
+
+    builder
 }

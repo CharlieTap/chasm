@@ -5,8 +5,8 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.GLOBAL_GET
 import io.github.charlietap.chasm.decoder.decoder.instruction.GLOBAL_SET
 import io.github.charlietap.chasm.decoder.decoder.instruction.LOCAL_GET
@@ -18,7 +18,7 @@ import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun VariableInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<VariableInstruction, WasmDecodeError> =
     VariableInstructionDecoder(
         context = context,
@@ -27,9 +27,9 @@ internal fun VariableInstructionDecoder(
     )
 
 internal inline fun VariableInstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline localIndexDecoder: Decoder<Index.LocalIndex>,
-    crossinline globalIndexDecoder: Decoder<Index.GlobalIndex>,
+    context: CodeBodyDecoderContext,
+    crossinline localIndexDecoder: CodeBodyDecoder<Index.LocalIndex>,
+    crossinline globalIndexDecoder: CodeBodyDecoder<Index.GlobalIndex>,
 ): Result<VariableInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte()) {
         LOCAL_GET -> {

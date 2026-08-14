@@ -338,7 +338,11 @@ public final class io/github/charlietap/chasm/embedding/global/WriteGlobalKt {
 }
 
 public final class io/github/charlietap/chasm/embedding/internal/InstanceKt {
-	public static final fun _instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/compiler/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun _instance (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/embedding/internal/ModuleKt {
+	public static final fun _module ([BLio/github/charlietap/chasm/config/ModuleConfig;Lio/github/charlietap/chasm/parallel/ParallelTaskExecutor;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/charlietap/chasm/embedding/memory/GrowMemoryKt {

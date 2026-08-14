@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.decoder.instruction.control
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.type.value.NUMBER_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.decoder.type.value.REFERENCE_TYPE_RANGE
 import io.github.charlietap.chasm.decoder.decoder.type.value.VECTOR_TYPE_RANGE
@@ -61,7 +61,7 @@ class BlockTypeDecoderTest {
         val reader = FakeWasmBinaryReader(fakePeekReader = { peekReader })
         val context = decoderContext(reader)
 
-        val valueTypeDecoder: Decoder<ValueType> = { _ ->
+        val valueTypeDecoder: CodeBodyDecoder<ValueType> = { _ ->
             Ok(i32ValueType())
         }
 

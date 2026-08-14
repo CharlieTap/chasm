@@ -100,6 +100,7 @@ kotlin {
             dependencies {
                 api(projects.config)
                 api(projects.host)
+                api(projects.libs.parallel)
                 api(projects.runtime.type)
                 api(projects.runtime.value)
                 api(projects.stream)

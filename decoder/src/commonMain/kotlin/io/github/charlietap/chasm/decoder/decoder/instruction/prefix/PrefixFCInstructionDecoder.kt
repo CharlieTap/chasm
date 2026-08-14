@@ -8,8 +8,8 @@ import io.github.charlietap.chasm.ast.instruction.MemoryInstruction
 import io.github.charlietap.chasm.ast.instruction.NumericInstruction
 import io.github.charlietap.chasm.ast.instruction.TableInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.DataIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.ElementIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.MemoryIndexDecoder
@@ -18,7 +18,7 @@ import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 
 internal fun PrefixFCInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<Instruction, WasmDecodeError> =
     PrefixFCInstructionDecoder(
         context = context,
@@ -29,11 +29,11 @@ internal fun PrefixFCInstructionDecoder(
     )
 
 internal inline fun PrefixFCInstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline dataIndexDecoder: Decoder<Index.DataIndex>,
-    crossinline elementIndexDecoder: Decoder<Index.ElementIndex>,
-    crossinline memoryIndexDecoder: Decoder<Index.MemoryIndex>,
-    crossinline tableIndexDecoder: Decoder<Index.TableIndex>,
+    context: CodeBodyDecoderContext,
+    crossinline dataIndexDecoder: CodeBodyDecoder<Index.DataIndex>,
+    crossinline elementIndexDecoder: CodeBodyDecoder<Index.ElementIndex>,
+    crossinline memoryIndexDecoder: CodeBodyDecoder<Index.MemoryIndex>,
+    crossinline tableIndexDecoder: CodeBodyDecoder<Index.TableIndex>,
 ): Result<Instruction, WasmDecodeError> = binding {
 
     when (val opcode = context.reader.uint()) {

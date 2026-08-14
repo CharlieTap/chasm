@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeUByteReader
@@ -25,12 +25,12 @@ class CatchHandlerDecoderTest {
         val context = decoderContext(reader)
 
         val labelIndex = labelIndex()
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = {
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = {
             Ok(labelIndex)
         }
 
         val tagIndex = tagIndex()
-        val tagIndexDecoder: Decoder<Index.TagIndex> = {
+        val tagIndexDecoder: CodeBodyDecoder<Index.TagIndex> = {
             Ok(tagIndex)
         }
 
@@ -54,12 +54,12 @@ class CatchHandlerDecoderTest {
         val context = decoderContext(reader)
 
         val labelIndex = labelIndex()
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = {
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = {
             Ok(labelIndex)
         }
 
         val tagIndex = tagIndex()
-        val tagIndexDecoder: Decoder<Index.TagIndex> = {
+        val tagIndexDecoder: CodeBodyDecoder<Index.TagIndex> = {
             Ok(tagIndex)
         }
 
@@ -83,7 +83,7 @@ class CatchHandlerDecoderTest {
         val context = decoderContext(reader)
 
         val labelIndex = labelIndex()
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = {
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = {
             Ok(labelIndex)
         }
 
@@ -107,7 +107,7 @@ class CatchHandlerDecoderTest {
         val context = decoderContext(reader)
 
         val labelIndex = labelIndex()
-        val labelIndexDecoder: Decoder<Index.LabelIndex> = {
+        val labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = {
             Ok(labelIndex)
         }
 
@@ -142,10 +142,10 @@ class CatchHandlerDecoderTest {
     }
 
     private companion object {
-        val neverLabelIndexDecoder: Decoder<Index.LabelIndex> = {
+        val neverLabelIndexDecoder: CodeBodyDecoder<Index.LabelIndex> = {
             fail("label index decoder should not be called in this scenario.")
         }
-        val neverTagIndexDecoder: Decoder<Index.TagIndex> = {
+        val neverTagIndexDecoder: CodeBodyDecoder<Index.TagIndex> = {
             fail("tag index decoder should not be called in this scenario.")
         }
     }

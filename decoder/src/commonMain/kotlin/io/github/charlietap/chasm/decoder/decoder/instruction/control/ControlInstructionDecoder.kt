@@ -6,8 +6,8 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Index.TagIndex
-import io.github.charlietap.chasm.decoder.context.ModuleDecoderContext
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.context.CodeBodyDecoderContext
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.decoder.instruction.BLOCK
 import io.github.charlietap.chasm.decoder.decoder.instruction.BR
 import io.github.charlietap.chasm.decoder.decoder.instruction.BR_IF
@@ -33,13 +33,13 @@ import io.github.charlietap.chasm.decoder.decoder.section.index.LabelIndexDecode
 import io.github.charlietap.chasm.decoder.decoder.section.index.TableIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.TagIndexDecoder
 import io.github.charlietap.chasm.decoder.decoder.section.index.TypeIndexDecoder
-import io.github.charlietap.chasm.decoder.decoder.vector.VectorDecoder
+import io.github.charlietap.chasm.decoder.decoder.vector.CodeBodyVectorDecoder
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.type.BlockType
 
 internal fun ControlInstructionDecoder(
-    context: ModuleDecoderContext,
+    context: CodeBodyDecoderContext,
 ): Result<ControlInstruction, WasmDecodeError> =
     ControlInstructionDecoder(
         context = context,
@@ -50,21 +50,21 @@ internal fun ControlInstructionDecoder(
         typeIndexDecoder = ::TypeIndexDecoder,
         tableIndexDecoder = ::TableIndexDecoder,
         labelIndexDecoder = ::LabelIndexDecoder,
-        handlerVectorDecoder = ::VectorDecoder,
-        labelVectorDecoder = ::VectorDecoder,
+        handlerVectorDecoder = ::CodeBodyVectorDecoder,
+        labelVectorDecoder = ::CodeBodyVectorDecoder,
     )
 
 internal inline fun ControlInstructionDecoder(
-    context: ModuleDecoderContext,
-    crossinline blockTypeDecoder: Decoder<BlockType>,
-    crossinline functionIndexDecoder: Decoder<Index.FunctionIndex>,
-    noinline handlerDecoder: Decoder<ControlInstruction.CatchHandler>,
-    crossinline tagIndexDecoder: Decoder<TagIndex>,
-    crossinline typeIndexDecoder: Decoder<Index.TypeIndex>,
-    crossinline tableIndexDecoder: Decoder<Index.TableIndex>,
-    noinline labelIndexDecoder: Decoder<Index.LabelIndex>,
-    crossinline handlerVectorDecoder: VectorDecoder<ControlInstruction.CatchHandler>,
-    crossinline labelVectorDecoder: VectorDecoder<Index.LabelIndex>,
+    context: CodeBodyDecoderContext,
+    crossinline blockTypeDecoder: CodeBodyDecoder<BlockType>,
+    crossinline functionIndexDecoder: CodeBodyDecoder<Index.FunctionIndex>,
+    noinline handlerDecoder: CodeBodyDecoder<ControlInstruction.CatchHandler>,
+    crossinline tagIndexDecoder: CodeBodyDecoder<TagIndex>,
+    crossinline typeIndexDecoder: CodeBodyDecoder<Index.TypeIndex>,
+    crossinline tableIndexDecoder: CodeBodyDecoder<Index.TableIndex>,
+    noinline labelIndexDecoder: CodeBodyDecoder<Index.LabelIndex>,
+    crossinline handlerVectorDecoder: CodeBodyVectorDecoder<ControlInstruction.CatchHandler>,
+    crossinline labelVectorDecoder: CodeBodyVectorDecoder<Index.LabelIndex>,
 ): Result<ControlInstruction, WasmDecodeError> = binding {
     when (val opcode = context.reader.ubyte()) {
         UNREACHABLE -> ControlInstruction.Unreachable

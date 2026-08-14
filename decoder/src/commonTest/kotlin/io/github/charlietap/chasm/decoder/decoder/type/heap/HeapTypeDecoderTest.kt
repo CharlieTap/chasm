@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.decoder.decoder.type.heap
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.decoder.decoder.Decoder
+import io.github.charlietap.chasm.decoder.decoder.CodeBodyDecoder
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
@@ -19,7 +19,7 @@ class HeapTypeDecoderTest {
 
         val abstractHeapTypes = ABSTRACT_HEAP_TYPE_RANGE.map(UInt::toUByte)
 
-        val abstractHeapTypeDecoder: Decoder<AbstractHeapType> = { _ ->
+        val abstractHeapTypeDecoder: CodeBodyDecoder<AbstractHeapType> = { _ ->
             Ok(AbstractHeapType.Extern)
         }
 
@@ -50,7 +50,7 @@ class HeapTypeDecoderTest {
             129u,
         ).map(UInt::toUByte)
 
-        val abstractHeapTypeDecoder: Decoder<AbstractHeapType> = { _ ->
+        val abstractHeapTypeDecoder: CodeBodyDecoder<AbstractHeapType> = { _ ->
             fail("AbstractHeapTypeDecoder should not be called in this scenario")
         }
 

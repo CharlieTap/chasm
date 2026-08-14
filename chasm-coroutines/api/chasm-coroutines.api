@@ -3,3 +3,8 @@ public final class io/github/charlietap/chasm/coroutines/InstanceKt {
 	public static synthetic fun instance$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Module;Ljava/util/List;Lio/github/charlietap/chasm/config/RuntimeConfig;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class io/github/charlietap/chasm/coroutines/ModuleKt {
+	public static final fun module ([BLio/github/charlietap/chasm/config/ModuleConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun module$default ([BLio/github/charlietap/chasm/config/ModuleConfig;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
