@@ -13,11 +13,12 @@ internal class PointerAndLengthStringFunctionReturnGenerator {
     ) = CodeBlock.builder().apply {
         add(
             "%L(args).%M { (pointer, length) ->\n" +
-                "    virtualMachine.%L(store, memory, (pointer as %T).value, (length as %T).value)\n" +
+                "    virtualMachine.%L(store, %L, (pointer as %T).value, (length as %T).value)\n" +
                 "}.expect(%S)",
             preparedFunctionPropertyName(function),
             FLATMAP_RESULT_FUNCTION,
             READ_STRING_FUNCTION,
+            DEFAULT_MEMORY_BACKING_NAME,
             WasmVirtualMachine.Value.I32::class,
             WasmVirtualMachine.Value.I32::class,
             "Failed to invoke function ${function.name}",
@@ -31,11 +32,12 @@ internal class NullTerminatedStringFunctionReturnGenerator {
     ) = CodeBlock.builder().apply {
         add(
             "%L(args).%M { (pointer) ->\n" +
-                "    virtualMachine.%L(store, memory, (pointer as %T).value)\n" +
+                "    virtualMachine.%L(store, %L, (pointer as %T).value)\n" +
                 "}.expect(%S)",
             preparedFunctionPropertyName(function),
             FLATMAP_RESULT_FUNCTION,
             READ_NULL_STRING_FUNCTION,
+            DEFAULT_MEMORY_BACKING_NAME,
             WasmVirtualMachine.Value.I32::class,
             "Failed to invoke function ${function.name}",
         )
@@ -48,16 +50,18 @@ internal class LengthPrefixedStringFunctionReturnGenerator {
     ) = CodeBlock.builder().apply {
         add(
             "%L(args).%M { (pointer) ->\n" +
-                "    val length = virtualMachine.%L(store, memory, (pointer as %T).value).%M(%S)\n" +
-                "    virtualMachine.%L(store, memory, (pointer as %T).value + 4, length)\n" +
+                "    val length = virtualMachine.%L(store, %L, (pointer as %T).value).%M(%S)\n" +
+                "    virtualMachine.%L(store, %L, (pointer as %T).value + 4, length)\n" +
                 "}.expect(%S)",
             preparedFunctionPropertyName(function),
             FLATMAP_RESULT_FUNCTION,
             READ_INT_FUNCTION,
+            DEFAULT_MEMORY_BACKING_NAME,
             WasmVirtualMachine.Value.I32::class,
             EXPECT_RESULT_FUNCTION,
             "Failed to read string length",
             READ_STRING_FUNCTION,
+            DEFAULT_MEMORY_BACKING_NAME,
             WasmVirtualMachine.Value.I32::class,
             "Failed to invoke function ${function.name}",
         )
@@ -73,12 +77,13 @@ internal class PackedStringFunctionReturnGenerator {
                 "    val packed = (pointerAndLength as %T).value\n" +
                 "    val pointer = (packed ushr 32).toInt()\n" +
                 "    val length = packed.toInt()\n" +
-                "    virtualMachine.%L(store, memory, pointer, length)\n" +
+                "    virtualMachine.%L(store, %L, pointer, length)\n" +
                 "}.expect(%S)",
             preparedFunctionPropertyName(function),
             FLATMAP_RESULT_FUNCTION,
             WasmVirtualMachine.Value.I64::class,
             READ_STRING_FUNCTION,
+            DEFAULT_MEMORY_BACKING_NAME,
             "Failed to invoke function ${function.name}",
         )
     }.build()

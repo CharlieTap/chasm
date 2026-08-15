@@ -183,6 +183,18 @@ object NonJsVirtualMachine : WasmVirtualMachine {
         return ResultFactory.new(result)
     }
 
+    override fun memoryWriteBytes(
+        store: Store,
+        memory: Memory,
+        pointer: Int,
+        buffer: ByteArray,
+        bufferPointer: Int,
+        bytesToWrite: Int,
+    ): Result<Unit> {
+        val result = writeBytes(store.reference, memory.reference, pointer, buffer, bufferPointer, bytesToWrite)
+        return ResultFactory.new(result)
+    }
+
     override fun memoryReadUtf8NullTerminatedUtf8String(
         store: Store,
         memory: Memory,

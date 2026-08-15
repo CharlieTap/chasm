@@ -23,6 +23,7 @@ interface CodegenWorkParameters : WorkParameters {
     val implementationVisibility: Property<String>
     val generateSuspendingFactories: Property<Boolean>
     val configGenerateTypesafeGlobalProperties: Property<Boolean>
+    val configGenerateTypesafeMemoryProperties: Property<Boolean>
     val allocatorAllocationFunction: Property<String>
     val allocatorDeallocationFunction: Property<String>
     val hasAllocator: Property<Boolean>
@@ -70,6 +71,7 @@ abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
 
         val config = CodegenConfig(
             generateTypesafeGlobalProperties = params.configGenerateTypesafeGlobalProperties.get(),
+            generateTypesafeMemoryProperties = params.configGenerateTypesafeMemoryProperties.get(),
         )
 
         val allocator = if (params.hasAllocator.get()) {

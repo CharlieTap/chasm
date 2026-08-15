@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.gradle
 import io.github.charlietap.chasm.fixture.chasm.embedding.exportDefinition
 import io.github.charlietap.chasm.fixture.chasm.embedding.moduleInfo
 import io.github.charlietap.chasm.fixture.runtime.type.functionExternalType
+import io.github.charlietap.chasm.fixture.runtime.type.memoryExternalType
 import io.github.charlietap.chasm.fixture.type.f32ValueType
 import io.github.charlietap.chasm.fixture.type.f64ValueType
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -26,6 +27,7 @@ import io.github.charlietap.chasm.gradle.fixture.functionReturn
 import io.github.charlietap.chasm.gradle.fixture.generatedType
 import io.github.charlietap.chasm.gradle.fixture.integerScalarType
 import io.github.charlietap.chasm.gradle.fixture.longScalarType
+import io.github.charlietap.chasm.gradle.fixture.memoryBinding
 import io.github.charlietap.chasm.gradle.fixture.returnTypeDefinition
 import io.github.charlietap.chasm.gradle.fixture.stringScalarType
 import io.github.charlietap.chasm.gradle.fixture.unitScalarType
@@ -36,6 +38,155 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 
 class WasmInterfaceFactoryTest {
+
+    @Test
+    fun `can generate properties for exported memories`() {
+        val info = moduleInfo(
+            exports = listOf(
+                exportDefinition(
+                    name = "frame_buffer",
+                    type = memoryExternalType(),
+                ),
+            ),
+        )
+
+        val actual = WasmInterfaceFactory()(
+            interfaceName = "TestService",
+            packageName = "com.test",
+            config = codegenConfig(generateTypesafeMemoryProperties = true),
+            info = info,
+            allocator = null,
+            initializers = emptySet(),
+            wasmFunctions = emptyList(),
+            ignoredExports = emptySet(),
+            logger = NeverLogger,
+        )
+
+        val expected = wasmInterface(
+            interfaceName = "TestService",
+            packageName = "com.test",
+            memories = listOf(
+                memoryBinding(
+                    name = "frame_buffer",
+                    source = "frame_buffer",
+                    exposed = true,
+                ),
+            ),
+        )
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `memory names do not collide with bindings or implementation properties`() {
+        val info = moduleInfo(
+            exports = listOf(
+                exportDefinition(name = "memory", type = memoryExternalType()),
+                exportDefinition(name = "_memory", type = memoryExternalType()),
+                exportDefinition(name = "store", type = memoryExternalType()),
+            ),
+        )
+
+        val actual = WasmInterfaceFactory()(
+            interfaceName = "TestService",
+            packageName = "com.test",
+            config = codegenConfig(generateTypesafeMemoryProperties = true),
+            info = info,
+            allocator = null,
+            initializers = emptySet(),
+            wasmFunctions = emptyList(),
+            ignoredExports = emptySet(),
+            logger = NeverLogger,
+        )
+
+        val expected = wasmInterface(
+            interfaceName = "TestService",
+            packageName = "com.test",
+            memories = listOf(
+                memoryBinding(
+                    name = "memory",
+                    source = "memory",
+                    backingName = "_memory",
+                ),
+                memoryBinding(
+                    name = "_memory_",
+                    source = "_memory",
+                    backingName = "__memory",
+                ),
+                memoryBinding(
+                    name = "store_",
+                    source = "store",
+                    backingName = "_store",
+                ),
+            ),
+        )
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `creates an unexposed default memory binding for string functions`() {
+        val info = moduleInfo(
+            exports = listOf(
+                exportDefinition(
+                    name = "read_string",
+                    type = functionExternalType(
+                        functionType = functionType(
+                            results = resultType(listOf(i32ValueType(), i32ValueType())),
+                        ),
+                    ),
+                ),
+                exportDefinition(
+                    name = "memory",
+                    type = memoryExternalType(),
+                ),
+            ),
+        )
+        val stringFunction = wasmFunction(
+            name = "read_string",
+            returnType = returnTypeDefinition(
+                type = stringScalarType(),
+                stringEncodingStrategy = StringEncodingStrategy.POINTER_AND_LENGTH,
+            ),
+        )
+
+        val actual = WasmInterfaceFactory()(
+            interfaceName = "TestService",
+            packageName = "com.test",
+            config = codegenConfig(),
+            info = info,
+            allocator = null,
+            initializers = emptySet(),
+            wasmFunctions = listOf(stringFunction),
+            ignoredExports = emptySet(),
+            logger = NeverLogger,
+        )
+
+        val expected = wasmInterface(
+            interfaceName = "TestService",
+            packageName = "com.test",
+            functions = listOf(
+                function(
+                    name = "readString",
+                    returns = functionReturn(
+                        type = stringScalarType(),
+                        stringEncodingStrategy = StringEncodingStrategy.POINTER_AND_LENGTH,
+                    ),
+                    resultTypes = listOf(i32ValueType(), i32ValueType()),
+                    implementation = functionProxy("read_string"),
+                ),
+            ),
+            memories = listOf(
+                memoryBinding(
+                    name = "memory",
+                    source = "memory",
+                    exposed = false,
+                ),
+            ),
+        )
+
+        assertEquals(expected, actual)
+    }
 
     @Test
     fun `can generate a new type when the return type has multiple values`() {

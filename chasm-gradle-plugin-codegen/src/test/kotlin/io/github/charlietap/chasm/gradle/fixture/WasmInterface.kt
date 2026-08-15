@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.gradle.FunctionProxy
 import io.github.charlietap.chasm.gradle.FunctionReturn
 import io.github.charlietap.chasm.gradle.GeneratedType
 import io.github.charlietap.chasm.gradle.GlobalProxy
+import io.github.charlietap.chasm.gradle.MemoryBinding
 import io.github.charlietap.chasm.gradle.Property
 import io.github.charlietap.chasm.gradle.PropertyImplementation
 import io.github.charlietap.chasm.gradle.Scalar
@@ -119,6 +120,18 @@ internal fun property(
     implementation = implementation,
 )
 
+internal fun memoryBinding(
+    name: String = "",
+    source: String = "",
+    exposed: Boolean = true,
+    backingName: String = "_$name",
+) = MemoryBinding(
+    name = name,
+    source = source,
+    exposed = exposed,
+    backingName = backingName,
+)
+
 internal fun wasmInterface(
     interfaceName: String = "",
     packageName: String = "",
@@ -126,6 +139,7 @@ internal fun wasmInterface(
     types: List<GeneratedType> = [],
     functions: List<Function> = [],
     properties: List<Property> = [],
+    memories: List<MemoryBinding> = [],
     allocator: ExportedAllocator? = null,
 ) = WasmInterface(
     interfaceName = interfaceName,
@@ -135,4 +149,5 @@ internal fun wasmInterface(
     types = types,
     functions = functions,
     properties = properties,
+    memories = memories,
 )

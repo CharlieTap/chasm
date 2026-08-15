@@ -16,6 +16,39 @@ import kotlin.test.assertEquals
 class WriteBytesTest {
 
     @Test
+    fun `can write a range from a buffer to a memory instance`() {
+        val instance = memoryInstance()
+        val store = publicStore(store(memories = mutableListOf(instance)))
+        val memory = publicMemory(memoryExternalValue(memoryAddress()))
+        val pointer = 118
+        val buffer = byteArrayOf(116, 117, 118, 119)
+
+        val bytesWriter: BytesWriter = { _memory, _size, _buffer, _pointer, _bytes, _bufferPointer ->
+            assertEquals(instance.data, _memory)
+            assertEquals(instance.size, _size)
+            assertEquals(buffer, _buffer)
+            assertEquals(pointer, _pointer)
+            assertEquals(2, _bytes)
+            assertEquals(1, _bufferPointer)
+
+            Ok(Unit)
+        }
+
+        val expected: Result<Unit, ModuleTrapError> = Ok(Unit)
+        val actual = writeBytes(
+            store = store,
+            memory = memory,
+            pointer = pointer,
+            buffer = buffer,
+            bufferPointer = 1,
+            bytesToWrite = 2,
+            bytesWriter = bytesWriter,
+        )
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun `can write bytes to a memory instance`() {
 
         val instance = memoryInstance()

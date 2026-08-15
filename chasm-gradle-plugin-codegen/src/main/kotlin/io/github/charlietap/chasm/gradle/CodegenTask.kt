@@ -99,6 +99,7 @@ abstract class CodegenTask
                 workParameters.generateSuspendingFactories.set(generateSuspendingFactoriesValue)
 
                 workParameters.configGenerateTypesafeGlobalProperties.set(codegenConfigValue.generateTypesafeGlobalProperties)
+                workParameters.configGenerateTypesafeMemoryProperties.set(codegenConfigValue.generateTypesafeMemoryProperties)
 
                 workParameters.hasAllocator.set(allocatorValue != null)
                 allocatorValue?.let {

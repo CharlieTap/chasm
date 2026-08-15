@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
+import com.squareup.kotlinpoet.NameAllocator
 import io.github.charlietap.chasm.embedding.shapes.FunctionNameData
 import io.github.charlietap.chasm.embedding.shapes.ModuleInfo
 import io.github.charlietap.chasm.gradle.ext.asType
@@ -258,6 +259,65 @@ internal class GlobalPropertyFactory(
     }
 }
 
+internal data class MemoryExport(
+    val name: String,
+    val exposed: Boolean,
+)
+
+internal class MemoryBindingFactory {
+    operator fun invoke(
+        exports: List<MemoryExport>,
+        reservedNames: Set<String>,
+    ): List<MemoryBinding> {
+        val names = NameAllocator()
+        reservedNames.forEach { name -> names.newName(name, "reserved:$name") }
+
+        val defaultMemory = exports.indexOfFirst { export ->
+            export.name == DEFAULT_MEMORY_EXPORT_NAME
+        }
+        val defaultBackingName = if (defaultMemory >= 0) {
+            names.newName(DEFAULT_MEMORY_BACKING_NAME, "backing:$defaultMemory")
+        } else {
+            null
+        }
+
+        val propertyNames = exports.mapIndexed { index, export ->
+            if (export.exposed) {
+                names.newName(export.name, "property:$index")
+            } else {
+                export.name
+            }
+        }
+
+        return exports.mapIndexed { index, export ->
+            val backingName = if (index == defaultMemory) {
+                requireNotNull(defaultBackingName)
+            } else {
+                names.newName("_${export.name}", "backing:$index")
+            }
+            MemoryBinding(
+                name = propertyNames[index],
+                source = export.name,
+                exposed = export.exposed,
+                backingName = backingName,
+            )
+        }
+    }
+}
+
+private val IMPLEMENTATION_PROPERTY_NAMES = setOf(
+    "binary",
+    "imports",
+    "virtualMachine",
+    "moduleFactory",
+    "instanceFactory",
+    "store",
+    "module",
+    "allocatedImports",
+    "instance",
+    "allocator",
+)
+
 internal class ExportExcluder() {
     operator fun invoke(
         name: String,
@@ -277,6 +337,7 @@ internal class ExportExcluder() {
 internal class WasmInterfaceFactory(
     private val functionFactory: FunctionFactory = FunctionFactory(),
     private val globalPropertyFactory: GlobalPropertyFactory = GlobalPropertyFactory(),
+    private val memoryBindingFactory: MemoryBindingFactory = MemoryBindingFactory(),
     private val allocatorValidator: AllocatorValidator = AllocatorValidator(),
     private val exportExcluder: ExportExcluder = ExportExcluder(),
 ) {
@@ -294,6 +355,7 @@ internal class WasmInterfaceFactory(
 
         val functions = mutableListOf<Function>()
         val properties = mutableListOf<Property>()
+        val memoryExports = mutableListOf<MemoryExport>()
         val types = mutableListOf<GeneratedType>()
 
         info.exports.forEach { export ->
@@ -332,12 +394,28 @@ internal class WasmInterfaceFactory(
                         logger.error("Failed to generate global ${export.name} because ${exception.message}")
                     }
                 }
-                is ExternalType.Memory,
+                is ExternalType.Memory -> {
+                    if (config.generateTypesafeMemoryProperties) {
+                        memoryExports.add(MemoryExport(export.name, exposed = true))
+                    }
+                }
                 is ExternalType.Table,
                 is ExternalType.Tag,
                 -> Unit
             }
         }
+
+        val requiresMemory = functions.any { function ->
+            function.params.any { it.type == Scalar.String } || function.returns.type == Scalar.String
+        }
+        if (requiresMemory && memoryExports.none { it.name == DEFAULT_MEMORY_EXPORT_NAME }) {
+            memoryExports.add(MemoryExport(DEFAULT_MEMORY_EXPORT_NAME, exposed = false))
+        }
+
+        val reservedNames = IMPLEMENTATION_PROPERTY_NAMES +
+            properties.map { property -> property.name } +
+            functions.map(::preparedFunctionPropertyName)
+        val memories = memoryBindingFactory(memoryExports, reservedNames)
 
         allocatorValidator(allocator, functions, info)
 
@@ -348,6 +426,7 @@ internal class WasmInterfaceFactory(
             initializers = initializers,
             functions = functions,
             properties = properties,
+            memories = memories,
             types = types,
         )
     }

@@ -180,6 +180,20 @@ internal object WebVirtualMachine : WasmVirtualMachine {
         }
     }
 
+    override fun memoryWriteBytes(
+        store: Store,
+        memory: Memory,
+        pointer: Int,
+        buffer: ByteArray,
+        bufferPointer: Int,
+        bytesToWrite: Int,
+    ): WasmVirtualMachine.Result<Unit> = webCatch {
+        val view = webMemoryView(memory.reference, pointer, bytesToWrite)
+        for (index in 0 until bytesToWrite) {
+            webWriteByte(view, index, buffer[bufferPointer + index].toInt() and 0xFF)
+        }
+    }
+
     override fun memoryReadUtf8NullTerminatedUtf8String(
         store: Store,
         memory: Memory,

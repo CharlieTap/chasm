@@ -217,6 +217,26 @@ class VirtualMachineTest {
     }
 
     @Test
+    fun `can write a range of bytes from a buffer to a memory`() {
+        val vm = virtualMachineFactory()
+        val bytes = Resource(FILE_DIR + "test.wasm").readBytes()
+
+        val store = vm.storeInit()
+        val module = vm.moduleDecode(bytes).expect("Failed to decode module")
+        val instance = vm.moduleInstantiate(store, module, defaultImports(vm, store)).expect("Failed to instantiate module")
+        val memory = vm.exportMemory(instance, "memory").expect()
+
+        val buffer = "__painter__".encodeToByteArray()
+        val result = vm.memoryWriteBytes(store, memory, 1, buffer, 2, 7).expect()
+        assertEquals(Unit, result)
+
+        val output = ByteArray(18)
+        vm.memoryReadBytes(store, memory, 1, output.size, output).expect()
+
+        assertEquals("painter and length", output.decodeToString())
+    }
+
+    @Test
     fun `can read an int from a memory`() {
 
         val vm = virtualMachineFactory()

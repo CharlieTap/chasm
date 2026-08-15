@@ -270,24 +270,60 @@ internal class FunctionProxyImplementationGenerator(
             when (requireNotNull(param.stringEncodingStrategy)) {
                 StringEncodingStrategy.POINTER_AND_LENGTH -> {
                     addStatement("val %L = allocator.alloc(%L.size)", allocVar, bytesVar)
-                    addStatement("virtualMachine.%L(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement(
+                        "virtualMachine.%L(store, %L, %L, %L)",
+                        WRITE_BYTES_FUNCTION,
+                        DEFAULT_MEMORY_BACKING_NAME,
+                        allocVar,
+                        bytesVar,
+                    )
                 }
 
                 StringEncodingStrategy.NULL_TERMINATED -> {
                     addStatement("val %L = allocator.alloc(%L.size + 1)", allocVar, bytesVar)
-                    addStatement("virtualMachine.%L(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
-                    addStatement("virtualMachine.%L(store, memory, %L + %L.size, byteArrayOf(0))", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement(
+                        "virtualMachine.%L(store, %L, %L, %L)",
+                        WRITE_BYTES_FUNCTION,
+                        DEFAULT_MEMORY_BACKING_NAME,
+                        allocVar,
+                        bytesVar,
+                    )
+                    addStatement(
+                        "virtualMachine.%L(store, %L, %L + %L.size, byteArrayOf(0))",
+                        WRITE_BYTES_FUNCTION,
+                        DEFAULT_MEMORY_BACKING_NAME,
+                        allocVar,
+                        bytesVar,
+                    )
                 }
 
                 StringEncodingStrategy.LENGTH_PREFIXED -> {
                     addStatement("val %L = allocator.alloc(%L.size + 4)", allocVar, bytesVar)
-                    addStatement("virtualMachine.%L(store, memory, %L, %L.size)", WRITE_INT_FUNCTION, allocVar, bytesVar)
-                    addStatement("virtualMachine.%L(store, memory, %L + 4, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement(
+                        "virtualMachine.%L(store, %L, %L, %L.size)",
+                        WRITE_INT_FUNCTION,
+                        DEFAULT_MEMORY_BACKING_NAME,
+                        allocVar,
+                        bytesVar,
+                    )
+                    addStatement(
+                        "virtualMachine.%L(store, %L, %L + 4, %L)",
+                        WRITE_BYTES_FUNCTION,
+                        DEFAULT_MEMORY_BACKING_NAME,
+                        allocVar,
+                        bytesVar,
+                    )
                 }
 
                 StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
                     addStatement("val %L = allocator.alloc(%L.size)", allocVar, bytesVar)
-                    addStatement("virtualMachine.%L(store, memory, %L, %L)", WRITE_BYTES_FUNCTION, allocVar, bytesVar)
+                    addStatement(
+                        "virtualMachine.%L(store, %L, %L, %L)",
+                        WRITE_BYTES_FUNCTION,
+                        DEFAULT_MEMORY_BACKING_NAME,
+                        allocVar,
+                        bytesVar,
+                    )
                 }
             }
             if (param.stringAllocationStrategy?.freeAfterCall == true) {
@@ -434,10 +470,107 @@ internal class FunctionImplementationGenerator(
     }.build()
 }
 
+internal class MemoryPropertyImplementationGenerator {
+    operator fun invoke(
+        packageName: String,
+        interfaceName: String,
+        memory: MemoryBinding,
+    ): PropertySpec = PropertySpec.builder(
+        memory.name,
+        ClassName(packageName, interfaceName, "Memory"),
+    ).addModifiers(KModifier.OVERRIDE)
+        .initializer(
+            "%T(store, %N, virtualMachine)",
+            ClassName(packageName, interfaceName + "Impl", "MemoryImpl"),
+            memory.backingName,
+        ).build()
+}
+
+internal class MemoryBindingImplementationGenerator {
+    operator fun invoke(memory: MemoryBinding): PropertySpec = PropertySpec.builder(
+        memory.backingName,
+        MEMORY_CLASS_NAME,
+    ).addModifiers(KModifier.PRIVATE)
+        .initializer(
+            "virtualMachine.%L(instance, %S).%M(%S)",
+            EXPORT_MEMORY,
+            memory.source,
+            EXPECT_RESULT_FUNCTION,
+            "Failed to find memory export with name ${memory.source}",
+        ).build()
+}
+
+internal class MemoryImplementationGenerator {
+    operator fun invoke(
+        packageName: String,
+        interfaceName: String,
+    ): TypeSpec {
+        val constructor = FunSpec.constructorBuilder()
+            .addParameter("store", STORE_CLASS_NAME)
+            .addParameter("memory", MEMORY_CLASS_NAME)
+            .addParameter("virtualMachine", WASM_VIRTUAL_MACHINE_CLASS_NAME)
+            .build()
+
+        return TypeSpec.classBuilder("MemoryImpl")
+            .addModifiers(KModifier.PRIVATE)
+            .primaryConstructor(constructor)
+            .addSuperinterface(ClassName(packageName, interfaceName, "Memory"))
+            .addProperty(
+                PropertySpec.builder("store", STORE_CLASS_NAME)
+                    .addModifiers(KModifier.PRIVATE)
+                    .initializer("store")
+                    .build(),
+            ).addProperty(
+                PropertySpec.builder("memory", MEMORY_CLASS_NAME)
+                    .addModifiers(KModifier.PRIVATE)
+                    .initializer("memory")
+                    .build(),
+            ).addProperty(
+                PropertySpec.builder("virtualMachine", WASM_VIRTUAL_MACHINE_CLASS_NAME)
+                    .addModifiers(KModifier.PRIVATE)
+                    .initializer("virtualMachine")
+                    .build(),
+            ).addFunction(
+                FunSpec.builder("read")
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addParameter("buffer", ByteArray::class)
+                    .addParameter("memoryPointer", INT)
+                    .addParameter("bufferPointer", INT)
+                    .addParameter("bytesToRead", INT)
+                    .returns(ByteArray::class)
+                    .addStatement(
+                        "return virtualMachine.%L(store, memory, memoryPointer, bytesToRead, buffer, bufferPointer).%M(%S)",
+                        READ_BYTES_FUNCTION,
+                        EXPECT_RESULT_FUNCTION,
+                        "Failed to read memory",
+                    ).build(),
+            ).addFunction(
+                FunSpec.builder("write")
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addParameter("pointer", INT)
+                    .addParameter("buffer", ByteArray::class)
+                    .addParameter("bufferPointer", INT)
+                    .addParameter("bytesToWrite", INT)
+                    .addStatement(
+                        "virtualMachine.%L(store, memory, pointer, buffer, bufferPointer, bytesToWrite).%M(%S)",
+                        WRITE_BYTES_FUNCTION,
+                        EXPECT_RESULT_FUNCTION,
+                        "Failed to write memory",
+                    ).build(),
+            ).build()
+    }
+}
+
 internal class ClassPropertiesGenerator(
     private val propertyImplementationGenerator: PropertyImplementationGenerator = PropertyImplementationGenerator(),
+    private val memoryBindingImplementationGenerator: MemoryBindingImplementationGenerator =
+        MemoryBindingImplementationGenerator(),
+    private val memoryPropertyImplementationGenerator: MemoryPropertyImplementationGenerator =
+        MemoryPropertyImplementationGenerator(),
 ) {
     operator fun invoke(
+        packageName: String,
+        interfaceName: String,
         wasmInterface: WasmInterface,
         generateSuspendingFactory: Boolean,
     ) = buildList {
@@ -499,22 +632,8 @@ internal class ClassPropertiesGenerator(
             )
         }
 
-        val requiresMemory = wasmInterface.functions.any { fn ->
-            fn.params.any { it.type == Scalar.String } || fn.returns.type == Scalar.String
-        }
-        if (requiresMemory) {
-            val memoryProperty = PropertySpec.builder("memory", MEMORY_CLASS_NAME)
-                .addModifiers(KModifier.PRIVATE)
-                .initializer(
-                    CodeBlock.of(
-                        "virtualMachine.%L(instance, %S).%M(%S)",
-                        EXPORT_MEMORY,
-                        "memory",
-                        EXPECT_RESULT_FUNCTION,
-                        "Failed to find memory export",
-                    ),
-                ).build()
-            add(memoryProperty)
+        wasmInterface.memories.forEach { memory ->
+            add(memoryBindingImplementationGenerator(memory))
         }
 
         wasmInterface.allocator?.let { allocator ->
@@ -533,6 +652,10 @@ internal class ClassPropertiesGenerator(
 
         wasmInterface.properties.forEach { property ->
             add(propertyImplementationGenerator(property))
+        }
+
+        wasmInterface.memories.filter { it.exposed }.forEach { memory ->
+            add(memoryPropertyImplementationGenerator(packageName, interfaceName, memory))
         }
     }
 
@@ -635,6 +758,7 @@ internal class ClassImplementationGenerator(
     private val resultTypePropertiesGenerator: ResultTypePropertiesGenerator = ResultTypePropertiesGenerator(),
     private val runtimeStateGenerator: RuntimeStateGenerator = RuntimeStateGenerator(),
     private val suspendingFactoryGenerator: SuspendingFactoryGenerator = SuspendingFactoryGenerator(),
+    private val memoryImplementationGenerator: MemoryImplementationGenerator = MemoryImplementationGenerator(),
 ) {
     operator fun invoke(
         packageName: String,
@@ -654,13 +778,17 @@ internal class ClassImplementationGenerator(
 
         addConstructor(constructorGenerator, generateSuspendingFactory)
 
-        val properties = propertiesGenerator(wasmInterface, generateSuspendingFactory)
+        val properties = propertiesGenerator(packageName, interfaceName, wasmInterface, generateSuspendingFactory)
         properties.forEach { property ->
             addProperty(property)
         }
 
         if (wasmInterface.initializers.isNotEmpty()) {
             addInitializerBlock(initializerBlockGenerator(wasmInterface.initializers))
+        }
+
+        if (wasmInterface.memories.any { it.exposed }) {
+            addType(memoryImplementationGenerator(packageName, interfaceName))
         }
 
         val resultTypeProperties = resultTypePropertiesGenerator(wasmInterface)

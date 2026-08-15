@@ -180,6 +180,7 @@ public final class io/github/charlietap/chasm/vm/NonJsVirtualMachine : io/github
 	public fun memoryReadUtf8NullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[BII)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryWriteInt (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
@@ -263,6 +264,7 @@ public final class io/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine$De
 	public static fun memoryReadInt (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryReadLong (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[BII)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryWriteInt (Lio/github/charlietap/chasm/vm/SuspendingWasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
@@ -364,6 +366,7 @@ public abstract interface class io/github/charlietap/chasm/vm/WasmVirtualMachine
 	public abstract fun memoryReadUtf8NullTerminatedUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public abstract fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[B)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[BII)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public fun memoryWriteInt (Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
@@ -383,6 +386,7 @@ public final class io/github/charlietap/chasm/vm/WasmVirtualMachine$DefaultImpls
 	public static fun memoryReadInt (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryReadLong (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryReadUtf8String (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
+	public static fun memoryWriteBytes (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;I[BII)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryWriteDouble (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;ID)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryWriteFloat (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;IF)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;
 	public static fun memoryWriteInt (Lio/github/charlietap/chasm/vm/WasmVirtualMachine;Lio/github/charlietap/chasm/vm/Store;Lio/github/charlietap/chasm/vm/Memory;II)Lio/github/charlietap/chasm/vm/WasmVirtualMachine$Result;

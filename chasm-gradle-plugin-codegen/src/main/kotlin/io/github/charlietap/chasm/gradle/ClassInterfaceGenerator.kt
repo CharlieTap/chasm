@@ -7,6 +7,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LONG
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeSpec
@@ -44,9 +45,57 @@ internal class PropertyGenerator {
     }.build()
 }
 
+internal class MemoryInterfaceGenerator {
+    operator fun invoke(): TypeSpec = TypeSpec.interfaceBuilder("Memory")
+        .addFunction(
+            FunSpec.builder("read")
+                .addModifiers(KModifier.ABSTRACT)
+                .addParameter("buffer", ByteArray::class)
+                .addParameter("memoryPointer", INT)
+                .addParameter(
+                    ParameterSpec.builder("bufferPointer", INT)
+                        .defaultValue("0")
+                        .build(),
+                ).addParameter(
+                    ParameterSpec.builder("bytesToRead", INT)
+                        .defaultValue("buffer.size - bufferPointer")
+                        .build(),
+                ).returns(ByteArray::class)
+                .build(),
+        ).addFunction(
+            FunSpec.builder("write")
+                .addModifiers(KModifier.ABSTRACT)
+                .addParameter("pointer", INT)
+                .addParameter("buffer", ByteArray::class)
+                .addParameter(
+                    ParameterSpec.builder("bufferPointer", INT)
+                        .defaultValue("0")
+                        .build(),
+                ).addParameter(
+                    ParameterSpec.builder("bytesToWrite", INT)
+                        .defaultValue("buffer.size - bufferPointer")
+                        .build(),
+                ).returns(UNIT)
+                .build(),
+        ).build()
+}
+
+internal class MemoryPropertyGenerator {
+    operator fun invoke(
+        packageName: String,
+        interfaceName: String,
+        memory: MemoryBinding,
+    ): PropertySpec = PropertySpec.builder(
+        memory.name,
+        ClassName(packageName, interfaceName, "Memory"),
+    ).build()
+}
+
 internal class ClassInterfaceGenerator(
     private val functionGenerator: FunctionGenerator = FunctionGenerator(),
     private val propertyGenerator: PropertyGenerator = PropertyGenerator(),
+    private val memoryInterfaceGenerator: MemoryInterfaceGenerator = MemoryInterfaceGenerator(),
+    private val memoryPropertyGenerator: MemoryPropertyGenerator = MemoryPropertyGenerator(),
 ) {
     operator fun invoke(
         packageName: String,
@@ -61,12 +110,21 @@ internal class ClassInterfaceGenerator(
         }
         addModifiers(visibilityModifier)
 
+        val exposedMemories = wasmInterface.memories.filter { it.exposed }
+        if (exposedMemories.isNotEmpty()) {
+            addType(memoryInterfaceGenerator())
+        }
+
         wasmInterface.functions.forEach { function ->
             addFunction(functionGenerator(packageName, function))
         }
 
         wasmInterface.properties.forEach { property ->
             addProperty(propertyGenerator(property))
+        }
+
+        exposedMemories.forEach { memory ->
+            addProperty(memoryPropertyGenerator(packageName, interfaceName, memory))
         }
     }.build()
 }

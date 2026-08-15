@@ -58,6 +58,16 @@ internal data class Property(
     val implementation: PropertyImplementation,
 )
 
+internal data class MemoryBinding(
+    val name: String,
+    val source: String,
+    val exposed: Boolean,
+    val backingName: String = "_$name",
+)
+
+internal const val DEFAULT_MEMORY_EXPORT_NAME = "memory"
+internal const val DEFAULT_MEMORY_BACKING_NAME = "_$DEFAULT_MEMORY_EXPORT_NAME"
+
 internal data class WasmInterface(
     val interfaceName: String,
     val packageName: String,
@@ -66,4 +76,5 @@ internal data class WasmInterface(
     val types: List<GeneratedType>,
     val functions: List<Function>,
     val properties: List<Property>,
+    val memories: List<MemoryBinding> = emptyList(),
 )

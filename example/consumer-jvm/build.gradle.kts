@@ -19,6 +19,7 @@ chasm {
             packageName = "com.test.chasm"
             codegenConfig = CodegenConfig(
                 generateTypesafeGlobalProperties = true,
+                generateTypesafeMemoryProperties = true,
             )
             function("pal_string_function") {
                 stringReturnType(StringEncodingStrategy.POINTER_AND_LENGTH)

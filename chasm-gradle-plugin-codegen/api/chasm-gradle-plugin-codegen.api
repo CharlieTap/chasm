@@ -31,6 +31,7 @@ public abstract interface class io/github/charlietap/chasm/gradle/CodegenWorkPar
 	public abstract fun getAllocatorDeallocationFunction ()Lorg/gradle/api/provider/Property;
 	public abstract fun getBinaryPath ()Lorg/gradle/api/provider/Property;
 	public abstract fun getConfigGenerateTypesafeGlobalProperties ()Lorg/gradle/api/provider/Property;
+	public abstract fun getConfigGenerateTypesafeMemoryProperties ()Lorg/gradle/api/provider/Property;
 	public abstract fun getFunctions ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getGenerateSuspendingFactories ()Lorg/gradle/api/provider/Property;
 	public abstract fun getHasAllocator ()Lorg/gradle/api/provider/Property;

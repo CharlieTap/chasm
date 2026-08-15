@@ -117,6 +117,17 @@ object JsVirtualMachine : WasmVirtualMachine {
         return WebVirtualMachine.memoryWriteBytes(store, memory, pointer, bytes)
     }
 
+    override fun memoryWriteBytes(
+        store: Store,
+        memory: Memory,
+        pointer: Int,
+        buffer: ByteArray,
+        bufferPointer: Int,
+        bytesToWrite: Int,
+    ): WasmVirtualMachine.Result<Unit> {
+        return WebVirtualMachine.memoryWriteBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite)
+    }
+
     override fun memoryReadUtf8NullTerminatedUtf8String(
         store: Store,
         memory: Memory,

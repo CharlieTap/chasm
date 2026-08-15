@@ -396,6 +396,8 @@ public final class io/github/charlietap/chasm/embedding/memory/WriteByteKt {
 
 public final class io/github/charlietap/chasm/embedding/memory/WriteBytesKt {
 	public static final fun writeBytes (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Memory;I[B)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static final fun writeBytes (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Memory;I[BII)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public static synthetic fun writeBytes$default (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Memory;I[BIIILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/memory/WriteDoubleKt {

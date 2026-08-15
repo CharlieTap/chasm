@@ -121,6 +121,22 @@ interface WasmVirtualMachine {
         bytes: ByteArray,
     ): Result<Unit>
 
+    fun memoryWriteBytes(
+        store: Store,
+        memory: Memory,
+        pointer: Int,
+        buffer: ByteArray,
+        bufferPointer: Int,
+        bytesToWrite: Int,
+    ): Result<Unit> {
+        val bytes = if (bufferPointer == 0 && bytesToWrite == buffer.size) {
+            buffer
+        } else {
+            buffer.copyOfRange(bufferPointer, bufferPointer + bytesToWrite)
+        }
+        return memoryWriteBytes(store, memory, pointer, bytes)
+    }
+
     fun memoryReadInt(
         store: Store,
         memory: Memory,
