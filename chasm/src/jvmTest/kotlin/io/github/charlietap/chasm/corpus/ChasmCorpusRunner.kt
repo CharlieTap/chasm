@@ -106,10 +106,10 @@ class ChasmCorpusRunner(
         timings: CorpusTimingRecorder,
     ): CorpusResult {
         val modulePath = "$corpusRoot/${fixture.version ?: "1.0"}/${fixture.path}"
+        val bytes = readBytes(modulePath)
+        timings.binarySizeBytes = bytes.size.toLong()
         val decoded = when (
             val result = timings.decode {
-                val bytes = readBytes(modulePath)
-                timings.binarySizeBytes = bytes.size.toLong()
                 module(bytes, config.moduleConfig)
             }
         ) {
