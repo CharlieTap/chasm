@@ -8,13 +8,13 @@ internal fun assertGenerates(
     wasmInterface: WasmInterface,
     interfaceVisibility: TypeVisibility = TypeVisibility.PUBLIC,
     implementationVisibility: TypeVisibility = TypeVisibility.INTERNAL,
-    generateSuspendingFactories: Boolean = false,
+    config: CodegenConfig = CodegenConfig(),
 ) {
     val generated = WasmInterfaceGenerator()(
         interfaceVisibility = interfaceVisibility,
         implementationVisibility = implementationVisibility,
         wasmInterface = wasmInterface,
-        generateSuspendingFactories = generateSuspendingFactories,
+        config = config,
     )
     val expectedFileNames = listOf(
         wasmInterface.interfaceName,

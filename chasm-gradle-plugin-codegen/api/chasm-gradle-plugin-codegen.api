@@ -17,7 +17,9 @@ public abstract class io/github/charlietap/chasm/gradle/CodegenTask : org/gradle
 }
 
 public final class io/github/charlietap/chasm/gradle/CodegenTasksKt {
+	public static final fun registerCodegenTask (Lorg/gradle/api/Project;Lio/github/charlietap/chasm/gradle/WasmModule;Ljava/lang/String;Lorg/gradle/api/artifacts/Configuration;Ljava/io/File;)Lorg/gradle/api/tasks/TaskProvider;
 	public static final fun registerCodegenTask (Lorg/gradle/api/Project;Lio/github/charlietap/chasm/gradle/WasmModule;Ljava/lang/String;Lorg/gradle/api/artifacts/Configuration;Lorg/gradle/api/provider/Provider;Ljava/io/File;)Lorg/gradle/api/tasks/TaskProvider;
+	public static synthetic fun registerCodegenTask$default (Lorg/gradle/api/Project;Lio/github/charlietap/chasm/gradle/WasmModule;Ljava/lang/String;Lorg/gradle/api/artifacts/Configuration;Ljava/io/File;ILjava/lang/Object;)Lorg/gradle/api/tasks/TaskProvider;
 	public static synthetic fun registerCodegenTask$default (Lorg/gradle/api/Project;Lio/github/charlietap/chasm/gradle/WasmModule;Ljava/lang/String;Lorg/gradle/api/artifacts/Configuration;Lorg/gradle/api/provider/Provider;Ljava/io/File;ILjava/lang/Object;)Lorg/gradle/api/tasks/TaskProvider;
 }
 

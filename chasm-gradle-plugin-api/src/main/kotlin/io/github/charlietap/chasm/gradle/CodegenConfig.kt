@@ -9,4 +9,6 @@ data class CodegenConfig(
     val generateTypesafeGlobalProperties: Boolean = false,
     @IntroducedAt("2.2.0")
     val generateTypesafeMemoryProperties: Boolean = false,
+    @IntroducedAt("2.2.0")
+    val generateSuspendingFactories: Boolean = false,
 ) : Serializable

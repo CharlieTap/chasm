@@ -29,5 +29,13 @@ open class ChasmExtension
         val modules: NamedDomainObjectContainer<WasmModule> = objects.domainObjectContainer(WasmModule::class.java)
         val runtimeDependencyConfiguration: Property<RuntimeDependencyConfiguration> =
             objects.property(RuntimeDependencyConfiguration::class.java).convention(RuntimeDependencyConfiguration.IMPLEMENTATION)
+
+        /**
+         * This property no longer has any effect. Configure [CodegenConfig.generateSuspendingFactories]
+         * for each module instead.
+         */
+        @Deprecated(
+            "This property no longer has any effect. Configure generateSuspendingFactories in each module's CodegenConfig instead.",
+        )
         val generateSuspendingFactories: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     }

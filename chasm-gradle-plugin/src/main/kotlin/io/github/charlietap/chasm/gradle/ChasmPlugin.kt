@@ -41,7 +41,6 @@ class ChasmPlugin : Plugin<Project> {
                                 module,
                                 "commonMain",
                                 workerClasspath,
-                                extension.generateSuspendingFactories,
                             )
                             commonMainSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
                         }
@@ -71,7 +70,6 @@ class ChasmPlugin : Plugin<Project> {
                         module,
                         MAIN_COMPILATION_NAME,
                         workerClasspath,
-                        extension.generateSuspendingFactories,
                     )
                     mainCompilation.defaultSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
                 }
@@ -149,7 +147,6 @@ class ChasmPlugin : Plugin<Project> {
                 module,
                 target.name,
                 workerClasspath,
-                extension.generateSuspendingFactories,
             ).apply {
                 configure { task ->
                     task.binary.set(wasmFile)

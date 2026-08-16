@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
+import io.github.charlietap.chasm.gradle.fixture.codegenConfig
 import io.github.charlietap.chasm.gradle.fixture.wasmInterface
 import kotlin.test.Test
 
@@ -9,9 +10,9 @@ class ConstructionCodegenTest {
     fun `generates synchronous construction`() = assertConstruction("SynchronousConstruction")
 
     @Test
-    fun `generates suspending construction`() = assertConstruction(
+    fun `generates suspending construction from codegen config`() = assertConstruction(
         scenario = "SuspendingConstruction",
-        generateSuspendingFactories = true,
+        config = codegenConfig(generateSuspendingFactories = true),
     )
 
     @Test
@@ -37,13 +38,13 @@ class ConstructionCodegenTest {
 
     private fun assertConstruction(
         scenario: String,
-        generateSuspendingFactories: Boolean = false,
+        config: CodegenConfig = codegenConfig(),
     ) = assertGenerates(
         category = "construction",
         wasmInterface = wasmInterface(
             interfaceName = scenario,
             packageName = "com.test",
         ),
-        generateSuspendingFactories = generateSuspendingFactories,
+        config = config,
     )
 }

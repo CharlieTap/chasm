@@ -232,11 +232,19 @@ chasm {
             packageName = ...
             codegenConfig = CodegenConfig(
                 generateTypesafeGlobalProperties = true,
+                generateSuspendingFactories = true,
             )
         }
     }
 }
 ```
+
+### `generateSuspendingFactories: Boolean`
+
+default = false
+
+When set Chasm generates a suspending factory for that module. This can be configured independently for each module.
+
 ### `generateTypesafeGlobalProperties: Boolean`
 
 default = false
@@ -257,7 +265,6 @@ will become
   var mutableGlobal: Int
   val immutableGlobal: Int
 ```
-
 
 
 

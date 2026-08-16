@@ -11,7 +11,6 @@ fun registerCodegenTask(
     module: WasmModule,
     sourceSetName: String,
     classpath: Configuration,
-    generateSuspendingFactories: Provider<Boolean>,
     moduleBinary: File? = null,
 ): TaskProvider<CodegenTask> {
     val capitalizedSourceName = sourceSetName.replaceFirstChar { it.uppercase() }
@@ -30,10 +29,26 @@ fun registerCodegenTask(
         task.packageName.set(module.packageName)
         task.interfaceVisibility.set(module.interfaceVisibility)
         task.implementationVisibility.set(module.implementationVisibility)
-        task.generateSuspendingFactories.set(generateSuspendingFactories)
+        task.generateSuspendingFactories.set(module.codegenConfig.map(CodegenConfig::generateSuspendingFactories))
         task.initializers.set(module.initializers)
         task.functions.set(module.functions)
         task.ignoredExports.set(module.ignoredExports)
         task.outputDirectory.set(project.layout.buildDirectory.dir("generated/kotlin/$sourceSetName"))
     }
 }
+
+@Suppress("UNUSED_PARAMETER")
+fun registerCodegenTask(
+    project: Project,
+    module: WasmModule,
+    sourceSetName: String,
+    classpath: Configuration,
+    generateSuspendingFactories: Provider<Boolean>,
+    moduleBinary: File? = null,
+): TaskProvider<CodegenTask> = registerCodegenTask(
+    project = project,
+    module = module,
+    sourceSetName = sourceSetName,
+    classpath = classpath,
+    moduleBinary = moduleBinary,
+)

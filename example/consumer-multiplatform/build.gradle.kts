@@ -29,19 +29,21 @@ artifacts.add(
 )
 
 chasm {
-    generateSuspendingFactories = true
-
     modules {
         create("FactorialService") {
             binary = layout.projectDirectory.file("src/commonMain/resources/factorial.wasm")
             packageName = "com.test.chasm"
             codegenConfig = CodegenConfig(
                 generateTypesafeGlobalProperties = true,
+                generateSuspendingFactories = true,
             )
         }
         create("StringService") {
             binary = layout.projectDirectory.file("src/commonMain/resources/truncate.wasm")
             packageName = "com.test.chasm"
+            codegenConfig = CodegenConfig(
+                generateSuspendingFactories = true,
+            )
             allocator = ExportedAllocator("malloc", "free")
             function("truncate") {
                 stringParam("input")
@@ -65,6 +67,7 @@ chasm {
             packageName = "com.test.chasm"
             codegenConfig = CodegenConfig(
                 generateTypesafeGlobalProperties = true,
+                generateSuspendingFactories = true,
             )
             function("pointer_and_length_string") {
                 stringReturnType(StringEncodingStrategy.POINTER_AND_LENGTH)

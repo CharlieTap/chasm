@@ -41,7 +41,7 @@ internal class WasmInterfaceGenerator(
         interfaceVisibility: TypeVisibility,
         implementationVisibility: TypeVisibility,
         wasmInterface: WasmInterface,
-        generateSuspendingFactories: Boolean = false,
+        config: CodegenConfig = CodegenConfig(),
     ): List<FileSpec> {
 
         val interfaceFile = FileSpec.builder(wasmInterface.packageName, wasmInterface.interfaceName).apply {
@@ -58,7 +58,7 @@ internal class WasmInterfaceGenerator(
                     interfaceName = wasmInterface.interfaceName,
                     visibility = implementationVisibility,
                     wasmInterface = wasmInterface,
-                    generateSuspendingFactory = generateSuspendingFactories,
+                    generateSuspendingFactory = config.generateSuspendingFactories,
                 ),
             )
         }.build()

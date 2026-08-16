@@ -27,7 +27,6 @@ class Agp9AndroidConfigurer : AndroidConfigurer {
                     module,
                     variant.name,
                     context.workerClasspath,
-                    context.extension.generateSuspendingFactories,
                 )
                 variant.sources.java?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)
                 variant.sources.kotlin?.addGeneratedSourceDirectory(task, CodegenTask::outputDirectory)

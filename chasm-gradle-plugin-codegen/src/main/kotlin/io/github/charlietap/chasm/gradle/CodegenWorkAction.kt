@@ -72,6 +72,7 @@ abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
         val config = CodegenConfig(
             generateTypesafeGlobalProperties = params.configGenerateTypesafeGlobalProperties.get(),
             generateTypesafeMemoryProperties = params.configGenerateTypesafeMemoryProperties.get(),
+            generateSuspendingFactories = params.generateSuspendingFactories.get(),
         )
 
         val allocator = if (params.hasAllocator.get()) {
@@ -103,7 +104,7 @@ abstract class CodegenWorkAction : WorkAction<CodegenWorkParameters> {
             interfaceVisibility = interfaceVisibility,
             implementationVisibility = implementationVisibility,
             wasmInterface = data,
-            generateSuspendingFactories = params.generateSuspendingFactories.get(),
+            config = config,
         )
 
         val outputDir = File(params.outputDirectoryPath.get())
