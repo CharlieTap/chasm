@@ -23,6 +23,8 @@ internal val MODULE_CLASS_NAME = Module::class.asClassName()
 internal val INSTANCE_CLASS_NAME = Instance::class.asClassName()
 internal val MEMORY_CLASS_NAME = Memory::class.asClassName()
 internal val PREPARED_FUNCTION_CLASS_NAME = PreparedFunction::class.asClassName()
+internal val VALUE_CLASS_NAME = WasmVirtualMachine.Value::class.asClassName()
+internal val VALUE_MUTABLE_LIST_CLASS_NAME = ClassName("kotlin.collections", "MutableList").parameterizedBy(VALUE_CLASS_NAME)
 internal val VALUE_TYPE_CLASS_NAME = ValueType::class.asClassName()
 internal val VALUE_TYPE_LIST_CLASS_NAME = List::class.asClassName().parameterizedBy(VALUE_TYPE_CLASS_NAME)
 internal val VALUE_TYPE_NUMBER_CLASS_NAME = ClassName("io.github.charlietap.chasm.vm", "ValueType", "Number")
@@ -45,6 +47,7 @@ internal const val CREATE_MODULE_SUSPENDING_FUNCTION = "moduleDecodeSuspending"
 internal const val CREATE_INSTANCE_SUSPENDING_FUNCTION = "moduleInstantiateSuspending"
 internal const val PREPARE_FUNCTION = "prepareFunction"
 internal const val INVOKE_TYPED_FUNCTION = "functionInvokeTyped"
+internal const val FUNCTION_INPUT_BUFFER_NAME = "functionInputBuffer"
 
 internal const val EXPORT_FUNCTION = "exportFunction"
 internal const val EXPORT_GLOBAL = "exportGlobal"

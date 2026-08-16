@@ -414,7 +414,13 @@ internal class WasmInterfaceFactory(
 
         val reservedNames = IMPLEMENTATION_PROPERTY_NAMES +
             properties.map { property -> property.name } +
-            functions.map(::preparedFunctionPropertyName)
+            functions.map(::preparedFunctionPropertyName) +
+            functions.map(Function::inputCount)
+                .filter { inputCount -> inputCount > 0 }
+                .distinct()
+                .flatMap { inputCount ->
+                    listOf(FUNCTION_INPUT_BUFFER_NAME, functionInputBufferName(inputCount))
+                }
         val memories = memoryBindingFactory(memoryExports, reservedNames)
 
         allocatorValidator(allocator, functions, info)

@@ -34,6 +34,22 @@ internal data class Function(
     val implementation: FunctionImplementation,
 )
 
+internal val Function.inputCount: Int
+    get() = params.sumOf { param ->
+        if (
+            param.type == Scalar.String &&
+            param.stringEncodingStrategy == StringEncodingStrategy.POINTER_AND_LENGTH
+        ) {
+            2
+        } else {
+            1
+        }
+    }
+
+internal fun functionInputBufferName(inputCount: Int): String {
+    return FUNCTION_INPUT_BUFFER_NAME + inputCount
+}
+
 internal data class Field(
     val name: String,
     val type: Type,

@@ -334,28 +334,54 @@ internal class FunctionProxyImplementationGenerator(
         if (function.params.isEmpty()) {
             addStatement("val args = emptyList<%T>()", WasmVirtualMachine.Value::class)
         } else {
-            beginControlFlow("val args = buildList")
+            var inputIndex = 0
             function.params.forEach { param ->
                 if (param.type == Scalar.String) {
                     val bytesVar = param.name + "Bytes"
                     val allocVar = param.name + "Alloc"
                     when (requireNotNull(param.stringEncodingStrategy)) {
                         StringEncodingStrategy.POINTER_AND_LENGTH -> {
-                            addStatement("add(%T(%L))", WasmVirtualMachine.Value.I32::class, allocVar)
-                            addStatement("add(%T(%L.size))", WasmVirtualMachine.Value.I32::class, bytesVar)
+                            addStatement(
+                                "%L[%L] = %T(%L)",
+                                FUNCTION_INPUT_BUFFER_NAME,
+                                inputIndex++,
+                                WasmVirtualMachine.Value.I32::class,
+                                allocVar,
+                            )
+                            addStatement(
+                                "%L[%L] = %T(%L.size)",
+                                FUNCTION_INPUT_BUFFER_NAME,
+                                inputIndex++,
+                                WasmVirtualMachine.Value.I32::class,
+                                bytesVar,
+                            )
                         }
 
                         StringEncodingStrategy.NULL_TERMINATED -> {
-                            addStatement("add(%T(%L))", WasmVirtualMachine.Value.I32::class, allocVar)
+                            addStatement(
+                                "%L[%L] = %T(%L)",
+                                FUNCTION_INPUT_BUFFER_NAME,
+                                inputIndex++,
+                                WasmVirtualMachine.Value.I32::class,
+                                allocVar,
+                            )
                         }
 
                         StringEncodingStrategy.LENGTH_PREFIXED -> {
-                            addStatement("add(%T(%L))", WasmVirtualMachine.Value.I32::class, allocVar)
+                            addStatement(
+                                "%L[%L] = %T(%L)",
+                                FUNCTION_INPUT_BUFFER_NAME,
+                                inputIndex++,
+                                WasmVirtualMachine.Value.I32::class,
+                                allocVar,
+                            )
                         }
 
                         StringEncodingStrategy.PACKED_POINTER_AND_LENGTH -> {
                             addStatement(
-                                "add(%T((%L.toLong() shl 32) or (%L.size.toLong() and 0xFFFFFFFFL)))",
+                                "%L[%L] = %T((%L.toLong() shl 32) or (%L.size.toLong() and 0xFFFFFFFFL))",
+                                FUNCTION_INPUT_BUFFER_NAME,
+                                inputIndex++,
                                 WasmVirtualMachine.Value.I64::class,
                                 allocVar,
                                 bytesVar,
@@ -363,10 +389,16 @@ internal class FunctionProxyImplementationGenerator(
                         }
                     }
                 } else {
-                    addStatement("add(%T(%L))", param.type.asValue(), param.name)
+                    addStatement(
+                        "%L[%L] = %T(%L)",
+                        FUNCTION_INPUT_BUFFER_NAME,
+                        inputIndex++,
+                        param.type.asValue(),
+                        param.name,
+                    )
                 }
             }
-            endControlFlow()
+            addStatement("val args = %L", functionInputBufferName(function.inputCount))
         }
 
         addReturn(
@@ -630,6 +662,36 @@ internal class ClassPropertiesGenerator(
                         ),
                     ).build(),
             )
+        }
+
+        val inputCounts = wasmInterface.functions.map(Function::inputCount)
+            .filter { inputCount -> inputCount > 0 }
+            .distinct()
+            .sorted()
+        inputCounts.maxOrNull()?.let { maximumInputCount ->
+            add(
+                PropertySpec.builder(FUNCTION_INPUT_BUFFER_NAME, VALUE_MUTABLE_LIST_CLASS_NAME)
+                    .addModifiers(KModifier.PRIVATE)
+                    .initializer(
+                        "MutableList<%T>(%L) { %T(0) }",
+                        VALUE_CLASS_NAME,
+                        maximumInputCount,
+                        WasmVirtualMachine.Value.I32::class,
+                    ).build(),
+            )
+            inputCounts.forEach { inputCount ->
+                val initializer = if (inputCount == maximumInputCount) {
+                    CodeBlock.of("%L", FUNCTION_INPUT_BUFFER_NAME)
+                } else {
+                    CodeBlock.of("%L.subList(0, %L)", FUNCTION_INPUT_BUFFER_NAME, inputCount)
+                }
+                add(
+                    PropertySpec.builder(functionInputBufferName(inputCount), VALUE_MUTABLE_LIST_CLASS_NAME)
+                        .addModifiers(KModifier.PRIVATE)
+                        .initializer(initializer)
+                        .build(),
+                )
+            }
         }
 
         wasmInterface.memories.forEach { memory ->

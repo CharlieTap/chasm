@@ -188,9 +188,54 @@ class WasmInterfaceGeneratorTest {
         assertContains(spec, "private val answerPreparedFunction: PreparedFunction")
         assertContains(spec, "virtualMachine.prepareFunction(")
         assertContains(spec, "\"answer_export\"")
+        assertContains(
+            spec,
+            "private val functionInputBuffer: MutableList<WasmVirtualMachine.Value>",
+        )
+        assertContains(spec, "MutableList<WasmVirtualMachine.Value>(1)")
+        assertContains(spec, "private val functionInputBuffer1: MutableList<WasmVirtualMachine.Value> = functionInputBuffer")
+        assertContains(spec, "functionInputBuffer[0] = WasmVirtualMachine.Value.I32(input)")
+        assertContains(spec, "val args = functionInputBuffer1")
         assertContains(spec, "answerPreparedFunction(args)")
+        assertFalse(spec.contains("buildList"))
         assertFalse(spec.contains("functionInvokeTyped("))
         assertFalse(spec.contains("suspend fun create("))
+    }
+
+    @Test
+    fun `implementation shares one input buffer across function arities`() {
+        val spec = WasmInterfaceGenerator()(
+            interfaceVisibility = TypeVisibility.PUBLIC,
+            implementationVisibility = TypeVisibility.PUBLIC,
+            wasmInterface = wasmInterface(
+                interfaceName = "InputService",
+                packageName = "com.example",
+                functions = listOf(
+                    function(
+                        name = "oneInput",
+                        params = listOf(functionParameter("p0", integerScalarType())),
+                        implementation = functionProxy("one_input"),
+                    ),
+                    function(
+                        name = "twoInputs",
+                        params = listOf(
+                            functionParameter("p0", integerScalarType()),
+                            functionParameter("p1", integerScalarType()),
+                        ),
+                        implementation = functionProxy("two_inputs"),
+                    ),
+                ),
+            ),
+        ).last().toString()
+
+        assertContains(spec, "MutableList<WasmVirtualMachine.Value>(2)")
+        assertContains(
+            spec,
+            "private val functionInputBuffer1: MutableList<WasmVirtualMachine.Value> =\n" +
+                "      functionInputBuffer.subList(0, 1)",
+        )
+        assertContains(spec, "private val functionInputBuffer2: MutableList<WasmVirtualMachine.Value> = functionInputBuffer")
+        assertEquals(1, spec.split("MutableList<WasmVirtualMachine.Value>(2)").size - 1)
     }
 
     @Test
