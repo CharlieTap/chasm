@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinx.test.resources)
 
     alias(libs.plugins.conventions.gradle.plugin)
     alias(libs.plugins.conventions.linting)
@@ -33,6 +34,7 @@ kotlin {
         implementation(libs.kotlin.poet)
 
         testImplementation(libs.kotlin.test)
+        testImplementation(libs.kotlinx.test.resources)
         testImplementation(projects.test.fixture.chasm)
     }
 }

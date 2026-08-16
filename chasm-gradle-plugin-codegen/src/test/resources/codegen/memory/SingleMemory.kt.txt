@@ -1,0 +1,24 @@
+package com.test
+
+import kotlin.ByteArray
+import kotlin.Int
+
+public interface SingleMemory {
+  public val memory: Memory
+
+  public interface Memory {
+    public fun read(
+      buffer: ByteArray,
+      memoryPointer: Int,
+      bufferPointer: Int = 0,
+      bytesToRead: Int = buffer.size - bufferPointer,
+    ): ByteArray
+
+    public fun write(
+      pointer: Int,
+      buffer: ByteArray,
+      bufferPointer: Int = 0,
+      bytesToWrite: Int = buffer.size - bufferPointer,
+    )
+  }
+}

@@ -1,0 +1,7 @@
+package com.test
+
+import kotlin.Double
+
+public interface DoubleParam {
+  public fun invoke(`value`: Double)
+}

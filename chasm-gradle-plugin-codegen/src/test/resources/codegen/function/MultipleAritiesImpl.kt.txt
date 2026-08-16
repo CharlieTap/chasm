@@ -1,0 +1,81 @@
+package com.test
+
+import io.github.charlietap.chasm.vm.Import
+import io.github.charlietap.chasm.vm.Instance
+import io.github.charlietap.chasm.vm.InstanceFactory
+import io.github.charlietap.chasm.vm.Module
+import io.github.charlietap.chasm.vm.ModuleFactory
+import io.github.charlietap.chasm.vm.PreparedFunction
+import io.github.charlietap.chasm.vm.Store
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
+import io.github.charlietap.chasm.vm.`expect`
+import io.github.charlietap.chasm.vm.codegen.CodegenImport
+import io.github.charlietap.chasm.vm.importFactory
+import io.github.charlietap.chasm.vm.virtualMachineFactory
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.collections.List
+import kotlin.collections.MutableList
+
+internal class MultipleAritiesImpl(
+  private val binary: ByteArray,
+  private val imports: List<CodegenImport> = emptyList(),
+  private val virtualMachine: WasmVirtualMachine = virtualMachineFactory(),
+  private val moduleFactory: ModuleFactory? = null,
+  private val instanceFactory: InstanceFactory? = null,
+) : MultipleArities {
+  private val store: Store = virtualMachine.storeInit()
+
+  private val module: Module =
+      moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecode(binary).`expect`("Failed to decode binary")
+
+  private val allocatedImports: List<Import> = virtualMachine.importFactory(store, imports)
+
+  private val instance: Instance =
+      instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiate(store, module, allocatedImports).`expect`("Failed to instantiate module")
+
+  private val onePreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "one", emptyList()).`expect`("Failed to prepare function one")
+
+  private val twoPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "two", emptyList()).`expect`("Failed to prepare function two")
+
+  private val threePreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "three", emptyList()).`expect`("Failed to prepare function three")
+
+  private val functionInputBuffer: MutableList<WasmVirtualMachine.Value> =
+      MutableList<WasmVirtualMachine.Value>(3) { WasmVirtualMachine.Value.I32(0) }
+
+  private val functionInputBuffer1: MutableList<WasmVirtualMachine.Value> =
+      functionInputBuffer.subList(0, 1)
+
+  private val functionInputBuffer2: MutableList<WasmVirtualMachine.Value> =
+      functionInputBuffer.subList(0, 2)
+
+  private val functionInputBuffer3: MutableList<WasmVirtualMachine.Value> = functionInputBuffer
+
+  override fun one(p0: Int) {
+    functionInputBuffer[0] = WasmVirtualMachine.Value.I32(p0)
+    val args = functionInputBuffer1
+    onePreparedFunction(args).`expect`("Failed to invoke function one")
+  }
+
+  override fun two(p0: Int, p1: Int) {
+    functionInputBuffer[0] = WasmVirtualMachine.Value.I32(p0)
+    functionInputBuffer[1] = WasmVirtualMachine.Value.I32(p1)
+    val args = functionInputBuffer2
+    twoPreparedFunction(args).`expect`("Failed to invoke function two")
+  }
+
+  override fun three(
+    p0: Int,
+    p1: Int,
+    p2: Int,
+  ) {
+    functionInputBuffer[0] = WasmVirtualMachine.Value.I32(p0)
+    functionInputBuffer[1] = WasmVirtualMachine.Value.I32(p1)
+    functionInputBuffer[2] = WasmVirtualMachine.Value.I32(p2)
+    val args = functionInputBuffer3
+    threePreparedFunction(args).`expect`("Failed to invoke function three")
+  }
+}

@@ -1,0 +1,72 @@
+package com.test
+
+import io.github.charlietap.chasm.vm.Import
+import io.github.charlietap.chasm.vm.Instance
+import io.github.charlietap.chasm.vm.InstanceFactory
+import io.github.charlietap.chasm.vm.Memory
+import io.github.charlietap.chasm.vm.Module
+import io.github.charlietap.chasm.vm.ModuleFactory
+import io.github.charlietap.chasm.vm.Store
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
+import io.github.charlietap.chasm.vm.`expect`
+import io.github.charlietap.chasm.vm.codegen.CodegenImport
+import io.github.charlietap.chasm.vm.importFactory
+import io.github.charlietap.chasm.vm.virtualMachineFactory
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.collections.List
+
+internal class CollidingMemoryNamesImpl(
+  private val binary: ByteArray,
+  private val imports: List<CodegenImport> = emptyList(),
+  private val virtualMachine: WasmVirtualMachine = virtualMachineFactory(),
+  private val moduleFactory: ModuleFactory? = null,
+  private val instanceFactory: InstanceFactory? = null,
+) : CollidingMemoryNames {
+  private val store: Store = virtualMachine.storeInit()
+
+  private val module: Module =
+      moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecode(binary).`expect`("Failed to decode binary")
+
+  private val allocatedImports: List<Import> = virtualMachine.importFactory(store, imports)
+
+  private val instance: Instance =
+      instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiate(store, module, allocatedImports).`expect`("Failed to instantiate module")
+
+  private val _memory: Memory =
+      virtualMachine.exportMemory(instance, "memory").`expect`("Failed to find memory export with name memory")
+
+  private val __memory: Memory =
+      virtualMachine.exportMemory(instance, "_memory").`expect`("Failed to find memory export with name _memory")
+
+  private val _store: Memory =
+      virtualMachine.exportMemory(instance, "store").`expect`("Failed to find memory export with name store")
+
+  override val memory: CollidingMemoryNames.Memory = MemoryImpl(store, _memory, virtualMachine)
+
+  override val _memory_: CollidingMemoryNames.Memory = MemoryImpl(store, __memory, virtualMachine)
+
+  override val store_: CollidingMemoryNames.Memory = MemoryImpl(store, _store, virtualMachine)
+
+  private class MemoryImpl(
+    private val store: Store,
+    private val memory: Memory,
+    private val virtualMachine: WasmVirtualMachine,
+  ) : CollidingMemoryNames.Memory {
+    override fun read(
+      buffer: ByteArray,
+      memoryPointer: Int,
+      bufferPointer: Int,
+      bytesToRead: Int,
+    ): ByteArray = virtualMachine.memoryReadBytes(store, memory, memoryPointer, bytesToRead, buffer, bufferPointer).`expect`("Failed to read memory")
+
+    override fun write(
+      pointer: Int,
+      buffer: ByteArray,
+      bufferPointer: Int,
+      bytesToWrite: Int,
+    ) {
+      virtualMachine.memoryWriteBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite).`expect`("Failed to write memory")
+    }
+  }
+}

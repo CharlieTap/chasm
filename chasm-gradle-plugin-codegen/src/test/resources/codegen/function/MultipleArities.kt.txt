@@ -1,0 +1,15 @@
+package com.test
+
+import kotlin.Int
+
+public interface MultipleArities {
+  public fun one(p0: Int)
+
+  public fun two(p0: Int, p1: Int)
+
+  public fun three(
+    p0: Int,
+    p1: Int,
+    p2: Int,
+  )
+}

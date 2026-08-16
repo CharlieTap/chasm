@@ -1,0 +1,7 @@
+package com.test
+
+import kotlin.Long
+
+public interface LongReturn {
+  public fun invoke(): Long
+}

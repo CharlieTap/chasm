@@ -1,0 +1,7 @@
+package com.test
+
+import kotlin.String
+
+public interface PointerAndLengthStringReturn {
+  public fun invoke(): String
+}

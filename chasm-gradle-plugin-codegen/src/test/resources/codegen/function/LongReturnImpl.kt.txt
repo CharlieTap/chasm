@@ -1,0 +1,53 @@
+package com.test
+
+import io.github.charlietap.chasm.vm.Import
+import io.github.charlietap.chasm.vm.Instance
+import io.github.charlietap.chasm.vm.InstanceFactory
+import io.github.charlietap.chasm.vm.Module
+import io.github.charlietap.chasm.vm.ModuleFactory
+import io.github.charlietap.chasm.vm.NumberType
+import io.github.charlietap.chasm.vm.PreparedFunction
+import io.github.charlietap.chasm.vm.Store
+import io.github.charlietap.chasm.vm.ValueType
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
+import io.github.charlietap.chasm.vm.`expect`
+import io.github.charlietap.chasm.vm.codegen.CodegenImport
+import io.github.charlietap.chasm.vm.expectFirstLong
+import io.github.charlietap.chasm.vm.importFactory
+import io.github.charlietap.chasm.vm.virtualMachineFactory
+import kotlin.ByteArray
+import kotlin.Long
+import kotlin.collections.List
+
+internal class LongReturnImpl(
+  private val binary: ByteArray,
+  private val imports: List<CodegenImport> = emptyList(),
+  private val virtualMachine: WasmVirtualMachine = virtualMachineFactory(),
+  private val moduleFactory: ModuleFactory? = null,
+  private val instanceFactory: InstanceFactory? = null,
+) : LongReturn {
+  private val store: Store = virtualMachine.storeInit()
+
+  private val module: Module =
+      moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecode(binary).`expect`("Failed to decode binary")
+
+  private val allocatedImports: List<Import> = virtualMachine.importFactory(store, imports)
+
+  private val instance: Instance =
+      instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiate(store, module, allocatedImports).`expect`("Failed to instantiate module")
+
+  private val invokePreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "invoke", invokeResultTypes).`expect`("Failed to prepare function invoke")
+
+  override fun invoke(): Long {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = invokePreparedFunction(args).expectFirstLong("Failed to invoke function invoke")
+    return result
+  }
+
+  private companion object {
+    private val invokeResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.I64),
+        )
+  }
+}

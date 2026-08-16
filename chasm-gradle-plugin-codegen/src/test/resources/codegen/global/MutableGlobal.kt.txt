@@ -1,0 +1,7 @@
+package com.test
+
+import kotlin.Int
+
+public interface MutableGlobal {
+  public var `value`: Int
+}

@@ -1,0 +1,68 @@
+package com.test
+
+import io.github.charlietap.chasm.vm.Import
+import io.github.charlietap.chasm.vm.Instance
+import io.github.charlietap.chasm.vm.InstanceFactory
+import io.github.charlietap.chasm.vm.Module
+import io.github.charlietap.chasm.vm.ModuleFactory
+import io.github.charlietap.chasm.vm.Store
+import io.github.charlietap.chasm.vm.SuspendingWasmVirtualMachine
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
+import io.github.charlietap.chasm.vm.`expect`
+import io.github.charlietap.chasm.vm.codegen.CodegenImport
+import io.github.charlietap.chasm.vm.importFactory
+import io.github.charlietap.chasm.vm.suspendingVirtualMachineFactory
+import io.github.charlietap.chasm.vm.virtualMachineFactory
+import kotlin.ByteArray
+import kotlin.collections.List
+
+internal class SuspendingConstructionImpl private constructor(
+  private val binary: ByteArray,
+  private val imports: List<CodegenImport>,
+  private val virtualMachine: WasmVirtualMachine,
+  private val moduleFactory: ModuleFactory?,
+  private val instanceFactory: InstanceFactory?,
+  runtimeState: RuntimeState?,
+) : SuspendingConstruction {
+  private val store: Store = runtimeState?.store ?: virtualMachine.storeInit()
+
+  private val module: Module =
+      runtimeState?.module ?: moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecode(binary).`expect`("Failed to decode binary")
+
+  private val allocatedImports: List<Import> =
+      runtimeState?.allocatedImports ?: virtualMachine.importFactory(store, imports)
+
+  private val instance: Instance =
+      runtimeState?.instance ?: instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiate(store, module, allocatedImports).`expect`("Failed to instantiate module")
+
+  public constructor(
+    binary: ByteArray,
+    imports: List<CodegenImport> = emptyList(),
+    virtualMachine: WasmVirtualMachine = virtualMachineFactory(),
+    moduleFactory: ModuleFactory? = null,
+    instanceFactory: InstanceFactory? = null,
+  ) : this(binary, imports, virtualMachine, moduleFactory, instanceFactory, null)
+
+  private class RuntimeState(
+    public val store: Store,
+    public val module: Module,
+    public val allocatedImports: List<Import>,
+    public val instance: Instance,
+  )
+
+  public companion object {
+    public suspend fun create(
+      binary: ByteArray,
+      imports: List<CodegenImport> = emptyList(),
+      virtualMachine: SuspendingWasmVirtualMachine = suspendingVirtualMachineFactory(),
+      moduleFactory: ModuleFactory? = null,
+      instanceFactory: InstanceFactory? = null,
+    ): SuspendingConstructionImpl {
+      val store = virtualMachine.storeInit()
+      val module = moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecodeSuspending(binary).`expect`("Failed to decode binary")
+      val allocatedImports = virtualMachine.importFactory(store, imports)
+      val instance = instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiateSuspending(store, module, allocatedImports).`expect`("Failed to instantiate module")
+      return SuspendingConstructionImpl(binary, imports, virtualMachine, moduleFactory, instanceFactory, RuntimeState(store, module, allocatedImports, instance))
+    }
+  }
+}

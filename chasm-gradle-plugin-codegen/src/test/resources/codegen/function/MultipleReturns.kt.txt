@@ -1,0 +1,17 @@
+package com.test
+
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+
+public data class MultipleReturnsResult(
+  public val r0: Int,
+  public val r1: Long,
+  public val r2: Float,
+  public val r3: Double,
+)
+
+public interface MultipleReturns {
+  public fun invoke(): MultipleReturnsResult
+}

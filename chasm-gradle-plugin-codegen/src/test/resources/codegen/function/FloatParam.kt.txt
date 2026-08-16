@@ -1,0 +1,7 @@
+package com.test
+
+import kotlin.Float
+
+public interface FloatParam {
+  public fun invoke(`value`: Float)
+}

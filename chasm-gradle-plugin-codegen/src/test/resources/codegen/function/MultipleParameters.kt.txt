@@ -1,0 +1,8 @@
+package com.test
+
+import kotlin.Double
+import kotlin.Int
+
+public interface MultipleParameters {
+  public fun invoke(p0: Int, p1: Double): Double
+}

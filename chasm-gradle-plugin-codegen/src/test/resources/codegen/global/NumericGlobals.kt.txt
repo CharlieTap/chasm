@@ -1,0 +1,16 @@
+package com.test
+
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+
+public interface NumericGlobals {
+  public val intValue: Int
+
+  public val longValue: Long
+
+  public val floatValue: Float
+
+  public val doubleValue: Double
+}

@@ -1,0 +1,258 @@
+package com.test.chasm
+
+import io.github.charlietap.chasm.vm.Import
+import io.github.charlietap.chasm.vm.Instance
+import io.github.charlietap.chasm.vm.InstanceFactory
+import io.github.charlietap.chasm.vm.Memory
+import io.github.charlietap.chasm.vm.Module
+import io.github.charlietap.chasm.vm.ModuleFactory
+import io.github.charlietap.chasm.vm.NumberType
+import io.github.charlietap.chasm.vm.PreparedFunction
+import io.github.charlietap.chasm.vm.Store
+import io.github.charlietap.chasm.vm.ValueType
+import io.github.charlietap.chasm.vm.WasmVirtualMachine
+import io.github.charlietap.chasm.vm.`expect`
+import io.github.charlietap.chasm.vm.codegen.CodegenImport
+import io.github.charlietap.chasm.vm.expectFirstDouble
+import io.github.charlietap.chasm.vm.expectFirstFloat
+import io.github.charlietap.chasm.vm.expectFirstInt
+import io.github.charlietap.chasm.vm.expectFirstLong
+import io.github.charlietap.chasm.vm.flatMap
+import io.github.charlietap.chasm.vm.importFactory
+import io.github.charlietap.chasm.vm.map
+import io.github.charlietap.chasm.vm.virtualMachineFactory
+import kotlin.ByteArray
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.String
+import kotlin.collections.List
+import kotlin.collections.MutableList
+
+internal class TestServiceImpl(
+  private val binary: ByteArray,
+  private val imports: List<CodegenImport> = emptyList(),
+  private val virtualMachine: WasmVirtualMachine = virtualMachineFactory(),
+  private val moduleFactory: ModuleFactory? = null,
+  private val instanceFactory: InstanceFactory? = null,
+) : TestService {
+  private val store: Store = virtualMachine.storeInit()
+
+  private val module: Module =
+      moduleFactory?.invoke(binary) ?: virtualMachine.moduleDecode(binary).`expect`("Failed to decode binary")
+
+  private val allocatedImports: List<Import> = virtualMachine.importFactory(store, imports)
+
+  private val instance: Instance =
+      instanceFactory?.invoke(store, module, allocatedImports) ?: virtualMachine.moduleInstantiate(store, module, allocatedImports).`expect`("Failed to instantiate module")
+
+  private val intFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "int_function", intFunctionResultTypes).`expect`("Failed to prepare function int_function")
+
+  private val longFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "long_function", longFunctionResultTypes).`expect`("Failed to prepare function long_function")
+
+  private val floatFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "float_function", floatFunctionResultTypes).`expect`("Failed to prepare function float_function")
+
+  private val doubleFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "double_function", doubleFunctionResultTypes).`expect`("Failed to prepare function double_function")
+
+  private val palStringFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "pal_string_function", palStringFunctionResultTypes).`expect`("Failed to prepare function pal_string_function")
+
+  private val lengthPrefixedStringFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "length_prefixed_string_function", lengthPrefixedStringFunctionResultTypes).`expect`("Failed to prepare function length_prefixed_string_function")
+
+  private val nullTerminatedStringFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "null_terminated_string_function", nullTerminatedStringFunctionResultTypes).`expect`("Failed to prepare function null_terminated_string_function")
+
+  private val packedI64StringFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "packed_i64_string_function", packedI64StringFunctionResultTypes).`expect`("Failed to prepare function packed_i64_string_function")
+
+  private val unitFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "unit_function", emptyList()).`expect`("Failed to prepare function unit_function")
+
+  private val multipleParamFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "multiple_param_function", multipleParamFunctionResultTypes).`expect`("Failed to prepare function multiple_param_function")
+
+  private val multipleReturnFunctionPreparedFunction: PreparedFunction =
+      virtualMachine.prepareFunction(store, instance, "multiple_return_function", multipleReturnFunctionResultTypes).`expect`("Failed to prepare function multiple_return_function")
+
+  private val functionInputBuffer: MutableList<WasmVirtualMachine.Value> =
+      MutableList<WasmVirtualMachine.Value>(2) { WasmVirtualMachine.Value.I32(0) }
+
+  private val functionInputBuffer2: MutableList<WasmVirtualMachine.Value> = functionInputBuffer
+
+  private val _memory: Memory =
+      virtualMachine.exportMemory(instance, "memory").`expect`("Failed to find memory export with name memory")
+
+  override var mutableGlobal: Int
+    get() {
+      val global = virtualMachine.exportGlobal(instance, "mutable_global").`expect`("Failed to find global export with name mutable_global")
+      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global mutable_global")
+    }
+    set(newValue) {
+      val global = virtualMachine.exportGlobal(instance, "mutable_global").`expect`("Failed to find global export with name mutable_global")
+      virtualMachine.globalWrite(store, global, WasmVirtualMachine.Value.I32(newValue))
+    }
+
+  override val immutableGlobal: Int
+    get() {
+      val global = virtualMachine.exportGlobal(instance, "immutable_global").`expect`("Failed to find global export with name immutable_global")
+      return virtualMachine.globalRead(store, global).map { (it as WasmVirtualMachine.Value.I32).value }.`expect`("Failed to read global immutable_global")
+    }
+
+  override val memory: TestService.Memory = MemoryImpl(store, _memory, virtualMachine)
+
+  override fun intFunction(): Int {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = intFunctionPreparedFunction(args).expectFirstInt("Failed to invoke function intFunction")
+    return result
+  }
+
+  override fun longFunction(): Long {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = longFunctionPreparedFunction(args).expectFirstLong("Failed to invoke function longFunction")
+    return result
+  }
+
+  override fun floatFunction(): Float {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = floatFunctionPreparedFunction(args).expectFirstFloat("Failed to invoke function floatFunction")
+    return result
+  }
+
+  override fun doubleFunction(): Double {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = doubleFunctionPreparedFunction(args).expectFirstDouble("Failed to invoke function doubleFunction")
+    return result
+  }
+
+  override fun palStringFunction(): String {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = palStringFunctionPreparedFunction(args).flatMap { (pointer, length) ->
+            virtualMachine.memoryReadUtf8String(store, _memory, (pointer as WasmVirtualMachine.Value.I32).value, (length as WasmVirtualMachine.Value.I32).value)
+        }.expect("Failed to invoke function palStringFunction")
+    return result
+  }
+
+  override fun lengthPrefixedStringFunction(): String {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = lengthPrefixedStringFunctionPreparedFunction(args).flatMap { (pointer) ->
+            val length = virtualMachine.memoryReadInt(store, _memory, (pointer as WasmVirtualMachine.Value.I32).value).`expect`("Failed to read string length")
+            virtualMachine.memoryReadUtf8String(store, _memory, (pointer as WasmVirtualMachine.Value.I32).value + 4, length)
+        }.expect("Failed to invoke function lengthPrefixedStringFunction")
+    return result
+  }
+
+  override fun nullTerminatedStringFunction(): String {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = nullTerminatedStringFunctionPreparedFunction(args).flatMap { (pointer) ->
+            virtualMachine.memoryReadUtf8NullTerminatedUtf8String(store, _memory, (pointer as WasmVirtualMachine.Value.I32).value)
+        }.expect("Failed to invoke function nullTerminatedStringFunction")
+    return result
+  }
+
+  override fun packedI64StringFunction(): String {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = packedI64StringFunctionPreparedFunction(args).flatMap { (pointerAndLength) ->
+            val packed = (pointerAndLength as WasmVirtualMachine.Value.I64).value
+            val pointer = (packed ushr 32).toInt()
+            val length = packed.toInt()
+            virtualMachine.memoryReadUtf8String(store, _memory, pointer, length)
+        }.expect("Failed to invoke function packedI64StringFunction")
+    return result
+  }
+
+  override fun unitFunction() {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    unitFunctionPreparedFunction(args).`expect`("Failed to invoke function unitFunction")
+  }
+
+  override fun multipleParamFunction(p0: Int, p1: Double): Double {
+    functionInputBuffer[0] = WasmVirtualMachine.Value.I32(p0)
+    functionInputBuffer[1] = WasmVirtualMachine.Value.F64(p1)
+    val args = functionInputBuffer2
+    val result = multipleParamFunctionPreparedFunction(args).expectFirstDouble("Failed to invoke function multipleParamFunction")
+    return result
+  }
+
+  override fun multipleReturnFunction(): MultipleReturnFunctionResult {
+    val args = emptyList<WasmVirtualMachine.Value>()
+    val result = multipleReturnFunctionPreparedFunction(args).map {
+            MultipleReturnFunctionResult(
+                r0 = (it[0] as WasmVirtualMachine.Value.I32).value,
+        r1 = (it[1] as WasmVirtualMachine.Value.I64).value
+            )
+        }.`expect`("Failed to invoke function multipleReturnFunction")
+    return result
+  }
+
+  private class MemoryImpl(
+    private val store: Store,
+    private val memory: Memory,
+    private val virtualMachine: WasmVirtualMachine,
+  ) : TestService.Memory {
+    override fun read(
+      buffer: ByteArray,
+      memoryPointer: Int,
+      bufferPointer: Int,
+      bytesToRead: Int,
+    ): ByteArray = virtualMachine.memoryReadBytes(store, memory, memoryPointer, bytesToRead, buffer, bufferPointer).`expect`("Failed to read memory")
+
+    override fun write(
+      pointer: Int,
+      buffer: ByteArray,
+      bufferPointer: Int,
+      bytesToWrite: Int,
+    ) {
+      virtualMachine.memoryWriteBytes(store, memory, pointer, buffer, bufferPointer, bytesToWrite).`expect`("Failed to write memory")
+    }
+  }
+
+  private companion object {
+    private val intFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.I32),
+        )
+
+    private val longFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.I64),
+        )
+
+    private val floatFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.F32),
+        )
+
+    private val doubleFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.F64),
+        )
+
+    private val palStringFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.I32),
+          ValueType.Number(NumberType.I32),
+        )
+
+    private val lengthPrefixedStringFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.I32),
+        )
+
+    private val nullTerminatedStringFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.I32),
+        )
+
+    private val packedI64StringFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.I64),
+        )
+
+    private val multipleParamFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.F64),
+        )
+
+    private val multipleReturnFunctionResultTypes: List<ValueType> = listOf(
+          ValueType.Number(NumberType.I32),
+          ValueType.Number(NumberType.I64),
+        )
+  }
+}

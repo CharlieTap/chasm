@@ -1,0 +1,7 @@
+package com.test
+
+import kotlin.Int
+
+public interface IntParam {
+  public fun invoke(`value`: Int)
+}

@@ -1,0 +1,7 @@
+package com.test
+
+import kotlin.Double
+
+public interface DoubleReturn {
+  public fun invoke(): Double
+}

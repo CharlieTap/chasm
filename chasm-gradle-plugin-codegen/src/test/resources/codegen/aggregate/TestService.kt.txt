@@ -1,0 +1,59 @@
+package com.test.chasm
+
+import kotlin.ByteArray
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.String
+
+public data class MultipleReturnFunctionResult(
+  public val r0: Int,
+  public val r1: Long,
+)
+
+public interface TestService {
+  public var mutableGlobal: Int
+
+  public val immutableGlobal: Int
+
+  public val memory: Memory
+
+  public fun intFunction(): Int
+
+  public fun longFunction(): Long
+
+  public fun floatFunction(): Float
+
+  public fun doubleFunction(): Double
+
+  public fun palStringFunction(): String
+
+  public fun lengthPrefixedStringFunction(): String
+
+  public fun nullTerminatedStringFunction(): String
+
+  public fun packedI64StringFunction(): String
+
+  public fun unitFunction()
+
+  public fun multipleParamFunction(p0: Int, p1: Double): Double
+
+  public fun multipleReturnFunction(): MultipleReturnFunctionResult
+
+  public interface Memory {
+    public fun read(
+      buffer: ByteArray,
+      memoryPointer: Int,
+      bufferPointer: Int = 0,
+      bytesToRead: Int = buffer.size - bufferPointer,
+    ): ByteArray
+
+    public fun write(
+      pointer: Int,
+      buffer: ByteArray,
+      bufferPointer: Int = 0,
+      bytesToWrite: Int = buffer.size - bufferPointer,
+    )
+  }
+}

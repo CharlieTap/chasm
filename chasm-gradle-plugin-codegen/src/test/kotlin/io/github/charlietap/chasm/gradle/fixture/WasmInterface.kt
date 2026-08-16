@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.gradle.MemoryBinding
 import io.github.charlietap.chasm.gradle.Property
 import io.github.charlietap.chasm.gradle.PropertyImplementation
 import io.github.charlietap.chasm.gradle.Scalar
+import io.github.charlietap.chasm.gradle.StringAllocationStrategy
 import io.github.charlietap.chasm.gradle.StringEncodingStrategy
 import io.github.charlietap.chasm.gradle.Type
 import io.github.charlietap.chasm.gradle.WasmInterface
@@ -61,10 +62,12 @@ internal fun aggregateType(
 internal fun functionParameter(
     name: String = "",
     type: Type = type(),
+    stringAllocationStrategy: StringAllocationStrategy? = null,
     stringEncodingStrategy: StringEncodingStrategy? = null,
 ) = FunctionParameter(
     name = name,
     type = type,
+    stringAllocationStrategy = stringAllocationStrategy,
     stringEncodingStrategy = stringEncodingStrategy,
 )
 
@@ -100,7 +103,7 @@ internal fun function(
 
 internal fun globalProxy(
     name: String = "",
-    source: KClass<WasmVirtualMachine.Value> = WasmVirtualMachine.Value::class,
+    source: KClass<out WasmVirtualMachine.Value> = WasmVirtualMachine.Value::class,
 ) = GlobalProxy(
     name = name,
     source = source,
