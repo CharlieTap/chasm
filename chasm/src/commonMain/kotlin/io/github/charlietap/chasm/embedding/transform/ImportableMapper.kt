@@ -7,8 +7,11 @@ import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Table
 import io.github.charlietap.chasm.embedding.shapes.Tag
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
+import io.github.charlietap.chasm.runtime.store.Store
 
-internal object ImportableMapper : BidirectionalMapper<Importable, ExternalValue> {
+internal class ImportableMapper(
+    private val store: Store,
+) : BidirectionalMapper<Importable, ExternalValue> {
     override fun map(input: Importable): ExternalValue = when (input) {
         is Function -> input.reference
         is Global -> input.reference
@@ -18,10 +21,10 @@ internal object ImportableMapper : BidirectionalMapper<Importable, ExternalValue
     }
 
     override fun bimap(input: ExternalValue): Importable = when (input) {
-        is ExternalValue.Function -> Function(input)
-        is ExternalValue.Global -> Global(input)
-        is ExternalValue.Memory -> Memory(input)
-        is ExternalValue.Table -> Table(input)
-        is ExternalValue.Tag -> Tag(input)
+        is ExternalValue.Function -> Function(input, store)
+        is ExternalValue.Global -> Global(input, store)
+        is ExternalValue.Memory -> Memory(input, store)
+        is ExternalValue.Table -> Table(input, store)
+        is ExternalValue.Tag -> Tag(input, store)
     }
 }

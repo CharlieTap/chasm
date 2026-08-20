@@ -20,5 +20,8 @@ internal fun memory(
     type: MemoryType,
     allocator: MemoryAllocator,
 ): Memory {
-    return Memory(ExternalValue.Memory(allocator(store.store, type)))
+    return Memory(
+        reference = ExternalValue.Memory(allocator(store.store, type)),
+        store = store.store,
+    )
 }

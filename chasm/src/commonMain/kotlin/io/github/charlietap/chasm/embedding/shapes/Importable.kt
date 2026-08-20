@@ -1,3 +1,5 @@
 package io.github.charlietap.chasm.embedding.shapes
 
-sealed interface Importable
+import io.github.charlietap.chasm.runtime.store.Store
+
+sealed class Importable protected constructor(internal val store: Store)

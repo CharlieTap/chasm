@@ -22,7 +22,7 @@ class ReadGlobalTest {
         val instance = globalInstance(value = value)
         val store = publicStore(store(globals = mutableListOf(instance)))
         val address = globalAddress(0)
-        val global = Global(globalExternalValue(address))
+        val global = Global(globalExternalValue(address), store.store)
 
         val expected: ChasmResult<ExecutionValue, ChasmError.ExecutionError> = ChasmResult.Success(NumberValue.I32(117))
 

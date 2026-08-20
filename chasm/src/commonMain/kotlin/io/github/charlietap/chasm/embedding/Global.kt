@@ -25,5 +25,8 @@ internal fun global(
     value: ExecutionValue,
     allocator: GlobalAllocator,
 ): Global {
-    return Global(ExternalValue.Global(allocator(store.store, type, value.toLongFromBoxed())))
+    return Global(
+        reference = ExternalValue.Global(allocator(store.store, type, value.toLongFromBoxed())),
+        store = store.store,
+    )
 }

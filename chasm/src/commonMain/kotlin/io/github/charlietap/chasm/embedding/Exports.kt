@@ -11,7 +11,7 @@ fun exports(
     instance: Instance,
 ): List<Export> = exports(
     instance = instance,
-    importableMapper = ImportableMapper,
+    importableMapper = ImportableMapper(instance.store),
 )
 
 internal fun exports(

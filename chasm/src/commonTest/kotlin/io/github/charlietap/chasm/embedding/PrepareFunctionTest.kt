@@ -74,13 +74,15 @@ class PrepareFunctionTest {
     @Test
     fun `prepared function cannot execute after its instance is dropped`() {
         val address = functionAddress(0)
+        val internalStore = runtimeStore(functions = mutableListOf(hostFunctionInstance()))
+        val store = publicStore(internalStore)
         val instance = publicInstance(
             moduleInstance = moduleInstance(
                 exports = mutableListOf(exportInstance(nameValue("function"), functionExternalValue(address))),
                 functionAddresses = mutableListOf(address),
             ),
+            store = internalStore,
         )
-        val store = publicStore(runtimeStore(functions = mutableListOf(hostFunctionInstance())))
         val prepared = assertNotNull(prepareFunction(store, instance, "function").getOrNull())
 
         dropInstance(store, instance)

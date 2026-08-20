@@ -21,7 +21,7 @@ class WriteGlobalTest {
         val instance = globalInstance()
         val store = publicStore(store(globals = mutableListOf(instance)))
         val address = globalAddress(0)
-        val global = Global(globalExternalValue(address))
+        val global = Global(globalExternalValue(address), store.store)
 
         val expected: ChasmResult<Unit, ChasmError.ExecutionError> = ChasmResult.Success(Unit)
 

@@ -31,5 +31,6 @@ internal fun function(
     val hostFunction = hostFunctionMapper.map(function)
     return Function(
         reference = allocator(store.store, type, hostFunction),
+        store = store.store,
     )
 }

@@ -25,5 +25,8 @@ internal fun tag(
     val definedType = type.functionType.definedType()
     val rtt = store.store.runtimeTypes.register(definedType)
 
-    return Tag(ExternalValue.Tag(allocator(store.store, rtt, type)))
+    return Tag(
+        reference = ExternalValue.Tag(allocator(store.store, rtt, type)),
+        store = store.store,
+    )
 }

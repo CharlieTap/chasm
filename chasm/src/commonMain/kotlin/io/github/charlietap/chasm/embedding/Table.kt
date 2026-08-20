@@ -25,5 +25,8 @@ internal fun table(
     value: ReferenceValue,
     allocator: TableAllocator,
 ): Table {
-    return Table(ExternalValue.Table(allocator(store.store, type, value.toLongFromBoxed())))
+    return Table(
+        reference = ExternalValue.Table(allocator(store.store, type, value.toLongFromBoxed())),
+        store = store.store,
+    )
 }

@@ -34,7 +34,7 @@ fun instance(
         imports = imports,
         config = config,
         instantiator = ::ModuleInstantiator,
-        importableMapper = ImportableMapper,
+        importableMapper = ImportableMapper(store.store),
     )
 }
 
@@ -47,6 +47,10 @@ internal fun instance(
     importableMapper: Mapper<Importable, ExternalValue>,
 ): ChasmResult<Instance, ChasmError.ExecutionError> {
 
+    if (imports.any { it.value.store !== store.store }) {
+        return Error(ChasmError.ExecutionError("Importable belongs to a different Store"))
+    }
+
     val mappedImports = imports.mapImports(importableMapper)
 
     return instantiator(config, store.store, module.module, mappedImports)
@@ -54,7 +58,7 @@ internal fun instance(
 }
 
 internal fun List<Import>.mapImports(
-    importableMapper: Mapper<Importable, ExternalValue> = ImportableMapper,
+    importableMapper: Mapper<Importable, ExternalValue>,
 ): List<RuntimeImport> = map { import ->
     RuntimeImport(
         import.moduleName,
