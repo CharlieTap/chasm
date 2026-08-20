@@ -27,5 +27,5 @@ suspend fun _instance(
         module = module.module,
         imports = imports.mapImports(),
         taskExecutor = taskExecutor,
-    ).toChasmResult(config)
+    ).toChasmResult(config, store)
 }

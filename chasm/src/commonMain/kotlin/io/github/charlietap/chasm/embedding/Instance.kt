@@ -50,7 +50,7 @@ internal fun instance(
     val mappedImports = imports.mapImports(importableMapper)
 
     return instantiator(config, store.store, module.module, mappedImports)
-        .toChasmResult(config)
+        .toChasmResult(config, store)
 }
 
 internal fun List<Import>.mapImports(
@@ -65,6 +65,7 @@ internal fun List<Import>.mapImports(
 
 internal fun Result<RuntimeModuleInstance, ModuleTrapError>.toChasmResult(
     config: RuntimeConfig,
+    store: Store,
 ): ChasmResult<Instance, ChasmError.ExecutionError> =
     this
         .mapError(ModuleTrapError::toString)
@@ -73,5 +74,6 @@ internal fun Result<RuntimeModuleInstance, ModuleTrapError>.toChasmResult(
             Instance(
                 config = config,
                 instance = internal,
+                store = store.store,
             )
         }.fold(::Success, ::Error)

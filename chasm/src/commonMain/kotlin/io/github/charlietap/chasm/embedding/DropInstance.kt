@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.embedding
 
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
+import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
@@ -29,6 +30,10 @@ internal fun dropInstance(
     instance: Instance,
     memoryDropper: MemoryInstanceDropper,
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
+
+    if (instance.store !== store.store) {
+        return Error(ChasmError.ExecutionError("Instance belongs to a different Store"))
+    }
 
     val instance = instance.instance
     val store = store.store
