@@ -8,8 +8,6 @@ import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.createCompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
@@ -21,7 +19,6 @@ import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
 suspend fun ParallelModuleCompiler(
-    config: RuntimeConfig,
     store: Store,
     module: Module,
     instance: ModuleInstance,
@@ -37,13 +34,12 @@ suspend fun ParallelModuleCompiler(
     }
     val assignments = when (plan) {
         CompilationPlan.Serial -> {
-            return ModuleCompiler(config, store, module, instance, runtimeTypes, types, diagnostics)
+            return ModuleCompiler(store, module, instance, runtimeTypes, types, diagnostics)
         }
         is CompilationPlan.Parallel -> plan.assignments
     }
 
     val context = createCompilerContext(
-        config = config,
         module = module,
         types = types,
         store = store,
@@ -80,7 +76,6 @@ suspend fun ParallelModuleCompiler(
             successfulCompilations[index] = checkNotNull(compilations[index]).result.bind()
         }
 
-        var containsGcInstructions = false
         for (index in compilations.indices) {
             val compilation = checkNotNull(successfulCompilations[index])
             val function = module.functions[index]
@@ -94,26 +89,7 @@ suspend fun ParallelModuleCompiler(
                 frameSlots = compiledFunction.frameSlots,
             )
             functionInstance.function = compiledFunction
-            containsGcInstructions = containsGcInstructions || compilation.containsGcInstructions
         }
-
-        if (config.gcStrategy == GCStrategy.ARENA && containsGcInstructions) {
-            markExportedFunctionsForGarbageCollection(context, module)
-        }
-    }
-}
-
-private fun markExportedFunctionsForGarbageCollection(
-    context: CompilerContext,
-    module: Module,
-) {
-    for (functionIndex in module.functions.indices) {
-        val function = module.functions[functionIndex]
-        val index = function.idx.toInt()
-        if (!context.exportedFunctions[index]) continue
-
-        val functionInstance = context.functions[index] as FunctionInstance.WasmFunction
-        functionInstance.function.collectGarbageAfterInvocation = true
     }
 }
 

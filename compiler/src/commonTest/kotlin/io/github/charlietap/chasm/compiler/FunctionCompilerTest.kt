@@ -14,17 +14,16 @@ import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.Local
 import io.github.charlietap.chasm.compiler.context.CompilerContext
-import io.github.charlietap.chasm.config.GCStrategy
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.fixture.ast.module.export
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.ast.module.module
-import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.type.arrayCompositeType
+import io.github.charlietap.chasm.fixture.type.arrayType
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
@@ -47,6 +46,7 @@ import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.ValueType
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -742,12 +742,12 @@ class FunctionCompilerTest {
     }
 
     @Test
-    fun manualGcDoesNotEmitCollectionInstructions() {
+    fun allocatingInstructionUsesExecutorPreflightWithoutAnExtraLinkedInstruction() {
         val function = allocatingFunction()
         val module = allocatingModule(function)
 
         val compiled = compileFunction(
-            context = compilerContext(module, RuntimeConfig(gcStrategy = GCStrategy.MANUAL)),
+            context = compilerContext(module),
             function = function,
             baseIp = 0,
         )
@@ -756,21 +756,238 @@ class FunctionCompilerTest {
     }
 
     @Test
-    fun traditionalGcEmitsAConditionalPauseAfterAnAllocation() {
-        val function = allocatingFunction()
-        val module = allocatingModule(function)
-
-        val compiled = compileFunction(
-            context = compilerContext(module, RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL)),
-            function = function,
-            baseIp = 0,
+    fun materializesMixedStructOperandsIntoAContiguousRangeBeforePublication() {
+        val valueStruct = definedType(
+            recursiveType = recursiveType(
+                listOf(
+                    finalSubType(
+                        compositeType = structCompositeType(
+                            structType(
+                                listOf(
+                                    immutableFieldType(valueStorageType(i32ValueType())),
+                                    immutableFieldType(valueStorageType(i64ValueType())),
+                                    immutableFieldType(valueStorageType(i32ValueType())),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 0,
         )
+        val functionType = definedType(
+            recursiveType = functionRecursiveType(
+                functionType(
+                    params = resultType(listOf(i32ValueType())),
+                    results = resultType(
+                        listOf(
+                            referenceValueType(refNonNullReferenceType(AbstractHeapType.Struct)),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 1,
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I64Const(22L),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(3),
+                NumericInstruction.I32Add,
+                AggregateInstruction.StructNew(Index.TypeIndex(0u)),
+            ),
+        )
+        val module = module(definedTypes = listOf(valueStruct, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(compilerContext(module, store = runtimeStore), function, baseIp = 0)
 
-        assertEquals(3, compiled.instructions.size)
+        val vstack = execute(compiled, runtimeStore) { setFrameSlot(0, 7L) }
+        val reference = vstack.getFrameSlot(compiled.returnSlots.single())
+
+        assertEquals(7L, runtimeStore.heap.getStructField(reference, 0))
+        assertEquals(22L, runtimeStore.heap.getStructField(reference, 1))
+        assertEquals(10L, runtimeStore.heap.getStructField(reference, 2))
     }
 
     @Test
-    fun traditionalGcDoesNotPauseAfterANonAllocatingGcInstruction() {
+    fun reusesAlreadyContiguousFrameOperandsForStructPublication() {
+        val valueStruct = definedType(
+            recursiveType = recursiveType(
+                listOf(
+                    finalSubType(
+                        compositeType = structCompositeType(
+                            structType(
+                                List(2) {
+                                    immutableFieldType(valueStorageType(i32ValueType()))
+                                },
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 0,
+        )
+        val functionType = definedType(
+            recursiveType = functionRecursiveType(
+                functionType(
+                    params = resultType(listOf(i32ValueType(), i32ValueType())),
+                    results = resultType(
+                        listOf(
+                            referenceValueType(refNonNullReferenceType(AbstractHeapType.Struct)),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 1,
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Add,
+                VariableInstruction.LocalGet(Index.LocalIndex(1u)),
+                NumericInstruction.I32Const(2),
+                NumericInstruction.I32Add,
+                AggregateInstruction.StructNew(Index.TypeIndex(0u)),
+            ),
+        )
+        val module = module(definedTypes = listOf(valueStruct, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(compilerContext(module, store = runtimeStore), function, baseIp = 0)
+
+        val vstack = execute(compiled, runtimeStore) {
+            setFrameSlot(0, 10)
+            setFrameSlot(1, 20)
+        }
+        val reference = vstack.getFrameSlot(compiled.returnSlots.single())
+
+        assertEquals(4, compiled.instructions.size)
+        assertEquals(11L, runtimeStore.heap.getStructField(reference, 0))
+        assertEquals(22L, runtimeStore.heap.getStructField(reference, 1))
+    }
+
+    @Test
+    fun publishesAZeroFieldStructWithoutReadingATemporaryRange() {
+        val valueStruct = definedType(
+            recursiveType = recursiveType(
+                listOf(
+                    finalSubType(
+                        compositeType = structCompositeType(structType(emptyList())),
+                    ),
+                ),
+            ),
+            typeIndex = 0,
+        )
+        val functionType = definedType(
+            recursiveType = functionRecursiveType(
+                functionType(
+                    results = resultType(
+                        listOf(
+                            referenceValueType(refNonNullReferenceType(AbstractHeapType.Struct)),
+                        ),
+                    ),
+                ),
+            ),
+            typeIndex = 1,
+        )
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(AggregateInstruction.StructNew(Index.TypeIndex(0u))),
+        )
+        val module = module(definedTypes = listOf(valueStruct, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(compilerContext(module, store = runtimeStore), function, baseIp = 0)
+
+        val vstack = execute(compiled, runtimeStore)
+        val reference = vstack.getFrameSlot(compiled.returnSlots.single())
+
+        assertEquals(0, runtimeStore.heap.structRuntimeTypeIdOrNegative(reference))
+    }
+
+    @Test
+    fun materializesMixedArrayOperandsIntoAContiguousRangeBeforePublication() {
+        val arrayDefinition = i32ArrayDefinition()
+        val functionType = arrayReturningFunctionType(listOf(i32ValueType()))
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(22),
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(3),
+                NumericInstruction.I32Add,
+                AggregateInstruction.ArrayNewFixed(Index.TypeIndex(0u), 3u),
+            ),
+        )
+        val module = module(definedTypes = listOf(arrayDefinition, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(compilerContext(module, store = runtimeStore), function, baseIp = 0)
+
+        val vstack = execute(compiled, runtimeStore) { setFrameSlot(0, 7) }
+        val reference = vstack.getFrameSlot(compiled.returnSlots.single())
+
+        assertContentEquals(
+            longArrayOf(7, 22, 10),
+            LongArray(3) { runtimeStore.heap.getArrayElement(reference, it) },
+        )
+    }
+
+    @Test
+    fun reusesAlreadyContiguousFrameOperandsForArrayPublication() {
+        val arrayDefinition = i32ArrayDefinition()
+        val functionType = arrayReturningFunctionType(listOf(i32ValueType(), i32ValueType()))
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(
+                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
+                NumericInstruction.I32Const(1),
+                NumericInstruction.I32Add,
+                VariableInstruction.LocalGet(Index.LocalIndex(1u)),
+                NumericInstruction.I32Const(2),
+                NumericInstruction.I32Add,
+                AggregateInstruction.ArrayNewFixed(Index.TypeIndex(0u), 2u),
+            ),
+        )
+        val module = module(definedTypes = listOf(arrayDefinition, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(compilerContext(module, store = runtimeStore), function, baseIp = 0)
+
+        val vstack = execute(compiled, runtimeStore) {
+            setFrameSlot(0, 10)
+            setFrameSlot(1, 20)
+        }
+        val reference = vstack.getFrameSlot(compiled.returnSlots.single())
+
+        assertEquals(4, compiled.instructions.size)
+        assertContentEquals(
+            longArrayOf(11, 22),
+            LongArray(2) { runtimeStore.heap.getArrayElement(reference, it) },
+        )
+    }
+
+    @Test
+    fun publishesAZeroLengthArrayWithoutReadingATemporaryRange() {
+        val arrayDefinition = i32ArrayDefinition()
+        val functionType = arrayReturningFunctionType()
+        val function = function(
+            typeIndex = Index.TypeIndex(1u),
+            body = Expression(AggregateInstruction.ArrayNewFixed(Index.TypeIndex(0u), 0u)),
+        )
+        val module = module(definedTypes = listOf(arrayDefinition, functionType), functions = listOf(function))
+        val runtimeStore = store()
+        val compiled = compileFunction(compilerContext(module, store = runtimeStore), function, baseIp = 0)
+
+        val vstack = execute(compiled, runtimeStore)
+        val reference = vstack.getFrameSlot(compiled.returnSlots.single())
+
+        assertEquals(0, runtimeStore.heap.arrayLength(reference))
+    }
+
+    @Test
+    fun nonAllocatingGcInstructionDoesNotEmitACollectionInstruction() {
         val function = function(
             typeIndex = Index.TypeIndex(1u),
             body = Expression(
@@ -782,54 +999,12 @@ class FunctionCompilerTest {
         val module = allocatingModule(function)
 
         val compiled = compileFunction(
-            context = compilerContext(module, RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL)),
+            context = compilerContext(module),
             function = function,
             baseIp = 0,
         )
 
         assertEquals(2, compiled.instructions.size)
-    }
-
-    @Test
-    fun arenaGcDoesNotEmitACollectionInstructionIntoAnExportedFunction() {
-        val function = allocatingFunction()
-        val module = allocatingModule(function, exported = true)
-
-        val compiled = compileFunction(
-            context = compilerContext(module, RuntimeConfig(gcStrategy = GCStrategy.ARENA)),
-            function = function,
-            baseIp = 0,
-        )
-
-        assertEquals(2, compiled.instructions.size)
-    }
-
-    @Test
-    fun arenaGcDoesNotEmitACollectionPointForAnInternalFunction() {
-        val function = allocatingFunction()
-        val module = allocatingModule(function)
-
-        val compiled = compileFunction(
-            context = compilerContext(module, RuntimeConfig(gcStrategy = GCStrategy.ARENA)),
-            function = function,
-            baseIp = 0,
-        )
-
-        assertEquals(2, compiled.instructions.size)
-    }
-
-    @Test
-    fun arenaGcDoesNotEmitACollectionPointForAModuleWithoutGcInstructions() {
-        val function = function(typeIndex = Index.TypeIndex(1u))
-        val module = allocatingModule(function, exported = true)
-
-        val compiled = compileFunction(
-            context = compilerContext(module, RuntimeConfig(gcStrategy = GCStrategy.ARENA)),
-            function = function,
-            baseIp = 0,
-        )
-
-        assertEquals(1, compiled.instructions.size)
     }
 
     @Test
@@ -945,6 +1120,33 @@ private fun allocatingModule(
     )
 }
 
+private fun i32ArrayDefinition() = definedType(
+    recursiveType = recursiveType(
+        listOf(
+            finalSubType(
+                compositeType = arrayCompositeType(
+                    arrayType(immutableFieldType(valueStorageType(i32ValueType()))),
+                ),
+            ),
+        ),
+    ),
+    typeIndex = 0,
+)
+
+private fun arrayReturningFunctionType(
+    parameters: List<ValueType> = emptyList(),
+) = definedType(
+    recursiveType = functionRecursiveType(
+        functionType(
+            params = resultType(parameters),
+            results = resultType(
+                listOf(referenceValueType(refNonNullReferenceType(AbstractHeapType.Array))),
+            ),
+        ),
+    ),
+    typeIndex = 1,
+)
+
 private fun allocatingFunction() = function(
     typeIndex = Index.TypeIndex(1u),
     body = Expression(
@@ -955,14 +1157,12 @@ private fun allocatingFunction() = function(
 
 private fun compilerContext(
     module: io.github.charlietap.chasm.ast.module.Module,
-    config: RuntimeConfig = runtimeConfig(),
+    store: io.github.charlietap.chasm.runtime.store.Store = store(),
 ): CompilerContext {
-    val store = store()
     return CompilerContext(
-        config = config,
         module = module,
         types = ModuleTypeResolver(module),
-        runtimeTypes = store.runtimeTypes.register(module.definedTypes),
+        runtimeTypes = store.heap.registerRuntimeTypes(module.definedTypes),
     )
 }
 
@@ -982,6 +1182,7 @@ private fun compileFunction(
 
 private fun execute(
     compiled: TestCompiledFunction,
+    store: io.github.charlietap.chasm.runtime.store.Store = store(),
     configure: io.github.charlietap.chasm.runtime.stack.ValueStack.() -> Unit = {},
 ): io.github.charlietap.chasm.runtime.stack.ValueStack {
     val vstack = vstack().apply {
@@ -996,7 +1197,6 @@ private fun execute(
             ),
         ),
     )
-    val store = store()
     val executionContext = executionContext(vstack = vstack, cstack = cstack, store = store)
     var ip = 0
     while (ip != EXIT_IP) {

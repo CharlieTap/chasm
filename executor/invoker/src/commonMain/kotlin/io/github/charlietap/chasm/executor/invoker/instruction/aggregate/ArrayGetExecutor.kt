@@ -1,9 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.ext.array
-import io.github.charlietap.chasm.runtime.ext.field
-import io.github.charlietap.chasm.runtime.ext.popArrayAddress
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -17,9 +14,8 @@ internal inline fun ArrayGetExecutor(
     instruction: AggregateInstruction.ArrayGet,
 ) {
     val fieldIndex = vstack.popI32()
-    val address = vstack.popArrayAddress()
-    val arrayInstance = store.array(address)
-    val fieldValue = arrayInstance.field(fieldIndex)
+    val reference = vstack.pop()
+    val fieldValue = context.heap.getArrayElementTrusted(reference, fieldIndex)
 
     vstack.push(fieldValue)
 }

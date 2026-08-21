@@ -5,15 +5,13 @@ import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnHostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
-import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
-import io.github.charlietap.chasm.runtime.ext.toLong
-import io.github.charlietap.chasm.runtime.instance.ExceptionInstance
+import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
@@ -23,7 +21,6 @@ import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RTT
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor as ControlThrowRefExecutor
 
 internal fun CallExecutor(
@@ -188,25 +185,15 @@ internal fun ThrowExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
     store: Store,
+    context: ExecutionContext,
     instruction: ControlSuperInstruction.Throw,
 ): Int {
     val address = cstack.frameInstance().tagAddress(instruction.tagIndex)
-    val params = LongArray(instruction.payloadSlots.size) { index ->
-        val sourceIndex = instruction.payloadSlots.lastIndex - index
-        vstack.getFrameSlot(instruction.payloadSlots[sourceIndex])
-    }
-    val exceptionInstance = ExceptionInstance(
-        tagAddress = address,
-        fields = params,
-    )
-
-    store.exceptions.add(exceptionInstance)
-    val exceptionAddress = Address.Exception(store.exceptions.size - 1)
     return ControlThrowRefExecutor(
         vstack = vstack,
         cstack = cstack,
         store = store,
-        ref = ReferenceValue.Exception(exceptionAddress).toLong(),
+        ref = context.heap.allocateExceptionFromFrame(context, address, instruction.firstPayloadSlot),
     )
 }
 
@@ -235,7 +222,7 @@ private fun strictIndirectCall(
     callFrameSlot: Int,
     returnIp: Int,
 ): Int {
-    val functionInstance = strictResolveIndirectFunction(store, table, type, elementIndex)
+    val functionInstance = strictResolveIndirectFunction(store, context.heap, table, type, elementIndex)
     return strictInvokeFunction(
         vstack = vstack,
         cstack = cstack,
@@ -284,7 +271,7 @@ private fun strictIndirectReturnCall(
     type: RTT,
     table: TableInstance,
 ): Int {
-    val functionInstance = strictResolveIndirectFunction(store, table, type, elementIndex)
+    val functionInstance = strictResolveIndirectFunction(store, context.heap, table, type, elementIndex)
     return strictInvokeReturnFunction(
         vstack = vstack,
         cstack = cstack,
@@ -316,13 +303,14 @@ private fun strictReferenceReturnCall(
 
 private fun strictResolveIndirectFunction(
     store: Store,
+    heap: WasmHeap,
     table: TableInstance,
     type: RTT,
     elementIndex: Int,
 ): FunctionInstance {
     val address = table.element(elementIndex).toFunctionAddress()
     val functionInstance = store.function(address)
-    if (!store.runtimeTypes.matches(functionInstance.rtt, type)) {
+    if (!heap.matchesRuntimeType(functionInstance.rtt, type)) {
         throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
     return functionInstance

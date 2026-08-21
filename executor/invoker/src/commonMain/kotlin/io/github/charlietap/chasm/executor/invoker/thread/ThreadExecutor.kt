@@ -3,8 +3,10 @@ package io.github.charlietap.chasm.executor.invoker.thread
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
+import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryError
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -49,13 +51,13 @@ internal inline fun ThreadExecutor(
         config = config,
     )
 
+    val params = instance.functionType.params.types.size
+    val results = instance.functionType.results.types.size
+    val interfaceSlots = maxOf(params, results)
     values.forEach { value ->
         vstack.push(value.toLongFromBoxed())
     }
 
-    val params = instance.functionType.params.types.size
-    val results = instance.functionType.results.types.size
-    val interfaceSlots = maxOf(params, results)
     cstack.pushFrame(
         arity = results,
         handlerDepth = 0,
@@ -69,7 +71,6 @@ internal inline fun ThreadExecutor(
     instance.function.locals.forEachIndexed { index, value ->
         vstack.setFrameSlot(interfaceSlots + index, value)
     }
-
     try {
         var ip = instance.function.body.entryIp
         val instructions = store.program.instructions
@@ -95,6 +96,8 @@ internal inline fun ThreadExecutor(
         }
     } catch (exception: InvocationException) {
         Err(exception.error).bind()
+    } catch (_: GuestHeapOutOfMemoryError) {
+        Err(InvocationError.GuestHeapOutOfMemory).bind()
     }
 
     if (cstack.framesDepth() != 0 || cstack.handlersDepth() != 0 || vstack.depth() != results) {
@@ -102,13 +105,14 @@ internal inline fun ThreadExecutor(
     }
 
     if (
-        instance.function.collectGarbageAfterInvocation &&
-        store.heap.sizeInBytes >= config.gcThreshold.bytes
+        config.gcStrategy == GCStrategy.ARENA &&
+        context.heap.shouldCollectGarbage(config.gcThreshold.bytes)
     ) {
         garbageCollector(store, vstack).bind()
     }
 
     List(results) {
         vstack.pop()
-    }.asReversed()
+    }
+        .asReversed()
 }

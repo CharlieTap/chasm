@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.executor.instantiator.context.InstantiationContext
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.ext.tag
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.ast.module.Import as ModuleImport
 
@@ -16,8 +15,8 @@ internal inline fun TagImportMatcher(
     import: ExternalValue.Tag,
 ): Result<Boolean, ModuleTrapError> = binding {
     val store = context.store
-    val tag = store.tag(import.address)
+    val tag = store.heap.tag(import.address)
     val descriptorRtt = context.runtimeTypes[context.types.resolve(descriptor.type).typeIndex]
 
-    store.runtimeTypes.matches(tag.rtt, descriptorRtt)
+    store.heap.matchesRuntimeType(tag.rtt, descriptorRtt)
 }

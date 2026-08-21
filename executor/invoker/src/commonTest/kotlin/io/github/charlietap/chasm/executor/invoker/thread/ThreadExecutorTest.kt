@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.executor.invoker.thread
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
@@ -12,10 +14,16 @@ import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.i32
+import io.github.charlietap.chasm.fixture.type.definedType
+import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.fixture.type.structCompositeType
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryError
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import kotlin.test.Test
@@ -24,6 +32,27 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ThreadExecutorTest {
+
+    @Test
+    fun `guest heap exhaustion becomes a deterministic invocation error`() {
+        val program = Program()
+        val entryIp = program.append(
+            arrayOf(
+                DispatchableInstruction { _, _, _, _, _ ->
+                    throw GuestHeapOutOfMemoryError("injected configured capacity exhaustion")
+                },
+            ),
+        )
+        val function = wasmFunctionInstance(
+            module = moduleInstance(),
+            function = runtimeFunction(body = runtimeExpression(entryIp)),
+        )
+        val store = store(program = program)
+
+        val actual = ThreadExecutor(runtimeConfig(), store, function, emptyList())
+
+        assertEquals(Err(InvocationError.GuestHeapOutOfMemory), actual)
+    }
 
     @Test
     fun `executes a program and returns its results`() {
@@ -82,9 +111,10 @@ class ThreadExecutorTest {
             function = runtimeFunction(
                 body = runtimeExpression(entryIp),
                 frameSlots = 2,
-                collectGarbageAfterInvocation = true,
             ),
         )
+        val store = store(program = program)
+        allocateUnreachableGuestObject(store)
         var collected = false
         val collector: GarbageCollector = { _, stack ->
             collected = true
@@ -93,8 +123,11 @@ class ThreadExecutorTest {
         }
 
         val actual = ThreadExecutor(
-            config = RuntimeConfig(gcThreshold = GCThreshold.KB(0)),
-            store = store(program = program),
+            config = RuntimeConfig(
+                gcStrategy = GCStrategy.ARENA,
+                gcThreshold = GCThreshold.KB(0),
+            ),
+            store = store,
             instance = function,
             values = emptyList(),
             garbageCollector = collector,
@@ -105,7 +138,7 @@ class ThreadExecutorTest {
     }
 
     @Test
-    fun `does not collect garbage below the configured threshold`() {
+    fun `manual and traditional strategies do not collect after invocation`() {
         val program = Program()
         val entryIp = program.append(
             arrayOf(
@@ -115,26 +148,70 @@ class ThreadExecutorTest {
         val module = moduleInstance()
         val function = wasmFunctionInstance(
             module = module,
-            function = runtimeFunction(
-                body = runtimeExpression(entryIp),
-                collectGarbageAfterInvocation = true,
-            ),
+            function = runtimeFunction(body = runtimeExpression(entryIp)),
         )
+        val store = store(program = program)
+        allocateUnreachableGuestObject(store)
         var collected = false
         val collector: GarbageCollector = { _, _ ->
             collected = true
             Ok(Unit)
         }
 
+        for (strategy in listOf(GCStrategy.MANUAL, GCStrategy.TRADITIONAL)) {
+            val actual = ThreadExecutor(
+                config = RuntimeConfig(
+                    gcStrategy = strategy,
+                    gcThreshold = GCThreshold.KB(0),
+                ),
+                store = store,
+                instance = function,
+                values = emptyList(),
+                garbageCollector = collector,
+            )
+
+            assertEquals(Ok(emptyList()), actual)
+        }
+        assertFalse(collected)
+    }
+
+    @Test
+    fun `collector failure is returned`() {
+        val program = Program()
+        val entryIp = program.append(
+            arrayOf(EndFunctionDispatcher(AdminInstruction.EndFunction)),
+        )
+        val function = wasmFunctionInstance(
+            module = moduleInstance(),
+            function = runtimeFunction(body = runtimeExpression(entryIp)),
+        )
+        val store = store(program = program)
+        allocateUnreachableGuestObject(store)
+        val failure = InvocationError.GarbageCollectionFailed("injected")
+
         val actual = ThreadExecutor(
-            config = runtimeConfig(),
-            store = store(program = program),
+            config = RuntimeConfig(
+                gcStrategy = GCStrategy.ARENA,
+                gcThreshold = GCThreshold.KB(0),
+            ),
+            store = store,
             instance = function,
             values = emptyList(),
-            garbageCollector = collector,
+            garbageCollector = { _, _ -> Err(failure) },
         )
 
-        assertEquals(Ok(emptyList()), actual)
-        assertFalse(collected)
+        assertEquals(Err(failure), actual)
+    }
+
+    private fun allocateUnreachableGuestObject(store: io.github.charlietap.chasm.runtime.store.Store) {
+        val types = listOf(
+            definedType(
+                recursiveType = recursiveType(
+                    subTypes = listOf(finalSubType(compositeType = structCompositeType())),
+                ),
+            ),
+        )
+        val runtimeType = store.heap.registerRuntimeTypes(types)[0]
+        store.heap.allocateStruct(runtimeType, LongArray(0))
     }
 }

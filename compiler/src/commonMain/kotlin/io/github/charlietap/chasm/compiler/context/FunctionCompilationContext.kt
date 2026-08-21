@@ -268,6 +268,73 @@ internal class FunctionCompilationContext(
         return operand.reservedSlot
     }
 
+    /** Copies popped operands into a fresh contiguous temporary range. */
+    fun materializeContiguous(operands: List<Operand>): Int {
+        var highestFrameSource = frame.temporarySlotBase - 1
+        var index = 0
+        while (index < operands.size) {
+            val operand = operands[index]
+            if (operand.sourceKind == OperandSourceKind.Frame) {
+                highestFrameSource = maxOf(highestFrameSource, operand.sourceSlot)
+            }
+            index++
+        }
+        frame.reserve(highestFrameSource)
+
+        val firstSlot = frame.allocate()
+        index = 1
+        while (index < operands.size) {
+            frame.allocate()
+            index++
+        }
+
+        index = 0
+        while (index < operands.size) {
+            val operand = operands[index]
+            val destinationSlot = firstSlot + index
+            when (operand.sourceKind) {
+                OperandSourceKind.I32Immediate -> emitI32Constant(operand.i32Immediate, destinationSlot)
+                OperandSourceKind.I64Immediate -> emitI64Constant(operand.i64Immediate, destinationSlot)
+                OperandSourceKind.F32Immediate -> emitF32Constant(operand.sourceBits.toInt(), destinationSlot)
+                OperandSourceKind.F64Immediate -> emitF64Constant(operand.sourceBits, destinationSlot)
+                OperandSourceKind.Local,
+                OperandSourceKind.Frame,
+                -> if (operand.sourceSlot != destinationSlot) {
+                    emitCopy(operand.sourceSlot, destinationSlot)
+                }
+            }
+            index++
+        }
+        return firstSlot
+    }
+
+    /** Returns the first source slot when every operand already occupies one contiguous range. */
+    fun contiguousFrameSourceOrNull(operands: List<Operand>): Int? {
+        if (operands.isEmpty()) return null
+        val firstSlot = operands[0].sourceSlot
+        var index = 0
+        while (index < operands.size) {
+            val operand = operands[index]
+            if (operand.sourceKind != OperandSourceKind.Frame || operand.sourceSlot != firstSlot + index) {
+                return null
+            }
+            index++
+        }
+        return firstSlot
+    }
+
+    /** Releases a contiguous temporary range after its consuming instruction is emitted. */
+    fun releaseContiguous(
+        firstSlot: Int,
+        count: Int,
+    ) {
+        var index = count - 1
+        while (index >= 0) {
+            frame.release(firstSlot + index)
+            index--
+        }
+    }
+
     fun rewindFrame() {
         frame.rewindTo(operands.highestReservedSlot())
     }

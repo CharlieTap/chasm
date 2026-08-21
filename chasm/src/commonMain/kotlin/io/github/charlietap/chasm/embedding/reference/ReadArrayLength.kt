@@ -12,7 +12,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.ext.array
+import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
 fun readArrayLength(
@@ -30,7 +30,7 @@ internal fun internalReadArrayLength(
     store: Store,
     array: ReferenceValue.Array,
 ): Result<Int, ModuleTrapError> = runCatching {
-    store.store.array(array.address).fields.size
+    store.store.heap.arrayLength(array.toLong())
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

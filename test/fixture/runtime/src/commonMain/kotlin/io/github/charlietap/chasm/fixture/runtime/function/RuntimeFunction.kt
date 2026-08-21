@@ -11,7 +11,6 @@ fun runtimeFunction(
     body: Expression = runtimeExpression(),
     frameSlots: Int = 0,
     returnSlots: IntArray = intArrayOf(),
-    collectGarbageAfterInvocation: Boolean = false,
 ) = Function(
     idx = idx,
     typeIndex = typeIndex,
@@ -19,5 +18,4 @@ fun runtimeFunction(
     body = body,
     frameSlots = frameSlots,
     returnSlots = returnSlots,
-    collectGarbageAfterInvocation = collectGarbageAfterInvocation,
 )

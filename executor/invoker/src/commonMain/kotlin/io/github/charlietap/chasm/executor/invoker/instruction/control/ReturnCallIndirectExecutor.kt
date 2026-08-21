@@ -24,7 +24,7 @@ internal fun ReturnCallIndirectExecutor(
     val elementIndex = vstack.popI32()
     val address = instruction.table.element(elementIndex).toFunctionAddress()
     val function = store.function(address)
-    if (!store.runtimeTypes.matches(function.rtt, instruction.type)) {
+    if (!context.heap.matchesRuntimeType(function.rtt, instruction.type)) {
         throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
 

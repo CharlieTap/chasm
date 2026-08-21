@@ -48,7 +48,7 @@ class ModuleAllocatorTest {
                 Address.Element(allocatedElements.lastIndex)
             },
             dataAllocator = { _, _ -> error("unexpected data allocation") },
-            moduleCompiler = { _, _, _, _, _, _, _ -> Ok(Unit) },
+            moduleCompiler = { _, _, _, _, _, _ -> Ok(Unit) },
             exportAllocator = { _, _ -> error("unexpected export allocation") },
         )
 

@@ -10,7 +10,6 @@ data class Function(
     var body: Expression,
     val frameSlots: Int,
     val returnSlots: IntArray,
-    var collectGarbageAfterInvocation: Boolean = false,
 ) {
     companion object {
         val TEMP = Function(
@@ -35,8 +34,6 @@ data class Function(
         if (body != other.body) return false
         if (frameSlots != other.frameSlots) return false
         if (!returnSlots.contentEquals(other.returnSlots)) return false
-        if (collectGarbageAfterInvocation != other.collectGarbageAfterInvocation) return false
-
         return true
     }
 
@@ -47,7 +44,6 @@ data class Function(
         result = 31 * result + body.hashCode()
         result = 31 * result + frameSlots
         result = 31 * result + returnSlots.contentHashCode()
-        result = 31 * result + collectGarbageAfterInvocation.hashCode()
         return result
     }
 }

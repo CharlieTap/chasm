@@ -9,4 +9,4 @@ internal typealias TypeAllocator = (Module, Store) -> RuntimeTypeMap
 internal fun TypeAllocator(
     module: Module,
     store: Store,
-): RuntimeTypeMap = store.runtimeTypes.register(module.definedTypes)
+): RuntimeTypeMap = store.heap.registerRuntimeTypes(module.definedTypes)

@@ -13,14 +13,13 @@ import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.instantiator.ext.globalAddress
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryError
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.HeapTypeEncoder
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
-import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_FUNCTION
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_I31
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
-import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.runtime.encoder.ReferenceValueEncoder
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.ext.default
@@ -29,9 +28,7 @@ import io.github.charlietap.chasm.runtime.ext.isExternReference
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.ext.toExternReference
 import io.github.charlietap.chasm.runtime.ext.toReferenceValue
-import io.github.charlietap.chasm.runtime.instance.ArrayInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instance.StructInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
@@ -48,14 +45,19 @@ fun ConstantExpressionEvaluator(
     instance: ModuleInstance,
     types: ModuleTypeResolver,
     expression: Expression,
-): Result<Long, InvocationError> =
-    ConstantExpressionEvaluator(
-        store = store,
-        instance = instance,
-        types = types,
-        expression = expression,
-        stack = ValueStack(),
-    )
+): Result<Long, InvocationError> {
+    return try {
+        ConstantExpressionEvaluator(
+            store = store,
+            instance = instance,
+            types = types,
+            expression = expression,
+            stack = ValueStack(),
+        )
+    } catch (_: GuestHeapOutOfMemoryError) {
+        Err(InvocationError.GuestHeapOutOfMemory)
+    }
+}
 
 internal fun ConstantExpressionEvaluator(
     store: Store,
@@ -120,14 +122,7 @@ internal fun ConstantExpressionEvaluator(
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
                 val structType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asStructType()
-                val size = structType.fields.size
-                val fields = LongArray(size)
-                for (i in size - 1 downTo 0) {
-                    fields[i] = stack.pop()
-                }
-                val structInstance = StructInstance(rtt, structType, fields)
-                val structAddress = allocateStruct(store, structInstance)
-                stack.push((structAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_STRUCT)
+                store.heap.allocateStructFromStack(rtt, structType.fields.size, stack)
             }
             is AggregateInstruction.StructNewDefault -> {
                 val typeIndex = instruction.typeIndex.toInt()
@@ -136,20 +131,14 @@ internal fun ConstantExpressionEvaluator(
                 val fields = LongArray(structType.fields.size) { idx ->
                     structType.fields[idx].default()
                 }
-                val structInstance = StructInstance(rtt, structType, fields)
-                val structAddress = allocateStruct(store, structInstance)
-                stack.push((structAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_STRUCT)
+                stack.push(store.heap.allocateStruct(rtt, fields))
             }
             is AggregateInstruction.ArrayNew -> {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
-                val arrayType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asArrayType()
                 val size = stack.popI32()
                 val value = stack.pop()
-                val fields = LongArray(size) { value }
-                val arrayInstance = ArrayInstance(rtt, arrayType, fields)
-                val arrayAddress = allocateArray(store, arrayInstance)
-                stack.push((arrayAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_ARRAY)
+                stack.push(store.heap.allocateArrayFilled(rtt, size, value))
             }
             is AggregateInstruction.ArrayNewDefault -> {
                 val typeIndex = instruction.typeIndex.toInt()
@@ -157,23 +146,12 @@ internal fun ConstantExpressionEvaluator(
                 val arrayType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asArrayType()
                 val size = stack.popI32()
                 val defaultValue = arrayType.fieldType.default()
-                val fields = LongArray(size) { defaultValue }
-                val arrayInstance = ArrayInstance(rtt, arrayType, fields)
-                val arrayAddress = allocateArray(store, arrayInstance)
-                stack.push((arrayAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_ARRAY)
+                stack.push(store.heap.allocateArrayFilled(rtt, size, defaultValue))
             }
             is AggregateInstruction.ArrayNewFixed -> {
                 val typeIndex = instruction.typeIndex.toInt()
                 val rtt = instance.runtimeTypes[typeIndex]
-                val arrayType = DefinedTypeExpander(types.definedType(instruction.typeIndex)).asArrayType()
-                val length = instruction.size.toInt()
-                val fields = LongArray(length)
-                for (i in length - 1 downTo 0) {
-                    fields[i] = stack.pop()
-                }
-                val arrayInstance = ArrayInstance(rtt, arrayType, fields)
-                val arrayAddress = allocateArray(store, arrayInstance)
-                stack.push((arrayAddress.address.toLong() shl RV_SHIFT_BITS) or RV_TYPE_ARRAY)
+                store.heap.allocateArrayFromStack(rtt, instruction.size.toInt(), stack)
             }
             is AggregateInstruction.RefI31 -> {
                 val value = stack.popI32()
@@ -216,24 +194,4 @@ internal fun ConstantExpressionEvaluator(
     } else {
         Err(InvocationError.MissingStackValue)
     }
-}
-
-private fun allocateStruct(store: Store, instance: StructInstance): Address.Struct {
-    val reference = store.heap.structReferencePool.removeFirstOrNull()
-    if (reference != null) {
-        store.structs[reference] = instance
-    } else {
-        store.structs.add(instance)
-    }
-    return Address.Struct(reference ?: (store.structs.size - 1))
-}
-
-private fun allocateArray(store: Store, instance: ArrayInstance): Address.Array {
-    val reference = store.heap.arrayReferencePool.removeFirstOrNull()
-    if (reference != null) {
-        store.arrays[reference] = instance
-    } else {
-        store.arrays.add(instance)
-    }
-    return Address.Array(reference ?: (store.arrays.size - 1))
 }

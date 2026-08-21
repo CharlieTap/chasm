@@ -17,7 +17,7 @@ fun HostFunctionAllocator(
 ): ExternalValue.Function {
 
     val type = functionType.definedType()
-    val rtt = store.runtimeTypes.register(type)
+    val rtt = store.heap.registerRuntimeType(type)
 
     val instance = FunctionInstance.HostFunction(rtt, functionType, function)
 

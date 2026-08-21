@@ -27,11 +27,6 @@ internal fun dropStore(
     }
     store.data.clear()
 
-    store.exceptions.forEach { exception ->
-        exception.fields = longArrayOf()
-    }
-    store.exceptions.clear()
-
     store.elements.forEach { element ->
         element.elements = longArrayOf()
     }
@@ -56,11 +51,7 @@ internal fun dropStore(
     }
     store.tables.clear()
 
-    store.arrays.clear()
-
-    store.structs.clear()
-
-    store.tags.clear()
+    store.heap.drop()
 
     return Success(Unit)
 }

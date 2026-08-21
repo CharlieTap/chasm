@@ -578,14 +578,18 @@ private fun compileThrow(
     instruction: ControlInstruction.Throw,
 ) {
     val payloads = state.pop(state.compiler.tag(instruction.tagIndex).type.functionType.params.types.size)
+    val contiguousSource = state.contiguousFrameSourceOrNull(payloads)
+    val materializedPayloads = payloads.isNotEmpty() && contiguousSource == null
+    val firstPayloadSlot = contiguousSource ?: if (payloads.isEmpty()) {
+        0
+    } else {
+        state.materializeContiguous(payloads)
+    }
     state.emitThrow(
         tagIndex = instruction.tagIndex,
-        payloadSlots = if (payloads.isEmpty()) {
-            emptyIntArray
-        } else {
-            IntArray(payloads.size) { index -> state.materialize(payloads[index]) }
-        },
+        firstPayloadSlot = firstPayloadSlot,
     )
+    if (materializedPayloads) state.releaseContiguous(firstPayloadSlot, payloads.size)
     state.reachable = false
 }
 

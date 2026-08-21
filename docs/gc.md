@@ -1,33 +1,46 @@
-## What is Wasm GC
+# WebAssembly GC in Chasm
 
-Chasm supports the [Wasm GC proposal](https://github.com/WebAssembly/gc/blob/main/proposals/gc/Overview.md). This means that *if* your Wasm
-binary includes Wasm GC instructions, Chasm is capable of executing them.
+Chasm supports the [WebAssembly GC proposal](https://github.com/WebAssembly/gc/blob/main/proposals/gc/Overview.md).
+Structs, arrays, and exceptions are allocated in a non-moving, mark-and-sweep
+heap owned by the runtime Store. Modules that only use linear memory do not
+allocate in this heap.
 
-Wasm-GC is an extension to the WebAssembly virtual machine that allows garbage-collected languages to compile to it. It adds new
-instructions to the virtual machine's specification to create structs and arrays whose lifecycle is managed by the runtime implementing
-the specification (i.e., chasm). Historically, garbage-collected languages would have to embed their own garbage collection code in the
-Wasm binary, massively inflating its size.
+The collector traces reference fields described by registered WebAssembly
+types. During execution, the current value stack is passed directly to a
+synchronous collection. Globals, tables, and element segments are also roots.
 
-## Chasm's GC
+Kotlin host values and `externref` remain outside this collector. Explicit
+collection is intended for embedding code between invocations; collection from
+inside a host-function callback is not supported.
 
-It's important to understand that if your Wasm binary contains no Wasm-GC instructions, then the following strategies will have no effect.
-There will be no heap checks or pauses as your program will use linear memory instead.
+## Collection strategies
 
-Chasm supports three [GCStrategies](../config/src/commonMain/kotlin/io/github/charlietap/chasm/config/GCStrategy.kt):
+Choose a strategy with `RuntimeConfig.gcStrategy`.
 
-* **Arena (Default)**
+### Arena (default)
 
-This is the default mode of operation. In this mode, chasm will rewrite the bytecode of your Wasm functions to include a single
-unconditional pause at the end of the function's execution, removing all GC objects which are no longer referenced. It's recommended
-to use this mode unless you run into out of memory issues as the alternative (Traditional) requires costly heap checks.
+At the end of a top-level WebAssembly invocation, Chasm checks the managed heap
+against `RuntimeConfig.gcThreshold` and collects when the threshold has been
+reached. Arena adds no per-allocation policy check.
 
-* **Manual**
+### Manual
 
-In this mode, chasm will perform no heap checks and will not pause for garbage collection. It's expected the user monitors the heap size
-and manually triggers garbage collection using the [GC public API](../chasm/src/commonMain/kotlin/io/github/charlietap/chasm/embedding/GC.kt).
+Chasm performs no automatic collection. The embedding triggers collection with
+the public `gc` function.
 
-* **Traditional**
+### Traditional
 
-This mode of operation functions like a traditional garbage collector. Chasm will rewrite the bytecode of your functions and insert heap
-checks after every allocation. If the heap exceeds the threshold configurable in the `RuntimeConfig`, a pause will run, removing all dead
-references.
+Each struct, array, and exception allocation performs a capacity and threshold
+preflight. When collection is required, the currently executing value stack is
+scanned directly before allocation continues.
+
+After collection, the next threshold adapts to the live heap and pending
+allocation:
+
+```text
+max(configured threshold, 2 * live words, 2 * pending allocation words)
+```
+
+Reusable swept capacity can satisfy an allocation without another collection.
+If the configured heap is exhausted, Chasm makes one collection attempt before
+reporting guest heap exhaustion as an invocation error.

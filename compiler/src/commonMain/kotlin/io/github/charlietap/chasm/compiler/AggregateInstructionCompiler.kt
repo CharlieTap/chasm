@@ -40,42 +40,14 @@ import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
 import io.github.charlietap.chasm.compiler.operand.isImmediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
+import io.github.charlietap.chasm.runtime.ext.default
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ConcreteHeapType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.ValueType
-
-internal fun AggregateInstruction.isAllocating(): Boolean = when (this) {
-    is AggregateInstruction.StructNew,
-    is AggregateInstruction.StructNewDefault,
-    is AggregateInstruction.ArrayNew,
-    is AggregateInstruction.ArrayNewData,
-    is AggregateInstruction.ArrayNewFixed,
-    is AggregateInstruction.ArrayNewElement,
-    is AggregateInstruction.ArrayNewDefault,
-    -> true
-    is AggregateInstruction.StructGet,
-    is AggregateInstruction.StructGetSigned,
-    is AggregateInstruction.StructGetUnsigned,
-    is AggregateInstruction.StructSet,
-    is AggregateInstruction.ArrayGet,
-    is AggregateInstruction.ArrayGetSigned,
-    is AggregateInstruction.ArrayGetUnsigned,
-    is AggregateInstruction.ArraySet,
-    AggregateInstruction.ArrayLen,
-    is AggregateInstruction.ArrayFill,
-    is AggregateInstruction.ArrayCopy,
-    is AggregateInstruction.ArrayInitData,
-    is AggregateInstruction.ArrayInitElement,
-    AggregateInstruction.RefI31,
-    AggregateInstruction.I31GetSigned,
-    AggregateInstruction.I31GetUnsigned,
-    AggregateInstruction.AnyConvertExtern,
-    AggregateInstruction.ExternConvertAny,
-    -> false
-}
+import io.github.charlietap.chasm.type.ext.bitWidth
 
 internal fun compileAggregateAccessChain(
     state: FunctionCompilationContext,
@@ -193,12 +165,19 @@ internal fun compileAggregateInstruction(
         val type = state.compiler.structType(instruction.typeIndex)
         val fields = state.pop(type.fields.size)
         val destination = destination(state, fields.firstOrNull(), nextInstruction)
+        val contiguousSource = state.contiguousFrameSourceOrNull(fields)
+        val materializedFields = fields.isNotEmpty() && contiguousSource == null
+        val firstFieldSlot = contiguousSource ?: if (fields.isEmpty()) {
+            destination.slot
+        } else {
+            state.materializeContiguous(fields)
+        }
         state.emitStructNew(
-            fieldSlots = fields.map(state::materialize),
+            firstFieldSlot = firstFieldSlot,
             destinationSlot = destination.slot,
             rtt = state.compiler.rtt(instruction.typeIndex),
-            type = type,
         )
+        if (materializedFields) state.releaseContiguous(firstFieldSlot, fields.size)
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
         destination.consumesNextInstruction
     }
@@ -263,31 +242,40 @@ internal fun compileAggregateInstruction(
             value = value,
             destinationSlot = destination.slot,
             rtt = state.compiler.rtt(instruction.typeIndex),
-            type = state.compiler.arrayType(instruction.typeIndex),
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
         destination.consumesNextInstruction
     }
     is AggregateInstruction.ArrayNewFixed -> {
-        val values = state.pop(instruction.size.toInt())
+        val length = instruction.size.toInt()
+        val values = state.pop(length)
         val destination = destination(state, values.firstOrNull(), nextInstruction)
+        val contiguousSource = state.contiguousFrameSourceOrNull(values)
+        val materializedValues = values.isNotEmpty() && contiguousSource == null
+        val firstElementSlot = contiguousSource ?: if (values.isEmpty()) {
+            destination.slot
+        } else {
+            state.materializeContiguous(values)
+        }
         state.emitArrayNewFixed(
-            valueSlots = values.map(state::materialize),
+            firstElementSlot = firstElementSlot,
+            length = length,
             destinationSlot = destination.slot,
             rtt = state.compiler.rtt(instruction.typeIndex),
-            type = state.compiler.arrayType(instruction.typeIndex),
         )
+        if (materializedValues) state.releaseContiguous(firstElementSlot, length)
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
         destination.consumesNextInstruction
     }
     is AggregateInstruction.ArrayNewDefault -> {
         val size = state.pop()
         val destination = destination(state, size, nextInstruction)
+        val type = state.compiler.arrayType(instruction.typeIndex)
         state.emitArrayNewDefault(
             size = size,
             destinationSlot = destination.slot,
             rtt = state.compiler.rtt(instruction.typeIndex),
-            type = state.compiler.arrayType(instruction.typeIndex),
+            field = type.fieldType.default(),
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
         destination.consumesNextInstruction
@@ -296,13 +284,15 @@ internal fun compileAggregateInstruction(
         val length = state.pop()
         val sourceOffset = state.pop()
         val destination = destination(state, sourceOffset, nextInstruction)
+        val type = state.compiler.arrayType(instruction.typeIndex)
+        val fieldWidthInBytes = checkNotNull(type.fieldType.bitWidth()) / 8
         state.emitArrayNewData(
             sourceOffset = sourceOffset,
             length = length,
             destinationSlot = destination.slot,
             rtt = state.compiler.rtt(instruction.typeIndex),
-            type = state.compiler.arrayType(instruction.typeIndex),
             data = state.compiler.data(instruction.dataIndex),
+            fieldWidthInBytes = fieldWidthInBytes,
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
         destination.consumesNextInstruction
@@ -316,7 +306,6 @@ internal fun compileAggregateInstruction(
             length = length,
             destinationSlot = destination.slot,
             rtt = state.compiler.rtt(instruction.typeIndex),
-            type = state.compiler.arrayType(instruction.typeIndex),
             element = state.compiler.element(instruction.elementIndex),
         )
         completeReferenceDestination(state, instruction.typeIndex.toInt(), destination)
@@ -391,13 +380,16 @@ internal fun compileAggregateInstruction(
         val sourceOffset = state.pop()
         val destinationOffset = state.pop()
         val address = state.pop()
+        val elementByteWidth = checkNotNull(
+            state.compiler.arrayType(instruction.typeIndex).fieldType.bitWidth(),
+        ) / Byte.SIZE_BITS
         state.emitArrayInitData(
             elements,
             sourceOffset,
             destinationOffset,
             state.operandSlot(address),
             state.compiler.data(instruction.dataIndex),
-            state.compiler.arrayType(instruction.typeIndex),
+            elementByteWidth,
         )
         false
     }

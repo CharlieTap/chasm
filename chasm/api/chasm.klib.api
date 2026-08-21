@@ -77,8 +77,6 @@ sealed interface io.github.charlietap.chasm.embedding.error/ChasmError { // io.g
     }
 }
 
-sealed interface io.github.charlietap.chasm.embedding.shapes/Importable // io.github.charlietap.chasm.embedding.shapes/Importable|null[0]
-
 sealed interface io.github.charlietap.chasm.embedding.shapes/NameData // io.github.charlietap.chasm.embedding.shapes/NameData|null[0]
 
 final class io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder { // io.github.charlietap.chasm.embedding.dsl/FunctionImportBuilder|null[0]
@@ -418,6 +416,8 @@ final class io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator : io.git
     final fun alloc(kotlin/Int): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.alloc|alloc(kotlin.Int){}[0]
     final fun free(kotlin/Int) // io.github.charlietap.chasm.embedding.shapes/Wasm32Allocator.free|free(kotlin.Int){}[0]
 }
+
+sealed class io.github.charlietap.chasm.embedding.shapes/Importable // io.github.charlietap.chasm.embedding.shapes/Importable|null[0]
 
 final fun (io.github.charlietap.chasm.embedding.shapes/HostFunctionContext).io.github.charlietap.chasm.embedding.ext/externRef(kotlin/Any?): io.github.charlietap.chasm.runtime.value/ReferenceValue // io.github.charlietap.chasm.embedding.ext/externRef|externRef@io.github.charlietap.chasm.embedding.shapes.HostFunctionContext(kotlin.Any?){}[0]
 final fun (io.github.charlietap.chasm.embedding.shapes/HostFunctionContext).io.github.charlietap.chasm.embedding.ext/readArrayElement(io.github.charlietap.chasm.runtime.value/ReferenceValue.Array, kotlin/Int): io.github.charlietap.chasm.embedding.shapes/ChasmResult<io.github.charlietap.chasm.runtime.value/FieldValue, io.github.charlietap.chasm.embedding.error/ChasmError.ExecutionError> // io.github.charlietap.chasm.embedding.ext/readArrayElement|readArrayElement@io.github.charlietap.chasm.embedding.shapes.HostFunctionContext(io.github.charlietap.chasm.runtime.value.ReferenceValue.Array;kotlin.Int){}[0]

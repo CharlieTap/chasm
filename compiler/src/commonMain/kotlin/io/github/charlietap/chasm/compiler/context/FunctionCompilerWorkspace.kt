@@ -12,17 +12,6 @@ internal class FunctionCompilerWorkspace {
     private val valueBlockTypes = ArrayList<ValueType>()
     private val valueBlockFunctionTypes = ArrayList<FunctionType>()
 
-    var containsGcInstructions = false
-        private set
-
-    fun beginFunction() {
-        containsGcInstructions = false
-    }
-
-    fun markGcInstructions() {
-        containsGcInstructions = true
-    }
-
     fun blockType(
         compiler: CompilerContext,
         type: BlockType,

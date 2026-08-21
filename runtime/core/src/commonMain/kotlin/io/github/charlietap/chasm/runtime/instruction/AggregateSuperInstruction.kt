@@ -2,9 +2,7 @@ package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
-import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.PackedType
-import io.github.charlietap.chasm.type.StructType
 
 sealed interface AggregateSuperInstruction : LinkedInstruction {
 
@@ -144,28 +142,28 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val addressSlot: Int,
         val field: Int,
         val destinationSlot: Int,
-        val packedType: PackedType? = null,
+        val packedType: PackedType,
     ) : AggregateSuperInstruction
 
     data class ArrayGetSignedS(
         val addressSlot: Int,
         val fieldSlot: Int,
         val destinationSlot: Int,
-        val packedType: PackedType? = null,
+        val packedType: PackedType,
     ) : AggregateSuperInstruction
 
     data class ArrayGetUnsignedI(
         val addressSlot: Int,
         val field: Int,
         val destinationSlot: Int,
-        val packedType: PackedType? = null,
+        val packedType: PackedType,
     ) : AggregateSuperInstruction
 
     data class ArrayGetUnsignedS(
         val addressSlot: Int,
         val fieldSlot: Int,
         val destinationSlot: Int,
-        val packedType: PackedType? = null,
+        val packedType: PackedType,
     ) : AggregateSuperInstruction
 
     data class ArrayLenS(
@@ -178,7 +176,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val value: Long,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
     ) : AggregateSuperInstruction
 
     data class ArrayNewIs(
@@ -186,7 +183,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val valueSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
     ) : AggregateSuperInstruction
 
     data class ArrayNewSi(
@@ -194,7 +190,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val value: Long,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
     ) : AggregateSuperInstruction
 
     data class ArrayNewSs(
@@ -202,14 +197,12 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val valueSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
     ) : AggregateSuperInstruction
 
     data class ArrayNewDefaultI(
         val size: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val field: Long,
     ) : AggregateSuperInstruction
 
@@ -217,7 +210,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val sizeSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val field: Long,
     ) : AggregateSuperInstruction
 
@@ -226,7 +218,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val arrayLength: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
     ) : AggregateSuperInstruction
@@ -236,7 +227,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val arrayLengthSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
     ) : AggregateSuperInstruction
@@ -246,7 +236,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val arrayLength: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
     ) : AggregateSuperInstruction
@@ -256,7 +245,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val arrayLengthSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
     ) : AggregateSuperInstruction
@@ -266,7 +254,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val arrayLength: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
     ) : AggregateSuperInstruction
 
@@ -275,7 +262,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val arrayLengthSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
     ) : AggregateSuperInstruction
 
@@ -284,7 +270,6 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val arrayLength: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
     ) : AggregateSuperInstruction
 
@@ -293,15 +278,13 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val arrayLengthSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
     ) : AggregateSuperInstruction
 
     data class ArrayNewFixedS(
-        val valueSlots: List<Int>,
+        val firstElementSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val arrayType: ArrayType,
         val size: Int,
     ) : AggregateSuperInstruction
 
@@ -505,14 +488,14 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
         val addressSlot: Int,
         val destinationSlot: Int,
         val fieldIndex: Int,
-        val packedType: PackedType? = null,
+        val packedType: PackedType,
     ) : AggregateSuperInstruction
 
     data class StructGetUnsignedS(
         val addressSlot: Int,
         val destinationSlot: Int,
         val fieldIndex: Int,
-        val packedType: PackedType? = null,
+        val packedType: PackedType,
     ) : AggregateSuperInstruction
 
     data class RefCastStructGetS(
@@ -537,16 +520,14 @@ sealed interface AggregateSuperInstruction : LinkedInstruction {
     ) : AggregateSuperInstruction
 
     data class StructNewS(
-        val fieldSlots: List<Int>,
+        val firstFieldSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-        val structType: StructType,
     ) : AggregateSuperInstruction
 
     data class StructNewDefaultS(
         val destinationSlot: Int,
         val rtt: RTT,
-        val structType: StructType,
         val fields: LongArray,
     ) : AggregateSuperInstruction
 

@@ -6,6 +6,6 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 
 fun ThrowDispatcher(
     instruction: ControlInstruction.Throw,
-): DispatchableInstruction = { vstack, cstack, store, _, _ ->
-    ThrowExecutor(vstack, cstack, store, instruction)
+): DispatchableInstruction = { vstack, cstack, store, context, _ ->
+    ThrowExecutor(vstack, cstack, store, context, instruction)
 }

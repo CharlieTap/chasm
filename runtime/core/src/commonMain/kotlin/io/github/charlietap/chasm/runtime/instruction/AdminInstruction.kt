@@ -156,6 +156,4 @@ sealed interface AdminInstruction : LinkedInstruction {
     ) : AdminInstruction
 
     data object PopHandler : AdminInstruction
-
-    data object PauseIf : AdminInstruction
 }

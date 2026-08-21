@@ -12,12 +12,14 @@ import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.functionExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.globalAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.globalExternalValue
+import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.tableExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.tagAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.tagExternalValue
+import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.functionReferenceValue
 import io.github.charlietap.chasm.fixture.runtime.value.i32
 import io.github.charlietap.chasm.fixture.type.constMutability
@@ -149,7 +151,9 @@ class ImportTest {
     @Test
     fun `can create a table import using the import dsl builder`() {
 
-        val store = publicStore()
+        val store = publicStore(
+            store(functions = mutableListOf(hostFunctionInstance())),
+        )
 
         val actual = imports(store) {
             table {
@@ -201,7 +205,6 @@ class ImportTest {
                     attribute = exceptionAttribute()
                     functionType {
                         params { i32() }
-                        results { i32() }
                     }
                 }
             }
@@ -209,7 +212,6 @@ class ImportTest {
 
         val expectedFunctionType = functionType(
             params = resultType(listOf(i32ValueType())),
-            results = resultType(listOf(i32ValueType())),
         )
         val expectedTagType = tagType(
             attribute = exceptionAttribute(),
@@ -228,7 +230,6 @@ class ImportTest {
         )
 
         assertEquals(expected, actual)
-        assertEquals(1, store.store.tags.size)
-        assertEquals(expectedTagType, store.store.tags[0].type)
+        assertEquals(expectedTagType, store.store.heap.tag(tagAddress(0)).type)
     }
 }

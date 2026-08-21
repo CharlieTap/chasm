@@ -1,11 +1,11 @@
 package io.github.charlietap.chasm.integration
 
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.fixture.runtime.instance.arrayAddress
-import io.github.charlietap.chasm.fixture.runtime.value.arrayReferenceValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 class DefaultIssueExceptionTest {
 
@@ -19,14 +19,9 @@ class DefaultIssueExceptionTest {
             arguments = listOf(NumberValue.I32(7)),
         )
 
-        val expected = ChasmResult.Success(
-            listOf(
-                arrayReferenceValue(
-                    arrayAddress(0),
-                ),
-            ),
-        )
-        assertEquals(expected, result)
+        val values = assertIs<ChasmResult.Success<List<*>>>(result).result
+        assertEquals(1, values.size)
+        assertIs<ReferenceValue.Array>(values.single())
     }
 
     companion object {

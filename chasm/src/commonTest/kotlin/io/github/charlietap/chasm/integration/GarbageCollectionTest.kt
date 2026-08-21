@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.embedding.validate
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class GarbageCollectionTest {
 
@@ -24,11 +25,11 @@ class GarbageCollectionTest {
 
         context.allocate()
 
-        context.assertAllocatedObjects(structs = 4, arrays = 5)
+        val allocatedBytesBeforeCollection = context.store.store.heap.allocatedGuestBytes()
 
         gc(context.store).expect("expected garbage collection to succeed")
 
-        context.assertAllocatedObjects(structs = 2, arrays = 3)
+        assertTrue(context.store.store.heap.allocatedGuestBytes() < allocatedBytesBeforeCollection)
         context.assertReachableObjects()
     }
 
@@ -40,8 +41,19 @@ class GarbageCollectionTest {
         )
 
         context.allocate()
-
-        context.assertAllocatedObjects(structs = 2, arrays = 3)
+        var previousGuestBytes = context.store.store.heap.allocatedGuestBytes()
+        var collected = false
+        var allocationCount = 0
+        while (!collected && allocationCount < 1_000) {
+            context.allocate()
+            val guestBytes = context.store.store.heap.allocatedGuestBytes()
+            if (guestBytes <= previousGuestBytes) {
+                collected = true
+            }
+            previousGuestBytes = guestBytes
+            allocationCount++
+        }
+        assertTrue(collected)
         context.assertReachableObjects()
     }
 
@@ -53,8 +65,10 @@ class GarbageCollectionTest {
         )
 
         context.allocate()
-
-        context.assertAllocatedObjects(structs = 2, arrays = 3)
+        val retainedBytes = context.store.store.heap.allocatedGuestBytes()
+        context.allocate()
+        val secondAllocationGrowth = context.store.store.heap.allocatedGuestBytes() - retainedBytes
+        assertTrue(secondAllocationGrowth < retainedBytes)
         context.assertReachableObjects()
     }
 
@@ -82,14 +96,6 @@ class GarbageCollectionTest {
             .expect("expected allocation function to succeed")
 
         assertEquals(emptyList(), results)
-    }
-
-    private fun TestContext.assertAllocatedObjects(
-        structs: Int,
-        arrays: Int,
-    ) {
-        assertEquals(structs, store.store.structs.count { it != null })
-        assertEquals(arrays, store.store.arrays.count { it != null })
     }
 
     private fun TestContext.assertReachableObjects() {

@@ -582,7 +582,6 @@
                     "name": "aggregate.array.new.ii",
                     "instructions": [
                         "aggregate.array.new.ii",
-                        "admin.pause_if",
                         "control.return"
                     ]
                 },
@@ -591,7 +590,6 @@
                     "name": "aggregate.array.new.is",
                     "instructions": [
                         "aggregate.array.new.is",
-                        "admin.pause_if",
                         "control.return"
                     ]
                 },
@@ -600,7 +598,6 @@
                     "name": "aggregate.array.new.si",
                     "instructions": [
                         "aggregate.array.new.si",
-                        "admin.pause_if",
                         "control.return"
                     ]
                 },
@@ -609,7 +606,6 @@
                     "name": "aggregate.array.new.ss",
                     "instructions": [
                         "aggregate.array.new.ss",
-                        "admin.pause_if",
                         "control.return"
                     ]
                 },

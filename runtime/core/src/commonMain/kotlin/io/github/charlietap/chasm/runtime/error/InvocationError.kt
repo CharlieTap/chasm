@@ -169,6 +169,8 @@ sealed interface InvocationError : ModuleTrapError {
 
     data object CallStackExhausted : InvocationError
 
+    data object GuestHeapOutOfMemory : InvocationError
+
     @JvmInline
     value class UnimplementedInstruction(val instruction: LinkedInstruction) : InvocationError
 

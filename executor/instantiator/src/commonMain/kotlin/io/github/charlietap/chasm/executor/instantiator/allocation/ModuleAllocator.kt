@@ -8,7 +8,6 @@ import com.github.michaelbull.result.toResultOr
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.compiler.ModuleCompiler
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.instantiator.ConstantExpressionEvaluator
 import io.github.charlietap.chasm.executor.instantiator.allocation.data.DataAllocator
 import io.github.charlietap.chasm.executor.instantiator.allocation.element.ElementAllocator
@@ -41,7 +40,6 @@ internal typealias ModuleAllocator = (
 ) -> Result<ModuleInstance, ModuleTrapError>
 
 internal typealias ModuleCompiler = (
-    RuntimeConfig,
     Store,
     Module,
     ModuleInstance,
@@ -100,7 +98,6 @@ internal inline fun ModuleAllocator(
         dataAllocator = dataAllocator,
     ).bind()
     moduleCompiler(
-        context.config,
         context.store,
         context.module,
         instance,

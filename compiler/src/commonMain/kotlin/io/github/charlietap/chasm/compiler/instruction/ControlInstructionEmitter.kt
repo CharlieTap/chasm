@@ -470,9 +470,9 @@ internal fun FunctionCompilationContext.emitPopHandler() {
 
 internal fun FunctionCompilationContext.emitThrow(
     tagIndex: Index.TagIndex,
-    payloadSlots: IntArray,
+    firstPayloadSlot: Int,
 ) {
-    val instruction = ControlSuperInstruction.Throw(tagIndex, payloadSlots)
+    val instruction = ControlSuperInstruction.Throw(tagIndex, firstPayloadSlot)
     emit(instruction, ::ThrowDispatcher)
 }
 

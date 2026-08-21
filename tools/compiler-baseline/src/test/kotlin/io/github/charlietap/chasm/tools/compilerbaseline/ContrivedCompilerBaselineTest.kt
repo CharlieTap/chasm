@@ -41,7 +41,7 @@ class ContrivedCompilerBaselineTest {
         assertTrue("table.set.ss" in instructions)
         assertTrue(controlTags.all(instructions::contains))
         assertTrue(aggregateFusionTags.all(instructions::contains))
-        assertTrue("admin.pause_if" in instructions)
+        assertFalse("admin.pause_if" in instructions)
 
         assertEquals(
             listOf("numeric.i32.add.ss", "control.return"),

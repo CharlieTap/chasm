@@ -1,37 +1,86 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.control
 
+import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.ast.instruction.catchAllRefHandler
+import io.github.charlietap.chasm.fixture.ast.instruction.catchCatchHandler
 import io.github.charlietap.chasm.fixture.ast.instruction.catchRefHandler
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.tagIndex
-import io.github.charlietap.chasm.fixture.runtime.instance.exceptionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tagAddress
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
-import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.fixture.runtime.type.rtt
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.i64ValueType
+import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ThrowRefExecutorTest {
 
     @Test
-    fun `writes matched catch payloads and returns the continuation address`() {
-        val exceptionRef = ReferenceValue.Exception(Address.Exception(0)).toLong()
-        val store = store(
-            exceptions = mutableListOf(
-                exceptionInstance(
-                    tagAddress = tagAddress(0),
-                    fields = longArrayOf(22L, 11L),
+    fun `throw allocates semantic order payload and catches it directly`() {
+        val store = store()
+        val exceptionTagAddress = store.heap.registerTag(
+            rtt(),
+            tagType(
+                functionType = functionType(
+                    params = resultType(listOf(i64ValueType(), i64ValueType())),
                 ),
             ),
         )
+        val cstack = cstack(
+            frames = listOf(
+                frame(instance = moduleInstance(tagAddresses = mutableListOf(exceptionTagAddress))),
+            ),
+            handlers = listOf(
+                ExceptionHandler(
+                    handlers = listOf(catchCatchHandler(tagIndex(0u), labelIndex(0u))),
+                    payloadDestinationSlots = listOf(intArrayOf(1, 2)),
+                    continuationIps = intArrayOf(37),
+                    framesDepth = 1,
+                    framePointer = 0,
+                    valueDepth = 4,
+                ),
+            ),
+        )
+        val vstack = vstack().apply {
+            reserveFrame(4)
+            push(11)
+            push(22)
+        }
+
+        val continuationIp = ThrowExecutor(
+            vstack,
+            cstack,
+            store,
+            executionContext(store = store, vstack = vstack, cstack = cstack),
+            ControlInstruction.Throw(tagIndex(0u)),
+        )
+
+        assertEquals(37, continuationIp)
+        assertEquals(11, vstack.getFrameSlot(1))
+        assertEquals(22, vstack.getFrameSlot(2))
+    }
+
+    @Test
+    fun `writes matched catch payloads and returns the continuation address`() {
+        val store = store()
+        val exceptionTagAddress = store.heap.registerTag(
+            rtt(),
+            tagType(
+                functionType = functionType(
+                    params = resultType(listOf(i64ValueType(), i64ValueType())),
+                ),
+            ),
+        )
+        val exceptionRef = store.heap.allocateException(exceptionTagAddress, longArrayOf(11L, 22L))
         val cstack = cstack(
             frames = listOf(
                 frame(
@@ -70,10 +119,9 @@ class ThrowRefExecutorTest {
 
     @Test
     fun `continues through non-matching handlers without scheduling instructions`() {
-        val exceptionRef = ReferenceValue.Exception(Address.Exception(0)).toLong()
-        val store = store(
-            exceptions = mutableListOf(exceptionInstance(tagAddress = tagAddress(0))),
-        )
+        val store = store()
+        val exceptionTagAddress = store.heap.registerTag(rtt(), tagType())
+        val exceptionRef = store.heap.allocateException(exceptionTagAddress, longArrayOf())
         val module = moduleInstance(tagAddresses = mutableListOf(tagAddress(1)))
         val cstack = cstack(
             frames = listOf(frame(instance = module)),

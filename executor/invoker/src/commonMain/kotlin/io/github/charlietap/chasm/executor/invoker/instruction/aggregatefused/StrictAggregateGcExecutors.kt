@@ -1,23 +1,19 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused
 
-import io.github.charlietap.chasm.executor.invoker.ext.allocateArray
-import io.github.charlietap.chasm.executor.invoker.ext.valueFromBytes
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.ext.array
 import io.github.charlietap.chasm.runtime.ext.extendSigned
 import io.github.charlietap.chasm.runtime.ext.extendUnsigned
 import io.github.charlietap.chasm.runtime.ext.isExternReference
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
-import io.github.charlietap.chasm.runtime.ext.toArrayAddress
 import io.github.charlietap.chasm.runtime.ext.toExternReference
 import io.github.charlietap.chasm.runtime.ext.toI31
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.ext.wrapI31
-import io.github.charlietap.chasm.runtime.instance.ArrayInstance
+import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -25,7 +21,6 @@ import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
-import io.github.charlietap.chasm.type.ArrayType
 
 internal inline fun ArrayNewDefaultExecutor(
     vstack: ValueStack,
@@ -35,11 +30,11 @@ internal inline fun ArrayNewDefaultExecutor(
     instruction: AggregateSuperInstruction.ArrayNewDefaultI,
 ) = executeArrayNewDefault(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     size = instruction.size,
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     field = instruction.field,
 )
 
@@ -51,11 +46,11 @@ internal inline fun ArrayNewDefaultExecutor(
     instruction: AggregateSuperInstruction.ArrayNewDefaultS,
 ) = executeArrayNewDefault(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     size = vstack.getFrameSlot(instruction.sizeSlot).toInt(),
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     field = instruction.field,
 )
 
@@ -67,12 +62,12 @@ internal inline fun ArrayNewDataExecutor(
     instruction: AggregateSuperInstruction.ArrayNewDataIi,
 ) = executeArrayNewData(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     sourceOffset = instruction.sourceOffset,
     arrayLength = instruction.arrayLength,
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -85,12 +80,12 @@ internal inline fun ArrayNewDataExecutor(
     instruction: AggregateSuperInstruction.ArrayNewDataIs,
 ) = executeArrayNewData(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     sourceOffset = instruction.sourceOffset,
     arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -103,12 +98,12 @@ internal inline fun ArrayNewDataExecutor(
     instruction: AggregateSuperInstruction.ArrayNewDataSi,
 ) = executeArrayNewData(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     arrayLength = instruction.arrayLength,
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -121,12 +116,12 @@ internal inline fun ArrayNewDataExecutor(
     instruction: AggregateSuperInstruction.ArrayNewDataSs,
 ) = executeArrayNewData(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -139,12 +134,12 @@ internal inline fun ArrayNewElementExecutor(
     instruction: AggregateSuperInstruction.ArrayNewElementIi,
 ) = executeArrayNewElement(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     sourceOffset = instruction.sourceOffset,
     arrayLength = instruction.arrayLength,
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     elementInstance = instruction.elementInstance,
 )
 
@@ -156,12 +151,12 @@ internal inline fun ArrayNewElementExecutor(
     instruction: AggregateSuperInstruction.ArrayNewElementIs,
 ) = executeArrayNewElement(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     sourceOffset = instruction.sourceOffset,
     arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     elementInstance = instruction.elementInstance,
 )
 
@@ -173,12 +168,12 @@ internal inline fun ArrayNewElementExecutor(
     instruction: AggregateSuperInstruction.ArrayNewElementSi,
 ) = executeArrayNewElement(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     arrayLength = instruction.arrayLength,
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     elementInstance = instruction.elementInstance,
 )
 
@@ -190,12 +185,12 @@ internal inline fun ArrayNewElementExecutor(
     instruction: AggregateSuperInstruction.ArrayNewElementSs,
 ) = executeArrayNewElement(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     elementInstance = instruction.elementInstance,
 )
 
@@ -206,11 +201,11 @@ internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataIii,
 ) = executeArrayInitData(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = instruction.sourceOffset,
     destinationOffset = instruction.destinationOffset,
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -222,11 +217,11 @@ internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataIis,
 ) = executeArrayInitData(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = instruction.sourceOffset,
     destinationOffset = vstack.getFrameSlot(instruction.destinationOffsetSlot).toInt(),
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -238,11 +233,11 @@ internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataIsi,
 ) = executeArrayInitData(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     destinationOffset = instruction.destinationOffset,
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -254,11 +249,11 @@ internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataIss,
 ) = executeArrayInitData(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     destinationOffset = vstack.getFrameSlot(instruction.destinationOffsetSlot).toInt(),
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -270,11 +265,11 @@ internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataSii,
 ) = executeArrayInitData(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = instruction.sourceOffset,
     destinationOffset = instruction.destinationOffset,
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -286,11 +281,11 @@ internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataSis,
 ) = executeArrayInitData(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = instruction.sourceOffset,
     destinationOffset = vstack.getFrameSlot(instruction.destinationOffsetSlot).toInt(),
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -302,11 +297,11 @@ internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataSsi,
 ) = executeArrayInitData(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     destinationOffset = instruction.destinationOffset,
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -318,11 +313,11 @@ internal inline fun ArrayInitDataExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataSss,
 ) = executeArrayInitData(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     destinationOffset = vstack.getFrameSlot(instruction.destinationOffsetSlot).toInt(),
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     dataInstance = instruction.dataInstance,
     fieldWidthInBytes = instruction.fieldWidthInBytes,
 )
@@ -334,11 +329,11 @@ internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementIii,
 ) = executeArrayInitElement(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = instruction.sourceOffset,
     destinationOffset = instruction.destinationOffset,
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     elementInstance = instruction.elementInstance,
 )
 
@@ -349,11 +344,11 @@ internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementIis,
 ) = executeArrayInitElement(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = instruction.sourceOffset,
     destinationOffset = vstack.getFrameSlot(instruction.destinationOffsetSlot).toInt(),
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     elementInstance = instruction.elementInstance,
 )
 
@@ -364,11 +359,11 @@ internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementIsi,
 ) = executeArrayInitElement(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     destinationOffset = instruction.destinationOffset,
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     elementInstance = instruction.elementInstance,
 )
 
@@ -379,11 +374,11 @@ internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementIss,
 ) = executeArrayInitElement(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     destinationOffset = vstack.getFrameSlot(instruction.destinationOffsetSlot).toInt(),
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     elementInstance = instruction.elementInstance,
 )
 
@@ -394,11 +389,11 @@ internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementSii,
 ) = executeArrayInitElement(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = instruction.sourceOffset,
     destinationOffset = instruction.destinationOffset,
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     elementInstance = instruction.elementInstance,
 )
 
@@ -409,11 +404,11 @@ internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementSis,
 ) = executeArrayInitElement(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = instruction.sourceOffset,
     destinationOffset = vstack.getFrameSlot(instruction.destinationOffsetSlot).toInt(),
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     elementInstance = instruction.elementInstance,
 )
 
@@ -424,11 +419,11 @@ internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementSsi,
 ) = executeArrayInitElement(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     destinationOffset = instruction.destinationOffset,
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     elementInstance = instruction.elementInstance,
 )
 
@@ -439,11 +434,11 @@ internal inline fun ArrayInitElementExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementSss,
 ) = executeArrayInitElement(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     destinationOffset = vstack.getFrameSlot(instruction.destinationOffsetSlot).toInt(),
-    address = vstack.getFrameSlot(instruction.addressSlot).toArrayAddress(),
+    address = vstack.getFrameSlot(instruction.addressSlot),
     elementInstance = instruction.elementInstance,
 )
 
@@ -523,119 +518,111 @@ internal inline fun ExternConvertAnyExecutor(
 
 private fun executeArrayNewDefault(
     vstack: ValueStack,
-    store: Store,
+    heap: WasmHeap,
+    context: ExecutionContext,
     size: Int,
     destinationSlot: Int,
     rtt: RTT,
-    arrayType: ArrayType,
     field: Long,
 ) {
-    val fields = LongArray(size) { field }
-    val instance = ArrayInstance(rtt, arrayType, fields)
-    val address = store.allocateArray(instance)
-    vstack.setFrameSlot(destinationSlot, ReferenceValue.Array(address).toLong())
+    try {
+        vstack.setFrameSlot(destinationSlot, heap.allocateArrayFilled(context, rtt, size, field))
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
+    }
 }
 
 private fun executeArrayNewData(
     vstack: ValueStack,
-    store: Store,
+    heap: WasmHeap,
+    context: ExecutionContext,
     sourceOffset: Int,
     arrayLength: Int,
     destinationSlot: Int,
     rtt: RTT,
-    arrayType: ArrayType,
     dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
     fieldWidthInBytes: Int,
 ) {
-    val byteArray = dataInstance.bytes
-    val arrayEndOffsetInSegment = sourceOffset + (arrayLength * fieldWidthInBytes)
-    if (arrayLength < 0 || arrayEndOffsetInSegment > byteArray.size) {
+    val reference = try {
+        heap.allocateArrayFromData(
+            context,
+            rtt,
+            dataInstance.bytes,
+            sourceOffset,
+            arrayLength,
+            fieldWidthInBytes,
+        )
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
-
-    val fields = LongArray(arrayLength) { offset ->
-        val elementOffset = sourceOffset + (offset * fieldWidthInBytes)
-        arrayType.fieldType.valueFromBytes(byteArray, elementOffset)
-    }
-
-    val instance = ArrayInstance(rtt, arrayType, fields)
-    val address = store.allocateArray(instance)
-    vstack.setFrameSlot(destinationSlot, ReferenceValue.Array(address).toLong())
+    vstack.setFrameSlot(destinationSlot, reference)
 }
 
 private fun executeArrayNewElement(
     vstack: ValueStack,
-    store: Store,
+    heap: WasmHeap,
+    context: ExecutionContext,
     sourceOffset: Int,
     arrayLength: Int,
     destinationSlot: Int,
     rtt: RTT,
-    arrayType: ArrayType,
     elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) {
-    val arrayEndOffsetInSegment = sourceOffset + arrayLength
-    if (arrayLength < 0 || arrayEndOffsetInSegment > elementInstance.elements.size) {
+    val reference = try {
+        heap.allocateArrayFromElements(
+            context,
+            rtt,
+            elementInstance.elements,
+            sourceOffset,
+            arrayLength,
+        )
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
-
-    val fields = LongArray(arrayLength)
-    elementInstance.elements.copyInto(fields, 0, sourceOffset, arrayEndOffsetInSegment)
-
-    val instance = ArrayInstance(rtt, arrayType, fields)
-    val address = store.allocateArray(instance)
-    vstack.setFrameSlot(destinationSlot, ReferenceValue.Array(address).toLong())
+    vstack.setFrameSlot(destinationSlot, reference)
 }
 
 private fun executeArrayInitData(
-    store: Store,
+    heap: WasmHeap,
     elementsToCopy: Int,
     sourceOffset: Int,
     destinationOffset: Int,
-    address: io.github.charlietap.chasm.runtime.address.Address.Array,
+    address: Long,
     dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
     fieldWidthInBytes: Int,
 ) {
-    val arrayInstance = store.array(address)
-    val arrayType = arrayInstance.arrayType
-
-    if (elementsToCopy == 0) {
-        if (
-            (destinationOffset + elementsToCopy > arrayInstance.fields.size) ||
-            (sourceOffset + (elementsToCopy * fieldWidthInBytes) > dataInstance.bytes.size)
-        ) {
-            throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
-        }
-        return
-    }
-
-    val byteArray = dataInstance.bytes
     try {
-        val elements = LongArray(elementsToCopy) { offset ->
-            val srcOffsetInByteArray = sourceOffset + (fieldWidthInBytes * offset)
-            arrayType.fieldType.valueFromBytes(byteArray, srcOffsetInByteArray)
-        }
-        elements.copyInto(arrayInstance.fields, destinationOffset)
-    } catch (_: IndexOutOfBoundsException) {
+        heap.initializeArrayFromData(
+            address,
+            destinationOffset,
+            dataInstance.bytes,
+            sourceOffset,
+            elementsToCopy,
+            fieldWidthInBytes,
+        )
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 }
 
 private fun executeArrayInitElement(
-    store: Store,
+    heap: WasmHeap,
     elementsToCopy: Int,
     sourceOffset: Int,
     destinationOffset: Int,
-    address: io.github.charlietap.chasm.runtime.address.Address.Array,
+    address: Long,
     elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
 ) {
-    val arrayInstance = store.array(address)
-
     try {
-        elementInstance.elements.copyInto(arrayInstance.fields, destinationOffset, sourceOffset, sourceOffset + elementsToCopy)
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
+        heap.initializeArrayFromElements(
+            address,
+            destinationOffset,
+            elementInstance.elements,
+            sourceOffset,
+            elementsToCopy,
+        )
     } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.TableOperationOutOfBounds)
+        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 }
 

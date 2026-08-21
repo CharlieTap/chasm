@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.runtime.stack
 
+import io.github.charlietap.chasm.gc.GarbageCollectedHeap
+import io.github.charlietap.chasm.gc.GcRootSink
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 
@@ -241,6 +243,97 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
     }
 
     fun depth(): Int = top
+
+    internal fun replaceTopFieldsWithStruct(
+        heap: GarbageCollectedHeap,
+        descriptorKey: Int,
+        fieldCount: Int,
+    ) {
+        if (fieldCount > top) {
+            throw InvocationException(InvocationError.MissingStackValue)
+        }
+        if (fieldCount == 0 && top == elements.size) {
+            doubleCapacity()
+        }
+        val sourceOffset = top - fieldCount
+        val rawReference = heap.allocateStruct(descriptorKey, elements, sourceOffset)
+        elements[sourceOffset] = rawReference
+        top = sourceOffset + 1
+    }
+
+    internal fun replaceTopFieldsWithArray(
+        heap: GarbageCollectedHeap,
+        descriptorKey: Int,
+        length: Int,
+    ) {
+        if (length > top) {
+            throw InvocationException(InvocationError.MissingStackValue)
+        }
+        if (length == 0 && top == elements.size) {
+            doubleCapacity()
+        }
+        val sourceOffset = top - length
+        val rawReference = heap.allocateArrayFromElements(descriptorKey, elements, sourceOffset, length)
+        elements[sourceOffset] = rawReference
+        top = sourceOffset + 1
+    }
+
+    internal fun setFrameSlotToNewStruct(
+        heap: GarbageCollectedHeap,
+        descriptorKey: Int,
+        firstFieldSlot: Int,
+        destinationSlot: Int,
+    ) {
+        val sourceOffset = framePointer + firstFieldSlot
+        val destinationOffset = framePointer + destinationSlot
+        val rawReference = heap.allocateStruct(descriptorKey, elements, sourceOffset)
+        elements[destinationOffset] = rawReference
+    }
+
+    internal fun setFrameSlotToNewArray(
+        heap: GarbageCollectedHeap,
+        descriptorKey: Int,
+        firstElementSlot: Int,
+        length: Int,
+        destinationSlot: Int,
+    ) {
+        val sourceOffset = framePointer + firstElementSlot
+        val destinationOffset = framePointer + destinationSlot
+        val rawReference = heap.allocateArrayFromElements(descriptorKey, elements, sourceOffset, length)
+        elements[destinationOffset] = rawReference
+    }
+
+    internal fun consumeTopFieldsToException(
+        heap: GarbageCollectedHeap,
+        descriptorKey: Int,
+        fieldCount: Int,
+    ): Long {
+        if (fieldCount > top) {
+            throw InvocationException(InvocationError.MissingStackValue)
+        }
+        val sourceOffset = top - fieldCount
+        val rawReference = heap.allocateException(descriptorKey, elements, sourceOffset)
+        top = sourceOffset
+        return rawReference
+    }
+
+    internal fun allocateExceptionFromFrame(
+        heap: GarbageCollectedHeap,
+        descriptorKey: Int,
+        firstFieldSlot: Int,
+    ): Long {
+        val sourceOffset = framePointer + firstFieldSlot
+        return heap.allocateException(descriptorKey, elements, sourceOffset)
+    }
+
+    internal fun visitGcRoots(rootSink: GcRootSink) {
+        val end = top
+        var index = 0
+        while (index < end) {
+            rootSink.markRoot(elements[index])
+            index++
+        }
+    }
 
     fun clear() {
         elements.fill(0L)

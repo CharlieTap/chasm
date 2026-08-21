@@ -191,6 +191,10 @@ class ChasmCorpusRunner(
 
         return instance(store, module, importResolution.imports, config.runtimeConfig).fold(
             { instance ->
+                val exportedMemory = instance.exports.firstNotNullOfOrNull { export -> export.value as? Memory }
+                if (importResolution.memories.isEmpty() && exportedMemory != null) {
+                    importResolution.memories["memory"] = exportedMemory
+                }
                 importResolution.emscriptenFinalizers.forEach { finalizer ->
                     finalizer.finalize(instance)
                 }
@@ -251,6 +255,7 @@ class ChasmCorpusRunner(
         if (wasi != null && hasWasiImports) {
             imports += ChasmWasiPreview1Builder(store) {
                 host = wasi.host
+                memoryProvider = { memories.values.first() }
             }.build()
         }
 
@@ -863,7 +868,7 @@ class ChasmCorpusRunner(
 
     private data class ImportResolution(
         val imports: List<Import>,
-        val memories: Map<String, Memory>,
+        val memories: MutableMap<String, Memory>,
         val globals: Map<String, Global>,
         val hosts: List<EmbedderHost>,
         val stdout: MutableList<Byte>,

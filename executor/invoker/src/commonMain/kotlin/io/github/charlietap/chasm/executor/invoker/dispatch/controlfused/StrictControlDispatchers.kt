@@ -162,8 +162,8 @@ fun ReturnCallDispatcher(
 
 fun ThrowDispatcher(
     instruction: ControlSuperInstruction.Throw,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, _, _ ->
-    ThrowExecutor(vstack, cstack, store, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, _ ->
+    ThrowExecutor(vstack, cstack, store, context, instruction)
 }
 
 fun ThrowRefDispatcher(

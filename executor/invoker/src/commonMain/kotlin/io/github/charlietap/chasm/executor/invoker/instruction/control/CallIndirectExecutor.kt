@@ -50,7 +50,7 @@ internal inline fun CallIndirectExecutor(
     val address = table.element(elementIndex).toFunctionAddress()
 
     val functionInstance = store.function(address)
-    if (!store.runtimeTypes.matches(functionInstance.rtt, type)) {
+    if (!context.heap.matchesRuntimeType(functionInstance.rtt, type)) {
         throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
 

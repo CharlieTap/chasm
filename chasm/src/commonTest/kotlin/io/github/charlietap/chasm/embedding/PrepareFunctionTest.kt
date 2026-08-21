@@ -13,6 +13,9 @@ import io.github.charlietap.chasm.fixture.runtime.instance.globalExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.value.i32
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,14 +33,22 @@ class PrepareFunctionTest {
         )
         val internalStore = runtimeStore(
             functions = mutableListOf(
-                hostFunctionInstance { params ->
+                hostFunctionInstance(
+                    functionType = functionType(
+                        params = resultType(listOf(i32ValueType())),
+                        results = resultType(listOf(i32ValueType())),
+                    ),
+                ) { params ->
                     assertEquals(moduleInstance, instance)
                     params
                 },
             ),
         )
         val publicStore = publicStore(internalStore)
-        val instance = publicInstance(moduleInstance = moduleInstance)
+        val instance = publicInstance(
+            moduleInstance = moduleInstance,
+            store = internalStore,
+        )
         val prepared = assertNotNull(prepareFunction(publicStore, instance, name).getOrNull())
 
         assertEquals(ChasmResult.Success(listOf(i32(1))), prepared(listOf(i32(1))))
@@ -50,38 +61,43 @@ class PrepareFunctionTest {
         val expected = ChasmResult.Error(
             ChasmError.ExecutionError(InvocationError.FunctionNotFound(name).toString()),
         )
+        val store = publicStore()
 
-        assertEquals(expected, prepareFunction(publicStore(), publicInstance(), name))
+        assertEquals(expected, prepareFunction(store, publicInstance(store = store.store), name))
 
         val instance = publicInstance(
             moduleInstance = moduleInstance(
                 exports = mutableListOf(exportInstance(nameValue(name), globalExternalValue())),
             ),
+            store = store.store,
         )
-        assertEquals(expected, prepareFunction(publicStore(), instance, name))
+        assertEquals(expected, prepareFunction(store, instance, name))
     }
 
     @Test
     fun `cannot prepare a function from a deallocated instance`() {
-        val instance = publicInstance(moduleInstance = moduleInstance(deallocated = true))
+        val store = publicStore()
+        val instance = publicInstance(
+            moduleInstance = moduleInstance(deallocated = true),
+            store = store.store,
+        )
         val expected = ChasmResult.Error(
             ChasmError.ExecutionError(InvocationError.InvocationOfADeinstantiatedInstance.toString()),
         )
 
-        assertEquals(expected, prepareFunction(publicStore(), instance, "function"))
+        assertEquals(expected, prepareFunction(store, instance, "function"))
     }
 
     @Test
     fun `prepared function cannot execute after its instance is dropped`() {
         val address = functionAddress(0)
-        val internalStore = runtimeStore(functions = mutableListOf(hostFunctionInstance()))
-        val store = publicStore(internalStore)
+        val store = publicStore(runtimeStore(functions = mutableListOf(hostFunctionInstance())))
         val instance = publicInstance(
             moduleInstance = moduleInstance(
                 exports = mutableListOf(exportInstance(nameValue("function"), functionExternalValue(address))),
                 functionAddresses = mutableListOf(address),
             ),
-            store = internalStore,
+            store = store.store,
         )
         val prepared = assertNotNull(prepareFunction(store, instance, "function").getOrNull())
 
@@ -102,6 +118,7 @@ class PrepareFunctionTest {
             moduleInstance = moduleInstance(
                 exports = mutableListOf(exportInstance(nameValue("function"), functionExternalValue(address))),
             ),
+            store = internalStore,
         )
         val prepared = assertNotNull(prepareFunction(store, instance, "function").getOrNull())
 

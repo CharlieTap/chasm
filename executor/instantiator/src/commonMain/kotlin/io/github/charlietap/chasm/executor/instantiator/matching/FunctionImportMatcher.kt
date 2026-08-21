@@ -19,5 +19,5 @@ internal inline fun FunctionImportMatcher(
 
     val store = context.store
     val actualFunction = store.function(import.address)
-    store.runtimeTypes.matches(actualFunction.rtt, context.runtimeTypes[descriptor.typeIndex.toInt()])
+    store.heap.matchesRuntimeType(actualFunction.rtt, context.runtimeTypes[descriptor.typeIndex.toInt()])
 }

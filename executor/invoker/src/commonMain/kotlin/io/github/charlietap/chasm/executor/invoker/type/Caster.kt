@@ -35,19 +35,21 @@ private fun Long.isInstanceOf(
     castRuntimeType: RTT,
     store: Store,
 ): Boolean {
-    val address = (this shr RV_SHIFT_BITS).toInt()
     return when (referenceTag) {
         RV_TYPE_STRUCT.toInt() -> {
-            val instance = store.structs.getOrNull(address) ?: return false
-            store.runtimeTypes.matches(instance.rtt, castRuntimeType)
+            val runtimeTypeId = store.heap.structRuntimeTypeIdOrNegative(this)
+            if (runtimeTypeId < 0) return false
+            store.heap.matchesRuntimeType(RTT(runtimeTypeId), castRuntimeType)
         }
         RV_TYPE_ARRAY.toInt() -> {
-            val instance = store.arrays.getOrNull(address) ?: return false
-            store.runtimeTypes.matches(instance.rtt, castRuntimeType)
+            val runtimeTypeId = store.heap.arrayRuntimeTypeIdOrNegative(this)
+            if (runtimeTypeId < 0) return false
+            store.heap.matchesRuntimeType(RTT(runtimeTypeId), castRuntimeType)
         }
         RV_TYPE_FUNCTION.toInt() -> {
+            val address = (this shr RV_SHIFT_BITS).toInt()
             val instance = store.functions.getOrNull(address) ?: return false
-            store.runtimeTypes.matches(instance.rtt, castRuntimeType)
+            store.heap.matchesRuntimeType(instance.rtt, castRuntimeType)
         }
         else -> return false
     }

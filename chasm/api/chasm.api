@@ -585,7 +585,8 @@ public final class io/github/charlietap/chasm/embedding/shapes/ImportDefinition 
 	public fun toString ()Ljava/lang/String;
 }
 
-public abstract interface class io/github/charlietap/chasm/embedding/shapes/Importable {
+public abstract class io/github/charlietap/chasm/embedding/shapes/Importable {
+	public synthetic fun <init> (Lio/github/charlietap/chasm/runtime/store/Store;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/Instance {
@@ -651,4 +652,3 @@ public final class io/github/charlietap/chasm/embedding/table/ReadTableKt {
 public final class io/github/charlietap/chasm/embedding/table/WriteTableKt {
 	public static final fun writeTable (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Table;ILio/github/charlietap/chasm/runtime/value/ReferenceValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
-

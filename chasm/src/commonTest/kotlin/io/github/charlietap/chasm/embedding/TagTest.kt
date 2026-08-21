@@ -22,6 +22,6 @@ class TagTest {
         val actual = tag(store, tagType)
 
         assertEquals(expected, actual)
-        assertEquals(tagType(), store.store.tags[0].type)
+        assertEquals(tagType(), store.store.heap.tag(Address.Tag(0)).type)
     }
 }

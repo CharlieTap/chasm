@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.execution
 
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -12,4 +13,6 @@ data class ExecutionContext(
     val store: Store,
     val instance: ModuleInstance,
     val config: RuntimeConfig,
-)
+) {
+    val heap: WasmHeap = store.heap
+}

@@ -5,13 +5,11 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.fixture.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.elementInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.exceptionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.functionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.hostInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.tagInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.hostReferenceValue
 import io.github.charlietap.chasm.fixture.type.memoryType
@@ -33,9 +31,6 @@ class DropStoreTest {
         val dataInstance = dataInstance(
             bytes = ubyteArrayOf(1u, 2u),
         )
-        val exceptionInstance = exceptionInstance(
-            fields = longArrayOf(referenceValue),
-        )
         val elementInstance = elementInstance(
             elements = longArrayOf(referenceValue, referenceValue),
         )
@@ -54,14 +49,12 @@ class DropStoreTest {
         val store = publicStore(
             store(
                 data = mutableListOf(dataInstance),
-                exceptions = mutableListOf(exceptionInstance),
                 elements = mutableListOf(elementInstance),
                 globals = mutableListOf(globalInstance),
                 hosts = mutableListOf(hostInstance()),
                 memories = mutableListOf(memoryInstance),
                 tables = mutableListOf(tableInstance),
                 functions = mutableListOf(functionInstance()),
-                tags = mutableListOf(tagInstance()),
             ),
         )
 
@@ -77,18 +70,14 @@ class DropStoreTest {
         assertEquals(expected, actual)
         assertEquals(true, memoryDropped)
         assertContentEquals(ubyteArrayOf(), dataInstance.bytes)
-        assertContentEquals(longArrayOf(), exceptionInstance.fields)
         assertContentEquals(longArrayOf(), elementInstance.elements)
         assertEquals(ExecutionValue.Uninitialised.toLongFromBoxed(), globalInstance.value)
         assertContentEquals(longArrayOf(), tableInstance.elements)
         assertEquals(0, store.store.data.size)
-        assertEquals(0, store.store.exceptions.size)
         assertEquals(0, store.store.elements.size)
         assertEquals(0, store.store.functions.size)
         assertEquals(0, store.store.globals.size)
-        assertEquals(0, store.store.hosts.size)
         assertEquals(0, store.store.memories.size)
         assertEquals(0, store.store.tables.size)
-        assertEquals(0, store.store.tags.size)
     }
 }

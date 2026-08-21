@@ -4,8 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.dispatchInstruction
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayCopyExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayFillExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayGetSignedExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayGetUnsignedExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayLenExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayNewExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.ArrayNewFixedExecutor
@@ -13,9 +11,7 @@ import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.Ar
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.LocalSetStructGetExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.RefCastStructGetExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructGetSignedExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructGetStructGetExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructGetUnsignedExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructNewDefaultExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructNewExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructSetExecutor
@@ -57,13 +53,13 @@ fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetI) = dispa
 
 fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetS) = dispatchInstruction(instruction, ::ArrayGetExecutor)
 
-fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedI) = PackedArrayGetSignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
+fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedI) = PackedArrayGetSignedDispatcher(instruction)
 
-fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedS) = PackedArrayGetSignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::ArrayGetSignedExecutor)
+fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedS) = PackedArrayGetSignedDispatcher(instruction)
 
-fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedI) = PackedArrayGetUnsignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
+fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedI) = PackedArrayGetUnsignedDispatcher(instruction)
 
-fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedS) = PackedArrayGetUnsignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::ArrayGetUnsignedExecutor)
+fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedS) = PackedArrayGetUnsignedDispatcher(instruction)
 
 fun ArrayLenDispatcher(instruction: AggregateSuperInstruction.ArrayLenS) = dispatchInstruction(instruction, ::ArrayLenExecutor)
 
@@ -87,9 +83,9 @@ fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetSs) = disp
 
 fun StructGetDispatcher(instruction: AggregateSuperInstruction.StructGetS) = dispatchInstruction(instruction, ::StructGetExecutor)
 
-fun StructGetSignedDispatcher(instruction: AggregateSuperInstruction.StructGetSignedS) = PackedStructGetSignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::StructGetSignedExecutor)
+fun StructGetSignedDispatcher(instruction: AggregateSuperInstruction.StructGetSignedS) = PackedStructGetSignedDispatcher(instruction)
 
-fun StructGetUnsignedDispatcher(instruction: AggregateSuperInstruction.StructGetUnsignedS) = PackedStructGetUnsignedDispatcher(instruction) ?: dispatchInstruction(instruction, ::StructGetUnsignedExecutor)
+fun StructGetUnsignedDispatcher(instruction: AggregateSuperInstruction.StructGetUnsignedS) = PackedStructGetUnsignedDispatcher(instruction)
 
 fun RefCastStructGetDispatcher(instruction: AggregateSuperInstruction.RefCastStructGetS) = dispatchInstruction(instruction, ::RefCastStructGetExecutor)
 

@@ -14,7 +14,7 @@ fun instantiationContext(
     store: Store = store(),
     module: Module = module(),
     config: RuntimeConfig = runtimeConfig(),
-    runtimeTypes: RuntimeTypeMap = store.runtimeTypes.register(module.definedTypes),
+    runtimeTypes: RuntimeTypeMap = store.heap.registerRuntimeTypes(module.definedTypes),
     instance: ModuleInstance? = null,
 ): InstantiationContext = InstantiationContext(
     store = store,

@@ -4,10 +4,6 @@ import com.github.michaelbull.result.Ok
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.transform.FieldValueDecoder
-import io.github.charlietap.chasm.fixture.runtime.instance.arrayAddress
-import io.github.charlietap.chasm.fixture.runtime.instance.arrayInstance
-import io.github.charlietap.chasm.fixture.runtime.store
-import io.github.charlietap.chasm.fixture.runtime.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.runtime.value.bytePackedValue
 import io.github.charlietap.chasm.fixture.runtime.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.runtime.value.i32
@@ -32,13 +28,9 @@ class ReadArrayElementTest {
                 valueType = i32ValueType(),
             ),
         )
-        val instance = arrayInstance(
-            arrayType = arrayType(fieldType),
-            fields = longArrayOf(116L, 117L, 118L),
-        )
-        val store = publicStore(store(arrays = mutableListOf(instance)))
-        val address = arrayAddress(0)
-        val array = arrayReferenceValue(address)
+        val fixture = arrayFieldTestFixture(arrayType(fieldType), longArrayOf(116L, 117L, 118L))
+        val store = fixture.store
+        val array = fixture.reference
         val index = 1
         val value = executionFieldValue(i32(117))
 
@@ -69,13 +61,9 @@ class ReadArrayElementTest {
                 packedType = i8PackedType(),
             ),
         )
-        val instance = arrayInstance(
-            arrayType = arrayType(fieldType),
-            fields = longArrayOf(117L),
-        )
-        val store = publicStore(store(arrays = mutableListOf(instance)))
-        val address = arrayAddress(0)
-        val array = arrayReferenceValue(address)
+        val fixture = arrayFieldTestFixture(arrayType(fieldType), longArrayOf(117L))
+        val store = fixture.store
+        val array = fixture.reference
 
         val expected = ChasmResult.Success(
             packedFieldValue(bytePackedValue(117L)),

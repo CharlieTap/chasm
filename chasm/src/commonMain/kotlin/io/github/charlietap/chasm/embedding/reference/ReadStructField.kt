@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.embedding.transform.FieldValueDecoder
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.ext.struct
+import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.value.FieldValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 
@@ -37,13 +37,12 @@ internal fun internalReadStructField(
     index: Int,
     fieldValueDecoder: FieldValueDecoder,
 ): Result<FieldValue, ModuleTrapError> = runCatching {
-    val instance = store.store.struct(struct.address)
-    val fieldType = instance.structType.fields.getOrNull(index)
-        ?: throw InvocationException(InvocationError.StructFieldLookupFailed(index))
-    fieldValueDecoder(instance.fields[index], fieldType)
+    val rawReference = struct.toLong()
+    val fieldType = store.store.heap.structFieldType(rawReference, index)
+    fieldValueDecoder(store.store.heap.getStructField(rawReference, index), fieldType)
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error
-        else -> InvocationError.StructFieldLookupFailed(index)
+        else -> throw e
     }
 }

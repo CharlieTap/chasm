@@ -56,6 +56,8 @@ include(":executor:invoker")
 
 include(":host")
 
+include(":gc")
+
 include(":libs:sse2")
 include(":libs:stack")
 include(":libs:benchmark")

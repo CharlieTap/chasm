@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.embedding.transform.FieldValueEncoder
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.ext.array
+import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.value.FieldValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.Mutability
@@ -41,17 +41,17 @@ internal fun internalWriteArrayElement(
     value: FieldValue,
     fieldValueEncoder: FieldValueEncoder,
 ): Result<Unit, ModuleTrapError> = runCatching {
-    val instance = store.store.array(array.address)
-    val fieldType = instance.arrayType.fieldType
+    val rawReference = array.toLong()
+    val fieldType = store.store.heap.arrayFieldType(rawReference)
 
     if (fieldType.mutability != Mutability.Var) {
         throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
-    if (index !in instance.fields.indices) {
+    if (index !in 0 until store.store.heap.arrayLength(rawReference)) {
         throw InvocationException(InvocationError.ArrayFieldLookupFailed(index))
     }
 
-    instance.fields[index] = fieldValueEncoder(value, fieldType)
+    store.store.heap.setArrayElement(rawReference, index, fieldValueEncoder(value, fieldType))
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error

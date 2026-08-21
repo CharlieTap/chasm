@@ -2,13 +2,8 @@ package io.github.charlietap.chasm.embedding.reference
 
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.transform.FieldValueEncoder
-import io.github.charlietap.chasm.fixture.runtime.instance.arrayAddress
-import io.github.charlietap.chasm.fixture.runtime.instance.arrayInstance
-import io.github.charlietap.chasm.fixture.runtime.store
-import io.github.charlietap.chasm.fixture.runtime.value.arrayReferenceValue
 import io.github.charlietap.chasm.fixture.runtime.value.bytePackedValue
 import io.github.charlietap.chasm.fixture.runtime.value.executionFieldValue
 import io.github.charlietap.chasm.fixture.runtime.value.i32
@@ -20,7 +15,6 @@ import io.github.charlietap.chasm.fixture.type.packedStorageType
 import io.github.charlietap.chasm.fixture.type.valueStorageType
 import io.github.charlietap.chasm.fixture.type.varMutability
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.ext.array
 import io.github.charlietap.chasm.runtime.value.FieldValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,13 +30,9 @@ class WriteArrayElementTest {
             ),
             mutability = varMutability(),
         )
-        val instance = arrayInstance(
-            arrayType = arrayType(fieldType),
-            fields = longArrayOf(116L, 117L, 118L),
-        )
-        val store = publicStore(store(arrays = mutableListOf(instance)))
-        val address = arrayAddress(0)
-        val array = arrayReferenceValue(address)
+        val fixture = arrayFieldTestFixture(arrayType(fieldType), longArrayOf(116L, 117L, 118L))
+        val store = fixture.store
+        val array = fixture.reference
         val value = executionFieldValue(i32(119))
         val index = 1
 
@@ -64,7 +54,7 @@ class WriteArrayElementTest {
         )
 
         assertEquals(expected, actual)
-        assertEquals(119L, store.store.array(address).fields[index])
+        assertEquals(119L, store.store.heap.getArrayElement(fixture.rawReference, index))
     }
 
     @Test
@@ -76,13 +66,9 @@ class WriteArrayElementTest {
             ),
             mutability = varMutability(),
         )
-        val instance = arrayInstance(
-            arrayType = arrayType(fieldType),
-            fields = longArrayOf(0L),
-        )
-        val store = publicStore(store(arrays = mutableListOf(instance)))
-        val address = arrayAddress(0)
-        val array = arrayReferenceValue(address)
+        val fixture = arrayFieldTestFixture(arrayType(fieldType), longArrayOf(0L))
+        val store = fixture.store
+        val array = fixture.reference
         val value = FieldValue.Packed(bytePackedValue(0x1FFL))
 
         val expected = ChasmResult.Success(Unit)
@@ -95,6 +81,6 @@ class WriteArrayElementTest {
         )
 
         assertEquals(expected, actual)
-        assertEquals(0xFFL, store.store.array(address).fields[0])
+        assertEquals(0xFFL, store.store.heap.getArrayElement(fixture.rawReference, 0))
     }
 }

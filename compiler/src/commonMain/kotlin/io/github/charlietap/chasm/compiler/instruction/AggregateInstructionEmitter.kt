@@ -13,17 +13,22 @@ import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
-import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.StructType
-import io.github.charlietap.chasm.type.ext.bitWidth
 
 internal fun FunctionCompilationContext.emitStructNew(
-    fieldSlots: List<Int>,
+    firstFieldSlot: Int,
     destinationSlot: Int,
     rtt: RTT,
-    type: StructType,
-) = emitAggregate(AggregateSuperInstruction.StructNewS(fieldSlots, destinationSlot, rtt, type))
+) {
+    emitAggregate(
+        AggregateSuperInstruction.StructNewS(
+            firstFieldSlot = firstFieldSlot,
+            destinationSlot = destinationSlot,
+            rtt = rtt,
+        ),
+    )
+}
 
 internal fun FunctionCompilationContext.emitStructNewDefault(
     destinationSlot: Int,
@@ -33,7 +38,6 @@ internal fun FunctionCompilationContext.emitStructNewDefault(
     AggregateSuperInstruction.StructNewDefaultS(
         destinationSlot,
         rtt,
-        type,
         LongArray(type.fields.size) { index -> type.fields[index].default() },
     ),
 )
@@ -47,8 +51,18 @@ internal fun FunctionCompilationContext.emitStructGet(
 ) = emitAggregate(
     when (signed) {
         null -> AggregateSuperInstruction.StructGetS(addressSlot, destinationSlot, fieldIndex)
-        true -> AggregateSuperInstruction.StructGetSignedS(addressSlot, destinationSlot, fieldIndex, packedType)
-        false -> AggregateSuperInstruction.StructGetUnsignedS(addressSlot, destinationSlot, fieldIndex, packedType)
+        true -> AggregateSuperInstruction.StructGetSignedS(
+            addressSlot,
+            destinationSlot,
+            fieldIndex,
+            checkNotNull(packedType),
+        )
+        false -> AggregateSuperInstruction.StructGetUnsignedS(
+            addressSlot,
+            destinationSlot,
+            fieldIndex,
+            checkNotNull(packedType),
+        )
     },
 )
 
@@ -111,16 +125,15 @@ internal fun FunctionCompilationContext.emitArrayNew(
     value: OperandSource,
     destinationSlot: Int,
     rtt: RTT,
-    type: ArrayType,
 ) {
     val sizeImmediate = size.sourceKind == OperandSourceKind.I32Immediate
     val valueImmediate = value.isImmediate
     emitAggregate(
         when {
-            sizeImmediate && valueImmediate -> AggregateSuperInstruction.ArrayNewIi(size.i32Immediate, value.sourceBits, destinationSlot, rtt, type)
-            sizeImmediate -> AggregateSuperInstruction.ArrayNewIs(size.i32Immediate, value.sourceSlot, destinationSlot, rtt, type)
-            valueImmediate -> AggregateSuperInstruction.ArrayNewSi(size.sourceSlot, value.sourceBits, destinationSlot, rtt, type)
-            else -> AggregateSuperInstruction.ArrayNewSs(size.sourceSlot, value.sourceSlot, destinationSlot, rtt, type)
+            sizeImmediate && valueImmediate -> AggregateSuperInstruction.ArrayNewIi(size.i32Immediate, value.sourceBits, destinationSlot, rtt)
+            sizeImmediate -> AggregateSuperInstruction.ArrayNewIs(size.i32Immediate, value.sourceSlot, destinationSlot, rtt)
+            valueImmediate -> AggregateSuperInstruction.ArrayNewSi(size.sourceSlot, value.sourceBits, destinationSlot, rtt)
+            else -> AggregateSuperInstruction.ArrayNewSs(size.sourceSlot, value.sourceSlot, destinationSlot, rtt)
         },
     )
 }
@@ -129,12 +142,12 @@ internal fun FunctionCompilationContext.emitArrayNewDefault(
     size: OperandSource,
     destinationSlot: Int,
     rtt: RTT,
-    type: ArrayType,
+    field: Long,
 ) = emitAggregate(
     if (size.sourceKind == OperandSourceKind.I32Immediate) {
-        AggregateSuperInstruction.ArrayNewDefaultI(size.i32Immediate, destinationSlot, rtt, type, type.fieldType.default())
+        AggregateSuperInstruction.ArrayNewDefaultI(size.i32Immediate, destinationSlot, rtt, field)
     } else {
-        AggregateSuperInstruction.ArrayNewDefaultS(size.sourceSlot, destinationSlot, rtt, type, type.fieldType.default())
+        AggregateSuperInstruction.ArrayNewDefaultS(size.sourceSlot, destinationSlot, rtt, field)
     },
 )
 
@@ -143,18 +156,17 @@ internal fun FunctionCompilationContext.emitArrayNewData(
     length: OperandSource,
     destinationSlot: Int,
     rtt: RTT,
-    type: ArrayType,
     data: DataInstance,
+    fieldWidthInBytes: Int,
 ) {
     val sourceImmediate = sourceOffset.sourceKind == OperandSourceKind.I32Immediate
     val lengthImmediate = length.sourceKind == OperandSourceKind.I32Immediate
-    val width = checkNotNull(type.fieldType.bitWidth()) / 8
     emitAggregate(
         when {
-            sourceImmediate && lengthImmediate -> AggregateSuperInstruction.ArrayNewDataIi(sourceOffset.i32Immediate, length.i32Immediate, destinationSlot, rtt, type, data, width)
-            sourceImmediate -> AggregateSuperInstruction.ArrayNewDataIs(sourceOffset.i32Immediate, length.sourceSlot, destinationSlot, rtt, type, data, width)
-            lengthImmediate -> AggregateSuperInstruction.ArrayNewDataSi(sourceOffset.sourceSlot, length.i32Immediate, destinationSlot, rtt, type, data, width)
-            else -> AggregateSuperInstruction.ArrayNewDataSs(sourceOffset.sourceSlot, length.sourceSlot, destinationSlot, rtt, type, data, width)
+            sourceImmediate && lengthImmediate -> AggregateSuperInstruction.ArrayNewDataIi(sourceOffset.i32Immediate, length.i32Immediate, destinationSlot, rtt, data, fieldWidthInBytes)
+            sourceImmediate -> AggregateSuperInstruction.ArrayNewDataIs(sourceOffset.i32Immediate, length.sourceSlot, destinationSlot, rtt, data, fieldWidthInBytes)
+            lengthImmediate -> AggregateSuperInstruction.ArrayNewDataSi(sourceOffset.sourceSlot, length.i32Immediate, destinationSlot, rtt, data, fieldWidthInBytes)
+            else -> AggregateSuperInstruction.ArrayNewDataSs(sourceOffset.sourceSlot, length.sourceSlot, destinationSlot, rtt, data, fieldWidthInBytes)
         },
     )
 }
@@ -164,27 +176,26 @@ internal fun FunctionCompilationContext.emitArrayNewElement(
     length: OperandSource,
     destinationSlot: Int,
     rtt: RTT,
-    type: ArrayType,
     element: ElementInstance,
 ) {
     val sourceImmediate = sourceOffset.sourceKind == OperandSourceKind.I32Immediate
     val lengthImmediate = length.sourceKind == OperandSourceKind.I32Immediate
     emitAggregate(
         when {
-            sourceImmediate && lengthImmediate -> AggregateSuperInstruction.ArrayNewElementIi(sourceOffset.i32Immediate, length.i32Immediate, destinationSlot, rtt, type, element)
-            sourceImmediate -> AggregateSuperInstruction.ArrayNewElementIs(sourceOffset.i32Immediate, length.sourceSlot, destinationSlot, rtt, type, element)
-            lengthImmediate -> AggregateSuperInstruction.ArrayNewElementSi(sourceOffset.sourceSlot, length.i32Immediate, destinationSlot, rtt, type, element)
-            else -> AggregateSuperInstruction.ArrayNewElementSs(sourceOffset.sourceSlot, length.sourceSlot, destinationSlot, rtt, type, element)
+            sourceImmediate && lengthImmediate -> AggregateSuperInstruction.ArrayNewElementIi(sourceOffset.i32Immediate, length.i32Immediate, destinationSlot, rtt, element)
+            sourceImmediate -> AggregateSuperInstruction.ArrayNewElementIs(sourceOffset.i32Immediate, length.sourceSlot, destinationSlot, rtt, element)
+            lengthImmediate -> AggregateSuperInstruction.ArrayNewElementSi(sourceOffset.sourceSlot, length.i32Immediate, destinationSlot, rtt, element)
+            else -> AggregateSuperInstruction.ArrayNewElementSs(sourceOffset.sourceSlot, length.sourceSlot, destinationSlot, rtt, element)
         },
     )
 }
 
 internal fun FunctionCompilationContext.emitArrayNewFixed(
-    valueSlots: List<Int>,
+    firstElementSlot: Int,
+    length: Int,
     destinationSlot: Int,
     rtt: RTT,
-    type: ArrayType,
-) = emitAggregate(AggregateSuperInstruction.ArrayNewFixedS(valueSlots, destinationSlot, rtt, type, valueSlots.size))
+) = emitAggregate(AggregateSuperInstruction.ArrayNewFixedS(firstElementSlot, destinationSlot, rtt, length))
 
 internal fun FunctionCompilationContext.emitArrayGet(
     signed: Boolean?,
@@ -197,8 +208,8 @@ internal fun FunctionCompilationContext.emitArrayGet(
     emitAggregate(
         when (signed) {
             null -> if (immediate) AggregateSuperInstruction.ArrayGetI(addressSlot, field.i32Immediate, destinationSlot) else AggregateSuperInstruction.ArrayGetS(addressSlot, field.sourceSlot, destinationSlot)
-            true -> if (immediate) AggregateSuperInstruction.ArrayGetSignedI(addressSlot, field.i32Immediate, destinationSlot, packedType) else AggregateSuperInstruction.ArrayGetSignedS(addressSlot, field.sourceSlot, destinationSlot, packedType)
-            false -> if (immediate) AggregateSuperInstruction.ArrayGetUnsignedI(addressSlot, field.i32Immediate, destinationSlot, packedType) else AggregateSuperInstruction.ArrayGetUnsignedS(addressSlot, field.sourceSlot, destinationSlot, packedType)
+            true -> if (immediate) AggregateSuperInstruction.ArrayGetSignedI(addressSlot, field.i32Immediate, destinationSlot, checkNotNull(packedType)) else AggregateSuperInstruction.ArrayGetSignedS(addressSlot, field.sourceSlot, destinationSlot, checkNotNull(packedType))
+            false -> if (immediate) AggregateSuperInstruction.ArrayGetUnsignedI(addressSlot, field.i32Immediate, destinationSlot, checkNotNull(packedType)) else AggregateSuperInstruction.ArrayGetUnsignedS(addressSlot, field.sourceSlot, destinationSlot, checkNotNull(packedType))
         },
     )
 }
@@ -275,21 +286,20 @@ internal fun FunctionCompilationContext.emitArrayInitData(
     destinationOffset: OperandSource,
     addressSlot: Int,
     data: DataInstance,
-    type: ArrayType,
+    elementByteWidth: Int,
 ) {
-    val width = checkNotNull(type.fieldType.bitWidth()) / 8
     emitAggregateTernary(
         elements,
         sourceOffset,
         destinationOffset,
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIii(a, b, c, addressSlot, data, width) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIis(a, b, c, addressSlot, data, width) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIsi(a, b, c, addressSlot, data, width) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIss(a, b, c, addressSlot, data, width) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSii(a, b, c, addressSlot, data, width) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSis(a, b, c, addressSlot, data, width) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSsi(a, b, c, addressSlot, data, width) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSss(a, b, c, addressSlot, data, width) },
+        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIii(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIis(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIsi(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIss(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSii(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSis(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSsi(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSss(a, b, c, addressSlot, data, elementByteWidth) },
     )
 }
 

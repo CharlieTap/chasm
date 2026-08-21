@@ -28,7 +28,6 @@ import io.github.charlietap.chasm.compiler.instruction.emitF64Constant
 import io.github.charlietap.chasm.compiler.instruction.emitGlobalSet
 import io.github.charlietap.chasm.compiler.instruction.emitI32Constant
 import io.github.charlietap.chasm.compiler.instruction.emitI64Constant
-import io.github.charlietap.chasm.compiler.instruction.emitPauseIf
 import io.github.charlietap.chasm.compiler.operand.FrameAllocator
 import io.github.charlietap.chasm.compiler.operand.FunctionFrameLayout
 import io.github.charlietap.chasm.compiler.operand.Operand
@@ -41,7 +40,6 @@ import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramBuilder
 import io.github.charlietap.chasm.compiler.program.ProgramFragment
-import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.default
@@ -58,7 +56,6 @@ internal fun FunctionCompiler(
     workspace: FunctionCompilerWorkspace = FunctionCompilerWorkspace(),
     programBuilder: ProgramBuilder = ProgramBuilder(program),
 ): Result<RuntimeFunction, ModuleTrapError> {
-    workspace.beginFunction()
     val baseIp = program.size
     val result: Result<RuntimeFunction, ModuleTrapError> = run compile@{
         val functionType = context.types.functionType(function.typeIndex)
@@ -174,21 +171,12 @@ internal fun FunctionCompiler(
                             instruction = instruction,
                             nextInstruction = nextInstruction,
                         )
-                        is AggregateInstruction -> {
-                            workspace.markGcInstructions()
-                            compileAggregateInstruction(
-                                state = state,
-                                instruction = instruction,
-                                nextInstruction = nextInstruction,
-                            ).also {
-                                if (context.config.gcStrategy == GCStrategy.TRADITIONAL && instruction.isAllocating()) {
-                                    state.emitPauseIf()
-                                }
-                            }
-                        }
-                        is ControlInstruction -> {
-                            compileControlInstruction(state, instruction, nextInstruction)
-                        }
+                        is AggregateInstruction -> compileAggregateInstruction(
+                            state = state,
+                            instruction = instruction,
+                            nextInstruction = nextInstruction,
+                        )
+                        is ControlInstruction -> compileControlInstruction(state, instruction, nextInstruction)
                         is AtomicMemoryInstruction -> return@compile Err(InstantiationError.UnsupportedThreadsModule)
                         is VectorInstruction -> return@compile Err(InstantiationError.UnsupportedSIMDModule)
                     }
@@ -234,14 +222,12 @@ internal fun FunctionCompiler(
     FunctionCompilation(
         function = compiled,
         program = builder.fragment(),
-        containsGcInstructions = workspace.containsGcInstructions,
     )
 }
 
 internal class FunctionCompilation(
     val function: RuntimeFunction,
     val program: ProgramFragment,
-    val containsGcInstructions: Boolean,
 )
 
 private fun compileInstructionChain(
@@ -289,7 +275,6 @@ private fun compileInstructionChain(
     }
 
     if (nextInstruction is AggregateInstruction.StructGet) {
-        state.workspace.markGcInstructions()
         compileAggregateAccessChain(
             state = state,
             first = instruction,

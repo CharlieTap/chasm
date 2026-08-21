@@ -1,29 +1,17 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused
 
-import io.github.charlietap.chasm.executor.invoker.ext.allocateArray
-import io.github.charlietap.chasm.executor.invoker.ext.allocateStruct
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.FieldUnpacker
 import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.ext.array
-import io.github.charlietap.chasm.runtime.ext.field
-import io.github.charlietap.chasm.runtime.ext.packedField
-import io.github.charlietap.chasm.runtime.ext.struct
-import io.github.charlietap.chasm.runtime.ext.toArrayAddress
-import io.github.charlietap.chasm.runtime.ext.toLong
-import io.github.charlietap.chasm.runtime.ext.toStructAddress
-import io.github.charlietap.chasm.runtime.instance.ArrayInstance
-import io.github.charlietap.chasm.runtime.instance.StructInstance
+import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RTT
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
-import io.github.charlietap.chasm.type.ArrayType
-import io.github.charlietap.chasm.type.StructType
+import io.github.charlietap.chasm.type.PackedType
 
 internal inline fun ArrayCopyExecutor(
     vstack: ValueStack,
@@ -32,7 +20,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayCopyIii,
 ) = executeArrayCopy(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = instruction.sourceOffset,
     sourceAddress = arrayAddress(vstack, instruction.sourceAddressSlot),
@@ -47,7 +35,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayCopyIis,
 ) = executeArrayCopy(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = instruction.sourceOffset,
     sourceAddress = arrayAddress(vstack, instruction.sourceAddressSlot),
@@ -62,7 +50,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayCopyIsi,
 ) = executeArrayCopy(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     sourceAddress = arrayAddress(vstack, instruction.sourceAddressSlot),
@@ -77,7 +65,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayCopyIss,
 ) = executeArrayCopy(
-    store = store,
+    heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     sourceAddress = arrayAddress(vstack, instruction.sourceAddressSlot),
@@ -92,7 +80,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayCopySii,
 ) = executeArrayCopy(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = instruction.sourceOffset,
     sourceAddress = arrayAddress(vstack, instruction.sourceAddressSlot),
@@ -107,7 +95,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayCopySis,
 ) = executeArrayCopy(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = instruction.sourceOffset,
     sourceAddress = arrayAddress(vstack, instruction.sourceAddressSlot),
@@ -122,7 +110,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayCopySsi,
 ) = executeArrayCopy(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     sourceAddress = arrayAddress(vstack, instruction.sourceAddressSlot),
@@ -137,7 +125,7 @@ internal inline fun ArrayCopyExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayCopySss,
 ) = executeArrayCopy(
-    store = store,
+    heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
     sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
     sourceAddress = arrayAddress(vstack, instruction.sourceAddressSlot),
@@ -152,7 +140,7 @@ internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayFillIii,
 ) = executeArrayFill(
-    store = store,
+    heap = context.heap,
     elementsToFill = instruction.elementsToFill,
     fillValue = instruction.fillValue,
     arrayElementOffset = instruction.arrayElementOffset,
@@ -166,7 +154,7 @@ internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayFillIis,
 ) = executeArrayFill(
-    store = store,
+    heap = context.heap,
     elementsToFill = instruction.elementsToFill,
     fillValue = instruction.fillValue,
     arrayElementOffset = vstack.getFrameSlot(instruction.arrayElementOffsetSlot).toInt(),
@@ -180,7 +168,7 @@ internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayFillIsi,
 ) = executeArrayFill(
-    store = store,
+    heap = context.heap,
     elementsToFill = instruction.elementsToFill,
     fillValue = vstack.getFrameSlot(instruction.fillValueSlot),
     arrayElementOffset = instruction.arrayElementOffset,
@@ -194,7 +182,7 @@ internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayFillIss,
 ) = executeArrayFill(
-    store = store,
+    heap = context.heap,
     elementsToFill = instruction.elementsToFill,
     fillValue = vstack.getFrameSlot(instruction.fillValueSlot),
     arrayElementOffset = vstack.getFrameSlot(instruction.arrayElementOffsetSlot).toInt(),
@@ -208,7 +196,7 @@ internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayFillSii,
 ) = executeArrayFill(
-    store = store,
+    heap = context.heap,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
     fillValue = instruction.fillValue,
     arrayElementOffset = instruction.arrayElementOffset,
@@ -222,7 +210,7 @@ internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayFillSis,
 ) = executeArrayFill(
-    store = store,
+    heap = context.heap,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
     fillValue = instruction.fillValue,
     arrayElementOffset = vstack.getFrameSlot(instruction.arrayElementOffsetSlot).toInt(),
@@ -236,7 +224,7 @@ internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayFillSsi,
 ) = executeArrayFill(
-    store = store,
+    heap = context.heap,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
     fillValue = vstack.getFrameSlot(instruction.fillValueSlot),
     arrayElementOffset = instruction.arrayElementOffset,
@@ -250,7 +238,7 @@ internal inline fun ArrayFillExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayFillSss,
 ) = executeArrayFill(
-    store = store,
+    heap = context.heap,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
     fillValue = vstack.getFrameSlot(instruction.fillValueSlot),
     arrayElementOffset = vstack.getFrameSlot(instruction.arrayElementOffsetSlot).toInt(),
@@ -265,7 +253,7 @@ internal inline fun ArrayGetExecutor(
     instruction: AggregateSuperInstruction.ArrayGetI,
 ) = executeArrayGet(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
     fieldIndex = instruction.field,
     address = arrayAddress(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
@@ -279,7 +267,7 @@ internal inline fun ArrayGetExecutor(
     instruction: AggregateSuperInstruction.ArrayGetS,
 ) = executeArrayGet(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
     fieldIndex = vstack.getFrameSlot(instruction.fieldSlot).toInt(),
     address = arrayAddress(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
@@ -294,7 +282,7 @@ internal fun ArrayGetSignedExecutor(
 ) = ArrayGetSignedExecutor(
     vstack = vstack,
     cstack = cstack,
-    store = store,
+    heap = context.heap,
     context = context,
     instruction = instruction,
     fieldUnpacker = ::FieldUnpacker,
@@ -303,17 +291,18 @@ internal fun ArrayGetSignedExecutor(
 internal inline fun ArrayGetSignedExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
-    store: Store,
+    heap: WasmHeap,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayGetSignedI,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedArrayGet(
     vstack = vstack,
-    store = store,
+    heap = heap,
     fieldIndex = instruction.field,
     address = arrayAddress(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
     signed = true,
+    packedType = instruction.packedType,
     fieldUnpacker = fieldUnpacker,
 )
 
@@ -326,7 +315,7 @@ internal fun ArrayGetSignedExecutor(
 ) = ArrayGetSignedExecutor(
     vstack = vstack,
     cstack = cstack,
-    store = store,
+    heap = context.heap,
     context = context,
     instruction = instruction,
     fieldUnpacker = ::FieldUnpacker,
@@ -335,17 +324,18 @@ internal fun ArrayGetSignedExecutor(
 internal inline fun ArrayGetSignedExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
-    store: Store,
+    heap: WasmHeap,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayGetSignedS,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedArrayGet(
     vstack = vstack,
-    store = store,
+    heap = heap,
     fieldIndex = vstack.getFrameSlot(instruction.fieldSlot).toInt(),
     address = arrayAddress(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
     signed = true,
+    packedType = instruction.packedType,
     fieldUnpacker = fieldUnpacker,
 )
 
@@ -358,7 +348,7 @@ internal fun ArrayGetUnsignedExecutor(
 ) = ArrayGetUnsignedExecutor(
     vstack = vstack,
     cstack = cstack,
-    store = store,
+    heap = context.heap,
     context = context,
     instruction = instruction,
     fieldUnpacker = ::FieldUnpacker,
@@ -367,17 +357,18 @@ internal fun ArrayGetUnsignedExecutor(
 internal inline fun ArrayGetUnsignedExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
-    store: Store,
+    heap: WasmHeap,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayGetUnsignedI,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedArrayGet(
     vstack = vstack,
-    store = store,
+    heap = heap,
     fieldIndex = instruction.field,
     address = arrayAddress(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
     signed = false,
+    packedType = instruction.packedType,
     fieldUnpacker = fieldUnpacker,
 )
 
@@ -390,7 +381,7 @@ internal fun ArrayGetUnsignedExecutor(
 ) = ArrayGetUnsignedExecutor(
     vstack = vstack,
     cstack = cstack,
-    store = store,
+    heap = context.heap,
     context = context,
     instruction = instruction,
     fieldUnpacker = ::FieldUnpacker,
@@ -399,17 +390,18 @@ internal fun ArrayGetUnsignedExecutor(
 internal inline fun ArrayGetUnsignedExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
-    store: Store,
+    heap: WasmHeap,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayGetUnsignedS,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedArrayGet(
     vstack = vstack,
-    store = store,
+    heap = heap,
     fieldIndex = vstack.getFrameSlot(instruction.fieldSlot).toInt(),
     address = arrayAddress(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
     signed = false,
+    packedType = instruction.packedType,
     fieldUnpacker = fieldUnpacker,
 )
 
@@ -421,7 +413,7 @@ internal fun ArrayLenExecutor(
     instruction: AggregateSuperInstruction.ArrayLenS,
 ) = executeArrayLen(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
     address = arrayAddress(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
 )
@@ -434,12 +426,12 @@ internal inline fun ArrayNewExecutor(
     instruction: AggregateSuperInstruction.ArrayNewIi,
 ) = executeArrayNew(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     size = instruction.size,
     value = instruction.value,
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
 )
 
 internal inline fun ArrayNewExecutor(
@@ -450,12 +442,12 @@ internal inline fun ArrayNewExecutor(
     instruction: AggregateSuperInstruction.ArrayNewIs,
 ) = executeArrayNew(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     size = instruction.size,
     value = vstack.getFrameSlot(instruction.valueSlot),
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
 )
 
 internal inline fun ArrayNewExecutor(
@@ -466,12 +458,12 @@ internal inline fun ArrayNewExecutor(
     instruction: AggregateSuperInstruction.ArrayNewSi,
 ) = executeArrayNew(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     size = vstack.getFrameSlot(instruction.sizeSlot).toInt(),
     value = instruction.value,
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
 )
 
 internal inline fun ArrayNewExecutor(
@@ -482,12 +474,12 @@ internal inline fun ArrayNewExecutor(
     instruction: AggregateSuperInstruction.ArrayNewSs,
 ) = executeArrayNew(
     vstack = vstack,
-    store = store,
+    heap = context.heap,
+    context = context,
     size = vstack.getFrameSlot(instruction.sizeSlot).toInt(),
     value = vstack.getFrameSlot(instruction.valueSlot),
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
 )
 
 internal inline fun ArrayNewFixedExecutor(
@@ -498,11 +490,11 @@ internal inline fun ArrayNewFixedExecutor(
     instruction: AggregateSuperInstruction.ArrayNewFixedS,
 ) = executeArrayNewFixed(
     vstack = vstack,
-    store = store,
-    valueSlots = instruction.valueSlots,
+    heap = context.heap,
+    context = context,
+    firstElementSlot = instruction.firstElementSlot,
     destinationSlot = instruction.destinationSlot,
     rtt = instruction.rtt,
-    arrayType = instruction.arrayType,
     size = instruction.size,
 )
 
@@ -513,7 +505,7 @@ internal inline fun ArraySetExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArraySetIi,
 ) = executeArraySet(
-    store = store,
+    heap = context.heap,
     value = instruction.value,
     fieldIndex = instruction.field,
     address = arrayAddress(vstack, instruction.addressSlot),
@@ -526,7 +518,7 @@ internal inline fun ArraySetExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArraySetIs,
 ) = executeArraySet(
-    store = store,
+    heap = context.heap,
     value = instruction.value,
     fieldIndex = vstack.getFrameSlot(instruction.fieldSlot).toInt(),
     address = arrayAddress(vstack, instruction.addressSlot),
@@ -539,7 +531,7 @@ internal inline fun ArraySetExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArraySetSi,
 ) = executeArraySet(
-    store = store,
+    heap = context.heap,
     value = vstack.getFrameSlot(instruction.valueSlot),
     fieldIndex = instruction.field,
     address = arrayAddress(vstack, instruction.addressSlot),
@@ -552,7 +544,7 @@ internal inline fun ArraySetExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArraySetSs,
 ) = executeArraySet(
-    store = store,
+    heap = context.heap,
     value = vstack.getFrameSlot(instruction.valueSlot),
     fieldIndex = vstack.getFrameSlot(instruction.fieldSlot).toInt(),
     address = arrayAddress(vstack, instruction.addressSlot),
@@ -566,8 +558,8 @@ internal inline fun StructGetExecutor(
     instruction: AggregateSuperInstruction.StructGetS,
 ) = executeStructGet(
     vstack = vstack,
-    store = store,
-    address = structAddress(vstack, instruction.addressSlot),
+    heap = context.heap,
+    reference = structReference(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
     fieldIndex = instruction.fieldIndex,
 )
@@ -585,7 +577,7 @@ internal inline fun RefCastStructGetExecutor(
     }
     vstack.setFrameSlot(
         instruction.destinationSlot,
-        structField(store, reference, instruction.fieldIndex),
+        context.heap.getStructFieldTrusted(reference, instruction.fieldIndex),
     )
 }
 
@@ -597,13 +589,13 @@ internal inline fun StructGetStructGetExecutor(
     instruction: AggregateSuperInstruction.StructGetStructGetS,
 ) {
     val reference = structField(
-        store = store,
+        heap = context.heap,
         reference = vstack.getFrameSlot(instruction.addressSlot),
         fieldIndex = instruction.firstFieldIndex,
     )
     vstack.setFrameSlot(
         instruction.destinationSlot,
-        structField(store, reference, instruction.secondFieldIndex),
+        structField(context.heap, reference, instruction.secondFieldIndex),
     )
 }
 
@@ -618,7 +610,7 @@ internal inline fun LocalSetStructGetExecutor(
     vstack.setFrameSlot(instruction.localSlot, reference)
     vstack.setFrameSlot(
         instruction.destinationSlot,
-        structField(store, reference, instruction.fieldIndex),
+        structField(context.heap, reference, instruction.fieldIndex),
     )
 }
 
@@ -631,7 +623,7 @@ internal fun StructGetSignedExecutor(
 ) = StructGetSignedExecutor(
     vstack = vstack,
     cstack = cstack,
-    store = store,
+    heap = context.heap,
     context = context,
     instruction = instruction,
     fieldUnpacker = ::FieldUnpacker,
@@ -640,16 +632,17 @@ internal fun StructGetSignedExecutor(
 internal inline fun StructGetSignedExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
-    store: Store,
+    heap: WasmHeap,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.StructGetSignedS,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedStructGet(
     vstack = vstack,
-    store = store,
-    address = structAddress(vstack, instruction.addressSlot),
+    heap = heap,
+    reference = structReference(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
     fieldIndex = instruction.fieldIndex,
+    packedType = instruction.packedType,
     signed = true,
     fieldUnpacker = fieldUnpacker,
 )
@@ -663,7 +656,7 @@ internal fun StructGetUnsignedExecutor(
 ) = StructGetUnsignedExecutor(
     vstack = vstack,
     cstack = cstack,
-    store = store,
+    heap = context.heap,
     context = context,
     instruction = instruction,
     fieldUnpacker = ::FieldUnpacker,
@@ -672,16 +665,17 @@ internal fun StructGetUnsignedExecutor(
 internal inline fun StructGetUnsignedExecutor(
     vstack: ValueStack,
     cstack: ControlStack,
-    store: Store,
+    heap: WasmHeap,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.StructGetUnsignedS,
     crossinline fieldUnpacker: FieldUnpacker,
 ) = executePackedStructGet(
     vstack = vstack,
-    store = store,
-    address = structAddress(vstack, instruction.addressSlot),
+    heap = heap,
+    reference = structReference(vstack, instruction.addressSlot),
     destinationSlot = instruction.destinationSlot,
     fieldIndex = instruction.fieldIndex,
+    packedType = instruction.packedType,
     signed = false,
     fieldUnpacker = fieldUnpacker,
 )
@@ -692,14 +686,14 @@ internal inline fun StructNewExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.StructNewS,
-) = executeStructNew(
-    vstack = vstack,
-    store = store,
-    fieldSlots = instruction.fieldSlots,
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    structType = instruction.structType,
-)
+) {
+    context.heap.allocateStructFromFrame(
+        context = context,
+        runtimeType = instruction.rtt,
+        firstFieldSlot = instruction.firstFieldSlot,
+        destinationSlot = instruction.destinationSlot,
+    )
+}
 
 internal inline fun StructNewDefaultExecutor(
     vstack: ValueStack,
@@ -707,14 +701,12 @@ internal inline fun StructNewDefaultExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.StructNewDefaultS,
-) = executeStructNewDefault(
-    vstack = vstack,
-    store = store,
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    structType = instruction.structType,
-    fields = instruction.fields,
-)
+) {
+    vstack.setFrameSlot(
+        instruction.destinationSlot,
+        context.heap.allocateStruct(context, instruction.rtt, instruction.fields),
+    )
+}
 
 internal inline fun StructSetExecutor(
     vstack: ValueStack,
@@ -723,9 +715,9 @@ internal inline fun StructSetExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.StructSetI,
 ) = executeStructSet(
-    store = store,
+    heap = context.heap,
     value = instruction.value,
-    address = structAddress(vstack, instruction.addressSlot),
+    reference = structReference(vstack, instruction.addressSlot),
     fieldIndex = instruction.fieldIndex,
 )
 
@@ -736,215 +728,160 @@ internal inline fun StructSetExecutor(
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.StructSetS,
 ) = executeStructSet(
-    store = store,
+    heap = context.heap,
     value = vstack.getFrameSlot(instruction.valueSlot),
-    address = structAddress(vstack, instruction.addressSlot),
+    reference = structReference(vstack, instruction.addressSlot),
     fieldIndex = instruction.fieldIndex,
 )
 
 private fun executeArrayCopy(
-    store: Store,
+    heap: WasmHeap,
     elementsToCopy: Int,
     sourceOffset: Int,
-    sourceAddress: io.github.charlietap.chasm.runtime.address.Address.Array,
+    sourceAddress: Long,
     destinationOffset: Int,
-    destinationAddress: io.github.charlietap.chasm.runtime.address.Address.Array,
+    destinationAddress: Long,
 ) {
-    val source = store.array(sourceAddress)
-    val destination = store.array(destinationAddress)
-
     try {
-        source.fields.copyInto(destination.fields, destinationOffset, sourceOffset, sourceOffset + elementsToCopy)
-    } catch (_: IndexOutOfBoundsException) {
+        heap.copyArray(sourceAddress, sourceOffset, destinationAddress, destinationOffset, elementsToCopy)
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 }
 
 private fun executeArrayFill(
-    store: Store,
+    heap: WasmHeap,
     elementsToFill: Int,
     fillValue: Long,
     arrayElementOffset: Int,
-    address: io.github.charlietap.chasm.runtime.address.Address.Array,
+    address: Long,
 ) {
-    val arrayInstance = store.array(address)
     try {
-        arrayInstance.fields.fill(fillValue, arrayElementOffset, arrayElementOffset + elementsToFill)
-    } catch (_: IndexOutOfBoundsException) {
+        heap.fillArray(address, arrayElementOffset, elementsToFill, fillValue)
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 }
 
 private fun executeArrayGet(
     vstack: ValueStack,
-    store: Store,
+    heap: WasmHeap,
     fieldIndex: Int,
-    address: io.github.charlietap.chasm.runtime.address.Address.Array,
+    address: Long,
     destinationSlot: Int,
 ) {
-    val arrayInstance = store.array(address)
-    val fieldValue = arrayInstance.field(fieldIndex)
-    vstack.setFrameSlot(destinationSlot, fieldValue)
+    vstack.setFrameSlot(destinationSlot, heap.getArrayElementTrusted(address, fieldIndex))
 }
 
 private inline fun executePackedArrayGet(
     vstack: ValueStack,
-    store: Store,
+    heap: WasmHeap,
     fieldIndex: Int,
-    address: io.github.charlietap.chasm.runtime.address.Address.Array,
+    address: Long,
     destinationSlot: Int,
     signed: Boolean,
+    packedType: PackedType,
     crossinline fieldUnpacker: FieldUnpacker,
 ) {
-    val arrayInstance = store.array(address)
-    val (packed, type) = arrayInstance.packedField(fieldIndex)
-    vstack.setFrameSlot(destinationSlot, fieldUnpacker(packed, type, signed))
+    val packed = heap.getArrayElementTrusted(address, fieldIndex)
+    vstack.setFrameSlot(destinationSlot, fieldUnpacker(packed, packedType, signed))
 }
 
 private fun executeArrayLen(
     vstack: ValueStack,
-    store: Store,
-    address: io.github.charlietap.chasm.runtime.address.Address.Array,
+    heap: WasmHeap,
+    address: Long,
     destinationSlot: Int,
 ) {
-    val arrayInstance = store.array(address)
-    vstack.setFrameSlot(destinationSlot, arrayInstance.fields.size.toLong())
+    vstack.setFrameSlot(destinationSlot, heap.arrayLengthTrusted(address).toLong())
 }
 
 private fun executeArrayNew(
     vstack: ValueStack,
-    store: Store,
+    heap: WasmHeap,
+    context: ExecutionContext,
     size: Int,
     value: Long,
     destinationSlot: Int,
     rtt: RTT,
-    arrayType: ArrayType,
 ) {
-    val fields = LongArray(size) { value }
-    val instance = ArrayInstance(rtt, arrayType, fields)
-    val address = store.allocateArray(instance)
-    vstack.setFrameSlot(destinationSlot, ReferenceValue.Array(address).toLong())
+    try {
+        vstack.setFrameSlot(destinationSlot, heap.allocateArrayFilled(context, rtt, size, value))
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
+    }
 }
 
 private fun executeArrayNewFixed(
     vstack: ValueStack,
-    store: Store,
-    valueSlots: List<Int>,
+    heap: WasmHeap,
+    context: ExecutionContext,
+    firstElementSlot: Int,
     destinationSlot: Int,
     rtt: RTT,
-    arrayType: ArrayType,
     size: Int,
 ) {
-    val fields = LongArray(size)
-    var index = 0
-    while (index < size) {
-        fields[index] = vstack.getFrameSlot(valueSlots[index])
-        index++
-    }
-
-    val instance = ArrayInstance(rtt, arrayType, fields)
-    val address = store.allocateArray(instance)
-    vstack.setFrameSlot(destinationSlot, ReferenceValue.Array(address).toLong())
+    heap.allocateArrayFromFrame(context, rtt, firstElementSlot, size, destinationSlot)
 }
 
 private fun executeArraySet(
-    store: Store,
+    heap: WasmHeap,
     value: Long,
     fieldIndex: Int,
-    address: io.github.charlietap.chasm.runtime.address.Address.Array,
+    address: Long,
 ) {
-    val arrayInstance = store.array(address)
     try {
-        arrayInstance.fields[fieldIndex] = value
-    } catch (_: IndexOutOfBoundsException) {
+        heap.setArrayElementTrusted(address, fieldIndex, value)
+    } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
 }
 
 private fun executeStructGet(
     vstack: ValueStack,
-    store: Store,
-    address: io.github.charlietap.chasm.runtime.address.Address.Struct,
+    heap: WasmHeap,
+    reference: Long,
     destinationSlot: Int,
     fieldIndex: Int,
 ) {
-    val structInstance = store.struct(address)
-    val fieldValue = structInstance.field(fieldIndex)
-    vstack.setFrameSlot(destinationSlot, fieldValue)
+    vstack.setFrameSlot(destinationSlot, heap.getStructFieldTrusted(reference, fieldIndex))
 }
 
 private fun structField(
-    store: Store,
+    heap: WasmHeap,
     reference: Long,
     fieldIndex: Int,
-): Long = store
-    .struct(reference.toStructAddress())
-    .field(fieldIndex)
+): Long = heap.getStructFieldTrusted(reference, fieldIndex)
 
 private inline fun executePackedStructGet(
     vstack: ValueStack,
-    store: Store,
-    address: io.github.charlietap.chasm.runtime.address.Address.Struct,
+    heap: WasmHeap,
+    reference: Long,
     destinationSlot: Int,
     fieldIndex: Int,
+    packedType: PackedType,
     signed: Boolean,
     crossinline fieldUnpacker: FieldUnpacker,
 ) {
-    val structInstance = store.struct(address)
-    val (packed, type) = structInstance.packedField(fieldIndex)
-    vstack.setFrameSlot(destinationSlot, fieldUnpacker(packed, type, signed))
-}
-
-private fun executeStructNew(
-    vstack: ValueStack,
-    store: Store,
-    fieldSlots: List<Int>,
-    destinationSlot: Int,
-    rtt: RTT,
-    structType: StructType,
-) {
-    val size = structType.fields.size
-    val fields = LongArray(size)
-    var index = 0
-    while (index < size) {
-        fields[index] = vstack.getFrameSlot(fieldSlots[index])
-        index++
-    }
-
-    val instance = StructInstance(rtt, structType, fields)
-    val address = store.allocateStruct(instance)
-    vstack.setFrameSlot(destinationSlot, ReferenceValue.Struct(address).toLong())
-}
-
-private fun executeStructNewDefault(
-    vstack: ValueStack,
-    store: Store,
-    destinationSlot: Int,
-    rtt: RTT,
-    structType: StructType,
-    fields: LongArray,
-) {
-    val instance = StructInstance(rtt, structType, fields.copyOf())
-    val address = store.allocateStruct(instance)
-    vstack.setFrameSlot(destinationSlot, ReferenceValue.Struct(address).toLong())
+    val packed = heap.getStructFieldTrusted(reference, fieldIndex)
+    vstack.setFrameSlot(destinationSlot, fieldUnpacker(packed, packedType, signed))
 }
 
 private fun executeStructSet(
-    store: Store,
+    heap: WasmHeap,
     value: Long,
-    address: io.github.charlietap.chasm.runtime.address.Address.Struct,
+    reference: Long,
     fieldIndex: Int,
 ) {
-    val structInstance = store.struct(address)
-    structInstance.fields[fieldIndex] = value
+    heap.setStructFieldTrusted(reference, fieldIndex, value)
 }
 
 private inline fun arrayAddress(
     vstack: ValueStack,
     addressSlot: Int,
-) = vstack.getFrameSlot(addressSlot).toArrayAddress()
+): Long = vstack.getFrameSlot(addressSlot)
 
-private inline fun structAddress(
+private inline fun structReference(
     vstack: ValueStack,
     addressSlot: Int,
-) = vstack.getFrameSlot(addressSlot).toStructAddress()
+): Long = vstack.getFrameSlot(addressSlot)

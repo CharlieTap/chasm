@@ -1,19 +1,12 @@
 package io.github.charlietap.chasm.embedding.reference
 
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.transform.FieldValueEncoder
-import io.github.charlietap.chasm.fixture.runtime.instance.structAddress
-import io.github.charlietap.chasm.fixture.runtime.instance.structInstance
-import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.value.i32
-import io.github.charlietap.chasm.fixture.runtime.value.structReferenceValue
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.mutableFieldType
-import io.github.charlietap.chasm.fixture.type.structType
 import io.github.charlietap.chasm.fixture.type.valueStorageType
 import io.github.charlietap.chasm.fixture.type.varMutability
-import io.github.charlietap.chasm.runtime.ext.struct
 import io.github.charlietap.chasm.runtime.value.FieldValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -29,13 +22,7 @@ class WriteStructFieldTest {
             ),
             mutability = varMutability(),
         )
-        val instance = structInstance(
-            structType = structType(listOf(fieldType)),
-            fields = longArrayOf(117L),
-        )
-        val store = publicStore(store(structs = mutableListOf(instance)))
-        val address = structAddress(0)
-        val struct = structReferenceValue(address)
+        val fixture = structFieldTestFixture(fieldType, 117L)
         val index = 0
         val value = FieldValue.Execution(i32(119))
 
@@ -49,14 +36,14 @@ class WriteStructFieldTest {
         val expected = Ok(Unit)
 
         val actual = internalWriteStructField(
-            store = store,
-            struct = struct,
+            store = fixture.store,
+            struct = fixture.reference,
             index = index,
             value = value,
             fieldValueEncoder = fieldValueEncoder,
         )
 
         assertEquals(expected, actual)
-        assertEquals(119L, store.store.struct(address).fields[index])
+        assertEquals(119L, fixture.store.store.heap.getStructField(fixture.rawReference, index))
     }
 }

@@ -24,7 +24,7 @@ class HostFunctionAllocatorTest {
         val functionType = functionType()
         val hostFunction: HostFunction = { emptyList() }
 
-        val rtt = store.runtimeTypes.register(functionType.definedType())
+        val rtt = store.heap.registerRuntimeType(functionType.definedType())
 
         val expectedInstance = FunctionInstance.HostFunction(
             rtt = rtt,

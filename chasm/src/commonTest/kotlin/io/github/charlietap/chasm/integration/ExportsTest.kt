@@ -35,10 +35,11 @@ class ExportsTest {
 
         val byteStream = Resource(FILE_DIR + "export.wasm").readBytes()
         val reader = FakeSourceReader(byteStream)
+        val store = publicStore()
 
         val actual = module(reader)
             .flatMap { module ->
-                instance(publicStore(), module, emptyList())
+                instance(store, module, emptyList())
             }.map { instance ->
                 exports(instance)
             }.getOrNull()

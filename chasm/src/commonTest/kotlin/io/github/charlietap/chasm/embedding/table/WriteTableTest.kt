@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.fixture.publicTable
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.tableExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
@@ -25,7 +26,12 @@ class WriteTableTest {
         val functionAddress = functionAddress()
         val value = functionReferenceValue(functionAddress)
         val instance = tableInstance(elements = longArrayOf(ReferenceValue.Null(AbstractHeapType.Func).toLongFromBoxed()))
-        val store = publicStore(store(tables = mutableListOf(instance)))
+        val store = publicStore(
+            store(
+                functions = mutableListOf(hostFunctionInstance()),
+                tables = mutableListOf(instance),
+            ),
+        )
         val address = tableAddress(0)
         val table = publicTable(tableExternalValue(address))
 

@@ -27,6 +27,7 @@ class InvokeTest {
 
         val store = publicStore()
         val instance = publicInstance(
+            store = store.store,
             moduleInstance = moduleInstance(
                 deallocated = true,
                 exports = mutableListOf(
@@ -51,7 +52,7 @@ class InvokeTest {
         val function = "missing"
 
         val store = publicStore()
-        val instance = publicInstance()
+        val instance = publicInstance(store = store.store)
 
         val expected = ChasmError.ExecutionError(InvocationError.FunctionNotFound(function).toString())
 
@@ -68,6 +69,7 @@ class InvokeTest {
         val functionExtern = functionExternalValue(address)
         val function = publicFunction(functionExtern)
         val instance = publicInstance(
+            store = store.store,
             moduleInstance = moduleInstance(
                 deallocated = true,
                 exports = mutableListOf(
@@ -90,11 +92,9 @@ class InvokeTest {
     fun `calling invoke with a function reference that is not exported returns FunctionNotFound`() {
 
         val store = publicStore()
-        val instance = publicInstance()
+        val instance = publicInstance(store = store.store)
         val address = functionAddress(117)
-        val function = publicFunction(
-            functionExternalValue(address),
-        )
+        val function = publicFunction(functionExternalValue(address))
 
         val expected = ChasmError.ExecutionError(InvocationError.FunctionNotFound("Function with address: ${address.address}").toString())
 
@@ -113,6 +113,7 @@ class InvokeTest {
 
         val config = runtimeConfig()
         val instance = publicInstance(
+            store = store.store,
             config = config,
             moduleInstance = moduleInstance(
                 exports = mutableListOf(
@@ -151,6 +152,7 @@ class InvokeTest {
         val address = functionAddress(0)
         val config = runtimeConfig()
         val instance = publicInstance(
+            store = store.store,
             config = config,
             moduleInstance = moduleInstance(
                 exports = mutableListOf(
@@ -191,6 +193,7 @@ class InvokeTest {
 
         val config = runtimeConfig()
         val instance = publicInstance(
+            store = store.store,
             config = config,
             moduleInstance = moduleInstance(
                 exports = mutableListOf(
@@ -230,6 +233,7 @@ class InvokeTest {
         val function = publicFunction(functionExtern)
         val config = runtimeConfig()
         val instance = publicInstance(
+            store = store.store,
             config = config,
             moduleInstance = moduleInstance(
                 exports = mutableListOf(
@@ -268,6 +272,7 @@ class InvokeTest {
 
         val config = runtimeConfig()
         val instance = publicInstance(
+            store = store.store,
             config = config,
             moduleInstance = moduleInstance(
                 exports = mutableListOf(
@@ -305,6 +310,7 @@ class InvokeTest {
         val address = functionAddress(0)
         val config = runtimeConfig()
         val instance = publicInstance(
+            store = store.store,
             config = config,
             moduleInstance = moduleInstance(
                 exports = mutableListOf(

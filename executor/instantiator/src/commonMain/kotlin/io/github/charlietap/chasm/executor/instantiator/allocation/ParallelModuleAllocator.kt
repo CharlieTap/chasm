@@ -38,7 +38,6 @@ internal suspend fun ParallelModuleAllocator(
     if (allocation.isErr) return allocation.asErr()
 
     val compilation = ParallelModuleCompiler(
-        config = context.config,
         store = context.store,
         module = context.module,
         instance = instance,

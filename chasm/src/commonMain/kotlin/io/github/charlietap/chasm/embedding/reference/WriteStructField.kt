@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.embedding.transform.FieldValueEncoder
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.ext.struct
+import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.value.FieldValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.Mutability
@@ -41,18 +41,17 @@ internal fun internalWriteStructField(
     value: FieldValue,
     fieldValueEncoder: FieldValueEncoder,
 ): Result<Unit, ModuleTrapError> = runCatching {
-    val instance = store.store.struct(struct.address)
-    val fieldType = instance.structType.fields.getOrNull(index)
-        ?: throw InvocationException(InvocationError.StructFieldLookupFailed(index))
+    val rawReference = struct.toLong()
+    val fieldType = store.store.heap.structFieldType(rawReference, index)
 
     if (fieldType.mutability != Mutability.Var) {
         throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
 
-    instance.fields[index] = fieldValueEncoder(value, fieldType)
+    store.store.heap.setStructField(rawReference, index, fieldValueEncoder(value, fieldType))
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error
-        else -> InvocationError.StructFieldLookupFailed(index)
+        else -> throw e
     }
 }

@@ -3,34 +3,26 @@ package io.github.charlietap.chasm.embedding
 import com.github.michaelbull.result.Err
 import io.github.charlietap.chasm.embedding.error.ChasmError
 import io.github.charlietap.chasm.embedding.fixture.publicStore
+import io.github.charlietap.chasm.embedding.reference.arrayFieldTestFixture
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
-import io.github.charlietap.chasm.fixture.runtime.instance.arrayInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.structInstance
-import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.type.arrayType
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 class GCTest {
 
     @Test
     fun `gc runs successfully and correctly handles collection`() {
 
-        val internalStore = store()
-        val arrayInstance = arrayInstance()
-        internalStore.arrays.add(arrayInstance)
-        val structInstance = structInstance()
-        internalStore.structs.add(structInstance)
-
-        val publicStore = publicStore(internalStore)
+        val fixture = arrayFieldTestFixture(arrayType(), LongArray(0))
+        val publicStore = fixture.store
 
         val actual = gc(publicStore)
 
         assertEquals(ChasmResult.Success(Unit), actual)
-        assertNull(internalStore.arrays[0])
-        assertNull(internalStore.structs[0])
+        assertEquals(-1, publicStore.store.heap.arrayRuntimeTypeIdOrNegative(fixture.rawReference))
     }
 
     @Test

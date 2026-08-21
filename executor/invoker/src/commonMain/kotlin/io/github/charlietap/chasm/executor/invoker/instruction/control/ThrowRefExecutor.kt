@@ -4,9 +4,7 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandle
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
-import io.github.charlietap.chasm.runtime.ext.exception
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
-import io.github.charlietap.chasm.runtime.ext.toExceptionAddress
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -30,13 +28,10 @@ internal fun ThrowRefValueExecutor(
     store: Store,
     ref: Long,
 ): Int {
-    val exceptionAddress = if (ref.isNullableReference()) {
+    if (ref.isNullableReference()) {
         throw InvocationException(InvocationError.UnexpectedReferenceValue)
-    } else {
-        ref.toExceptionAddress()
     }
-    val exception = store.exception(exceptionAddress)
-
+    val exceptionTagAddress = store.heap.exceptionTagAddress(ref)
     while (true) {
         val handler = cstack.popHandler()
 
@@ -47,17 +42,23 @@ internal fun ThrowRefValueExecutor(
         val moduleInstance = cstack.frameInstance()
         handler.handlers.forEachIndexed { index, catchHandler ->
             val tagMatches = when (catchHandler) {
-                is CatchHandler.Catch -> exception.tagAddress == moduleInstance.tagAddress(catchHandler.tagIndex)
-                is CatchHandler.CatchRef -> exception.tagAddress == moduleInstance.tagAddress(catchHandler.tagIndex)
+                is CatchHandler.Catch -> {
+                    exceptionTagAddress == moduleInstance.tagAddress(catchHandler.tagIndex)
+                }
+                is CatchHandler.CatchRef -> {
+                    exceptionTagAddress == moduleInstance.tagAddress(catchHandler.tagIndex)
+                }
                 else -> true
             }
 
             if (tagMatches) {
                 val destinationSlots = handler.payloadDestinationSlots[index]
                 when (catchHandler) {
-                    is CatchHandler.Catch -> writeCatchPayload(vstack, exception.fields, destinationSlots)
+                    is CatchHandler.Catch -> {
+                        writeCatchPayload(vstack, store, ref, destinationSlots.size, destinationSlots)
+                    }
                     is CatchHandler.CatchRef -> {
-                        writeCatchPayload(vstack, exception.fields, destinationSlots)
+                        writeCatchPayload(vstack, store, ref, destinationSlots.lastIndex, destinationSlots)
                         vstack.setFrameSlot(destinationSlots.last(), ref)
                     }
                     is CatchHandler.CatchAll -> Unit
@@ -71,10 +72,17 @@ internal fun ThrowRefValueExecutor(
 
 private fun writeCatchPayload(
     vstack: ValueStack,
-    fields: LongArray,
+    store: Store,
+    exceptionReference: Long,
+    payloadCount: Int,
     destinationSlots: IntArray,
 ) {
-    for (index in fields.indices) {
-        vstack.setFrameSlot(destinationSlots[fields.lastIndex - index], fields[index])
+    var fieldIndex = 0
+    while (fieldIndex < payloadCount) {
+        vstack.setFrameSlot(
+            destinationSlots[fieldIndex],
+            store.heap.getExceptionFieldTrusted(exceptionReference, fieldIndex),
+        )
+        fieldIndex++
     }
 }

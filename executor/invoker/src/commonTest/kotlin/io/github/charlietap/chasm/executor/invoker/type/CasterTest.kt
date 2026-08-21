@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.executor.invoker.type
 
-import io.github.charlietap.chasm.fixture.runtime.instance.structInstance
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXCEPTION
@@ -16,10 +15,15 @@ import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.ConcreteHeapType
+import io.github.charlietap.chasm.type.FieldType
+import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.NumberType
 import io.github.charlietap.chasm.type.RecursiveType
 import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.SubType
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.type.factory.DefinedTypeFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -63,9 +67,9 @@ class CasterTest {
     @Test
     fun `concrete reference tests use canonical subtype displays`() {
         val store = Store()
-        val runtimeTypes = store.runtimeTypes.register(structChain())
-        store.structs += structInstance(rtt = runtimeTypes[1])
-        store.structs += structInstance(rtt = runtimeTypes[0])
+        val runtimeTypes = store.heap.registerRuntimeTypes(structChain())
+        val leafReference = store.heap.allocateStruct(runtimeTypes[1], LongArray(0))
+        val rootReference = store.heap.allocateStruct(runtimeTypes[0], LongArray(0))
         val rootTest = ReferenceTypeTest.from(
             ReferenceType.Ref(ConcreteHeapType.TypeIndex(0)),
             runtimeTypes,
@@ -75,9 +79,36 @@ class CasterTest {
             runtimeTypes,
         )
 
-        assertEquals(true, Caster(RV_TYPE_STRUCT, rootTest, store))
-        assertEquals(true, Caster(RV_TYPE_STRUCT, leafTest, store))
-        assertEquals(false, Caster((1L shl RV_SHIFT_BITS) or RV_TYPE_STRUCT, leafTest, store))
+        assertEquals(true, Caster(leafReference, rootTest, store))
+        assertEquals(true, Caster(leafReference, leafTest, store))
+        assertEquals(false, Caster(rootReference, leafTest, store))
+    }
+
+    @Test
+    fun `concrete struct casts reject wrong kind forged interior and stale values`() {
+        val store = Store()
+        val runtimeTypes = store.heap.registerRuntimeTypes(twoFieldStruct())
+        val reference = store.heap.allocateStruct(runtimeTypes[0], longArrayOf(1L, 2L))
+        val test = ReferenceTypeTest.from(
+            ReferenceType.Ref(ConcreteHeapType.TypeIndex(0)),
+            runtimeTypes,
+        )
+        val interior = reference + (1L shl RV_SHIFT_BITS)
+        val forged = (500_000L shl RV_SHIFT_BITS) or RV_TYPE_STRUCT
+        val wrongKind = (reference and RV_TYPE_STRUCT.inv()) or RV_TYPE_ARRAY
+
+        assertEquals(true, Caster(reference, test, store))
+        assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(interior))
+        assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(forged))
+        assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(wrongKind))
+        assertEquals(false, Caster(interior, test, store))
+        assertEquals(false, Caster(forged, test, store))
+        assertEquals(false, Caster(wrongKind, test, store))
+
+        store.heap.collectGarbage(store)
+
+        assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(reference))
+        assertEquals(false, Caster(reference, test, store))
     }
 
     private companion object {
@@ -95,6 +126,29 @@ class CasterTest {
             listOf(
                 recursiveStruct(parent = null),
                 recursiveStruct(parent = 0),
+            ),
+        )
+
+        fun twoFieldStruct() = DefinedTypeFactory(
+            listOf(
+                RecursiveType(
+                    subTypes = listOf(
+                        SubType.Final(
+                            superTypes = emptyList(),
+                            compositeType = CompositeType.Struct(
+                                StructType(
+                                    List(2) {
+                                        FieldType(
+                                            StorageType.Value(ValueType.Number(NumberType.I64)),
+                                            Mutability.Var,
+                                        )
+                                    },
+                                ),
+                            ),
+                        ),
+                    ),
+                    state = RecursiveType.State.SYNTAX,
+                ),
             ),
         )
 

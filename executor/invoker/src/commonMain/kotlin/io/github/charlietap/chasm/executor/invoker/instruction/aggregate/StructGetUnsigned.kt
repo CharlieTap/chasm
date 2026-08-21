@@ -2,9 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.ext.packedField
-import io.github.charlietap.chasm.runtime.ext.popStructAddress
-import io.github.charlietap.chasm.runtime.ext.struct
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -22,6 +19,7 @@ internal fun StructGetUnsignedExecutor(
     store = store,
     context = context,
     fieldIndex = instruction.fieldIndex,
+    packedType = instruction.packedType,
     fieldUnpacker = ::FieldUnpacker,
 )
 
@@ -31,13 +29,12 @@ internal inline fun StructGetUnsignedExecutor(
     store: Store,
     context: ExecutionContext,
     fieldIndex: Index.FieldIndex,
+    packedType: io.github.charlietap.chasm.type.PackedType,
     crossinline fieldUnpacker: FieldUnpacker,
 ) {
-    val address = vstack.popStructAddress()
-    val structInstance = store.struct(address)
-
-    val (packed, type) = structInstance.packedField(fieldIndex)
-    val unpackedValue = fieldUnpacker(packed, type, false)
+    val reference = vstack.pop()
+    val packed = context.heap.getStructFieldTrusted(reference, fieldIndex.idx.toInt())
+    val unpackedValue = fieldUnpacker(packed, packedType, false)
 
     vstack.push(unpackedValue)
 }

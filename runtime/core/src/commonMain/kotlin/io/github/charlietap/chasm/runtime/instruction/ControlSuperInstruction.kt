@@ -82,7 +82,7 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class Throw(
         val tagIndex: Index.TagIndex,
-        val payloadSlots: IntArray,
+        val firstPayloadSlot: Int,
     ) : ControlSuperInstruction
 
     data class ThrowRefS(
