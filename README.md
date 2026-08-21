@@ -48,7 +48,7 @@ A minimal example using the plugin looks like this:
 ```kotlin
 plugins {
     ...
-    id("io.github.charlietap.chasm.gradle") version "2.2.0-1.6.1"
+    id("io.github.charlietap.chasm.gradle") version "2.2.0-1.7.0"
 }
 
 chasm {
@@ -80,7 +80,7 @@ APIs without the plugin.
 
 ```kotlin
 dependencies {
-    implementation("io.github.charlietap.chasm:chasm:1.6.1")
+    implementation("io.github.charlietap.chasm:chasm:1.7.0")
 }
 ```
 
