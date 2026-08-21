@@ -27,14 +27,18 @@ jobs:
       runner: ubuntu-24.04-arm
       task: checkCompilerBaseline
 
+  metadata:
+    uses: ./.github/workflows/task-runner.yml
+    with:
+      runner: ubuntu-24.04-arm
+      task: compileCommonMainKotlinMetadata
+
   test:
     strategy:
       matrix:
         include:
           - os: ubuntu-24.04-arm
-            task: test
-          - os: ubuntu-24.04-arm
-            task: corpus
+            task: test corpus
           - os: ubuntu-24.04-arm
             task: jsTest
           - os: ubuntu-24.04-arm
