@@ -445,7 +445,7 @@ class ArrayAllocationTest {
         assertFailsWith<IllegalArgumentException> {
             heap.allocateArrayFilled(structDescriptor, 1, 0)
         }
-        assertFailsWith<OutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryError> {
             heap.allocateArrayFilled(arrayDescriptor, 2048, 0)
         }
 
@@ -469,7 +469,7 @@ class ArrayAllocationTest {
         val dedicated = dedicatedFirst.allocateArrayFilled(dedicatedFirstDescriptor, 1024, 11)
         val beforeOrdinaryFailure = dedicatedFirst.snapshotStatistics()
 
-        assertFailsWith<OutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryError> {
             dedicatedFirst.allocateArrayFilled(dedicatedFirstDescriptor, 1, 22)
         }
         val afterOrdinaryFailure = dedicatedFirst.snapshotStatistics()
@@ -493,7 +493,7 @@ class ArrayAllocationTest {
         val ordinary = ordinaryFirst.allocateArrayFilled(ordinaryFirstDescriptor, 1, 33)
         val beforeDedicatedFailure = ordinaryFirst.snapshotStatistics()
 
-        assertFailsWith<OutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryError> {
             ordinaryFirst.allocateArrayFilled(ordinaryFirstDescriptor, 1024, 44)
         }
         val afterDedicatedFailure = ordinaryFirst.snapshotStatistics()

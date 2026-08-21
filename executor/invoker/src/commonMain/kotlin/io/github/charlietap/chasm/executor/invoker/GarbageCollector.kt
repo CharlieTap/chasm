@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryError
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -18,7 +19,7 @@ fun GarbageCollector(
     return try {
         store.heap.collectGarbage(store, stack)
         Ok(Unit)
-    } catch (failure: OutOfMemoryError) {
+    } catch (failure: GuestHeapOutOfMemoryError) {
         Err(
             InvocationError.GarbageCollectionFailed(
                 failure.message ?: "collection exhausted host memory",

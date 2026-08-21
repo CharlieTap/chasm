@@ -72,7 +72,7 @@ enum class AllocationAvailability {
 
 class GuestHeapOutOfMemoryError(
     message: String,
-) : OutOfMemoryError(message)
+) : Error(message)
 
 interface GcRootSink {
     fun markRoot(rawValue: Long)
@@ -1039,7 +1039,7 @@ class GarbageCollectedHeap(
     ) {
         if (requiredCapacity <= markWorklist.size) return
         if (requiredCapacity < 0 || requiredCapacity > maximumCapacity) {
-            throw OutOfMemoryError("mark worklist capacity exhausted")
+            throw GuestHeapOutOfMemoryError("mark worklist capacity exhausted")
         }
         markWorklist = markWorklist.copyOf(
             grownPrimitiveCapacity(markWorklist.size, requiredCapacity, maximumCapacity),
@@ -1863,7 +1863,7 @@ class GarbageCollectedHeap(
             val doubled = capacity.toLong() shl 1
             capacity = minOf(maximumCapacity.toLong(), doubled).toInt()
             if (capacity < requiredCapacity && capacity == maximumCapacity) {
-                throw OutOfMemoryError("heap metadata capacity exhausted")
+                throw GuestHeapOutOfMemoryError("heap metadata capacity exhausted")
             }
         }
         return capacity
@@ -1982,7 +1982,7 @@ class GarbageCollectedHeap(
     ) {
         if (requiredCapacity <= recycledPageIds.size) return
         if (requiredCapacity > maximumCapacity) {
-            throw OutOfMemoryError("recycled page capacity exhausted")
+            throw GuestHeapOutOfMemoryError("recycled page capacity exhausted")
         }
         recycledPageIds = recycledPageIds.copyOf(
             grownPrimitiveCapacity(recycledPageIds.size, requiredCapacity, maximumCapacity),
