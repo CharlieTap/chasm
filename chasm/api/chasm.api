@@ -652,3 +652,4 @@ public final class io/github/charlietap/chasm/embedding/table/ReadTableKt {
 public final class io/github/charlietap/chasm/embedding/table/WriteTableKt {
 	public static final fun writeTable (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Table;ILio/github/charlietap/chasm/runtime/value/ReferenceValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
+
