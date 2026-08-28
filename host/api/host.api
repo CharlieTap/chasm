@@ -9,6 +9,32 @@ public final class io/github/charlietap/chasm/host/HostContextExtensionsKt {
 	public static final fun withTag (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
+public final class io/github/charlietap/chasm/host/HostException {
+	public static final synthetic fun box-impl (J)Lio/github/charlietap/chasm/host/HostException;
+	public static fun constructor-impl (J)J
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (JLjava/lang/Object;)Z
+	public static final fun equals-impl0 (JJ)Z
+	public final fun getRawReference ()J
+	public fun hashCode ()I
+	public static fun hashCode-impl (J)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (J)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()J
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostExceptions {
+	public abstract fun create-jDW8ye0 (Lio/github/charlietap/chasm/host/HostResources;I[JI)J
+	public abstract fun getHasPending ()Z
+	public abstract fun payloadSize-4DeFWus (J)I
+	public abstract fun raise-4DeFWus (J)Ljava/lang/Void;
+	public abstract fun raisePending ()Ljava/lang/Void;
+	public abstract fun readPayload-VUYYV5o (JI[JII)[J
+	public abstract fun readPayload-nvx_kU4 (JI)J
+	public abstract fun tag-Y91bqTg (J)I
+	public abstract fun takePending-EyTNJns ()J
+}
+
 public final class io/github/charlietap/chasm/host/HostExternKind {
 	public static final field Companion Lio/github/charlietap/chasm/host/HostExternKind$Companion;
 	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostExternKind;

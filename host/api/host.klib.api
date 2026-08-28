@@ -14,6 +14,20 @@ abstract fun interface io.github.charlietap.chasm.host/HostFunction { // io.gith
     abstract fun (context(kotlin/LongArray, io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).invoke(kotlin/Int, kotlin/Int) // io.github.charlietap.chasm.host/HostFunction.invoke|invoke(kotlin.LongArray;io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Int){}[0]
 }
 
+abstract interface io.github.charlietap.chasm.host/HostExceptions { // io.github.charlietap.chasm.host/HostExceptions|null[0]
+    abstract val hasPending // io.github.charlietap.chasm.host/HostExceptions.hasPending|{}hasPending[0]
+        abstract fun <get-hasPending>(): kotlin/Boolean // io.github.charlietap.chasm.host/HostExceptions.hasPending.<get-hasPending>|<get-hasPending>(){}[0]
+
+    abstract fun (context(io.github.charlietap.chasm.host/HostResources)).create(io.github.charlietap.chasm.host/HostTag, kotlin/LongArray, kotlin/Int): io.github.charlietap.chasm.host/HostException // io.github.charlietap.chasm.host/HostExceptions.create|create(io.github.charlietap.chasm.host.HostResources)(io.github.charlietap.chasm.host.HostTag;kotlin.LongArray;kotlin.Int){}[0]
+    abstract fun payloadSize(io.github.charlietap.chasm.host/HostException): kotlin/Int // io.github.charlietap.chasm.host/HostExceptions.payloadSize|payloadSize(io.github.charlietap.chasm.host.HostException){}[0]
+    abstract fun raise(io.github.charlietap.chasm.host/HostException): kotlin/Nothing // io.github.charlietap.chasm.host/HostExceptions.raise|raise(io.github.charlietap.chasm.host.HostException){}[0]
+    abstract fun raisePending(): kotlin/Nothing // io.github.charlietap.chasm.host/HostExceptions.raisePending|raisePending(){}[0]
+    abstract fun readPayload(io.github.charlietap.chasm.host/HostException, kotlin/Int): kotlin/Long // io.github.charlietap.chasm.host/HostExceptions.readPayload|readPayload(io.github.charlietap.chasm.host.HostException;kotlin.Int){}[0]
+    abstract fun readPayload(io.github.charlietap.chasm.host/HostException, kotlin/Int, kotlin/LongArray, kotlin/Int, kotlin/Int): kotlin/LongArray // io.github.charlietap.chasm.host/HostExceptions.readPayload|readPayload(io.github.charlietap.chasm.host.HostException;kotlin.Int;kotlin.LongArray;kotlin.Int;kotlin.Int){}[0]
+    abstract fun tag(io.github.charlietap.chasm.host/HostException): io.github.charlietap.chasm.host/HostTag // io.github.charlietap.chasm.host/HostExceptions.tag|tag(io.github.charlietap.chasm.host.HostException){}[0]
+    abstract fun takePending(): io.github.charlietap.chasm.host/HostException // io.github.charlietap.chasm.host/HostExceptions.takePending|takePending(){}[0]
+}
+
 abstract interface io.github.charlietap.chasm.host/HostExterns { // io.github.charlietap.chasm.host/HostExterns|null[0]
     abstract fun (context(io.github.charlietap.chasm.host/HostResources)).create(kotlin/Any): io.github.charlietap.chasm.host/HostExternReference // io.github.charlietap.chasm.host/HostExterns.create|create(io.github.charlietap.chasm.host.HostResources)(kotlin.Any){}[0]
     abstract fun externalize(kotlin/Long): io.github.charlietap.chasm.host/HostExternReference // io.github.charlietap.chasm.host/HostExterns.externalize|externalize(kotlin.Long){}[0]
@@ -122,6 +136,17 @@ final class io.github.charlietap.chasm.host/HostFunctionException : kotlin/Excep
 
     final val reason // io.github.charlietap.chasm.host/HostFunctionException.reason|{}reason[0]
         final fun <get-reason>(): kotlin/String // io.github.charlietap.chasm.host/HostFunctionException.reason.<get-reason>|<get-reason>(){}[0]
+}
+
+final value class io.github.charlietap.chasm.host/HostException { // io.github.charlietap.chasm.host/HostException|null[0]
+    constructor <init>(kotlin/Long) // io.github.charlietap.chasm.host/HostException.<init>|<init>(kotlin.Long){}[0]
+
+    final val rawReference // io.github.charlietap.chasm.host/HostException.rawReference|{}rawReference[0]
+        final fun <get-rawReference>(): kotlin/Long // io.github.charlietap.chasm.host/HostException.rawReference.<get-rawReference>|<get-rawReference>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/HostException.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/HostException.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.host/HostException.toString|toString(){}[0]
 }
 
 final value class io.github.charlietap.chasm.host/HostExternKind { // io.github.charlietap.chasm.host/HostExternKind|null[0]
