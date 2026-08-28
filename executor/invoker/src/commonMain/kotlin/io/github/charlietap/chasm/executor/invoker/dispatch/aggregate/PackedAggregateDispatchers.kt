@@ -1,10 +1,10 @@
-package io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused
+package io.github.charlietap.chasm.executor.invoker.dispatch.aggregate
 
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.type.PackedType
 
-internal fun PackedArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedI): DispatchableInstruction {
+internal fun PackedArrayGetSignedDispatcher(instruction: AggregateInstruction.ArrayGetSignedI): DispatchableInstruction {
     val shift = instruction.packedType.signedShift()
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
@@ -16,7 +16,7 @@ internal fun PackedArrayGetSignedDispatcher(instruction: AggregateSuperInstructi
     }
 }
 
-internal fun PackedArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedS): DispatchableInstruction {
+internal fun PackedArrayGetSignedDispatcher(instruction: AggregateInstruction.ArrayGetSignedS): DispatchableInstruction {
     val shift = instruction.packedType.signedShift()
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
@@ -29,7 +29,7 @@ internal fun PackedArrayGetSignedDispatcher(instruction: AggregateSuperInstructi
     }
 }
 
-internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedI): DispatchableInstruction {
+internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateInstruction.ArrayGetUnsignedI): DispatchableInstruction {
     val mask = instruction.packedType.unsignedMask()
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
@@ -41,7 +41,7 @@ internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruc
     }
 }
 
-internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedS): DispatchableInstruction {
+internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateInstruction.ArrayGetUnsignedS): DispatchableInstruction {
     val mask = instruction.packedType.unsignedMask()
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
@@ -54,7 +54,7 @@ internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruc
     }
 }
 
-internal fun PackedStructGetSignedDispatcher(instruction: AggregateSuperInstruction.StructGetSignedS): DispatchableInstruction {
+internal fun PackedStructGetSignedDispatcher(instruction: AggregateInstruction.StructGetSignedS): DispatchableInstruction {
     val shift = instruction.packedType.signedShift()
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
@@ -67,7 +67,7 @@ internal fun PackedStructGetSignedDispatcher(instruction: AggregateSuperInstruct
     }
 }
 
-internal fun PackedStructGetUnsignedDispatcher(instruction: AggregateSuperInstruction.StructGetUnsignedS): DispatchableInstruction {
+internal fun PackedStructGetUnsignedDispatcher(instruction: AggregateInstruction.StructGetUnsignedS): DispatchableInstruction {
     val mask = instruction.packedType.unsignedMask()
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot

@@ -6,11 +6,11 @@ import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
 import io.github.charlietap.chasm.compiler.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.operand.isImmediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
-import io.github.charlietap.chasm.executor.invoker.dispatch.aggregatefused.AggregateSuperInstructionDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.aggregate.AggregateInstructionDispatcher
 import io.github.charlietap.chasm.runtime.ext.default
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
-import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.PackedType
@@ -22,7 +22,7 @@ internal fun FunctionCompilationContext.emitStructNew(
     rtt: RTT,
 ) {
     emitAggregate(
-        AggregateSuperInstruction.StructNewS(
+        AggregateInstruction.StructNewS(
             firstFieldSlot = firstFieldSlot,
             destinationSlot = destinationSlot,
             rtt = rtt,
@@ -35,7 +35,7 @@ internal fun FunctionCompilationContext.emitStructNewDefault(
     rtt: RTT,
     type: StructType,
 ) = emitAggregate(
-    AggregateSuperInstruction.StructNewDefaultS(
+    AggregateInstruction.StructNewDefaultS(
         destinationSlot,
         rtt,
         LongArray(type.fields.size) { index -> type.fields[index].default() },
@@ -50,14 +50,14 @@ internal fun FunctionCompilationContext.emitStructGet(
     fieldIndex: Int,
 ) = emitAggregate(
     when (signed) {
-        null -> AggregateSuperInstruction.StructGetS(addressSlot, destinationSlot, fieldIndex)
-        true -> AggregateSuperInstruction.StructGetSignedS(
+        null -> AggregateInstruction.StructGetS(addressSlot, destinationSlot, fieldIndex)
+        true -> AggregateInstruction.StructGetSignedS(
             addressSlot,
             destinationSlot,
             fieldIndex,
             checkNotNull(packedType),
         )
-        false -> AggregateSuperInstruction.StructGetUnsignedS(
+        false -> AggregateInstruction.StructGetUnsignedS(
             addressSlot,
             destinationSlot,
             fieldIndex,
@@ -72,7 +72,7 @@ internal fun FunctionCompilationContext.emitRefCastStructGet(
     typeTest: ReferenceTypeTest,
     fieldIndex: Int,
 ) = emitAggregate(
-    AggregateSuperInstruction.RefCastStructGetS(
+    AggregateInstruction.RefCastStructGetS(
         referenceSlot = referenceSlot,
         destinationSlot = destinationSlot,
         typeTest = typeTest,
@@ -86,7 +86,7 @@ internal fun FunctionCompilationContext.emitStructGetStructGet(
     firstFieldIndex: Int,
     secondFieldIndex: Int,
 ) = emitAggregate(
-    AggregateSuperInstruction.StructGetStructGetS(
+    AggregateInstruction.StructGetStructGetS(
         addressSlot = addressSlot,
         destinationSlot = destinationSlot,
         firstFieldIndex = firstFieldIndex,
@@ -100,7 +100,7 @@ internal fun FunctionCompilationContext.emitLocalSetStructGet(
     destinationSlot: Int,
     fieldIndex: Int,
 ) = emitAggregate(
-    AggregateSuperInstruction.LocalSetStructGetS(
+    AggregateInstruction.LocalSetStructGetS(
         sourceSlot = sourceSlot,
         localSlot = localSlot,
         destinationSlot = destinationSlot,
@@ -114,9 +114,9 @@ internal fun FunctionCompilationContext.emitStructSet(
     fieldIndex: Int,
 ) = emitAggregate(
     if (value.isImmediate) {
-        AggregateSuperInstruction.StructSetI(value.sourceBits, addressSlot, fieldIndex)
+        AggregateInstruction.StructSetI(value.sourceBits, addressSlot, fieldIndex)
     } else {
-        AggregateSuperInstruction.StructSetS(value.sourceSlot, addressSlot, fieldIndex)
+        AggregateInstruction.StructSetS(value.sourceSlot, addressSlot, fieldIndex)
     },
 )
 
@@ -130,10 +130,10 @@ internal fun FunctionCompilationContext.emitArrayNew(
     val valueImmediate = value.isImmediate
     emitAggregate(
         when {
-            sizeImmediate && valueImmediate -> AggregateSuperInstruction.ArrayNewIi(size.i32Immediate, value.sourceBits, destinationSlot, rtt)
-            sizeImmediate -> AggregateSuperInstruction.ArrayNewIs(size.i32Immediate, value.sourceSlot, destinationSlot, rtt)
-            valueImmediate -> AggregateSuperInstruction.ArrayNewSi(size.sourceSlot, value.sourceBits, destinationSlot, rtt)
-            else -> AggregateSuperInstruction.ArrayNewSs(size.sourceSlot, value.sourceSlot, destinationSlot, rtt)
+            sizeImmediate && valueImmediate -> AggregateInstruction.ArrayNewIi(size.i32Immediate, value.sourceBits, destinationSlot, rtt)
+            sizeImmediate -> AggregateInstruction.ArrayNewIs(size.i32Immediate, value.sourceSlot, destinationSlot, rtt)
+            valueImmediate -> AggregateInstruction.ArrayNewSi(size.sourceSlot, value.sourceBits, destinationSlot, rtt)
+            else -> AggregateInstruction.ArrayNewSs(size.sourceSlot, value.sourceSlot, destinationSlot, rtt)
         },
     )
 }
@@ -145,9 +145,9 @@ internal fun FunctionCompilationContext.emitArrayNewDefault(
     field: Long,
 ) = emitAggregate(
     if (size.sourceKind == OperandSourceKind.I32Immediate) {
-        AggregateSuperInstruction.ArrayNewDefaultI(size.i32Immediate, destinationSlot, rtt, field)
+        AggregateInstruction.ArrayNewDefaultI(size.i32Immediate, destinationSlot, rtt, field)
     } else {
-        AggregateSuperInstruction.ArrayNewDefaultS(size.sourceSlot, destinationSlot, rtt, field)
+        AggregateInstruction.ArrayNewDefaultS(size.sourceSlot, destinationSlot, rtt, field)
     },
 )
 
@@ -163,10 +163,38 @@ internal fun FunctionCompilationContext.emitArrayNewData(
     val lengthImmediate = length.sourceKind == OperandSourceKind.I32Immediate
     emitAggregate(
         when {
-            sourceImmediate && lengthImmediate -> AggregateSuperInstruction.ArrayNewDataIi(sourceOffset.i32Immediate, length.i32Immediate, destinationSlot, rtt, data, fieldWidthInBytes)
-            sourceImmediate -> AggregateSuperInstruction.ArrayNewDataIs(sourceOffset.i32Immediate, length.sourceSlot, destinationSlot, rtt, data, fieldWidthInBytes)
-            lengthImmediate -> AggregateSuperInstruction.ArrayNewDataSi(sourceOffset.sourceSlot, length.i32Immediate, destinationSlot, rtt, data, fieldWidthInBytes)
-            else -> AggregateSuperInstruction.ArrayNewDataSs(sourceOffset.sourceSlot, length.sourceSlot, destinationSlot, rtt, data, fieldWidthInBytes)
+            sourceImmediate && lengthImmediate -> AggregateInstruction.ArrayNewDataIi(
+                sourceOffset.i32Immediate,
+                length.i32Immediate,
+                destinationSlot,
+                rtt,
+                data,
+                fieldWidthInBytes,
+            )
+            sourceImmediate -> AggregateInstruction.ArrayNewDataIs(
+                sourceOffset.i32Immediate,
+                length.sourceSlot,
+                destinationSlot,
+                rtt,
+                data,
+                fieldWidthInBytes,
+            )
+            lengthImmediate -> AggregateInstruction.ArrayNewDataSi(
+                sourceOffset.sourceSlot,
+                length.i32Immediate,
+                destinationSlot,
+                rtt,
+                data,
+                fieldWidthInBytes,
+            )
+            else -> AggregateInstruction.ArrayNewDataSs(
+                sourceOffset.sourceSlot,
+                length.sourceSlot,
+                destinationSlot,
+                rtt,
+                data,
+                fieldWidthInBytes,
+            )
         },
     )
 }
@@ -182,10 +210,34 @@ internal fun FunctionCompilationContext.emitArrayNewElement(
     val lengthImmediate = length.sourceKind == OperandSourceKind.I32Immediate
     emitAggregate(
         when {
-            sourceImmediate && lengthImmediate -> AggregateSuperInstruction.ArrayNewElementIi(sourceOffset.i32Immediate, length.i32Immediate, destinationSlot, rtt, element)
-            sourceImmediate -> AggregateSuperInstruction.ArrayNewElementIs(sourceOffset.i32Immediate, length.sourceSlot, destinationSlot, rtt, element)
-            lengthImmediate -> AggregateSuperInstruction.ArrayNewElementSi(sourceOffset.sourceSlot, length.i32Immediate, destinationSlot, rtt, element)
-            else -> AggregateSuperInstruction.ArrayNewElementSs(sourceOffset.sourceSlot, length.sourceSlot, destinationSlot, rtt, element)
+            sourceImmediate && lengthImmediate -> AggregateInstruction.ArrayNewElementIi(
+                sourceOffset.i32Immediate,
+                length.i32Immediate,
+                destinationSlot,
+                rtt,
+                element,
+            )
+            sourceImmediate -> AggregateInstruction.ArrayNewElementIs(
+                sourceOffset.i32Immediate,
+                length.sourceSlot,
+                destinationSlot,
+                rtt,
+                element,
+            )
+            lengthImmediate -> AggregateInstruction.ArrayNewElementSi(
+                sourceOffset.sourceSlot,
+                length.i32Immediate,
+                destinationSlot,
+                rtt,
+                element,
+            )
+            else -> AggregateInstruction.ArrayNewElementSs(
+                sourceOffset.sourceSlot,
+                length.sourceSlot,
+                destinationSlot,
+                rtt,
+                element,
+            )
         },
     )
 }
@@ -195,7 +247,7 @@ internal fun FunctionCompilationContext.emitArrayNewFixed(
     length: Int,
     destinationSlot: Int,
     rtt: RTT,
-) = emitAggregate(AggregateSuperInstruction.ArrayNewFixedS(firstElementSlot, destinationSlot, rtt, length))
+) = emitAggregate(AggregateInstruction.ArrayNewFixedS(firstElementSlot, destinationSlot, rtt, length))
 
 internal fun FunctionCompilationContext.emitArrayGet(
     signed: Boolean?,
@@ -207,9 +259,41 @@ internal fun FunctionCompilationContext.emitArrayGet(
     val immediate = field.sourceKind == OperandSourceKind.I32Immediate
     emitAggregate(
         when (signed) {
-            null -> if (immediate) AggregateSuperInstruction.ArrayGetI(addressSlot, field.i32Immediate, destinationSlot) else AggregateSuperInstruction.ArrayGetS(addressSlot, field.sourceSlot, destinationSlot)
-            true -> if (immediate) AggregateSuperInstruction.ArrayGetSignedI(addressSlot, field.i32Immediate, destinationSlot, checkNotNull(packedType)) else AggregateSuperInstruction.ArrayGetSignedS(addressSlot, field.sourceSlot, destinationSlot, checkNotNull(packedType))
-            false -> if (immediate) AggregateSuperInstruction.ArrayGetUnsignedI(addressSlot, field.i32Immediate, destinationSlot, checkNotNull(packedType)) else AggregateSuperInstruction.ArrayGetUnsignedS(addressSlot, field.sourceSlot, destinationSlot, checkNotNull(packedType))
+            null -> if (immediate) {
+                AggregateInstruction.ArrayGetI(addressSlot, field.i32Immediate, destinationSlot)
+            } else {
+                AggregateInstruction.ArrayGetS(addressSlot, field.sourceSlot, destinationSlot)
+            }
+            true -> if (immediate) {
+                AggregateInstruction.ArrayGetSignedI(
+                    addressSlot,
+                    field.i32Immediate,
+                    destinationSlot,
+                    checkNotNull(packedType),
+                )
+            } else {
+                AggregateInstruction.ArrayGetSignedS(
+                    addressSlot,
+                    field.sourceSlot,
+                    destinationSlot,
+                    checkNotNull(packedType),
+                )
+            }
+            false -> if (immediate) {
+                AggregateInstruction.ArrayGetUnsignedI(
+                    addressSlot,
+                    field.i32Immediate,
+                    destinationSlot,
+                    checkNotNull(packedType),
+                )
+            } else {
+                AggregateInstruction.ArrayGetUnsignedS(
+                    addressSlot,
+                    field.sourceSlot,
+                    destinationSlot,
+                    checkNotNull(packedType),
+                )
+            }
         },
     )
 }
@@ -223,16 +307,16 @@ internal fun FunctionCompilationContext.emitArraySet(
     val fieldImmediate = field.sourceKind == OperandSourceKind.I32Immediate
     emitAggregate(
         when {
-            valueImmediate && fieldImmediate -> AggregateSuperInstruction.ArraySetIi(value.sourceBits, field.i32Immediate, addressSlot)
-            valueImmediate -> AggregateSuperInstruction.ArraySetIs(value.sourceBits, field.sourceSlot, addressSlot)
-            fieldImmediate -> AggregateSuperInstruction.ArraySetSi(value.sourceSlot, field.i32Immediate, addressSlot)
-            else -> AggregateSuperInstruction.ArraySetSs(value.sourceSlot, field.sourceSlot, addressSlot)
+            valueImmediate && fieldImmediate -> AggregateInstruction.ArraySetIi(value.sourceBits, field.i32Immediate, addressSlot)
+            valueImmediate -> AggregateInstruction.ArraySetIs(value.sourceBits, field.sourceSlot, addressSlot)
+            fieldImmediate -> AggregateInstruction.ArraySetSi(value.sourceSlot, field.i32Immediate, addressSlot)
+            else -> AggregateInstruction.ArraySetSs(value.sourceSlot, field.sourceSlot, addressSlot)
         },
     )
 }
 
 internal fun FunctionCompilationContext.emitArrayLen(addressSlot: Int, destinationSlot: Int) =
-    emitAggregate(AggregateSuperInstruction.ArrayLenS(addressSlot, destinationSlot))
+    emitAggregate(AggregateInstruction.ArrayLenS(addressSlot, destinationSlot))
 
 internal fun FunctionCompilationContext.emitArrayFill(
     elements: OperandSource,
@@ -248,14 +332,14 @@ internal fun FunctionCompilationContext.emitArrayFill(
     val c = if (ci) offset.i32Immediate else offset.sourceSlot
     emitAggregate(
         when {
-            ai && bi && ci -> AggregateSuperInstruction.ArrayFillIii(a, b, c, addressSlot)
-            ai && bi -> AggregateSuperInstruction.ArrayFillIis(a, b, c, addressSlot)
-            ai && ci -> AggregateSuperInstruction.ArrayFillIsi(a, value.sourceSlot, c, addressSlot)
-            ai -> AggregateSuperInstruction.ArrayFillIss(a, value.sourceSlot, c, addressSlot)
-            bi && ci -> AggregateSuperInstruction.ArrayFillSii(a, b, c, addressSlot)
-            bi -> AggregateSuperInstruction.ArrayFillSis(a, b, c, addressSlot)
-            ci -> AggregateSuperInstruction.ArrayFillSsi(a, value.sourceSlot, c, addressSlot)
-            else -> AggregateSuperInstruction.ArrayFillSss(a, value.sourceSlot, c, addressSlot)
+            ai && bi && ci -> AggregateInstruction.ArrayFillIii(a, b, c, addressSlot)
+            ai && bi -> AggregateInstruction.ArrayFillIis(a, b, c, addressSlot)
+            ai && ci -> AggregateInstruction.ArrayFillIsi(a, value.sourceSlot, c, addressSlot)
+            ai -> AggregateInstruction.ArrayFillIss(a, value.sourceSlot, c, addressSlot)
+            bi && ci -> AggregateInstruction.ArrayFillSii(a, b, c, addressSlot)
+            bi -> AggregateInstruction.ArrayFillSis(a, b, c, addressSlot)
+            ci -> AggregateInstruction.ArrayFillSsi(a, value.sourceSlot, c, addressSlot)
+            else -> AggregateInstruction.ArrayFillSss(a, value.sourceSlot, c, addressSlot)
         },
     )
 }
@@ -270,14 +354,14 @@ internal fun FunctionCompilationContext.emitArrayCopy(
     elements,
     sourceOffset,
     destinationOffset,
-    { a, b, c -> AggregateSuperInstruction.ArrayCopyIii(a, b, c, sourceAddressSlot, destinationAddressSlot) },
-    { a, b, c -> AggregateSuperInstruction.ArrayCopyIis(a, b, c, sourceAddressSlot, destinationAddressSlot) },
-    { a, b, c -> AggregateSuperInstruction.ArrayCopyIsi(a, b, c, sourceAddressSlot, destinationAddressSlot) },
-    { a, b, c -> AggregateSuperInstruction.ArrayCopyIss(a, b, c, sourceAddressSlot, destinationAddressSlot) },
-    { a, b, c -> AggregateSuperInstruction.ArrayCopySii(a, b, c, sourceAddressSlot, destinationAddressSlot) },
-    { a, b, c -> AggregateSuperInstruction.ArrayCopySis(a, b, c, sourceAddressSlot, destinationAddressSlot) },
-    { a, b, c -> AggregateSuperInstruction.ArrayCopySsi(a, b, c, sourceAddressSlot, destinationAddressSlot) },
-    { a, b, c -> AggregateSuperInstruction.ArrayCopySss(a, b, c, sourceAddressSlot, destinationAddressSlot) },
+    { a, b, c -> AggregateInstruction.ArrayCopyIii(a, b, c, sourceAddressSlot, destinationAddressSlot) },
+    { a, b, c -> AggregateInstruction.ArrayCopyIis(a, b, c, sourceAddressSlot, destinationAddressSlot) },
+    { a, b, c -> AggregateInstruction.ArrayCopyIsi(a, b, c, sourceAddressSlot, destinationAddressSlot) },
+    { a, b, c -> AggregateInstruction.ArrayCopyIss(a, b, c, sourceAddressSlot, destinationAddressSlot) },
+    { a, b, c -> AggregateInstruction.ArrayCopySii(a, b, c, sourceAddressSlot, destinationAddressSlot) },
+    { a, b, c -> AggregateInstruction.ArrayCopySis(a, b, c, sourceAddressSlot, destinationAddressSlot) },
+    { a, b, c -> AggregateInstruction.ArrayCopySsi(a, b, c, sourceAddressSlot, destinationAddressSlot) },
+    { a, b, c -> AggregateInstruction.ArrayCopySss(a, b, c, sourceAddressSlot, destinationAddressSlot) },
 )
 
 internal fun FunctionCompilationContext.emitArrayInitData(
@@ -292,14 +376,14 @@ internal fun FunctionCompilationContext.emitArrayInitData(
         elements,
         sourceOffset,
         destinationOffset,
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIii(a, b, c, addressSlot, data, elementByteWidth) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIis(a, b, c, addressSlot, data, elementByteWidth) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIsi(a, b, c, addressSlot, data, elementByteWidth) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataIss(a, b, c, addressSlot, data, elementByteWidth) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSii(a, b, c, addressSlot, data, elementByteWidth) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSis(a, b, c, addressSlot, data, elementByteWidth) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSsi(a, b, c, addressSlot, data, elementByteWidth) },
-        { a, b, c -> AggregateSuperInstruction.ArrayInitDataSss(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateInstruction.ArrayInitDataIii(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateInstruction.ArrayInitDataIis(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateInstruction.ArrayInitDataIsi(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateInstruction.ArrayInitDataIss(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateInstruction.ArrayInitDataSii(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateInstruction.ArrayInitDataSis(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateInstruction.ArrayInitDataSsi(a, b, c, addressSlot, data, elementByteWidth) },
+        { a, b, c -> AggregateInstruction.ArrayInitDataSss(a, b, c, addressSlot, data, elementByteWidth) },
     )
 }
 
@@ -313,51 +397,51 @@ internal fun FunctionCompilationContext.emitArrayInitElement(
     elements,
     sourceOffset,
     destinationOffset,
-    { a, b, c -> AggregateSuperInstruction.ArrayInitElementIii(a, b, c, addressSlot, element) },
-    { a, b, c -> AggregateSuperInstruction.ArrayInitElementIis(a, b, c, addressSlot, element) },
-    { a, b, c -> AggregateSuperInstruction.ArrayInitElementIsi(a, b, c, addressSlot, element) },
-    { a, b, c -> AggregateSuperInstruction.ArrayInitElementIss(a, b, c, addressSlot, element) },
-    { a, b, c -> AggregateSuperInstruction.ArrayInitElementSii(a, b, c, addressSlot, element) },
-    { a, b, c -> AggregateSuperInstruction.ArrayInitElementSis(a, b, c, addressSlot, element) },
-    { a, b, c -> AggregateSuperInstruction.ArrayInitElementSsi(a, b, c, addressSlot, element) },
-    { a, b, c -> AggregateSuperInstruction.ArrayInitElementSss(a, b, c, addressSlot, element) },
+    { a, b, c -> AggregateInstruction.ArrayInitElementIii(a, b, c, addressSlot, element) },
+    { a, b, c -> AggregateInstruction.ArrayInitElementIis(a, b, c, addressSlot, element) },
+    { a, b, c -> AggregateInstruction.ArrayInitElementIsi(a, b, c, addressSlot, element) },
+    { a, b, c -> AggregateInstruction.ArrayInitElementIss(a, b, c, addressSlot, element) },
+    { a, b, c -> AggregateInstruction.ArrayInitElementSii(a, b, c, addressSlot, element) },
+    { a, b, c -> AggregateInstruction.ArrayInitElementSis(a, b, c, addressSlot, element) },
+    { a, b, c -> AggregateInstruction.ArrayInitElementSsi(a, b, c, addressSlot, element) },
+    { a, b, c -> AggregateInstruction.ArrayInitElementSss(a, b, c, addressSlot, element) },
 )
 
 internal fun FunctionCompilationContext.emitRefI31(value: OperandSource, destinationSlot: Int) = emitAggregate(
     if (value.sourceKind == OperandSourceKind.I32Immediate) {
-        AggregateSuperInstruction.RefI31I(value.i32Immediate, destinationSlot)
+        AggregateInstruction.RefI31I(value.i32Immediate, destinationSlot)
     } else {
-        AggregateSuperInstruction.RefI31S(value.sourceSlot, destinationSlot)
+        AggregateInstruction.RefI31S(value.sourceSlot, destinationSlot)
     },
 )
 
 internal fun FunctionCompilationContext.emitI31Get(signed: Boolean, valueSlot: Int, destinationSlot: Int) =
     emitAggregate(
         if (signed) {
-            AggregateSuperInstruction.I31GetSignedS(valueSlot, destinationSlot)
+            AggregateInstruction.I31GetSignedS(valueSlot, destinationSlot)
         } else {
-            AggregateSuperInstruction.I31GetUnsignedS(valueSlot, destinationSlot)
+            AggregateInstruction.I31GetUnsignedS(valueSlot, destinationSlot)
         },
     )
 
 internal fun FunctionCompilationContext.emitAnyConvertExtern(valueSlot: Int, destinationSlot: Int) =
-    emitAggregate(AggregateSuperInstruction.AnyConvertExternS(valueSlot, destinationSlot))
+    emitAggregate(AggregateInstruction.AnyConvertExternS(valueSlot, destinationSlot))
 
 internal fun FunctionCompilationContext.emitExternConvertAny(valueSlot: Int, destinationSlot: Int) =
-    emitAggregate(AggregateSuperInstruction.ExternConvertAnyS(valueSlot, destinationSlot))
+    emitAggregate(AggregateInstruction.ExternConvertAnyS(valueSlot, destinationSlot))
 
 private inline fun FunctionCompilationContext.emitAggregateTernary(
     first: OperandSource,
     second: OperandSource,
     third: OperandSource,
-    iii: (Int, Int, Int) -> AggregateSuperInstruction,
-    iis: (Int, Int, Int) -> AggregateSuperInstruction,
-    isi: (Int, Int, Int) -> AggregateSuperInstruction,
-    iss: (Int, Int, Int) -> AggregateSuperInstruction,
-    sii: (Int, Int, Int) -> AggregateSuperInstruction,
-    sis: (Int, Int, Int) -> AggregateSuperInstruction,
-    ssi: (Int, Int, Int) -> AggregateSuperInstruction,
-    sss: (Int, Int, Int) -> AggregateSuperInstruction,
+    iii: (Int, Int, Int) -> AggregateInstruction,
+    iis: (Int, Int, Int) -> AggregateInstruction,
+    isi: (Int, Int, Int) -> AggregateInstruction,
+    iss: (Int, Int, Int) -> AggregateInstruction,
+    sii: (Int, Int, Int) -> AggregateInstruction,
+    sis: (Int, Int, Int) -> AggregateInstruction,
+    ssi: (Int, Int, Int) -> AggregateInstruction,
+    sss: (Int, Int, Int) -> AggregateInstruction,
 ) {
     val ai = first.sourceKind == OperandSourceKind.I32Immediate
     val bi = second.sourceKind == OperandSourceKind.I32Immediate
@@ -379,6 +463,6 @@ private inline fun FunctionCompilationContext.emitAggregateTernary(
     )
 }
 
-private fun FunctionCompilationContext.emitAggregate(instruction: AggregateSuperInstruction) {
-    emit(instruction, ::AggregateSuperInstructionDispatcher)
+private fun FunctionCompilationContext.emitAggregate(instruction: AggregateInstruction) {
+    emit(instruction, ::AggregateInstructionDispatcher)
 }

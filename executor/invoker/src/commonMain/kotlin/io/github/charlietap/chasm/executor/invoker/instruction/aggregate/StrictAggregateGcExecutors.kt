@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused
+package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.ext.wrapI31
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
-import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
@@ -23,7 +23,7 @@ import io.github.charlietap.chasm.type.AbstractHeapType
 internal inline fun ArrayNewDefaultExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewDefaultI,
+    instruction: AggregateInstruction.ArrayNewDefaultI,
 ) = executeArrayNewDefault(
     vstack = vstack,
     heap = context.heap,
@@ -37,7 +37,7 @@ internal inline fun ArrayNewDefaultExecutor(
 internal inline fun ArrayNewDefaultExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewDefaultS,
+    instruction: AggregateInstruction.ArrayNewDefaultS,
 ) = executeArrayNewDefault(
     vstack = vstack,
     heap = context.heap,
@@ -51,7 +51,7 @@ internal inline fun ArrayNewDefaultExecutor(
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewDataIi,
+    instruction: AggregateInstruction.ArrayNewDataIi,
 ) = executeArrayNewData(
     vstack = vstack,
     heap = context.heap,
@@ -67,7 +67,7 @@ internal inline fun ArrayNewDataExecutor(
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewDataIs,
+    instruction: AggregateInstruction.ArrayNewDataIs,
 ) = executeArrayNewData(
     vstack = vstack,
     heap = context.heap,
@@ -83,7 +83,7 @@ internal inline fun ArrayNewDataExecutor(
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewDataSi,
+    instruction: AggregateInstruction.ArrayNewDataSi,
 ) = executeArrayNewData(
     vstack = vstack,
     heap = context.heap,
@@ -99,7 +99,7 @@ internal inline fun ArrayNewDataExecutor(
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewDataSs,
+    instruction: AggregateInstruction.ArrayNewDataSs,
 ) = executeArrayNewData(
     vstack = vstack,
     heap = context.heap,
@@ -115,7 +115,7 @@ internal inline fun ArrayNewDataExecutor(
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewElementIi,
+    instruction: AggregateInstruction.ArrayNewElementIi,
 ) = executeArrayNewElement(
     vstack = vstack,
     heap = context.heap,
@@ -130,7 +130,7 @@ internal inline fun ArrayNewElementExecutor(
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewElementIs,
+    instruction: AggregateInstruction.ArrayNewElementIs,
 ) = executeArrayNewElement(
     vstack = vstack,
     heap = context.heap,
@@ -145,7 +145,7 @@ internal inline fun ArrayNewElementExecutor(
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewElementSi,
+    instruction: AggregateInstruction.ArrayNewElementSi,
 ) = executeArrayNewElement(
     vstack = vstack,
     heap = context.heap,
@@ -160,7 +160,7 @@ internal inline fun ArrayNewElementExecutor(
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayNewElementSs,
+    instruction: AggregateInstruction.ArrayNewElementSs,
 ) = executeArrayNewElement(
     vstack = vstack,
     heap = context.heap,
@@ -175,7 +175,7 @@ internal inline fun ArrayNewElementExecutor(
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitDataIii,
+    instruction: AggregateInstruction.ArrayInitDataIii,
 ) = executeArrayInitData(
     heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
@@ -189,7 +189,7 @@ internal inline fun ArrayInitDataExecutor(
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitDataIis,
+    instruction: AggregateInstruction.ArrayInitDataIis,
 ) = executeArrayInitData(
     heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
@@ -203,7 +203,7 @@ internal inline fun ArrayInitDataExecutor(
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitDataIsi,
+    instruction: AggregateInstruction.ArrayInitDataIsi,
 ) = executeArrayInitData(
     heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
@@ -217,7 +217,7 @@ internal inline fun ArrayInitDataExecutor(
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitDataIss,
+    instruction: AggregateInstruction.ArrayInitDataIss,
 ) = executeArrayInitData(
     heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
@@ -231,7 +231,7 @@ internal inline fun ArrayInitDataExecutor(
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitDataSii,
+    instruction: AggregateInstruction.ArrayInitDataSii,
 ) = executeArrayInitData(
     heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -245,7 +245,7 @@ internal inline fun ArrayInitDataExecutor(
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitDataSis,
+    instruction: AggregateInstruction.ArrayInitDataSis,
 ) = executeArrayInitData(
     heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -259,7 +259,7 @@ internal inline fun ArrayInitDataExecutor(
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitDataSsi,
+    instruction: AggregateInstruction.ArrayInitDataSsi,
 ) = executeArrayInitData(
     heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -273,7 +273,7 @@ internal inline fun ArrayInitDataExecutor(
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitDataSss,
+    instruction: AggregateInstruction.ArrayInitDataSss,
 ) = executeArrayInitData(
     heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -287,7 +287,7 @@ internal inline fun ArrayInitDataExecutor(
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitElementIii,
+    instruction: AggregateInstruction.ArrayInitElementIii,
 ) = executeArrayInitElement(
     heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
@@ -300,7 +300,7 @@ internal inline fun ArrayInitElementExecutor(
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitElementIis,
+    instruction: AggregateInstruction.ArrayInitElementIis,
 ) = executeArrayInitElement(
     heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
@@ -313,7 +313,7 @@ internal inline fun ArrayInitElementExecutor(
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitElementIsi,
+    instruction: AggregateInstruction.ArrayInitElementIsi,
 ) = executeArrayInitElement(
     heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
@@ -326,7 +326,7 @@ internal inline fun ArrayInitElementExecutor(
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitElementIss,
+    instruction: AggregateInstruction.ArrayInitElementIss,
 ) = executeArrayInitElement(
     heap = context.heap,
     elementsToCopy = instruction.elementsToCopy,
@@ -339,7 +339,7 @@ internal inline fun ArrayInitElementExecutor(
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitElementSii,
+    instruction: AggregateInstruction.ArrayInitElementSii,
 ) = executeArrayInitElement(
     heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -352,7 +352,7 @@ internal inline fun ArrayInitElementExecutor(
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitElementSis,
+    instruction: AggregateInstruction.ArrayInitElementSis,
 ) = executeArrayInitElement(
     heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -365,7 +365,7 @@ internal inline fun ArrayInitElementExecutor(
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitElementSsi,
+    instruction: AggregateInstruction.ArrayInitElementSsi,
 ) = executeArrayInitElement(
     heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -378,7 +378,7 @@ internal inline fun ArrayInitElementExecutor(
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ArrayInitElementSss,
+    instruction: AggregateInstruction.ArrayInitElementSss,
 ) = executeArrayInitElement(
     heap = context.heap,
     elementsToCopy = vstack.getFrameSlot(instruction.elementsToCopySlot).toInt(),
@@ -391,7 +391,7 @@ internal inline fun ArrayInitElementExecutor(
 internal inline fun RefI31Executor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.RefI31I,
+    instruction: AggregateInstruction.RefI31I,
 ) = executeRefI31(
     vstack = vstack,
     value = instruction.value,
@@ -401,7 +401,7 @@ internal inline fun RefI31Executor(
 internal inline fun RefI31Executor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.RefI31S,
+    instruction: AggregateInstruction.RefI31S,
 ) = executeRefI31(
     vstack = vstack,
     value = vstack.getFrameSlot(instruction.valueSlot).toInt(),
@@ -411,7 +411,7 @@ internal inline fun RefI31Executor(
 internal inline fun I31GetSignedExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.I31GetSignedS,
+    instruction: AggregateInstruction.I31GetSignedS,
 ) = executeI31Get(
     vstack = vstack,
     value = vstack.getFrameSlot(instruction.valueSlot).toI31(),
@@ -422,7 +422,7 @@ internal inline fun I31GetSignedExecutor(
 internal inline fun I31GetUnsignedExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.I31GetUnsignedS,
+    instruction: AggregateInstruction.I31GetUnsignedS,
 ) = executeI31Get(
     vstack = vstack,
     value = vstack.getFrameSlot(instruction.valueSlot).toI31(),
@@ -433,7 +433,7 @@ internal inline fun I31GetUnsignedExecutor(
 internal inline fun AnyConvertExternExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.AnyConvertExternS,
+    instruction: AggregateInstruction.AnyConvertExternS,
 ) = executeAnyConvertExtern(
     vstack = vstack,
     referenceValue = vstack.getFrameSlot(instruction.valueSlot),
@@ -443,7 +443,7 @@ internal inline fun AnyConvertExternExecutor(
 internal inline fun ExternConvertAnyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: AggregateSuperInstruction.ExternConvertAnyS,
+    instruction: AggregateInstruction.ExternConvertAnyS,
 ) = executeExternConvertAny(
     vstack = vstack,
     referenceValue = vstack.getFrameSlot(instruction.valueSlot),

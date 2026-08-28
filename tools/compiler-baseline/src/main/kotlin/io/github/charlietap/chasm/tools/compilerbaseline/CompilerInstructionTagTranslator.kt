@@ -2,7 +2,7 @@ package io.github.charlietap.chasm.tools.compilerbaseline
 
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
@@ -29,7 +29,7 @@ class CompilerInstructionTagTranslator {
         is TableInstruction.ElemDrop -> "table.elem_drop"
         is TableInstruction -> variant(instruction, "table", tableOperations)
         is ReferenceInstruction -> reference(instruction)
-        is AggregateSuperInstruction -> variant(instruction, "aggregate", aggregateOperations)
+        is AggregateInstruction -> variant(instruction, "aggregate", aggregateOperations)
         else -> error("unsupported compiler instruction: ${instruction.javaClass.name}")
     }
 
@@ -46,7 +46,7 @@ class CompilerInstructionTagTranslator {
         instructionClass == TableInstruction.ElemDrop::class.java -> "table.elem_drop"
         TableInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "table", tableOperations)
-        AggregateSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
+        AggregateInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "aggregate", aggregateOperations)
         else -> error("unsupported compiler instruction variant: ${instructionClass.name}")
     }

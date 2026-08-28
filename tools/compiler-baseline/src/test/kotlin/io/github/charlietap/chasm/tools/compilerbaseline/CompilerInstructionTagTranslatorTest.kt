@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
@@ -75,5 +75,5 @@ private val variantFamilies = listOf(
     NumericInstruction::class.java,
     MemoryInstruction::class.java,
     TableInstruction::class.java,
-    AggregateSuperInstruction::class.java,
+    AggregateInstruction::class.java,
 )

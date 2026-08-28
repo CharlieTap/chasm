@@ -1,104 +1,545 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.runtime.instance.DataInstance
-import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.type.RTT
+import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 import io.github.charlietap.chasm.type.PackedType
-import io.github.charlietap.chasm.type.StructType
-import kotlin.jvm.JvmInline
 
 sealed interface AggregateInstruction : LinkedInstruction {
 
-    data class StructNew(
-        val rtt: RTT,
-        val fieldCount: Int,
+    data class ArrayCopyIii(
+        val elementsToCopy: Int,
+        val sourceOffset: Int,
+        val destinationOffset: Int,
+        val sourceAddressSlot: Int,
+        val destinationAddressSlot: Int,
     ) : AggregateInstruction
 
-    data class StructNewDefault(
-        val rtt: RTT,
-        val fields: LongArray,
+    data class ArrayCopyIis(
+        val elementsToCopy: Int,
+        val sourceOffset: Int,
+        val destinationOffsetSlot: Int,
+        val sourceAddressSlot: Int,
+        val destinationAddressSlot: Int,
     ) : AggregateInstruction
 
-    data class StructGet(val typeIndex: Index.TypeIndex, val fieldIndex: Index.FieldIndex) : AggregateInstruction
+    data class ArrayCopyIsi(
+        val elementsToCopy: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffset: Int,
+        val sourceAddressSlot: Int,
+        val destinationAddressSlot: Int,
+    ) : AggregateInstruction
 
-    data class StructGetSigned(
-        val typeIndex: Index.TypeIndex,
-        val fieldIndex: Index.FieldIndex,
+    data class ArrayCopyIss(
+        val elementsToCopy: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffsetSlot: Int,
+        val sourceAddressSlot: Int,
+        val destinationAddressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayCopySii(
+        val elementsToCopySlot: Int,
+        val sourceOffset: Int,
+        val destinationOffset: Int,
+        val sourceAddressSlot: Int,
+        val destinationAddressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayCopySis(
+        val elementsToCopySlot: Int,
+        val sourceOffset: Int,
+        val destinationOffsetSlot: Int,
+        val sourceAddressSlot: Int,
+        val destinationAddressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayCopySsi(
+        val elementsToCopySlot: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffset: Int,
+        val sourceAddressSlot: Int,
+        val destinationAddressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayCopySss(
+        val elementsToCopySlot: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffsetSlot: Int,
+        val sourceAddressSlot: Int,
+        val destinationAddressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayFillIii(
+        val elementsToFill: Int,
+        val fillValue: Long,
+        val arrayElementOffset: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayFillIis(
+        val elementsToFill: Int,
+        val fillValue: Long,
+        val arrayElementOffsetSlot: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayFillIsi(
+        val elementsToFill: Int,
+        val fillValueSlot: Int,
+        val arrayElementOffset: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayFillIss(
+        val elementsToFill: Int,
+        val fillValueSlot: Int,
+        val arrayElementOffsetSlot: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayFillSii(
+        val elementsToFillSlot: Int,
+        val fillValue: Long,
+        val arrayElementOffset: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayFillSis(
+        val elementsToFillSlot: Int,
+        val fillValue: Long,
+        val arrayElementOffsetSlot: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayFillSsi(
+        val elementsToFillSlot: Int,
+        val fillValueSlot: Int,
+        val arrayElementOffset: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayFillSss(
+        val elementsToFillSlot: Int,
+        val fillValueSlot: Int,
+        val arrayElementOffsetSlot: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayGetI(
+        val addressSlot: Int,
+        val field: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayGetS(
+        val addressSlot: Int,
+        val fieldSlot: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayGetSignedI(
+        val addressSlot: Int,
+        val field: Int,
+        val destinationSlot: Int,
         val packedType: PackedType,
     ) : AggregateInstruction
 
-    data class StructGetUnsigned(
-        val typeIndex: Index.TypeIndex,
-        val fieldIndex: Index.FieldIndex,
+    data class ArrayGetSignedS(
+        val addressSlot: Int,
+        val fieldSlot: Int,
+        val destinationSlot: Int,
         val packedType: PackedType,
     ) : AggregateInstruction
 
-    @JvmInline
-    value class StructSet(
-        val fieldIndex: Int,
+    data class ArrayGetUnsignedI(
+        val addressSlot: Int,
+        val field: Int,
+        val destinationSlot: Int,
+        val packedType: PackedType,
     ) : AggregateInstruction
 
-    data class ArrayNew(
+    data class ArrayGetUnsignedS(
+        val addressSlot: Int,
+        val fieldSlot: Int,
+        val destinationSlot: Int,
+        val packedType: PackedType,
+    ) : AggregateInstruction
+
+    data class ArrayLenS(
+        val addressSlot: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayNewIi(
+        val size: Int,
+        val value: Long,
+        val destinationSlot: Int,
         val rtt: RTT,
     ) : AggregateInstruction
 
-    data class ArrayNewFixed(
+    data class ArrayNewIs(
+        val size: Int,
+        val valueSlot: Int,
+        val destinationSlot: Int,
         val rtt: RTT,
-        val length: UInt,
     ) : AggregateInstruction
 
-    data class ArrayNewDefault(
+    data class ArrayNewSi(
+        val sizeSlot: Int,
+        val value: Long,
+        val destinationSlot: Int,
+        val rtt: RTT,
+    ) : AggregateInstruction
+
+    data class ArrayNewSs(
+        val sizeSlot: Int,
+        val valueSlot: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+    ) : AggregateInstruction
+
+    data class ArrayNewDefaultI(
+        val size: Int,
+        val destinationSlot: Int,
         val rtt: RTT,
         val field: Long,
     ) : AggregateInstruction
 
-    data class ArrayNewData(
+    data class ArrayNewDefaultS(
+        val sizeSlot: Int,
+        val destinationSlot: Int,
         val rtt: RTT,
-        val dataInstance: DataInstance,
+        val field: Long,
+    ) : AggregateInstruction
+
+    data class ArrayNewDataIi(
+        val sourceOffset: Int,
+        val arrayLength: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
     ) : AggregateInstruction
 
-    data class ArrayNewElement(
+    data class ArrayNewDataIs(
+        val sourceOffset: Int,
+        val arrayLengthSlot: Int,
+        val destinationSlot: Int,
         val rtt: RTT,
-        val elementInstance: ElementInstance,
-    ) : AggregateInstruction
-
-    @JvmInline
-    value class ArrayGet(val typeIndex: Index.TypeIndex) : AggregateInstruction
-
-    data class ArrayGetSigned(val typeIndex: Index.TypeIndex, val packedType: PackedType) : AggregateInstruction
-
-    data class ArrayGetUnsigned(val typeIndex: Index.TypeIndex, val packedType: PackedType) : AggregateInstruction
-
-    @JvmInline
-    value class ArraySet(val typeIndex: Index.TypeIndex) : AggregateInstruction
-
-    data object ArrayLen : AggregateInstruction
-
-    @JvmInline
-    value class ArrayFill(val typeIndex: Index.TypeIndex) : AggregateInstruction
-
-    data class ArrayCopy(val sourceTypeIndex: Index.TypeIndex, val destinationTypeIndex: Index.TypeIndex) : AggregateInstruction
-
-    data class ArrayInitData(
-        val typeIndex: Index.TypeIndex,
-        val dataInstance: DataInstance,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
     ) : AggregateInstruction
 
-    data class ArrayInitElement(
-        val typeIndex: Index.TypeIndex,
-        val elementInstance: ElementInstance,
+    data class ArrayNewDataSi(
+        val sourceOffsetSlot: Int,
+        val arrayLength: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
     ) : AggregateInstruction
 
-    data object RefI31 : AggregateInstruction
+    data class ArrayNewDataSs(
+        val sourceOffsetSlot: Int,
+        val arrayLengthSlot: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
 
-    data object I31GetSigned : AggregateInstruction
+    data class ArrayNewElementIi(
+        val sourceOffset: Int,
+        val arrayLength: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
 
-    data object I31GetUnsigned : AggregateInstruction
+    data class ArrayNewElementIs(
+        val sourceOffset: Int,
+        val arrayLengthSlot: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
 
-    data object AnyConvertExtern : AggregateInstruction
+    data class ArrayNewElementSi(
+        val sourceOffsetSlot: Int,
+        val arrayLength: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
 
-    data object ExternConvertAny : AggregateInstruction
+    data class ArrayNewElementSs(
+        val sourceOffsetSlot: Int,
+        val arrayLengthSlot: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class ArrayNewFixedS(
+        val firstElementSlot: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val size: Int,
+    ) : AggregateInstruction
+
+    data class ArraySetIi(
+        val value: Long,
+        val field: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArraySetIs(
+        val value: Long,
+        val fieldSlot: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArraySetSi(
+        val valueSlot: Int,
+        val field: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArraySetSs(
+        val valueSlot: Int,
+        val fieldSlot: Int,
+        val addressSlot: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitDataIii(
+        val elementsToCopy: Int,
+        val sourceOffset: Int,
+        val destinationOffset: Int,
+        val addressSlot: Int,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitDataIis(
+        val elementsToCopy: Int,
+        val sourceOffset: Int,
+        val destinationOffsetSlot: Int,
+        val addressSlot: Int,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitDataIsi(
+        val elementsToCopy: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffset: Int,
+        val addressSlot: Int,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitDataIss(
+        val elementsToCopy: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffsetSlot: Int,
+        val addressSlot: Int,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitDataSii(
+        val elementsToCopySlot: Int,
+        val sourceOffset: Int,
+        val destinationOffset: Int,
+        val addressSlot: Int,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitDataSis(
+        val elementsToCopySlot: Int,
+        val sourceOffset: Int,
+        val destinationOffsetSlot: Int,
+        val addressSlot: Int,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitDataSsi(
+        val elementsToCopySlot: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffset: Int,
+        val addressSlot: Int,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitDataSss(
+        val elementsToCopySlot: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffsetSlot: Int,
+        val addressSlot: Int,
+        val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
+        val fieldWidthInBytes: Int,
+    ) : AggregateInstruction
+
+    data class ArrayInitElementIii(
+        val elementsToCopy: Int,
+        val sourceOffset: Int,
+        val destinationOffset: Int,
+        val addressSlot: Int,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class ArrayInitElementIis(
+        val elementsToCopy: Int,
+        val sourceOffset: Int,
+        val destinationOffsetSlot: Int,
+        val addressSlot: Int,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class ArrayInitElementIsi(
+        val elementsToCopy: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffset: Int,
+        val addressSlot: Int,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class ArrayInitElementIss(
+        val elementsToCopy: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffsetSlot: Int,
+        val addressSlot: Int,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class ArrayInitElementSii(
+        val elementsToCopySlot: Int,
+        val sourceOffset: Int,
+        val destinationOffset: Int,
+        val addressSlot: Int,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class ArrayInitElementSis(
+        val elementsToCopySlot: Int,
+        val sourceOffset: Int,
+        val destinationOffsetSlot: Int,
+        val addressSlot: Int,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class ArrayInitElementSsi(
+        val elementsToCopySlot: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffset: Int,
+        val addressSlot: Int,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class ArrayInitElementSss(
+        val elementsToCopySlot: Int,
+        val sourceOffsetSlot: Int,
+        val destinationOffsetSlot: Int,
+        val addressSlot: Int,
+        val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
+    ) : AggregateInstruction
+
+    data class RefI31I(
+        val value: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class RefI31S(
+        val valueSlot: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class I31GetSignedS(
+        val valueSlot: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class I31GetUnsignedS(
+        val valueSlot: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class AnyConvertExternS(
+        val valueSlot: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class ExternConvertAnyS(
+        val valueSlot: Int,
+        val destinationSlot: Int,
+    ) : AggregateInstruction
+
+    data class StructGetS(
+        val addressSlot: Int,
+        val destinationSlot: Int,
+        val fieldIndex: Int,
+    ) : AggregateInstruction
+
+    data class StructGetSignedS(
+        val addressSlot: Int,
+        val destinationSlot: Int,
+        val fieldIndex: Int,
+        val packedType: PackedType,
+    ) : AggregateInstruction
+
+    data class StructGetUnsignedS(
+        val addressSlot: Int,
+        val destinationSlot: Int,
+        val fieldIndex: Int,
+        val packedType: PackedType,
+    ) : AggregateInstruction
+
+    data class RefCastStructGetS(
+        val referenceSlot: Int,
+        val destinationSlot: Int,
+        val typeTest: ReferenceTypeTest,
+        val fieldIndex: Int,
+    ) : AggregateInstruction
+
+    data class StructGetStructGetS(
+        val addressSlot: Int,
+        val destinationSlot: Int,
+        val firstFieldIndex: Int,
+        val secondFieldIndex: Int,
+    ) : AggregateInstruction
+
+    data class LocalSetStructGetS(
+        val sourceSlot: Int,
+        val localSlot: Int,
+        val destinationSlot: Int,
+        val fieldIndex: Int,
+    ) : AggregateInstruction
+
+    data class StructNewS(
+        val firstFieldSlot: Int,
+        val destinationSlot: Int,
+        val rtt: RTT,
+    ) : AggregateInstruction
+
+    data class StructNewDefaultS(
+        val destinationSlot: Int,
+        val rtt: RTT,
+        val fields: LongArray,
+    ) : AggregateInstruction
+
+    data class StructSetI(
+        val value: Long,
+        val addressSlot: Int,
+        val fieldIndex: Int,
+    ) : AggregateInstruction
+
+    data class StructSetS(
+        val valueSlot: Int,
+        val addressSlot: Int,
+        val fieldIndex: Int,
+    ) : AggregateInstruction
 }
