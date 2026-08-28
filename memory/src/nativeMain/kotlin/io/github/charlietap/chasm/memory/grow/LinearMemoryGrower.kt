@@ -1,8 +1,6 @@
 package io.github.charlietap.chasm.memory.grow
 
 import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
-import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 
@@ -10,8 +8,9 @@ actual inline fun LinearMemoryGrower(
     memory: LinearMemory,
     pagesToAdd: Int,
 ): LinearMemory {
-    val byteArray = (memory as ByteArrayLinearMemory).memory
+    val linearMemory = memory as ByteArrayLinearMemory
+    val byteArray = linearMemory.memory
     val newSize = byteArray.size + (pagesToAdd * PAGE_SIZE)
-    val newByteArray = byteArray.copyOf(newSize)
-    return ByteArrayLinearMemory(newByteArray)
+    linearMemory.memory = byteArray.copyOf(newSize)
+    return linearMemory
 }

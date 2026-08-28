@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.memory.grow.LinearMemoryGrower
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.memory
+import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
 
 fun growMemory(
@@ -37,17 +38,25 @@ internal fun growMemory(
 ): Result<Int, ModuleTrapError> {
 
     val instance = store.store.memory(memory.reference.address)
+    return Ok(growMemoryInstance(instance, pagesToAdd, grower))
+}
+
+internal inline fun growMemoryInstance(
+    instance: MemoryInstance,
+    pagesToAdd: Int,
+    crossinline grower: LinearMemoryGrower,
+): Int {
     val current = instance.type.limits.min.toInt()
 
     if (pagesToAdd == 0) {
-        return Ok(current)
+        return current
     }
 
     val new = current + pagesToAdd
     val max = instance.type.limits.max?.toInt() ?: MAX_PAGES
 
     if (pagesToAdd < 0 || new < current || new > max) {
-        return Ok(-1)
+        return -1
     }
 
     val grown = grower(instance.data, pagesToAdd)
@@ -56,5 +65,5 @@ internal fun growMemory(
     instance.type.limits.min = new.toULong()
     instance.refresh()
 
-    return Ok(current)
+    return current
 }
