@@ -42,3 +42,7 @@ inline fun <T> withGc(block: HostGc.() -> T): T = resources.gc.block()
 /** Makes the calling store's extern API the receiver. */
 context(resources: HostResources)
 inline fun <T> withExterns(block: HostExterns.() -> T): T = resources.externs.block()
+
+/** Makes the calling store's exception API the receiver. */
+context(resources: HostResources)
+inline fun <T> withExceptions(block: HostExceptions.() -> T): T = resources.exceptions.block()

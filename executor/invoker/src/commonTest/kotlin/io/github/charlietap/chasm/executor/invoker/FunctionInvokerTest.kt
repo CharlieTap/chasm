@@ -15,11 +15,13 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tagType
-import io.github.charlietap.chasm.host.HostException
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.HostResources
+import io.github.charlietap.chasm.host.raise
 import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.withExceptions
+import io.github.charlietap.chasm.host.withTag
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -28,6 +30,7 @@ import kotlin.contextOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class FunctionInvokerTest {
 
@@ -179,15 +182,17 @@ class FunctionInvokerTest {
     @Test
     fun `directly raised Wasm exception is returned at the host boundary`() {
         val config = runtimeConfig()
-        val moduleInstance = moduleInstance()
         val runtimeStore = store()
-        val exceptionReference = runtimeStore.heap.allocateException(
-            tagAddress = runtimeStore.heap.registerTag(rtt(), tagType()),
-            fields = LongArray(0),
-        )
+        val tagAddress = runtimeStore.heap.registerTag(rtt(), tagType())
+        val moduleInstance = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val functionInstance = hostFunctionInstance(
-            function = HostFunction { _, _ ->
-                runtimeStore.heap.raise(HostException(exceptionReference))
+            function = HostFunction { parameters, _ ->
+                withExceptions {
+                    assertFalse(hasPending)
+                }
+                withTag(0) {
+                    raise(parameters)
+                }
             },
         )
         val threadExecutor: ThreadExecutor = { _, _, _, _ ->
@@ -204,6 +209,8 @@ class FunctionInvokerTest {
         )
 
         assertEquals(Err(InvocationError.ThrownException), actual)
-        assertEquals(exceptionReference, runtimeStore.heap.takePendingExceptionReference())
+        assertTrue(runtimeStore.heap.hasPending)
+        val exceptionReference = runtimeStore.heap.takePendingExceptionReference()
+        assertEquals(tagAddress, runtimeStore.heap.exceptionTagAddress(exceptionReference))
     }
 }

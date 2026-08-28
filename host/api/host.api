@@ -1,4 +1,5 @@
 public final class io/github/charlietap/chasm/host/HostContextExtensionsKt {
+	public static final fun withExceptions (Lio/github/charlietap/chasm/host/HostResources;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun withExterns (Lio/github/charlietap/chasm/host/HostResources;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun withGc (Lio/github/charlietap/chasm/host/HostResources;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun withGlobal (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -33,6 +34,12 @@ public abstract interface class io/github/charlietap/chasm/host/HostExceptions {
 	public abstract fun readPayload-nvx_kU4 (JI)J
 	public abstract fun tag-Y91bqTg (J)I
 	public abstract fun takePending-EyTNJns ()J
+}
+
+public final class io/github/charlietap/chasm/host/HostExceptionsKt {
+	public static final fun createException-sCw2Xk4 ([JLio/github/charlietap/chasm/host/HostResources;II)J
+	public static final fun raise-UAKqVcM (Lio/github/charlietap/chasm/host/HostResources;J)Ljava/lang/Void;
+	public static final fun raise-sCw2Xk4 ([JLio/github/charlietap/chasm/host/HostResources;II)Ljava/lang/Void;
 }
 
 public final class io/github/charlietap/chasm/host/HostExternKind {
@@ -263,6 +270,7 @@ public final class io/github/charlietap/chasm/host/HostReferencesKt {
 }
 
 public abstract interface class io/github/charlietap/chasm/host/HostResources {
+	public abstract fun getExceptions ()Lio/github/charlietap/chasm/host/HostExceptions;
 	public abstract fun getExterns ()Lio/github/charlietap/chasm/host/HostExterns;
 	public abstract fun getGc ()Lio/github/charlietap/chasm/host/HostGc;
 	public abstract fun getReferences ()Lio/github/charlietap/chasm/host/HostReferences;

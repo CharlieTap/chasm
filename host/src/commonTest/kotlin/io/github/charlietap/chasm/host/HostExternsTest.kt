@@ -115,6 +115,9 @@ private class TestHostResources(
     override val externs: HostExterns
         get() = requireNotNull(hostExterns)
 
+    override val exceptions: HostExceptions
+        get() = error("unused")
+
     override fun memory(module: HostModuleInstance, index: Int): HostMemory = error("unused")
 
     override fun table(module: HostModuleInstance, index: Int): HostTable = error("unused")
