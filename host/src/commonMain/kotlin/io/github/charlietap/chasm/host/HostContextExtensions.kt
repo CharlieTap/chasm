@@ -38,3 +38,7 @@ inline fun <T> withReferences(
 /** Makes the calling store's garbage collector the receiver. */
 context(resources: HostResources)
 inline fun <T> withGc(block: HostGc.() -> T): T = resources.gc.block()
+
+/** Makes the calling store's extern API the receiver. */
+context(resources: HostResources)
+inline fun <T> withExterns(block: HostExterns.() -> T): T = resources.externs.block()

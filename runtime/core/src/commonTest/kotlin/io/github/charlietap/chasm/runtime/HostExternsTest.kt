@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.host.HostExternKind
 import io.github.charlietap.chasm.host.HostExternReference
+import io.github.charlietap.chasm.host.withExterns
 import io.github.charlietap.chasm.runtime.encoder.ReferenceValueEncoder
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
@@ -19,6 +20,20 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
 
 class HostExternsTest {
+
+    @Test
+    fun `host resources expose the extern API`() {
+        val store = Store()
+        val context = executionContext(store)
+        val marker = store.heap.beginScope()
+
+        val reference = context(context) {
+            withExterns { create("value") }
+        }
+
+        assertEquals("value", store.heap.value(reference))
+        store.heap.endScope(marker)
+    }
 
     @Test
     fun `host values have scoped identities and can be retained`() {

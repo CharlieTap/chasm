@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.execution
 
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.host.HostExterns
 import io.github.charlietap.chasm.host.HostGc
 import io.github.charlietap.chasm.host.HostGlobal
 import io.github.charlietap.chasm.host.HostMemory
@@ -28,6 +29,9 @@ data class ExecutionContext(
         get() = heap
 
     override val gc: HostGc
+        get() = heap
+
+    override val externs: HostExterns
         get() = heap
 
     override fun memory(module: HostModuleInstance, index: Int): HostMemory {

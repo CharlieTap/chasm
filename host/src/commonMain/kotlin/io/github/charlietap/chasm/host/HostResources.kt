@@ -6,6 +6,8 @@ interface HostResources {
 
     val gc: HostGc
 
+    val externs: HostExterns
+
     fun memory(module: HostModuleInstance, index: Int): HostMemory
 
     fun table(module: HostModuleInstance, index: Int): HostTable

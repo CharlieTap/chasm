@@ -45,6 +45,18 @@ class HostExternsTest {
         assertEquals(CREATED_EXTERN.raw, references.retainedReference)
         assertEquals(RETAINED_ROOT, root)
     }
+
+    @Test
+    fun `withExterns makes the caller extern API the receiver`() {
+        val externs = RecordingHostExterns()
+        val resources = TestHostResources(hostExterns = externs)
+
+        val actual = context(resources) {
+            withExterns { this }
+        }
+
+        assertSame(externs, actual)
+    }
 }
 
 private val NULL_EXTERN = HostExternReference(1L)
@@ -94,10 +106,14 @@ private class RecordingExternReferences : HostReferences {
 
 private class TestHostResources(
     override val references: HostReferences = RecordingExternReferences(),
+    private val hostExterns: HostExterns? = null,
 ) : HostResources {
 
     override val gc: HostGc
         get() = error("unused")
+
+    override val externs: HostExterns
+        get() = requireNotNull(hostExterns)
 
     override fun memory(module: HostModuleInstance, index: Int): HostMemory = error("unused")
 
