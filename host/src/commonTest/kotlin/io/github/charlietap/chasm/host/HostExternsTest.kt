@@ -120,7 +120,17 @@ private class TestHostResources(
 
     override fun memory(module: HostModuleInstance, index: ModuleIndex.MemoryIndex): HostMemory = error("unused")
 
+    override fun growMemory(module: HostModuleInstance, index: ModuleIndex.MemoryIndex, pagesToAdd: Int): Int =
+        error("unused")
+
     override fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable = error("unused")
+
+    override fun growTable(
+        module: HostModuleInstance,
+        index: ModuleIndex.TableIndex,
+        elementsToAdd: Int,
+        value: HostReference,
+    ): Int = error("unused")
 
     override fun global(module: HostModuleInstance, index: ModuleIndex.GlobalIndex): HostGlobal = error("unused")
 

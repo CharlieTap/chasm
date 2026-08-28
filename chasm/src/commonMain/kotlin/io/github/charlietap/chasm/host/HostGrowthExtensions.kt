@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.host
 
 import io.github.charlietap.chasm.embedding.memory.growMemoryInstance
-import io.github.charlietap.chasm.memory.grow.LinearMemoryGrower
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
@@ -29,13 +28,15 @@ fun HostMemory.grow(pagesToAdd: Int): Int {
         memory = store.memories[addresses[index].address]
     }
 
-    return growMemoryInstance(memory, pagesToAdd, ::LinearMemoryGrower)
+    return growMemoryInstance(memory, pagesToAdd)
 }
 
 /** Grows this table and returns its previous size, or `-1` on failure. */
 context(_: HostModuleInstance, _: HostResources)
-fun HostTable.grow(elementsToAdd: Int, value: HostReference): Int {
-    val table = this as TableInstance
+fun HostTable.grow(elementsToAdd: Int, value: HostReference): Int =
+    growTableInstance(this as TableInstance, elementsToAdd, value)
+
+private fun growTableInstance(table: TableInstance, elementsToAdd: Int, value: HostReference): Int {
     val currentSize = table.elements.size
 
     if (elementsToAdd == 0) {

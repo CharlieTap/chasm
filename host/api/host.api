@@ -273,12 +273,21 @@ public final class io/github/charlietap/chasm/host/HostReferencesKt {
 	public static synthetic fun withScope$default (Lio/github/charlietap/chasm/host/HostReferences;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class io/github/charlietap/chasm/host/HostResourceGrowthExtensionsKt {
+	public static final fun growMemory (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;II)I
+	public static final fun growMemory-rS8l3Lg (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;II)I
+	public static final fun growTable (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;IIJ)I
+	public static final fun growTable-_69jjMQ (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;IIJ)I
+}
+
 public abstract interface class io/github/charlietap/chasm/host/HostResources {
 	public abstract fun getExceptions ()Lio/github/charlietap/chasm/host/HostExceptions;
 	public abstract fun getExterns ()Lio/github/charlietap/chasm/host/HostExterns;
 	public abstract fun getGc ()Lio/github/charlietap/chasm/host/HostGc;
 	public abstract fun getReferences ()Lio/github/charlietap/chasm/host/HostReferences;
 	public abstract fun global-F_spUYk (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostGlobal;
+	public abstract fun growMemory-hTSzG6M (Lio/github/charlietap/chasm/host/HostModuleInstance;II)I
+	public abstract fun growTable-ztOt1vk (Lio/github/charlietap/chasm/host/HostModuleInstance;IIJ)I
 	public abstract fun memory-dlIRw0U (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostMemory;
 	public abstract fun table-ytdIF_o (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostTable;
 	public abstract fun tag-s5-adI0 (Lio/github/charlietap/chasm/host/HostModuleInstance;I)I

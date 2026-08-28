@@ -6,6 +6,8 @@ import io.github.charlietap.chasm.runtime.memory.LinearMemory
 object NoOpLinearMemory : LinearMemory {
     override val byteSize: Int = 0
 
+    override fun grow(pagesToAdd: Int): LinearMemory = this
+
     override fun readI8(memoryPointer: Int): Byte = error("NoOpLinearMemory")
 
     override fun readI16(memoryPointer: Int): Short = error("NoOpLinearMemory")

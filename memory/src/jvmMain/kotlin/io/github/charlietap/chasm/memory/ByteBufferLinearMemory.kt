@@ -31,6 +31,38 @@ class ByteBufferLinearMemory(
     override val byteSize: Int
         get() = memory.limit()
 
+    override fun grow(pagesToAdd: Int): LinearMemory {
+        val buffer = memory
+        val currentSize = buffer.limit()
+        val newSize = currentSize + (pagesToAdd * LinearMemory.PAGE_SIZE)
+
+        if (newSize <= buffer.capacity()) {
+            buffer.limit(newSize)
+            return this
+        }
+
+        val doubledCapacity = minOf(buffer.capacity().toLong() * 2, Int.MAX_VALUE.toLong()).toInt()
+        val reservedCapacity = minOf(newSize.toLong() + (newSize / 2), Int.MAX_VALUE.toLong()).toInt()
+        val newCapacity = maxOf(doubledCapacity, reservedCapacity)
+        val newBuffer = try {
+            ByteBuffer.allocateDirect(newCapacity)
+        } catch (error: OutOfMemoryError) {
+            if (newCapacity == newSize) throw error
+            ByteBuffer.allocateDirect(newSize)
+        }.order(ByteOrder.LITTLE_ENDIAN)
+
+        buffer.duplicate().apply {
+            position(0)
+            limit(currentSize)
+            newBuffer.put(this)
+        }
+        newBuffer.position(0)
+        newBuffer.limit(newSize)
+        memory = newBuffer
+
+        return this
+    }
+
     override fun readI8(memoryPointer: Int): Byte = memory.get(memoryPointer)
 
     override fun readI16(memoryPointer: Int): Short = memory.getShort(memoryPointer)

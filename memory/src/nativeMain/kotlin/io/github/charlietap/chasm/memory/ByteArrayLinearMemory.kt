@@ -24,6 +24,11 @@ class ByteArrayLinearMemory(
     override val byteSize: Int
         get() = memory.size
 
+    override fun grow(pagesToAdd: Int): LinearMemory {
+        memory = memory.copyOf(memory.size + (pagesToAdd * LinearMemory.PAGE_SIZE))
+        return this
+    }
+
     override fun readI8(memoryPointer: Int): Byte = memory[memoryPointer]
 
     override fun readI16(memoryPointer: Int): Short = memory.toShortLittleEndian(memoryPointer)

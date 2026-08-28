@@ -12,7 +12,20 @@ interface HostResources {
 
     fun memory(module: HostModuleInstance, index: ModuleIndex.MemoryIndex): HostMemory
 
+    fun growMemory(
+        module: HostModuleInstance,
+        index: ModuleIndex.MemoryIndex,
+        pagesToAdd: Int,
+    ): Int
+
     fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable
+
+    fun growTable(
+        module: HostModuleInstance,
+        index: ModuleIndex.TableIndex,
+        elementsToAdd: Int,
+        value: HostReference,
+    ): Int
 
     fun global(module: HostModuleInstance, index: ModuleIndex.GlobalIndex): HostGlobal
 

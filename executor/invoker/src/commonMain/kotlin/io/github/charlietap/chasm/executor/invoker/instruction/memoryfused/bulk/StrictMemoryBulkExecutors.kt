@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.executor.invoker.instruction.memoryfused.bulk
 
 import io.github.charlietap.chasm.memory.copy.LinearMemoryCopier
 import io.github.charlietap.chasm.memory.fill.LinearMemoryFiller
-import io.github.charlietap.chasm.memory.grow.LinearMemoryGrower
 import io.github.charlietap.chasm.memory.init.LinearMemoryInitialiser
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.DataInstance
@@ -18,29 +17,12 @@ internal fun MemoryGrowExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryGrowI,
-) = MemoryGrowExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    instruction = instruction,
-    grower = ::LinearMemoryGrower,
-)
-
-internal inline fun MemoryGrowExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: MemorySuperInstruction.MemoryGrowI,
-    crossinline grower: LinearMemoryGrower,
 ) = executeMemoryGrow(
     vstack = vstack,
     pagesToAdd = instruction.pagesToAdd,
     destinationSlot = instruction.destinationSlot,
     memory = instruction.memory,
     max = instruction.max,
-    grower = grower,
 )
 
 internal fun MemoryGrowExecutor(
@@ -49,29 +31,12 @@ internal fun MemoryGrowExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryGrowS,
-) = MemoryGrowExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    instruction = instruction,
-    grower = ::LinearMemoryGrower,
-)
-
-internal inline fun MemoryGrowExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instruction: MemorySuperInstruction.MemoryGrowS,
-    crossinline grower: LinearMemoryGrower,
 ) = executeMemoryGrow(
     vstack = vstack,
     pagesToAdd = vstack.getFrameSlot(instruction.pagesToAddSlot).toInt(),
     destinationSlot = instruction.destinationSlot,
     memory = instruction.memory,
     max = instruction.max,
-    grower = grower,
 )
 
 internal fun MemoryInitExecutor(
@@ -816,7 +781,6 @@ private inline fun executeMemoryGrow(
     destinationSlot: Int,
     memory: MemoryInstance,
     max: Int,
-    crossinline grower: LinearMemoryGrower,
 ) {
     val originalSizeInPages = memory.type.limits.min.toInt()
     val newSizeInPages = originalSizeInPages + pagesToAdd
@@ -825,7 +789,7 @@ private inline fun executeMemoryGrow(
         vstack.setFrameSlot(destinationSlot, -1L)
     } else {
         memory.type.limits.min = newSizeInPages.toULong()
-        memory.data = grower(memory.data, pagesToAdd)
+        memory.data = memory.data.grow(pagesToAdd)
         memory.refresh()
         vstack.setFrameSlot(destinationSlot, originalSizeInPages.toLong())
     }

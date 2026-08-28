@@ -5,16 +5,36 @@ import io.github.charlietap.chasm.host.readU16
 import io.github.charlietap.chasm.host.readU32
 import io.github.charlietap.chasm.host.readU64
 import io.github.charlietap.chasm.host.readU8
+import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 
 @OptIn(UnsafeHostApi::class)
 class ByteBufferLinearMemoryHostTest {
+
+    @Test
+    fun `grows in place within capacity and replaces only the backing buffer beyond capacity`() {
+        val originalBuffer = ByteBuffer.allocateDirect(PAGE_SIZE * 3)
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .limit(PAGE_SIZE)
+        val memory = ByteBufferLinearMemory(originalBuffer)
+        memory.writeI8(PAGE_SIZE - 1, 47)
+
+        assertSame(memory, memory.grow(1))
+        assertSame(originalBuffer, memory.memory)
+        assertEquals(PAGE_SIZE * 2, memory.byteSize)
+
+        assertSame(memory, memory.grow(2))
+        assertNotSame(originalBuffer, memory.memory)
+        assertEquals(PAGE_SIZE * 4, memory.byteSize)
+        assertEquals(47.toByte(), memory.readI8(PAGE_SIZE - 1))
+    }
 
     @Test
     fun `reads and writes scalar values directly in little endian order`() {

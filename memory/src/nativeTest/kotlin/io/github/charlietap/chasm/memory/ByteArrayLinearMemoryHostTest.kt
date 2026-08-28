@@ -1,13 +1,27 @@
 package io.github.charlietap.chasm.memory
 
 import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 
 @OptIn(UnsafeHostApi::class)
 class ByteArrayLinearMemoryHostTest {
+
+    @Test
+    fun `grows the backing array while preserving the memory object and contents`() {
+        val originalArray = ByteArray(PAGE_SIZE)
+        val memory = ByteArrayLinearMemory(originalArray)
+        memory.writeI8(PAGE_SIZE - 1, 47)
+
+        assertSame(memory, memory.grow(1))
+        assertNotSame(originalArray, memory.memory)
+        assertEquals(PAGE_SIZE * 2, memory.byteSize)
+        assertEquals(47.toByte(), memory.readI8(PAGE_SIZE - 1))
+    }
 
     @Test
     fun `reads and writes scalar and reusable buffer values`() {

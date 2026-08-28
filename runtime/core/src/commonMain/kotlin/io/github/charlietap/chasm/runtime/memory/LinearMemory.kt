@@ -5,6 +5,8 @@ import kotlin.jvm.JvmInline
 
 interface LinearMemory : HostMemory {
 
+    fun grow(pagesToAdd: Int): LinearMemory
+
     @JvmInline
     value class Pages(val amount: UInt)
 
