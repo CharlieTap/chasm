@@ -4,8 +4,10 @@ import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.gc.AllocationAvailability
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcHostReferenceMarker
-import io.github.charlietap.chasm.gc.GcRootSink
+import io.github.charlietap.chasm.gc.GcRootMarker
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
+import io.github.charlietap.chasm.host.HostException
+import io.github.charlietap.chasm.host.HostExceptions
 import io.github.charlietap.chasm.host.HostExternKind
 import io.github.charlietap.chasm.host.HostExternReference
 import io.github.charlietap.chasm.host.HostExterns
@@ -18,6 +20,8 @@ import io.github.charlietap.chasm.host.HostReference
 import io.github.charlietap.chasm.host.HostReferenceRoot
 import io.github.charlietap.chasm.host.HostReferences
 import io.github.charlietap.chasm.host.HostResources
+import io.github.charlietap.chasm.host.HostStack
+import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.HEAP_TYPE_EXTERN
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
@@ -29,6 +33,7 @@ import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_MASK
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
@@ -53,7 +58,7 @@ import io.github.charlietap.chasm.type.VectorType
 
 class WasmHeap internal constructor(
     private val garbageCollectedHeap: GarbageCollectedHeap,
-) : HostReferences, HostGc, HostExterns, GcHostReferenceMarker {
+) : HostReferences, HostGc, HostExterns, HostExceptions, GcHostReferenceMarker {
     constructor() : this(GarbageCollectedHeap())
 
     private val runtimeTypes = RuntimeTypeRegistry()
@@ -83,8 +88,13 @@ class WasmHeap internal constructor(
     private var externFreeHead = NO_SLOT
     private var nextAutomaticExternThreshold = MINIMUM_EXTERN_COLLECTION_THRESHOLD
 
+    private var pendingExceptionReference = 0L
+
     override val allocatedBytes: Long
         get() = allocatedGuestBytes()
+
+    override val hasPending: Boolean
+        get() = pendingExceptionReference != 0L
 
     override fun beginScope(capacity: Int): Int {
         val marker = scopedRootTop
@@ -343,6 +353,75 @@ class WasmHeap internal constructor(
         if (slot >= 0 && slot < externTop && externAllocated[slot]) {
             externMarks[slot] = true
         }
+    }
+
+    context(resources: HostResources)
+    override fun create(
+        tag: HostTag,
+        payload: HostStack,
+        payloadOffset: Int,
+    ): HostException {
+        val tagAddress = Address.Tag(tag.rawAddress)
+        prepareExceptionAllocation(resources as ExecutionContext, tagAddress)
+        val reference = garbageCollectedHeap.allocateException(
+            descriptorKey = exceptionDescriptorKey(tagAddress),
+            source = payload,
+            sourceOffset = payloadOffset,
+        )
+        rootScoped(reference)
+        return HostException(reference)
+    }
+
+    override fun tag(exception: HostException): HostTag =
+        HostTag(exceptionTagAddress(exception.rawReference).address)
+
+    override fun payloadSize(exception: HostException): Int {
+        val tagAddress = exceptionTagAddress(exception.rawReference)
+        return tag(tagAddress).type.functionType.params.types.size
+    }
+
+    override fun readPayload(exception: HostException, index: Int): Long =
+        garbageCollectedHeap.getExceptionField(exception.rawReference, index)
+
+    override fun readPayload(
+        exception: HostException,
+        sourceOffset: Int,
+        destination: LongArray,
+        destinationOffset: Int,
+        length: Int,
+    ): LongArray = garbageCollectedHeap.readExceptionFields(
+        rawReference = exception.rawReference,
+        sourceOffset = sourceOffset,
+        destination = destination,
+        destinationOffset = destinationOffset,
+        length = length,
+    )
+
+    override fun takePending(): HostException {
+        val reference = takePendingExceptionReference()
+        rootScoped(reference)
+        return HostException(reference)
+    }
+
+    override fun raise(exception: HostException): Nothing {
+        setPendingException(exception.rawReference)
+        throw HostRaisedWasmException.instance
+    }
+
+    override fun raisePending(): Nothing = throw HostRaisedWasmException.instance
+
+    fun setPendingException(reference: HostReference) {
+        pendingExceptionReference = reference
+    }
+
+    fun takePendingExceptionReference(): HostReference {
+        val reference = pendingExceptionReference
+        pendingExceptionReference = 0L
+        return reference
+    }
+
+    fun clearPendingException() {
+        pendingExceptionReference = 0L
     }
 
     internal fun countLiveExterns(): Int {
@@ -931,6 +1010,7 @@ class WasmHeap internal constructor(
         externTop = 0
         externFreeHead = NO_SLOT
         nextAutomaticExternThreshold = MINIMUM_EXTERN_COLLECTION_THRESHOLD
+        pendingExceptionReference = 0L
     }
 
     fun shouldCollectGarbage(thresholdBytes: Long): Boolean {
@@ -1032,17 +1112,21 @@ class WasmHeap internal constructor(
         )
     }
 
-    private fun visitGcRoots(store: Store, rootSink: GcRootSink) {
+    private fun visitGcRoots(store: Store, rootMarker: GcRootMarker) {
+        if (pendingExceptionReference != 0L) {
+            rootMarker.markRoot(pendingExceptionReference)
+        }
+
         var rootIndex = 0
         while (rootIndex < scopedRootTop) {
-            rootSink.markRoot(scopedRoots[rootIndex])
+            rootMarker.markRoot(scopedRoots[rootIndex])
             rootIndex++
         }
 
         rootIndex = 0
         while (rootIndex < retainedRootTop) {
             val reference = retainedRoots[rootIndex]
-            if (reference != 0L) rootSink.markRoot(reference)
+            if (reference != 0L) rootMarker.markRoot(reference)
             rootIndex++
         }
 
@@ -1050,7 +1134,7 @@ class WasmHeap internal constructor(
         while (globalIndex < store.globals.size) {
             val global = store.globals[globalIndex]
             if (global.type.valueType is ValueType.Reference) {
-                rootSink.markRoot(global.value)
+                rootMarker.markRoot(global.value)
             }
             globalIndex++
         }
@@ -1060,7 +1144,7 @@ class WasmHeap internal constructor(
             val tableElements = store.tables[tableIndex].elements
             var elementIndex = 0
             while (elementIndex < tableElements.size) {
-                rootSink.markRoot(tableElements[elementIndex])
+                rootMarker.markRoot(tableElements[elementIndex])
                 elementIndex++
             }
             tableIndex++
@@ -1071,7 +1155,7 @@ class WasmHeap internal constructor(
             val segmentElements = store.elements[segmentIndex].elements
             var elementIndex = 0
             while (elementIndex < segmentElements.size) {
-                rootSink.markRoot(segmentElements[elementIndex])
+                rootMarker.markRoot(segmentElements[elementIndex])
                 elementIndex++
             }
             segmentIndex++

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.runtime.stack
 
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
-import io.github.charlietap.chasm.gc.GcRootSink
+import io.github.charlietap.chasm.gc.GcRootMarker
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -349,11 +349,11 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         return heap.allocateException(descriptorKey, elements, sourceOffset)
     }
 
-    internal fun visitGcRoots(rootSink: GcRootSink) {
+    internal fun visitGcRoots(rootMarker: GcRootMarker) {
         val end = top
         var index = 0
         while (index < end) {
-            rootSink.markRoot(elements[index])
+            rootMarker.markRoot(elements[index])
             index++
         }
     }

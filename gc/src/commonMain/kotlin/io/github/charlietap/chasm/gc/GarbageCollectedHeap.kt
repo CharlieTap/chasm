@@ -76,7 +76,7 @@ class GuestHeapOutOfMemoryException(
     message: String,
 ) : Exception(message)
 
-interface GcRootSink {
+interface GcRootMarker {
     fun markRoot(rawValue: Long)
 }
 
@@ -95,7 +95,7 @@ interface GcHostReferenceMarker {
  */
 class GarbageCollectedHeap(
     configuration: Configuration = Configuration(),
-) : GcRootSink {
+) : GcRootMarker {
 
     /**
      * [maximumPageCount] sets the payload limit for ordinary pages and dedicated
@@ -782,6 +782,24 @@ class GarbageCollectedHeap(
     ): Long {
         val address = (rawReference ushr RV_SHIFT_BITS).toInt()
         return payloadWords[address - PAGE_WORDS + fieldIndex]
+    }
+
+    fun readExceptionFields(
+        rawReference: Long,
+        sourceOffset: Int,
+        destination: LongArray,
+        destinationOffset: Int,
+        length: Int,
+    ): LongArray {
+        val address = (rawReference ushr RV_SHIFT_BITS).toInt()
+        val payloadOffset = address - PAGE_WORDS + sourceOffset
+        payloadWords.copyInto(
+            destination = destination,
+            destinationOffset = destinationOffset,
+            startIndex = payloadOffset,
+            endIndex = payloadOffset + length,
+        )
+        return destination
     }
 
     fun exceptionTagAddress(rawReference: Long): Int {
