@@ -6,9 +6,6 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform")
 }
 
-@Suppress("DEPRECATION")
-fun KotlinMultiplatformExtension.compatibilityMacosX64() = macosX64()
-
 fun KotlinMultiplatformExtension.unixTargets() = setOf(
     macosArm64 {
         binaries {
@@ -17,7 +14,6 @@ fun KotlinMultiplatformExtension.unixTargets() = setOf(
             }
         }
     },
-    compatibilityMacosX64(),
     iosArm64(),
     iosSimulatorArm64(),
     iosX64(),
