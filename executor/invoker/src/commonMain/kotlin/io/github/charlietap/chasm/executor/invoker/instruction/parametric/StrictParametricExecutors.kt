@@ -1,13 +1,13 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.parametricfused
+package io.github.charlietap.chasm.executor.invoker.instruction.parametric
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ParametricSuperInstruction.SelectIii,
+    instruction: ParametricInstruction.SelectIii,
 ) = executeSelect(
     vstack = vstack,
     condition = instruction.condition,
@@ -19,7 +19,7 @@ internal inline fun SelectExecutor(
 internal inline fun SelectExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ParametricSuperInstruction.SelectIis,
+    instruction: ParametricInstruction.SelectIis,
 ) = executeSelect(
     vstack = vstack,
     condition = instruction.condition,
@@ -31,7 +31,7 @@ internal inline fun SelectExecutor(
 internal inline fun SelectExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ParametricSuperInstruction.SelectIsi,
+    instruction: ParametricInstruction.SelectIsi,
 ) = executeSelect(
     vstack = vstack,
     condition = instruction.condition,
@@ -43,7 +43,7 @@ internal inline fun SelectExecutor(
 internal inline fun SelectExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ParametricSuperInstruction.SelectIss,
+    instruction: ParametricInstruction.SelectIss,
 ) = executeSelect(
     vstack = vstack,
     condition = instruction.condition,
@@ -55,7 +55,7 @@ internal inline fun SelectExecutor(
 internal inline fun SelectExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ParametricSuperInstruction.SelectSii,
+    instruction: ParametricInstruction.SelectSii,
 ) = executeSelect(
     vstack = vstack,
     condition = vstack.getFrameSlot(instruction.conditionSlot),
@@ -67,7 +67,7 @@ internal inline fun SelectExecutor(
 internal inline fun SelectExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ParametricSuperInstruction.SelectSis,
+    instruction: ParametricInstruction.SelectSis,
 ) = executeSelect(
     vstack = vstack,
     condition = vstack.getFrameSlot(instruction.conditionSlot),
@@ -79,7 +79,7 @@ internal inline fun SelectExecutor(
 internal inline fun SelectExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ParametricSuperInstruction.SelectSsi,
+    instruction: ParametricInstruction.SelectSsi,
 ) = executeSelect(
     vstack = vstack,
     condition = vstack.getFrameSlot(instruction.conditionSlot),
@@ -91,7 +91,7 @@ internal inline fun SelectExecutor(
 internal inline fun SelectExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ParametricSuperInstruction.SelectSss,
+    instruction: ParametricInstruction.SelectSss,
 ) = executeSelect(
     vstack = vstack,
     condition = vstack.getFrameSlot(instruction.conditionSlot),

@@ -4,8 +4,8 @@ import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.isImmediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
-import io.github.charlietap.chasm.executor.invoker.dispatch.parametricfused.ParametricSuperInstructionDispatcher
-import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
+import io.github.charlietap.chasm.executor.invoker.dispatch.parametric.ParametricInstructionDispatcher
+import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction
 
 internal fun FunctionCompilationContext.emitSelect(
     condition: OperandSource,
@@ -19,7 +19,7 @@ internal fun FunctionCompilationContext.emitSelect(
 
     val instruction = when {
         conditionImmediate && firstImmediate && secondImmediate -> {
-            ParametricSuperInstruction.SelectIii(
+            ParametricInstruction.SelectIii(
                 condition.sourceBits,
                 first.sourceBits,
                 second.sourceBits,
@@ -27,7 +27,7 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
         conditionImmediate && firstImmediate -> {
-            ParametricSuperInstruction.SelectIis(
+            ParametricInstruction.SelectIis(
                 condition.sourceBits,
                 first.sourceBits,
                 second.sourceSlot,
@@ -35,7 +35,7 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
         conditionImmediate && secondImmediate -> {
-            ParametricSuperInstruction.SelectIsi(
+            ParametricInstruction.SelectIsi(
                 condition.sourceBits,
                 first.sourceSlot,
                 second.sourceBits,
@@ -43,7 +43,7 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
         conditionImmediate -> {
-            ParametricSuperInstruction.SelectIss(
+            ParametricInstruction.SelectIss(
                 condition.sourceBits,
                 first.sourceSlot,
                 second.sourceSlot,
@@ -51,7 +51,7 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
         firstImmediate && secondImmediate -> {
-            ParametricSuperInstruction.SelectSii(
+            ParametricInstruction.SelectSii(
                 condition.sourceSlot,
                 first.sourceBits,
                 second.sourceBits,
@@ -59,7 +59,7 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
         firstImmediate -> {
-            ParametricSuperInstruction.SelectSis(
+            ParametricInstruction.SelectSis(
                 condition.sourceSlot,
                 first.sourceBits,
                 second.sourceSlot,
@@ -67,7 +67,7 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
         secondImmediate -> {
-            ParametricSuperInstruction.SelectSsi(
+            ParametricInstruction.SelectSsi(
                 condition.sourceSlot,
                 first.sourceSlot,
                 second.sourceBits,
@@ -75,7 +75,7 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
         else -> {
-            ParametricSuperInstruction.SelectSss(
+            ParametricInstruction.SelectSss(
                 condition.sourceSlot,
                 first.sourceSlot,
                 second.sourceSlot,
@@ -83,5 +83,5 @@ internal fun FunctionCompilationContext.emitSelect(
             )
         }
     }
-    emit(instruction, ::ParametricSuperInstructionDispatcher)
+    emit(instruction, ::ParametricInstructionDispatcher)
 }

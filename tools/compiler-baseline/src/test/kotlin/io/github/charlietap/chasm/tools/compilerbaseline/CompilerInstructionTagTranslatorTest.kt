@@ -6,7 +6,7 @@ import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
-import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
 import kotlin.test.Test
@@ -29,7 +29,7 @@ class CompilerInstructionTagTranslatorTest {
         )
         assertEquals(
             "parametric.select.sis",
-            translator.translate(ParametricSuperInstruction.SelectSis(1, 2L, 3, 4)),
+            translator.translate(ParametricInstruction.SelectSis(1, 2L, 3, 4)),
         )
         assertEquals(
             "variable.global_set.s",
@@ -70,7 +70,7 @@ class CompilerInstructionTagTranslatorTest {
 }
 
 private val variantFamilies = listOf(
-    ParametricSuperInstruction::class.java,
+    ParametricInstruction::class.java,
     VariableInstruction::class.java,
     NumericInstruction::class.java,
     MemoryInstruction::class.java,

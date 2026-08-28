@@ -10,7 +10,7 @@ import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
-import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction
 import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
@@ -22,7 +22,7 @@ class CompilerInstructionTagTranslator {
         is ControlInstruction -> control(instruction)
         is ControlSuperInstruction -> control(instruction)
         is VariableInstruction -> variant(instruction, "variable", variableOperations)
-        is ParametricSuperInstruction -> variant(instruction, "parametric", parametricOperations)
+        is ParametricInstruction -> variant(instruction, "parametric", parametricOperations)
         is NumericInstruction -> variant(instruction, "numeric", numericOperations)
         is MemoryInstruction.DataDrop -> "memory.data_drop"
         is MemoryInstruction -> variant(instruction, "memory", memoryOperations)
@@ -34,7 +34,7 @@ class CompilerInstructionTagTranslator {
     }
 
     internal fun translateVariant(instructionClass: Class<*>): String = when {
-        ParametricSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
+        ParametricInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "parametric", parametricOperations)
         VariableInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "variable", variableOperations)
