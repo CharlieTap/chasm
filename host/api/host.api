@@ -3,3 +3,52 @@ public final class io/github/charlietap/chasm/host/HostFunctionException : java/
 	public final fun getReason ()Ljava/lang/String;
 }
 
+public abstract interface class io/github/charlietap/chasm/host/HostMemory {
+	public abstract fun copy (IIILio/github/charlietap/chasm/host/HostMemory;)V
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
+	public abstract fun fill (IBI)V
+	public abstract fun getByteSize ()I
+	public abstract fun move (IIILio/github/charlietap/chasm/host/HostMemory;)V
+	public static synthetic fun move$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
+	public abstract fun read ([BIII)[B
+	public static synthetic fun read$default (Lio/github/charlietap/chasm/host/HostMemory;[BIIIILjava/lang/Object;)[B
+	public abstract fun readF32 (I)F
+	public abstract fun readF64 (I)D
+	public abstract fun readI16 (I)S
+	public abstract fun readI32 (I)I
+	public abstract fun readI64 (I)J
+	public abstract fun readI8 (I)B
+	public abstract fun write (I[BII)V
+	public static synthetic fun write$default (Lio/github/charlietap/chasm/host/HostMemory;I[BIIILjava/lang/Object;)V
+	public abstract fun writeF32 (IF)V
+	public abstract fun writeF64 (ID)V
+	public abstract fun writeI16 (IS)V
+	public abstract fun writeI32 (II)V
+	public abstract fun writeI64 (IJ)V
+	public abstract fun writeI8 (IB)V
+}
+
+public final class io/github/charlietap/chasm/host/HostMemory$DefaultImpls {
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
+	public static synthetic fun move$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
+	public static synthetic fun read$default (Lio/github/charlietap/chasm/host/HostMemory;[BIIIILjava/lang/Object;)[B
+	public static synthetic fun write$default (Lio/github/charlietap/chasm/host/HostMemory;I[BIIILjava/lang/Object;)V
+}
+
+public final class io/github/charlietap/chasm/host/HostMemoryExtensionsKt {
+	public static final fun readNullTerminatedUtf8String (Lio/github/charlietap/chasm/host/HostMemory;I)Ljava/lang/String;
+	public static final fun readU16 (Lio/github/charlietap/chasm/host/HostMemory;I)S
+	public static final fun readU32 (Lio/github/charlietap/chasm/host/HostMemory;I)I
+	public static final fun readU64 (Lio/github/charlietap/chasm/host/HostMemory;I)J
+	public static final fun readU8 (Lio/github/charlietap/chasm/host/HostMemory;I)B
+	public static final fun readUtf8String (Lio/github/charlietap/chasm/host/HostMemory;II)Ljava/lang/String;
+	public static final fun writeUtf8String (Lio/github/charlietap/chasm/host/HostMemory;ILjava/lang/String;)V
+}
+
+public abstract interface class io/github/charlietap/chasm/host/JvmHostMemory : io/github/charlietap/chasm/host/HostMemory {
+	public abstract fun unsafeBorrowByteBuffer ()Ljava/nio/ByteBuffer;
+}
+
+public abstract interface annotation class io/github/charlietap/chasm/host/UnsafeHostApi : java/lang/annotation/Annotation {
+}
+

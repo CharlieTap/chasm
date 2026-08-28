@@ -6,9 +6,48 @@
 // - Show declarations: true
 
 // Library unique name: <io.github.charlietap.chasm:host>
+open annotation class io.github.charlietap.chasm.host/UnsafeHostApi : kotlin/Annotation { // io.github.charlietap.chasm.host/UnsafeHostApi|null[0]
+    constructor <init>() // io.github.charlietap.chasm.host/UnsafeHostApi.<init>|<init>(){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.host/HostMemory { // io.github.charlietap.chasm.host/HostMemory|null[0]
+    abstract val byteSize // io.github.charlietap.chasm.host/HostMemory.byteSize|{}byteSize[0]
+        abstract fun <get-byteSize>(): kotlin/Int // io.github.charlietap.chasm.host/HostMemory.byteSize.<get-byteSize>|<get-byteSize>(){}[0]
+
+    abstract fun copy(kotlin/Int, kotlin/Int, kotlin/Int, io.github.charlietap.chasm.host/HostMemory = ...) // io.github.charlietap.chasm.host/HostMemory.copy|copy(kotlin.Int;kotlin.Int;kotlin.Int;io.github.charlietap.chasm.host.HostMemory){}[0]
+    abstract fun fill(kotlin/Int, kotlin/Byte, kotlin/Int) // io.github.charlietap.chasm.host/HostMemory.fill|fill(kotlin.Int;kotlin.Byte;kotlin.Int){}[0]
+    abstract fun move(kotlin/Int, kotlin/Int, kotlin/Int, io.github.charlietap.chasm.host/HostMemory = ...) // io.github.charlietap.chasm.host/HostMemory.move|move(kotlin.Int;kotlin.Int;kotlin.Int;io.github.charlietap.chasm.host.HostMemory){}[0]
+    abstract fun read(kotlin/ByteArray, kotlin/Int, kotlin/Int, kotlin/Int = ...): kotlin/ByteArray // io.github.charlietap.chasm.host/HostMemory.read|read(kotlin.ByteArray;kotlin.Int;kotlin.Int;kotlin.Int){}[0]
+    abstract fun readF32(kotlin/Int): kotlin/Float // io.github.charlietap.chasm.host/HostMemory.readF32|readF32(kotlin.Int){}[0]
+    abstract fun readF64(kotlin/Int): kotlin/Double // io.github.charlietap.chasm.host/HostMemory.readF64|readF64(kotlin.Int){}[0]
+    abstract fun readI16(kotlin/Int): kotlin/Short // io.github.charlietap.chasm.host/HostMemory.readI16|readI16(kotlin.Int){}[0]
+    abstract fun readI32(kotlin/Int): kotlin/Int // io.github.charlietap.chasm.host/HostMemory.readI32|readI32(kotlin.Int){}[0]
+    abstract fun readI64(kotlin/Int): kotlin/Long // io.github.charlietap.chasm.host/HostMemory.readI64|readI64(kotlin.Int){}[0]
+    abstract fun readI8(kotlin/Int): kotlin/Byte // io.github.charlietap.chasm.host/HostMemory.readI8|readI8(kotlin.Int){}[0]
+    abstract fun write(kotlin/Int, kotlin/ByteArray, kotlin/Int = ..., kotlin/Int = ...) // io.github.charlietap.chasm.host/HostMemory.write|write(kotlin.Int;kotlin.ByteArray;kotlin.Int;kotlin.Int){}[0]
+    abstract fun writeF32(kotlin/Int, kotlin/Float) // io.github.charlietap.chasm.host/HostMemory.writeF32|writeF32(kotlin.Int;kotlin.Float){}[0]
+    abstract fun writeF64(kotlin/Int, kotlin/Double) // io.github.charlietap.chasm.host/HostMemory.writeF64|writeF64(kotlin.Int;kotlin.Double){}[0]
+    abstract fun writeI16(kotlin/Int, kotlin/Short) // io.github.charlietap.chasm.host/HostMemory.writeI16|writeI16(kotlin.Int;kotlin.Short){}[0]
+    abstract fun writeI32(kotlin/Int, kotlin/Int) // io.github.charlietap.chasm.host/HostMemory.writeI32|writeI32(kotlin.Int;kotlin.Int){}[0]
+    abstract fun writeI64(kotlin/Int, kotlin/Long) // io.github.charlietap.chasm.host/HostMemory.writeI64|writeI64(kotlin.Int;kotlin.Long){}[0]
+    abstract fun writeI8(kotlin/Int, kotlin/Byte) // io.github.charlietap.chasm.host/HostMemory.writeI8|writeI8(kotlin.Int;kotlin.Byte){}[0]
+}
+
+abstract interface io.github.charlietap.chasm.host/NativeHostMemory : io.github.charlietap.chasm.host/HostMemory { // io.github.charlietap.chasm.host/NativeHostMemory|null[0]
+    abstract fun unsafeBorrowByteArray(): kotlin/ByteArray // io.github.charlietap.chasm.host/NativeHostMemory.unsafeBorrowByteArray|unsafeBorrowByteArray(){}[0]
+}
+
 final class io.github.charlietap.chasm.host/HostFunctionException : kotlin/Exception { // io.github.charlietap.chasm.host/HostFunctionException|null[0]
     constructor <init>(kotlin/String) // io.github.charlietap.chasm.host/HostFunctionException.<init>|<init>(kotlin.String){}[0]
 
     final val reason // io.github.charlietap.chasm.host/HostFunctionException.reason|{}reason[0]
         final fun <get-reason>(): kotlin/String // io.github.charlietap.chasm.host/HostFunctionException.reason.<get-reason>|<get-reason>(){}[0]
 }
+
+final fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readNullTerminatedUtf8String(kotlin/Int): kotlin/String // io.github.charlietap.chasm.host/readNullTerminatedUtf8String|readNullTerminatedUtf8String@io.github.charlietap.chasm.host.HostMemory(kotlin.Int){}[0]
+final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readU16(kotlin/Int): kotlin/UShort // io.github.charlietap.chasm.host/readU16|readU16@io.github.charlietap.chasm.host.HostMemory(kotlin.Int){}[0]
+final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readU32(kotlin/Int): kotlin/UInt // io.github.charlietap.chasm.host/readU32|readU32@io.github.charlietap.chasm.host.HostMemory(kotlin.Int){}[0]
+final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readU64(kotlin/Int): kotlin/ULong // io.github.charlietap.chasm.host/readU64|readU64@io.github.charlietap.chasm.host.HostMemory(kotlin.Int){}[0]
+final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readU8(kotlin/Int): kotlin/UByte // io.github.charlietap.chasm.host/readU8|readU8@io.github.charlietap.chasm.host.HostMemory(kotlin.Int){}[0]
+final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readUtf8String(kotlin/Int, kotlin/Int): kotlin/String // io.github.charlietap.chasm.host/readUtf8String|readUtf8String@io.github.charlietap.chasm.host.HostMemory(kotlin.Int;kotlin.Int){}[0]
+final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/writeUtf8String(kotlin/Int, kotlin/String) // io.github.charlietap.chasm.host/writeUtf8String|writeUtf8String@io.github.charlietap.chasm.host.HostMemory(kotlin.Int;kotlin.String){}[0]
