@@ -618,6 +618,37 @@ class GarbageCollectedHeap(
         )
     }
 
+    fun readArrayElements(
+        rawReference: Long,
+        sourceOffset: Int,
+        destination: LongArray,
+        destinationOffset: Int,
+        length: Int,
+    ): LongArray {
+        val address = (rawReference ushr RV_SHIFT_BITS).toInt()
+        val sourceWords: LongArray
+        val sourceBase: Int
+        val sourceLength: Int
+        if (isDedicatedAddress(address)) {
+            sourceWords = checkNotNull(dedicatedPayloads[dedicatedId(address)])
+            sourceBase = 1
+            sourceLength = sourceWords.size - 1
+        } else {
+            sourceWords = payloadWords
+            sourceBase = address - PAGE_WORDS + 1
+            sourceLength = payloadWords[sourceBase - 1].toInt()
+        }
+        requireRange(sourceLength, sourceOffset, length, "source")
+        requireRange(destination.size, destinationOffset, length, "destination")
+        sourceWords.copyInto(
+            destination = destination,
+            destinationOffset = destinationOffset,
+            startIndex = sourceBase + sourceOffset,
+            endIndex = sourceBase + sourceOffset + length,
+        )
+        return destination
+    }
+
     fun initializeArrayFromData(
         rawReference: Long,
         destinationOffset: Int,

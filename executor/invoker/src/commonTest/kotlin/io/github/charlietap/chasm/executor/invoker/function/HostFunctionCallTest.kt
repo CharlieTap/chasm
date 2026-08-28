@@ -55,6 +55,40 @@ class HostFunctionCallTest {
     }
 
     @Test
+    fun `nested host callbacks own independent reference scopes`() {
+        val caller = moduleInstance()
+        val store = store()
+        val cstack = cstack(frames = listOf(frame(instance = caller)))
+        val vstack = vstack()
+        val context = executionContext(store = store, cstack = cstack, vstack = vstack)
+        val nestedFunction = hostFunctionInstance(
+            function = HostFunction { _, _ ->
+                val references = contextOf<HostResources>().references
+                references.rootScoped(2L)
+                val marker = references.beginScope()
+                assertEquals(2, marker)
+                references.endScope(marker)
+            },
+        )
+        val function = hostFunctionInstance(
+            function = HostFunction { _, _ ->
+                val references = contextOf<HostResources>().references
+                references.rootScoped(1L)
+                HostFunctionCall(vstack, context, caller, nestedFunction)
+                val marker = references.beginScope()
+                assertEquals(1, marker)
+                references.endScope(marker)
+            },
+        )
+
+        HostFunctionCall(vstack, context, caller, function)
+
+        val marker = store.heap.beginScope()
+        assertEquals(0, marker)
+        store.heap.endScope(marker)
+    }
+
+    @Test
     fun `strict call exposes raw parameter and result slots`() {
         val caller = moduleInstance()
         val store = store()

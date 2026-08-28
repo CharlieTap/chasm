@@ -9,6 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class ArrayAllocationTest {
@@ -178,7 +179,7 @@ class ArrayAllocationTest {
 
     @Test
     fun `bulk copy supports every ordinary and dedicated backing combination`() {
-        val heap = GarbageCollectedHeap(GarbageCollectedHeap.Configuration(maximumPageCount = 16))
+        val heap = GarbageCollectedHeap()
         val descriptorKey = heap.registerArray(0, elementsMayContainReferences = false)
         val ordinarySource = heap.allocateArrayFromElements(descriptorKey, LongArray(32) { it.toLong() }, 0, 32)
         val ordinaryDestination = heap.allocateArrayFilled(descriptorKey, 32, -1)
@@ -267,6 +268,35 @@ class ArrayAllocationTest {
             heap.initializeArrayFromElements(reference, 7, longArrayOf(30, 31), 0, 2)
         }
         assertContentEquals(beforeFailure, materialize(heap, reference))
+        heap.checkInvariants()
+    }
+
+    @Test
+    fun `bulk read supports ordinary and dedicated arrays`() {
+        val heap = GarbageCollectedHeap(GarbageCollectedHeap.Configuration(maximumPageCount = 16))
+        val descriptorKey = heap.registerArray(0, elementsMayContainReferences = false)
+        val ordinary = heap.allocateArrayFromElements(descriptorKey, LongArray(8) { it.toLong() }, 0, 8)
+        val dedicated = heap.allocateArrayFromElements(
+            descriptorKey,
+            LongArray(1024) { 1_000L + it },
+            0,
+            1024,
+        )
+        val destination = LongArray(12) { -1L }
+
+        assertSame(destination, heap.readArrayElements(ordinary, 2, destination, 1, 4))
+        assertSame(destination, heap.readArrayElements(dedicated, 1020, destination, 7, 4))
+
+        assertContentEquals(
+            longArrayOf(-1, 2, 3, 4, 5, -1, -1, 2_020, 2_021, 2_022, 2_023, -1),
+            destination,
+        )
+        assertFailsWith<IllegalArgumentException> {
+            heap.readArrayElements(ordinary, 6, destination, 0, 3)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            heap.readArrayElements(ordinary, 0, destination, 11, 2)
+        }
         heap.checkInvariants()
     }
 

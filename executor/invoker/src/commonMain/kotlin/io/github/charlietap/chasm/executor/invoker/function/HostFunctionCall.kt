@@ -73,8 +73,10 @@ internal inline fun HostFunction.invokeHost(
     context: ExecutionContext,
 ) {
     try {
-        context(stack, caller, context) {
-            invoke(parameterBase, resultBase)
+        context.withHostCallbackScope {
+            context(stack, caller, context) {
+                invoke(parameterBase, resultBase)
+            }
         }
     } catch (exception: HostFunctionException) {
         throw InvocationException(InvocationError.HostFunctionError(exception.reason))
