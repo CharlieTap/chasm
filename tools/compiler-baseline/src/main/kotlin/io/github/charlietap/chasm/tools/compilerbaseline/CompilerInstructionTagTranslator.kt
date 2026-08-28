@@ -9,7 +9,7 @@ import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
-import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
@@ -23,7 +23,7 @@ class CompilerInstructionTagTranslator {
         is ControlSuperInstruction -> control(instruction)
         is VariableSuperInstruction -> variable(instruction)
         is ParametricSuperInstruction -> variant(instruction, "parametric", parametricOperations)
-        is NumericSuperInstruction -> variant(instruction, "numeric", numericOperations)
+        is NumericInstruction -> variant(instruction, "numeric", numericOperations)
         is MemoryInstruction.DataDrop -> "memory.data_drop"
         is MemoryInstruction -> variant(instruction, "memory", memoryOperations)
         is TableInstruction.ElemDrop -> "table.elem_drop"
@@ -36,7 +36,7 @@ class CompilerInstructionTagTranslator {
     internal fun translateVariant(instructionClass: Class<*>): String = when {
         ParametricSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "parametric", parametricOperations)
-        NumericSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
+        NumericInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "numeric", numericOperations)
         instructionClass == MemoryInstruction.DataDrop::class.java -> "memory.data_drop"
         MemoryInstruction::class.java.isAssignableFrom(instructionClass) ->

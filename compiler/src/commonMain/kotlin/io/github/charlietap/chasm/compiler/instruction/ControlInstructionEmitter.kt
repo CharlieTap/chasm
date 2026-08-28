@@ -19,17 +19,17 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PushHandlerDis
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.FunctionReturnDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowRefDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32ConstDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64ConstDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ConstDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64ConstDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F32ConstDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F64ConstDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32ConstDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64ConstDispatcher
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
-import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
@@ -473,19 +473,19 @@ private fun FunctionCompilationContext.emitSlotTransfer(transfer: SlotTransfer) 
         val sourceSlot = transfer.sourceSlot(index)
         when (sourceKind) {
             OperandSourceKind.I32Immediate -> {
-                val instruction = NumericSuperInstruction.I32ConstS(sourceBits.toInt(), sourceSlot)
+                val instruction = NumericInstruction.I32ConstS(sourceBits.toInt(), sourceSlot)
                 emit(instruction, ::I32ConstDispatcher)
             }
             OperandSourceKind.I64Immediate -> {
-                val instruction = NumericSuperInstruction.I64ConstS(sourceBits, sourceSlot)
+                val instruction = NumericInstruction.I64ConstS(sourceBits, sourceSlot)
                 emit(instruction, ::I64ConstDispatcher)
             }
             OperandSourceKind.F32Immediate -> {
-                val instruction = NumericSuperInstruction.F32ConstS(sourceBits.toInt(), sourceSlot)
+                val instruction = NumericInstruction.F32ConstS(sourceBits.toInt(), sourceSlot)
                 emit(instruction, ::F32ConstDispatcher)
             }
             OperandSourceKind.F64Immediate -> {
-                val instruction = NumericSuperInstruction.F64ConstS(sourceBits, sourceSlot)
+                val instruction = NumericInstruction.F64ConstS(sourceBits, sourceSlot)
                 emit(instruction, ::F64ConstDispatcher)
             }
             OperandSourceKind.Local -> emitCopy(sourceBits.toInt(), sourceSlot)

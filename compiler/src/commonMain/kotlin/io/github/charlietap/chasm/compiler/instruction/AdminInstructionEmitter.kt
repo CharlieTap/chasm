@@ -3,12 +3,12 @@ package io.github.charlietap.chasm.compiler.instruction
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.CopySlotsDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F32ConstDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.F64ConstDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I32ConstDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64ConstDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F32ConstDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F64ConstDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32ConstDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64ConstDispatcher
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 
 internal fun FunctionCompilationContext.emitCopy(
     sourceSlot: Int,
@@ -45,21 +45,21 @@ internal fun FunctionCompilationContext.emitCopies(
 }
 
 internal fun FunctionCompilationContext.emitI32Constant(value: Int, destinationSlot: Int) {
-    val instruction = NumericSuperInstruction.I32ConstS(value, destinationSlot)
+    val instruction = NumericInstruction.I32ConstS(value, destinationSlot)
     emit(instruction, ::I32ConstDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitI64Constant(value: Long, destinationSlot: Int) {
-    val instruction = NumericSuperInstruction.I64ConstS(value, destinationSlot)
+    val instruction = NumericInstruction.I64ConstS(value, destinationSlot)
     emit(instruction, ::I64ConstDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitF32Constant(bits: Int, destinationSlot: Int) {
-    val instruction = NumericSuperInstruction.F32ConstS(bits, destinationSlot)
+    val instruction = NumericInstruction.F32ConstS(bits, destinationSlot)
     emit(instruction, ::F32ConstDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitF64Constant(bits: Long, destinationSlot: Int) {
-    val instruction = NumericSuperInstruction.F64ConstS(bits, destinationSlot)
+    val instruction = NumericInstruction.F64ConstS(bits, destinationSlot)
     emit(instruction, ::F64ConstDispatcher)
 }

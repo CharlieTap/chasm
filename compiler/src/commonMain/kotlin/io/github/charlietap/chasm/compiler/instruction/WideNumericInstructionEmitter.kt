@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
 import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
-import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.NumericSuperInstructionDispatcher
-import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
+import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.NumericInstructionDispatcher
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 
 internal fun FunctionCompilationContext.emitI64WideInstruction(
     opcode: NumericOpcode,
@@ -25,7 +25,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
             third = checkNotNull(third),
             fourth = checkNotNull(fourth),
             iiii = { operand1, operand2, operand3, operand4 ->
-                NumericSuperInstruction.I64Add128Iiii(
+                NumericInstruction.I64Add128Iiii(
                     operand1,
                     operand2,
                     operand3,
@@ -35,7 +35,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             iiis = { operand1, operand2, operand3, operand4Slot ->
-                NumericSuperInstruction.I64Add128Iiis(
+                NumericInstruction.I64Add128Iiis(
                     operand1,
                     operand2,
                     operand3,
@@ -45,7 +45,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             iisi = { operand1, operand2, operand3Slot, operand4 ->
-                NumericSuperInstruction.I64Add128Iisi(
+                NumericInstruction.I64Add128Iisi(
                     operand1,
                     operand2,
                     operand3Slot,
@@ -55,7 +55,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             iiss = { operand1, operand2, operand3Slot, operand4Slot ->
-                NumericSuperInstruction.I64Add128Iiss(
+                NumericInstruction.I64Add128Iiss(
                     operand1,
                     operand2,
                     operand3Slot,
@@ -65,7 +65,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             isii = { operand1, operand2Slot, operand3, operand4 ->
-                NumericSuperInstruction.I64Add128Isii(
+                NumericInstruction.I64Add128Isii(
                     operand1,
                     operand2Slot,
                     operand3,
@@ -75,7 +75,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             isis = { operand1, operand2Slot, operand3, operand4Slot ->
-                NumericSuperInstruction.I64Add128Isis(
+                NumericInstruction.I64Add128Isis(
                     operand1,
                     operand2Slot,
                     operand3,
@@ -85,7 +85,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             issi = { operand1, operand2Slot, operand3Slot, operand4 ->
-                NumericSuperInstruction.I64Add128Issi(
+                NumericInstruction.I64Add128Issi(
                     operand1,
                     operand2Slot,
                     operand3Slot,
@@ -95,7 +95,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             isss = { operand1, operand2Slot, operand3Slot, operand4Slot ->
-                NumericSuperInstruction.I64Add128Isss(
+                NumericInstruction.I64Add128Isss(
                     operand1,
                     operand2Slot,
                     operand3Slot,
@@ -105,7 +105,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             siii = { operand1Slot, operand2, operand3, operand4 ->
-                NumericSuperInstruction.I64Add128Siii(
+                NumericInstruction.I64Add128Siii(
                     operand1Slot,
                     operand2,
                     operand3,
@@ -115,7 +115,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             siis = { operand1Slot, operand2, operand3, operand4Slot ->
-                NumericSuperInstruction.I64Add128Siis(
+                NumericInstruction.I64Add128Siis(
                     operand1Slot,
                     operand2,
                     operand3,
@@ -125,7 +125,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             sisi = { operand1Slot, operand2, operand3Slot, operand4 ->
-                NumericSuperInstruction.I64Add128Sisi(
+                NumericInstruction.I64Add128Sisi(
                     operand1Slot,
                     operand2,
                     operand3Slot,
@@ -135,7 +135,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             siss = { operand1Slot, operand2, operand3Slot, operand4Slot ->
-                NumericSuperInstruction.I64Add128Siss(
+                NumericInstruction.I64Add128Siss(
                     operand1Slot,
                     operand2,
                     operand3Slot,
@@ -145,7 +145,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             ssii = { operand1Slot, operand2Slot, operand3, operand4 ->
-                NumericSuperInstruction.I64Add128Ssii(
+                NumericInstruction.I64Add128Ssii(
                     operand1Slot,
                     operand2Slot,
                     operand3,
@@ -155,7 +155,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             ssis = { operand1Slot, operand2Slot, operand3, operand4Slot ->
-                NumericSuperInstruction.I64Add128Ssis(
+                NumericInstruction.I64Add128Ssis(
                     operand1Slot,
                     operand2Slot,
                     operand3,
@@ -165,7 +165,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             sssi = { operand1Slot, operand2Slot, operand3Slot, operand4 ->
-                NumericSuperInstruction.I64Add128Sssi(
+                NumericInstruction.I64Add128Sssi(
                     operand1Slot,
                     operand2Slot,
                     operand3Slot,
@@ -175,7 +175,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             ssss = { operand1Slot, operand2Slot, operand3Slot, operand4Slot ->
-                NumericSuperInstruction.I64Add128Ssss(
+                NumericInstruction.I64Add128Ssss(
                     operand1Slot,
                     operand2Slot,
                     operand3Slot,
@@ -191,7 +191,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
             third = checkNotNull(third),
             fourth = checkNotNull(fourth),
             iiii = { operand1, operand2, operand3, operand4 ->
-                NumericSuperInstruction.I64Sub128Iiii(
+                NumericInstruction.I64Sub128Iiii(
                     operand1,
                     operand2,
                     operand3,
@@ -201,7 +201,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             iiis = { operand1, operand2, operand3, operand4Slot ->
-                NumericSuperInstruction.I64Sub128Iiis(
+                NumericInstruction.I64Sub128Iiis(
                     operand1,
                     operand2,
                     operand3,
@@ -211,7 +211,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             iisi = { operand1, operand2, operand3Slot, operand4 ->
-                NumericSuperInstruction.I64Sub128Iisi(
+                NumericInstruction.I64Sub128Iisi(
                     operand1,
                     operand2,
                     operand3Slot,
@@ -221,7 +221,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             iiss = { operand1, operand2, operand3Slot, operand4Slot ->
-                NumericSuperInstruction.I64Sub128Iiss(
+                NumericInstruction.I64Sub128Iiss(
                     operand1,
                     operand2,
                     operand3Slot,
@@ -231,7 +231,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             isii = { operand1, operand2Slot, operand3, operand4 ->
-                NumericSuperInstruction.I64Sub128Isii(
+                NumericInstruction.I64Sub128Isii(
                     operand1,
                     operand2Slot,
                     operand3,
@@ -241,7 +241,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             isis = { operand1, operand2Slot, operand3, operand4Slot ->
-                NumericSuperInstruction.I64Sub128Isis(
+                NumericInstruction.I64Sub128Isis(
                     operand1,
                     operand2Slot,
                     operand3,
@@ -251,7 +251,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             issi = { operand1, operand2Slot, operand3Slot, operand4 ->
-                NumericSuperInstruction.I64Sub128Issi(
+                NumericInstruction.I64Sub128Issi(
                     operand1,
                     operand2Slot,
                     operand3Slot,
@@ -261,7 +261,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             isss = { operand1, operand2Slot, operand3Slot, operand4Slot ->
-                NumericSuperInstruction.I64Sub128Isss(
+                NumericInstruction.I64Sub128Isss(
                     operand1,
                     operand2Slot,
                     operand3Slot,
@@ -271,7 +271,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             siii = { operand1Slot, operand2, operand3, operand4 ->
-                NumericSuperInstruction.I64Sub128Siii(
+                NumericInstruction.I64Sub128Siii(
                     operand1Slot,
                     operand2,
                     operand3,
@@ -281,7 +281,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             siis = { operand1Slot, operand2, operand3, operand4Slot ->
-                NumericSuperInstruction.I64Sub128Siis(
+                NumericInstruction.I64Sub128Siis(
                     operand1Slot,
                     operand2,
                     operand3,
@@ -291,7 +291,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             sisi = { operand1Slot, operand2, operand3Slot, operand4 ->
-                NumericSuperInstruction.I64Sub128Sisi(
+                NumericInstruction.I64Sub128Sisi(
                     operand1Slot,
                     operand2,
                     operand3Slot,
@@ -301,7 +301,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             siss = { operand1Slot, operand2, operand3Slot, operand4Slot ->
-                NumericSuperInstruction.I64Sub128Siss(
+                NumericInstruction.I64Sub128Siss(
                     operand1Slot,
                     operand2,
                     operand3Slot,
@@ -311,7 +311,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             ssii = { operand1Slot, operand2Slot, operand3, operand4 ->
-                NumericSuperInstruction.I64Sub128Ssii(
+                NumericInstruction.I64Sub128Ssii(
                     operand1Slot,
                     operand2Slot,
                     operand3,
@@ -321,7 +321,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             ssis = { operand1Slot, operand2Slot, operand3, operand4Slot ->
-                NumericSuperInstruction.I64Sub128Ssis(
+                NumericInstruction.I64Sub128Ssis(
                     operand1Slot,
                     operand2Slot,
                     operand3,
@@ -331,7 +331,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             sssi = { operand1Slot, operand2Slot, operand3Slot, operand4 ->
-                NumericSuperInstruction.I64Sub128Sssi(
+                NumericInstruction.I64Sub128Sssi(
                     operand1Slot,
                     operand2Slot,
                     operand3Slot,
@@ -341,7 +341,7 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
                 )
             },
             ssss = { operand1Slot, operand2Slot, operand3Slot, operand4Slot ->
-                NumericSuperInstruction.I64Sub128Ssss(
+                NumericInstruction.I64Sub128Ssss(
                     operand1Slot,
                     operand2Slot,
                     operand3Slot,
@@ -354,22 +354,22 @@ internal fun FunctionCompilationContext.emitI64WideInstruction(
         NumericOpcode.I64MulWideS -> strictI64BinaryDualDestination(
             left = first,
             right = second,
-            ii = { left, right -> NumericSuperInstruction.I64MulWideSIi(left, right, destinationLowSlot, destinationHighSlot) },
-            `is` = { left, rightSlot -> NumericSuperInstruction.I64MulWideSIs(left, rightSlot, destinationLowSlot, destinationHighSlot) },
-            si = { leftSlot, right -> NumericSuperInstruction.I64MulWideSSi(leftSlot, right, destinationLowSlot, destinationHighSlot) },
-            ss = { leftSlot, rightSlot -> NumericSuperInstruction.I64MulWideSSs(leftSlot, rightSlot, destinationLowSlot, destinationHighSlot) },
+            ii = { left, right -> NumericInstruction.I64MulWideSIi(left, right, destinationLowSlot, destinationHighSlot) },
+            `is` = { left, rightSlot -> NumericInstruction.I64MulWideSIs(left, rightSlot, destinationLowSlot, destinationHighSlot) },
+            si = { leftSlot, right -> NumericInstruction.I64MulWideSSi(leftSlot, right, destinationLowSlot, destinationHighSlot) },
+            ss = { leftSlot, rightSlot -> NumericInstruction.I64MulWideSSs(leftSlot, rightSlot, destinationLowSlot, destinationHighSlot) },
         )
         NumericOpcode.I64MulWideU -> strictI64BinaryDualDestination(
             left = first,
             right = second,
-            ii = { left, right -> NumericSuperInstruction.I64MulWideUIi(left, right, destinationLowSlot, destinationHighSlot) },
-            `is` = { left, rightSlot -> NumericSuperInstruction.I64MulWideUIs(left, rightSlot, destinationLowSlot, destinationHighSlot) },
-            si = { leftSlot, right -> NumericSuperInstruction.I64MulWideUSi(leftSlot, right, destinationLowSlot, destinationHighSlot) },
-            ss = { leftSlot, rightSlot -> NumericSuperInstruction.I64MulWideUSs(leftSlot, rightSlot, destinationLowSlot, destinationHighSlot) },
+            ii = { left, right -> NumericInstruction.I64MulWideUIi(left, right, destinationLowSlot, destinationHighSlot) },
+            `is` = { left, rightSlot -> NumericInstruction.I64MulWideUIs(left, rightSlot, destinationLowSlot, destinationHighSlot) },
+            si = { leftSlot, right -> NumericInstruction.I64MulWideUSi(leftSlot, right, destinationLowSlot, destinationHighSlot) },
+            ss = { leftSlot, rightSlot -> NumericInstruction.I64MulWideUSs(leftSlot, rightSlot, destinationLowSlot, destinationHighSlot) },
         )
         else -> error("numeric opcode does not have two results: $opcode")
     }
-    emit(linkedInstruction, ::NumericSuperInstructionDispatcher)
+    emit(linkedInstruction, ::NumericInstructionDispatcher)
 }
 
 private inline fun strictI64Quad(
@@ -377,23 +377,23 @@ private inline fun strictI64Quad(
     second: OperandSource,
     third: OperandSource,
     fourth: OperandSource,
-    iiii: (Long, Long, Long, Long) -> NumericSuperInstruction,
-    iiis: (Long, Long, Long, Int) -> NumericSuperInstruction,
-    iisi: (Long, Long, Int, Long) -> NumericSuperInstruction,
-    iiss: (Long, Long, Int, Int) -> NumericSuperInstruction,
-    isii: (Long, Int, Long, Long) -> NumericSuperInstruction,
-    isis: (Long, Int, Long, Int) -> NumericSuperInstruction,
-    issi: (Long, Int, Int, Long) -> NumericSuperInstruction,
-    isss: (Long, Int, Int, Int) -> NumericSuperInstruction,
-    siii: (Int, Long, Long, Long) -> NumericSuperInstruction,
-    siis: (Int, Long, Long, Int) -> NumericSuperInstruction,
-    sisi: (Int, Long, Int, Long) -> NumericSuperInstruction,
-    siss: (Int, Long, Int, Int) -> NumericSuperInstruction,
-    ssii: (Int, Int, Long, Long) -> NumericSuperInstruction,
-    ssis: (Int, Int, Long, Int) -> NumericSuperInstruction,
-    sssi: (Int, Int, Int, Long) -> NumericSuperInstruction,
-    ssss: (Int, Int, Int, Int) -> NumericSuperInstruction,
-): NumericSuperInstruction {
+    iiii: (Long, Long, Long, Long) -> NumericInstruction,
+    iiis: (Long, Long, Long, Int) -> NumericInstruction,
+    iisi: (Long, Long, Int, Long) -> NumericInstruction,
+    iiss: (Long, Long, Int, Int) -> NumericInstruction,
+    isii: (Long, Int, Long, Long) -> NumericInstruction,
+    isis: (Long, Int, Long, Int) -> NumericInstruction,
+    issi: (Long, Int, Int, Long) -> NumericInstruction,
+    isss: (Long, Int, Int, Int) -> NumericInstruction,
+    siii: (Int, Long, Long, Long) -> NumericInstruction,
+    siis: (Int, Long, Long, Int) -> NumericInstruction,
+    sisi: (Int, Long, Int, Long) -> NumericInstruction,
+    siss: (Int, Long, Int, Int) -> NumericInstruction,
+    ssii: (Int, Int, Long, Long) -> NumericInstruction,
+    ssis: (Int, Int, Long, Int) -> NumericInstruction,
+    sssi: (Int, Int, Int, Long) -> NumericInstruction,
+    ssss: (Int, Int, Int, Int) -> NumericInstruction,
+): NumericInstruction {
     val shape =
         (if (first.sourceKind == OperandSourceKind.I64Immediate) 0 else 8) or
             (if (second.sourceKind == OperandSourceKind.I64Immediate) 0 else 4) or
@@ -423,11 +423,11 @@ private inline fun strictI64Quad(
 private inline fun strictI64BinaryDualDestination(
     left: OperandSource,
     right: OperandSource,
-    ii: (Long, Long) -> NumericSuperInstruction,
-    `is`: (Long, Int) -> NumericSuperInstruction,
-    si: (Int, Long) -> NumericSuperInstruction,
-    ss: (Int, Int) -> NumericSuperInstruction,
-): NumericSuperInstruction {
+    ii: (Long, Long) -> NumericInstruction,
+    `is`: (Long, Int) -> NumericInstruction,
+    si: (Int, Long) -> NumericInstruction,
+    ss: (Int, Int) -> NumericInstruction,
+): NumericInstruction {
     return if (left.sourceKind == OperandSourceKind.I64Immediate) {
         if (right.sourceKind == OperandSourceKind.I64Immediate) {
             ii(left.i64Immediate, right.i64Immediate)

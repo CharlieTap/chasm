@@ -5,7 +5,7 @@ import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
-import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
@@ -21,11 +21,11 @@ class CompilerInstructionTagTranslatorTest {
     fun `translates instruction variants without recording operands`() {
         assertEquals(
             "numeric.i32.add.si",
-            translator.translate(NumericSuperInstruction.I32AddSi(1, 2, 3)),
+            translator.translate(NumericInstruction.I32AddSi(1, 2, 3)),
         )
         assertEquals(
             "numeric.i32.const",
-            translator.translate(NumericSuperInstruction.I32ConstS(1, 2)),
+            translator.translate(NumericInstruction.I32ConstS(1, 2)),
         )
         assertEquals(
             "parametric.select.sis",
@@ -71,7 +71,7 @@ class CompilerInstructionTagTranslatorTest {
 
 private val variantFamilies = listOf(
     ParametricSuperInstruction::class.java,
-    NumericSuperInstruction::class.java,
+    NumericInstruction::class.java,
     MemoryInstruction::class.java,
     TableInstruction::class.java,
     AggregateSuperInstruction::class.java,
