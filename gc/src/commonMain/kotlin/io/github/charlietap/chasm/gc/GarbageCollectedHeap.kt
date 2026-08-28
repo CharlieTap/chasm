@@ -3,6 +3,8 @@ package io.github.charlietap.chasm.gc
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXCEPTION
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXTERN
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_HOST
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_MASK
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 
@@ -76,6 +78,11 @@ class GuestHeapOutOfMemoryException(
 
 interface GcRootSink {
     fun markRoot(rawValue: Long)
+}
+
+/** Marks live host references found while tracing guest references. */
+interface GcHostReferenceMarker {
+    fun markHostReference(rawReference: Long)
 }
 
 /**
@@ -178,6 +185,7 @@ class GarbageCollectedHeap(
     private var markWorklist = EMPTY_MARK_WORKLIST
     private var markWorklistSize = 0
     private var markWorklistPeakSize = 0
+    private var hostReferenceMarker: GcHostReferenceMarker? = null
 
     fun registerStruct(
         semanticId: Int,
@@ -413,6 +421,7 @@ class GarbageCollectedHeap(
         markWorklist = EMPTY_MARK_WORKLIST
         markWorklistSize = 0
         markWorklistPeakSize = 0
+        hostReferenceMarker = null
     }
 
     fun allocateArrayFilled(
@@ -802,7 +811,8 @@ class GarbageCollectedHeap(
     }
 
     /** Starts a collection. Add roots with [markRoot], then finish or abort it. */
-    fun beginCollection() {
+    fun beginCollection(hostReferenceMarker: GcHostReferenceMarker? = null) {
+        this.hostReferenceMarker = hostReferenceMarker
         beginCollectionCycle()
     }
 
@@ -814,11 +824,13 @@ class GarbageCollectedHeap(
     /** Traces the submitted roots and reclaims unreachable objects. */
     fun finishCollection() {
         finishCollectionCycle(maximumRecycledPageCapacity = maximumPageCount)
+        hostReferenceMarker = null
     }
 
     /** Clears partial marks. This is safe to call after [finishCollection]. */
     fun abortCollection() {
         abortMarking()
+        hostReferenceMarker = null
     }
 
     fun snapshotStatistics(): Statistics {
@@ -982,6 +994,8 @@ class GarbageCollectedHeap(
         maximumWorklistCapacity: Int,
     ) {
         when (rawValue and RV_TYPE_MASK) {
+            RV_TYPE_EXTERN -> markCandidate(rawValue shr RV_SHIFT_BITS, maximumWorklistCapacity)
+            RV_TYPE_HOST -> hostReferenceMarker?.markHostReference(rawValue)
             RV_TYPE_STRUCT -> markAggregateCandidate(
                 rawValue,
                 STRUCT_DESCRIPTOR_KIND,
