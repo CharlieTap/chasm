@@ -47,6 +47,26 @@ value class HostGcType(val id: Int)
 value class HostReferenceRoot(val slot: Int)
 
 /**
+ * An `externref` encoded as a raw Chasm reference.
+ *
+ * Use [raw] when passing it through a host stack, global, or table. The value
+ * belongs to the store which created it.
+ */
+@JvmInline
+value class HostExternReference(val raw: HostReference)
+
+/** Describes what a [HostExternReference] contains. */
+@JvmInline
+value class HostExternKind(val id: Int) {
+
+    companion object {
+        val NULL = HostExternKind(0)
+        val HOST_VALUE = HostExternKind(1)
+        val EXTERNALIZED_REFERENCE = HostExternKind(2)
+    }
+}
+
+/**
  * Describes the storage type and mutability of a struct field or array
  * element. Use the type properties to interpret its raw value.
  */

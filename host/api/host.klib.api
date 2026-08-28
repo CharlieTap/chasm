@@ -14,6 +14,15 @@ abstract fun interface io.github.charlietap.chasm.host/HostFunction { // io.gith
     abstract fun (context(kotlin/LongArray, io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).invoke(kotlin/Int, kotlin/Int) // io.github.charlietap.chasm.host/HostFunction.invoke|invoke(kotlin.LongArray;io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Int){}[0]
 }
 
+abstract interface io.github.charlietap.chasm.host/HostExterns { // io.github.charlietap.chasm.host/HostExterns|null[0]
+    abstract fun (context(io.github.charlietap.chasm.host/HostResources)).create(kotlin/Any): io.github.charlietap.chasm.host/HostExternReference // io.github.charlietap.chasm.host/HostExterns.create|create(io.github.charlietap.chasm.host.HostResources)(kotlin.Any){}[0]
+    abstract fun externalize(kotlin/Long): io.github.charlietap.chasm.host/HostExternReference // io.github.charlietap.chasm.host/HostExterns.externalize|externalize(kotlin.Long){}[0]
+    abstract fun externalizedReference(io.github.charlietap.chasm.host/HostExternReference): kotlin/Long // io.github.charlietap.chasm.host/HostExterns.externalizedReference|externalizedReference(io.github.charlietap.chasm.host.HostExternReference){}[0]
+    abstract fun kind(io.github.charlietap.chasm.host/HostExternReference): io.github.charlietap.chasm.host/HostExternKind // io.github.charlietap.chasm.host/HostExterns.kind|kind(io.github.charlietap.chasm.host.HostExternReference){}[0]
+    abstract fun nullReference(): io.github.charlietap.chasm.host/HostExternReference // io.github.charlietap.chasm.host/HostExterns.nullReference|nullReference(){}[0]
+    abstract fun value(io.github.charlietap.chasm.host/HostExternReference): kotlin/Any // io.github.charlietap.chasm.host/HostExterns.value|value(io.github.charlietap.chasm.host.HostExternReference){}[0]
+}
+
 abstract interface io.github.charlietap.chasm.host/HostGc { // io.github.charlietap.chasm.host/HostGc|null[0]
     abstract val allocatedBytes // io.github.charlietap.chasm.host/HostGc.allocatedBytes|{}allocatedBytes[0]
         abstract fun <get-allocatedBytes>(): kotlin/Long // io.github.charlietap.chasm.host/HostGc.allocatedBytes.<get-allocatedBytes>|<get-allocatedBytes>(){}[0]
@@ -113,6 +122,37 @@ final class io.github.charlietap.chasm.host/HostFunctionException : kotlin/Excep
         final fun <get-reason>(): kotlin/String // io.github.charlietap.chasm.host/HostFunctionException.reason.<get-reason>|<get-reason>(){}[0]
 }
 
+final value class io.github.charlietap.chasm.host/HostExternKind { // io.github.charlietap.chasm.host/HostExternKind|null[0]
+    constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/HostExternKind.<init>|<init>(kotlin.Int){}[0]
+
+    final val id // io.github.charlietap.chasm.host/HostExternKind.id|{}id[0]
+        final fun <get-id>(): kotlin/Int // io.github.charlietap.chasm.host/HostExternKind.id.<get-id>|<get-id>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/HostExternKind.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/HostExternKind.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.host/HostExternKind.toString|toString(){}[0]
+
+    final object Companion { // io.github.charlietap.chasm.host/HostExternKind.Companion|null[0]
+        final val EXTERNALIZED_REFERENCE // io.github.charlietap.chasm.host/HostExternKind.Companion.EXTERNALIZED_REFERENCE|{}EXTERNALIZED_REFERENCE[0]
+            final fun <get-EXTERNALIZED_REFERENCE>(): io.github.charlietap.chasm.host/HostExternKind // io.github.charlietap.chasm.host/HostExternKind.Companion.EXTERNALIZED_REFERENCE.<get-EXTERNALIZED_REFERENCE>|<get-EXTERNALIZED_REFERENCE>(){}[0]
+        final val HOST_VALUE // io.github.charlietap.chasm.host/HostExternKind.Companion.HOST_VALUE|{}HOST_VALUE[0]
+            final fun <get-HOST_VALUE>(): io.github.charlietap.chasm.host/HostExternKind // io.github.charlietap.chasm.host/HostExternKind.Companion.HOST_VALUE.<get-HOST_VALUE>|<get-HOST_VALUE>(){}[0]
+        final val NULL // io.github.charlietap.chasm.host/HostExternKind.Companion.NULL|{}NULL[0]
+            final fun <get-NULL>(): io.github.charlietap.chasm.host/HostExternKind // io.github.charlietap.chasm.host/HostExternKind.Companion.NULL.<get-NULL>|<get-NULL>(){}[0]
+    }
+}
+
+final value class io.github.charlietap.chasm.host/HostExternReference { // io.github.charlietap.chasm.host/HostExternReference|null[0]
+    constructor <init>(kotlin/Long) // io.github.charlietap.chasm.host/HostExternReference.<init>|<init>(kotlin.Long){}[0]
+
+    final val raw // io.github.charlietap.chasm.host/HostExternReference.raw|{}raw[0]
+        final fun <get-raw>(): kotlin/Long // io.github.charlietap.chasm.host/HostExternReference.raw.<get-raw>|<get-raw>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/HostExternReference.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/HostExternReference.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.host/HostExternReference.toString|toString(){}[0]
+}
+
 final value class io.github.charlietap.chasm.host/HostGcFieldInfo { // io.github.charlietap.chasm.host/HostGcFieldInfo|null[0]
     constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/HostGcFieldInfo.<init>|<init>(kotlin.Int){}[0]
 
@@ -201,6 +241,8 @@ final value class io.github.charlietap.chasm.host/HostTag { // io.github.charlie
 }
 
 final fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readNullTerminatedUtf8String(kotlin/Int): kotlin/String // io.github.charlietap.chasm.host/readNullTerminatedUtf8String|readNullTerminatedUtf8String@io.github.charlietap.chasm.host.HostMemory(kotlin.Int){}[0]
+final inline fun (context(io.github.charlietap.chasm.host/HostResources), io.github.charlietap.chasm.host/HostExterns).io.github.charlietap.chasm.host/createNullable(kotlin/Any?): io.github.charlietap.chasm.host/HostExternReference // io.github.charlietap.chasm.host/createNullable|createNullable(io.github.charlietap.chasm.host.HostResources)@io.github.charlietap.chasm.host.HostExterns(kotlin.Any?){}[0]
+final inline fun (context(io.github.charlietap.chasm.host/HostResources), io.github.charlietap.chasm.host/HostExterns).io.github.charlietap.chasm.host/createRetained(kotlin/Any): io.github.charlietap.chasm.host/HostReferenceRoot // io.github.charlietap.chasm.host/createRetained|createRetained(io.github.charlietap.chasm.host.HostResources)@io.github.charlietap.chasm.host.HostExterns(kotlin.Any){}[0]
 final inline fun (context(kotlin/LongArray), kotlin/Int).io.github.charlietap.chasm.host/readF32(kotlin/Int): kotlin/Float // io.github.charlietap.chasm.host/readF32|readF32(kotlin.LongArray)@kotlin.Int(kotlin.Int){}[0]
 final inline fun (context(kotlin/LongArray), kotlin/Int).io.github.charlietap.chasm.host/readF64(kotlin/Int): kotlin/Double // io.github.charlietap.chasm.host/readF64|readF64(kotlin.LongArray)@kotlin.Int(kotlin.Int){}[0]
 final inline fun (context(kotlin/LongArray), kotlin/Int).io.github.charlietap.chasm.host/readI32(kotlin/Int): kotlin/Int // io.github.charlietap.chasm.host/readI32|readI32(kotlin.LongArray)@kotlin.Int(kotlin.Int){}[0]

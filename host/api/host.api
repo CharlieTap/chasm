@@ -8,6 +8,55 @@ public final class io/github/charlietap/chasm/host/HostContextExtensionsKt {
 	public static final fun withTag (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
+public final class io/github/charlietap/chasm/host/HostExternKind {
+	public static final field Companion Lio/github/charlietap/chasm/host/HostExternKind$Companion;
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostExternKind;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getId ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/host/HostExternKind$Companion {
+	public final fun getEXTERNALIZED_REFERENCE-loPX09w ()I
+	public final fun getHOST_VALUE-loPX09w ()I
+	public final fun getNULL-loPX09w ()I
+}
+
+public final class io/github/charlietap/chasm/host/HostExternReference {
+	public static final synthetic fun box-impl (J)Lio/github/charlietap/chasm/host/HostExternReference;
+	public static fun constructor-impl (J)J
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (JLjava/lang/Object;)Z
+	public static final fun equals-impl0 (JJ)Z
+	public final fun getRaw ()J
+	public fun hashCode ()I
+	public static fun hashCode-impl (J)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (J)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()J
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostExterns {
+	public abstract fun create-B_G5d2c (Lio/github/charlietap/chasm/host/HostResources;Ljava/lang/Object;)J
+	public abstract fun externalize-HlTrvjQ (J)J
+	public abstract fun externalizedReference-vIBlfvE (J)J
+	public abstract fun kind-YKMCaqk (J)I
+	public abstract fun nullReference-WvoliTw ()J
+	public abstract fun value-vIBlfvE (J)Ljava/lang/Object;
+}
+
+public final class io/github/charlietap/chasm/host/HostExternsKt {
+	public static final fun createNullable (Lio/github/charlietap/chasm/host/HostResources;Lio/github/charlietap/chasm/host/HostExterns;Ljava/lang/Object;)J
+	public static final fun createRetained (Lio/github/charlietap/chasm/host/HostResources;Lio/github/charlietap/chasm/host/HostExterns;Ljava/lang/Object;)I
+}
+
 public abstract interface class io/github/charlietap/chasm/host/HostFunction {
 	public abstract fun invoke ([JLio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;II)V
 }
