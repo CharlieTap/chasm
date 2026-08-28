@@ -50,8 +50,6 @@ sealed interface AdminInstruction : LinkedInstruction {
         val targetIp: Int,
     ) : AdminInstruction
 
-    data class JumpIfV(val targetIp: Int) : AdminInstruction
-
     data class JumpIfCopyI(
         val operand: Long,
         val sourceSlot: Int,
@@ -61,12 +59,6 @@ sealed interface AdminInstruction : LinkedInstruction {
 
     data class JumpIfCopyS(
         val operandSlot: Int,
-        val sourceSlot: Int,
-        val destinationSlot: Int,
-        val targetIp: Int,
-    ) : AdminInstruction
-
-    data class JumpIfCopyV(
         val sourceSlot: Int,
         val destinationSlot: Int,
         val targetIp: Int,
@@ -82,17 +74,8 @@ sealed interface AdminInstruction : LinkedInstruction {
         val targetIp: Int,
     ) : AdminInstruction
 
-    data class JumpTableI(
-        val operand: Int,
-        val targetIps: IntArray,
-    ) : AdminInstruction
-
     data class JumpTableS(
         val operandSlot: Int,
-        val targetIps: IntArray,
-    ) : AdminInstruction
-
-    data class JumpTableV(
         val targetIps: IntArray,
     ) : AdminInstruction
 
@@ -106,8 +89,6 @@ sealed interface AdminInstruction : LinkedInstruction {
         val targetIp: Int,
     ) : AdminInstruction
 
-    data class JumpOnNullV(val targetIp: Int) : AdminInstruction
-
     data class JumpOnNonNullI(
         val operand: Long,
         val targetIp: Int,
@@ -117,8 +98,6 @@ sealed interface AdminInstruction : LinkedInstruction {
         val operandSlot: Int,
         val targetIp: Int,
     ) : AdminInstruction
-
-    data class JumpOnNonNullV(val targetIp: Int) : AdminInstruction
 
     data class JumpOnCastI(
         val operand: Long,
@@ -132,11 +111,6 @@ sealed interface AdminInstruction : LinkedInstruction {
         val typeTest: ReferenceTypeTest,
     ) : AdminInstruction
 
-    data class JumpOnCastV(
-        val targetIp: Int,
-        val typeTest: ReferenceTypeTest,
-    ) : AdminInstruction
-
     data class JumpOnCastFailI(
         val operand: Long,
         val targetIp: Int,
@@ -145,11 +119,6 @@ sealed interface AdminInstruction : LinkedInstruction {
 
     data class JumpOnCastFailS(
         val operandSlot: Int,
-        val targetIp: Int,
-        val typeTest: ReferenceTypeTest,
-    ) : AdminInstruction
-
-    data class JumpOnCastFailV(
         val targetIp: Int,
         val typeTest: ReferenceTypeTest,
     ) : AdminInstruction

@@ -92,15 +92,6 @@ fun JumpDispatcher(
 }
 
 fun JumpDispatcher(
-    instruction: AdminInstruction.JumpIfV,
-): DispatchableInstruction {
-    val targetIp = instruction.targetIp
-    return DispatchableInstruction { vstack, _, nextIp ->
-        if (vstack.pop() != 0L) targetIp else nextIp
-    }
-}
-
-fun JumpDispatcher(
     instruction: AdminInstruction.JumpIfCopyI,
 ): DispatchableInstruction = if (instruction.operand != 0L) {
     val sourceSlot = instruction.sourceSlot
@@ -123,22 +114,6 @@ fun JumpDispatcher(
     val targetIp = instruction.targetIp
     return DispatchableInstruction { vstack, _, nextIp ->
         if (vstack.getFrameSlot(operandSlot) != 0L) {
-            vstack.setFrameSlot(destinationSlot, vstack.getFrameSlot(sourceSlot))
-            targetIp
-        } else {
-            nextIp
-        }
-    }
-}
-
-fun JumpDispatcher(
-    instruction: AdminInstruction.JumpIfCopyV,
-): DispatchableInstruction {
-    val sourceSlot = instruction.sourceSlot
-    val destinationSlot = instruction.destinationSlot
-    val targetIp = instruction.targetIp
-    return DispatchableInstruction { vstack, _, nextIp ->
-        if (vstack.pop() != 0L) {
             vstack.setFrameSlot(destinationSlot, vstack.getFrameSlot(sourceSlot))
             targetIp
         } else {
@@ -398,31 +373,12 @@ private fun FusedOperand.f64BitsOperand(): FusedOperand = when (this) {
 }
 
 fun JumpDispatcher(
-    instruction: AdminInstruction.JumpTableI,
-): DispatchableInstruction {
-    val operand = instruction.operand
-    val targetIps = instruction.targetIps
-    return DispatchableInstruction { _, _, _ ->
-        targetIps.branchTarget(operand)
-    }
-}
-
-fun JumpDispatcher(
     instruction: AdminInstruction.JumpTableS,
 ): DispatchableInstruction {
     val operandSlot = instruction.operandSlot
     val targetIps = instruction.targetIps
     return DispatchableInstruction { vstack, _, _ ->
         targetIps.branchTarget(vstack.getFrameSlot(operandSlot).toInt())
-    }
-}
-
-fun JumpDispatcher(
-    instruction: AdminInstruction.JumpTableV,
-): DispatchableInstruction {
-    val targetIps = instruction.targetIps
-    return DispatchableInstruction { vstack, _, _ ->
-        targetIps.branchTarget(vstack.popI32())
     }
 }
 
@@ -444,17 +400,6 @@ fun JumpDispatcher(
 }
 
 fun JumpDispatcher(
-    instruction: AdminInstruction.JumpOnNullV,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, nextIp ->
-    if (vstack.peek().isNullableReference()) {
-        vstack.pop()
-        instruction.targetIp
-    } else {
-        nextIp
-    }
-}
-
-fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnNonNullI,
 ): DispatchableInstruction = DispatchableInstruction { _, _, nextIp ->
     if (!instruction.operand.isNullableReference()) instruction.targetIp else nextIp
@@ -464,18 +409,6 @@ fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnNonNullS,
 ): DispatchableInstruction = DispatchableInstruction { vstack, _, nextIp ->
     if (!vstack.getFrameSlot(instruction.operandSlot).isNullableReference()) instruction.targetIp else nextIp
-}
-
-fun JumpDispatcher(
-    instruction: AdminInstruction.JumpOnNonNullV,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, nextIp ->
-    val operand = vstack.pop()
-    if (!operand.isNullableReference()) {
-        vstack.push(operand)
-        instruction.targetIp
-    } else {
-        nextIp
-    }
 }
 
 fun JumpDispatcher(
@@ -494,13 +427,6 @@ fun JumpDispatcher(
 }
 
 fun JumpDispatcher(
-    instruction: AdminInstruction.JumpOnCastV,
-): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
-    val matches = Caster(vstack.peek(), instruction.typeTest, context)
-    if (matches) instruction.targetIp else nextIp
-}
-
-fun JumpDispatcher(
     instruction: AdminInstruction.JumpOnCastFailI,
 ): DispatchableInstruction = DispatchableInstruction { _, context, nextIp ->
     val matches = Caster(instruction.operand, instruction.typeTest, context)
@@ -512,12 +438,5 @@ fun JumpDispatcher(
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
     val operand = vstack.getFrameSlot(instruction.operandSlot)
     val matches = Caster(operand, instruction.typeTest, context)
-    if (!matches) instruction.targetIp else nextIp
-}
-
-fun JumpDispatcher(
-    instruction: AdminInstruction.JumpOnCastFailV,
-): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
-    val matches = Caster(vstack.peek(), instruction.typeTest, context)
     if (!matches) instruction.targetIp else nextIp
 }
