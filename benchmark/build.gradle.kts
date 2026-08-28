@@ -31,6 +31,9 @@ benchmark {
         register("hostFunction") {
             include(".*HostFunctionBenchmark.*")
         }
+        register("hostException") {
+            include(".*HostExceptionBenchmark.*")
+        }
         register("gcComparison") {
             include(".*NewGcComparisonBenchmark.*")
         }
