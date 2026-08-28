@@ -1,3 +1,7 @@
+public abstract interface class io/github/charlietap/chasm/host/HostFunction {
+	public abstract fun invoke ([JLio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;II)V
+}
+
 public final class io/github/charlietap/chasm/host/HostFunctionException : java/lang/Exception {
 	public fun <init> (Ljava/lang/String;)V
 	public final fun getReason ()Ljava/lang/String;
@@ -43,6 +47,25 @@ public final class io/github/charlietap/chasm/host/HostMemoryExtensionsKt {
 	public static final fun readU8 (Lio/github/charlietap/chasm/host/HostMemory;I)B
 	public static final fun readUtf8String (Lio/github/charlietap/chasm/host/HostMemory;II)Ljava/lang/String;
 	public static final fun writeUtf8String (Lio/github/charlietap/chasm/host/HostMemory;ILjava/lang/String;)V
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostModuleInstance {
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostResources {
+}
+
+public final class io/github/charlietap/chasm/host/HostStackExtensionsKt {
+	public static final fun readF32 ([JII)F
+	public static final fun readF64 ([JII)D
+	public static final fun readI32 ([JII)I
+	public static final fun readI64 ([JII)J
+	public static final fun readRawReference ([JII)J
+	public static final fun writeF32 ([JIIF)V
+	public static final fun writeF64 ([JIID)V
+	public static final fun writeI32 ([JIII)V
+	public static final fun writeI64 ([JIIJ)V
+	public static final fun writeRawReference ([JIIJ)V
 }
 
 public abstract interface class io/github/charlietap/chasm/host/JvmHostMemory : io/github/charlietap/chasm/host/HostMemory {
