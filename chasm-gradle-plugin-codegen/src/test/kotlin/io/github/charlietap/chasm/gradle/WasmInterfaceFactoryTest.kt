@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.gradle
 
 import io.github.charlietap.chasm.fixture.chasm.embedding.exportDefinition
 import io.github.charlietap.chasm.fixture.chasm.embedding.moduleInfo
+import io.github.charlietap.chasm.fixture.host.memoryIndex
 import io.github.charlietap.chasm.fixture.runtime.type.functionExternalType
 import io.github.charlietap.chasm.fixture.runtime.type.memoryExternalType
 import io.github.charlietap.chasm.fixture.type.f32ValueType
@@ -45,6 +46,7 @@ class WasmInterfaceFactoryTest {
             exports = listOf(
                 exportDefinition(
                     name = "frame_buffer",
+                    index = memoryIndex(),
                     type = memoryExternalType(),
                 ),
             ),
@@ -81,9 +83,9 @@ class WasmInterfaceFactoryTest {
     fun `memory names do not collide with bindings or implementation properties`() {
         val info = moduleInfo(
             exports = listOf(
-                exportDefinition(name = "memory", type = memoryExternalType()),
-                exportDefinition(name = "_memory", type = memoryExternalType()),
-                exportDefinition(name = "store", type = memoryExternalType()),
+                exportDefinition(name = "memory", index = memoryIndex(), type = memoryExternalType()),
+                exportDefinition(name = "_memory", index = memoryIndex(), type = memoryExternalType()),
+                exportDefinition(name = "store", index = memoryIndex(), type = memoryExternalType()),
             ),
         )
 
@@ -138,6 +140,7 @@ class WasmInterfaceFactoryTest {
                 ),
                 exportDefinition(
                     name = "memory",
+                    index = memoryIndex(),
                     type = memoryExternalType(),
                 ),
             ),

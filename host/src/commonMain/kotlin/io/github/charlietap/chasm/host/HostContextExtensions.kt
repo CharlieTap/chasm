@@ -3,30 +3,58 @@ package io.github.charlietap.chasm.host
 /** Resolves [index] in the module instance and makes that memory the receiver. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun <T> withMemory(
-    index: Int,
+    index: ModuleIndex.MemoryIndex,
     block: HostMemory.() -> T,
 ): T = resources.memory(module, index).block()
+
+/** Resolves [index] in the module instance and makes that memory the receiver. */
+context(module: HostModuleInstance, resources: HostResources)
+inline fun <T> withMemory(
+    index: Int,
+    block: HostMemory.() -> T,
+): T = withMemory(ModuleIndex.MemoryIndex(index), block)
+
+/** Resolves [index] in the module instance and makes that table the receiver. */
+context(module: HostModuleInstance, resources: HostResources)
+inline fun <T> withTable(
+    index: ModuleIndex.TableIndex,
+    block: HostTable.() -> T,
+): T = resources.table(module, index).block()
 
 /** Resolves [index] in the module instance and makes that table the receiver. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun <T> withTable(
     index: Int,
     block: HostTable.() -> T,
-): T = resources.table(module, index).block()
+): T = withTable(ModuleIndex.TableIndex(index), block)
+
+/** Resolves [index] in the module instance and makes that global the receiver. */
+context(module: HostModuleInstance, resources: HostResources)
+inline fun <T> withGlobal(
+    index: ModuleIndex.GlobalIndex,
+    block: HostGlobal.() -> T,
+): T = resources.global(module, index).block()
 
 /** Resolves [index] in the module instance and makes that global the receiver. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun <T> withGlobal(
     index: Int,
     block: HostGlobal.() -> T,
-): T = resources.global(module, index).block()
+): T = withGlobal(ModuleIndex.GlobalIndex(index), block)
+
+/** Resolves [index] in the module instance and makes that tag the receiver. */
+context(module: HostModuleInstance, resources: HostResources)
+inline fun <T> withTag(
+    index: ModuleIndex.TagIndex,
+    block: HostTag.() -> T,
+): T = resources.tag(module, index).block()
 
 /** Resolves [index] in the module instance and makes that tag the receiver. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun <T> withTag(
     index: Int,
     block: HostTag.() -> T,
-): T = resources.tag(module, index).block()
+): T = withTag(ModuleIndex.TagIndex(index), block)
 
 /** Runs [block] in a nested reference scope owned by the calling store. */
 context(resources: HostResources)

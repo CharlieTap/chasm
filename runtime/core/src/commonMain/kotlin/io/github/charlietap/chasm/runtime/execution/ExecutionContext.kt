@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.host.HostReferences
 import io.github.charlietap.chasm.host.HostResources
 import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.host.HostTag
+import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.stack.ControlStack
@@ -38,23 +39,23 @@ data class ExecutionContext(
     override val exceptions: HostExceptions
         get() = heap
 
-    override fun memory(module: HostModuleInstance, index: Int): HostMemory {
-        val address = (module as ModuleInstance).memAddresses[index]
+    override fun memory(module: HostModuleInstance, index: ModuleIndex.MemoryIndex): HostMemory {
+        val address = (module as ModuleInstance).memAddresses[index.index]
         return store.memories[address.address].data
     }
 
-    override fun table(module: HostModuleInstance, index: Int): HostTable {
-        val address = (module as ModuleInstance).tableAddresses[index]
+    override fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable {
+        val address = (module as ModuleInstance).tableAddresses[index.index]
         return store.tables[address.address]
     }
 
-    override fun global(module: HostModuleInstance, index: Int): HostGlobal {
-        val address = (module as ModuleInstance).globalAddresses[index]
+    override fun global(module: HostModuleInstance, index: ModuleIndex.GlobalIndex): HostGlobal {
+        val address = (module as ModuleInstance).globalAddresses[index.index]
         return store.globals[address.address]
     }
 
-    override fun tag(module: HostModuleInstance, index: Int): HostTag {
-        val address = (module as ModuleInstance).tagAddresses[index]
+    override fun tag(module: HostModuleInstance, index: ModuleIndex.TagIndex): HostTag {
+        val address = (module as ModuleInstance).tagAddresses[index.index]
         return HostTag(address.address)
     }
 }

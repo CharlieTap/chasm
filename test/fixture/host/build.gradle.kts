@@ -5,11 +5,9 @@ plugins {
 
 kotlin {
     sourceSets {
-       commonMain {
+        commonMain {
             dependencies {
-                api(projects.chasm)
-                api(projects.test.fixture.host)
-                api(projects.test.fixture.runtime)
+                api(projects.host)
             }
         }
     }

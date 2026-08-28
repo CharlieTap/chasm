@@ -80,6 +80,7 @@ include(":test:fixture:ast")
 include(":test:fixture:chasm")
 include(":test:fixture:config")
 include(":test:fixture:executor:instantiator")
+include(":test:fixture:host")
 include(":test:fixture:runtime")
 include(":test:fixture:type-system")
 

@@ -264,8 +264,10 @@ final class io.github.charlietap.chasm.embedding.shapes/Export { // io.github.ch
 }
 
 final class io.github.charlietap.chasm.embedding.shapes/ExportDefinition { // io.github.charlietap.chasm.embedding.shapes/ExportDefinition|null[0]
-    constructor <init>(kotlin/String, io.github.charlietap.chasm.runtime.type/ExternalType, io.github.charlietap.chasm.embedding.shapes/NameData? = ...) // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.<init>|<init>(kotlin.String;io.github.charlietap.chasm.runtime.type.ExternalType;io.github.charlietap.chasm.embedding.shapes.NameData?){}[0]
+    constructor <init>(kotlin/String, io.github.charlietap.chasm.host/ModuleIndex, io.github.charlietap.chasm.runtime.type/ExternalType, io.github.charlietap.chasm.embedding.shapes/NameData? = ...) // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.<init>|<init>(kotlin.String;io.github.charlietap.chasm.host.ModuleIndex;io.github.charlietap.chasm.runtime.type.ExternalType;io.github.charlietap.chasm.embedding.shapes.NameData?){}[0]
 
+    final val index // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.index|{}index[0]
+        final fun <get-index>(): io.github.charlietap.chasm.host/ModuleIndex // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.index.<get-index>|<get-index>(){}[0]
     final val name // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.name|{}name[0]
         final fun <get-name>(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.name.<get-name>|<get-name>(){}[0]
     final val nameData // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.nameData|{}nameData[0]
@@ -274,9 +276,10 @@ final class io.github.charlietap.chasm.embedding.shapes/ExportDefinition { // io
         final fun <get-type>(): io.github.charlietap.chasm.runtime.type/ExternalType // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.type.<get-type>|<get-type>(){}[0]
 
     final fun component1(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.component1|component1(){}[0]
-    final fun component2(): io.github.charlietap.chasm.runtime.type/ExternalType // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.component2|component2(){}[0]
-    final fun component3(): io.github.charlietap.chasm.embedding.shapes/NameData? // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.component3|component3(){}[0]
-    final fun copy(kotlin/String = ..., io.github.charlietap.chasm.runtime.type/ExternalType = ..., io.github.charlietap.chasm.embedding.shapes/NameData? = ...): io.github.charlietap.chasm.embedding.shapes/ExportDefinition // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.copy|copy(kotlin.String;io.github.charlietap.chasm.runtime.type.ExternalType;io.github.charlietap.chasm.embedding.shapes.NameData?){}[0]
+    final fun component2(): io.github.charlietap.chasm.host/ModuleIndex // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.runtime.type/ExternalType // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.component3|component3(){}[0]
+    final fun component4(): io.github.charlietap.chasm.embedding.shapes/NameData? // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.component4|component4(){}[0]
+    final fun copy(kotlin/String = ..., io.github.charlietap.chasm.host/ModuleIndex = ..., io.github.charlietap.chasm.runtime.type/ExternalType = ..., io.github.charlietap.chasm.embedding.shapes/NameData? = ...): io.github.charlietap.chasm.embedding.shapes/ExportDefinition // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.copy|copy(kotlin.String;io.github.charlietap.chasm.host.ModuleIndex;io.github.charlietap.chasm.runtime.type.ExternalType;io.github.charlietap.chasm.embedding.shapes.NameData?){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/ExportDefinition.toString|toString(){}[0]
@@ -328,10 +331,12 @@ final class io.github.charlietap.chasm.embedding.shapes/Import { // io.github.ch
 }
 
 final class io.github.charlietap.chasm.embedding.shapes/ImportDefinition { // io.github.charlietap.chasm.embedding.shapes/ImportDefinition|null[0]
-    constructor <init>(kotlin/String, kotlin/String, io.github.charlietap.chasm.runtime.type/ExternalType) // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.<init>|<init>(kotlin.String;kotlin.String;io.github.charlietap.chasm.runtime.type.ExternalType){}[0]
+    constructor <init>(kotlin/String, kotlin/String, io.github.charlietap.chasm.host/ModuleIndex, io.github.charlietap.chasm.runtime.type/ExternalType) // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.<init>|<init>(kotlin.String;kotlin.String;io.github.charlietap.chasm.host.ModuleIndex;io.github.charlietap.chasm.runtime.type.ExternalType){}[0]
 
     final val entityName // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.entityName|{}entityName[0]
         final fun <get-entityName>(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.entityName.<get-entityName>|<get-entityName>(){}[0]
+    final val index // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.index|{}index[0]
+        final fun <get-index>(): io.github.charlietap.chasm.host/ModuleIndex // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.index.<get-index>|<get-index>(){}[0]
     final val moduleName // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.moduleName|{}moduleName[0]
         final fun <get-moduleName>(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.moduleName.<get-moduleName>|<get-moduleName>(){}[0]
     final val type // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.type|{}type[0]
@@ -339,8 +344,9 @@ final class io.github.charlietap.chasm.embedding.shapes/ImportDefinition { // io
 
     final fun component1(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.component1|component1(){}[0]
     final fun component2(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.component2|component2(){}[0]
-    final fun component3(): io.github.charlietap.chasm.runtime.type/ExternalType // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.component3|component3(){}[0]
-    final fun copy(kotlin/String = ..., kotlin/String = ..., io.github.charlietap.chasm.runtime.type/ExternalType = ...): io.github.charlietap.chasm.embedding.shapes/ImportDefinition // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.copy|copy(kotlin.String;kotlin.String;io.github.charlietap.chasm.runtime.type.ExternalType){}[0]
+    final fun component3(): io.github.charlietap.chasm.host/ModuleIndex // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.component3|component3(){}[0]
+    final fun component4(): io.github.charlietap.chasm.runtime.type/ExternalType // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.component4|component4(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., io.github.charlietap.chasm.host/ModuleIndex = ..., io.github.charlietap.chasm.runtime.type/ExternalType = ...): io.github.charlietap.chasm.embedding.shapes/ImportDefinition // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.copy|copy(kotlin.String;kotlin.String;io.github.charlietap.chasm.host.ModuleIndex;io.github.charlietap.chasm.runtime.type.ExternalType){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.github.charlietap.chasm.embedding.shapes/ImportDefinition.toString|toString(){}[0]

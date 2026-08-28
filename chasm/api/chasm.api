@@ -484,14 +484,16 @@ public final class io/github/charlietap/chasm/embedding/shapes/Export {
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/ExportDefinition {
-	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/runtime/type/ExternalType;Lio/github/charlietap/chasm/embedding/shapes/NameData;)V
-	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/runtime/type/ExternalType;Lio/github/charlietap/chasm/embedding/shapes/NameData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/runtime/type/ExternalType;Lio/github/charlietap/chasm/embedding/shapes/NameData;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/runtime/type/ExternalType;Lio/github/charlietap/chasm/embedding/shapes/NameData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Lio/github/charlietap/chasm/runtime/type/ExternalType;
-	public final fun component3 ()Lio/github/charlietap/chasm/embedding/shapes/NameData;
-	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/runtime/type/ExternalType;Lio/github/charlietap/chasm/embedding/shapes/NameData;)Lio/github/charlietap/chasm/embedding/shapes/ExportDefinition;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ExportDefinition;Ljava/lang/String;Lio/github/charlietap/chasm/runtime/type/ExternalType;Lio/github/charlietap/chasm/embedding/shapes/NameData;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ExportDefinition;
+	public final fun component2 ()Lio/github/charlietap/chasm/host/ModuleIndex;
+	public final fun component3 ()Lio/github/charlietap/chasm/runtime/type/ExternalType;
+	public final fun component4 ()Lio/github/charlietap/chasm/embedding/shapes/NameData;
+	public final fun copy (Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/runtime/type/ExternalType;Lio/github/charlietap/chasm/embedding/shapes/NameData;)Lio/github/charlietap/chasm/embedding/shapes/ExportDefinition;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ExportDefinition;Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/runtime/type/ExternalType;Lio/github/charlietap/chasm/embedding/shapes/NameData;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ExportDefinition;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIndex ()Lio/github/charlietap/chasm/host/ModuleIndex;
 	public final fun getName ()Ljava/lang/String;
 	public final fun getNameData ()Lio/github/charlietap/chasm/embedding/shapes/NameData;
 	public final fun getType ()Lio/github/charlietap/chasm/runtime/type/ExternalType;
@@ -538,14 +540,16 @@ public final class io/github/charlietap/chasm/embedding/shapes/Import {
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/ImportDefinition {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/runtime/type/ExternalType;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/runtime/type/ExternalType;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Lio/github/charlietap/chasm/runtime/type/ExternalType;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/runtime/type/ExternalType;)Lio/github/charlietap/chasm/embedding/shapes/ImportDefinition;
-	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ImportDefinition;Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/runtime/type/ExternalType;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ImportDefinition;
+	public final fun component3 ()Lio/github/charlietap/chasm/host/ModuleIndex;
+	public final fun component4 ()Lio/github/charlietap/chasm/runtime/type/ExternalType;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/runtime/type/ExternalType;)Lio/github/charlietap/chasm/embedding/shapes/ImportDefinition;
+	public static synthetic fun copy$default (Lio/github/charlietap/chasm/embedding/shapes/ImportDefinition;Ljava/lang/String;Ljava/lang/String;Lio/github/charlietap/chasm/host/ModuleIndex;Lio/github/charlietap/chasm/runtime/type/ExternalType;ILjava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ImportDefinition;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getEntityName ()Ljava/lang/String;
+	public final fun getIndex ()Lio/github/charlietap/chasm/host/ModuleIndex;
 	public final fun getModuleName ()Ljava/lang/String;
 	public final fun getType ()Lio/github/charlietap/chasm/runtime/type/ExternalType;
 	public fun hashCode ()I

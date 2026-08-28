@@ -6,9 +6,11 @@ import io.github.charlietap.chasm.ast.module.Import
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.ast.module.LocalNameSubsection
 import io.github.charlietap.chasm.ast.module.Module
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.embedding.ext.nameSubsection
 import io.github.charlietap.chasm.embedding.shapes.ExportDefinition
 import io.github.charlietap.chasm.embedding.shapes.FunctionNameData
+import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.runtime.type.ExternalType
 import io.github.charlietap.chasm.type.ext.functionType
 
@@ -23,6 +25,7 @@ internal class ExportMapper(
 
                 ExportDefinition(
                     name = input.name.name,
+                    index = ModuleIndex.FunctionIndex(descriptor.functionIndex.toInt()),
                     type = ExternalType.Function(functionType),
                     nameData = functionNameData(descriptor),
                 )
@@ -30,24 +33,28 @@ internal class ExportMapper(
             is Export.Descriptor.Global -> {
                 ExportDefinition(
                     name = input.name.name,
+                    index = ModuleIndex.GlobalIndex(descriptor.globalIndex.toInt()),
                     type = ExternalType.Global(exportedGlobalType(descriptor.globalIndex)),
                 )
             }
             is Export.Descriptor.Memory -> {
                 ExportDefinition(
                     name = input.name.name,
+                    index = ModuleIndex.MemoryIndex(descriptor.memoryIndex.toInt()),
                     type = ExternalType.Memory(exportedMemoryType(descriptor.memoryIndex)),
                 )
             }
             is Export.Descriptor.Table -> {
                 ExportDefinition(
                     name = input.name.name,
+                    index = ModuleIndex.TableIndex(descriptor.tableIndex.toInt()),
                     type = ExternalType.Table(exportedTableType(descriptor.tableIndex)),
                 )
             }
             is Export.Descriptor.Tag -> {
                 ExportDefinition(
                     name = input.name.name,
+                    index = ModuleIndex.TagIndex(descriptor.tagIndex.toInt()),
                     type = ExternalType.Tag(exportedTagType(descriptor.tagIndex)),
                 )
             }

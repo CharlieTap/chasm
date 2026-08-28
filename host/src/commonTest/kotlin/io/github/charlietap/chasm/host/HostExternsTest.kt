@@ -118,11 +118,11 @@ private class TestHostResources(
     override val exceptions: HostExceptions
         get() = error("unused")
 
-    override fun memory(module: HostModuleInstance, index: Int): HostMemory = error("unused")
+    override fun memory(module: HostModuleInstance, index: ModuleIndex.MemoryIndex): HostMemory = error("unused")
 
-    override fun table(module: HostModuleInstance, index: Int): HostTable = error("unused")
+    override fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable = error("unused")
 
-    override fun global(module: HostModuleInstance, index: Int): HostGlobal = error("unused")
+    override fun global(module: HostModuleInstance, index: ModuleIndex.GlobalIndex): HostGlobal = error("unused")
 
-    override fun tag(module: HostModuleInstance, index: Int): HostTag = error("unused")
+    override fun tag(module: HostModuleInstance, index: ModuleIndex.TagIndex): HostTag = error("unused")
 }

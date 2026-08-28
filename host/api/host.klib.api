@@ -114,10 +114,10 @@ abstract interface io.github.charlietap.chasm.host/HostResources { // io.github.
     abstract val references // io.github.charlietap.chasm.host/HostResources.references|{}references[0]
         abstract fun <get-references>(): io.github.charlietap.chasm.host/HostReferences // io.github.charlietap.chasm.host/HostResources.references.<get-references>|<get-references>(){}[0]
 
-    abstract fun global(io.github.charlietap.chasm.host/HostModuleInstance, kotlin/Int): io.github.charlietap.chasm.host/HostGlobal // io.github.charlietap.chasm.host/HostResources.global|global(io.github.charlietap.chasm.host.HostModuleInstance;kotlin.Int){}[0]
-    abstract fun memory(io.github.charlietap.chasm.host/HostModuleInstance, kotlin/Int): io.github.charlietap.chasm.host/HostMemory // io.github.charlietap.chasm.host/HostResources.memory|memory(io.github.charlietap.chasm.host.HostModuleInstance;kotlin.Int){}[0]
-    abstract fun table(io.github.charlietap.chasm.host/HostModuleInstance, kotlin/Int): io.github.charlietap.chasm.host/HostTable // io.github.charlietap.chasm.host/HostResources.table|table(io.github.charlietap.chasm.host.HostModuleInstance;kotlin.Int){}[0]
-    abstract fun tag(io.github.charlietap.chasm.host/HostModuleInstance, kotlin/Int): io.github.charlietap.chasm.host/HostTag // io.github.charlietap.chasm.host/HostResources.tag|tag(io.github.charlietap.chasm.host.HostModuleInstance;kotlin.Int){}[0]
+    abstract fun global(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex): io.github.charlietap.chasm.host/HostGlobal // io.github.charlietap.chasm.host/HostResources.global|global(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.ModuleIndex.GlobalIndex){}[0]
+    abstract fun memory(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex): io.github.charlietap.chasm.host/HostMemory // io.github.charlietap.chasm.host/HostResources.memory|memory(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.ModuleIndex.MemoryIndex){}[0]
+    abstract fun table(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/ModuleIndex.TableIndex): io.github.charlietap.chasm.host/HostTable // io.github.charlietap.chasm.host/HostResources.table|table(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.ModuleIndex.TableIndex){}[0]
+    abstract fun tag(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/ModuleIndex.TagIndex): io.github.charlietap.chasm.host/HostTag // io.github.charlietap.chasm.host/HostResources.tag|tag(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.ModuleIndex.TagIndex){}[0]
 }
 
 abstract interface io.github.charlietap.chasm.host/HostTable { // io.github.charlietap.chasm.host/HostTable|null[0]
@@ -131,6 +131,66 @@ abstract interface io.github.charlietap.chasm.host/HostTable { // io.github.char
 
 abstract interface io.github.charlietap.chasm.host/NativeHostMemory : io.github.charlietap.chasm.host/HostMemory { // io.github.charlietap.chasm.host/NativeHostMemory|null[0]
     abstract fun unsafeBorrowByteArray(): kotlin/ByteArray // io.github.charlietap.chasm.host/NativeHostMemory.unsafeBorrowByteArray|unsafeBorrowByteArray(){}[0]
+}
+
+sealed interface io.github.charlietap.chasm.host/ModuleIndex { // io.github.charlietap.chasm.host/ModuleIndex|null[0]
+    abstract val index // io.github.charlietap.chasm.host/ModuleIndex.index|{}index[0]
+        abstract fun <get-index>(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.index.<get-index>|<get-index>(){}[0]
+
+    final value class FunctionIndex : io.github.charlietap.chasm.host/ModuleIndex { // io.github.charlietap.chasm.host/ModuleIndex.FunctionIndex|null[0]
+        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/ModuleIndex.FunctionIndex.<init>|<init>(kotlin.Int){}[0]
+
+        final val index // io.github.charlietap.chasm.host/ModuleIndex.FunctionIndex.index|{}index[0]
+            final fun <get-index>(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.FunctionIndex.index.<get-index>|<get-index>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/ModuleIndex.FunctionIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.FunctionIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.host/ModuleIndex.FunctionIndex.toString|toString(){}[0]
+    }
+
+    final value class GlobalIndex : io.github.charlietap.chasm.host/ModuleIndex { // io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex|null[0]
+        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex.<init>|<init>(kotlin.Int){}[0]
+
+        final val index // io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex.index|{}index[0]
+            final fun <get-index>(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex.index.<get-index>|<get-index>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex.toString|toString(){}[0]
+    }
+
+    final value class MemoryIndex : io.github.charlietap.chasm.host/ModuleIndex { // io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex|null[0]
+        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex.<init>|<init>(kotlin.Int){}[0]
+
+        final val index // io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex.index|{}index[0]
+            final fun <get-index>(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex.index.<get-index>|<get-index>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex.toString|toString(){}[0]
+    }
+
+    final value class TableIndex : io.github.charlietap.chasm.host/ModuleIndex { // io.github.charlietap.chasm.host/ModuleIndex.TableIndex|null[0]
+        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/ModuleIndex.TableIndex.<init>|<init>(kotlin.Int){}[0]
+
+        final val index // io.github.charlietap.chasm.host/ModuleIndex.TableIndex.index|{}index[0]
+            final fun <get-index>(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.TableIndex.index.<get-index>|<get-index>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/ModuleIndex.TableIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.TableIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.host/ModuleIndex.TableIndex.toString|toString(){}[0]
+    }
+
+    final value class TagIndex : io.github.charlietap.chasm.host/ModuleIndex { // io.github.charlietap.chasm.host/ModuleIndex.TagIndex|null[0]
+        constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/ModuleIndex.TagIndex.<init>|<init>(kotlin.Int){}[0]
+
+        final val index // io.github.charlietap.chasm.host/ModuleIndex.TagIndex.index|{}index[0]
+            final fun <get-index>(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.TagIndex.index.<get-index>|<get-index>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/ModuleIndex.TagIndex.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/ModuleIndex.TagIndex.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.charlietap.chasm.host/ModuleIndex.TagIndex.toString|toString(){}[0]
+    }
 }
 
 final class io.github.charlietap.chasm.host/HostFunctionException : kotlin/Exception { // io.github.charlietap.chasm.host/HostFunctionException|null[0]
@@ -291,9 +351,13 @@ final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charliet
 final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readU8(kotlin/Int): kotlin/UByte // io.github.charlietap.chasm.host/readU8|readU8@io.github.charlietap.chasm.host.HostMemory(kotlin.Int){}[0]
 final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readUtf8String(kotlin/Int, kotlin/Int): kotlin/String // io.github.charlietap.chasm.host/readUtf8String|readUtf8String@io.github.charlietap.chasm.host.HostMemory(kotlin.Int;kotlin.Int){}[0]
 final inline fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/writeUtf8String(kotlin/Int, kotlin/String) // io.github.charlietap.chasm.host/writeUtf8String|writeUtf8String@io.github.charlietap.chasm.host.HostMemory(kotlin.Int;kotlin.String){}[0]
+final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withGlobal(io.github.charlietap.chasm.host/ModuleIndex.GlobalIndex, kotlin/Function1<io.github.charlietap.chasm.host/HostGlobal, #A>): #A // io.github.charlietap.chasm.host/withGlobal|withGlobal(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(io.github.charlietap.chasm.host.ModuleIndex.GlobalIndex;kotlin.Function1<io.github.charlietap.chasm.host.HostGlobal,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withGlobal(kotlin/Int, kotlin/Function1<io.github.charlietap.chasm.host/HostGlobal, #A>): #A // io.github.charlietap.chasm.host/withGlobal|withGlobal(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Function1<io.github.charlietap.chasm.host.HostGlobal,0:0>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withMemory(io.github.charlietap.chasm.host/ModuleIndex.MemoryIndex, kotlin/Function1<io.github.charlietap.chasm.host/HostMemory, #A>): #A // io.github.charlietap.chasm.host/withMemory|withMemory(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(io.github.charlietap.chasm.host.ModuleIndex.MemoryIndex;kotlin.Function1<io.github.charlietap.chasm.host.HostMemory,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withMemory(kotlin/Int, kotlin/Function1<io.github.charlietap.chasm.host/HostMemory, #A>): #A // io.github.charlietap.chasm.host/withMemory|withMemory(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Function1<io.github.charlietap.chasm.host.HostMemory,0:0>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withTable(io.github.charlietap.chasm.host/ModuleIndex.TableIndex, kotlin/Function1<io.github.charlietap.chasm.host/HostTable, #A>): #A // io.github.charlietap.chasm.host/withTable|withTable(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(io.github.charlietap.chasm.host.ModuleIndex.TableIndex;kotlin.Function1<io.github.charlietap.chasm.host.HostTable,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withTable(kotlin/Int, kotlin/Function1<io.github.charlietap.chasm.host/HostTable, #A>): #A // io.github.charlietap.chasm.host/withTable|withTable(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Function1<io.github.charlietap.chasm.host.HostTable,0:0>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withTag(io.github.charlietap.chasm.host/ModuleIndex.TagIndex, kotlin/Function1<io.github.charlietap.chasm.host/HostTag, #A>): #A // io.github.charlietap.chasm.host/withTag|withTag(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(io.github.charlietap.chasm.host.ModuleIndex.TagIndex;kotlin.Function1<io.github.charlietap.chasm.host.HostTag,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withTag(kotlin/Int, kotlin/Function1<io.github.charlietap.chasm.host/HostTag, #A>): #A // io.github.charlietap.chasm.host/withTag|withTag(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Function1<io.github.charlietap.chasm.host.HostTag,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withExceptions(kotlin/Function1<io.github.charlietap.chasm.host/HostExceptions, #A>): #A // io.github.charlietap.chasm.host/withExceptions|withExceptions(io.github.charlietap.chasm.host.HostResources)(kotlin.Function1<io.github.charlietap.chasm.host.HostExceptions,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withExterns(kotlin/Function1<io.github.charlietap.chasm.host/HostExterns, #A>): #A // io.github.charlietap.chasm.host/withExterns|withExterns(io.github.charlietap.chasm.host.HostResources)(kotlin.Function1<io.github.charlietap.chasm.host.HostExterns,0:0>){0§<kotlin.Any?>}[0]

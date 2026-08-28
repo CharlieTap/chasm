@@ -18,6 +18,7 @@ import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.HostResources
+import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.host.raise
 import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.withExceptions
@@ -190,7 +191,7 @@ class FunctionInvokerTest {
                 withExceptions {
                     assertFalse(hasPending)
                 }
-                withTag(0) {
+                withTag(ModuleIndex.TagIndex(0)) {
                     raise(parameters)
                 }
             },

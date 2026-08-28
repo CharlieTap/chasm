@@ -56,6 +56,11 @@ import io.github.charlietap.chasm.type.RecursiveType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import io.github.charlietap.chasm.fixture.ast.module.module as astModule
+import io.github.charlietap.chasm.fixture.host.functionIndex as moduleFunctionIndex
+import io.github.charlietap.chasm.fixture.host.globalIndex as moduleGlobalIndex
+import io.github.charlietap.chasm.fixture.host.memoryIndex as moduleMemoryIndex
+import io.github.charlietap.chasm.fixture.host.tableIndex as moduleTableIndex
+import io.github.charlietap.chasm.fixture.host.tagIndex as moduleTagIndex
 
 class ModuleInfoTest {
 
@@ -94,6 +99,11 @@ class ModuleInfoTest {
                     entityName = NameValue("imported_global"),
                     descriptor = globalImportDescriptor(importedGlobalType),
                 ),
+                functionImport(
+                    moduleName = NameValue("env"),
+                    entityName = NameValue("imported_function_2"),
+                    descriptor = functionImportDescriptor(typeIndex(0u)),
+                ),
                 import(
                     moduleName = NameValue("env"),
                     entityName = NameValue("imported_memory"),
@@ -103,6 +113,11 @@ class ModuleInfoTest {
                     moduleName = NameValue("env"),
                     entityName = NameValue("imported_table"),
                     descriptor = tableImportDescriptor(importedTableType),
+                ),
+                import(
+                    moduleName = NameValue("env"),
+                    entityName = NameValue("imported_memory_2"),
+                    descriptor = memoryImportDescriptor(importedMemoryType),
                 ),
                 import(
                     moduleName = NameValue("env"),
@@ -148,21 +163,37 @@ class ModuleInfoTest {
                 importDefinition(
                     moduleName = "env",
                     entityName = "imported_global",
+                    index = moduleGlobalIndex(),
                     type = globalExternalType(importedGlobalType),
                 ),
                 importDefinition(
                     moduleName = "env",
+                    entityName = "imported_function_2",
+                    index = moduleFunctionIndex(1),
+                    type = functionExternalType(importedFunctionType),
+                ),
+                importDefinition(
+                    moduleName = "env",
                     entityName = "imported_memory",
+                    index = moduleMemoryIndex(),
                     type = memoryExternalType(importedMemoryType),
                 ),
                 importDefinition(
                     moduleName = "env",
                     entityName = "imported_table",
+                    index = moduleTableIndex(),
                     type = tableExternalType(importedTableType),
                 ),
                 importDefinition(
                     moduleName = "env",
+                    entityName = "imported_memory_2",
+                    index = moduleMemoryIndex(1),
+                    type = memoryExternalType(importedMemoryType),
+                ),
+                importDefinition(
+                    moduleName = "env",
                     entityName = "imported_tag",
+                    index = moduleTagIndex(),
                     type = tagExternalType(importedTagType),
                 ),
             ),
@@ -173,18 +204,22 @@ class ModuleInfoTest {
                 ),
                 exportDefinition(
                     name = "reexported_global",
+                    index = moduleGlobalIndex(),
                     type = globalExternalType(importedGlobalType),
                 ),
                 exportDefinition(
                     name = "reexported_memory",
+                    index = moduleMemoryIndex(),
                     type = memoryExternalType(importedMemoryType),
                 ),
                 exportDefinition(
                     name = "reexported_table",
+                    index = moduleTableIndex(),
                     type = tableExternalType(importedTableType),
                 ),
                 exportDefinition(
                     name = "reexported_tag",
+                    index = moduleTagIndex(),
                     type = tagExternalType(importedTagType),
                 ),
             ),
@@ -249,44 +284,53 @@ class ModuleInfoTest {
                 importDefinition(
                     moduleName = "env",
                     entityName = "imported_global",
+                    index = moduleGlobalIndex(),
                     type = globalExternalType(importedGlobalType),
                 ),
                 importDefinition(
                     moduleName = "env",
                     entityName = "imported_memory",
+                    index = moduleMemoryIndex(),
                     type = memoryExternalType(importedMemoryType),
                 ),
                 importDefinition(
                     moduleName = "env",
                     entityName = "imported_table",
+                    index = moduleTableIndex(),
                     type = tableExternalType(importedTableType),
                 ),
                 importDefinition(
                     moduleName = "env",
                     entityName = "imported_tag",
+                    index = moduleTagIndex(),
                     type = tagExternalType(importedTagType),
                 ),
             ),
             exports = listOf(
                 exportDefinition(
                     name = "exported_function",
+                    index = moduleFunctionIndex(1),
                     type = functionExternalType(exportedFunctionType),
                     nameData = functionNameData,
                 ),
                 exportDefinition(
                     name = "exported_global",
+                    index = moduleGlobalIndex(1),
                     type = globalExternalType(exportedGlobalType),
                 ),
                 exportDefinition(
                     name = "exported_memory",
+                    index = moduleMemoryIndex(1),
                     type = memoryExternalType(exportedMemoryType),
                 ),
                 exportDefinition(
                     name = "exported_table",
+                    index = moduleTableIndex(1),
                     type = tableExternalType(exportedTableType),
                 ),
                 exportDefinition(
                     name = "exported_tag",
+                    index = moduleTagIndex(1),
                     type = tagExternalType(exportedTagType),
                 ),
             ),

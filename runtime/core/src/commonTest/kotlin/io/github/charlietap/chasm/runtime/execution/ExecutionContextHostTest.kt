@@ -13,6 +13,7 @@ import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.host.HostTag
+import io.github.charlietap.chasm.host.ModuleIndex
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.host.withGc
 import io.github.charlietap.chasm.host.withGlobal
@@ -53,21 +54,25 @@ class ExecutionContextHostTest {
             instance = moduleInstance(),
         )
 
-        val memory = context.memory(caller, 0)
-        val table = context.table(caller, 0)
-        val global = context.global(caller, 0)
+        val memoryIndex = ModuleIndex.MemoryIndex(0)
+        val tableIndex = ModuleIndex.TableIndex(0)
+        val globalIndex = ModuleIndex.GlobalIndex(0)
+        val tagIndex = ModuleIndex.TagIndex(0)
+        val memory = context.memory(caller, memoryIndex)
+        val table = context.table(caller, tableIndex)
+        val global = context.global(caller, globalIndex)
 
         assertSame(targetMemory, memory)
         assertSame(targetTable, table)
         assertSame(targetGlobal, global)
         assertSame(store.heap, context.references)
         assertSame(store.heap, context.gc)
-        assertEquals(HostTag(targetTagAddress.address), context.tag(caller, 0))
+        assertEquals(HostTag(targetTagAddress.address), context.tag(caller, tagIndex))
 
         context(caller, context) {
             withGc { assertSame(store.heap, this) }
-            withMemory(0) { assertSame(targetMemory, this) }
-            withTable(0) { assertSame(targetTable, this) }
+            withMemory(memoryIndex) { assertSame(targetMemory, this) }
+            withTable(tableIndex) { assertSame(targetTable, this) }
             withGlobal(0) { assertSame(targetGlobal, this) }
             withTag(0) { assertEquals(targetTagAddress.address, rawAddress) }
         }

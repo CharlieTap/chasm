@@ -10,11 +10,11 @@ interface HostResources {
 
     val exceptions: HostExceptions
 
-    fun memory(module: HostModuleInstance, index: Int): HostMemory
+    fun memory(module: HostModuleInstance, index: ModuleIndex.MemoryIndex): HostMemory
 
-    fun table(module: HostModuleInstance, index: Int): HostTable
+    fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable
 
-    fun global(module: HostModuleInstance, index: Int): HostGlobal
+    fun global(module: HostModuleInstance, index: ModuleIndex.GlobalIndex): HostGlobal
 
-    fun tag(module: HostModuleInstance, index: Int): HostTag
+    fun tag(module: HostModuleInstance, index: ModuleIndex.TagIndex): HostTag
 }
