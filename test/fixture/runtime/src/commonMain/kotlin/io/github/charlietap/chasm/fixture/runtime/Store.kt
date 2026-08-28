@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
-import io.github.charlietap.chasm.runtime.instance.HostInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.program.Program
@@ -18,7 +17,6 @@ fun store(
     memories: MutableList<MemoryInstance> = [],
     tables: MutableList<TableInstance> = [],
     program: Program = Program(),
-    hosts: MutableList<HostInstance> = [],
 ) = Store(
     data = data,
     elements = elements,
@@ -26,6 +24,5 @@ fun store(
     globals = globals,
     memories = memories,
     tables = tables,
-    hosts = hosts,
     program = program,
 )

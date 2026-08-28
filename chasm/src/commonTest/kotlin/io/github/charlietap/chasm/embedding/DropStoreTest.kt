@@ -7,7 +7,6 @@ import io.github.charlietap.chasm.fixture.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.elementInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.functionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
-import io.github.charlietap.chasm.fixture.runtime.instance.hostInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.store
@@ -51,7 +50,6 @@ class DropStoreTest {
                 data = mutableListOf(dataInstance),
                 elements = mutableListOf(elementInstance),
                 globals = mutableListOf(globalInstance),
-                hosts = mutableListOf(hostInstance()),
                 memories = mutableListOf(memoryInstance),
                 tables = mutableListOf(tableInstance),
                 functions = mutableListOf(functionInstance()),

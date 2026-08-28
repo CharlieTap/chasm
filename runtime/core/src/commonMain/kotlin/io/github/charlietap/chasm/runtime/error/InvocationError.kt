@@ -48,9 +48,6 @@ sealed interface InvocationError : ModuleTrapError {
     value class ArrayLookupFailed(val address: Address.Array) : InvocationError
 
     @JvmInline
-    value class HostLookupFailed(val address: Address.Host) : InvocationError
-
-    @JvmInline
     value class FunctionTypeLookupFailed(val index: Int) : InvocationError
 
     @JvmInline

@@ -3,7 +3,6 @@
 package io.github.charlietap.chasm.runtime.ext
 
 import io.github.charlietap.chasm.runtime.address.Address
-import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.InvocationError.DataLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.ElementLookupFailed
 import io.github.charlietap.chasm.runtime.error.InvocationError.FunctionLookupFailed
@@ -15,7 +14,6 @@ import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
-import io.github.charlietap.chasm.runtime.instance.HostInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.store.Store
@@ -66,20 +64,4 @@ inline fun Store.data(address: Address.Data): DataInstance = try {
     throw InvocationException(DataLookupFailed(address))
 } catch (_: IllegalArgumentException) {
     throw InvocationException(DataLookupFailed(address))
-}
-
-inline fun Store.host(address: Address.Host): HostInstance = try {
-    hosts[address.address]
-} catch (_: IndexOutOfBoundsException) {
-    throw InvocationException(InvocationError.HostLookupFailed(address))
-} catch (_: IllegalArgumentException) {
-    throw InvocationException(InvocationError.HostLookupFailed(address))
-}
-
-fun Store.allocateHost(
-    instance: HostInstance,
-): Address.Host {
-    hosts.add(instance)
-
-    return Address.Host(hosts.lastIndex)
 }
