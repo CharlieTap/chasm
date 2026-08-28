@@ -37,6 +37,20 @@ dependencyResolutionManagement {
     }
 }
 
+val localWasiEmscriptenHost = file("../wasi-emscripten-host")
+if (localWasiEmscriptenHost.isDirectory) {
+    gradle.startParameter.projectProperties = gradle.startParameter.projectProperties +
+        ("weh.chasm.source" to rootDir.absolutePath)
+    includeBuild(localWasiEmscriptenHost) {
+        dependencySubstitution {
+            substitute(module("at.released.weh:bindings-chasm-emscripten"))
+                .using(project(":bindings-chasm-emscripten"))
+            substitute(module("at.released.weh:bindings-chasm-wasip1"))
+                .using(project(":bindings-chasm-wasip1"))
+        }
+    }
+}
+
 include(":ast")
 include(":benchmark")
 include(":chasm")

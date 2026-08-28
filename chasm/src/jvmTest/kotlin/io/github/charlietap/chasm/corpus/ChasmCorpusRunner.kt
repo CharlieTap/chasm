@@ -203,7 +203,10 @@ class ChasmCorpusRunner(
                     importResolution.memories["memory"] = exportedMemory
                 }
                 importResolution.emscriptenFinalizers.forEach { finalizer ->
-                    finalizer.finalize(instance)
+                    val memory = importResolution.memories["$EMSCRIPTEN_ENV.memory"] ?: exportedMemory
+                    if (memory != null) {
+                        finalizer.finalize(instance, memory)
+                    }
                 }
                 RunnerResult.Success(
                     RuntimeSetup(
@@ -260,16 +263,14 @@ class ChasmCorpusRunner(
         }
 
         if (wasi != null && hasWasiImports) {
-            imports += ChasmWasiPreview1Builder(store) {
+            imports += ChasmWasiPreview1Builder(store, module) {
                 host = wasi.host
-                memoryProvider = { memories.values.first() }
             }.build()
         }
 
         if (wasi != null && hasEmscriptenImports) {
-            val emscriptenBuilder = ChasmEmscriptenHostBuilder(store) {
+            val emscriptenBuilder = ChasmEmscriptenHostBuilder(store, module) {
                 host = wasi.host
-                memoryProvider = { memories.getValue("$EMSCRIPTEN_ENV.memory") }
             }
             val finalizer = emscriptenBuilder.setupEmscriptenFunctions(EMSCRIPTEN_ENV)
             emscriptenFinalizers += finalizer
@@ -351,7 +352,7 @@ class ChasmCorpusRunner(
                 this.stdout = StdioSink.Provider { CapturingStdioSink(stdout) }
                 this.stderr = StdioSink.Provider { CapturingStdioSink(stderr) }
                 this.entropySource = object : EntropySource {
-                    override fun generateEntropy(length: Int): ByteArray = ByteArray(length)
+                    override fun generateEntropy(size: Int): ByteArray = ByteArray(size)
                 }
                 this.realTimeClock = object : Clock {
                     private var nanos = 0L
