@@ -14,6 +14,12 @@ abstract fun interface io.github.charlietap.chasm.host/HostFunction { // io.gith
     abstract fun (context(kotlin/LongArray, io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).invoke(kotlin/Int, kotlin/Int) // io.github.charlietap.chasm.host/HostFunction.invoke|invoke(kotlin.LongArray;io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Int){}[0]
 }
 
+abstract interface io.github.charlietap.chasm.host/HostGlobal { // io.github.charlietap.chasm.host/HostGlobal|null[0]
+    abstract var rawValue // io.github.charlietap.chasm.host/HostGlobal.rawValue|{}rawValue[0]
+        abstract fun <get-rawValue>(): kotlin/Long // io.github.charlietap.chasm.host/HostGlobal.rawValue.<get-rawValue>|<get-rawValue>(){}[0]
+        abstract fun <set-rawValue>(kotlin/Long) // io.github.charlietap.chasm.host/HostGlobal.rawValue.<set-rawValue>|<set-rawValue>(kotlin.Long){}[0]
+}
+
 abstract interface io.github.charlietap.chasm.host/HostMemory { // io.github.charlietap.chasm.host/HostMemory|null[0]
     abstract val byteSize // io.github.charlietap.chasm.host/HostMemory.byteSize|{}byteSize[0]
         abstract fun <get-byteSize>(): kotlin/Int // io.github.charlietap.chasm.host/HostMemory.byteSize.<get-byteSize>|<get-byteSize>(){}[0]
@@ -41,6 +47,15 @@ abstract interface io.github.charlietap.chasm.host/HostModuleInstance // io.gith
 
 abstract interface io.github.charlietap.chasm.host/HostResources // io.github.charlietap.chasm.host/HostResources|null[0]
 
+abstract interface io.github.charlietap.chasm.host/HostTable { // io.github.charlietap.chasm.host/HostTable|null[0]
+    abstract val size // io.github.charlietap.chasm.host/HostTable.size|{}size[0]
+        abstract fun <get-size>(): kotlin/Int // io.github.charlietap.chasm.host/HostTable.size.<get-size>|<get-size>(){}[0]
+
+    abstract fun readRaw(kotlin/Int): kotlin/Long // io.github.charlietap.chasm.host/HostTable.readRaw|readRaw(kotlin.Int){}[0]
+    abstract fun unsafeBorrowElements(): kotlin/LongArray // io.github.charlietap.chasm.host/HostTable.unsafeBorrowElements|unsafeBorrowElements(){}[0]
+    abstract fun writeRaw(kotlin/Int, kotlin/Long) // io.github.charlietap.chasm.host/HostTable.writeRaw|writeRaw(kotlin.Int;kotlin.Long){}[0]
+}
+
 abstract interface io.github.charlietap.chasm.host/NativeHostMemory : io.github.charlietap.chasm.host/HostMemory { // io.github.charlietap.chasm.host/NativeHostMemory|null[0]
     abstract fun unsafeBorrowByteArray(): kotlin/ByteArray // io.github.charlietap.chasm.host/NativeHostMemory.unsafeBorrowByteArray|unsafeBorrowByteArray(){}[0]
 }
@@ -50,6 +65,17 @@ final class io.github.charlietap.chasm.host/HostFunctionException : kotlin/Excep
 
     final val reason // io.github.charlietap.chasm.host/HostFunctionException.reason|{}reason[0]
         final fun <get-reason>(): kotlin/String // io.github.charlietap.chasm.host/HostFunctionException.reason.<get-reason>|<get-reason>(){}[0]
+}
+
+final value class io.github.charlietap.chasm.host/HostTag { // io.github.charlietap.chasm.host/HostTag|null[0]
+    constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/HostTag.<init>|<init>(kotlin.Int){}[0]
+
+    final val rawAddress // io.github.charlietap.chasm.host/HostTag.rawAddress|{}rawAddress[0]
+        final fun <get-rawAddress>(): kotlin/Int // io.github.charlietap.chasm.host/HostTag.rawAddress.<get-rawAddress>|<get-rawAddress>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/HostTag.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/HostTag.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.host/HostTag.toString|toString(){}[0]
 }
 
 final fun (io.github.charlietap.chasm.host/HostMemory).io.github.charlietap.chasm.host/readNullTerminatedUtf8String(kotlin/Int): kotlin/String // io.github.charlietap.chasm.host/readNullTerminatedUtf8String|readNullTerminatedUtf8String@io.github.charlietap.chasm.host.HostMemory(kotlin.Int){}[0]

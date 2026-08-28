@@ -7,6 +7,11 @@ public final class io/github/charlietap/chasm/host/HostFunctionException : java/
 	public final fun getReason ()Ljava/lang/String;
 }
 
+public abstract interface class io/github/charlietap/chasm/host/HostGlobal {
+	public abstract fun getRawValue ()J
+	public abstract fun setRawValue (J)V
+}
+
 public abstract interface class io/github/charlietap/chasm/host/HostMemory {
 	public abstract fun copy (IIILio/github/charlietap/chasm/host/HostMemory;)V
 	public static synthetic fun copy$default (Lio/github/charlietap/chasm/host/HostMemory;IIILio/github/charlietap/chasm/host/HostMemory;ILjava/lang/Object;)V
@@ -66,6 +71,27 @@ public final class io/github/charlietap/chasm/host/HostStackExtensionsKt {
 	public static final fun writeI32 ([JIII)V
 	public static final fun writeI64 ([JIIJ)V
 	public static final fun writeRawReference ([JIIJ)V
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostTable {
+	public abstract fun getSize ()I
+	public abstract fun readRaw (I)J
+	public abstract fun unsafeBorrowElements ()[J
+	public abstract fun writeRaw (IJ)V
+}
+
+public final class io/github/charlietap/chasm/host/HostTag {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostTag;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getRawAddress ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
 }
 
 public abstract interface class io/github/charlietap/chasm/host/JvmHostMemory : io/github/charlietap/chasm/host/HostMemory {
