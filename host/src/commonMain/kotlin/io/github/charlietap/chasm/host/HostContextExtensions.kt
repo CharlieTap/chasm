@@ -16,18 +16,20 @@ inline fun <T> withMemory(
     block: context(ModuleIndex.MemoryIndex) HostMemory.() -> T,
 ): T = withMemory(ModuleIndex.MemoryIndex(index), block)
 
-/** Resolves [index] in the module instance and makes that table the receiver. */
+/** Resolves [index] in the module instance and makes that table and its index available to [block]. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun <T> withTable(
     index: ModuleIndex.TableIndex,
-    block: HostTable.() -> T,
-): T = resources.table(module, index).block()
+    block: context(ModuleIndex.TableIndex) HostTable.() -> T,
+): T = context(index) {
+    resources.table(module, index).block()
+}
 
-/** Resolves [index] in the module instance and makes that table the receiver. */
+/** Resolves [index] in the module instance and makes that table and its index available to [block]. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun <T> withTable(
     index: Int,
-    block: HostTable.() -> T,
+    block: context(ModuleIndex.TableIndex) HostTable.() -> T,
 ): T = withTable(ModuleIndex.TableIndex(index), block)
 
 /** Resolves [index] in the module instance and makes that global the receiver. */

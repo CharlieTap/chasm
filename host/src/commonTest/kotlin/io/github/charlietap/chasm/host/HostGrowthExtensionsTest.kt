@@ -43,13 +43,35 @@ class HostGrowthExtensionsTest {
         assertEquals(37, resources.elementsToAdd)
         assertEquals(41L, resources.tableValue)
     }
+
+    @Test
+    fun `table receiver growth uses the index provided by withTable`() {
+        val module = object : HostModuleInstance {}
+        val resources = RecordingHostResources()
+        val tableIndex = ModuleIndex.TableIndex(43)
+
+        context(module, resources) {
+            withTable(tableIndex) {
+                assertSame(resources.table, this)
+                assertEquals(13, grow(47, 53L))
+            }
+        }
+
+        assertSame(module, resources.tableModule)
+        assertEquals(tableIndex, resources.tableLookupIndex)
+        assertEquals(tableIndex, resources.tableIndex)
+        assertEquals(47, resources.elementsToAdd)
+        assertEquals(53L, resources.tableValue)
+    }
 }
 
 private class RecordingHostResources : HostResources {
+    val table = RecordingHostTable()
     var memoryModule: HostModuleInstance? = null
     var memoryIndex: ModuleIndex.MemoryIndex? = null
     var pagesToAdd: Int? = null
     var tableModule: HostModuleInstance? = null
+    var tableLookupIndex: ModuleIndex.TableIndex? = null
     var tableIndex: ModuleIndex.TableIndex? = null
     var elementsToAdd: Int? = null
     var tableValue: HostReference? = null
@@ -75,7 +97,10 @@ private class RecordingHostResources : HostResources {
         return 7
     }
 
-    override fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable = error("unused")
+    override fun table(module: HostModuleInstance, index: ModuleIndex.TableIndex): HostTable {
+        tableLookupIndex = index
+        return table
+    }
 
     override fun growTable(
         module: HostModuleInstance,
@@ -93,4 +118,37 @@ private class RecordingHostResources : HostResources {
     override fun global(module: HostModuleInstance, index: ModuleIndex.GlobalIndex): HostGlobal = error("unused")
 
     override fun tag(module: HostModuleInstance, index: ModuleIndex.TagIndex): HostTag = error("unused")
+}
+
+@OptIn(UnsafeHostApi::class)
+private class RecordingHostTable : HostTable {
+    override val size: Int
+        get() = error("unused")
+
+    override fun readRaw(index: Int): Long = error("unused")
+
+    override fun writeRaw(index: Int, value: Long) = error("unused")
+
+    override fun read(buffer: LongArray, elementIndex: Int, elementsToRead: Int, bufferIndex: Int): LongArray =
+        error("unused")
+
+    override fun write(elementIndex: Int, buffer: LongArray, bufferIndex: Int, elementsToWrite: Int) = error("unused")
+
+    override fun fill(elementIndex: Int, value: HostReference, elementsToFill: Int) = error("unused")
+
+    override fun copy(
+        sourceElementIndex: Int,
+        destinationElementIndex: Int,
+        elementsToCopy: Int,
+        source: HostTable,
+    ) = error("unused")
+
+    override fun move(
+        sourceElementIndex: Int,
+        destinationElementIndex: Int,
+        elementsToMove: Int,
+        source: HostTable,
+    ) = error("unused")
+
+    override fun unsafeBorrowElements(): LongArray = error("unused")
 }

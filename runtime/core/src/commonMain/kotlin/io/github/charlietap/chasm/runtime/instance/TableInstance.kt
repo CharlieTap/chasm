@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.host.HostReference
 import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.type.TableType
@@ -17,6 +18,68 @@ data class TableInstance(
 
     override fun writeRaw(index: Int, value: Long) {
         elements[index] = value
+    }
+
+    override fun read(
+        buffer: LongArray,
+        elementIndex: Int,
+        elementsToRead: Int,
+        bufferIndex: Int,
+    ): LongArray = elements.copyInto(
+        destination = buffer,
+        destinationOffset = bufferIndex,
+        startIndex = elementIndex,
+        endIndex = elementIndex + elementsToRead,
+    )
+
+    override fun write(
+        elementIndex: Int,
+        buffer: LongArray,
+        bufferIndex: Int,
+        elementsToWrite: Int,
+    ) {
+        buffer.copyInto(
+            destination = elements,
+            destinationOffset = elementIndex,
+            startIndex = bufferIndex,
+            endIndex = bufferIndex + elementsToWrite,
+        )
+    }
+
+    override fun fill(
+        elementIndex: Int,
+        value: HostReference,
+        elementsToFill: Int,
+    ) {
+        elements.fill(value, elementIndex, elementIndex + elementsToFill)
+    }
+
+    override fun copy(
+        sourceElementIndex: Int,
+        destinationElementIndex: Int,
+        elementsToCopy: Int,
+        source: HostTable,
+    ) {
+        source.unsafeBorrowElements().copyInto(
+            destination = elements,
+            destinationOffset = destinationElementIndex,
+            startIndex = sourceElementIndex,
+            endIndex = sourceElementIndex + elementsToCopy,
+        )
+    }
+
+    override fun move(
+        sourceElementIndex: Int,
+        destinationElementIndex: Int,
+        elementsToMove: Int,
+        source: HostTable,
+    ) {
+        source.unsafeBorrowElements().copyInto(
+            destination = elements,
+            destinationOffset = destinationElementIndex,
+            startIndex = sourceElementIndex,
+            endIndex = sourceElementIndex + elementsToMove,
+        )
     }
 
     @UnsafeHostApi
