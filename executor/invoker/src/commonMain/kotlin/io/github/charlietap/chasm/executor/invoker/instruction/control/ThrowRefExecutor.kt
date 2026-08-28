@@ -33,6 +33,10 @@ internal fun ThrowRefValueExecutor(
     }
     val exceptionTagAddress = store.heap.exceptionTagAddress(ref)
     while (true) {
+        if (cstack.handlersDepth() == 0) {
+            store.heap.setPendingException(ref)
+            throw InvocationException(InvocationError.ThrownException)
+        }
         val handler = cstack.popHandler()
 
         cstack.shrinkFrames(handler.framesDepth)

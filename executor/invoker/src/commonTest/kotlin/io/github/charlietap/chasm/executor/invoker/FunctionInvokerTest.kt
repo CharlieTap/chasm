@@ -21,6 +21,7 @@ import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import kotlin.contextOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class FunctionInvokerTest {
 
@@ -64,6 +65,27 @@ class FunctionInvokerTest {
         )
 
         assertEquals(Ok(listOf(i32(117))), actual)
+    }
+
+    @Test
+    fun `new invocation clears the previous pending exception`() {
+        val config = runtimeConfig()
+        val moduleInstance = moduleInstance()
+        val functionInstance = wasmFunctionInstance(module = moduleInstance)
+        val runtimeStore = store()
+        runtimeStore.heap.setPendingException(117L)
+        val threadExecutor: ThreadExecutor = { _, _, _, _ -> Ok(emptyList()) }
+
+        FunctionInvoker(
+            config = config,
+            store = runtimeStore,
+            instance = moduleInstance,
+            function = functionInstance,
+            values = emptyList(),
+            threadExecutor = threadExecutor,
+        )
+
+        assertFalse(runtimeStore.heap.hasPending)
     }
 
     @Test

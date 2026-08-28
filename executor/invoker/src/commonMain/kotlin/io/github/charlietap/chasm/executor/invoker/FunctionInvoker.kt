@@ -79,6 +79,7 @@ internal inline fun FunctionInvoker(
     values: List<ExecutionValue>,
     crossinline threadExecutor: ThreadExecutor,
 ): Result<List<ExecutionValue>, InvocationError> {
+    store.heap.clearPendingException()
     return when (function) {
         is FunctionInstance.HostFunction -> {
             val resultCount = function.functionType.results.types.size

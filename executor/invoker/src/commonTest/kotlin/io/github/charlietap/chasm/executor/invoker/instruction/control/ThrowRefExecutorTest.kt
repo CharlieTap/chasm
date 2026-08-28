@@ -17,10 +17,14 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tagType
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class ThrowRefExecutorTest {
 
@@ -152,5 +156,23 @@ class ThrowRefExecutorTest {
         assertEquals(exceptionRef, vstack.getFrameSlot(1))
         assertEquals(2, vstack.depth())
         assertEquals(0, cstack.handlersDepth())
+    }
+
+    @Test
+    fun `escaping throw preserves the exact exception for the host`() {
+        val store = store()
+        val tagAddress = store.heap.registerTag(rtt(), tagType())
+        val exceptionRef = store.heap.allocateException(tagAddress, LongArray(0))
+        val cstack = cstack(
+            frames = listOf(frame(instance = moduleInstance())),
+        )
+
+        val failure = assertFailsWith<InvocationException> {
+            ThrowRefValueExecutor(vstack(), cstack, store, exceptionRef)
+        }
+
+        assertEquals(InvocationError.ThrownException, failure.error)
+        assertTrue(store.heap.hasPending)
+        assertEquals(exceptionRef, store.heap.takePendingExceptionReference())
     }
 }
