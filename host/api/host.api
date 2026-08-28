@@ -64,6 +64,39 @@ public final class io/github/charlietap/chasm/host/HostMemoryExtensionsKt {
 public abstract interface class io/github/charlietap/chasm/host/HostModuleInstance {
 }
 
+public final class io/github/charlietap/chasm/host/HostReferenceRoot {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostReferenceRoot;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getSlot ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public abstract interface class io/github/charlietap/chasm/host/HostReferences {
+	public abstract fun beginScope (I)I
+	public static synthetic fun beginScope$default (Lio/github/charlietap/chasm/host/HostReferences;IILjava/lang/Object;)I
+	public abstract fun endScope (I)V
+	public abstract fun reference-bZNBitQ (I)J
+	public abstract fun release-bZNBitQ (I)V
+	public abstract fun retain-umLyUtQ (J)I
+	public abstract fun rootScoped (J)J
+}
+
+public final class io/github/charlietap/chasm/host/HostReferences$DefaultImpls {
+	public static synthetic fun beginScope$default (Lio/github/charlietap/chasm/host/HostReferences;IILjava/lang/Object;)I
+}
+
+public final class io/github/charlietap/chasm/host/HostReferencesKt {
+	public static final fun withScope (Lio/github/charlietap/chasm/host/HostReferences;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun withScope$default (Lio/github/charlietap/chasm/host/HostReferences;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
 public abstract interface class io/github/charlietap/chasm/host/HostResources {
 	public abstract fun global (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostGlobal;
 	public abstract fun memory (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostMemory;

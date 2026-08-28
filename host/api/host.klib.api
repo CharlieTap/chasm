@@ -45,6 +45,15 @@ abstract interface io.github.charlietap.chasm.host/HostMemory { // io.github.cha
 
 abstract interface io.github.charlietap.chasm.host/HostModuleInstance // io.github.charlietap.chasm.host/HostModuleInstance|null[0]
 
+abstract interface io.github.charlietap.chasm.host/HostReferences { // io.github.charlietap.chasm.host/HostReferences|null[0]
+    abstract fun beginScope(kotlin/Int = ...): kotlin/Int // io.github.charlietap.chasm.host/HostReferences.beginScope|beginScope(kotlin.Int){}[0]
+    abstract fun endScope(kotlin/Int) // io.github.charlietap.chasm.host/HostReferences.endScope|endScope(kotlin.Int){}[0]
+    abstract fun reference(io.github.charlietap.chasm.host/HostReferenceRoot): kotlin/Long // io.github.charlietap.chasm.host/HostReferences.reference|reference(io.github.charlietap.chasm.host.HostReferenceRoot){}[0]
+    abstract fun release(io.github.charlietap.chasm.host/HostReferenceRoot) // io.github.charlietap.chasm.host/HostReferences.release|release(io.github.charlietap.chasm.host.HostReferenceRoot){}[0]
+    abstract fun retain(kotlin/Long): io.github.charlietap.chasm.host/HostReferenceRoot // io.github.charlietap.chasm.host/HostReferences.retain|retain(kotlin.Long){}[0]
+    abstract fun rootScoped(kotlin/Long): kotlin/Long // io.github.charlietap.chasm.host/HostReferences.rootScoped|rootScoped(kotlin.Long){}[0]
+}
+
 abstract interface io.github.charlietap.chasm.host/HostResources { // io.github.charlietap.chasm.host/HostResources|null[0]
     abstract fun global(io.github.charlietap.chasm.host/HostModuleInstance, kotlin/Int): io.github.charlietap.chasm.host/HostGlobal // io.github.charlietap.chasm.host/HostResources.global|global(io.github.charlietap.chasm.host.HostModuleInstance;kotlin.Int){}[0]
     abstract fun memory(io.github.charlietap.chasm.host/HostModuleInstance, kotlin/Int): io.github.charlietap.chasm.host/HostMemory // io.github.charlietap.chasm.host/HostResources.memory|memory(io.github.charlietap.chasm.host.HostModuleInstance;kotlin.Int){}[0]
@@ -70,6 +79,17 @@ final class io.github.charlietap.chasm.host/HostFunctionException : kotlin/Excep
 
     final val reason // io.github.charlietap.chasm.host/HostFunctionException.reason|{}reason[0]
         final fun <get-reason>(): kotlin/String // io.github.charlietap.chasm.host/HostFunctionException.reason.<get-reason>|<get-reason>(){}[0]
+}
+
+final value class io.github.charlietap.chasm.host/HostReferenceRoot { // io.github.charlietap.chasm.host/HostReferenceRoot|null[0]
+    constructor <init>(kotlin/Int) // io.github.charlietap.chasm.host/HostReferenceRoot.<init>|<init>(kotlin.Int){}[0]
+
+    final val slot // io.github.charlietap.chasm.host/HostReferenceRoot.slot|{}slot[0]
+        final fun <get-slot>(): kotlin/Int // io.github.charlietap.chasm.host/HostReferenceRoot.slot.<get-slot>|<get-slot>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.host/HostReferenceRoot.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.host/HostReferenceRoot.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.charlietap.chasm.host/HostReferenceRoot.toString|toString(){}[0]
 }
 
 final value class io.github.charlietap.chasm.host/HostTag { // io.github.charlietap.chasm.host/HostTag|null[0]
@@ -104,3 +124,4 @@ final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/Host
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withMemory(kotlin/Int, kotlin/Function1<io.github.charlietap.chasm.host/HostMemory, #A>): #A // io.github.charlietap.chasm.host/withMemory|withMemory(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Function1<io.github.charlietap.chasm.host.HostMemory,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withTable(kotlin/Int, kotlin/Function1<io.github.charlietap.chasm.host/HostTable, #A>): #A // io.github.charlietap.chasm.host/withTable|withTable(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Function1<io.github.charlietap.chasm.host.HostTable,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (context(io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).io.github.charlietap.chasm.host/withTag(kotlin/Int, kotlin/Function1<io.github.charlietap.chasm.host/HostTag, #A>): #A // io.github.charlietap.chasm.host/withTag|withTag(io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Function1<io.github.charlietap.chasm.host.HostTag,0:0>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (io.github.charlietap.chasm.host/HostReferences).io.github.charlietap.chasm.host/withScope(kotlin/Int = ..., kotlin/Function1<io.github.charlietap.chasm.host/HostReferences, #A>): #A // io.github.charlietap.chasm.host/withScope|withScope@io.github.charlietap.chasm.host.HostReferences(kotlin.Int;kotlin.Function1<io.github.charlietap.chasm.host.HostReferences,0:0>){0§<kotlin.Any?>}[0]

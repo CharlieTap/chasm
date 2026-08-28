@@ -1,5 +1,7 @@
 package io.github.charlietap.chasm.host
 
+import kotlin.jvm.JvmInline
+
 /**
  * Chasm's raw, unboxed WebAssembly reference representation.
  *
@@ -24,3 +26,13 @@ package io.github.charlietap.chasm.host
  * Address payloads are only valid in the store that produced them.
  */
 typealias HostReference = Long
+
+/**
+ * An opaque handle which keeps a Chasm reference alive until it is released
+ * through the [HostReferences] that created it. Use [HostReferences.reference]
+ * to retrieve the raw reference.
+ *
+ * The handle is invalid after release or after its store is destroyed.
+ */
+@JvmInline
+value class HostReferenceRoot(val slot: Int)
