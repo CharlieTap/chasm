@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.dispatch.controlfused
+package io.github.charlietap.chasm.executor.invoker.dispatch.control
 
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
@@ -23,7 +23,7 @@ import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.program.Program
@@ -44,12 +44,12 @@ class StrictControlDispatchersTest {
                 frameSlots = 2,
             ),
         )
-        val call = ControlSuperInstruction.WasmCall(
+        val call = ControlInstruction.WasmCall(
             strategy = function.callStrategy,
             operands = OperandTransfer(emptyArray(), destinationSlotBase = 2),
             callFrameOffset = 2,
         )
-        val returnInstruction = ControlSuperInstruction.FunctionReturn(
+        val returnInstruction = ControlInstruction.FunctionReturn(
             results = OperandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
                 destinationSlotBase = 0,
@@ -88,7 +88,7 @@ class StrictControlDispatchersTest {
             longArrayOf(0, 1),
         )
         val program = Program()
-        val linkedSources = mutableListOf<ControlSuperInstruction>()
+        val linkedSources = mutableListOf<ControlInstruction>()
 
         for ((index, locals) in localInitialValues.withIndex()) {
             val function = wasmFunctionInstance(
@@ -99,8 +99,8 @@ class StrictControlDispatchersTest {
                 ),
             )
             val operands = OperandTransfer(emptyArray(), destinationSlotBase = 0)
-            val call = ControlSuperInstruction.WasmCall(function.callStrategy, operands, callFrameOffset = 2)
-            val tailCall = ControlSuperInstruction.ReturnWasmCall(
+            val call = ControlInstruction.WasmCall(function.callStrategy, operands, callFrameOffset = 2)
+            val tailCall = ControlInstruction.ReturnWasmCall(
                 function.callStrategy,
                 operands,
                 callerActivationHeaderSlot = 0,
@@ -112,7 +112,7 @@ class StrictControlDispatchersTest {
         assertEquals(
             localInitialValues.size * 2,
             LinkWasmCallDispatchers(program, firstIp = 0) { _, source ->
-                linkedSources += source as ControlSuperInstruction
+                linkedSources += source as ControlInstruction
             },
         )
         assertEquals(localInitialValues.size * 2, linkedSources.size)
@@ -122,7 +122,7 @@ class StrictControlDispatchersTest {
     @Test
     fun `selects local initialization after the callee strategy is installed`() {
         val strategy = WasmFunctionCallStrategy(interfaceSlotCount = 0)
-        val call = ControlSuperInstruction.WasmCall(
+        val call = ControlInstruction.WasmCall(
             strategy = strategy,
             operands = OperandTransfer(emptyArray(), destinationSlotBase = 2),
             callFrameOffset = 2,
@@ -170,7 +170,7 @@ class StrictControlDispatchersTest {
             setFrameSlot(1, ReferenceValue.Function(functionAddress()).toLong())
         }
         val cstack = cstack()
-        val instruction = ControlSuperInstruction.CallRefS(
+        val instruction = ControlInstruction.CallRefS(
             functionSlot = 1,
             operands = OperandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
@@ -216,7 +216,7 @@ class StrictControlDispatchersTest {
             setFrameSlot(0, 41)
         }
         val cstack = cstack()
-        val instruction = ControlSuperInstruction.CallIndirectI(
+        val instruction = ControlInstruction.CallIndirectI(
             elementIndex = 0,
             operands = OperandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
@@ -262,7 +262,7 @@ class StrictControlDispatchersTest {
             setFrameSlot(0, 41)
         }
         val cstack = cstack()
-        val instruction = ControlSuperInstruction.CallIndirectI(
+        val instruction = ControlInstruction.CallIndirectI(
             elementIndex = 0,
             operands = OperandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
@@ -304,7 +304,7 @@ class StrictControlDispatchersTest {
         val table = tableInstance(
             elements = longArrayOf(ReferenceValue.Function(functionAddress()).toLong()),
         )
-        val call = ControlSuperInstruction.CallIndirectI(
+        val call = ControlInstruction.CallIndirectI(
             elementIndex = 0,
             operands = OperandTransfer(emptyArray(), destinationSlotBase = 2),
             type = runtimeType,
@@ -312,7 +312,7 @@ class StrictControlDispatchersTest {
             callFrameOffset = 2,
             caller = module,
         )
-        val returnInstruction = ControlSuperInstruction.FunctionReturn(
+        val returnInstruction = ControlInstruction.FunctionReturn(
             results = OperandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
                 destinationSlotBase = 0,
@@ -356,7 +356,7 @@ class StrictControlDispatchersTest {
             setFrameSlot(1, ReferenceValue.Function(functionAddress()).toLong())
         }
         val cstack = cstack()
-        val instruction = ControlSuperInstruction.CallRefS(
+        val instruction = ControlInstruction.CallRefS(
             functionSlot = 1,
             operands = OperandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),

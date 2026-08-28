@@ -1,19 +1,19 @@
-package io.github.charlietap.chasm.executor.invoker.dispatch.controlfused
+package io.github.charlietap.chasm.executor.invoker.dispatch.control
 
 import io.github.charlietap.chasm.executor.invoker.function.CallSiteResultDestination
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.resultCallSiteIp
 import io.github.charlietap.chasm.executor.invoker.function.returnToCaller
+import io.github.charlietap.chasm.executor.invoker.instruction.control.CallExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnCallExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.CallExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.ReturnCallExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.ThrowExecutor
-import io.github.charlietap.chasm.executor.invoker.instruction.controlfused.ThrowRefExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowExecutor
+import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
@@ -26,7 +26,7 @@ private const val RESULT_CALL_SITE_IP_LIMIT = 1 shl 30
 private const val CALLER_FRAME_DELTA_LIMIT = 1 shl 25
 
 fun CallDispatcher(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     resultDestinationSlot: Int? = null,
 ): DispatchableInstruction = UnlinkedWasmCallByStrategy(
     instruction,
@@ -35,7 +35,7 @@ fun CallDispatcher(
 )
 
 private fun wasmCallWithoutLocalsDispatcher(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     operands: OperandTransfer,
     callFrameOffset: Int,
     resultDestinationSlot: Int?,
@@ -138,7 +138,7 @@ private interface LinkableWasmCall {
 }
 
 private abstract class UnlinkedWasmCall(
-    final override val source: ControlSuperInstruction.WasmCall,
+    final override val source: ControlInstruction.WasmCall,
     val resultDestinationSlot: Int?,
 ) : DispatchableInstruction(), LinkableWasmCall {
 
@@ -169,7 +169,7 @@ private abstract class UnlinkedWasmCall(
 }
 
 private class UnlinkedWasmCallWithOperands(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     private val callFrameOffset: Int,
     resultDestinationSlot: Int?,
 ) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
@@ -190,7 +190,7 @@ private class UnlinkedWasmCallWithOperands(
 }
 
 private class UnlinkedWasmCallByStrategy(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     private val callFrameOffset: Int,
     resultDestinationSlot: Int?,
 ) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
@@ -219,7 +219,7 @@ private class UnlinkedWasmCallByStrategy(
 }
 
 private class UnlinkedWasmCallWithoutLocalsOrOperandTransfer(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     private val callFrameOffset: Int,
     resultDestinationSlot: Int?,
 ) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
@@ -257,7 +257,7 @@ private class LinkedWasmCallWithoutLocalsOrOperandTransfer(
 }
 
 private class UnlinkedWasmCallWithoutLocalsWithImmediateOperand(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     private val callFrameOffset: Int,
     private val operand: Long,
     resultDestinationSlot: Int?,
@@ -304,7 +304,7 @@ private class LinkedWasmCallWithoutLocalsWithImmediateOperand(
 }
 
 private class UnlinkedWasmCallWithoutLocalsWithSlotOperand(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     private val callFrameOffset: Int,
     private val sourceSlot: Int,
     resultDestinationSlot: Int?,
@@ -351,7 +351,7 @@ private class LinkedWasmCallWithoutLocalsWithSlotOperand(
 }
 
 private class UnlinkedWasmCallWithoutLocalsWithTwoSlotOperands(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     private val callFrameOffset: Int,
     private val firstSourceSlot: Int,
     private val secondSourceSlot: Int,
@@ -402,7 +402,7 @@ private class LinkedWasmCallWithoutLocalsWithTwoSlotOperands(
 }
 
 private class UnlinkedWasmCallWithoutLocalsWithThreeSlotOperands(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     private val callFrameOffset: Int,
     private val firstSourceSlot: Int,
     private val secondSourceSlot: Int,
@@ -457,7 +457,7 @@ private class LinkedWasmCallWithoutLocalsWithThreeSlotOperands(
 }
 
 private class UnlinkedWasmCallWithoutLocalsWithFourSlotOperands(
-    instruction: ControlSuperInstruction.WasmCall,
+    instruction: ControlInstruction.WasmCall,
     private val callFrameOffset: Int,
     private val firstSourceSlot: Int,
     private val secondSourceSlot: Int,
@@ -797,7 +797,7 @@ private inline fun linkedWasmFunctionCall(
 }
 
 fun CallDispatcher(
-    instruction: ControlSuperInstruction.HostCall,
+    instruction: ControlInstruction.HostCall,
     resultDestinationSlot: Int? = null,
 ): DispatchableInstruction {
     val function = instruction.instance
@@ -842,12 +842,12 @@ fun CallDispatcher(
 }
 
 fun CallDispatcher(
-    instruction: ControlSuperInstruction.CallIndirectI,
+    instruction: ControlInstruction.CallIndirectI,
     resultDestinationSlot: Int? = null,
 ): DispatchableInstruction = UnlinkedCallIndirectI(instruction, resultDestinationSlot)
 
 private class UnlinkedCallIndirectI(
-    override val source: ControlSuperInstruction.CallIndirectI,
+    override val source: ControlInstruction.CallIndirectI,
     private val resultDestinationSlot: Int?,
 ) : DispatchableInstruction(), LinkableWasmCall {
 
@@ -862,12 +862,12 @@ private class UnlinkedCallIndirectI(
 }
 
 fun CallDispatcher(
-    instruction: ControlSuperInstruction.CallIndirectS,
+    instruction: ControlInstruction.CallIndirectS,
     resultDestinationSlot: Int? = null,
 ): DispatchableInstruction = UnlinkedCallIndirectS(instruction, resultDestinationSlot)
 
 private class UnlinkedCallIndirectS(
-    override val source: ControlSuperInstruction.CallIndirectS,
+    override val source: ControlInstruction.CallIndirectS,
     private val resultDestinationSlot: Int?,
 ) : DispatchableInstruction(), LinkableWasmCall {
 
@@ -882,12 +882,12 @@ private class UnlinkedCallIndirectS(
 }
 
 fun CallDispatcher(
-    instruction: ControlSuperInstruction.CallRefS,
+    instruction: ControlInstruction.CallRefS,
     resultDestinationSlot: Int? = null,
 ): DispatchableInstruction = UnlinkedCallRef(instruction, resultDestinationSlot)
 
 private class UnlinkedCallRef(
-    override val source: ControlSuperInstruction.CallRefS,
+    override val source: ControlInstruction.CallRefS,
     private val resultDestinationSlot: Int?,
 ) : DispatchableInstruction(), LinkableWasmCall {
 
@@ -902,7 +902,7 @@ private class UnlinkedCallRef(
 }
 
 fun CallDispatcher(
-    instruction: ControlSuperInstruction.CallIndirectI,
+    instruction: ControlInstruction.CallIndirectI,
     callSiteIp: Int,
     resultDestinationSlot: Int? = null,
 ): DispatchableInstruction {
@@ -922,7 +922,7 @@ fun CallDispatcher(
 }
 
 fun CallDispatcher(
-    instruction: ControlSuperInstruction.CallIndirectS,
+    instruction: ControlInstruction.CallIndirectS,
     callSiteIp: Int,
     resultDestinationSlot: Int? = null,
 ): DispatchableInstruction {
@@ -942,7 +942,7 @@ fun CallDispatcher(
 }
 
 fun CallDispatcher(
-    instruction: ControlSuperInstruction.CallRefS,
+    instruction: ControlInstruction.CallRefS,
     callSiteIp: Int,
     resultDestinationSlot: Int? = null,
 ): DispatchableInstruction {
@@ -976,7 +976,7 @@ private fun checkWasmCallSite(
 }
 
 private class ResultCallIndirectIDispatcher(
-    private val instruction: ControlSuperInstruction.CallIndirectI,
+    private val instruction: ControlInstruction.CallIndirectI,
     private val returnIp: Int,
     private val activationHeader: Long,
     override val resultDestinationSlot: Int,
@@ -990,7 +990,7 @@ private class ResultCallIndirectIDispatcher(
 }
 
 private class ResultCallIndirectSDispatcher(
-    private val instruction: ControlSuperInstruction.CallIndirectS,
+    private val instruction: ControlInstruction.CallIndirectS,
     private val returnIp: Int,
     private val activationHeader: Long,
     override val resultDestinationSlot: Int,
@@ -1004,7 +1004,7 @@ private class ResultCallIndirectSDispatcher(
 }
 
 private class ResultCallRefDispatcher(
-    private val instruction: ControlSuperInstruction.CallRefS,
+    private val instruction: ControlInstruction.CallRefS,
     private val returnIp: Int,
     private val activationHeader: Long,
     override val resultDestinationSlot: Int,
@@ -1018,11 +1018,11 @@ private class ResultCallRefDispatcher(
 }
 
 fun ReturnCallDispatcher(
-    instruction: ControlSuperInstruction.ReturnWasmCall,
+    instruction: ControlInstruction.ReturnWasmCall,
 ): DispatchableInstruction = UnlinkedReturnWasmCall(instruction)
 
 private class UnlinkedReturnWasmCall(
-    override val source: ControlSuperInstruction.ReturnWasmCall,
+    override val source: ControlInstruction.ReturnWasmCall,
 ) : DispatchableInstruction(), LinkableWasmCall {
 
     override fun link(callSiteIp: Int): DispatchableInstruction {
@@ -1284,7 +1284,7 @@ private inline fun linkedReturnWasmFunctionCall(
 }
 
 fun FunctionReturnDispatcher(
-    instruction: ControlSuperInstruction.FunctionReturn,
+    instruction: ControlInstruction.FunctionReturn,
 ): DispatchableInstruction {
     val results = instruction.results
     val resultCount = results.sources.size
@@ -1331,7 +1331,7 @@ fun FunctionReturnDispatcher(
 }
 
 fun ReturnCallDispatcher(
-    instruction: ControlSuperInstruction.ReturnHostCall,
+    instruction: ControlInstruction.ReturnHostCall,
 ): DispatchableInstruction {
     val function = instruction.instance
     val caller = instruction.caller
@@ -1375,31 +1375,31 @@ fun ReturnCallDispatcher(
 }
 
 fun ReturnCallDispatcher(
-    instruction: ControlSuperInstruction.ReturnCallIndirectI,
+    instruction: ControlInstruction.ReturnCallIndirectI,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
     ReturnCallExecutor(vstack, context, instruction)
 }
 
 fun ReturnCallDispatcher(
-    instruction: ControlSuperInstruction.ReturnCallIndirectS,
+    instruction: ControlInstruction.ReturnCallIndirectS,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
     ReturnCallExecutor(vstack, context, instruction)
 }
 
 fun ReturnCallDispatcher(
-    instruction: ControlSuperInstruction.ReturnCallRefS,
+    instruction: ControlInstruction.ReturnCallRefS,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
     ReturnCallExecutor(vstack, context, instruction)
 }
 
 fun ThrowDispatcher(
-    instruction: ControlSuperInstruction.Throw,
+    instruction: ControlInstruction.Throw,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
     ThrowExecutor(vstack, context, instruction)
 }
 
 fun ThrowRefDispatcher(
-    instruction: ControlSuperInstruction.ThrowRefS,
+    instruction: ControlInstruction.ThrowRefS,
 ): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
     ThrowRefExecutor(vstack, context, instruction)
 }

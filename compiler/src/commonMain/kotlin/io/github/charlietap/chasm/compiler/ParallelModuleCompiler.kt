@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.createCompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.LinkWasmCallDispatchers
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.LinkWasmCallDispatchers
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError

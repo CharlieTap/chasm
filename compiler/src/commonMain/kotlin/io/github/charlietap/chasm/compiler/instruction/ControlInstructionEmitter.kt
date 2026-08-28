@@ -16,16 +16,16 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpConditionD
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PopHandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PushHandlerDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.FunctionReturnDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowRefDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.FunctionReturnDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F32ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.F64ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I32ConstDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.I64ConstDispatcher
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
@@ -42,7 +42,7 @@ internal enum class BranchOutcome {
 
 internal fun FunctionCompilationContext.emitFunctionReturn(transfer: SlotTransfer) {
     val destinationSlotBase = if (transfer.size == 0) 0 else transfer.destinationSlot(0)
-    val instruction = ControlSuperInstruction.FunctionReturn(
+    val instruction = ControlInstruction.FunctionReturn(
         results = transfer.toOperandTransfer(destinationSlotBase),
         activationHeaderSlot = layout.activationHeaderSlot,
     )
@@ -365,7 +365,7 @@ internal fun FunctionCompilationContext.emitThrow(
     tagIndex: Index.TagIndex,
     firstPayloadSlot: Int,
 ) {
-    val instruction = ControlSuperInstruction.Throw(
+    val instruction = ControlInstruction.Throw(
         tagAddress = compiler.instance.tagAddresses[tagIndex.toInt()],
         firstPayloadSlot = firstPayloadSlot,
     )
@@ -373,7 +373,7 @@ internal fun FunctionCompilationContext.emitThrow(
 }
 
 internal fun FunctionCompilationContext.emitThrowRef(exceptionSlot: Int) {
-    val instruction = ControlSuperInstruction.ThrowRefS(exceptionSlot)
+    val instruction = ControlInstruction.ThrowRefS(exceptionSlot)
     emit(instruction, ::ThrowRefDispatcher)
 }
 

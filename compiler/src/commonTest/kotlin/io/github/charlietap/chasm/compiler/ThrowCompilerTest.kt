@@ -22,7 +22,6 @@ import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tagType
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.store.Store
@@ -31,6 +30,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction as RuntimeControlInstruction
 
 class ThrowCompilerTest {
 
@@ -45,9 +45,9 @@ class ThrowCompilerTest {
             ),
         )
 
-        val throwIndex = fixture.instructions.indexOfFirst { it is ControlSuperInstruction.Throw }
+        val throwIndex = fixture.instructions.indexOfFirst { it is RuntimeControlInstruction.Throw }
         assertTrue(throwIndex >= 0)
-        val linkedThrow = assertIs<ControlSuperInstruction.Throw>(fixture.instructions[throwIndex])
+        val linkedThrow = assertIs<RuntimeControlInstruction.Throw>(fixture.instructions[throwIndex])
         assertTrue(linkedThrow.firstPayloadSlot >= 0)
     }
 
@@ -65,8 +65,8 @@ class ThrowCompilerTest {
                 ControlInstruction.Throw(Index.TagIndex(0u)),
             ),
         )
-        val linkedContiguous = assertIs<ControlSuperInstruction.Throw>(
-            contiguous.instructions.first { it is ControlSuperInstruction.Throw },
+        val linkedContiguous = assertIs<RuntimeControlInstruction.Throw>(
+            contiguous.instructions.first { it is RuntimeControlInstruction.Throw },
         )
         assertTrue(linkedContiguous.firstPayloadSlot >= 0)
 
@@ -74,8 +74,8 @@ class ThrowCompilerTest {
             parameters = 0,
             body = Expression(ControlInstruction.Throw(Index.TagIndex(0u))),
         )
-        val linkedEmpty = assertIs<ControlSuperInstruction.Throw>(
-            empty.instructions.first { it is ControlSuperInstruction.Throw },
+        val linkedEmpty = assertIs<RuntimeControlInstruction.Throw>(
+            empty.instructions.first { it is RuntimeControlInstruction.Throw },
         )
         assertEquals(0, linkedEmpty.firstPayloadSlot)
     }

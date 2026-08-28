@@ -45,7 +45,6 @@ import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.program.Program
@@ -58,6 +57,7 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction as RuntimeControlInstruction
 
 class FunctionCompilerTest {
 
@@ -100,7 +100,7 @@ class FunctionCompilerTest {
 
         FunctionCompiler(context, caller, Program()).unwrap()
 
-        assertEquals(1, lowered.filterIsInstance<ControlSuperInstruction.WasmCall>().size)
+        assertEquals(1, lowered.filterIsInstance<RuntimeControlInstruction.WasmCall>().size)
         assertTrue(lowered.none { it is AdminInstruction.CopySlot })
     }
 
@@ -153,7 +153,7 @@ class FunctionCompilerTest {
 
         FunctionCompiler(context, caller, Program()).unwrap()
 
-        val call = lowered.filterIsInstance<ControlSuperInstruction.WasmCall>().single()
+        val call = lowered.filterIsInstance<RuntimeControlInstruction.WasmCall>().single()
         assertTrue(call.operands.isInPlace)
         assertEquals(5, call.callFrameOffset)
         assertEquals(listOf(5, 6), call.operands.sources.map { (it as io.github.charlietap.chasm.runtime.instruction.TransferSource.Slot).slot })

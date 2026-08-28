@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.runtime.function.LocalInitialization
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
@@ -20,7 +19,6 @@ class CompilerInstructionTagTranslator {
     fun translate(instruction: LinkedInstruction): String = when (instruction) {
         is AdminInstruction -> admin(instruction)
         is ControlInstruction -> control(instruction)
-        is ControlSuperInstruction -> control(instruction)
         is VariableInstruction -> variant(instruction, "variable", variableOperations)
         is ParametricInstruction -> variant(instruction, "parametric", parametricOperations)
         is NumericInstruction -> variant(instruction, "numeric", numericOperations)
@@ -88,26 +86,23 @@ class CompilerInstructionTagTranslator {
 
     private fun control(instruction: ControlInstruction): String = when (instruction) {
         ControlInstruction.Unreachable -> "control.unreachable"
-    }
-
-    private fun control(instruction: ControlSuperInstruction): String = when (instruction) {
-        is ControlSuperInstruction.WasmCall -> if (instruction.strategy.localInitialization is LocalInitialization.None) {
+        is ControlInstruction.WasmCall -> if (instruction.strategy.localInitialization is LocalInitialization.None) {
             "control.call.wasm.no_locals"
         } else {
             "control.call.wasm.locals"
         }
-        is ControlSuperInstruction.HostCall -> "control.call.host"
-        is ControlSuperInstruction.ReturnWasmCall -> "control.return_call.wasm"
-        is ControlSuperInstruction.ReturnHostCall -> "control.return_call.host"
-        is ControlSuperInstruction.CallIndirectI -> "control.call_indirect.i"
-        is ControlSuperInstruction.CallIndirectS -> "control.call_indirect.s"
-        is ControlSuperInstruction.CallRefS -> "control.call_ref"
-        is ControlSuperInstruction.ReturnCallIndirectI -> "control.return_call_indirect.i"
-        is ControlSuperInstruction.ReturnCallIndirectS -> "control.return_call_indirect.s"
-        is ControlSuperInstruction.ReturnCallRefS -> "control.return_call_ref"
-        is ControlSuperInstruction.FunctionReturn -> "control.return"
-        is ControlSuperInstruction.Throw -> "control.throw"
-        is ControlSuperInstruction.ThrowRefS -> "control.throw_ref"
+        is ControlInstruction.HostCall -> "control.call.host"
+        is ControlInstruction.ReturnWasmCall -> "control.return_call.wasm"
+        is ControlInstruction.ReturnHostCall -> "control.return_call.host"
+        is ControlInstruction.CallIndirectI -> "control.call_indirect.i"
+        is ControlInstruction.CallIndirectS -> "control.call_indirect.s"
+        is ControlInstruction.CallRefS -> "control.call_ref"
+        is ControlInstruction.ReturnCallIndirectI -> "control.return_call_indirect.i"
+        is ControlInstruction.ReturnCallIndirectS -> "control.return_call_indirect.s"
+        is ControlInstruction.ReturnCallRefS -> "control.return_call_ref"
+        is ControlInstruction.FunctionReturn -> "control.return"
+        is ControlInstruction.Throw -> "control.throw"
+        is ControlInstruction.ThrowRefS -> "control.throw_ref"
     }
 
     private fun reference(instruction: ReferenceInstruction): String = when (instruction) {

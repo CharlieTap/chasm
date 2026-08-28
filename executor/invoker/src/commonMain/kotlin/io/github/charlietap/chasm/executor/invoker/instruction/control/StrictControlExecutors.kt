@@ -1,9 +1,8 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.controlfused
+package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
-import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -13,17 +12,16 @@ import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TailCallOperandTransfer
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.type.RTT
-import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor as ControlThrowRefExecutor
 
 internal fun CallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.CallIndirectI,
+    instruction: ControlInstruction.CallIndirectI,
     returnIp: Int,
     activationHeader: Long,
     resultDestinationSlot: Int? = null,
@@ -44,7 +42,7 @@ internal fun CallExecutor(
 internal fun CallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.CallIndirectS,
+    instruction: ControlInstruction.CallIndirectS,
     returnIp: Int,
     activationHeader: Long,
     resultDestinationSlot: Int? = null,
@@ -65,7 +63,7 @@ internal fun CallExecutor(
 internal fun CallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.CallRefS,
+    instruction: ControlInstruction.CallRefS,
     returnIp: Int,
     activationHeader: Long,
     resultDestinationSlot: Int? = null,
@@ -84,7 +82,7 @@ internal fun CallExecutor(
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.ReturnCallIndirectI,
+    instruction: ControlInstruction.ReturnCallIndirectI,
 ): Int = strictIndirectReturnCall(
     vstack = vstack,
     context = context,
@@ -100,7 +98,7 @@ internal fun ReturnCallExecutor(
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.ReturnCallIndirectS,
+    instruction: ControlInstruction.ReturnCallIndirectS,
 ): Int = strictIndirectReturnCall(
     vstack = vstack,
     context = context,
@@ -116,7 +114,7 @@ internal fun ReturnCallExecutor(
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.ReturnCallRefS,
+    instruction: ControlInstruction.ReturnCallRefS,
 ): Int = strictReferenceReturnCall(
     vstack = vstack,
     context = context,
@@ -130,9 +128,9 @@ internal fun ReturnCallExecutor(
 internal fun ThrowExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.Throw,
+    instruction: ControlInstruction.Throw,
 ): Int {
-    return ControlThrowRefExecutor(
+    return ThrowRefValueExecutor(
         vstack = vstack,
         context = context,
         ref = context.heap.allocateExceptionFromFrame(context, instruction.tagAddress, instruction.firstPayloadSlot),
@@ -142,8 +140,8 @@ internal fun ThrowExecutor(
 internal fun ThrowRefExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ControlSuperInstruction.ThrowRefS,
-) = ControlThrowRefExecutor(
+    instruction: ControlInstruction.ThrowRefS,
+) = ThrowRefValueExecutor(
     vstack = vstack,
     context = context,
     ref = vstack.getFrameSlot(instruction.exceptionSlot),

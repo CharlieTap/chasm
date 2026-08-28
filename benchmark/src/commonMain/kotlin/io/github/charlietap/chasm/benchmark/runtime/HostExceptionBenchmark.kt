@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.CallDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowRefDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
 import io.github.charlietap.chasm.fixture.ast.instruction.catchAllHandler
 import io.github.charlietap.chasm.fixture.ast.instruction.catchAllRefHandler
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
@@ -34,7 +34,7 @@ import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.program.Program
@@ -118,7 +118,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         )
         val invocation = if (hostRaised) {
             CallDispatcher(
-                ControlSuperInstruction.HostCall(
+                ControlInstruction.HostCall(
                     instance = hostFunction,
                     caller = module,
                     operands = OperandTransfer(
@@ -129,7 +129,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
                 ),
             )
         } else {
-            val throwInstruction = ThrowRefDispatcher(ControlSuperInstruction.ThrowRefS(exceptionSlot = 0))
+            val throwInstruction = ThrowRefDispatcher(ControlInstruction.ThrowRefS(exceptionSlot = 0))
             DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(0, exception.rawReference)
                 throwInstruction(vstack, context, nextIp)
@@ -242,7 +242,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
                     nextIp
                 },
                 CallDispatcher(
-                    ControlSuperInstruction.HostCall(
+                    ControlInstruction.HostCall(
                         instance = bridge,
                         caller = module,
                         operands = OperandTransfer(emptyArray(), destinationSlotBase = 0),
@@ -270,7 +270,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         module: ModuleInstance,
         exceptionReference: Long,
     ): FunctionInstance.WasmFunction {
-        val throwInstruction = ThrowRefDispatcher(ControlSuperInstruction.ThrowRefS(exceptionSlot = 0))
+        val throwInstruction = ThrowRefDispatcher(ControlInstruction.ThrowRefS(exceptionSlot = 0))
         return wasmFunctionInstance(
             module = module,
             function = runtimeFunction(

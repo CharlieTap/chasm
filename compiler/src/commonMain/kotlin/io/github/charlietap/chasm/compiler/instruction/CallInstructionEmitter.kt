@@ -6,11 +6,11 @@ import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
 import io.github.charlietap.chasm.compiler.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.operand.i64Immediate
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.CallDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ReturnCallDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnCallDispatcher
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TailCallOperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
@@ -26,7 +26,7 @@ internal fun FunctionCompilationContext.emitCall(
     when (function) {
         is FunctionInstance.WasmFunction -> {
             checkWasmCallFrame(callFrameOffset)
-            val instruction = ControlSuperInstruction.WasmCall(
+            val instruction = ControlInstruction.WasmCall(
                 strategy = function.callStrategy,
                 operands = operandTransfer,
                 callFrameOffset = callFrameOffset,
@@ -37,7 +37,7 @@ internal fun FunctionCompilationContext.emitCall(
             )
         }
         is FunctionInstance.HostFunction -> {
-            val instruction = ControlSuperInstruction.HostCall(
+            val instruction = ControlInstruction.HostCall(
                 instance = function,
                 caller = compiler.instance,
                 operands = operandTransfer,
@@ -62,7 +62,7 @@ internal fun FunctionCompilationContext.emitCallIndirect(
     checkWasmCallFrame(callFrameOffset)
     val operandTransfer = operands.toOperandTransfer(callFrameOffset)
     if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
-        val instruction = ControlSuperInstruction.CallIndirectI(
+        val instruction = ControlInstruction.CallIndirectI(
             elementIndex.sourceBits.toInt(),
             operandTransfer,
             type,
@@ -72,7 +72,7 @@ internal fun FunctionCompilationContext.emitCallIndirect(
         )
         emit(CallDispatcher(instruction, resultDestinationSlot)) { instruction }
     } else {
-        val instruction = ControlSuperInstruction.CallIndirectS(
+        val instruction = ControlInstruction.CallIndirectS(
             elementIndex.sourceBits.toInt(),
             operandTransfer,
             type,
@@ -91,7 +91,7 @@ internal fun FunctionCompilationContext.emitCallRef(
     resultDestinationSlot: Int?,
 ) {
     checkWasmCallFrame(callFrameOffset)
-    val instruction = ControlSuperInstruction.CallRefS(
+    val instruction = ControlInstruction.CallRefS(
         functionSlot,
         operands.toOperandTransfer(callFrameOffset),
         compiler.instance,
@@ -110,7 +110,7 @@ internal fun FunctionCompilationContext.emitReturnWasmCall(
     function: FunctionInstance.WasmFunction,
     operands: List<OperandSource>,
 ) {
-    val instruction = ControlSuperInstruction.ReturnWasmCall(
+    val instruction = ControlInstruction.ReturnWasmCall(
         function.callStrategy,
         operands.toOperandTransfer(0),
         layout.activationHeaderSlot,
@@ -123,7 +123,7 @@ internal fun FunctionCompilationContext.emitReturnHostCall(
     operands: List<OperandSource>,
     callFrameOffset: Int,
 ) {
-    val instruction = ControlSuperInstruction.ReturnHostCall(
+    val instruction = ControlInstruction.ReturnHostCall(
         instance = function,
         caller = compiler.instance,
         operands = operands.toOperandTransfer(callFrameOffset),
@@ -142,7 +142,7 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
 ) {
     val operandTransfer = operands.toTailCallOperandTransfer(callFrameOffset)
     if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
-        val instruction = ControlSuperInstruction.ReturnCallIndirectI(
+        val instruction = ControlInstruction.ReturnCallIndirectI(
             elementIndex.sourceBits.toInt(),
             operandTransfer,
             type,
@@ -153,7 +153,7 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
         )
         emit(instruction, ::ReturnCallDispatcher)
     } else {
-        val instruction = ControlSuperInstruction.ReturnCallIndirectS(
+        val instruction = ControlInstruction.ReturnCallIndirectS(
             elementIndex.sourceBits.toInt(),
             operandTransfer,
             type,
@@ -171,7 +171,7 @@ internal fun FunctionCompilationContext.emitReturnCallRef(
     operands: List<OperandSource>,
     callFrameOffset: Int,
 ) {
-    val instruction = ControlSuperInstruction.ReturnCallRefS(
+    val instruction = ControlInstruction.ReturnCallRefS(
         functionSlot,
         operands.toTailCallOperandTransfer(callFrameOffset),
         compiler.instance,

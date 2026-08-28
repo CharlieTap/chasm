@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.controlfused
+package io.github.charlietap.chasm.executor.invoker.instruction.control
 
 import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.fixture.ast.instruction.catchCatchHandler
@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -53,7 +53,7 @@ class StrictThrowExecutorTest {
         val continuationIp = ThrowExecutor(
             vstack,
             executionContext(store = store, vstack = vstack, cstack = cstack),
-            ControlSuperInstruction.Throw(tagAddress, firstPayloadSlot = 0),
+            ControlInstruction.Throw(tagAddress, firstPayloadSlot = 0),
         )
 
         assertEquals(64, continuationIp)
