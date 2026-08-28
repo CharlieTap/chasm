@@ -4,13 +4,17 @@ import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
+import io.github.charlietap.chasm.fixture.runtime.instance.tableAddress
+import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
+import io.github.charlietap.chasm.fixture.type.tableType
 import io.github.charlietap.chasm.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
@@ -92,5 +96,46 @@ class HostGrowthExtensionsTest {
         assertSame(memory, memoryInstance.data)
         assertEquals(1u, memoryInstance.type.limits.min)
         assertEquals(PAGE_SIZE, memoryInstance.size)
+    }
+
+    @Test
+    fun `grows table from within its host DSL`() {
+        val tableInstance = tableInstance(
+            type = tableType(limits = limits(min = 2u, max = 4u)),
+            elements = longArrayOf(7L, 9L),
+        )
+        val store = store(tables = mutableListOf(tableInstance))
+        val module = moduleInstance(tableAddresses = mutableListOf(tableAddress()))
+        val resources = executionContext(store = store)
+
+        context(module, resources) {
+            withTable(0) {
+                assertEquals(2, grow(2, 11L))
+                assertEquals(4, size)
+            }
+        }
+
+        assertContentEquals(longArrayOf(7L, 9L, 11L, 11L), tableInstance.elements)
+        assertEquals(4u, tableInstance.type.limits.min)
+    }
+
+    @Test
+    fun `table growth returns minus one without changing the table when it exceeds the maximum`() {
+        val elements = longArrayOf(7L, 9L)
+        val tableInstance = tableInstance(
+            type = tableType(limits = limits(min = 2u, max = 2u)),
+            elements = elements,
+        )
+        val store = store(tables = mutableListOf(tableInstance))
+        val module = moduleInstance(tableAddresses = mutableListOf(tableAddress()))
+        val resources = executionContext(store = store)
+
+        val result = context(module, resources) {
+            withTable(0) { grow(1, 11L) }
+        }
+
+        assertEquals(-1, result)
+        assertSame(elements, tableInstance.elements)
+        assertEquals(2u, tableInstance.type.limits.min)
     }
 }
