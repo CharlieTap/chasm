@@ -1,96 +1,51 @@
 package io.github.charlietap.chasm.runtime.stack
 
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
-import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.exception.InvocationException
 
-data class ControlStack(
-    private val frames: FrameStack = FrameStack(),
-    private val handlers: HandlerStack = HandlerStack(INITIAL_CAPACITY),
+class ControlStack(
+    initialHandlers: List<ExceptionHandler> = emptyList(),
 ) {
-    constructor(
-        frames: List<ActivationFrame>,
-        handlers: List<ExceptionHandler>,
-    ) : this() {
-        frames.forEach(this::push)
-        handlers.forEach(this::push)
+
+    private var handlers = arrayOfNulls<ExceptionHandler>(INITIAL_CAPACITY)
+    private var depth = 0
+
+    init {
+        initialHandlers.forEach(this::push)
     }
 
-    fun push(frame: ActivationFrame) = frames.push(frame)
+    fun push(handler: ExceptionHandler) {
+        handlers[depth] = handler
+        depth++
+        if (depth == handlers.size) {
+            doubleCapacity()
+        }
+    }
 
-    fun pushFrame(
-        arity: Int,
-        handlerDepth: Int,
-        valueDepth: Int,
-        instance: ModuleInstance,
-        previousFramePointer: Int = 0,
-        resultSlotBase: Int = NO_RESULT_SLOT_BASE,
-        returnIp: Int,
-    ) = frames.push(
-        arity = arity,
-        handlerDepth = handlerDepth,
-        valueDepth = valueDepth,
-        instance = instance,
-        previousFramePointer = previousFramePointer,
-        resultSlotBase = resultSlotBase,
-        returnIp = returnIp,
-    )
+    fun popHandler(): ExceptionHandler = try {
+        depth--
+        val handler = handlers[depth]
+        handlers[depth] = null
+        handler!!
+    } catch (_: IndexOutOfBoundsException) {
+        throw InvocationException(InvocationError.UncaughtException)
+    } catch (_: IllegalArgumentException) {
+        throw InvocationException(InvocationError.UncaughtException)
+    }
 
-    fun push(handler: ExceptionHandler) = handlers.push(handler)
-
-    fun popFrame(): ActivationFrame = frames.pop()
-
-    fun discardFrame() = frames.discard()
-
-    fun popHandler(): ExceptionHandler = handlers.pop()
-
-    fun peekFrame(): ActivationFrame = frames.peek()
-
-    fun frameArity(): Int = frames.peekArity()
-
-    fun frameHandlerDepth(): Int = frames.peekHandlerDepth()
-
-    fun frameValueDepth(): Int = frames.peekValueDepth()
-
-    fun frameInstance(): ModuleInstance = frames.peekInstance()
-
-    fun framePreviousFramePointer(): Int = frames.peekPreviousFramePointer()
-
-    fun frameResultSlotBase(): Int = frames.peekResultSlotBase()
-
-    fun frameReturnIp(): Int = frames.peekReturnIp()
-
-    fun replaceFrameInstance(instance: ModuleInstance) = frames.replaceInstance(instance)
-
-    fun peekNthFrameOrNull(n: Int): ActivationFrame? = frames.peekNth(n)
-
-    fun shrinkFrames(depth: Int) = frames.shrink(depth)
-
-    fun shrinkHandlers(depth: Int) = handlers.shrink(depth)
-
-    fun framesDepth(): Int = frames.depth()
-
-    fun handlersDepth(): Int = handlers.depth()
+    fun handlersDepth(): Int = depth
 
     fun clear() {
-        frames.clear()
-        handlers.clear()
+        for (index in 0 until depth) {
+            handlers[index] = null
+        }
+        depth = 0
     }
 
-    fun clearHandlers() = handlers.clear()
-
-    fun clearFrames() = frames.clear()
-
-    fun frames(): List<ActivationFrame> = frames.entries()
-
-    fun handlers(): List<ExceptionHandler> = handlers.entries()
-
-    fun fill(controlStack: ControlStack) {
-        controlStack.frames.entries().forEach(this::push)
-        controlStack.handlers.entries().forEach(this::push)
-    }
-
-    companion object {
-        const val INITIAL_CAPACITY = 32
-        const val MAX_DEPTH = 1028
+    private fun doubleCapacity() {
+        handlers = handlers.copyOf(handlers.size * 2)
     }
 }
+
+private const val INITIAL_CAPACITY = 32

@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
+import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
@@ -10,85 +10,92 @@ import io.github.charlietap.chasm.runtime.type.RTT
 sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class WasmCall(
-        val plan: WasmFunctionCallPlan,
-        val operands: OperandCopyPlan,
-        val resultSlotBase: Int,
-        val callFrameSlot: Int,
+        val strategy: WasmFunctionCallStrategy,
+        val operands: OperandTransfer,
+        val callFrameOffset: Int,
     ) : ControlSuperInstruction
 
     data class HostCall(
         val instance: FunctionInstance.HostFunction,
         val caller: ModuleInstance,
-        val operands: OperandCopyPlan,
-        val resultSlotBase: Int,
-        val callFrameSlot: Int,
+        val operands: OperandTransfer,
+        val callFrameOffset: Int,
     ) : ControlSuperInstruction
 
     data class ReturnWasmCall(
-        val plan: WasmFunctionCallPlan,
-        val operands: List<CopyOperand>,
+        val strategy: WasmFunctionCallStrategy,
+        val operands: OperandTransfer,
+        val callerActivationHeaderSlot: Int,
     ) : ControlSuperInstruction
 
     data class ReturnHostCall(
         val instance: FunctionInstance.HostFunction,
         val caller: ModuleInstance,
-        val operands: OperandCopyPlan,
-        val callFrameSlot: Int,
+        val operands: OperandTransfer,
+        val callFrameOffset: Int,
+        val activationHeaderSlot: Int,
     ) : ControlSuperInstruction
 
     data class CallIndirectI(
         val elementIndex: Int,
-        val operands: OperandCopyPlan,
+        val operands: OperandTransfer,
         val type: RTT,
         val table: TableInstance,
-        val resultSlotBase: Int,
-        val callFrameSlot: Int,
+        val caller: ModuleInstance,
+        val callFrameOffset: Int,
     ) : ControlSuperInstruction
 
     data class CallIndirectS(
         val elementIndexSlot: Int,
-        val operands: OperandCopyPlan,
+        val operands: OperandTransfer,
         val type: RTT,
         val table: TableInstance,
-        val resultSlotBase: Int,
-        val callFrameSlot: Int,
+        val caller: ModuleInstance,
+        val callFrameOffset: Int,
     ) : ControlSuperInstruction
 
     data class CallRefS(
         val functionSlot: Int,
-        val operands: OperandCopyPlan,
-        val resultSlotBase: Int,
-        val callFrameSlot: Int,
+        val operands: OperandTransfer,
+        val caller: ModuleInstance,
+        val callFrameOffset: Int,
     ) : ControlSuperInstruction
 
     data class ReturnCallIndirectI(
         val elementIndex: Int,
-        val operands: List<CopyOperand>,
+        val operands: TailCallOperandTransfer,
         val type: RTT,
         val table: TableInstance,
-        val callFrameSlot: Int,
+        val caller: ModuleInstance,
+        val callFrameOffset: Int,
+        val callerActivationHeaderSlot: Int,
     ) : ControlSuperInstruction
 
     data class ReturnCallIndirectS(
         val elementIndexSlot: Int,
-        val operands: List<CopyOperand>,
+        val operands: TailCallOperandTransfer,
         val type: RTT,
         val table: TableInstance,
-        val callFrameSlot: Int,
+        val caller: ModuleInstance,
+        val callFrameOffset: Int,
+        val callerActivationHeaderSlot: Int,
     ) : ControlSuperInstruction
 
     data class ReturnCallRefS(
         val functionSlot: Int,
-        val operands: List<CopyOperand>,
-        val callFrameSlot: Int,
+        val operands: TailCallOperandTransfer,
+        val caller: ModuleInstance,
+        val callFrameOffset: Int,
+        val callerActivationHeaderSlot: Int,
     ) : ControlSuperInstruction
 
     data class FunctionReturn(
-        val results: OperandCopyPlan,
+        val results: OperandTransfer,
+        val activationHeaderSlot: Int,
     ) : ControlSuperInstruction
 
     data class Throw(
-        val tagIndex: Index.TagIndex,
+        val tagAddress: Address.Tag,
         val firstPayloadSlot: Int,
     ) : ControlSuperInstruction
 

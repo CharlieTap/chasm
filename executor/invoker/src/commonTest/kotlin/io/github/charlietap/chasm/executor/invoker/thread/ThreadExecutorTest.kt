@@ -75,15 +75,15 @@ class ThreadExecutorTest {
                             handlers = listOf(catchCatchHandler(tagIndex(0u), labelIndex(0u))),
                             payloadDestinationSlots = listOf(intArrayOf(0)),
                             continuationIps = intArrayOf(1),
-                            framesDepth = 1,
-                            framePointer = 0,
-                            valueDepth = 1,
+                            instance = module,
+                            fp = vstack.fp,
+                            sp = vstack.sp,
                         ),
                     )
-                    HostFunctionCall(vstack, context, module, hostFunction)
+                    HostFunctionCall(vstack, context, module, hostFunction, 0, 0)
                     error("raised exception returned to the host call site")
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction),
+                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
             ),
         )
         val function = wasmFunctionInstance(
@@ -91,7 +91,7 @@ class ThreadExecutorTest {
             functionType = functionType(results = resultType(listOf(i64ValueType()))),
             function = runtimeFunction(
                 body = runtimeExpression(entryIp),
-                frameSlots = 1,
+                frameSlots = 2,
             ),
         )
 
@@ -120,7 +120,7 @@ class ThreadExecutorTest {
         )
         val entryIp = program.append(
             DispatchableInstruction { vstack, _, _, context, _ ->
-                HostFunctionCall(vstack, context, module, hostFunction)
+                HostFunctionCall(vstack, context, module, hostFunction, 0, 0)
                 error("raised exception returned to the host call site")
             },
         )
@@ -165,7 +165,7 @@ class ThreadExecutorTest {
                     vstack.setFrameSlot(0, 0L)
                     nextIp
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction),
+                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 2)),
             ),
         )
         val module = moduleInstance()
@@ -177,7 +177,7 @@ class ThreadExecutorTest {
             ),
             function = runtimeFunction(
                 body = runtimeExpression(entryIp),
-                frameSlots = 2,
+                frameSlots = 3,
             ),
         )
 
@@ -192,16 +192,50 @@ class ThreadExecutorTest {
     }
 
     @Test
+    fun `root results remain in the overlapping interface`() {
+        val program = Program()
+        val entryIp = program.append(
+            arrayOf(
+                DispatchableInstruction { vstack, _, _, _, nextIp ->
+                    vstack.setFrameSlot(0, 41L)
+                    vstack.setFrameSlot(1, 42L)
+                    nextIp
+                },
+                EndFunctionDispatcher(AdminInstruction.EndFunction(resultCount = 2, activationHeaderSlot = 2)),
+            ),
+        )
+        val function = wasmFunctionInstance(
+            module = moduleInstance(),
+            functionType = functionType(
+                results = resultType(listOf(i32ValueType(), i32ValueType())),
+            ),
+            function = runtimeFunction(
+                body = runtimeExpression(entryIp),
+                frameSlots = 3,
+            ),
+        )
+
+        val actual = ThreadExecutor(
+            config = runtimeConfig(),
+            store = store(program = program),
+            instance = function,
+            values = emptyList(),
+        )
+
+        assertEquals(Ok(listOf(41L, 42L)), actual)
+    }
+
+    @Test
     fun `collects garbage after the invocation frame has been removed`() {
         val program = Program()
         val entryIp = program.append(
             arrayOf(
                 DispatchableInstruction { vstack, _, _, _, nextIp ->
                     vstack.setFrameSlot(0, 117L)
-                    vstack.setFrameSlot(1, 999L)
+                    vstack.setFrameSlot(2, 999L)
                     nextIp
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction),
+                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
             ),
         )
         val module = moduleInstance()
@@ -212,7 +246,7 @@ class ThreadExecutorTest {
             ),
             function = runtimeFunction(
                 body = runtimeExpression(entryIp),
-                frameSlots = 2,
+                frameSlots = 3,
             ),
         )
         val store = store(program = program)
@@ -220,7 +254,8 @@ class ThreadExecutorTest {
         var collected = false
         val collector: GarbageCollector = { _, stack ->
             collected = true
-            assertEquals(listOf(117L), stack?.iterator()?.asSequence()?.toList())
+            assertEquals(1, stack?.sp)
+            assertEquals(117L, stack?.getFrameSlot(0))
             Ok(Unit)
         }
 
@@ -244,7 +279,7 @@ class ThreadExecutorTest {
         val program = Program()
         val entryIp = program.append(
             arrayOf(
-                EndFunctionDispatcher(AdminInstruction.EndFunction),
+                EndFunctionDispatcher(AdminInstruction.EndFunction(0, 0)),
             ),
         )
         val module = moduleInstance()
@@ -281,7 +316,7 @@ class ThreadExecutorTest {
     fun `collector failure is returned`() {
         val program = Program()
         val entryIp = program.append(
-            arrayOf(EndFunctionDispatcher(AdminInstruction.EndFunction)),
+            arrayOf(EndFunctionDispatcher(AdminInstruction.EndFunction(0, 0))),
         )
         val function = wasmFunctionInstance(
             module = moduleInstance(),

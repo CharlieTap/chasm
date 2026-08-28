@@ -5,22 +5,9 @@ import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-
-internal fun ThrowRefExecutor(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    instruction: ControlInstruction.ThrowRef,
-): Int = ThrowRefValueExecutor(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    ref = vstack.pop(),
-)
 
 internal fun ThrowRefValueExecutor(
     vstack: ValueStack,
@@ -39,18 +26,16 @@ internal fun ThrowRefValueExecutor(
         }
         val handler = cstack.popHandler()
 
-        cstack.shrinkFrames(handler.framesDepth)
-        vstack.framePointer = handler.framePointer
-        vstack.shrink(0, handler.valueDepth)
+        vstack.fp = handler.fp
+        vstack.shrink(0, handler.sp)
 
-        val moduleInstance = cstack.frameInstance()
         handler.handlers.forEachIndexed { index, catchHandler ->
             val tagMatches = when (catchHandler) {
                 is CatchHandler.Catch -> {
-                    exceptionTagAddress == moduleInstance.tagAddress(catchHandler.tagIndex)
+                    exceptionTagAddress == handler.instance.tagAddress(catchHandler.tagIndex)
                 }
                 is CatchHandler.CatchRef -> {
-                    exceptionTagAddress == moduleInstance.tagAddress(catchHandler.tagIndex)
+                    exceptionTagAddress == handler.instance.tagAddress(catchHandler.tagIndex)
                 }
                 else -> true
             }

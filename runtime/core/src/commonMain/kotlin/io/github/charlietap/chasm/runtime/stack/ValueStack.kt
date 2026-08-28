@@ -5,15 +5,85 @@ import io.github.charlietap.chasm.gc.GcRootMarker
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.instruction.OPERAND_TRANSFER_COPY_IMMEDIATE
+import io.github.charlietap.chasm.runtime.instruction.OPERAND_TRANSFER_COPY_SLOT
+import io.github.charlietap.chasm.runtime.instruction.OPERAND_TRANSFER_INDEX_MASK
+import io.github.charlietap.chasm.runtime.instruction.OPERAND_TRANSFER_OPERATION_SHIFT
+import io.github.charlietap.chasm.runtime.instruction.OPERAND_TRANSFER_RESTORE
+import io.github.charlietap.chasm.runtime.instruction.OPERAND_TRANSFER_SAVE_SLOT
+import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 
+/**
+ * Chasm's unified value and activation stack.
+ *
+ * A compiled Wasm function has no separate frame object or frame stack. Its
+ * activation frame is a contiguous region of this stack, and compiled
+ * instructions address every value as `FP + slot`:
+ *
+ * ```text
+ *                                           HIGHER ADDRESSES
+ *                                                  ▲
+ *                                                  │
+ *           FP + F = SP ───────────▶ ┌─────────────┴─────────────┐
+ *                                     │                           │
+ *                                     │   compiler temporaries    │
+ *                                     │     [I + 1 + L, F)        │
+ *                                     │                           │
+ *       FP + I + 1 + L ────────────▶ ├───────────────────────────┤
+ *                                     │                           │
+ *                                     │   retained local slots    │
+ *                                     │    [I + 1, I + 1 + L)     │
+ *                                     │                           │
+ *           FP + I + 1 ────────────▶ ├───────────────────────────┤
+ *                                     │     activation header     │
+ *                                     │  return IP │ caller FP Δ  │
+ *               FP + I ────────────▶ ╞═══════════════════════════╡
+ *                                     │   shared call interface   │
+ *                                     │          [0, I)           │
+ *                                     │                           │
+ *                                     │ entry   parameters [0, P) │
+ *                                     │ return  results    [0, R) │
+ *                                     │                           │
+ *                   FP ────────────▶ └─────────────┬─────────────┘
+ *                                                  │
+ *                                                  ▼
+ *                                           LOWER ADDRESSES
+ * ```
+ *
+ * `P` is the parameter count, `R` is the result count, and
+ * `I = max(P, R)` is the call-interface size. `L` is the number of defined-local
+ * slots retained by the compiler; locals that need no runtime storage are not
+ * present. `F` is the total number of slots in the activation frame.
+ *
+ * Parameters and results share the interface prefix. A caller places arguments
+ * there before entry, and the callee leaves results in the same slots on return.
+ * The single header slot at `FP + I` holds the return IP and the displacement to
+ * the caller's FP. These are the only per-call bookkeeping values stored at
+ * runtime.
+ *
+ * [fp] and [sp] are virtual-machine registers. Entry sets SP to the exclusive
+ * end of the compiler-sized frame, `FP + F`; return restores the caller's FP and
+ * contracts SP to the exclusive end of the result interface, `callee FP + R`.
+ * Compiled execution uses assigned slots rather than dynamically pushing Wasm
+ * operands. Push/pop operations remain for API boundaries and constant
+ * expressions.
+ */
 class ValueStack(minCapacity: Int = MIN_CAPACITY) {
 
-    var framePointer = 0
+    /** `FP`: absolute index of slot 0 in the active activation frame. */
+    var fp = 0
+
+    /** `SP`: absolute exclusive end of the active stack region. */
+    var sp = 0
+        private set
+
     private var elements: LongArray
-    private var top = 0
 
     init {
         val minimumCapacity = maxOf(minCapacity, MIN_CAPACITY)
+        if (minimumCapacity > MAX_CAPACITY) {
+            throw InvocationException(InvocationError.CallStackExhausted)
+        }
         val arrayCapacity: Int =
             if (minimumCapacity.countOneBits() != 1) {
                 (minimumCapacity - 1).takeHighestOneBit() shl 1
@@ -32,127 +102,93 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         setFrameSlot(localIndex, value)
     }
 
-    fun getFrameSlot(slot: Int): Long = elements[framePointer + slot]
+    fun getFrameSlot(slot: Int): Long = elements[fp + slot]
 
     fun getFrameSlot(
-        framePointer: Int,
+        fp: Int,
         slot: Int,
-    ): Long = elements[framePointer + slot]
+    ): Long = elements[fp + slot]
 
     fun setFrameSlot(
         slot: Int,
         value: Long,
     ) {
-        elements[framePointer + slot] = value
-    }
-
-    fun copyFrameSlots(
-        sourceFramePointer: Int,
-        destinationFramePointer: Int,
-        sourceSlot: Int,
-        destinationSlot: Int,
-        count: Int,
-    ) {
-        elements.copyInto(
-            destination = elements,
-            destinationOffset = destinationFramePointer + destinationSlot,
-            startIndex = sourceFramePointer + sourceSlot,
-            endIndex = sourceFramePointer + sourceSlot + count,
-        )
-    }
-
-    fun copySlots(
-        source: Int,
-        destination: Int,
-        count: Int,
-    ) {
-        elements.copyInto(
-            destination = elements,
-            destinationOffset = destination,
-            startIndex = source,
-            endIndex = source + count,
-        )
+        elements[fp + slot] = value
     }
 
     fun setFrameSlot(
-        framePointer: Int,
+        fp: Int,
         slot: Int,
         value: Long,
     ) {
-        elements[framePointer + slot] = value
+        elements[fp + slot] = value
     }
 
     fun peek(): Long = try {
-        elements[top - 1]
+        elements[sp - 1]
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
     fun push(value: Long) {
-        if (top == elements.size) {
+        if (sp == elements.size) {
             doubleCapacity()
         }
-        elements[top] = value
-        top++
+        elements[sp] = value
+        sp++
     }
 
     fun pop(): Long = try {
-        top--
-        elements[top]
+        sp--
+        elements[sp]
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
     fun peekI32(): Int = try {
-        elements[top - 1].toInt()
+        elements[sp - 1].toInt()
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
     fun peekNthI32(n: Int): Int = try {
-        elements[top - 1 - n].toInt()
+        elements[sp - 1 - n].toInt()
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
     fun pushI32(value: Int) {
-        if (top == elements.size) {
+        if (sp == elements.size) {
             doubleCapacity()
         }
-        elements[top] = value.toLong()
-        top++
+        elements[sp] = value.toLong()
+        sp++
     }
 
     fun popI32(): Int = try {
-        top--
-        elements[top].toInt()
-    } catch (_: IndexOutOfBoundsException) {
-        throw InvocationException(InvocationError.MissingStackValue)
-    }
-
-    fun peekI64(): Long = try {
-        elements[top - 1]
+        sp--
+        elements[sp].toInt()
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
     fun peekNthI64(n: Int): Long = try {
-        elements[top - 1 - n]
+        elements[sp - 1 - n]
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
 
     fun pushI64(value: Long) {
-        if (top == elements.size) {
+        if (sp == elements.size) {
             doubleCapacity()
         }
-        elements[top] = value
-        top++
+        elements[sp] = value
+        sp++
     }
 
     fun popI64(): Long = try {
-        top--
-        elements[top]
+        sp--
+        elements[sp]
     } catch (_: IndexOutOfBoundsException) {
         throw InvocationException(InvocationError.MissingStackValue)
     }
@@ -180,12 +216,10 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
     fun push(
         values: LongArray,
     ) {
-        val requiredSize = top + values.size
-        while (requiredSize > elements.size) {
-            doubleCapacity()
-        }
-        values.copyInto(elements, startIndex = 0, endIndex = values.size, destinationOffset = top)
-        top += values.size
+        val requiredSize = sp + values.size
+        ensureCapacity(requiredSize)
+        values.copyInto(elements, startIndex = 0, endIndex = values.size, destinationOffset = sp)
+        sp += values.size
     }
 
     fun shrink(
@@ -195,68 +229,257 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         elements.copyInto(
             destination = elements,
             destinationOffset = depth,
-            startIndex = top - preserveTopN,
-            endIndex = top,
+            startIndex = sp - preserveTopN,
+            endIndex = sp,
         )
-        top = depth + preserveTopN
-    }
-
-    fun shrinkFromFrameSlots(
-        slots: List<Int>,
-        depth: Int,
-    ) {
-        val values = LongArray(slots.size) { index ->
-            getFrameSlot(slots[index])
-        }
-        values.copyInto(
-            destination = elements,
-            destinationOffset = depth,
-        )
-        top = depth + values.size
-    }
-
-    fun shrinkFromFrameSlots(
-        slot: Int,
-        count: Int,
-        depth: Int,
-    ) {
-        elements.copyInto(
-            destination = elements,
-            destinationOffset = depth,
-            startIndex = framePointer + slot,
-            endIndex = framePointer + slot + count,
-        )
-        top = depth + count
-    }
-
-    fun spillTopToFrameSlots(
-        slots: List<Int>,
-    ) {
-        val start = top - slots.size
-        slots.forEachIndexed { index, slot ->
-            setFrameSlot(slot, elements[start + index])
-        }
-        top = start
-    }
-
-    fun reserveFrame(frameSlots: Int) {
-        val requiredTop = framePointer + frameSlots
-        while (requiredTop > elements.size) {
-            doubleCapacity()
-        }
-        top = requiredTop
+        sp = depth + preserveTopN
     }
 
     fun reserveDepth(depth: Int) {
-        while (depth > elements.size) {
-            doubleCapacity()
-        }
-        if (top < depth) {
-            top = depth
+        ensureCapacity(depth)
+        if (sp < depth) {
+            sp = depth
         }
     }
 
-    fun depth(): Int = top
+    /** Ensures backing storage without changing the logical stack depth. */
+    fun ensureCapacity(depth: Int) {
+        if (depth > elements.size) growCapacity(depth)
+    }
+
+    fun fillFrameSlots(
+        fp: Int,
+        firstSlot: Int,
+        count: Int,
+        value: Long,
+    ) {
+        elements.fill(
+            element = value,
+            fromIndex = fp + firstSlot,
+            toIndex = fp + firstSlot + count,
+        )
+    }
+
+    fun copyValuesToFrame(
+        values: LongArray,
+        fp: Int,
+        firstSlot: Int,
+    ) {
+        values.copyInto(elements, destinationOffset = fp + firstSlot)
+    }
+
+    /** Executes the exact parallel-move schedule selected before execution. */
+    fun transferOperands(
+        currentFp: Int,
+        destinationFp: Int,
+        transfer: OperandTransfer,
+    ) {
+        val schedule = transfer.schedule
+        var scratch = 0L
+        var index = 0
+        while (index < schedule.operationCount) {
+            val encoded = schedule.operations[index]
+            val operation = encoded ushr OPERAND_TRANSFER_OPERATION_SHIFT
+            val destination = encoded and OPERAND_TRANSFER_INDEX_MASK
+            val value = schedule.values[index]
+            when (operation) {
+                OPERAND_TRANSFER_COPY_SLOT -> elements[destinationFp + destination] = elements[currentFp + value.toInt()]
+                OPERAND_TRANSFER_COPY_IMMEDIATE -> elements[destinationFp + destination] = value
+                OPERAND_TRANSFER_SAVE_SLOT -> scratch = elements[currentFp + value.toInt()]
+                OPERAND_TRANSFER_RESTORE -> elements[destinationFp + destination] = scratch
+            }
+            index++
+        }
+    }
+
+    /** Activates a frame after its capacity has already been reserved. */
+    fun activateFrame(
+        fp: Int,
+        frameSlots: Int,
+    ) {
+        this.fp = fp
+        sp = fp + frameSlots
+    }
+
+    /** Activates a frame using an already calculated absolute stack depth. */
+    fun activateFrameAtDepth(
+        fp: Int,
+        depth: Int,
+    ) {
+        this.fp = fp
+        sp = depth
+    }
+
+    /**
+     * Activates a compiler-linked callee whose operands already occupy its
+     * interface slots.
+     *
+     * The callee frame end relative to the caller is resolved when the module
+     * is linked. This keeps strategy lookup and separate header-write/frame-
+     * activation calls out of the invocation path.
+     */
+    fun activateLinkedFrame(
+        callFrameOffset: Int,
+        frameEndOffset: Int,
+        activationHeaderSlot: Int,
+        activationHeader: Long,
+    ) {
+        val callerFp = fp
+        val calleeFp = callerFp + callFrameOffset
+        val requiredSp = callerFp + frameEndOffset
+        if (requiredSp > elements.size) growCapacity(requiredSp)
+        elements[calleeFp + activationHeaderSlot] = activationHeader
+        fp = calleeFp
+        sp = requiredSp
+    }
+
+    /** Activates a compiler-linked callee with one immediate operand. */
+    fun activateLinkedFrameWithImmediate(
+        callFrameOffset: Int,
+        frameEndOffset: Int,
+        activationHeaderSlot: Int,
+        activationHeader: Long,
+        operand: Long,
+    ) {
+        val callerFp = fp
+        val calleeFp = callerFp + callFrameOffset
+        val requiredSp = callerFp + frameEndOffset
+        if (requiredSp > elements.size) growCapacity(requiredSp)
+        elements[calleeFp] = operand
+        elements[calleeFp + activationHeaderSlot] = activationHeader
+        fp = calleeFp
+        sp = requiredSp
+    }
+
+    /** Activates a compiler-linked callee with one slot operand. */
+    fun activateLinkedFrameWithSlot(
+        callFrameOffset: Int,
+        frameEndOffset: Int,
+        activationHeaderSlot: Int,
+        activationHeader: Long,
+        sourceSlot: Int,
+    ) {
+        val callerFp = fp
+        val calleeFp = callerFp + callFrameOffset
+        val requiredSp = callerFp + frameEndOffset
+        if (requiredSp > elements.size) growCapacity(requiredSp)
+        elements[calleeFp] = elements[callerFp + sourceSlot]
+        elements[calleeFp + activationHeaderSlot] = activationHeader
+        fp = calleeFp
+        sp = requiredSp
+    }
+
+    /** Activates a compiler-linked callee with two staged slot operands. */
+    fun activateLinkedFrameWithTwoSlots(
+        callFrameOffset: Int,
+        frameEndOffset: Int,
+        activationHeaderSlot: Int,
+        activationHeader: Long,
+        firstSourceSlot: Int,
+        secondSourceSlot: Int,
+    ) {
+        val callerFp = fp
+        val calleeFp = callerFp + callFrameOffset
+        val requiredSp = callerFp + frameEndOffset
+        if (requiredSp > elements.size) growCapacity(requiredSp)
+        val first = elements[callerFp + firstSourceSlot]
+        val second = elements[callerFp + secondSourceSlot]
+        elements[calleeFp] = first
+        elements[calleeFp + 1] = second
+        elements[calleeFp + activationHeaderSlot] = activationHeader
+        fp = calleeFp
+        sp = requiredSp
+    }
+
+    /** Activates a compiler-linked callee with three staged slot operands. */
+    fun activateLinkedFrameWithThreeSlots(
+        callFrameOffset: Int,
+        frameEndOffset: Int,
+        activationHeaderSlot: Int,
+        activationHeader: Long,
+        firstSourceSlot: Int,
+        secondSourceSlot: Int,
+        thirdSourceSlot: Int,
+    ) {
+        val callerFp = fp
+        val calleeFp = callerFp + callFrameOffset
+        val requiredSp = callerFp + frameEndOffset
+        if (requiredSp > elements.size) growCapacity(requiredSp)
+        val first = elements[callerFp + firstSourceSlot]
+        val second = elements[callerFp + secondSourceSlot]
+        val third = elements[callerFp + thirdSourceSlot]
+        elements[calleeFp] = first
+        elements[calleeFp + 1] = second
+        elements[calleeFp + 2] = third
+        elements[calleeFp + activationHeaderSlot] = activationHeader
+        fp = calleeFp
+        sp = requiredSp
+    }
+
+    /** Activates a compiler-linked callee with four staged slot operands. */
+    fun activateLinkedFrameWithFourSlots(
+        callFrameOffset: Int,
+        frameEndOffset: Int,
+        activationHeaderSlot: Int,
+        activationHeader: Long,
+        firstSourceSlot: Int,
+        secondSourceSlot: Int,
+        thirdSourceSlot: Int,
+        fourthSourceSlot: Int,
+    ) {
+        val callerFp = fp
+        val calleeFp = callerFp + callFrameOffset
+        val requiredSp = callerFp + frameEndOffset
+        if (requiredSp > elements.size) growCapacity(requiredSp)
+        val first = elements[callerFp + firstSourceSlot]
+        val second = elements[callerFp + secondSourceSlot]
+        val third = elements[callerFp + thirdSourceSlot]
+        val fourth = elements[callerFp + fourthSourceSlot]
+        elements[calleeFp] = first
+        elements[calleeFp + 1] = second
+        elements[calleeFp + 2] = third
+        elements[calleeFp + 3] = fourth
+        elements[calleeFp + activationHeaderSlot] = activationHeader
+        fp = calleeFp
+        sp = requiredSp
+    }
+
+    /**
+     * Writes the activation header immediately after the callee interface.
+     *
+     * The compiler and program installer validate both fields before execution;
+     * this hot-path operation is intentionally unchecked.
+     */
+    fun writeActivationHeader(
+        calleeFp: Int,
+        activationHeaderSlot: Int,
+        activationHeader: Long,
+    ) {
+        elements[calleeFp + activationHeaderSlot] = activationHeader
+    }
+
+    /** Writes the precomputed root activation header. */
+    fun writeRootActivationHeader(activationHeaderSlot: Int) {
+        elements[activationHeaderSlot] = ROOT_ACTIVATION_HEADER
+    }
+
+    /**
+     * Restores the caller from the current activation header and returns its IP.
+     *
+     * Results remain in the current frame's interface slots. [sp] is moved to
+     * the end of that result interface so the slots remain live to boundary and
+     * root-scanning code without retaining the rest of the completed frame.
+     */
+    fun restoreCallerFrame(
+        resultCount: Int,
+        activationHeaderSlot: Int,
+    ): Int {
+        val calleeFp = fp
+        val header = elements[calleeFp + activationHeaderSlot]
+        sp = calleeFp + resultCount
+        fp = calleeFp - activationCallerFrameDelta(header)
+        return activationReturnIp(header)
+    }
 
     /**
      * Returns the live backing storage for trusted host functions.
@@ -272,16 +495,16 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         descriptorKey: Int,
         fieldCount: Int,
     ) {
-        if (fieldCount > top) {
+        if (fieldCount > sp) {
             throw InvocationException(InvocationError.MissingStackValue)
         }
-        if (fieldCount == 0 && top == elements.size) {
+        if (fieldCount == 0 && sp == elements.size) {
             doubleCapacity()
         }
-        val sourceOffset = top - fieldCount
+        val sourceOffset = sp - fieldCount
         val rawReference = heap.allocateStruct(descriptorKey, elements, sourceOffset)
         elements[sourceOffset] = rawReference
-        top = sourceOffset + 1
+        sp = sourceOffset + 1
     }
 
     internal fun replaceTopFieldsWithArray(
@@ -289,16 +512,16 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         descriptorKey: Int,
         length: Int,
     ) {
-        if (length > top) {
+        if (length > sp) {
             throw InvocationException(InvocationError.MissingStackValue)
         }
-        if (length == 0 && top == elements.size) {
+        if (length == 0 && sp == elements.size) {
             doubleCapacity()
         }
-        val sourceOffset = top - length
+        val sourceOffset = sp - length
         val rawReference = heap.allocateArrayFromElements(descriptorKey, elements, sourceOffset, length)
         elements[sourceOffset] = rawReference
-        top = sourceOffset + 1
+        sp = sourceOffset + 1
     }
 
     internal fun setFrameSlotToNewStruct(
@@ -307,8 +530,8 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         firstFieldSlot: Int,
         destinationSlot: Int,
     ) {
-        val sourceOffset = framePointer + firstFieldSlot
-        val destinationOffset = framePointer + destinationSlot
+        val sourceOffset = fp + firstFieldSlot
+        val destinationOffset = fp + destinationSlot
         val rawReference = heap.allocateStruct(descriptorKey, elements, sourceOffset)
         elements[destinationOffset] = rawReference
     }
@@ -320,8 +543,8 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         length: Int,
         destinationSlot: Int,
     ) {
-        val sourceOffset = framePointer + firstElementSlot
-        val destinationOffset = framePointer + destinationSlot
+        val sourceOffset = fp + firstElementSlot
+        val destinationOffset = fp + destinationSlot
         val rawReference = heap.allocateArrayFromElements(descriptorKey, elements, sourceOffset, length)
         elements[destinationOffset] = rawReference
     }
@@ -331,12 +554,12 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         descriptorKey: Int,
         fieldCount: Int,
     ): Long {
-        if (fieldCount > top) {
+        if (fieldCount > sp) {
             throw InvocationException(InvocationError.MissingStackValue)
         }
-        val sourceOffset = top - fieldCount
+        val sourceOffset = sp - fieldCount
         val rawReference = heap.allocateException(descriptorKey, elements, sourceOffset)
-        top = sourceOffset
+        sp = sourceOffset
         return rawReference
     }
 
@@ -345,12 +568,12 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         descriptorKey: Int,
         firstFieldSlot: Int,
     ): Long {
-        val sourceOffset = framePointer + firstFieldSlot
+        val sourceOffset = fp + firstFieldSlot
         return heap.allocateException(descriptorKey, elements, sourceOffset)
     }
 
     internal fun visitGcRoots(rootMarker: GcRootMarker) {
-        val end = top
+        val end = sp
         var index = 0
         while (index < end) {
             rootMarker.markRoot(elements[index])
@@ -360,28 +583,40 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
 
     fun clear() {
         elements.fill(0L)
-        top = 0
+        fp = 0
+        sp = 0
     }
 
-    fun doubleCapacity() {
-        val newCapacity = elements.size * 2
+    private fun doubleCapacity() {
+        if (elements.size == MAX_CAPACITY) {
+            throw InvocationException(InvocationError.CallStackExhausted)
+        }
+        val newCapacity = minOf(elements.size * 2, MAX_CAPACITY)
         elements = elements.copyOf(newCapacity)
     }
 
-    fun iterator(): Iterator<Long> = elements.slice(0..top - 1).iterator()
+    private fun growCapacity(requiredCapacity: Int) {
+        if (requiredCapacity > MAX_CAPACITY) {
+            throw InvocationException(InvocationError.CallStackExhausted)
+        }
+        val newCapacity = (requiredCapacity - 1).takeHighestOneBit() shl 1
+        elements = elements.copyOf(newCapacity)
+    }
 
     override fun toString(): String {
         return buildString {
             append("[")
-            for (i in 0 until top) {
+            for (i in 0 until sp) {
                 append(elements[i])
-                if (i + 1 < top) append(", ")
+                if (i + 1 < sp) append(", ")
             }
             append("]")
         }
     }
 
     companion object {
+        private val ROOT_ACTIVATION_HEADER = activationHeader(Int.MAX_VALUE, 0)
         private const val MIN_CAPACITY = 32
+        private const val MAX_CAPACITY = 1 shl 25
     }
 }

@@ -139,6 +139,7 @@ private fun compileLocalTeeStructGet(
         else -> return null
     }
     val localIndex = tee.localIdx.toInt()
+    if (!state.layout.hasLocalSlot(localIndex)) return null
     val localSlot = state.layout.localSlot(localIndex)
     if (sourceSlot == localSlot) return null
 

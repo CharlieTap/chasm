@@ -189,7 +189,7 @@ internal fun ConstantExpressionEvaluator(
         }
     }
 
-    return if (stack.depth() > 0) {
+    return if (stack.sp > 0) {
         Ok(stack.pop())
     } else {
         Err(InvocationError.MissingStackValue)

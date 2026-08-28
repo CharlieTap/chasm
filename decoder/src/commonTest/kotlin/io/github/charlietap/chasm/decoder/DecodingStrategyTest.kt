@@ -6,44 +6,44 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class ParallelDecodingPlannerTest {
+class selectDecodingStrategyTest {
 
     @Test
     fun `keeps small modules serial`() {
-        val plan = ParallelDecodingPlanner(
+        val strategy = selectDecodingStrategy(
             moduleSize = 1024,
             bodies = bodyRanges(512, 512),
             mode = DecodingMode.AUTO,
             availableProcessors = 8,
         )
 
-        assertEquals(DecodingPlan.Serial, plan)
+        assertEquals(DecodingStrategy.Serial, strategy)
     }
 
     @Test
     fun `balances large bodies before small bodies`() {
-        val plan = ParallelDecodingPlanner(
+        val strategy = selectDecodingStrategy(
             moduleSize = 256 * 1024,
             bodies = bodyRanges(1000, 900, 100, 100),
             mode = DecodingMode.PARALLEL,
             availableProcessors = 3,
         )
 
-        val assignments = assertIs<DecodingPlan.Parallel>(plan).assignments
+        val assignments = assertIs<DecodingStrategy.Parallel>(strategy).assignments
         assertContentEquals(intArrayOf(0, 3), assignments[0])
         assertContentEquals(intArrayOf(1, 2), assignments[1])
     }
 
     @Test
     fun `requires two body workers`() {
-        val plan = ParallelDecodingPlanner(
+        val strategy = selectDecodingStrategy(
             moduleSize = 256 * 1024,
             bodies = bodyRanges(1024, 1024),
             mode = DecodingMode.PARALLEL,
             availableProcessors = 2,
         )
 
-        assertEquals(DecodingPlan.Serial, plan)
+        assertEquals(DecodingStrategy.Serial, strategy)
     }
 
     private fun bodyRanges(vararg sizes: Int): CodeBodyRanges = CodeBodyRanges(

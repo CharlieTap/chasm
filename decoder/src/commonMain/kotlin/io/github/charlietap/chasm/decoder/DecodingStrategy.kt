@@ -8,12 +8,12 @@ internal fun shouldScanParallelLayout(
     mode: DecodingMode,
 ): Boolean = mode == DecodingMode.PARALLEL || moduleSize >= MINIMUM_PARALLEL_MODULE_SIZE
 
-internal fun ParallelDecodingPlanner(
+internal fun selectDecodingStrategy(
     moduleSize: Int,
     bodies: CodeBodyRanges,
     mode: DecodingMode,
     availableProcessors: Int = availableParallelProcessors(),
-): DecodingPlan {
+): DecodingStrategy {
     val workerLimit = minOf(
         bodies.size,
         maxOf(availableProcessors - 1, 1),
@@ -24,7 +24,7 @@ internal fun ParallelDecodingPlanner(
         bodies.size < MINIMUM_PARALLEL_BODY_COUNT ||
         workerLimit < MINIMUM_PARALLEL_WORKER_COUNT
     ) {
-        return DecodingPlan.Serial
+        return DecodingStrategy.Serial
     }
     var bodyBytes = 0L
     val scheduledBodies = Array(bodies.size) { bodyIndex ->
@@ -36,7 +36,7 @@ internal fun ParallelDecodingPlanner(
         mode == DecodingMode.AUTO &&
         (moduleSize < MINIMUM_PARALLEL_MODULE_SIZE || bodyBytes < MINIMUM_PARALLEL_BODY_BYTES)
     ) {
-        return DecodingPlan.Serial
+        return DecodingStrategy.Serial
     }
     scheduledBodies.sortWith(
         compareByDescending<ScheduledBody>(ScheduledBody::estimatedCost)
@@ -52,7 +52,7 @@ internal fun ParallelDecodingPlanner(
         )
     }
     val assignments = scheduleBodies(scheduledBodies, workerCount)
-    return DecodingPlan.Parallel(
+    return DecodingStrategy.Parallel(
         Array(assignments.size) { index ->
             assignments[index].toIntArray().also(IntArray::sort)
         },
@@ -65,10 +65,10 @@ internal enum class DecodingMode {
     PARALLEL,
 }
 
-internal sealed interface DecodingPlan {
-    data object Serial : DecodingPlan
+internal sealed interface DecodingStrategy {
+    data object Serial : DecodingStrategy
 
-    class Parallel(val assignments: Array<IntArray>) : DecodingPlan
+    class Parallel(val assignments: Array<IntArray>) : DecodingStrategy
 }
 
 private fun scheduleBodies(
@@ -94,7 +94,6 @@ private class BodyAssignment(initialCapacity: Int) {
     private var bodyIndices = IntArray(initialCapacity)
     private var size = 0
     var estimatedCost = 0L
-        private set
 
     fun add(body: ScheduledBody) {
         if (size == bodyIndices.size) bodyIndices = bodyIndices.copyOf(bodyIndices.size * 2)

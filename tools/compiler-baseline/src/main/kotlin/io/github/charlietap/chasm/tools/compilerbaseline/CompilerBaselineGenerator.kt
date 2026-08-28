@@ -114,7 +114,7 @@ class ModuleCompilerBaselineGenerator(
             val functionIndex = function.idx.toInt()
             val address = instance.functionAddresses[functionIndex]
             val functionInstance = store.function(address) as FunctionInstance.WasmFunction
-            functionIndex to functionInstance.callPlan.entryIp
+            functionIndex to functionInstance.callStrategy.entryIp
         }
 
         return functions.mapIndexed { index, (functionIndex, entryIp) ->

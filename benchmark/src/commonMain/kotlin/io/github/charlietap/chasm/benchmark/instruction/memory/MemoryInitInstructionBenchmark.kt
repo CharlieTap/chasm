@@ -11,7 +11,6 @@ import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instruction.memoryInitRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
-import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
@@ -67,10 +66,6 @@ class MemoryInitInstructionBenchmark : StabilizedBenchmark() {
         data = dataInstance,
     )
 
-    private val frame = frame(
-        instance = context.instance,
-    )
-
     private val srcOffset = 0
     private val destOffset = 0
     private val bytesToCopy = 200
@@ -80,7 +75,6 @@ class MemoryInitInstructionBenchmark : StabilizedBenchmark() {
         context.apply {
             instance.memAddresses.add(0, memoryAddress(0))
             instance.dataAddresses.add(0, dataAddress(0))
-            cstack.push(frame)
             store.memories.add(0, memoryInstance)
             store.data.add(0, dataInstance)
         }

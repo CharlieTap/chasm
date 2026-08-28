@@ -1,86 +1,16 @@
 package io.github.charlietap.chasm.runtime
 
-import io.github.charlietap.chasm.fixture.runtime.stack.cstack
-import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
-import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.ext.binaryOperation
 import io.github.charlietap.chasm.runtime.ext.constOperation
 import io.github.charlietap.chasm.runtime.ext.convertOperation
 import io.github.charlietap.chasm.runtime.ext.relationalOperation
 import io.github.charlietap.chasm.runtime.ext.testOperation
 import io.github.charlietap.chasm.runtime.ext.unaryOperation
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotSame
-import kotlin.test.assertSame
 
 class StackExtTest {
-
-    @Test
-    fun `can push a stack frame to the stack`() {
-
-        val stack = cstack()
-        val frame = frame()
-
-        stack.push(frame)
-
-        assertEquals(1, stack.framesDepth())
-
-        val frameEntry = stack.popFrame()
-        assertEquals(frame, frameEntry)
-    }
-
-    @Test
-    fun `can replace and discard the current stack frame`() {
-
-        val stack = cstack()
-        val original = frame()
-        val replacement = frame().instance
-
-        stack.pushFrame(
-            arity = original.arity,
-            handlerDepth = original.handlerDepth,
-            valueDepth = original.valueDepth,
-            instance = original.instance,
-            previousFramePointer = original.previousFramePointer,
-            resultSlotBase = original.resultSlotBase,
-            returnIp = original.returnIp,
-        )
-        stack.replaceFrameInstance(replacement)
-
-        assertNotSame(original.instance, replacement)
-        assertEquals(original.arity, stack.frameArity())
-        assertEquals(original.handlerDepth, stack.frameHandlerDepth())
-        assertEquals(original.valueDepth, stack.frameValueDepth())
-        assertSame(replacement, stack.frameInstance())
-        assertEquals(original.previousFramePointer, stack.framePreviousFramePointer())
-        assertEquals(original.resultSlotBase, stack.frameResultSlotBase())
-        assertEquals(original.returnIp, stack.frameReturnIp())
-
-        stack.discardFrame()
-
-        assertEquals(0, stack.framesDepth())
-    }
-
-    @Test
-    fun `pushing too many frames to the stack returns an error`() {
-
-        val frame = frame()
-        val controlStack = cstack(
-            frames = List(ControlStack.MAX_DEPTH) { frame },
-        )
-
-        val actual = assertFailsWith<InvocationException> {
-            controlStack.push(frame)
-        }
-
-        assertEquals(InvocationError.CallStackExhausted, actual.error)
-        assertEquals(ControlStack.MAX_DEPTH, controlStack.framesDepth())
-    }
 
     @Test
     fun `can run an const operation on the stack`() {
@@ -92,7 +22,7 @@ class StackExtTest {
         stack.constOperation(117f)
         stack.constOperation(117.0)
 
-        assertEquals(4, stack.depth())
+        assertEquals(4, stack.sp)
 
         val f64 = stack.popF64()
         val f32 = stack.popF32()
@@ -116,7 +46,7 @@ class StackExtTest {
         val actual = stack.unaryOperation(op)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(4, value)
@@ -133,7 +63,7 @@ class StackExtTest {
         val actual = stack.unaryOperation(op)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI64()
         assertEquals(4, value)
@@ -150,7 +80,7 @@ class StackExtTest {
         val actual = stack.unaryOperation(op)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popF32()
         assertEquals(4f, value)
@@ -167,7 +97,7 @@ class StackExtTest {
         val actual = stack.unaryOperation(op)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popF64()
         assertEquals(4.0, value)
@@ -184,7 +114,7 @@ class StackExtTest {
         val actual = stack.binaryOperation(Int::plus)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(4, value)
@@ -201,7 +131,7 @@ class StackExtTest {
         val actual = stack.binaryOperation(Long::plus)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI64()
         assertEquals(4, value)
@@ -218,7 +148,7 @@ class StackExtTest {
         val actual = stack.binaryOperation(Float::plus)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popF32()
         assertEquals(4f, value)
@@ -235,7 +165,7 @@ class StackExtTest {
         val actual = stack.binaryOperation(Double::plus)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popF64()
 
@@ -252,7 +182,7 @@ class StackExtTest {
         val actual = stack.testOperation(Int::eqz)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(0, value)
@@ -268,7 +198,7 @@ class StackExtTest {
         val actual = stack.testOperation(Long::eqz)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(0, value)
@@ -285,7 +215,7 @@ class StackExtTest {
         val actual = stack.relationalOperation(Int::eq)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(1, value)
@@ -302,7 +232,7 @@ class StackExtTest {
         val actual = stack.relationalOperation(Long::eq)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(1, value)
@@ -319,7 +249,7 @@ class StackExtTest {
         val actual = stack.relationalOperation(Float::eq)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(1, value)
@@ -336,7 +266,7 @@ class StackExtTest {
         val actual = stack.relationalOperation(Double::eq)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(1, value)
@@ -352,7 +282,7 @@ class StackExtTest {
         val actual = stack.convertOperation(Long::wrap)
 
         assertEquals(Unit, actual)
-        assertEquals(1, stack.depth())
+        assertEquals(1, stack.sp)
 
         val value = stack.popI32()
         assertEquals(117, value)

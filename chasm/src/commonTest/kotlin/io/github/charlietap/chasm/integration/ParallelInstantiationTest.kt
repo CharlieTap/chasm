@@ -70,7 +70,7 @@ class ParallelInstantiationTest {
 
         assertEquals(1, taskExecutor.executionCount)
         assertEquals(serialStore.store.program.size, parallelStore.store.program.size)
-        assertEquals(serialStore.functionPlans(), parallelStore.functionPlans())
+        assertEquals(serialStore.compiledFunctions(), parallelStore.compiledFunctions())
 
         invoke(serialStore, serialInstance, "allocate")
             .expect("expected serial allocation function to execute")
@@ -110,7 +110,7 @@ class ParallelInstantiationTest {
                         .expect("expected parallel allocation function to execute")
                     val result = invoke(store, instance, "nested-array-length")
                         .expect("expected parallel function to execute")
-                    CompilationResult(store.store.program.size, store.functionPlans(), result)
+                    CompilationResult(store.store.program.size, store.compiledFunctions(), result)
                 }
             }.awaitAll()
         }
@@ -145,17 +145,17 @@ class ParallelInstantiationTest {
         assertTrue(
             store.store.functions
                 .filterIsInstance<FunctionInstance.WasmFunction>()
-                .none { it.callPlan.isInstalled },
+                .none { it.callStrategy.isInstalled },
         )
     }
 
-    private fun Store.functionPlans(): List<FunctionPlan> = store.functions
+    private fun Store.compiledFunctions(): List<CompiledFunction> = store.functions
         .filterIsInstance<FunctionInstance.WasmFunction>()
         .map { function ->
-            FunctionPlan(
-                entryIp = function.callPlan.entryIp,
-                frameSlots = function.callPlan.frameSlots,
-                returnSlots = function.function.returnSlots.toList(),
+            CompiledFunction(
+                entryIp = function.callStrategy.entryIp,
+                frameSlots = function.callStrategy.frameSlots,
+                returnSlots = function.functionType.results.types.indices.toList(),
             )
         }
 
@@ -206,11 +206,11 @@ class ParallelInstantiationTest {
 
     private data class CompilationResult(
         val programSize: Int,
-        val functionPlans: List<FunctionPlan>,
+        val compiledFunctions: List<CompiledFunction>,
         val result: List<ExecutionValue>,
     )
 
-    private data class FunctionPlan(
+    private data class CompiledFunction(
         val entryIp: Int,
         val frameSlots: Int,
         val returnSlots: List<Int>,

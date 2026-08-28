@@ -31,6 +31,9 @@ benchmark {
         register("hostFunction") {
             include(".*HostFunctionBenchmark.*")
         }
+        register("wasmFunction") {
+            include(".*HostFunctionBenchmark.wasm.*")
+        }
         register("hostException") {
             include(".*HostExceptionBenchmark.*")
         }

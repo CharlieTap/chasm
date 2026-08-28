@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.tools.compilerbaseline
 
+import io.github.charlietap.chasm.runtime.function.LocalInitialization
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
@@ -49,7 +50,7 @@ class CompilerInstructionTagTranslator {
     }
 
     private fun admin(instruction: AdminInstruction): String = when (instruction) {
-        AdminInstruction.EndFunction -> "admin.end_function"
+        is AdminInstruction.EndFunction -> "admin.end_function"
         is AdminInstruction.CopySlot -> "admin.copy_slot"
         is AdminInstruction.CopySlots -> "admin.copy_slots"
         is AdminInstruction.Jump -> "admin.jump"
@@ -85,22 +86,10 @@ class CompilerInstructionTagTranslator {
 
     private fun control(instruction: ControlInstruction): String = when (instruction) {
         ControlInstruction.Unreachable -> "control.unreachable"
-        ControlInstruction.Nop -> "control.nop"
-        is ControlInstruction.Throw -> "control.throw"
-        ControlInstruction.ThrowRef -> "control.throw_ref"
-        ControlInstruction.Return -> "control.return"
-        is ControlInstruction.ReturnWasmFunctionCall -> "control.return_call.wasm"
-        is ControlInstruction.ReturnHostFunctionCall -> "control.return_call.host"
-        is ControlInstruction.ReturnCallRef -> "control.return_call_ref"
-        is ControlInstruction.WasmFunctionCall -> "control.call.wasm"
-        is ControlInstruction.HostFunctionCall -> "control.call.host"
-        is ControlInstruction.CallRef -> "control.call_ref"
-        is ControlInstruction.CallIndirect -> "control.call_indirect"
-        is ControlInstruction.ReturnCallIndirect -> "control.return_call_indirect"
     }
 
     private fun control(instruction: ControlSuperInstruction): String = when (instruction) {
-        is ControlSuperInstruction.WasmCall -> if (instruction.plan.locals.isEmpty()) {
+        is ControlSuperInstruction.WasmCall -> if (instruction.strategy.localInitialization is LocalInitialization.None) {
             "control.call.wasm.no_locals"
         } else {
             "control.call.wasm.locals"

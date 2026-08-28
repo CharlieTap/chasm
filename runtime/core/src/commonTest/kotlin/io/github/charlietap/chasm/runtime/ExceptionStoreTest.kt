@@ -67,11 +67,11 @@ class ExceptionStoreTest {
         }
 
         val topReference = store.heap.allocateExceptionFromStack(tagAddress, stack)
-        assertEquals(0, stack.depth())
+        assertEquals(0, stack.sp)
         assertEquals(31, store.heap.getExceptionFieldTrusted(topReference, 0))
         assertEquals(32, store.heap.getExceptionFieldTrusted(topReference, 1))
 
-        stack.reserveFrame(3)
+        stack.reserveDepth(3)
         stack.setFrameSlot(0, 41)
         stack.setFrameSlot(1, 42)
         val frameReference = store.heap.allocateExceptionFromFrame(tagAddress, 0, stack)

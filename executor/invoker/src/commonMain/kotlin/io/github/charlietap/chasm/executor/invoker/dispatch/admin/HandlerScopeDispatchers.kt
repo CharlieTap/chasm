@@ -12,9 +12,9 @@ fun PushHandlerDispatcher(
             handlers = instruction.handlers,
             payloadDestinationSlots = instruction.payloadDestinationSlots,
             continuationIps = instruction.continuationIps,
-            framesDepth = cstack.framesDepth(),
-            framePointer = vstack.framePointer,
-            valueDepth = vstack.depth(),
+            instance = instruction.instance,
+            fp = vstack.fp,
+            sp = vstack.sp,
         ),
     )
     nextIp

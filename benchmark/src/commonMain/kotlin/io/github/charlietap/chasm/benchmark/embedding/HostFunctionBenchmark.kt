@@ -78,6 +78,26 @@ class HostFunctionBenchmark : StabilizedBenchmark() {
     }
 
     @Benchmark
+    fun wasmNoop(blackhole: Blackhole) {
+        blackhole.consume(invokeExport("wasm_noop"))
+    }
+
+    @Benchmark
+    fun wasmIdentity1(blackhole: Blackhole) {
+        blackhole.consume(invokeExport("wasm_identity1"))
+    }
+
+    @Benchmark
+    fun wasmSum3(blackhole: Blackhole) {
+        blackhole.consume(invokeExport("wasm_sum3"))
+    }
+
+    @Benchmark
+    fun wasmSum4(blackhole: Blackhole) {
+        blackhole.consume(invokeExport("wasm_sum4"))
+    }
+
+    @Benchmark
     fun baselineConsume4(blackhole: Blackhole) {
         blackhole.consume(invokeExport("baseline_consume4"))
     }
@@ -96,6 +116,11 @@ class HostFunctionBenchmark : StabilizedBenchmark() {
     @Benchmark
     fun hostRoundtrip2(blackhole: Blackhole) {
         blackhole.consume(invokeExport("host_roundtrip2"))
+    }
+
+    @Benchmark
+    fun wasmRoundtrip2(blackhole: Blackhole) {
+        blackhole.consume(invokeExport("wasm_roundtrip2"))
     }
 
     private fun invokeExport(name: String): Int =

@@ -8,10 +8,11 @@ import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.createCompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
+import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.LinkWasmCallDispatchers
 import io.github.charlietap.chasm.parallel.ParallelTaskExecutor
 import io.github.charlietap.chasm.parallel.ParallelTaskScope
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.function.Expression
+import io.github.charlietap.chasm.runtime.function.classifyLocalInitialization
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
@@ -27,16 +28,16 @@ suspend fun ParallelModuleCompiler(
     diagnostics: CompilerDiagnostics? = null,
     taskExecutor: ParallelTaskExecutor,
 ): Result<Unit, ModuleTrapError> {
-    val plan = if (diagnostics == null) {
-        CompilationPlanner(module.functions, CompilationMode.AUTO)
+    val strategy = if (diagnostics == null) {
+        selectCompilationStrategy(module.functions, CompilationMode.AUTO)
     } else {
-        CompilationPlan.Serial
+        CompilationStrategy.Serial
     }
-    val assignments = when (plan) {
-        CompilationPlan.Serial -> {
+    val assignments = when (strategy) {
+        CompilationStrategy.Serial -> {
             return ModuleCompiler(store, module, instance, runtimeTypes, types, diagnostics)
         }
-        is CompilationPlan.Parallel -> plan.assignments
+        is CompilationStrategy.Parallel -> strategy.assignments
     }
 
     val context = createCompilerContext(
@@ -71,6 +72,7 @@ suspend fun ParallelModuleCompiler(
     }
 
     return binding {
+        val firstModuleIp = store.program.size
         val successfulCompilations = arrayOfNulls<FunctionCompilation>(compilations.size)
         for (index in compilations.indices) {
             successfulCompilations[index] = checkNotNull(compilations[index]).result.bind()
@@ -82,14 +84,13 @@ suspend fun ParallelModuleCompiler(
             val functionInstance = context.functions[function.idx.toInt()] as FunctionInstance.WasmFunction
             val entryIp = compilation.program.appendTo(store.program)
             val compiledFunction = compilation.function
-            compiledFunction.body = Expression(entryIp)
 
-            functionInstance.callPlan.install(
-                entryIp = entryIp,
-                frameSlots = compiledFunction.frameSlots,
-            )
-            functionInstance.function = compiledFunction
+            val callStrategy = functionInstance.callStrategy
+            callStrategy.frameSlots = compiledFunction.frameSlots
+            callStrategy.localInitialization = classifyLocalInitialization(compiledFunction.localInitialValues)
+            callStrategy.entryIp = entryIp
         }
+        LinkWasmCallDispatchers(store.program, firstModuleIp)
     }
 }
 

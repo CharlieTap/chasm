@@ -134,7 +134,7 @@ class ArrayStoreTest {
         val store = Store()
         val runtimeType = store.heap.registerRuntimeTypes(arrayTypes(numericField(Mutability.Var)))[0]
         val stack = ValueStack().apply {
-            reserveFrame(3)
+            reserveDepth(3)
             setFrameSlot(0, 11)
             setFrameSlot(1, 22)
             setFrameSlot(2, 33)

@@ -15,8 +15,6 @@
     i32.const 1)
 
   (func $callee.locals (result i32) (local i32)
-    i32.const 1
-    local.set 0
     local.get 0)
 
   (func $callee.unary (param $value i32) (result i32)

@@ -40,10 +40,10 @@ internal suspend fun ParallelWasmModuleDecoder(
 ): Result<Module, ModuleDecoderError> {
     if (!shouldScanParallelLayout(bytes.size, mode)) return WasmModuleDecoder(config, bytes)
     val codeBodies = ModuleLayoutScanner(bytes) ?: return WasmModuleDecoder(config, bytes)
-    val plan = ParallelDecodingPlanner(bytes.size, codeBodies, mode, availableProcessors)
-    val assignments = when (plan) {
-        DecodingPlan.Serial -> return WasmModuleDecoder(config, bytes)
-        is DecodingPlan.Parallel -> plan.assignments
+    val strategy = selectDecodingStrategy(bytes.size, codeBodies, mode, availableProcessors)
+    val assignments = when (strategy) {
+        DecodingStrategy.Serial -> return WasmModuleDecoder(config, bytes)
+        is DecodingStrategy.Parallel -> strategy.assignments
     }
 
     val tasks = ArrayList<ParallelTaskScope.() -> DecodeTaskResult>(assignments.size + 1)

@@ -1,233 +1,130 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.runtime.stack.cstack
-import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
-import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
-import io.github.charlietap.chasm.runtime.instruction.CopyOperand
-import io.github.charlietap.chasm.runtime.stack.NO_RESULT_SLOT_BASE
+import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
+import io.github.charlietap.chasm.runtime.instruction.TransferSource
+import io.github.charlietap.chasm.runtime.stack.activationHeader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class WasmFunctionCallTest {
 
     @Test
-    fun `call enters the function and records its return address`() {
-        val module = moduleInstance()
-        val function = wasmFunctionInstance(
-            module = module,
-            functionType = functionType(
-                params = resultType(listOf(i32ValueType())),
-                results = resultType(listOf(i32ValueType())),
-            ),
-            function = runtimeFunction(
-                locals = longArrayOf(0),
-                body = runtimeExpression(entryIp = 37),
-                frameSlots = 2,
-            ),
+    fun `call activates a compiled frame and writes its activation header`() {
+        val function = wasmFunction(
+            params = 1,
+            results = 1,
+            locals = longArrayOf(0),
+            entryIp = 37,
+            frameSlots = 3,
         )
-        val vstack = vstack().apply { push(11L) }
-        val cstack = cstack()
-        val store = store()
+        val vstack = vstack().apply {
+            reserveDepth(4)
+            fp = 1
+            setFrameSlot(0, 11)
+        }
 
         val entryIp = WasmFunctionCall(
-            vstack,
-            cstack,
-            store,
-            executionContext(cstack, vstack, store, module),
-            function,
-            returnIp = 19,
+            vstack = vstack,
+            strategy = function.callStrategy,
+            operands = OperandTransfer(arrayOf(TransferSource.Slot(0)), destinationSlotBase = 3),
+            callFrameOffset = 3,
+            activationHeader = activationHeader(returnIp = 19, callerFrameDelta = 3),
         )
 
         assertEquals(37, entryIp)
-        assertEquals(19, cstack.peekFrame().returnIp)
-        assertEquals(NO_RESULT_SLOT_BASE, cstack.peekFrame().resultSlotBase)
-        assertEquals(0, vstack.framePointer)
-        assertEquals(2, vstack.depth())
+        assertEquals(4, vstack.fp)
+        assertEquals(7, vstack.sp)
         assertEquals(11L, vstack.getFrameSlot(0))
-        assertEquals(0L, vstack.getFrameSlot(1))
+        assertEquals(0L, vstack.getFrameSlot(2))
+        assertEquals(19, vstack.restoreCallerFrame(resultCount = 1, activationHeaderSlot = 1))
+        assertEquals(1, vstack.fp)
     }
 
     @Test
-    fun `tail call reuses the current activation frame`() {
-        val callerModule = moduleInstance()
-        val calleeModule = moduleInstance()
-        val function = wasmFunctionInstance(
-            module = calleeModule,
-            functionType = functionType(params = resultType(listOf(i32ValueType()))),
-            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 1),
-        )
-        val cstack = cstack(
-            frames = listOf(
-                frame(
-                    instance = callerModule,
-                    valueDepth = 0,
-                    returnIp = 71,
-                ),
-            ),
-        )
-        val vstack = vstack().apply { push(29L) }
-        val store = store()
+    fun `tail call preserves the activation header while reusing the frame`() {
+        val function = wasmFunction(params = 1, entryIp = 53, frameSlots = 2)
+        val vstack = vstack().apply {
+            reserveDepth(3)
+            writeActivationHeader(
+                calleeFp = 1,
+                activationHeaderSlot = 0,
+                activationHeader = activationHeader(71, 1),
+            )
+            activateFrame(fp = 1, frameSlots = 2)
+            setFrameSlot(1, 29)
+        }
 
         val entryIp = ReturnWasmFunctionCall(
-            vstack,
-            cstack,
-            store,
-            executionContext(cstack, vstack, store, callerModule),
-            function,
+            vstack = vstack,
+            strategy = function.callStrategy,
+            operands = OperandTransfer(
+                arrayOf(TransferSource.Slot(1)),
+                destinationSlotBase = 0,
+            ),
+            callerActivationHeaderSlot = 0,
         )
 
         assertEquals(53, entryIp)
-        assertEquals(1, cstack.framesDepth())
-        assertEquals(71, cstack.peekFrame().returnIp)
-        assertEquals(calleeModule, cstack.peekFrame().instance)
+        assertEquals(1, vstack.fp)
         assertEquals(29L, vstack.getFrameSlot(0))
+        assertEquals(71, vstack.restoreCallerFrame(resultCount = 0, activationHeaderSlot = 1))
     }
 
     @Test
-    fun `tail call copies overlapping operands in a safe direction`() {
-        val module = moduleInstance()
-        val function = wasmFunctionInstance(
-            module = module,
-            functionType = functionType(
-                params = resultType(listOf(i32ValueType(), i32ValueType())),
-            ),
-            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 2),
-        )
-        val cstack = cstack(frames = listOf(frame(instance = module, valueDepth = 1)))
+    fun `tail call stages cyclic operand moves in the reused frame`() {
+        val function = wasmFunction(params = 2, entryIp = 53, frameSlots = 3)
         val vstack = vstack().apply {
-            reserveFrame(2)
+            reserveDepth(4)
+            writeActivationHeader(
+                calleeFp = 1,
+                activationHeaderSlot = 2,
+                activationHeader = activationHeader(71, 1),
+            )
+            activateFrame(fp = 1, frameSlots = 3)
             setFrameSlot(0, 11)
             setFrameSlot(1, 22)
         }
-        val store = store()
 
         ReturnWasmFunctionCall(
             vstack = vstack,
-            cstack = cstack,
-            store = store,
-            context = executionContext(cstack, vstack, store, module),
-            instance = function,
-            operands = listOf(
-                CopyOperand.Slot(0),
-                CopyOperand.Slot(1),
+            strategy = function.callStrategy,
+            operands = OperandTransfer(
+                arrayOf(TransferSource.Slot(1), TransferSource.Slot(0)),
+                destinationSlotBase = 0,
             ),
+            callerActivationHeaderSlot = 2,
         )
 
-        assertEquals(1, vstack.framePointer)
-        assertEquals(11L, vstack.getFrameSlot(0))
-        assertEquals(22L, vstack.getFrameSlot(1))
-    }
-
-    @Test
-    fun `tail call leaves operands that are already in place untouched`() {
-        val module = moduleInstance()
-        val function = wasmFunctionInstance(
-            module = module,
-            functionType = functionType(
-                params = resultType(listOf(i32ValueType(), i32ValueType())),
-            ),
-            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 2),
-        )
-        val cstack = cstack(frames = listOf(frame(instance = module, valueDepth = 0)))
-        val vstack = vstack().apply {
-            reserveFrame(2)
-            setFrameSlot(0, 11)
-            setFrameSlot(1, 22)
-        }
-        val store = store()
-
-        ReturnWasmFunctionCall(
-            vstack = vstack,
-            cstack = cstack,
-            store = store,
-            context = executionContext(cstack, vstack, store, module),
-            instance = function,
-            operands = listOf(
-                CopyOperand.Slot(0),
-                CopyOperand.Slot(1),
-            ),
-        )
-
-        assertEquals(11L, vstack.getFrameSlot(0))
-        assertEquals(22L, vstack.getFrameSlot(1))
-    }
-
-    @Test
-    fun `tail call copies operands forwards when their frame moves down`() {
-        val module = moduleInstance()
-        val function = wasmFunctionInstance(
-            module = module,
-            functionType = functionType(
-                params = resultType(listOf(i32ValueType(), i32ValueType())),
-            ),
-            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 2),
-        )
-        val cstack = cstack(frames = listOf(frame(instance = module, valueDepth = 0)))
-        val vstack = vstack().apply {
-            reserveDepth(3)
-            framePointer = 1
-            setFrameSlot(0, 11)
-            setFrameSlot(1, 22)
-        }
-        val store = store()
-
-        ReturnWasmFunctionCall(
-            vstack = vstack,
-            cstack = cstack,
-            store = store,
-            context = executionContext(cstack, vstack, store, module),
-            instance = function,
-            operands = listOf(
-                CopyOperand.Slot(0),
-                CopyOperand.Slot(1),
-            ),
-        )
-
-        assertEquals(0, vstack.framePointer)
-        assertEquals(11L, vstack.getFrameSlot(0))
-        assertEquals(22L, vstack.getFrameSlot(1))
-    }
-
-    @Test
-    fun `tail call stages cyclic operand moves`() {
-        val module = moduleInstance()
-        val function = wasmFunctionInstance(
-            module = module,
-            functionType = functionType(
-                params = resultType(listOf(i32ValueType(), i32ValueType())),
-            ),
-            function = runtimeFunction(body = runtimeExpression(53), frameSlots = 2),
-        )
-        val cstack = cstack(frames = listOf(frame(instance = module, valueDepth = 0)))
-        val vstack = vstack().apply {
-            reserveFrame(2)
-            setFrameSlot(0, 11)
-            setFrameSlot(1, 22)
-        }
-        val store = store()
-
-        ReturnWasmFunctionCall(
-            vstack = vstack,
-            cstack = cstack,
-            store = store,
-            context = executionContext(cstack, vstack, store, module),
-            instance = function,
-            operands = listOf(
-                CopyOperand.Slot(1),
-                CopyOperand.Slot(0),
-            ),
-        )
-
+        assertEquals(1, vstack.fp)
         assertEquals(22L, vstack.getFrameSlot(0))
         assertEquals(11L, vstack.getFrameSlot(1))
+        assertEquals(71, vstack.restoreCallerFrame(resultCount = 0, activationHeaderSlot = 2))
     }
+
+    private fun wasmFunction(
+        params: Int = 0,
+        results: Int = 0,
+        locals: LongArray = longArrayOf(),
+        entryIp: Int,
+        frameSlots: Int,
+    ) = wasmFunctionInstance(
+        module = moduleInstance(),
+        functionType = functionType(
+            params = resultType(List(params) { i32ValueType() }),
+            results = resultType(List(results) { i32ValueType() }),
+        ),
+        function = runtimeFunction(
+            locals = locals,
+            body = runtimeExpression(entryIp),
+            frameSlots = frameSlots,
+        ),
+    )
 }

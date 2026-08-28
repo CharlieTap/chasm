@@ -28,6 +28,7 @@ import io.github.charlietap.chasm.compiler.instruction.emitF64Constant
 import io.github.charlietap.chasm.compiler.instruction.emitGlobalSet
 import io.github.charlietap.chasm.compiler.instruction.emitI32Constant
 import io.github.charlietap.chasm.compiler.instruction.emitI64Constant
+import io.github.charlietap.chasm.compiler.operand.DefinedLocalStorage
 import io.github.charlietap.chasm.compiler.operand.FrameAllocator
 import io.github.charlietap.chasm.compiler.operand.FunctionFrameLayout
 import io.github.charlietap.chasm.compiler.operand.Operand
@@ -42,12 +43,9 @@ import io.github.charlietap.chasm.compiler.program.ProgramBuilder
 import io.github.charlietap.chasm.compiler.program.ProgramFragment
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
-import io.github.charlietap.chasm.runtime.ext.default
-import io.github.charlietap.chasm.runtime.function.Expression
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.type.ValueType
 import kotlin.jvm.JvmInline
-import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
 internal fun FunctionCompiler(
     context: CompilerContext,
@@ -55,13 +53,15 @@ internal fun FunctionCompiler(
     program: Program,
     workspace: FunctionCompilerWorkspace = FunctionCompilerWorkspace(),
     programBuilder: ProgramBuilder = ProgramBuilder(program),
-): Result<RuntimeFunction, ModuleTrapError> {
+): Result<CompiledFunction, ModuleTrapError> {
     val baseIp = program.size
-    val result: Result<RuntimeFunction, ModuleTrapError> = run compile@{
+    val result: Result<CompiledFunction, ModuleTrapError> = run compile@{
         val functionType = context.types.functionType(function.typeIndex)
+        val definedLocalStorage = DefinedLocalStorage(function, functionType.params.types.size)
         val layout = FunctionFrameLayout(
             functionType = functionType,
             definedLocals = function.locals,
+            definedLocalStorage = definedLocalStorage,
         )
         val state = FunctionCompilationContext(
             compiler = context,
@@ -125,22 +125,26 @@ internal fun FunctionCompiler(
                         is VariableInstruction.LocalSet -> {
                             val localIndex = instruction.localIdx.toInt()
                             val operand = state.pop()
-                            state.preserveLocal(localIndex)
-                            emitOperand(state, operand, layout.localSlot(localIndex))
+                            if (layout.hasLocalSlot(localIndex)) {
+                                state.preserveLocal(localIndex)
+                                emitOperand(state, operand, layout.localSlot(localIndex))
+                            }
                             false
                         }
                         is VariableInstruction.LocalTee -> {
                             val localIndex = instruction.localIdx.toInt()
-                            val operand = state.pop()
-                            val destinationSlot = layout.localSlot(localIndex)
-                            state.preserveLocal(localIndex)
-                            emitOperand(state, operand, destinationSlot)
-                            state.pushLocal(
-                                type = operand.type,
-                                reservedSlot = state.frame.allocate(),
-                                localIndex = localIndex,
-                                sourceSlot = destinationSlot,
-                            )
+                            if (layout.hasLocalSlot(localIndex)) {
+                                val operand = state.pop()
+                                val destinationSlot = layout.localSlot(localIndex)
+                                state.preserveLocal(localIndex)
+                                emitOperand(state, operand, destinationSlot)
+                                state.pushLocal(
+                                    type = operand.type,
+                                    reservedSlot = state.frame.allocate(),
+                                    localIndex = localIndex,
+                                    sourceSlot = destinationSlot,
+                                )
+                            }
                             false
                         }
                         is VariableInstruction.GlobalGet -> compileGlobalGetInstruction(
@@ -193,15 +197,9 @@ internal fun FunctionCompiler(
         state.emitDeferredBranchPaths()
         state.finishProgram()
         Ok(
-            RuntimeFunction(
-                idx = function.idx,
-                typeIndex = function.typeIndex,
-                locals = LongArray(function.locals.size) { localIndex ->
-                    function.locals[localIndex].type.default()
-                },
-                body = Expression(baseIp),
+            CompiledFunction(
                 frameSlots = state.frame.maxSlotExclusive,
-                returnSlots = layout.returnSlots,
+                localInitialValues = layout.localInitialValues,
             ),
         )
     }
@@ -226,8 +224,13 @@ internal fun FunctionCompiler(
 }
 
 internal class FunctionCompilation(
-    val function: RuntimeFunction,
+    val function: CompiledFunction,
     val program: ProgramFragment,
+)
+
+internal class CompiledFunction(
+    val frameSlots: Int,
+    val localInitialValues: LongArray,
 )
 
 private fun compileInstructionChain(
@@ -339,27 +342,46 @@ internal fun destination(
     state: FunctionCompilationContext,
     reusableOperand: Operand?,
     nextInstruction: io.github.charlietap.chasm.ast.instruction.Instruction?,
+    allowRootResult: Boolean = true,
 ): Destination {
     when (nextInstruction) {
         is VariableInstruction.LocalSet -> {
             val localIndex = nextInstruction.localIdx.toInt()
-            state.preserveLocal(localIndex)
-            return Destination.local(
-                slot = state.layout.localSlot(localIndex),
-                localIndex = localIndex,
-                retainsValue = false,
-            )
+            if (state.layout.hasLocalSlot(localIndex)) {
+                state.preserveLocal(localIndex)
+                return Destination.local(
+                    slot = state.layout.localSlot(localIndex),
+                    localIndex = localIndex,
+                    retainsValue = false,
+                )
+            }
         }
         is VariableInstruction.LocalTee -> {
             val localIndex = nextInstruction.localIdx.toInt()
-            state.preserveLocal(localIndex)
-            return Destination.local(
-                slot = state.layout.localSlot(localIndex),
-                localIndex = localIndex,
-                retainsValue = true,
-            )
+            if (state.layout.hasLocalSlot(localIndex)) {
+                state.preserveLocal(localIndex)
+                return Destination.local(
+                    slot = state.layout.localSlot(localIndex),
+                    localIndex = localIndex,
+                    retainsValue = true,
+                )
+            }
         }
         else -> Unit
+    }
+
+    if (allowRootResult && nextInstruction == null && state.controls.isEmpty()) {
+        val root = state.rootControl
+        if (root != null) {
+            val resultIndex = state.operands.size - root.baseHeight
+            if (resultIndex in root.resultSlots.indices) {
+                val resultSlot = root.resultSlots[resultIndex]
+                if (resultSlot < state.layout.parameterTypes.size) {
+                    state.preserveLocal(resultSlot)
+                }
+                return Destination.frame(resultSlot)
+            }
+        }
     }
 
     if (reusableOperand != null) {

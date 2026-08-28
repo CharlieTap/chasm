@@ -1,89 +1,25 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
-import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
-import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.instruction.CopyOperand
-import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
+import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun ReturnWasmFunctionCall(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instance: FunctionInstance.WasmFunction,
-): Int = ReturnWasmFunctionCall(vstack, cstack, instance.callPlan)
-
-internal fun ReturnWasmFunctionCall(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    plan: WasmFunctionCallPlan,
+    strategy: WasmFunctionCallStrategy,
+    operands: OperandTransfer,
+    callerActivationHeaderSlot: Int,
 ): Int {
-    val handlerDepth = cstack.frameHandlerDepth()
-    val valueDepth = cstack.frameValueDepth()
-
-    cstack.shrinkHandlers(handlerDepth)
-    vstack.shrink(plan.params, valueDepth)
-    vstack.framePointer = valueDepth
-    vstack.reserveFrame(plan.frameSlots)
-    plan.locals.forEachIndexed { index, value ->
-        vstack.setFrameSlot(plan.interfaceSlots + index, value)
-    }
-    cstack.replaceFrameInstance(plan.module)
-    return plan.entryIp
-}
-
-internal fun ReturnWasmFunctionCall(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
-    context: ExecutionContext,
-    instance: FunctionInstance.WasmFunction,
-    operands: List<CopyOperand>,
-): Int = ReturnWasmFunctionCall(vstack, cstack, instance.callPlan, operands)
-
-internal fun ReturnWasmFunctionCall(
-    vstack: ValueStack,
-    cstack: ControlStack,
-    plan: WasmFunctionCallPlan,
-    operands: List<CopyOperand>,
-): Int {
-    val currentFramePointer = vstack.framePointer
-    val handlerDepth = cstack.frameHandlerDepth()
-    val calleeFramePointer = cstack.frameValueDepth()
-    cstack.shrinkHandlers(handlerDepth)
-    vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
-    copyTailCallOperands(
-        vstack = vstack,
-        currentFramePointer = currentFramePointer,
-        calleeFramePointer = calleeFramePointer,
-        operands = operands,
+    val fp = vstack.fp
+    val activationHeader = vstack.getFrameSlot(fp, callerActivationHeaderSlot)
+    vstack.ensureCapacity(fp + strategy.frameSlots)
+    vstack.transferOperands(
+        currentFp = fp,
+        destinationFp = fp,
+        transfer = operands,
     )
-    vstack.shrink(0, calleeFramePointer)
-    vstack.reserveDepth(calleeFramePointer + plan.frameSlots)
-    plan.locals.forEachIndexed { index, value ->
-        vstack.setFrameSlot(calleeFramePointer, plan.interfaceSlots + index, value)
-    }
-
-    vstack.framePointer = calleeFramePointer
-    vstack.reserveFrame(plan.frameSlots)
-    cstack.replaceFrameInstance(plan.module)
-    return plan.entryIp
-}
-
-private fun copyTailCallOperands(
-    vstack: ValueStack,
-    currentFramePointer: Int,
-    calleeFramePointer: Int,
-    operands: List<CopyOperand>,
-) {
-    copyOperands(
-        vstack = vstack,
-        currentFramePointer = currentFramePointer,
-        destinationFramePointer = calleeFramePointer,
-        operands = operands,
-        order = operandCopyOrder(currentFramePointer, calleeFramePointer, operands),
-    )
+    initializeLocals(vstack, strategy, fp)
+    vstack.setFrameSlot(fp, strategy.interfaceSlotCount, activationHeader)
+    vstack.activateFrame(fp, strategy.frameSlots)
+    return strategy.entryIp
 }

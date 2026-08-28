@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.benchmark.runtime
 
 import io.github.charlietap.chasm.benchmark.BenchmarkConfig
 import io.github.charlietap.chasm.benchmark.StabilizedBenchmark
-import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.value.executionValue
 import io.github.charlietap.chasm.stack.stackOf
 import kotlinx.benchmark.Benchmark
@@ -26,35 +25,11 @@ class StackBenchmark : StabilizedBenchmark() {
 
     private val stack = stackOf<Any>()
 
-    private val frame = frame()
     private val value = executionValue()
 
     @TearDown
     fun cleanup() {
         stack.clear()
-    }
-
-    @Benchmark
-    fun peekFrame(blackhole: Blackhole) {
-        stack.push(frame)
-        val result = stack.peekOrNull()
-        stack.clear()
-        blackhole.consume(result)
-    }
-
-    @Benchmark
-    fun pushFrame(blackhole: Blackhole) {
-        val result = stack.push(frame)
-        stack.clear()
-        blackhole.consume(result)
-    }
-
-    @Benchmark
-    fun popFrame(blackhole: Blackhole) {
-        stack.push(frame)
-        val result = stack.popOrNull()
-        stack.clear()
-        blackhole.consume(result)
     }
 
     @Benchmark

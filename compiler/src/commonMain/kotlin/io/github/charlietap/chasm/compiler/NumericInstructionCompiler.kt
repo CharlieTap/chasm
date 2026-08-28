@@ -128,7 +128,12 @@ private fun compileBitcastInstruction(
     nextInstruction: Instruction?,
 ): Boolean {
     val operand = state.pop()
-    val destination = destination(state, operand, nextInstruction)
+    val destination = destination(
+        state = state,
+        reusableOperand = operand,
+        nextInstruction = nextInstruction,
+        allowRootResult = false,
+    )
     if (operand.isImmediate) {
         emitOperand(state, operand, destination.slot)
     } else {

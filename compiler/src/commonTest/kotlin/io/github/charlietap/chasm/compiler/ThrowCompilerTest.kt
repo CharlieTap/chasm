@@ -15,6 +15,7 @@ import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserve
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.ast.module.tag
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -113,6 +114,7 @@ class ThrowCompilerTest {
             module = module,
             types = types,
             runtimeTypes = runtimeTypes,
+            instance = moduleInstance(tagAddresses = mutableListOf(tagAddress)),
             diagnostics = CompilerDiagnostics(
                 CompilerInstructionObserver { _, instruction -> instructions += instruction },
             ),

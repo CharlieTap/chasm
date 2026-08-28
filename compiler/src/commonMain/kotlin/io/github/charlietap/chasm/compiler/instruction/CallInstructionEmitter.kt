@@ -11,37 +11,42 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ReturnC
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
-import io.github.charlietap.chasm.runtime.instruction.CopyOperand
-import io.github.charlietap.chasm.runtime.instruction.OperandCopyOrder
-import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
+import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
+import io.github.charlietap.chasm.runtime.instruction.TailCallOperandTransfer
+import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.type.RTT
 
 internal fun FunctionCompilationContext.emitCall(
     function: FunctionInstance,
     operands: List<OperandSource>,
-    resultSlotBase: Int,
-    callFrameSlot: Int,
+    callFrameOffset: Int,
+    resultDestinationSlot: Int?,
 ) {
-    val operandCopyPlan = operands.toOperandCopyPlan(callFrameSlot)
+    val operandTransfer = operands.toOperandTransfer(callFrameOffset)
     when (function) {
         is FunctionInstance.WasmFunction -> {
+            checkWasmCallFrame(callFrameOffset)
             val instruction = ControlSuperInstruction.WasmCall(
-                plan = function.callPlan,
-                operands = operandCopyPlan,
-                resultSlotBase = resultSlotBase,
-                callFrameSlot = callFrameSlot,
+                strategy = function.callStrategy,
+                operands = operandTransfer,
+                callFrameOffset = callFrameOffset,
             )
-            emit(instruction, ::CallDispatcher)
+            emit(
+                CallDispatcher(instruction, resultDestinationSlot),
+                instruction = { instruction },
+            )
         }
         is FunctionInstance.HostFunction -> {
             val instruction = ControlSuperInstruction.HostCall(
                 instance = function,
                 caller = compiler.instance,
-                operands = operandCopyPlan,
-                resultSlotBase = resultSlotBase,
-                callFrameSlot = callFrameSlot,
+                operands = operandTransfer,
+                callFrameOffset = callFrameOffset,
             )
-            emit(instruction, ::CallDispatcher)
+            emit(
+                CallDispatcher(instruction, resultDestinationSlot),
+                instruction = { instruction },
+            )
         }
     }
 }
@@ -51,69 +56,81 @@ internal fun FunctionCompilationContext.emitCallIndirect(
     operands: List<OperandSource>,
     type: RTT,
     table: TableInstance,
-    resultSlotBase: Int,
-    callFrameSlot: Int,
+    callFrameOffset: Int,
+    resultDestinationSlot: Int?,
 ) {
-    val operandCopyPlan = operands.toOperandCopyPlan(callFrameSlot)
+    checkWasmCallFrame(callFrameOffset)
+    val operandTransfer = operands.toOperandTransfer(callFrameOffset)
     if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
         val instruction = ControlSuperInstruction.CallIndirectI(
             elementIndex.sourceBits.toInt(),
-            operandCopyPlan,
+            operandTransfer,
             type,
             table,
-            resultSlotBase,
-            callFrameSlot,
+            compiler.instance,
+            callFrameOffset,
         )
-        emit(instruction, ::CallDispatcher)
+        emit(CallDispatcher(instruction, resultDestinationSlot)) { instruction }
     } else {
         val instruction = ControlSuperInstruction.CallIndirectS(
             elementIndex.sourceBits.toInt(),
-            operandCopyPlan,
+            operandTransfer,
             type,
             table,
-            resultSlotBase,
-            callFrameSlot,
+            compiler.instance,
+            callFrameOffset,
         )
-        emit(instruction, ::CallDispatcher)
+        emit(CallDispatcher(instruction, resultDestinationSlot)) { instruction }
     }
 }
 
 internal fun FunctionCompilationContext.emitCallRef(
     functionSlot: Int,
     operands: List<OperandSource>,
-    resultSlotBase: Int,
-    callFrameSlot: Int,
+    callFrameOffset: Int,
+    resultDestinationSlot: Int?,
 ) {
+    checkWasmCallFrame(callFrameOffset)
     val instruction = ControlSuperInstruction.CallRefS(
         functionSlot,
-        operands.toOperandCopyPlan(callFrameSlot),
-        resultSlotBase,
-        callFrameSlot,
+        operands.toOperandTransfer(callFrameOffset),
+        compiler.instance,
+        callFrameOffset,
     )
-    emit(instruction, ::CallDispatcher)
+    emit(CallDispatcher(instruction, resultDestinationSlot)) { instruction }
 }
 
-internal fun FunctionCompilationContext.emitReturnCall(
-    function: FunctionInstance,
-    operands: List<OperandSource>,
-    callFrameSlot: Int,
-) {
-    val copyOperands = operands.toCopyOperands()
-    when (function) {
-        is FunctionInstance.WasmFunction -> {
-            val instruction = ControlSuperInstruction.ReturnWasmCall(function.callPlan, copyOperands)
-            emit(instruction, ::ReturnCallDispatcher)
-        }
-        is FunctionInstance.HostFunction -> {
-            val instruction = ControlSuperInstruction.ReturnHostCall(
-                instance = function,
-                caller = compiler.instance,
-                operands = operands.toOperandCopyPlan(callFrameSlot),
-                callFrameSlot = callFrameSlot,
-            )
-            emit(instruction, ::ReturnCallDispatcher)
-        }
+private fun checkWasmCallFrame(callFrameOffset: Int) {
+    check(callFrameOffset in 0 until CALLER_FRAME_DELTA_LIMIT) {
+        "Wasm caller-frame displacement exceeds the activation-header representation"
     }
+}
+
+internal fun FunctionCompilationContext.emitReturnWasmCall(
+    function: FunctionInstance.WasmFunction,
+    operands: List<OperandSource>,
+) {
+    val instruction = ControlSuperInstruction.ReturnWasmCall(
+        function.callStrategy,
+        operands.toOperandTransfer(0),
+        layout.activationHeaderSlot,
+    )
+    emit(instruction, ::ReturnCallDispatcher)
+}
+
+internal fun FunctionCompilationContext.emitReturnHostCall(
+    function: FunctionInstance.HostFunction,
+    operands: List<OperandSource>,
+    callFrameOffset: Int,
+) {
+    val instruction = ControlSuperInstruction.ReturnHostCall(
+        instance = function,
+        caller = compiler.instance,
+        operands = operands.toOperandTransfer(callFrameOffset),
+        callFrameOffset = callFrameOffset,
+        activationHeaderSlot = layout.activationHeaderSlot,
+    )
+    emit(instruction, ::ReturnCallDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitReturnCallIndirect(
@@ -121,25 +138,29 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
     operands: List<OperandSource>,
     type: RTT,
     table: TableInstance,
-    callFrameSlot: Int,
+    callFrameOffset: Int,
 ) {
-    val copyOperands = operands.toCopyOperands()
+    val operandTransfer = operands.toTailCallOperandTransfer(callFrameOffset)
     if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
         val instruction = ControlSuperInstruction.ReturnCallIndirectI(
             elementIndex.sourceBits.toInt(),
-            copyOperands,
+            operandTransfer,
             type,
             table,
-            callFrameSlot,
+            compiler.instance,
+            callFrameOffset,
+            layout.activationHeaderSlot,
         )
         emit(instruction, ::ReturnCallDispatcher)
     } else {
         val instruction = ControlSuperInstruction.ReturnCallIndirectS(
             elementIndex.sourceBits.toInt(),
-            copyOperands,
+            operandTransfer,
             type,
             table,
-            callFrameSlot,
+            compiler.instance,
+            callFrameOffset,
+            layout.activationHeaderSlot,
         )
         emit(instruction, ::ReturnCallDispatcher)
     }
@@ -148,95 +169,50 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
 internal fun FunctionCompilationContext.emitReturnCallRef(
     functionSlot: Int,
     operands: List<OperandSource>,
-    callFrameSlot: Int,
+    callFrameOffset: Int,
 ) {
     val instruction = ControlSuperInstruction.ReturnCallRefS(
         functionSlot,
-        operands.toCopyOperands(),
-        callFrameSlot,
+        operands.toTailCallOperandTransfer(callFrameOffset),
+        compiler.instance,
+        callFrameOffset,
+        layout.activationHeaderSlot,
     )
     emit(instruction, ::ReturnCallDispatcher)
 }
 
-internal fun FunctionCompilationContext.callFrameSlot(): Int {
+internal fun FunctionCompilationContext.callFrameOffset(): Int {
     val highestReservedSlot = operands.highestReservedSlot()
     return if (frame.isTemporary(highestReservedSlot)) highestReservedSlot + 1 else frame.temporarySlotBase
 }
 
-private fun List<OperandSource>.toCopyOperands(): List<CopyOperand> {
-    if (isEmpty()) return emptyList()
-    return ArrayList<CopyOperand>(size).also { operands ->
-        for (index in indices) {
-            operands.add(this[index].toCopyOperand())
-        }
-    }
+private fun List<OperandSource>.toOperandTransfer(destinationSlotBase: Int): OperandTransfer {
+    val sources = Array(size) { index -> this[index].toTransferSource() }
+    return selectOperandTransfer(sources, destinationSlotBase)
 }
 
-private fun List<OperandSource>.toOperandCopyPlan(destinationSlotBase: Int): OperandCopyPlan {
-    val operands = Array(size) { index -> this[index].toCopyOperand() }
-    return operandCopyPlan(operands, destinationSlotBase)
+private fun List<OperandSource>.toTailCallOperandTransfer(hostDestinationSlotBase: Int): TailCallOperandTransfer {
+    val sources = Array(size) { index -> this[index].toTransferSource() }
+    return TailCallOperandTransfer(
+        wasm = OperandTransfer(sources, destinationSlotBase = 0),
+        host = OperandTransfer(sources, destinationSlotBase = hostDestinationSlotBase),
+    )
 }
 
-private fun OperandSource.toCopyOperand(): CopyOperand = when (sourceKind) {
+private fun OperandSource.toTransferSource(): TransferSource = when (sourceKind) {
     OperandSourceKind.I32Immediate,
     OperandSourceKind.I64Immediate,
     OperandSourceKind.F32Immediate,
     OperandSourceKind.F64Immediate,
-    -> CopyOperand.Immediate(sourceBits)
+    -> TransferSource.Immediate(sourceBits)
     OperandSourceKind.Local,
     OperandSourceKind.Frame,
-    -> CopyOperand.Slot(sourceBits.toInt())
+    -> TransferSource.Slot(sourceBits.toInt())
 }
 
-internal fun operandCopyPlan(
-    operands: Array<CopyOperand>,
+internal fun selectOperandTransfer(
+    sources: Array<TransferSource>,
     destinationSlotBase: Int,
-): OperandCopyPlan = OperandCopyPlan(
-    operands = operands,
-    order = operandCopyOrder(operands, destinationSlotBase),
-)
+): OperandTransfer = OperandTransfer(sources, destinationSlotBase)
 
-private fun operandCopyOrder(
-    operands: Array<CopyOperand>,
-    destinationSlotBase: Int,
-): OperandCopyOrder {
-    var index = 0
-    while (index < operands.size) {
-        val operand = operands[index]
-        if (operand !is CopyOperand.Slot || operand.slot != destinationSlotBase + index) break
-        index++
-    }
-    if (index == operands.size) return OperandCopyOrder.None
-
-    index = 0
-    while (index < operands.size) {
-        val destinationSlot = destinationSlotBase + index
-        var remainingIndex = index + 1
-        while (remainingIndex < operands.size) {
-            val remaining = operands[remainingIndex]
-            if (remaining is CopyOperand.Slot && remaining.slot == destinationSlot) break
-            remainingIndex++
-        }
-        if (remainingIndex < operands.size) break
-        index++
-    }
-    if (index == operands.size) return OperandCopyOrder.Forward
-
-    index = operands.lastIndex
-    while (index >= 0) {
-        val destinationSlot = destinationSlotBase + index
-        var remainingIndex = index - 1
-        while (remainingIndex >= 0) {
-            val remaining = operands[remainingIndex]
-            if (remaining is CopyOperand.Slot && remaining.slot == destinationSlot) break
-            remainingIndex--
-        }
-        if (remainingIndex >= 0) break
-        index--
-    }
-    return if (index < 0) {
-        OperandCopyOrder.Reverse
-    } else {
-        OperandCopyOrder.Staged
-    }
-}
+private const val CALLER_FRAME_DELTA_LIMIT = 1 shl 25

@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.compiler
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction
 import io.github.charlietap.chasm.ast.instruction.Instruction
 import io.github.charlietap.chasm.ast.instruction.ReferenceInstruction
+import io.github.charlietap.chasm.ast.instruction.VariableInstruction
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.context.BlockContext
 import io.github.charlietap.chasm.compiler.context.BlockKind
@@ -13,7 +14,7 @@ import io.github.charlietap.chasm.compiler.context.table
 import io.github.charlietap.chasm.compiler.context.tag
 import io.github.charlietap.chasm.compiler.emptyIntArray
 import io.github.charlietap.chasm.compiler.instruction.BranchOutcome
-import io.github.charlietap.chasm.compiler.instruction.callFrameSlot
+import io.github.charlietap.chasm.compiler.instruction.callFrameOffset
 import io.github.charlietap.chasm.compiler.instruction.emitBranchIf
 import io.github.charlietap.chasm.compiler.instruction.emitBranchOnCast
 import io.github.charlietap.chasm.compiler.instruction.emitBranchOnNull
@@ -22,18 +23,20 @@ import io.github.charlietap.chasm.compiler.instruction.emitCall
 import io.github.charlietap.chasm.compiler.instruction.emitCallIndirect
 import io.github.charlietap.chasm.compiler.instruction.emitCallRef
 import io.github.charlietap.chasm.compiler.instruction.emitCopies
+import io.github.charlietap.chasm.compiler.instruction.emitCopy
 import io.github.charlietap.chasm.compiler.instruction.emitFunctionReturn
 import io.github.charlietap.chasm.compiler.instruction.emitJump
 import io.github.charlietap.chasm.compiler.instruction.emitPopHandler
 import io.github.charlietap.chasm.compiler.instruction.emitPushHandler
-import io.github.charlietap.chasm.compiler.instruction.emitReturnCall
 import io.github.charlietap.chasm.compiler.instruction.emitReturnCallIndirect
 import io.github.charlietap.chasm.compiler.instruction.emitReturnCallRef
+import io.github.charlietap.chasm.compiler.instruction.emitReturnHostCall
+import io.github.charlietap.chasm.compiler.instruction.emitReturnWasmCall
 import io.github.charlietap.chasm.compiler.instruction.emitThrow
 import io.github.charlietap.chasm.compiler.instruction.emitThrowRef
-import io.github.charlietap.chasm.compiler.instruction.emptySlotCopyPlan
-import io.github.charlietap.chasm.compiler.instruction.planCopies
+import io.github.charlietap.chasm.compiler.instruction.emptySlotTransfer
 import io.github.charlietap.chasm.compiler.instruction.prepareBranchTarget
+import io.github.charlietap.chasm.compiler.instruction.slotTransferTo
 import io.github.charlietap.chasm.compiler.operand.Operand
 import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
@@ -81,25 +84,34 @@ internal fun finishFunctionControl(state: FunctionCompilationContext) {
         check(state.operands.size == root.resultSlots.size) {
             "function result stack does not match its type: stack=${state.operands} results=${root.resultTypes}"
         }
-        val copies = state.planCopies(root.resultSlots)
+        val transfer = state.slotTransferTo(root.resultSlots)
         if (root.reachedByBranch) {
-            if (copies.isIdentity()) {
+            if (transfer.isIdentity()) {
                 state.bind(root.continuationTarget)
-                state.emit(AdminInstruction.EndFunction, ::EndFunctionDispatcher)
+                state.emit(
+                    AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
+                    ::EndFunctionDispatcher,
+                )
                 return
             }
-            state.emitFunctionReturn(copies)
+            state.emitFunctionReturn(transfer)
             state.bind(root.continuationTarget)
-            state.emit(AdminInstruction.EndFunction, ::EndFunctionDispatcher)
+            state.emit(
+                AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
+                ::EndFunctionDispatcher,
+            )
             return
         }
         state.bind(root.continuationTarget)
-        state.emitFunctionReturn(copies)
+        state.emitFunctionReturn(transfer)
         return
     }
     state.bind(root.continuationTarget)
     if (root.reachedByBranch) {
-        state.emit(AdminInstruction.EndFunction, ::EndFunctionDispatcher)
+        state.emit(
+            AdminInstruction.EndFunction(root.resultSlots.size, state.layout.activationHeaderSlot),
+            ::EndFunctionDispatcher,
+        )
     }
 }
 
@@ -222,7 +234,7 @@ private fun enterIf(
 
     val condition = state.pop()
     enterIf(state, instruction) { elseTarget ->
-        state.emitBranchIf(condition, elseTarget, emptySlotCopyPlan, whenZero = true)
+        state.emitBranchIf(condition, elseTarget, emptySlotTransfer, whenZero = true)
     }
 }
 
@@ -232,7 +244,7 @@ internal fun compileIfCondition(
     condition: NumericCondition,
 ) {
     enterIf(state, instruction) { elseTarget ->
-        state.emitBranchIf(condition, elseTarget, emptySlotCopyPlan, branchOnMatch = false)
+        state.emitBranchIf(condition, elseTarget, emptySlotTransfer, branchOnMatch = false)
     }
 }
 
@@ -430,7 +442,7 @@ private fun compileBranch(
     val target = state.target(instruction.labelIndex.toInt())
     state.emitJump(
         target.branchTarget,
-        state.planCopies(target.branchSlots),
+        state.slotTransferTo(target.branchSlots),
         state.handlerDepth - target.handlerDepth,
     )
     target.reachedByBranch = true
@@ -446,7 +458,7 @@ private fun compileBranchIf(
     val outcome = state.emitBranchIf(
         condition = condition,
         target = target.branchTarget,
-        copies = state.planCopies(target.branchSlots),
+        transfer = state.slotTransferTo(target.branchSlots),
         handlerPopCount = state.handlerDepth - target.handlerDepth,
     )
     if (outcome != BranchOutcome.Never) target.reachedByBranch = true
@@ -462,7 +474,7 @@ internal fun compileBranchIfCondition(
     val outcome = state.emitBranchIf(
         condition = condition,
         target = target.branchTarget,
-        copies = state.planCopies(target.branchSlots),
+        transfer = state.slotTransferTo(target.branchSlots),
         handlerPopCount = state.handlerDepth - target.handlerDepth,
     )
     if (outcome != BranchOutcome.Never) target.reachedByBranch = true
@@ -480,7 +492,7 @@ private fun compileBranchTable(
         val target = state.target(labelIndex.toInt())
         state.emitJump(
             target = target.branchTarget,
-            copies = state.planCopies(target.branchSlots),
+            transfer = state.slotTransferTo(target.branchSlots),
             handlerPopCount = state.handlerDepth - target.handlerDepth,
         )
         target.reachedByBranch = true
@@ -496,14 +508,14 @@ private fun compileBranchTable(
         check(target.branchSlots.size == arity)
         targetIndices[index] = state.prepareBranchTarget(
             target = target.branchTarget,
-            copies = state.planCopies(target.branchSlots),
+            transfer = state.slotTransferTo(target.branchSlots),
             handlerPopCount = state.handlerDepth - target.handlerDepth,
         ).index
         target.reachedByBranch = true
     }
     targetIndices[instruction.labelIndices.size] = state.prepareBranchTarget(
         target = defaultTarget.branchTarget,
-        copies = state.planCopies(defaultTarget.branchSlots),
+        transfer = state.slotTransferTo(defaultTarget.branchSlots),
         handlerPopCount = state.handlerDepth - defaultTarget.handlerDepth,
     ).index
     state.emitBranchTable(
@@ -516,7 +528,8 @@ private fun compileBranchTable(
 
 private fun compileReturn(state: FunctionCompilationContext) {
     val root = checkNotNull(state.rootControl)
-    state.emitFunctionReturn(state.planCopies(root.branchSlots))
+    repeat(state.handlerDepth) { state.emitPopHandler() }
+    state.emitFunctionReturn(state.slotTransferTo(root.branchSlots))
     state.reachable = false
 }
 
@@ -529,7 +542,7 @@ private fun compileBranchOnNull(
     state.emitBranchOnNull(
         operand = operand,
         target = target.branchTarget,
-        copies = state.planCopies(target.branchSlots, excludedTopCount = 1),
+        transfer = state.slotTransferTo(target.branchSlots, excludedTrailingOperandCount = 1),
         onNull = true,
         handlerPopCount = state.handlerDepth - target.handlerDepth,
     )
@@ -545,7 +558,7 @@ private fun compileBranchOnNonNull(
     state.emitBranchOnNull(
         operand = operand,
         target = target.branchTarget,
-        copies = state.planCopies(target.branchSlots),
+        transfer = state.slotTransferTo(target.branchSlots),
         onNull = false,
         handlerPopCount = state.handlerDepth - target.handlerDepth,
     )
@@ -568,7 +581,7 @@ private fun compileBranchOnCast(
     state.emitBranchOnCast(
         operand = operand,
         target = target.branchTarget,
-        copies = state.planCopies(target.branchSlots),
+        transfer = state.slotTransferTo(target.branchSlots),
         typeTest = ReferenceTypeTest.from(destinationType, state.compiler.runtimeTypes),
         onSuccess = onSuccess,
         handlerPopCount = state.handlerDepth - target.handlerDepth,
@@ -609,17 +622,17 @@ private fun compileCall(
     val function = state.compiler.function(instruction.functionIndex)
     val type = function.functionType
     val operands = state.pop(type.params.types.size)
-    val callFrameSlot = state.callFrameSlot()
-    val interfaceSlots = maxOf(type.params.types.size, type.results.types.size)
-    reserveCallInterface(state, callFrameSlot, interfaceSlots)
+    val callFrameOffset = state.callFrameOffset()
+    val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
+    reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
     val destination = callResultDestination(state, type.results.types, nextInstruction)
     state.emitCall(
         function = function,
         operands = operands,
-        resultSlotBase = destination?.slot ?: callFrameSlot,
-        callFrameSlot = callFrameSlot,
+        callFrameOffset = callFrameOffset,
+        resultDestinationSlot = destination?.slot,
     )
-    return completeCallResults(state, type.results.types, callFrameSlot, destination)
+    return completeCallResults(state, type.results.types, callFrameOffset, destination)
 }
 
 private fun compileCallIndirect(
@@ -630,19 +643,19 @@ private fun compileCallIndirect(
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val elementIndex = state.pop()
     val operands = state.pop(type.params.types.size)
-    val callFrameSlot = state.callFrameSlot()
-    val interfaceSlots = maxOf(type.params.types.size, type.results.types.size)
-    reserveCallInterface(state, callFrameSlot, interfaceSlots)
+    val callFrameOffset = state.callFrameOffset()
+    val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
+    reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
     val destination = callResultDestination(state, type.results.types, nextInstruction)
     state.emitCallIndirect(
         elementIndex = elementIndex,
         operands = operands,
         type = state.compiler.rtt(instruction.typeIndex),
         table = state.compiler.table(instruction.tableIndex),
-        resultSlotBase = destination?.slot ?: callFrameSlot,
-        callFrameSlot = callFrameSlot,
+        callFrameOffset = callFrameOffset,
+        resultDestinationSlot = destination?.slot,
     )
-    return completeCallResults(state, type.results.types, callFrameSlot, destination)
+    return completeCallResults(state, type.results.types, callFrameOffset, destination)
 }
 
 private fun compileCallRef(
@@ -653,18 +666,18 @@ private fun compileCallRef(
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val functionReference = state.pop()
     val operands = state.pop(type.params.types.size)
-    val callFrameSlot = state.callFrameSlot()
-    val interfaceSlots = maxOf(type.params.types.size, type.results.types.size)
-    reserveCallInterface(state, callFrameSlot, interfaceSlots)
+    val callFrameOffset = state.callFrameOffset()
+    val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
+    reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
     val destination = callResultDestination(state, type.results.types, nextInstruction)
     check(!functionReference.isImmediate)
     state.emitCallRef(
         functionSlot = functionReference.sourceSlot,
         operands = operands,
-        resultSlotBase = destination?.slot ?: callFrameSlot,
-        callFrameSlot = callFrameSlot,
+        callFrameOffset = callFrameOffset,
+        resultDestinationSlot = destination?.slot,
     )
-    return completeCallResults(state, type.results.types, callFrameSlot, destination)
+    return completeCallResults(state, type.results.types, callFrameOffset, destination)
 }
 
 internal fun compileKnownReferenceCall(
@@ -675,17 +688,17 @@ internal fun compileKnownReferenceCall(
 ): Boolean {
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val operands = state.pop(type.params.types.size)
-    val callFrameSlot = state.callFrameSlot()
-    val interfaceSlots = maxOf(type.params.types.size, type.results.types.size)
-    reserveCallInterface(state, callFrameSlot, interfaceSlots)
+    val callFrameOffset = state.callFrameOffset()
+    val interfaceSlotCount = maxOf(type.params.types.size, type.results.types.size)
+    reserveCallInterface(state, callFrameOffset, interfaceSlotCount)
     val destination = callResultDestination(state, type.results.types, nextInstruction)
     state.emitCall(
         function = state.compiler.function(reference.funcIdx),
         operands = operands,
-        resultSlotBase = destination?.slot ?: callFrameSlot,
-        callFrameSlot = callFrameSlot,
+        callFrameOffset = callFrameOffset,
+        resultDestinationSlot = destination?.slot,
     )
-    return completeCallResults(state, type.results.types, callFrameSlot, destination)
+    return completeCallResults(state, type.results.types, callFrameOffset, destination)
 }
 
 private fun compileReturnCall(
@@ -694,12 +707,15 @@ private fun compileReturnCall(
 ) {
     val function = state.compiler.function(instruction.functionIndex)
     val operands = state.pop(function.functionType.params.types.size)
-    val callFrameSlot = state.callFrameSlot()
-    if (function is FunctionInstance.HostFunction) {
-        reserveCallInterface(state, callFrameSlot, function.functionType.params.types.size)
-    }
     repeat(state.handlerDepth) { state.emitPopHandler() }
-    state.emitReturnCall(function, operands, callFrameSlot)
+    when (function) {
+        is FunctionInstance.WasmFunction -> state.emitReturnWasmCall(function, operands)
+        is FunctionInstance.HostFunction -> {
+            val callFrameOffset = state.callFrameOffset()
+            reserveCallInterface(state, callFrameOffset, function.functionType.params.types.size)
+            state.emitReturnHostCall(function, operands, callFrameOffset)
+        }
+    }
     state.reachable = false
 }
 
@@ -710,15 +726,15 @@ private fun compileReturnCallIndirect(
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val elementIndex = state.pop()
     val operands = state.pop(type.params.types.size)
-    val callFrameSlot = state.callFrameSlot()
-    reserveCallInterface(state, callFrameSlot, type.params.types.size)
+    val callFrameOffset = state.callFrameOffset()
+    reserveCallInterface(state, callFrameOffset, type.params.types.size)
     repeat(state.handlerDepth) { state.emitPopHandler() }
     state.emitReturnCallIndirect(
         elementIndex = elementIndex,
         operands = operands,
         type = state.compiler.rtt(instruction.typeIndex),
         table = state.compiler.table(instruction.tableIndex),
-        callFrameSlot = callFrameSlot,
+        callFrameOffset = callFrameOffset,
     )
     state.reachable = false
 }
@@ -730,13 +746,13 @@ private fun compileReturnCallRef(
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val functionReference = state.pop()
     val operands = state.pop(type.params.types.size)
-    val callFrameSlot = state.callFrameSlot()
-    reserveCallInterface(state, callFrameSlot, type.params.types.size)
+    val callFrameOffset = state.callFrameOffset()
+    reserveCallInterface(state, callFrameOffset, type.params.types.size)
     repeat(state.handlerDepth) { state.emitPopHandler() }
     state.emitReturnCallRef(
         functionSlot = state.materialize(functionReference),
         operands = operands,
-        callFrameSlot = callFrameSlot,
+        callFrameOffset = callFrameOffset,
     )
     state.reachable = false
 }
@@ -749,17 +765,20 @@ internal fun compileKnownReferenceReturnCall(
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val operands = state.pop(type.params.types.size)
     val function = state.compiler.function(reference.funcIdx)
-    val callFrameSlot = state.callFrameSlot()
-    if (function is FunctionInstance.HostFunction) {
-        reserveCallInterface(state, callFrameSlot, function.functionType.params.types.size)
-    }
     repeat(state.handlerDepth) { state.emitPopHandler() }
-    state.emitReturnCall(function, operands, callFrameSlot)
+    when (function) {
+        is FunctionInstance.WasmFunction -> state.emitReturnWasmCall(function, operands)
+        is FunctionInstance.HostFunction -> {
+            val callFrameOffset = state.callFrameOffset()
+            reserveCallInterface(state, callFrameOffset, function.functionType.params.types.size)
+            state.emitReturnHostCall(function, operands, callFrameOffset)
+        }
+    }
     state.reachable = false
 }
 
 private fun reserveCallInterface(state: FunctionCompilationContext, base: Int, size: Int) {
-    if (size > 0) state.frame.reserve(base + size - 1)
+    state.frame.reserve(base + size)
 }
 
 private fun pushCallResults(
@@ -776,7 +795,14 @@ private fun callResultDestination(
     state: FunctionCompilationContext,
     types: List<ValueType>,
     nextInstruction: Instruction?,
-): Destination? = if (types.size == 1) destination(state, null, nextInstruction) else null
+): Destination? = if (
+    types.size == 1 &&
+    (nextInstruction is VariableInstruction.LocalSet || nextInstruction is VariableInstruction.LocalTee)
+) {
+    destination(state, null, nextInstruction).takeIf(Destination::consumesNextInstruction)
+} else {
+    null
+}
 
 private fun completeCallResults(
     state: FunctionCompilationContext,

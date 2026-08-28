@@ -3,17 +3,17 @@ package io.github.charlietap.chasm.compiler
 import io.github.charlietap.chasm.ast.module.Function
 import io.github.charlietap.chasm.parallel.availableParallelProcessors
 
-internal fun CompilationPlanner(
+internal fun selectCompilationStrategy(
     functions: List<Function>,
     mode: CompilationMode,
     availableProcessors: Int = availableParallelProcessors(),
-): CompilationPlan {
+): CompilationStrategy {
     val workerLimit = minOf(
         functions.size,
         maxOf(availableProcessors - 1, 1),
         COMPILER_WORKER_LIMIT,
     )
-    if (mode == CompilationMode.SERIAL || workerLimit <= 1) return CompilationPlan.Serial
+    if (mode == CompilationMode.SERIAL || workerLimit <= 1) return CompilationStrategy.Serial
 
     var serialCost = 0L
     val scheduledFunctions = Array(functions.size) { functionIndex ->
@@ -29,10 +29,10 @@ internal fun CompilationPlanner(
     if (mode == CompilationMode.PARALLEL) {
         scheduledFunctions.sortByEstimatedCost()
         val assignments = scheduleFunctions(scheduledFunctions, workerLimit)
-        return CompilationPlan.Parallel(Array(assignments.size) { index -> assignments[index].toIntArray() })
+        return CompilationStrategy.Parallel(Array(assignments.size) { index -> assignments[index].toIntArray() })
     }
 
-    if (!couldBenefitFromParallelism(serialCost, workerLimit)) return CompilationPlan.Serial
+    if (!couldBenefitFromParallelism(serialCost, workerLimit)) return CompilationStrategy.Serial
     scheduledFunctions.sortByEstimatedCost()
 
     var bestCost = serialCost
@@ -48,11 +48,11 @@ internal fun CompilationPlanner(
         }
     }
 
-    val assignments = bestAssignments ?: return CompilationPlan.Serial
+    val assignments = bestAssignments ?: return CompilationStrategy.Serial
     return if (bestCost * COST_SCALE <= serialCost * MINIMUM_PARALLEL_COST_PERCENT) {
-        CompilationPlan.Parallel(Array(assignments.size) { index -> assignments[index].toIntArray() })
+        CompilationStrategy.Parallel(Array(assignments.size) { index -> assignments[index].toIntArray() })
     } else {
-        CompilationPlan.Serial
+        CompilationStrategy.Serial
     }
 }
 
@@ -83,10 +83,10 @@ private fun Array<ScheduledFunction>.sortByEstimatedCost() {
     )
 }
 
-internal sealed interface CompilationPlan {
-    data object Serial : CompilationPlan
+internal sealed interface CompilationStrategy {
+    data object Serial : CompilationStrategy
 
-    class Parallel(val assignments: Array<IntArray>) : CompilationPlan
+    class Parallel(val assignments: Array<IntArray>) : CompilationStrategy
 }
 
 private fun scheduleFunctions(
@@ -112,7 +112,6 @@ private class FunctionAssignment(initialCapacity: Int) {
     private var functionIndices = IntArray(initialCapacity)
     private var size = 0
     var estimatedCost = 0L
-        private set
 
     fun add(function: ScheduledFunction) {
         if (size == functionIndices.size) functionIndices = functionIndices.copyOf(functionIndices.size * 2)

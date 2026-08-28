@@ -12,7 +12,7 @@ class CopySlotsDispatcherTest {
     @Test
     fun `copies overlapping slots in order`() {
         val vstack = vstack().apply {
-            reserveFrame(3)
+            reserveDepth(3)
             setFrameSlot(0, 1)
             setFrameSlot(1, 2)
             setFrameSlot(2, 3)

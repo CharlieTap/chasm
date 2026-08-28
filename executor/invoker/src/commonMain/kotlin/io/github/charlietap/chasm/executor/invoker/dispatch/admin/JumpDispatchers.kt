@@ -1,13 +1,12 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
-import io.github.charlietap.chasm.executor.invoker.function.copyOperands
 import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
-import io.github.charlietap.chasm.runtime.instruction.CopyOperand
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
+import io.github.charlietap.chasm.runtime.instruction.TransferSource
 
 fun JumpDispatcher(
     instruction: AdminInstruction.Jump,
@@ -24,16 +23,16 @@ fun JumpDispatcher(
     val destinationSlotBase = instruction.destinationSlotBase
     val targetIp = instruction.targetIp
     val operands = instruction.operands
-    val operand = operands.operands.singleOrNull()
+    val operand = operands.sources.singleOrNull()
     return when (operand) {
-        is CopyOperand.Immediate -> {
+        is TransferSource.Immediate -> {
             val value = operand.value
             DispatchableInstruction { vstack, _, _, _, _ ->
                 vstack.setFrameSlot(destinationSlotBase, value)
                 targetIp
             }
         }
-        is CopyOperand.Slot -> {
+        is TransferSource.Slot -> {
             val sourceSlot = operand.slot
             DispatchableInstruction { vstack, _, _, _, _ ->
                 vstack.setFrameSlot(destinationSlotBase, vstack.getFrameSlot(sourceSlot))
@@ -41,13 +40,11 @@ fun JumpDispatcher(
             }
         }
         null -> DispatchableInstruction { vstack, _, _, _, _ ->
-            val framePointer = vstack.framePointer
-            copyOperands(
-                vstack = vstack,
-                currentFramePointer = framePointer,
-                destinationFramePointer = framePointer + destinationSlotBase,
-                operands = operands.operands,
-                order = operands.order,
+            val fp = vstack.fp
+            vstack.transferOperands(
+                currentFp = fp,
+                destinationFp = fp + destinationSlotBase,
+                transfer = operands,
             )
             targetIp
         }

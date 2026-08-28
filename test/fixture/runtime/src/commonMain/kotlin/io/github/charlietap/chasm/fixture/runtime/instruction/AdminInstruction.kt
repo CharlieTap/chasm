@@ -12,4 +12,7 @@ fun copySlotsAdminInstruction(
     destinationSlots = destinationSlots.toIntArray(),
 )
 
-fun endFunctionAdminInstruction() = AdminInstruction.EndFunction
+fun endFunctionAdminInstruction(
+    resultCount: Int = 0,
+    activationHeaderSlot: Int = resultCount,
+) = AdminInstruction.EndFunction(resultCount, activationHeaderSlot)

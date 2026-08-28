@@ -10,13 +10,11 @@ import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.addFunctionAddress
-import io.github.charlietap.chasm.runtime.ext.default
-import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.ext.functionType
-import io.github.charlietap.chasm.runtime.function.Function as RuntimeFunction
 
 internal typealias WasmFunctionAllocator = (Module, ModuleInstance, Function, Store) -> Result<Unit, ModuleTrapError>
 
@@ -34,19 +32,14 @@ internal fun WasmFunctionAllocator(
     val functionType = type.functionType()
         ?: Err(InstantiationError.FailedToResolveFunctionType(function.typeIndex)).bind()
 
-    // Function bodies may reference functions with higher indices, so create every stable
-    // function instance and call-plan shell before compiling any body.
+    // Function bodies may reference functions with higher indices, so allocate every
+    // function instance before compiling any body.
     val instance = FunctionInstance.WasmFunction(
         rtt = rtt,
         functionType = functionType,
         module = moduleInstance,
-        function = RuntimeFunction.TEMP,
-        callPlan = WasmFunctionCallPlan(
-            params = functionType.params.types.size,
-            results = functionType.results.types.size,
-            interfaceSlots = maxOf(functionType.params.types.size, functionType.results.types.size),
-            module = moduleInstance,
-            locals = LongArray(function.locals.size) { index -> function.locals[index].type.default() },
+        callStrategy = WasmFunctionCallStrategy(
+            interfaceSlotCount = maxOf(functionType.params.types.size, functionType.results.types.size),
         ),
     )
     store.functions.add(instance)

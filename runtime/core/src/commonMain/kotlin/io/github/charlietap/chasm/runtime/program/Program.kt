@@ -60,7 +60,7 @@ class Program
         }
     }
 
-const val EXIT_IP = -1
+const val EXIT_IP = Int.MAX_VALUE
 
 private const val INITIAL_CAPACITY = 256
 

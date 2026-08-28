@@ -7,7 +7,9 @@ import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.createCompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
+import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.LinkWasmCallDispatchers
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
+import io.github.charlietap.chasm.runtime.function.classifyLocalInitialization
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.store.Store
@@ -22,6 +24,7 @@ fun ModuleCompiler(
     types: ModuleTypeResolver = ModuleTypeResolver(module),
     diagnostics: CompilerDiagnostics? = null,
 ): Result<Unit, ModuleTrapError> = binding {
+    val firstModuleIp = store.program.size
     val context = createCompilerContext(
         module = module,
         types = types,
@@ -38,10 +41,15 @@ fun ModuleCompiler(
         val entryIp = store.program.size
         val compiled = FunctionCompiler(context, function, store.program, workspace).bind()
 
-        functionInstance.callPlan.install(
-            entryIp = entryIp,
-            frameSlots = compiled.frameSlots,
-        )
-        functionInstance.function = compiled
+        val callStrategy = functionInstance.callStrategy
+        callStrategy.frameSlots = compiled.frameSlots
+        callStrategy.localInitialization = classifyLocalInitialization(compiled.localInitialValues)
+        callStrategy.entryIp = entryIp
+    }
+    val instructionObserver = diagnostics?.instructionObserver
+    if (instructionObserver == null) {
+        LinkWasmCallDispatchers(store.program, firstModuleIp)
+    } else {
+        LinkWasmCallDispatchers(store.program, firstModuleIp, instructionObserver::onInstruction)
     }
 }

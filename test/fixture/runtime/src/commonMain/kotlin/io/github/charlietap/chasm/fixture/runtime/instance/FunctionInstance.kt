@@ -1,11 +1,13 @@
 package io.github.charlietap.chasm.fixture.runtime.instance
 
+import io.github.charlietap.chasm.fixture.runtime.function.RuntimeFunction
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.host.HostFunction
-import io.github.charlietap.chasm.runtime.function.Function
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
+import io.github.charlietap.chasm.runtime.function.classifyLocalInitialization
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.type.RTT
@@ -28,10 +30,15 @@ fun wasmFunctionInstance(
     rtt: RTT = rtt(),
     functionType: FunctionType = functionType(),
     module: ModuleInstance = moduleInstance(),
-    function: Function = runtimeFunction(),
+    function: RuntimeFunction = runtimeFunction(),
 ) = FunctionInstance.WasmFunction(
     rtt = rtt,
     functionType = functionType,
     module = module,
-    function = function,
+    callStrategy = WasmFunctionCallStrategy(
+        interfaceSlotCount = maxOf(functionType.params.types.size, functionType.results.types.size),
+        entryIp = function.body.entryIp,
+        frameSlots = function.frameSlots,
+        localInitialization = classifyLocalInitialization(function.locals),
+    ),
 )

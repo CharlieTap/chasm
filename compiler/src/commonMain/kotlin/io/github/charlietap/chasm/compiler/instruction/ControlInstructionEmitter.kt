@@ -2,9 +2,9 @@ package io.github.charlietap.chasm.compiler.instruction
 
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
 import io.github.charlietap.chasm.ast.module.Index
+import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserver
-import io.github.charlietap.chasm.compiler.operand.Operand
 import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
 import io.github.charlietap.chasm.compiler.operand.i32Immediate
@@ -16,7 +16,6 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpConditionD
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PopHandlerDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.PushHandlerDispatcher
-import io.github.charlietap.chasm.executor.invoker.dispatch.control.ReturnDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.FunctionReturnDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.controlfused.ThrowRefDispatcher
@@ -27,124 +26,13 @@ import io.github.charlietap.chasm.executor.invoker.dispatch.numericfused.I64Cons
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
-import io.github.charlietap.chasm.runtime.instruction.CopyOperand
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
-import io.github.charlietap.chasm.runtime.instruction.OperandCopyPlan
+import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
+import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
-import io.github.charlietap.chasm.runtime.instruction.ControlInstruction as RuntimeControlInstruction
-
-internal class SlotCopyPlan private constructor(
-    val size: Int,
-    private val firstSourceKind: OperandSourceKind,
-    private val firstSourceBits: Long,
-    private val firstSourceSlot: Int,
-    private val firstDestinationSlot: Int,
-    private val sourceKinds: ByteArray?,
-    private val sourceBits: LongArray?,
-    private val sourceSlots: IntArray?,
-    private val destinationSlots: IntArray?,
-) {
-
-    fun sourceKind(index: Int): OperandSourceKind = if (sourceKinds == null) {
-        firstSourceKind
-    } else {
-        OperandSourceKind.entries[sourceKinds[index].toInt()]
-    }
-
-    fun sourceBits(index: Int): Long = sourceBits?.get(index) ?: firstSourceBits
-
-    fun sourceSlot(index: Int): Int = sourceSlots?.get(index) ?: firstSourceSlot
-
-    fun destinationSlot(index: Int): Int = destinationSlots?.get(index) ?: firstDestinationSlot
-
-    fun sourceSlots(): IntArray = checkNotNull(sourceSlots)
-
-    fun destinationSlots(): IntArray = checkNotNull(destinationSlots)
-
-    fun isIdentity(): Boolean {
-        for (index in 0 until size) {
-            val sourceSlot = when (sourceKind(index)) {
-                OperandSourceKind.Local -> sourceBits(index).toInt()
-                OperandSourceKind.Frame -> sourceSlot(index)
-                else -> return false
-            }
-            if (sourceSlot != destinationSlot(index)) return false
-        }
-        return true
-    }
-
-    companion object {
-        val Empty = SlotCopyPlan(
-            size = 0,
-            firstSourceKind = OperandSourceKind.Frame,
-            firstSourceBits = 0,
-            firstSourceSlot = 0,
-            firstDestinationSlot = 0,
-            sourceKinds = null,
-            sourceBits = null,
-            sourceSlots = null,
-            destinationSlots = null,
-        )
-
-        fun create(
-            operands: List<Operand>,
-            operandStartIndex: Int,
-            destinationSlots: IntArray,
-        ): SlotCopyPlan {
-            check(operandStartIndex >= 0 && operandStartIndex + destinationSlots.size <= operands.size)
-            if (destinationSlots.isEmpty()) return Empty
-            val first = operands[operandStartIndex]
-            if (destinationSlots.size == 1) {
-                return SlotCopyPlan(
-                    size = 1,
-                    firstSourceKind = first.sourceKind,
-                    firstSourceBits = first.sourceBits,
-                    firstSourceSlot = first.reservedSlot,
-                    firstDestinationSlot = destinationSlots[0],
-                    sourceKinds = null,
-                    sourceBits = null,
-                    sourceSlots = null,
-                    destinationSlots = null,
-                )
-            }
-
-            var allFrameSources = true
-            val sourceSlots = IntArray(destinationSlots.size)
-            for (index in destinationSlots.indices) {
-                val operand = operands[operandStartIndex + index]
-                if (operand.sourceKind != OperandSourceKind.Frame) allFrameSources = false
-                sourceSlots[index] = operand.reservedSlot
-            }
-            val sourceKinds = if (allFrameSources) null else ByteArray(destinationSlots.size)
-            val sourceBits = if (allFrameSources) null else LongArray(destinationSlots.size)
-            if (!allFrameSources) {
-                val kinds = checkNotNull(sourceKinds)
-                val bits = checkNotNull(sourceBits)
-                for (index in destinationSlots.indices) {
-                    val operand = operands[operandStartIndex + index]
-                    kinds[index] = operand.sourceKind.ordinal.toByte()
-                    bits[index] = operand.sourceBits
-                }
-            }
-            return SlotCopyPlan(
-                size = destinationSlots.size,
-                firstSourceKind = first.sourceKind,
-                firstSourceBits = first.sourceBits,
-                firstSourceSlot = first.reservedSlot,
-                firstDestinationSlot = destinationSlots[0],
-                sourceKinds = sourceKinds,
-                sourceBits = sourceBits,
-                sourceSlots = sourceSlots,
-                destinationSlots = destinationSlots,
-            )
-        }
-    }
-}
-
-internal val emptySlotCopyPlan = SlotCopyPlan.Empty
 
 internal enum class BranchOutcome {
     Always,
@@ -152,26 +40,24 @@ internal enum class BranchOutcome {
     Dynamic,
 }
 
-internal fun FunctionCompilationContext.emitFunctionReturn(copies: SlotCopyPlan) {
-    if (copies.isIdentity()) {
-        emit(RuntimeControlInstruction.Return, ::ReturnDispatcher)
-        return
-    }
-
-    val destinationSlotBase = copies.destinationSlot(0)
-    val instruction = ControlSuperInstruction.FunctionReturn(copies.operandCopyPlan(destinationSlotBase))
+internal fun FunctionCompilationContext.emitFunctionReturn(transfer: SlotTransfer) {
+    val destinationSlotBase = if (transfer.size == 0) 0 else transfer.destinationSlot(0)
+    val instruction = ControlSuperInstruction.FunctionReturn(
+        results = transfer.toOperandTransfer(destinationSlotBase),
+        activationHeaderSlot = layout.activationHeaderSlot,
+    )
     emit(instruction, ::FunctionReturnDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitJump(
     target: ProgramTarget,
-    copies: SlotCopyPlan = emptySlotCopyPlan,
+    transfer: SlotTransfer = emptySlotTransfer,
     handlerPopCount: Int = 0,
 ) {
     check(handlerPopCount >= 0)
-    if (handlerPopCount == 0 && copies.size > 0 && !copies.isIdentity()) {
-        val destinationSlotBase = copies.destinationSlot(0)
-        val operands = copies.operandCopyPlan(destinationSlotBase)
+    if (handlerPopCount == 0 && transfer.size > 0 && !transfer.isIdentity()) {
+        val destinationSlotBase = transfer.destinationSlot(0)
+        val operands = transfer.toOperandTransfer(destinationSlotBase)
         append(
             target = target,
             instruction = { targetIp -> AdminInstruction.JumpCopies(operands, destinationSlotBase, targetIp) },
@@ -180,71 +66,71 @@ internal fun FunctionCompilationContext.emitJump(
         return
     }
 
-    if (!copies.isIdentity()) emitCopies(copies)
+    if (!transfer.isIdentity()) emitSlotTransfer(transfer)
     repeat(handlerPopCount) { emitPopHandler() }
     append(target, AdminInstruction::Jump, ::JumpDispatcher)
 }
 
-private fun SlotCopyPlan.operandCopyPlan(
+private fun SlotTransfer.toOperandTransfer(
     destinationSlotBase: Int,
-): OperandCopyPlan {
-    val operands = Array<CopyOperand>(size) { index ->
+): OperandTransfer {
+    val operands = Array<TransferSource>(size) { index ->
         check(destinationSlot(index) == destinationSlotBase + index)
         when (sourceKind(index)) {
             OperandSourceKind.I32Immediate,
             OperandSourceKind.I64Immediate,
             OperandSourceKind.F32Immediate,
             OperandSourceKind.F64Immediate,
-            -> CopyOperand.Immediate(sourceBits(index))
-            OperandSourceKind.Local -> CopyOperand.Slot(sourceBits(index).toInt())
-            OperandSourceKind.Frame -> CopyOperand.Slot(sourceSlot(index))
+            -> TransferSource.Immediate(sourceBits(index))
+            OperandSourceKind.Local -> TransferSource.Slot(sourceBits(index).toInt())
+            OperandSourceKind.Frame -> TransferSource.Slot(sourceSlot(index))
         }
     }
-    return operandCopyPlan(operands, destinationSlotBase)
+    return selectOperandTransfer(operands, destinationSlotBase)
 }
 
 internal fun FunctionCompilationContext.emitBranchIf(
     condition: OperandSource,
     target: ProgramTarget,
-    copies: SlotCopyPlan,
+    transfer: SlotTransfer,
     whenZero: Boolean = false,
     handlerPopCount: Int = 0,
 ): BranchOutcome {
     check(handlerPopCount >= 0)
     if (condition.sourceKind == OperandSourceKind.I32Immediate) {
         val branch = (condition.sourceBits == 0L) == whenZero
-        if (branch) emitJump(target, copies, handlerPopCount)
+        if (branch) emitJump(target, transfer, handlerPopCount)
         return if (branch) BranchOutcome.Always else BranchOutcome.Never
     }
-    val copy = copies.size == 1 && copies.sourceKind(0) == OperandSourceKind.Frame &&
-        copies.sourceSlot(0) != copies.destinationSlot(0) && !whenZero && handlerPopCount == 0
-    val branchTarget = if (copy || copies.size == 0 && handlerPopCount == 0) {
+    val scalarTransfer = transfer.size == 1 && transfer.sourceKind(0) == OperandSourceKind.Frame &&
+        transfer.sourceSlot(0) != transfer.destinationSlot(0) && !whenZero && handlerPopCount == 0
+    val branchTarget = if (scalarTransfer || transfer.size == 0 && handlerPopCount == 0) {
         target
     } else {
         program.target().also { tailTarget ->
-            deferBranchPath(tailTarget, target, copies, handlerPopCount)
+            deferBranchPath(tailTarget, target, transfer, handlerPopCount)
         }
     }
     val conditionKind = condition.sourceKind
     val conditionBits = condition.sourceBits
     append(branchTarget) { targetIp, observer ->
         when {
-            copy && conditionKind.isImmediate -> dispatch(
+            scalarTransfer && conditionKind.isImmediate -> dispatch(
                 observer,
                 AdminInstruction.JumpIfCopyI(
                     operand = conditionBits,
-                    sourceSlot = copies.sourceSlot(0),
-                    destinationSlot = copies.destinationSlot(0),
+                    sourceSlot = transfer.sourceSlot(0),
+                    destinationSlot = transfer.destinationSlot(0),
                     targetIp = targetIp,
                 ),
                 ::JumpDispatcher,
             )
-            copy -> dispatch(
+            scalarTransfer -> dispatch(
                 observer,
                 AdminInstruction.JumpIfCopyS(
                     operandSlot = conditionBits.toInt(),
-                    sourceSlot = copies.sourceSlot(0),
-                    destinationSlot = copies.destinationSlot(0),
+                    sourceSlot = transfer.sourceSlot(0),
+                    destinationSlot = transfer.destinationSlot(0),
                     targetIp = targetIp,
                 ),
                 ::JumpDispatcher,
@@ -277,7 +163,7 @@ internal fun FunctionCompilationContext.emitBranchIf(
 internal fun FunctionCompilationContext.emitBranchIf(
     condition: NumericCondition,
     target: ProgramTarget,
-    copies: SlotCopyPlan,
+    transfer: SlotTransfer,
     branchOnMatch: Boolean = true,
     handlerPopCount: Int = 0,
 ): BranchOutcome {
@@ -285,10 +171,10 @@ internal fun FunctionCompilationContext.emitBranchIf(
     val conditionMatches = condition.evaluateOrNull()
     if (conditionMatches != null) {
         val branch = conditionMatches == branchOnMatch
-        if (branch) emitJump(target, copies, handlerPopCount)
+        if (branch) emitJump(target, transfer, handlerPopCount)
         return if (branch) BranchOutcome.Always else BranchOutcome.Never
     }
-    val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
+    val branchTarget = prepareBranchTarget(target, transfer, handlerPopCount)
     appendDispatched(
         target = branchTarget,
         dispatchableInstruction = { targetIp -> JumpConditionDispatcher(condition, targetIp, branchOnMatch) },
@@ -382,11 +268,11 @@ internal fun FunctionCompilationContext.emitBranchTable(
 internal fun FunctionCompilationContext.emitBranchOnNull(
     operand: OperandSource,
     target: ProgramTarget,
-    copies: SlotCopyPlan,
+    transfer: SlotTransfer,
     onNull: Boolean,
     handlerPopCount: Int,
 ) {
-    val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
+    val branchTarget = prepareBranchTarget(target, transfer, handlerPopCount)
     val immediate = operand.sourceKind.isImmediate
     val operandBits = operand.sourceBits
     append(branchTarget) { targetIp, observer ->
@@ -418,12 +304,12 @@ internal fun FunctionCompilationContext.emitBranchOnNull(
 internal fun FunctionCompilationContext.emitBranchOnCast(
     operand: OperandSource,
     target: ProgramTarget,
-    copies: SlotCopyPlan,
+    transfer: SlotTransfer,
     typeTest: ReferenceTypeTest,
     onSuccess: Boolean,
     handlerPopCount: Int,
 ) {
-    val branchTarget = prepareBranchTarget(target, copies, handlerPopCount)
+    val branchTarget = prepareBranchTarget(target, transfer, handlerPopCount)
     val immediate = operand.sourceKind.isImmediate
     val operandBits = operand.sourceBits
     append(branchTarget) { targetIp, observer ->
@@ -459,7 +345,14 @@ internal fun FunctionCompilationContext.emitPushHandler(
 ) {
     append(
         targetIndices = targetIndices,
-        instruction = { continuationIps -> AdminInstruction.PushHandler(handlers, continuationIps, payloadDestinationSlots) },
+        instruction = { continuationIps ->
+            AdminInstruction.PushHandler(
+                handlers = handlers,
+                continuationIps = continuationIps,
+                payloadDestinationSlots = payloadDestinationSlots,
+                instance = compiler.instance,
+            )
+        },
         dispatcher = ::PushHandlerDispatcher,
     )
 }
@@ -472,7 +365,10 @@ internal fun FunctionCompilationContext.emitThrow(
     tagIndex: Index.TagIndex,
     firstPayloadSlot: Int,
 ) {
-    val instruction = ControlSuperInstruction.Throw(tagIndex, firstPayloadSlot)
+    val instruction = ControlSuperInstruction.Throw(
+        tagAddress = compiler.instance.tagAddresses[tagIndex.toInt()],
+        firstPayloadSlot = firstPayloadSlot,
+    )
     emit(instruction, ::ThrowDispatcher)
 }
 
@@ -483,24 +379,24 @@ internal fun FunctionCompilationContext.emitThrowRef(exceptionSlot: Int) {
 
 internal fun FunctionCompilationContext.prepareBranchTarget(
     target: ProgramTarget,
-    copies: SlotCopyPlan,
+    transfer: SlotTransfer,
     handlerPopCount: Int,
 ): ProgramTarget {
     check(handlerPopCount >= 0)
-    if (copies.size == 0 && handlerPopCount == 0) return target
+    if (transfer.size == 0 && handlerPopCount == 0) return target
     return program.target().also { tail ->
-        deferBranchPath(tail, target, copies, handlerPopCount)
+        deferBranchPath(tail, target, transfer, handlerPopCount)
     }
 }
 
 private fun FunctionCompilationContext.deferBranchPath(
     tail: ProgramTarget,
     destination: ProgramTarget,
-    copies: SlotCopyPlan,
+    transfer: SlotTransfer,
     handlerPopCount: Int,
 ) {
     val paths = deferredBranchPaths ?: DeferredBranchPaths().also { deferredBranchPaths = it }
-    paths.add(tail, destination, copies, handlerPopCount)
+    paths.add(tail, destination, transfer, handlerPopCount)
 }
 
 internal fun FunctionCompilationContext.emitDeferredBranchPaths() {
@@ -513,15 +409,15 @@ internal class DeferredBranchPaths {
     private var tailTargetIndices = IntArray(INITIAL_CAPACITY)
     private var destinationTargetIndices = IntArray(INITIAL_CAPACITY)
     private var handlerPopCounts = IntArray(INITIAL_CAPACITY)
-    private val copyPlans = ArrayList<SlotCopyPlan>()
+    private val deferredTransfers = ArrayList<SlotTransfer>()
 
     fun add(
         tail: ProgramTarget,
         destination: ProgramTarget,
-        copies: SlotCopyPlan,
+        transfer: SlotTransfer,
         handlerPopCount: Int,
     ) {
-        val index = copyPlans.size
+        val index = deferredTransfers.size
         if (index == tailTargetIndices.size) {
             val capacity = tailTargetIndices.size * 2
             tailTargetIndices = tailTargetIndices.copyOf(capacity)
@@ -531,13 +427,13 @@ internal class DeferredBranchPaths {
         tailTargetIndices[index] = tail.index
         destinationTargetIndices[index] = destination.index
         handlerPopCounts[index] = handlerPopCount
-        copyPlans.add(copies)
+        deferredTransfers.add(transfer)
     }
 
     fun emit(context: FunctionCompilationContext) {
-        for (index in copyPlans.indices) {
+        for (index in deferredTransfers.indices) {
             context.bind(ProgramTarget(tailTargetIndices[index]))
-            context.emitCopies(copyPlans[index])
+            context.emitSlotTransfer(deferredTransfers[index])
             repeat(handlerPopCounts[index]) {
                 context.emitPopHandler()
             }
@@ -551,12 +447,12 @@ internal class DeferredBranchPaths {
     }
 }
 
-internal fun FunctionCompilationContext.planCopies(
+internal fun FunctionCompilationContext.slotTransferTo(
     destinationSlots: IntArray,
-    excludedTopCount: Int = 0,
-): SlotCopyPlan = SlotCopyPlan.create(
+    excludedTrailingOperandCount: Int = 0,
+): SlotTransfer = SlotTransfer.create(
     operands = operands,
-    operandStartIndex = operands.size - excludedTopCount - destinationSlots.size,
+    operandStartIndex = operands.size - excludedTrailingOperandCount - destinationSlots.size,
     destinationSlots = destinationSlots,
 )
 
@@ -570,11 +466,11 @@ private inline fun <T : LinkedInstruction> dispatch(
     return dispatchableInstruction
 }
 
-private fun FunctionCompilationContext.emitCopies(copies: SlotCopyPlan) {
-    for (index in 0 until copies.size) {
-        val sourceKind = copies.sourceKind(index)
-        val sourceBits = copies.sourceBits(index)
-        val sourceSlot = copies.sourceSlot(index)
+private fun FunctionCompilationContext.emitSlotTransfer(transfer: SlotTransfer) {
+    for (index in 0 until transfer.size) {
+        val sourceKind = transfer.sourceKind(index)
+        val sourceBits = transfer.sourceBits(index)
+        val sourceSlot = transfer.sourceSlot(index)
         when (sourceKind) {
             OperandSourceKind.I32Immediate -> {
                 val instruction = NumericSuperInstruction.I32ConstS(sourceBits.toInt(), sourceSlot)
@@ -596,11 +492,11 @@ private fun FunctionCompilationContext.emitCopies(copies: SlotCopyPlan) {
             OperandSourceKind.Frame -> Unit
         }
     }
-    if (copies.size == 1) {
-        emitCopy(copies.sourceSlot(0), copies.destinationSlot(0))
-    } else if (copies.size > 1) {
-        val sourceSlots = copies.sourceSlots()
-        val destinationSlots = copies.destinationSlots()
+    if (transfer.size == 1) {
+        emitCopy(transfer.sourceSlot(0), transfer.destinationSlot(0))
+    } else if (transfer.size > 1) {
+        val sourceSlots = transfer.sourceSlots()
+        val destinationSlots = transfer.destinationSlots()
         if (sourceSlots.contentEquals(destinationSlots)) return
         val instruction = AdminInstruction.CopySlots(sourceSlots, destinationSlots)
         emit(instruction, ::CopySlotsDispatcher)

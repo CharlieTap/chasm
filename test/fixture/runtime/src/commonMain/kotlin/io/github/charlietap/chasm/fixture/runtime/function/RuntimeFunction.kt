@@ -1,21 +1,19 @@
 package io.github.charlietap.chasm.fixture.runtime.function
 
-import io.github.charlietap.chasm.ast.module.Index
-import io.github.charlietap.chasm.runtime.function.Expression
-import io.github.charlietap.chasm.runtime.function.Function
+class RuntimeFunction(
+    locals: LongArray = longArrayOf(),
+    val body: RuntimeExpression = runtimeExpression(),
+    val frameSlots: Int = 0,
+) {
+    val locals = locals.copyOf()
+}
 
 fun runtimeFunction(
-    idx: Index.FunctionIndex = Index.FunctionIndex(0u),
-    typeIndex: Index.TypeIndex = Index.TypeIndex(0u),
     locals: LongArray = longArrayOf(),
-    body: Expression = runtimeExpression(),
+    body: RuntimeExpression = runtimeExpression(),
     frameSlots: Int = 0,
-    returnSlots: IntArray = intArrayOf(),
-) = Function(
-    idx = idx,
-    typeIndex = typeIndex,
+) = RuntimeFunction(
     locals = locals,
     body = body,
     frameSlots = frameSlots,
-    returnSlots = returnSlots,
 )

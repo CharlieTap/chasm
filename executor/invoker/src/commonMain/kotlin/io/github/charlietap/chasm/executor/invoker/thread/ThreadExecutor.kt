@@ -6,6 +6,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
+import io.github.charlietap.chasm.executor.invoker.function.initializeLocals
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.error.InvocationError
@@ -43,8 +44,9 @@ internal inline fun ThreadExecutor(
     values: List<ExecutionValue>,
     crossinline garbageCollector: GarbageCollector,
 ): Result<List<Long>, InvocationError> = binding {
+    val callStrategy = instance.callStrategy
     val cstack = ControlStack()
-    val vstack = ValueStack(instance.function.frameSlots)
+    val vstack = ValueStack(callStrategy.frameSlots)
     val context = ExecutionContext(
         cstack = cstack,
         vstack = vstack,
@@ -53,28 +55,15 @@ internal inline fun ThreadExecutor(
         config = config,
     )
 
-    val params = instance.functionType.params.types.size
     val results = instance.functionType.results.types.size
-    val interfaceSlots = maxOf(params, results)
-    values.forEach { value ->
-        vstack.push(value.toLongFromBoxed())
+    vstack.writeRootActivationHeader(callStrategy.interfaceSlotCount)
+    vstack.activateFrame(ROOT_FP, callStrategy.frameSlots)
+    values.forEachIndexed { index, value ->
+        vstack.setFrameSlot(index, value.toLongFromBoxed())
     }
-
-    cstack.pushFrame(
-        arity = results,
-        handlerDepth = 0,
-        valueDepth = 0,
-        instance = instance.module,
-        returnIp = EXIT_IP,
-    )
-
-    vstack.framePointer = 0
-    vstack.reserveFrame(instance.function.frameSlots)
-    instance.function.locals.forEachIndexed { index, value ->
-        vstack.setFrameSlot(interfaceSlots + index, value)
-    }
+    initializeLocals(vstack, callStrategy, ROOT_FP)
     try {
-        var ip = instance.function.body.entryIp
+        var ip = callStrategy.entryIp
         val instructions = store.program.instructions
         dispatch@ while (true) {
             try {
@@ -111,7 +100,9 @@ internal inline fun ThreadExecutor(
         Err(InvocationError.GuestHeapOutOfMemory).bind()
     }
 
-    if (cstack.framesDepth() != 0 || cstack.handlersDepth() != 0 || vstack.depth() != results) {
+    vstack.shrink(preserveTopN = 0, depth = results)
+
+    if (cstack.handlersDepth() != 0 || vstack.sp != results) {
         Err(InvocationError.ProgramFinishedInconsistentState).bind<List<Long>>()
     }
 
@@ -127,3 +118,5 @@ internal inline fun ThreadExecutor(
     }
         .asReversed()
 }
+
+private const val ROOT_FP = 0

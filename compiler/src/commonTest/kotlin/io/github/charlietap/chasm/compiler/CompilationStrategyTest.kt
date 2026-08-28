@@ -8,24 +8,24 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class CompilationPlannerTest {
+class selectCompilationStrategyTest {
 
     @Test
     fun `serial strategy always compiles serially`() {
         val functions = functions(6) { 10_000 }
 
-        val plan = CompilationPlanner(functions, CompilationMode.SERIAL, availableProcessors = 8)
+        val strategy = selectCompilationStrategy(functions, CompilationMode.SERIAL, availableProcessors = 8)
 
-        assertIs<CompilationPlan.Serial>(plan)
+        assertIs<CompilationStrategy.Serial>(strategy)
     }
 
     @Test
     fun `parallel strategy uses every available worker`() {
         val functions = functions(10) { 1 }
 
-        val plan = CompilationPlanner(functions, CompilationMode.PARALLEL, availableProcessors = 8)
+        val strategy = selectCompilationStrategy(functions, CompilationMode.PARALLEL, availableProcessors = 8)
 
-        val parallel = assertIs<CompilationPlan.Parallel>(plan)
+        val parallel = assertIs<CompilationStrategy.Parallel>(strategy)
         assertEquals(6, parallel.assignments.size)
         assertEquals(functions.indices.toSet(), parallel.assignments.flatMap(IntArray::asIterable).toSet())
     }
@@ -34,9 +34,9 @@ class CompilationPlannerTest {
     fun `auto keeps many tiny functions serial`() {
         val functions = functions(32) { 1 }
 
-        val plan = CompilationPlanner(functions, CompilationMode.AUTO, availableProcessors = 8)
+        val strategy = selectCompilationStrategy(functions, CompilationMode.AUTO, availableProcessors = 8)
 
-        assertIs<CompilationPlan.Serial>(plan)
+        assertIs<CompilationStrategy.Serial>(strategy)
     }
 
     @Test
@@ -45,18 +45,18 @@ class CompilationPlannerTest {
             if (functionIndex == 0) 20_000 else 1_000
         }
 
-        val plan = CompilationPlanner(functions, CompilationMode.AUTO, availableProcessors = 8)
+        val strategy = selectCompilationStrategy(functions, CompilationMode.AUTO, availableProcessors = 8)
 
-        assertIs<CompilationPlan.Serial>(plan)
+        assertIs<CompilationStrategy.Serial>(strategy)
     }
 
     @Test
     fun `auto parallelizes balanced work`() {
         val functions = functions(6) { 10_000 }
 
-        val plan = CompilationPlanner(functions, CompilationMode.AUTO, availableProcessors = 8)
+        val strategy = selectCompilationStrategy(functions, CompilationMode.AUTO, availableProcessors = 8)
 
-        val parallel = assertIs<CompilationPlan.Parallel>(plan)
+        val parallel = assertIs<CompilationStrategy.Parallel>(strategy)
         assertEquals(6, parallel.assignments.size)
         assertEquals(functions.indices.toSet(), parallel.assignments.flatMap(IntArray::asIterable).toSet())
     }
@@ -67,9 +67,9 @@ class CompilationPlannerTest {
             if (functionIndex < 2) 10_000 else 100
         }
 
-        val plan = CompilationPlanner(functions, CompilationMode.AUTO, availableProcessors = 8)
+        val strategy = selectCompilationStrategy(functions, CompilationMode.AUTO, availableProcessors = 8)
 
-        val parallel = assertIs<CompilationPlan.Parallel>(plan)
+        val parallel = assertIs<CompilationStrategy.Parallel>(strategy)
         assertEquals(3, parallel.assignments.size)
         assertEquals(functions.indices.toSet(), parallel.assignments.flatMap(IntArray::asIterable).toSet())
     }

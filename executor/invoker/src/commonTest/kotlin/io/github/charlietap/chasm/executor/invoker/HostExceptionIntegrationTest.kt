@@ -80,7 +80,7 @@ class HostExceptionIntegrationTest {
                     )
                     nextIp
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction),
+                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
             ),
         )
         val outer = wasmFunctionInstance(
@@ -126,15 +126,15 @@ class HostExceptionIntegrationTest {
                             handlers = listOf(catchAllRefHandler(labelIndex(0u))),
                             payloadDestinationSlots = listOf(intArrayOf(0)),
                             continuationIps = intArrayOf(continuationIp),
-                            framesDepth = 1,
-                            framePointer = 0,
-                            valueDepth = 1,
+                            instance = module,
+                            fp = vstack.fp,
+                            sp = vstack.sp,
                         ),
                     )
-                    HostFunctionCall(vstack, context, module, bridge)
+                    HostFunctionCall(vstack, context, module, bridge, 0, 0)
                     error("pending exception returned to the host call site")
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction),
+                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
             ),
         )
         val outer = wasmFunctionInstance(

@@ -15,7 +15,6 @@
                     "index": 1,
                     "name": "callee.locals",
                     "instructions": [
-                        "numeric.i32.const",
                         "control.return"
                     ]
                 },

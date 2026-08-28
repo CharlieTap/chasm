@@ -9,7 +9,6 @@ import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instruction.memoryGrowRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
-import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
@@ -60,17 +59,12 @@ class MemoryGrowInstructionBenchmark : StabilizedBenchmark() {
         memory = memoryInstance,
     )
 
-    private val frame = frame(
-        instance = context.instance,
-    )
-
     private val pagesToGrow = 200
 
     @Setup
     fun setup() {
         context.apply {
             instance.memAddresses.add(0, memoryAddress(0))
-            cstack.push(frame)
             store.memories.add(0, memoryInstance)
         }
     }

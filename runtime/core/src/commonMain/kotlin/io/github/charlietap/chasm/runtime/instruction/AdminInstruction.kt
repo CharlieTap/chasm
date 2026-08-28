@@ -1,11 +1,16 @@
 package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
+import kotlin.jvm.JvmInline
 
 sealed interface AdminInstruction : LinkedInstruction {
 
-    data object EndFunction : AdminInstruction
+    data class EndFunction(
+        val resultCount: Int,
+        val activationHeaderSlot: Int,
+    ) : AdminInstruction
 
     data class CopySlot(
         val sourceSlot: Int,
@@ -20,7 +25,7 @@ sealed interface AdminInstruction : LinkedInstruction {
     data class Jump(val targetIp: Int) : AdminInstruction
 
     data class JumpCopies(
-        val operands: OperandCopyPlan,
+        val operands: OperandTransfer,
         val destinationSlotBase: Int,
         val targetIp: Int,
     ) : AdminInstruction
@@ -153,6 +158,7 @@ sealed interface AdminInstruction : LinkedInstruction {
         val handlers: List<CatchHandler>,
         val continuationIps: IntArray,
         val payloadDestinationSlots: List<IntArray> = [],
+        val instance: ModuleInstance,
     ) : AdminInstruction
 
     data object PopHandler : AdminInstruction

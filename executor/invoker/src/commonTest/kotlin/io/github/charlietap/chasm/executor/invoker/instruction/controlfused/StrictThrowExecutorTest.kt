@@ -6,7 +6,6 @@ import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.tagIndex
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
-import io.github.charlietap.chasm.fixture.runtime.stack.frame
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
@@ -32,21 +31,21 @@ class StrictThrowExecutorTest {
                 ),
             ),
         )
+        val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val cstack = cstack(
-            frames = listOf(frame(instance = moduleInstance(tagAddresses = mutableListOf(tagAddress)))),
             handlers = listOf(
                 ExceptionHandler(
                     handlers = listOf(catchCatchHandler(tagIndex(0u), labelIndex(0u))),
                     payloadDestinationSlots = listOf(intArrayOf(2, 3)),
                     continuationIps = intArrayOf(64),
-                    framesDepth = 1,
-                    framePointer = 0,
-                    valueDepth = 5,
+                    instance = module,
+                    fp = 0,
+                    sp = 5,
                 ),
             ),
         )
         val vstack = vstack().apply {
-            reserveFrame(5)
+            reserveDepth(5)
             setFrameSlot(0, 51)
             setFrameSlot(1, 52)
         }
@@ -56,7 +55,7 @@ class StrictThrowExecutorTest {
             cstack,
             store,
             executionContext(store = store, vstack = vstack, cstack = cstack),
-            ControlSuperInstruction.Throw(tagIndex(0u), firstPayloadSlot = 0),
+            ControlSuperInstruction.Throw(tagAddress, firstPayloadSlot = 0),
         )
 
         assertEquals(64, continuationIp)
