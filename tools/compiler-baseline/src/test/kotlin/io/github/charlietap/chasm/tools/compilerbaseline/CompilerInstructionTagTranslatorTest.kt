@@ -7,7 +7,7 @@ import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
-import io.github.charlietap.chasm.runtime.instruction.TableSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -73,6 +73,6 @@ private val variantFamilies = listOf(
     ParametricSuperInstruction::class.java,
     NumericSuperInstruction::class.java,
     MemoryInstruction::class.java,
-    TableSuperInstruction::class.java,
+    TableInstruction::class.java,
     AggregateSuperInstruction::class.java,
 )

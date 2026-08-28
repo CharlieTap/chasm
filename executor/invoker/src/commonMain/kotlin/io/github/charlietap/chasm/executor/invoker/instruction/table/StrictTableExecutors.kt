@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.tablefused
+package io.github.charlietap.chasm.executor.invoker.instruction.table
 
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -6,13 +6,13 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
-import io.github.charlietap.chasm.runtime.instruction.TableSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableCopyIii,
+    instruction: TableInstruction.TableCopyIii,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -24,7 +24,7 @@ internal fun TableCopyExecutor(
 internal fun TableCopyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableCopyIis,
+    instruction: TableInstruction.TableCopyIis,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -36,7 +36,7 @@ internal fun TableCopyExecutor(
 internal fun TableCopyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableCopyIsi,
+    instruction: TableInstruction.TableCopyIsi,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -48,7 +48,7 @@ internal fun TableCopyExecutor(
 internal fun TableCopyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableCopyIss,
+    instruction: TableInstruction.TableCopyIss,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -60,7 +60,7 @@ internal fun TableCopyExecutor(
 internal fun TableCopyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableCopySii,
+    instruction: TableInstruction.TableCopySii,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -72,7 +72,7 @@ internal fun TableCopyExecutor(
 internal fun TableCopyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableCopySis,
+    instruction: TableInstruction.TableCopySis,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -84,7 +84,7 @@ internal fun TableCopyExecutor(
 internal fun TableCopyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableCopySsi,
+    instruction: TableInstruction.TableCopySsi,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -96,7 +96,7 @@ internal fun TableCopyExecutor(
 internal fun TableCopyExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableCopySss,
+    instruction: TableInstruction.TableCopySss,
 ) = executeTableCopy(
     srcTable = instruction.srcTable,
     destTable = instruction.destTable,
@@ -108,29 +108,7 @@ internal fun TableCopyExecutor(
 internal fun TableFillExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableFillIii,
-) = executeTableFill(
-    table = instruction.table,
-    elementsToFill = instruction.elementsToFill,
-    fillValue = instruction.fillValue,
-    tableOffset = instruction.tableOffset,
-)
-
-internal fun TableFillExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: TableSuperInstruction.TableFillIis,
-) = executeTableFill(
-    table = instruction.table,
-    elementsToFill = instruction.elementsToFill,
-    fillValue = instruction.fillValue,
-    tableOffset = vstack.getFrameSlot(instruction.tableOffsetSlot).toInt(),
-)
-
-internal fun TableFillExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: TableSuperInstruction.TableFillIsi,
+    instruction: TableInstruction.TableFillIsi,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = instruction.elementsToFill,
@@ -141,7 +119,7 @@ internal fun TableFillExecutor(
 internal fun TableFillExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableFillIss,
+    instruction: TableInstruction.TableFillIss,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = instruction.elementsToFill,
@@ -152,29 +130,7 @@ internal fun TableFillExecutor(
 internal fun TableFillExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableFillSii,
-) = executeTableFill(
-    table = instruction.table,
-    elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
-    fillValue = instruction.fillValue,
-    tableOffset = instruction.tableOffset,
-)
-
-internal fun TableFillExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: TableSuperInstruction.TableFillSis,
-) = executeTableFill(
-    table = instruction.table,
-    elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
-    fillValue = instruction.fillValue,
-    tableOffset = vstack.getFrameSlot(instruction.tableOffsetSlot).toInt(),
-)
-
-internal fun TableFillExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: TableSuperInstruction.TableFillSsi,
+    instruction: TableInstruction.TableFillSsi,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -185,7 +141,7 @@ internal fun TableFillExecutor(
 internal fun TableFillExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableFillSss,
+    instruction: TableInstruction.TableFillSss,
 ) = executeTableFill(
     table = instruction.table,
     elementsToFill = vstack.getFrameSlot(instruction.elementsToFillSlot).toInt(),
@@ -196,20 +152,7 @@ internal fun TableFillExecutor(
 internal fun TableGrowExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableGrowIi,
-) = executeTableGrow(
-    vstack = vstack,
-    table = instruction.table,
-    elementsToAdd = instruction.elementsToAdd,
-    referenceValue = instruction.referenceValue,
-    destinationSlot = instruction.destinationSlot,
-    max = instruction.max,
-)
-
-internal fun TableGrowExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: TableSuperInstruction.TableGrowIs,
+    instruction: TableInstruction.TableGrowIs,
 ) = executeTableGrow(
     vstack = vstack,
     table = instruction.table,
@@ -222,20 +165,7 @@ internal fun TableGrowExecutor(
 internal fun TableGrowExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableGrowSi,
-) = executeTableGrow(
-    vstack = vstack,
-    table = instruction.table,
-    elementsToAdd = vstack.getFrameSlot(instruction.elementsToAddSlot).toInt(),
-    referenceValue = instruction.referenceValue,
-    destinationSlot = instruction.destinationSlot,
-    max = instruction.max,
-)
-
-internal fun TableGrowExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: TableSuperInstruction.TableGrowSs,
+    instruction: TableInstruction.TableGrowSs,
 ) = executeTableGrow(
     vstack = vstack,
     table = instruction.table,
@@ -248,7 +178,7 @@ internal fun TableGrowExecutor(
 internal fun TableInitExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableInitIii,
+    instruction: TableInstruction.TableInitIii,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -260,7 +190,7 @@ internal fun TableInitExecutor(
 internal fun TableInitExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableInitIis,
+    instruction: TableInstruction.TableInitIis,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -272,7 +202,7 @@ internal fun TableInitExecutor(
 internal fun TableInitExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableInitIsi,
+    instruction: TableInstruction.TableInitIsi,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -284,7 +214,7 @@ internal fun TableInitExecutor(
 internal fun TableInitExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableInitIss,
+    instruction: TableInstruction.TableInitIss,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -296,7 +226,7 @@ internal fun TableInitExecutor(
 internal fun TableInitExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableInitSii,
+    instruction: TableInstruction.TableInitSii,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -308,7 +238,7 @@ internal fun TableInitExecutor(
 internal fun TableInitExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableInitSis,
+    instruction: TableInstruction.TableInitSis,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -320,7 +250,7 @@ internal fun TableInitExecutor(
 internal fun TableInitExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableInitSsi,
+    instruction: TableInstruction.TableInitSsi,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -332,7 +262,7 @@ internal fun TableInitExecutor(
 internal fun TableInitExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableInitSss,
+    instruction: TableInstruction.TableInitSss,
 ) = executeTableInit(
     table = instruction.table,
     element = instruction.element,
@@ -344,7 +274,7 @@ internal fun TableInitExecutor(
 internal inline fun TableGetExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableGetI,
+    instruction: TableInstruction.TableGetI,
 ) = executeTableGet(
     vstack = vstack,
     table = instruction.table,
@@ -355,7 +285,7 @@ internal inline fun TableGetExecutor(
 internal inline fun TableGetExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableGetS,
+    instruction: TableInstruction.TableGetS,
 ) = executeTableGet(
     vstack = vstack,
     table = instruction.table,
@@ -366,27 +296,7 @@ internal inline fun TableGetExecutor(
 internal inline fun TableSetExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableSetIi,
-) = executeTableSet(
-    table = instruction.table,
-    elementIndex = instruction.elementIndex,
-    value = instruction.value,
-)
-
-internal inline fun TableSetExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: TableSuperInstruction.TableSetIs,
-) = executeTableSet(
-    table = instruction.table,
-    elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
-    value = instruction.value,
-)
-
-internal inline fun TableSetExecutor(
-    vstack: ValueStack,
-    context: ExecutionContext,
-    instruction: TableSuperInstruction.TableSetSi,
+    instruction: TableInstruction.TableSetSi,
 ) = executeTableSet(
     table = instruction.table,
     elementIndex = instruction.elementIndex,
@@ -396,7 +306,7 @@ internal inline fun TableSetExecutor(
 internal inline fun TableSetExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableSetSs,
+    instruction: TableInstruction.TableSetSs,
 ) = executeTableSet(
     table = instruction.table,
     elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
@@ -406,7 +316,7 @@ internal inline fun TableSetExecutor(
 internal inline fun TableSizeExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: TableSuperInstruction.TableSizeS,
+    instruction: TableInstruction.TableSizeS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.table.elements.size.toLong())
 }

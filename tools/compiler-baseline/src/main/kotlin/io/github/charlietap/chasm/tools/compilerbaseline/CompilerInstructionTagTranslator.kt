@@ -13,7 +13,6 @@ import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
-import io.github.charlietap.chasm.runtime.instruction.TableSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
 
 class CompilerInstructionTagTranslator {
@@ -27,8 +26,8 @@ class CompilerInstructionTagTranslator {
         is NumericSuperInstruction -> variant(instruction, "numeric", numericOperations)
         is MemoryInstruction.DataDrop -> "memory.data_drop"
         is MemoryInstruction -> variant(instruction, "memory", memoryOperations)
-        is TableSuperInstruction -> variant(instruction, "table", tableOperations)
         is TableInstruction.ElemDrop -> "table.elem_drop"
+        is TableInstruction -> variant(instruction, "table", tableOperations)
         is ReferenceSuperInstruction -> reference(instruction)
         is AggregateSuperInstruction -> variant(instruction, "aggregate", aggregateOperations)
         else -> error("unsupported compiler instruction: ${instruction.javaClass.name}")
@@ -42,7 +41,8 @@ class CompilerInstructionTagTranslator {
         instructionClass == MemoryInstruction.DataDrop::class.java -> "memory.data_drop"
         MemoryInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "memory", memoryOperations)
-        TableSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
+        instructionClass == TableInstruction.ElemDrop::class.java -> "table.elem_drop"
+        TableInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "table", tableOperations)
         AggregateSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "aggregate", aggregateOperations)
