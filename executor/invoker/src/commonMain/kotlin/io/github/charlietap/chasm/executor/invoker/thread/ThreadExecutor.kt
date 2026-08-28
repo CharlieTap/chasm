@@ -15,7 +15,6 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.program.EXIT_IP
 import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -74,15 +73,15 @@ internal inline fun ThreadExecutor(
                 // exit branch, and more compiled code. On HotSpot these call sites are
                 // megamorphic and also require their own profiling and safepoint metadata.
                 ip = instructions[ip](vstack, context, ip + 1)
-                if (ip == EXIT_IP) {
+                if (ip.toUInt() >= instructions.size.toUInt()) {
                     break@dispatch
                 }
                 ip = instructions[ip](vstack, context, ip + 1)
-                if (ip == EXIT_IP) {
+                if (ip.toUInt() >= instructions.size.toUInt()) {
                     break@dispatch
                 }
                 ip = instructions[ip](vstack, context, ip + 1)
-                if (ip == EXIT_IP) {
+                if (ip.toUInt() >= instructions.size.toUInt()) {
                     break@dispatch
                 }
             } catch (_: HostRaisedWasmException) {
