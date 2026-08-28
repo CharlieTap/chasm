@@ -25,7 +25,6 @@ open class ChasmExtension
     constructor(
         objects: ObjectFactory,
     ) {
-        val mode: Property<Mode> = objects.property(Mode::class.java).convention(Mode.CONSUMER)
         val modules: NamedDomainObjectContainer<WasmModule> = objects.domainObjectContainer(WasmModule::class.java)
         val runtimeDependencyConfiguration: Property<RuntimeDependencyConfiguration> =
             objects.property(RuntimeDependencyConfiguration::class.java).convention(RuntimeDependencyConfiguration.IMPLEMENTATION)

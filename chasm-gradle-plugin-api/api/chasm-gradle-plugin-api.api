@@ -4,7 +4,6 @@ public abstract interface annotation class io/github/charlietap/chasm/gradle/Cha
 public class io/github/charlietap/chasm/gradle/ChasmExtension {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public final fun getGenerateSuspendingFactories ()Lorg/gradle/api/provider/Property;
-	public final fun getMode ()Lorg/gradle/api/provider/Property;
 	public final fun getModules ()Lorg/gradle/api/NamedDomainObjectContainer;
 	public final fun getRuntimeDependencyConfiguration ()Lorg/gradle/api/provider/Property;
 }
@@ -59,14 +58,6 @@ public final class io/github/charlietap/chasm/gradle/FunctionParameterDefinition
 	public final fun getType ()Lio/github/charlietap/chasm/gradle/Type;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/charlietap/chasm/gradle/Mode : java/lang/Enum {
-	public static final field CONSUMER Lio/github/charlietap/chasm/gradle/Mode;
-	public static final field PRODUCER Lio/github/charlietap/chasm/gradle/Mode;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lio/github/charlietap/chasm/gradle/Mode;
-	public static fun values ()[Lio/github/charlietap/chasm/gradle/Mode;
 }
 
 public final class io/github/charlietap/chasm/gradle/ReturnTypeDefinition : java/io/Serializable {
@@ -185,4 +176,3 @@ public abstract class io/github/charlietap/chasm/gradle/WasmModule {
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 	public final fun getProject ()Lorg/gradle/api/Project;
 }
-

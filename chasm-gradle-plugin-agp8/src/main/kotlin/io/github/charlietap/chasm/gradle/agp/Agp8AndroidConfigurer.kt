@@ -5,7 +5,6 @@ import com.android.build.api.variant.Variant
 import io.github.charlietap.chasm.gradle.AndroidConfigContext
 import io.github.charlietap.chasm.gradle.AndroidConfigurer
 import io.github.charlietap.chasm.gradle.CodegenTask
-import io.github.charlietap.chasm.gradle.Mode
 import io.github.charlietap.chasm.gradle.registerCodegenTask
 
 class Agp8AndroidConfigurer : AndroidConfigurer {
@@ -15,13 +14,6 @@ class Agp8AndroidConfigurer : AndroidConfigurer {
 
         components.onVariants { variant: Variant ->
             context.extension.modules.configureEach { module ->
-                if (context.extension.mode.get() == Mode.PRODUCER) {
-                    context.project.logger.error(
-                        "Producer mode is only supported for Kotlin Multiplatform projects with WASM targets",
-                    )
-                    return@configureEach
-                }
-
                 val task = registerCodegenTask(
                     context.project,
                     module,

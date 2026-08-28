@@ -3,23 +3,9 @@
 The chasm gradle plugin creates a kotlin typesafe interface from a wasm binary which hides
 the complexities of chasms lower level virtual machine api.
 
-## Modes
+## Configuration
 
-The plugin has the notion of a mode, of which there exists two:
-
-- **Consumers** (The default)
-- **Producers**
-
-Consumers **consume** wasm modules that are created externally, maybe by other
-languages, toolchains or frameworks.
-
-Producers are kotlin multiplatform modules which have the wasm target enabled, effectively they
-**produce** wasm modules internally as part of their compilation.
-
-
-## Consumer Configuration
-
-For consumers, you'll need to take the externally produced wasm binary and place it inside the module
+You'll need to take the externally produced wasm binary and place it inside the module
 where you plan to generate the kotlin interface. Now where you place the binary, is really dependent
 on how you're planning to use it at runtime. Some people use chasm to execute code from different languages
 and simply bake the binary into the application. Others download the binary remotely so they can update
@@ -62,52 +48,13 @@ public interface FibonacciService {
 }
 ```
 
-## Producer config
-
-Producers are kotlin multiplatform modules that use the wasm target to turn kotlin code into wasm binaries which chasm can then generate
-an interface for. You can find an example of a producer module in the [example project](../example/producer/build.gradle.kts)
-
-Typical configuration for a producer will involve enabling the wasm target and other targets you would like to share
-the code generated classes with. For example, say we want to integrate chasm codegen in an android application you would enable both
-the wasm target and the jvm target
-
-```kotlin
-kotlin {
-    jvm()
-    wasmWasi {
-        binaries.executable()
-    }
-}
-```
-
-Then configure the chasm plugin:
-
-```kotlin
-chasm {
-    mode = Mode.PRODUCER
-    modules {
-        create("FooService") {
-            packageName = "com.foo.bar"
-        }
-    }
-}
-```
-
-Now any dependant JVM or android modules will be able to see the classes code generated as part of the producer modules
-compilation. Code generation itself happens on Gradle sync or by manually running the task:
-
-```shell
-./gradlew codegenModuleWasmWasiFooService
-```
-
 # Module Configuration
 
 Each module declared in the extensions DSL can be individually configured, the following configuration options are available:
 
 ### `binary: File`
 
-A file pointing to the wasm binary the codegen should use to generate the kotlin interface, this option is only used when in
-`Mode.CONSUMER`
+A file pointing to the wasm binary the codegen should use to generate the kotlin interface.
 
 ### `packageName: String`
 
@@ -265,7 +212,3 @@ will become
   var mutableGlobal: Int
   val immutableGlobal: Int
 ```
-
-
-
-

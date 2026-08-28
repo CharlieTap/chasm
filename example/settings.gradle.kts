@@ -55,7 +55,6 @@ include(":binary")
 include(":consumer-android")
 include(":consumer-jvm")
 include(":consumer-multiplatform")
-include(":producer")
 include(":web")
 
 rootProject.name = "chasm-example"
