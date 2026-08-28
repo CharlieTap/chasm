@@ -15,7 +15,7 @@ fun RefFuncDispatcher(
 internal inline fun RefFuncDispatcher(
     instruction: ReferenceInstruction.RefFunc,
     crossinline executor: Executor<ReferenceInstruction.RefFunc>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

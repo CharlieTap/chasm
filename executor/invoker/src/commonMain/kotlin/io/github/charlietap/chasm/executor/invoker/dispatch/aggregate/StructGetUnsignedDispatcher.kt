@@ -15,7 +15,7 @@ fun StructGetUnsignedDispatcher(
 internal inline fun StructGetUnsignedDispatcher(
     instruction: AggregateInstruction.StructGetUnsigned,
     crossinline executor: Executor<AggregateInstruction.StructGetUnsigned>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

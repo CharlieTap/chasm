@@ -15,7 +15,7 @@ fun ArrayFillDispatcher(
 internal inline fun ArrayFillDispatcher(
     instruction: AggregateInstruction.ArrayFill,
     crossinline executor: Executor<AggregateInstruction.ArrayFill>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

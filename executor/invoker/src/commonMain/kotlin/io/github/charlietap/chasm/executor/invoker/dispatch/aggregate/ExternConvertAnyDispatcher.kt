@@ -15,7 +15,7 @@ fun ExternConvertAnyDispatcher(
 internal inline fun ExternConvertAnyDispatcher(
     instruction: AggregateInstruction.ExternConvertAny,
     crossinline executor: Executor<AggregateInstruction.ExternConvertAny>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

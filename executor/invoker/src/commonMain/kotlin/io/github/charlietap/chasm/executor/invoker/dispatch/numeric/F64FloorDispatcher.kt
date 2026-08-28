@@ -15,7 +15,7 @@ fun F64FloorDispatcher(
 internal inline fun F64FloorDispatcher(
     instruction: NumericInstruction.F64Floor,
     crossinline executor: Executor<NumericInstruction.F64Floor>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

@@ -15,7 +15,7 @@ fun F32MaxDispatcher(
 internal inline fun F32MaxDispatcher(
     instruction: NumericInstruction.F32Max,
     crossinline executor: Executor<NumericInstruction.F32Max>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

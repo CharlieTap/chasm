@@ -15,7 +15,7 @@ fun MemoryGrowDispatcher(
 internal inline fun MemoryGrowDispatcher(
     instruction: MemoryInstruction.MemoryGrow,
     crossinline executor: Executor<MemoryInstruction.MemoryGrow>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

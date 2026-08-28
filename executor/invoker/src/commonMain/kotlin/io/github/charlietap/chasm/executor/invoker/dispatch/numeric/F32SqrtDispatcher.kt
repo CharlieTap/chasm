@@ -15,7 +15,7 @@ fun F32SqrtDispatcher(
 internal inline fun F32SqrtDispatcher(
     instruction: NumericInstruction.F32Sqrt,
     crossinline executor: Executor<NumericInstruction.F32Sqrt>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

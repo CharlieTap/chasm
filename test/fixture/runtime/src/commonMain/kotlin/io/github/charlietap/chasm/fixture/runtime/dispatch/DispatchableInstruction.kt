@@ -15,7 +15,7 @@ fun dispatchableInstruction(
     }
 } ?: NoOpDispatchableInstruction
 
-private object NoOpDispatchableInstruction : DispatchableInstruction {
+private object NoOpDispatchableInstruction : DispatchableInstruction() {
     override fun invoke(
         vstack: ValueStack,
         cstack: ControlStack,

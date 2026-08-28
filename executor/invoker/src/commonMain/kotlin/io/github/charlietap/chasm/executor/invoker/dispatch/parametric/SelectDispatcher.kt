@@ -15,7 +15,7 @@ fun SelectDispatcher(
 internal inline fun SelectDispatcher(
     instruction: ParametricInstruction.Select,
     crossinline executor: Executor<ParametricInstruction.Select>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

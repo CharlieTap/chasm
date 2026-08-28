@@ -15,7 +15,7 @@ fun F64NearestDispatcher(
 internal inline fun F64NearestDispatcher(
     instruction: NumericInstruction.F64Nearest,
     crossinline executor: Executor<NumericInstruction.F64Nearest>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

@@ -6,6 +6,6 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 
 fun CallIndirectDispatcher(
     instruction: ControlInstruction.CallIndirect,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     CallIndirectExecutor(vstack, cstack, store, context, instruction, nextIp)
 }

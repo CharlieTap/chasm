@@ -15,7 +15,7 @@ fun SelectWithTypeDispatcher(
 internal inline fun SelectWithTypeDispatcher(
     instruction: ParametricInstruction.SelectWithType,
     crossinline executor: Executor<ParametricInstruction.SelectWithType>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

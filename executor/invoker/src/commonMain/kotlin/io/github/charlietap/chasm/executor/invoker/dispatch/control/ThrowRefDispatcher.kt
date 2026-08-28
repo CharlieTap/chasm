@@ -6,6 +6,6 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 
 fun ThrowRefDispatcher(
     instruction: ControlInstruction.ThrowRef,
-): DispatchableInstruction = { vstack, cstack, store, _, _ ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, _, _ ->
     ThrowRefExecutor(vstack, cstack, store, instruction)
 }

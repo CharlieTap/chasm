@@ -15,7 +15,7 @@ fun I32ShrSDispatcher(
 internal inline fun I32ShrSDispatcher(
     instruction: NumericInstruction.I32ShrS,
     crossinline executor: Executor<NumericInstruction.I32ShrS>,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     executor(vstack, cstack, store, context, instruction)
     nextIp
 }

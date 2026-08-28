@@ -6,6 +6,6 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 
 fun ReturnCallRefDispatcher(
     instruction: ControlInstruction.ReturnCallRef,
-): DispatchableInstruction = { vstack, cstack, store, context, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
     ReturnCallRefExecutor(vstack, cstack, store, context, instruction)
 }

@@ -6,6 +6,6 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 
 fun ReturnDispatcher(
     instruction: ControlInstruction.Return,
-): DispatchableInstruction = { vstack, cstack, _, _, _ ->
+): DispatchableInstruction = DispatchableInstruction { vstack, cstack, _, _, _ ->
     ReturnExecutor(vstack, cstack)
 }
