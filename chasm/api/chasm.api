@@ -316,14 +316,6 @@ public final class io/github/charlietap/chasm/embedding/extern/CreateExternRefKt
 	public static final fun createExternRef (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
-public final class io/github/charlietap/chasm/embedding/extern/ExternRefKt {
-	public static final fun externRef (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;)Lio/github/charlietap/chasm/runtime/value/ReferenceValue;
-}
-
-public final class io/github/charlietap/chasm/embedding/extern/ReadExternValueKt {
-	public static final fun readExternValue (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/runtime/value/ReferenceValue;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
-}
-
 public final class io/github/charlietap/chasm/embedding/global/ReadGlobalKt {
 	public static final fun readGlobal (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/embedding/shapes/Global;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
