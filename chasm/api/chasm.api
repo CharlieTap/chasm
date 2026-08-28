@@ -244,11 +244,22 @@ public final class io/github/charlietap/chasm/embedding/dsl/TagTypeBuilder {
 
 public final class io/github/charlietap/chasm/embedding/dsl/ValueTypeListBuilder {
 	public fun <init> ()V
+	public final fun anyref ()V
+	public final fun arrayref ()V
 	public final fun build ()Ljava/util/List;
-	public final fun f32 ()Z
-	public final fun f64 ()Z
-	public final fun i32 ()Z
-	public final fun i64 ()Z
+	public final fun eqref ()V
+	public final fun exnref ()V
+	public final fun externref ()V
+	public final fun f32 ()V
+	public final fun f64 ()V
+	public final fun funcref ()V
+	public final fun i31ref ()V
+	public final fun i32 ()V
+	public final fun i64 ()V
+	public final fun ref (Lio/github/charlietap/chasm/type/HeapType;)V
+	public final fun refNull (Lio/github/charlietap/chasm/type/HeapType;)V
+	public final fun reference (Lio/github/charlietap/chasm/type/ReferenceType;)V
+	public final fun structref ()V
 }
 
 public final class io/github/charlietap/chasm/embedding/dsl/ValueTypeListKt {

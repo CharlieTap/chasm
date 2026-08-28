@@ -41,6 +41,8 @@ import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.ReferenceType
+import io.github.charlietap.chasm.type.ValueType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -112,6 +114,29 @@ class ImportTest {
 
         assertEquals(expected, actual)
         assertEquals(type, store.store.functions.single().functionType)
+    }
+
+    @Test
+    fun `can create an exception reference function import`() {
+        val store = publicStore()
+
+        imports(store) {
+            function {
+                moduleName = "errors"
+                entityName = "round_trip"
+                type {
+                    params { exnref() }
+                    results { exnref() }
+                }
+                reference(hostFunction { _, _ -> })
+            }
+        }
+
+        val exnref = ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Exception))
+        val functionType = store.store.functions.single().functionType
+
+        assertEquals(listOf(exnref), functionType.params.types)
+        assertEquals(listOf(exnref), functionType.results.types)
     }
 
     @Test
