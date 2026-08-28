@@ -1,8 +1,9 @@
 package io.github.charlietap.chasm.runtime.memory
 
+import io.github.charlietap.chasm.host.HostMemory
 import kotlin.jvm.JvmInline
 
-interface LinearMemory {
+interface LinearMemory : HostMemory {
 
     @JvmInline
     value class Pages(val amount: UInt)

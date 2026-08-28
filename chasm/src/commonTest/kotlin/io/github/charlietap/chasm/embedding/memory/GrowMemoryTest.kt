@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
+import io.github.charlietap.chasm.fixture.runtime.memory.NoOpLinearMemory
 import io.github.charlietap.chasm.fixture.runtime.memory.linearMemory
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.limits
@@ -118,5 +119,5 @@ class GrowMemoryTest {
         assertSame(initialMemory, instance.data)
     }
 
-    private object FakeLinearMemory : LinearMemory
+    private object FakeLinearMemory : LinearMemory by NoOpLinearMemory
 }
