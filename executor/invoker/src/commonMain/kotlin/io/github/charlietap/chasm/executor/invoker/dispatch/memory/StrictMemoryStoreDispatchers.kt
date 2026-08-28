@@ -56,7 +56,8 @@ fun I32StoreDispatcher(instruction: MemoryInstruction.I32StoreSs) = if (instruct
     val addressSlot = instruction.addressSlot
     val valueSlot = instruction.valueSlot
     memoryStoreNoOffsetDispatcher(
-        memory, Int.SIZE_BYTES,
+        memory,
+        Int.SIZE_BYTES,
         { vstack ->
             vstack.getFrameSlot(addressSlot).toInt()
         },
@@ -79,7 +80,8 @@ fun I64StoreDispatcher(instruction: MemoryInstruction.I64StoreIs) = if (instruct
     val addressSlot = instruction.addressSlot
     val value = instruction.value
     memoryStoreNoOffsetDispatcher(
-        instruction.memory, Long.SIZE_BYTES,
+        instruction.memory,
+        Long.SIZE_BYTES,
         { vstack ->
             vstack.getFrameSlot(addressSlot).toInt()
         },
@@ -168,7 +170,8 @@ fun I32Store8Dispatcher(instruction: MemoryInstruction.I32Store8Is) = if (instru
     val addressSlot = instruction.addressSlot
     val value = instruction.value
     memoryStoreNoOffsetDispatcher(
-        instruction.memory, Byte.SIZE_BYTES,
+        instruction.memory,
+        Byte.SIZE_BYTES,
         { vstack ->
             vstack.getFrameSlot(addressSlot).toInt()
         },
@@ -191,7 +194,8 @@ fun I32Store8Dispatcher(instruction: MemoryInstruction.I32Store8Ss) = if (instru
     val addressSlot = instruction.addressSlot
     val valueSlot = instruction.valueSlot
     memoryStoreNoOffsetDispatcher(
-        instruction.memory, Byte.SIZE_BYTES,
+        instruction.memory,
+        Byte.SIZE_BYTES,
         { vstack ->
             vstack.getFrameSlot(addressSlot).toInt()
         },
@@ -214,7 +218,8 @@ fun I32Store16Dispatcher(instruction: MemoryInstruction.I32Store16Is) = if (inst
     val addressSlot = instruction.addressSlot
     val value = instruction.value
     memoryStoreNoOffsetDispatcher(
-        instruction.memory, Short.SIZE_BYTES,
+        instruction.memory,
+        Short.SIZE_BYTES,
         { vstack ->
             vstack.getFrameSlot(addressSlot).toInt()
         },
@@ -237,7 +242,8 @@ fun I32Store16Dispatcher(instruction: MemoryInstruction.I32Store16Ss) = if (inst
     val addressSlot = instruction.addressSlot
     val valueSlot = instruction.valueSlot
     memoryStoreNoOffsetDispatcher(
-        instruction.memory, Short.SIZE_BYTES,
+        instruction.memory,
+        Short.SIZE_BYTES,
         { vstack ->
             vstack.getFrameSlot(addressSlot).toInt()
         },
@@ -308,7 +314,8 @@ fun I64Store32Dispatcher(instruction: MemoryInstruction.I64Store32Is) = if (inst
     val addressSlot = instruction.addressSlot
     val value = instruction.value
     memoryStoreNoOffsetDispatcher(
-        instruction.memory, Int.SIZE_BYTES,
+        instruction.memory,
+        Int.SIZE_BYTES,
         { vstack ->
             vstack.getFrameSlot(addressSlot).toInt()
         },
