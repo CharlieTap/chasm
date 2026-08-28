@@ -1,17 +1,19 @@
 package io.github.charlietap.chasm.host
 
-/** Resolves [index] in the module instance and makes that memory the receiver. */
+/** Resolves [index] in the module instance and makes that memory and its index available to [block]. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun <T> withMemory(
     index: ModuleIndex.MemoryIndex,
-    block: HostMemory.() -> T,
-): T = resources.memory(module, index).block()
+    block: context(ModuleIndex.MemoryIndex) HostMemory.() -> T,
+): T = context(index) {
+    resources.memory(module, index).block()
+}
 
-/** Resolves [index] in the module instance and makes that memory the receiver. */
+/** Resolves [index] in the module instance and makes that memory and its index available to [block]. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun <T> withMemory(
     index: Int,
-    block: HostMemory.() -> T,
+    block: context(ModuleIndex.MemoryIndex) HostMemory.() -> T,
 ): T = withMemory(ModuleIndex.MemoryIndex(index), block)
 
 /** Resolves [index] in the module instance and makes that table the receiver. */

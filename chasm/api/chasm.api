@@ -638,7 +638,6 @@ public final class io/github/charlietap/chasm/embedding/table/WriteTableKt {
 }
 
 public final class io/github/charlietap/chasm/host/HostGrowthExtensionsKt {
-	public static final fun grow (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;Lio/github/charlietap/chasm/host/HostMemory;I)I
 	public static final fun grow (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;Lio/github/charlietap/chasm/host/HostTable;IJ)I
 }
 

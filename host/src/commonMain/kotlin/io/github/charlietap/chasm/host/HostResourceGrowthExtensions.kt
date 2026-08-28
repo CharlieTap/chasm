@@ -16,6 +16,10 @@ inline fun growMemory(
     pagesToAdd: Int,
 ): Int = growMemory(ModuleIndex.MemoryIndex(index), pagesToAdd)
 
+/** Grows this memory and returns its previous size in pages, or `-1` on failure. */
+context(module: HostModuleInstance, resources: HostResources, index: ModuleIndex.MemoryIndex)
+inline fun HostMemory.grow(pagesToAdd: Int): Int = resources.growMemory(module, index, pagesToAdd)
+
 /** Grows the table at [index] and returns its previous size, or `-1` on failure. */
 context(module: HostModuleInstance, resources: HostResources)
 inline fun growTable(
