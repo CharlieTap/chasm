@@ -75,7 +75,9 @@ class WriteBytesTest {
             store = store,
             memory = memory,
             pointer = pointer,
-            bytes = buffer,
+            buffer = buffer,
+            bufferPointer = 0,
+            bytesToWrite = buffer.size,
             bytesWriter = bytesWriter,
         )
 
