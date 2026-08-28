@@ -281,6 +281,17 @@ public final class io/github/charlietap/chasm/host/HostResourceGrowthExtensionsK
 	public static final fun growTable-_69jjMQ (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;IIJ)I
 }
 
+public final class io/github/charlietap/chasm/host/HostResourceLookupExtensionsKt {
+	public static final fun global (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostGlobal;
+	public static final fun global-fFnRdl8 (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostGlobal;
+	public static final fun memory (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostMemory;
+	public static final fun memory-ywxmMWo (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostMemory;
+	public static final fun table (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostTable;
+	public static final fun table-UCLtGCk (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)Lio/github/charlietap/chasm/host/HostTable;
+	public static final fun tag (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)I
+	public static final fun tag-h2KSNLg (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;I)I
+}
+
 public abstract interface class io/github/charlietap/chasm/host/HostResources {
 	public abstract fun getExceptions ()Lio/github/charlietap/chasm/host/HostExceptions;
 	public abstract fun getExterns ()Lio/github/charlietap/chasm/host/HostExterns;
