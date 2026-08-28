@@ -80,7 +80,7 @@ class I32LoadInstructionBenchmark : StabilizedBenchmark() {
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
         context.vstack.pushI32(baseAddress)
-        val result = I32LoadExecutor(vstack, cstack, store, context, instruction)
+        val result = I32LoadExecutor(vstack, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

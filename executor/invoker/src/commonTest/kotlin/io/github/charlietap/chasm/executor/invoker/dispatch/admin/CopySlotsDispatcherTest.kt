@@ -25,8 +25,6 @@ class CopySlotsDispatcherTest {
             destinationSlots = intArrayOf(1, 2),
         )(
             vstack,
-            cstack,
-            store,
             executionContext(cstack, vstack, store),
             17,
         )

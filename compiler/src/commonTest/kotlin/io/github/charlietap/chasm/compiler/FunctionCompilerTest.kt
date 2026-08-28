@@ -191,7 +191,7 @@ class FunctionCompilerTest {
         val store = store()
         val executionContext = executionContext(vstack = vstack, cstack = cstack, store = store)
 
-        compiled.instructions.first()(vstack, cstack, store, executionContext, 1)
+        compiled.instructions.first()(vstack, executionContext, 1)
 
         assertEquals(42, vstack.getFrameSlot(0).toInt())
     }
@@ -1507,7 +1507,7 @@ private fun execute(
     val executionContext = executionContext(vstack = vstack, cstack = cstack, store = store)
     var ip = 0
     while (ip != EXIT_IP) {
-        ip = compiled.instructions[ip](vstack, cstack, store, executionContext, ip + 1)
+        ip = compiled.instructions[ip](vstack, executionContext, ip + 1)
     }
     vstack.fp = 0
     return vstack
@@ -1522,4 +1522,4 @@ private class TestCompiledFunction(
     val localInitialValues = compiled.localInitialValues
 }
 
-private val noOpInstruction = DispatchableInstruction { _, _, _, _, nextIp -> nextIp }
+private val noOpInstruction = DispatchableInstruction { _, _, nextIp -> nextIp }

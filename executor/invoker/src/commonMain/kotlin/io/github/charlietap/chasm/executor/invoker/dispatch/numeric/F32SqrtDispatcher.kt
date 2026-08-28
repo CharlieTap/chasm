@@ -2,20 +2,11 @@ package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.unop.F32SqrtExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.execution.Executor
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 
 fun F32SqrtDispatcher(
     instruction: NumericInstruction.F32Sqrt,
-) = F32SqrtDispatcher(
-    instruction = instruction,
-    executor = ::F32SqrtExecutor,
-)
-
-internal inline fun F32SqrtDispatcher(
-    instruction: NumericInstruction.F32Sqrt,
-    crossinline executor: Executor<NumericInstruction.F32Sqrt>,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    F32SqrtExecutor(vstack, context, instruction)
     nextIp
 }

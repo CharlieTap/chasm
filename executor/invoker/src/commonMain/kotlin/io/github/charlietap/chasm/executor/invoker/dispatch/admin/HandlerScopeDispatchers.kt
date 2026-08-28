@@ -6,8 +6,8 @@ import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 
 fun PushHandlerDispatcher(
     instruction: AdminInstruction.PushHandler,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, _, _, nextIp ->
-    cstack.push(
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    context.cstack.push(
         ExceptionHandler(
             handlers = instruction.handlers,
             payloadDestinationSlots = instruction.payloadDestinationSlots,
@@ -22,7 +22,7 @@ fun PushHandlerDispatcher(
 
 fun PopHandlerDispatcher(
     instruction: AdminInstruction.PopHandler,
-): DispatchableInstruction = DispatchableInstruction { _, cstack, _, _, nextIp ->
-    cstack.popHandler()
+): DispatchableInstruction = DispatchableInstruction { _, context, nextIp ->
+    context.cstack.popHandler()
     nextIp
 }

@@ -2,14 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.variablefused
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun GlobalGetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: VariableSuperInstruction.GlobalGetS,
 ) {
@@ -18,8 +14,6 @@ internal inline fun GlobalGetExecutor(
 
 internal inline fun GlobalSetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: VariableSuperInstruction.GlobalSetI,
 ) {
@@ -28,8 +22,6 @@ internal inline fun GlobalSetExecutor(
 
 internal inline fun GlobalSetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: VariableSuperInstruction.GlobalSetS,
 ) {
@@ -38,8 +30,6 @@ internal inline fun GlobalSetExecutor(
 
 internal inline fun LocalSetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: VariableSuperInstruction.LocalSetI,
 ) {
@@ -48,8 +38,6 @@ internal inline fun LocalSetExecutor(
 
 internal inline fun LocalSetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: VariableSuperInstruction.LocalSetS,
 ) {

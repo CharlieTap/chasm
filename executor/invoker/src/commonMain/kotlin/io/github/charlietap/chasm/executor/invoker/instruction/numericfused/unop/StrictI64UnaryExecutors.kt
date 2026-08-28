@@ -2,14 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.numericfused.uno
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I64ClzExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64ClzI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
@@ -18,8 +14,6 @@ internal inline fun I64ClzExecutor(
 
 internal inline fun I64ClzExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64ClzS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
@@ -28,8 +22,6 @@ internal inline fun I64ClzExecutor(
 
 internal inline fun I64CtzExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64CtzI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
@@ -38,8 +30,6 @@ internal inline fun I64CtzExecutor(
 
 internal inline fun I64CtzExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64CtzS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
@@ -48,8 +38,6 @@ internal inline fun I64CtzExecutor(
 
 internal inline fun I64PopcntExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64PopcntI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
@@ -58,8 +46,6 @@ internal inline fun I64PopcntExecutor(
 
 internal inline fun I64PopcntExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64PopcntS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
@@ -68,8 +54,6 @@ internal inline fun I64PopcntExecutor(
 
 internal inline fun I64Extend8SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64Extend8SI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
@@ -78,8 +62,6 @@ internal inline fun I64Extend8SExecutor(
 
 internal inline fun I64Extend8SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64Extend8SS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
@@ -88,8 +70,6 @@ internal inline fun I64Extend8SExecutor(
 
 internal inline fun I64Extend16SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64Extend16SI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
@@ -98,8 +78,6 @@ internal inline fun I64Extend16SExecutor(
 
 internal inline fun I64Extend16SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64Extend16SS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
@@ -108,8 +86,6 @@ internal inline fun I64Extend16SExecutor(
 
 internal inline fun I64Extend32SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64Extend32SI,
 ) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
@@ -118,8 +94,6 @@ internal inline fun I64Extend32SExecutor(
 
 internal inline fun I64Extend32SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64Extend32SS,
 ) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->

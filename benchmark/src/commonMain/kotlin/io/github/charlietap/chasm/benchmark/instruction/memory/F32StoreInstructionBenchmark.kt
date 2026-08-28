@@ -82,7 +82,7 @@ class F32StoreInstructionBenchmark : StabilizedBenchmark() {
     fun benchmark(blackhole: Blackhole) {
         context.vstack.pushI32(baseAddress)
         context.vstack.pushF32(value)
-        val result = F32StoreExecutor(vstack, cstack, store, context, instruction)
+        val result = F32StoreExecutor(vstack, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

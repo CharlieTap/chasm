@@ -73,23 +73,22 @@ internal inline fun ThreadExecutor(
                 // Adding iterations is not free: every slot adds another indirect call site,
                 // exit branch, and more compiled code. On HotSpot these call sites are
                 // megamorphic and also require their own profiling and safepoint metadata.
-                ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+                ip = instructions[ip](vstack, context, ip + 1)
                 if (ip == EXIT_IP) {
                     break@dispatch
                 }
-                ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+                ip = instructions[ip](vstack, context, ip + 1)
                 if (ip == EXIT_IP) {
                     break@dispatch
                 }
-                ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+                ip = instructions[ip](vstack, context, ip + 1)
                 if (ip == EXIT_IP) {
                     break@dispatch
                 }
             } catch (_: HostRaisedWasmException) {
                 ip = ThrowRefValueExecutor(
                     vstack = vstack,
-                    cstack = cstack,
-                    store = store,
+                    context = context,
                     ref = store.heap.takePendingExceptionReference(),
                 )
             }

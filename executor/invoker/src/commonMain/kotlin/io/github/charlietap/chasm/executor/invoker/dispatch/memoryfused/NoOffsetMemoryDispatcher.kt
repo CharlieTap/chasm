@@ -14,7 +14,7 @@ internal inline fun memoryLoadNoOffsetDispatcher(
     bytes: Int,
     crossinline address: (ValueStack) -> Int,
     crossinline load: (LinearMemory, Int) -> Long,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, _, nextIp ->
     val effectiveAddress = address(vstack)
     if (effectiveAddress < 0) {
         throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
@@ -32,7 +32,7 @@ internal inline fun memoryStoreNoOffsetDispatcher(
     bytes: Int,
     crossinline address: (ValueStack) -> Int,
     crossinline store: (ValueStack, LinearMemory, Int) -> Unit,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, _, _, nextIp ->
+): DispatchableInstruction = DispatchableInstruction { vstack, _, nextIp ->
     val effectiveAddress = address(vstack)
     OptimisticBoundsChecker(effectiveAddress, bytes, memory.size) {
         store(vstack, memory.data, effectiveAddress)

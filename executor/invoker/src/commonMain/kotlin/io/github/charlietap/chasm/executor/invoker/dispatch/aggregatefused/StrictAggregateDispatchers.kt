@@ -17,41 +17,41 @@ import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.St
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregatefused.StructSetExecutor
 import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 
-fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIii) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIii) = dispatchInstruction { vstack, context -> ArrayCopyExecutor(vstack, context, instruction) }
 
-fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIis) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIis) = dispatchInstruction { vstack, context -> ArrayCopyExecutor(vstack, context, instruction) }
 
-fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIsi) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIsi) = dispatchInstruction { vstack, context -> ArrayCopyExecutor(vstack, context, instruction) }
 
-fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIss) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopyIss) = dispatchInstruction { vstack, context -> ArrayCopyExecutor(vstack, context, instruction) }
 
-fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySii) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySii) = dispatchInstruction { vstack, context -> ArrayCopyExecutor(vstack, context, instruction) }
 
-fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySis) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySis) = dispatchInstruction { vstack, context -> ArrayCopyExecutor(vstack, context, instruction) }
 
-fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySsi) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySsi) = dispatchInstruction { vstack, context -> ArrayCopyExecutor(vstack, context, instruction) }
 
-fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySss) = dispatchInstruction(instruction, ::ArrayCopyExecutor)
+fun ArrayCopyDispatcher(instruction: AggregateSuperInstruction.ArrayCopySss) = dispatchInstruction { vstack, context -> ArrayCopyExecutor(vstack, context, instruction) }
 
-fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIii) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIii) = dispatchInstruction { vstack, context -> ArrayFillExecutor(vstack, context, instruction) }
 
-fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIis) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIis) = dispatchInstruction { vstack, context -> ArrayFillExecutor(vstack, context, instruction) }
 
-fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIsi) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIsi) = dispatchInstruction { vstack, context -> ArrayFillExecutor(vstack, context, instruction) }
 
-fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIss) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillIss) = dispatchInstruction { vstack, context -> ArrayFillExecutor(vstack, context, instruction) }
 
-fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSii) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSii) = dispatchInstruction { vstack, context -> ArrayFillExecutor(vstack, context, instruction) }
 
-fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSis) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSis) = dispatchInstruction { vstack, context -> ArrayFillExecutor(vstack, context, instruction) }
 
-fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSsi) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSsi) = dispatchInstruction { vstack, context -> ArrayFillExecutor(vstack, context, instruction) }
 
-fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSss) = dispatchInstruction(instruction, ::ArrayFillExecutor)
+fun ArrayFillDispatcher(instruction: AggregateSuperInstruction.ArrayFillSss) = dispatchInstruction { vstack, context -> ArrayFillExecutor(vstack, context, instruction) }
 
-fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetI) = dispatchInstruction(instruction, ::ArrayGetExecutor)
+fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetI) = dispatchInstruction { vstack, context -> ArrayGetExecutor(vstack, context, instruction) }
 
-fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetS) = dispatchInstruction(instruction, ::ArrayGetExecutor)
+fun ArrayGetDispatcher(instruction: AggregateSuperInstruction.ArrayGetS) = dispatchInstruction { vstack, context -> ArrayGetExecutor(vstack, context, instruction) }
 
 fun ArrayGetSignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetSignedI) = PackedArrayGetSignedDispatcher(instruction)
 
@@ -61,42 +61,42 @@ fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUn
 
 fun ArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruction.ArrayGetUnsignedS) = PackedArrayGetUnsignedDispatcher(instruction)
 
-fun ArrayLenDispatcher(instruction: AggregateSuperInstruction.ArrayLenS) = dispatchInstruction(instruction, ::ArrayLenExecutor)
+fun ArrayLenDispatcher(instruction: AggregateSuperInstruction.ArrayLenS) = dispatchInstruction { vstack, context -> ArrayLenExecutor(vstack, context, instruction) }
 
-fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewIi) = dispatchInstruction(instruction, ::ArrayNewExecutor)
+fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewIi) = dispatchInstruction { vstack, context -> ArrayNewExecutor(vstack, context, instruction) }
 
-fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewIs) = dispatchInstruction(instruction, ::ArrayNewExecutor)
+fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewIs) = dispatchInstruction { vstack, context -> ArrayNewExecutor(vstack, context, instruction) }
 
-fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewSi) = dispatchInstruction(instruction, ::ArrayNewExecutor)
+fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewSi) = dispatchInstruction { vstack, context -> ArrayNewExecutor(vstack, context, instruction) }
 
-fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewSs) = dispatchInstruction(instruction, ::ArrayNewExecutor)
+fun ArrayNewDispatcher(instruction: AggregateSuperInstruction.ArrayNewSs) = dispatchInstruction { vstack, context -> ArrayNewExecutor(vstack, context, instruction) }
 
-fun ArrayNewFixedDispatcher(instruction: AggregateSuperInstruction.ArrayNewFixedS) = dispatchInstruction(instruction, ::ArrayNewFixedExecutor)
+fun ArrayNewFixedDispatcher(instruction: AggregateSuperInstruction.ArrayNewFixedS) = dispatchInstruction { vstack, context -> ArrayNewFixedExecutor(vstack, context, instruction) }
 
-fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetIi) = dispatchInstruction(instruction, ::ArraySetExecutor)
+fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetIi) = dispatchInstruction { vstack, context -> ArraySetExecutor(vstack, context, instruction) }
 
-fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetIs) = dispatchInstruction(instruction, ::ArraySetExecutor)
+fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetIs) = dispatchInstruction { vstack, context -> ArraySetExecutor(vstack, context, instruction) }
 
-fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetSi) = dispatchInstruction(instruction, ::ArraySetExecutor)
+fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetSi) = dispatchInstruction { vstack, context -> ArraySetExecutor(vstack, context, instruction) }
 
-fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetSs) = dispatchInstruction(instruction, ::ArraySetExecutor)
+fun ArraySetDispatcher(instruction: AggregateSuperInstruction.ArraySetSs) = dispatchInstruction { vstack, context -> ArraySetExecutor(vstack, context, instruction) }
 
-fun StructGetDispatcher(instruction: AggregateSuperInstruction.StructGetS) = dispatchInstruction(instruction, ::StructGetExecutor)
+fun StructGetDispatcher(instruction: AggregateSuperInstruction.StructGetS) = dispatchInstruction { vstack, context -> StructGetExecutor(vstack, context, instruction) }
 
 fun StructGetSignedDispatcher(instruction: AggregateSuperInstruction.StructGetSignedS) = PackedStructGetSignedDispatcher(instruction)
 
 fun StructGetUnsignedDispatcher(instruction: AggregateSuperInstruction.StructGetUnsignedS) = PackedStructGetUnsignedDispatcher(instruction)
 
-fun RefCastStructGetDispatcher(instruction: AggregateSuperInstruction.RefCastStructGetS) = dispatchInstruction(instruction, ::RefCastStructGetExecutor)
+fun RefCastStructGetDispatcher(instruction: AggregateSuperInstruction.RefCastStructGetS) = dispatchInstruction { vstack, context -> RefCastStructGetExecutor(vstack, context, instruction) }
 
-fun StructGetStructGetDispatcher(instruction: AggregateSuperInstruction.StructGetStructGetS) = dispatchInstruction(instruction, ::StructGetStructGetExecutor)
+fun StructGetStructGetDispatcher(instruction: AggregateSuperInstruction.StructGetStructGetS) = dispatchInstruction { vstack, context -> StructGetStructGetExecutor(vstack, context, instruction) }
 
-fun LocalSetStructGetDispatcher(instruction: AggregateSuperInstruction.LocalSetStructGetS) = dispatchInstruction(instruction, ::LocalSetStructGetExecutor)
+fun LocalSetStructGetDispatcher(instruction: AggregateSuperInstruction.LocalSetStructGetS) = dispatchInstruction { vstack, context -> LocalSetStructGetExecutor(vstack, context, instruction) }
 
-fun StructNewDispatcher(instruction: AggregateSuperInstruction.StructNewS) = dispatchInstruction(instruction, ::StructNewExecutor)
+fun StructNewDispatcher(instruction: AggregateSuperInstruction.StructNewS) = dispatchInstruction { vstack, context -> StructNewExecutor(vstack, context, instruction) }
 
-fun StructNewDefaultDispatcher(instruction: AggregateSuperInstruction.StructNewDefaultS) = dispatchInstruction(instruction, ::StructNewDefaultExecutor)
+fun StructNewDefaultDispatcher(instruction: AggregateSuperInstruction.StructNewDefaultS) = dispatchInstruction { vstack, context -> StructNewDefaultExecutor(vstack, context, instruction) }
 
-fun StructSetDispatcher(instruction: AggregateSuperInstruction.StructSetI) = dispatchInstruction(instruction, ::StructSetExecutor)
+fun StructSetDispatcher(instruction: AggregateSuperInstruction.StructSetI) = dispatchInstruction { vstack, context -> StructSetExecutor(vstack, context, instruction) }
 
-fun StructSetDispatcher(instruction: AggregateSuperInstruction.StructSetS) = dispatchInstruction(instruction, ::StructSetExecutor)
+fun StructSetDispatcher(instruction: AggregateSuperInstruction.StructSetS) = dispatchInstruction { vstack, context -> StructSetExecutor(vstack, context, instruction) }

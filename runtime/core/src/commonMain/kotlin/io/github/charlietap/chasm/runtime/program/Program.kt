@@ -64,7 +64,7 @@ const val EXIT_IP = Int.MAX_VALUE
 
 private const val INITIAL_CAPACITY = 256
 
-private val unavailableInstruction = DispatchableInstruction { _, _, _, _, _ ->
+private val unavailableInstruction = DispatchableInstruction { _, _, _ ->
     error("unavailable program instruction cannot be dispatched")
 }
 

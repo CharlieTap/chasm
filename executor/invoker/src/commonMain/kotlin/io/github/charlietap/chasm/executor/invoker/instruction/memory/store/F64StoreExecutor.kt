@@ -5,20 +5,14 @@ import io.github.charlietap.chasm.memory.PessimisticBoundsChecker
 import io.github.charlietap.chasm.memory.write.F64Writer
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 fun F64StoreExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.F64Store,
 ) = F64StoreExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     boundsChecker = ::PessimisticBoundsChecker,
@@ -27,8 +21,6 @@ fun F64StoreExecutor(
 
 internal inline fun F64StoreExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.F64Store,
     crossinline boundsChecker: BoundsChecker<Unit>,

@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.fixture.ast.instruction.catchAllRefHandler
 import io.github.charlietap.chasm.fixture.ast.instruction.catchRefHandler
 import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.ast.module.tagIndex
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tagAddress
 import io.github.charlietap.chasm.fixture.runtime.stack.cstack
@@ -51,7 +52,11 @@ class ThrowRefExecutorTest {
         )
         val vstack = vstack().apply { reserveDepth(5) }
 
-        val continuationIp = ThrowRefValueExecutor(vstack, cstack, store, exceptionRef)
+        val continuationIp = ThrowRefValueExecutor(
+            vstack,
+            executionContext(store = store, vstack = vstack, cstack = cstack),
+            exceptionRef,
+        )
 
         assertEquals(42, continuationIp)
         assertEquals(11L, vstack.getFrameSlot(2))
@@ -88,7 +93,11 @@ class ThrowRefExecutorTest {
         )
         val vstack = vstack().apply { reserveDepth(12) }
 
-        val continuationIp = ThrowRefValueExecutor(vstack, cstack, store, exceptionRef)
+        val continuationIp = ThrowRefValueExecutor(
+            vstack,
+            executionContext(store = store, vstack = vstack, cstack = cstack),
+            exceptionRef,
+        )
 
         assertEquals(73, continuationIp)
         assertEquals(exceptionRef, vstack.getFrameSlot(1))
@@ -104,7 +113,12 @@ class ThrowRefExecutorTest {
         val cstack = cstack()
 
         val failure = assertFailsWith<InvocationException> {
-            ThrowRefValueExecutor(vstack(), cstack, store, exceptionRef)
+            val vstack = vstack()
+            ThrowRefValueExecutor(
+                vstack,
+                executionContext(store = store, vstack = vstack, cstack = cstack),
+                exceptionRef,
+            )
         }
 
         assertEquals(InvocationError.ThrownException, failure.error)

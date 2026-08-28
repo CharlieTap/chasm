@@ -2,20 +2,11 @@ package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.cnstop.F32ConstExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.execution.Executor
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 
 fun F32ConstDispatcher(
     instruction: NumericInstruction.F32Const,
-) = F32ConstDispatcher(
-    instruction = instruction,
-    executor = ::F32ConstExecutor,
-)
-
-internal inline fun F32ConstDispatcher(
-    instruction: NumericInstruction.F32Const,
-    crossinline executor: Executor<NumericInstruction.F32Const>,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    F32ConstExecutor(vstack, context, instruction)
     nextIp
 }

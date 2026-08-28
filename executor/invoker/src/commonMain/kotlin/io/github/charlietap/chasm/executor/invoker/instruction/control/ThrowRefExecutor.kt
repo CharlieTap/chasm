@@ -4,24 +4,25 @@ import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandle
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
-import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun ThrowRefValueExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
+    context: ExecutionContext,
     ref: Long,
 ): Int {
     if (ref.isNullableReference()) {
         throw InvocationException(InvocationError.UnexpectedReferenceValue)
     }
-    val exceptionTagAddress = store.heap.exceptionTagAddress(ref)
+    val cstack = context.cstack
+    val heap = context.heap
+    val exceptionTagAddress = heap.exceptionTagAddress(ref)
     while (true) {
         if (cstack.handlersDepth() == 0) {
-            store.heap.setPendingException(ref)
+            heap.setPendingException(ref)
             throw InvocationException(InvocationError.ThrownException)
         }
         val handler = cstack.popHandler()
@@ -44,10 +45,10 @@ internal fun ThrowRefValueExecutor(
                 val destinationSlots = handler.payloadDestinationSlots[index]
                 when (catchHandler) {
                     is CatchHandler.Catch -> {
-                        writeCatchPayload(vstack, store, ref, destinationSlots.size, destinationSlots)
+                        writeCatchPayload(vstack, heap, ref, destinationSlots.size, destinationSlots)
                     }
                     is CatchHandler.CatchRef -> {
-                        writeCatchPayload(vstack, store, ref, destinationSlots.lastIndex, destinationSlots)
+                        writeCatchPayload(vstack, heap, ref, destinationSlots.lastIndex, destinationSlots)
                         vstack.setFrameSlot(destinationSlots.last(), ref)
                     }
                     is CatchHandler.CatchAll -> Unit
@@ -61,7 +62,7 @@ internal fun ThrowRefValueExecutor(
 
 private fun writeCatchPayload(
     vstack: ValueStack,
-    store: Store,
+    heap: WasmHeap,
     exceptionReference: Long,
     payloadCount: Int,
     destinationSlots: IntArray,
@@ -70,7 +71,7 @@ private fun writeCatchPayload(
     while (fieldIndex < payloadCount) {
         vstack.setFrameSlot(
             destinationSlots[fieldIndex],
-            store.heap.getExceptionFieldTrusted(exceptionReference, fieldIndex),
+            heap.getExceptionFieldTrusted(exceptionReference, fieldIndex),
         )
         fieldIndex++
     }

@@ -1,12 +1,15 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch
 
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.execution.Executor
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.stack.ValueStack
 
-internal inline fun <T> dispatchInstruction(
-    instruction: T,
-    crossinline executor: Executor<T>,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-    executor(vstack, cstack, store, context, instruction)
+internal inline fun dispatchInstruction(
+    crossinline execute: (
+        vstack: ValueStack,
+        context: ExecutionContext,
+    ) -> Unit,
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    execute(vstack, context)
     nextIp
 }

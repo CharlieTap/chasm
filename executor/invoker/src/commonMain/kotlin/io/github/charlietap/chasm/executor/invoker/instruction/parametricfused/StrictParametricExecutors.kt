@@ -2,14 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.parametricfused
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ParametricSuperInstruction.SelectIii,
 ) = executeSelect(
@@ -22,8 +18,6 @@ internal inline fun SelectExecutor(
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ParametricSuperInstruction.SelectIis,
 ) = executeSelect(
@@ -36,8 +30,6 @@ internal inline fun SelectExecutor(
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ParametricSuperInstruction.SelectIsi,
 ) = executeSelect(
@@ -50,8 +42,6 @@ internal inline fun SelectExecutor(
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ParametricSuperInstruction.SelectIss,
 ) = executeSelect(
@@ -64,8 +54,6 @@ internal inline fun SelectExecutor(
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ParametricSuperInstruction.SelectSii,
 ) = executeSelect(
@@ -78,8 +66,6 @@ internal inline fun SelectExecutor(
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ParametricSuperInstruction.SelectSis,
 ) = executeSelect(
@@ -92,8 +78,6 @@ internal inline fun SelectExecutor(
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ParametricSuperInstruction.SelectSsi,
 ) = executeSelect(
@@ -106,8 +90,6 @@ internal inline fun SelectExecutor(
 
 internal inline fun SelectExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ParametricSuperInstruction.SelectSss,
 ) = executeSelect(

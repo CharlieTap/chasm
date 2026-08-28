@@ -18,10 +18,8 @@ import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.stack.activationHeader
-import io.github.charlietap.chasm.runtime.store.Store
 
 private const val NO_RESULT_DESTINATION = -1
 private const val RESULT_CALL_SITE_IP_LIMIT = 1 shl 30
@@ -165,8 +163,6 @@ private abstract class UnlinkedWasmCall(
 
     final override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int = error("unlinked Wasm call cannot be dispatched")
@@ -252,8 +248,6 @@ private class LinkedWasmCallWithoutLocalsOrOperandTransfer(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int {
@@ -295,8 +289,6 @@ private class LinkedWasmCallWithoutLocalsWithImmediateOperand(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int {
@@ -344,8 +336,6 @@ private class LinkedWasmCallWithoutLocalsWithSlotOperand(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int {
@@ -396,8 +386,6 @@ private class LinkedWasmCallWithoutLocalsWithTwoSlotOperands(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int {
@@ -452,8 +440,6 @@ private class LinkedWasmCallWithoutLocalsWithThreeSlotOperands(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int {
@@ -512,8 +498,6 @@ private class LinkedWasmCallWithoutLocalsWithFourSlotOperands(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int {
@@ -645,7 +629,7 @@ private inline fun linkedWasmCallDispatcher(
     val third = sources.getOrNull(2)
     val fourth = sources.getOrNull(3)
     return when {
-        operands.isInPlace -> linkedWasmCallDispatcher(resultDestinationSlot) { vstack, _, _, _, _ ->
+        operands.isInPlace -> linkedWasmCallDispatcher(resultDestinationSlot) { vstack ->
             linkedWasmFunctionCall(
                 vstack,
                 callFrameOffset,
@@ -659,7 +643,7 @@ private inline fun linkedWasmCallDispatcher(
         sources.size == 2 && first is TransferSource.Slot && second is TransferSource.Slot -> {
             val firstSlot = first.slot
             val secondSlot = second.slot
-            linkedWasmCallDispatcher(resultDestinationSlot) { vstack, _, _, _, _ ->
+            linkedWasmCallDispatcher(resultDestinationSlot) { vstack ->
                 linkedWasmFunctionCall(
                     vstack,
                     callFrameOffset,
@@ -683,7 +667,7 @@ private inline fun linkedWasmCallDispatcher(
             val firstSlot = first.slot
             val secondSlot = second.slot
             val thirdSlot = third.slot
-            linkedWasmCallDispatcher(resultDestinationSlot) { vstack, _, _, _, _ ->
+            linkedWasmCallDispatcher(resultDestinationSlot) { vstack ->
                 linkedWasmFunctionCall(
                     vstack,
                     callFrameOffset,
@@ -711,7 +695,7 @@ private inline fun linkedWasmCallDispatcher(
             val secondSlot = second.slot
             val thirdSlot = third.slot
             val fourthSlot = fourth.slot
-            linkedWasmCallDispatcher(resultDestinationSlot) { vstack, _, _, _, _ ->
+            linkedWasmCallDispatcher(resultDestinationSlot) { vstack ->
                 linkedWasmFunctionCall(
                     vstack,
                     callFrameOffset,
@@ -734,7 +718,7 @@ private inline fun linkedWasmCallDispatcher(
         }
         operand is TransferSource.Immediate -> {
             val value = operand.value
-            linkedWasmCallDispatcher(resultDestinationSlot) { vstack, _, _, _, _ ->
+            linkedWasmCallDispatcher(resultDestinationSlot) { vstack ->
                 linkedWasmFunctionCall(
                     vstack,
                     callFrameOffset,
@@ -748,7 +732,7 @@ private inline fun linkedWasmCallDispatcher(
         }
         operand is TransferSource.Slot -> {
             val slot = operand.slot
-            linkedWasmCallDispatcher(resultDestinationSlot) { vstack, _, _, _, _ ->
+            linkedWasmCallDispatcher(resultDestinationSlot) { vstack ->
                 linkedWasmFunctionCall(
                     vstack,
                     callFrameOffset,
@@ -762,7 +746,7 @@ private inline fun linkedWasmCallDispatcher(
                 }
             }
         }
-        else -> linkedWasmCallDispatcher(resultDestinationSlot) { vstack, _, _, _, _ ->
+        else -> linkedWasmCallDispatcher(resultDestinationSlot) { vstack ->
             linkedWasmFunctionCall(
                 vstack,
                 callFrameOffset,
@@ -780,23 +764,15 @@ private inline fun linkedWasmCallDispatcher(
 
 private inline fun linkedWasmCallDispatcher(
     destinationSlot: Int,
-    crossinline call: (
-        ValueStack,
-        ControlStack,
-        Store,
-        ExecutionContext,
-        Int,
-    ) -> Int,
+    crossinline call: (ValueStack) -> Int,
 ): DispatchableInstruction = object : DispatchableInstruction(), CallSiteResultDestination {
     override val resultDestinationSlot = destinationSlot
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
-    ): Int = call(vstack, cstack, store, context, nextIp)
+    ): Int = call(vstack)
 }
 
 private inline fun linkedWasmFunctionCall(
@@ -832,13 +808,13 @@ fun CallDispatcher(
     val operand = operands.sources.singleOrNull()
 
     return when {
-        operands.isInPlace -> DispatchableInstruction { vstack, _, _, context, nextIp ->
+        operands.isInPlace -> DispatchableInstruction { vstack, context, nextIp ->
             HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
             nextIp
         }
         operand is TransferSource.Immediate -> {
             val value = operand.value
-            DispatchableInstruction { vstack, _, _, context, nextIp ->
+            DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(callFrameOffset, value)
                 HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
                 nextIp
@@ -846,13 +822,13 @@ fun CallDispatcher(
         }
         operand is TransferSource.Slot -> {
             val sourceSlot = operand.slot
-            DispatchableInstruction { vstack, _, _, context, nextIp ->
+            DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(callFrameOffset, vstack.getFrameSlot(sourceSlot))
                 HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
                 nextIp
             }
         }
-        else -> DispatchableInstruction { vstack, _, _, context, nextIp ->
+        else -> DispatchableInstruction { vstack, context, nextIp ->
             val fp = vstack.fp
             vstack.transferOperands(
                 currentFp = fp,
@@ -880,8 +856,6 @@ private class UnlinkedCallIndirectI(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int = error("unlinked indirect Wasm call cannot be dispatched")
@@ -902,8 +876,6 @@ private class UnlinkedCallIndirectS(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int = error("unlinked indirect Wasm call cannot be dispatched")
@@ -924,8 +896,6 @@ private class UnlinkedCallRef(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int = error("unlinked reference Wasm call cannot be dispatched")
@@ -943,8 +913,8 @@ fun CallDispatcher(
         instruction.callFrameOffset,
     )
     return if (resultDestinationSlot == null) {
-        DispatchableInstruction { vstack, _, store, context, _ ->
-            CallExecutor(vstack, store, context, instruction, returnIp, header)
+        DispatchableInstruction { vstack, context, _ ->
+            CallExecutor(vstack, context, instruction, returnIp, header)
         }
     } else {
         ResultCallIndirectIDispatcher(instruction, returnIp, header, resultDestinationSlot)
@@ -963,8 +933,8 @@ fun CallDispatcher(
         instruction.callFrameOffset,
     )
     return if (resultDestinationSlot == null) {
-        DispatchableInstruction { vstack, _, store, context, _ ->
-            CallExecutor(vstack, store, context, instruction, returnIp, header)
+        DispatchableInstruction { vstack, context, _ ->
+            CallExecutor(vstack, context, instruction, returnIp, header)
         }
     } else {
         ResultCallIndirectSDispatcher(instruction, returnIp, header, resultDestinationSlot)
@@ -983,8 +953,8 @@ fun CallDispatcher(
         instruction.callFrameOffset,
     )
     return if (resultDestinationSlot == null) {
-        DispatchableInstruction { vstack, _, store, context, _ ->
-            CallExecutor(vstack, store, context, instruction, returnIp, header)
+        DispatchableInstruction { vstack, context, _ ->
+            CallExecutor(vstack, context, instruction, returnIp, header)
         }
     } else {
         ResultCallRefDispatcher(instruction, returnIp, header, resultDestinationSlot)
@@ -1014,11 +984,9 @@ private class ResultCallIndirectIDispatcher(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
-    ): Int = CallExecutor(vstack, store, context, instruction, returnIp, activationHeader, resultDestinationSlot)
+    ): Int = CallExecutor(vstack, context, instruction, returnIp, activationHeader, resultDestinationSlot)
 }
 
 private class ResultCallIndirectSDispatcher(
@@ -1030,11 +998,9 @@ private class ResultCallIndirectSDispatcher(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
-    ): Int = CallExecutor(vstack, store, context, instruction, returnIp, activationHeader, resultDestinationSlot)
+    ): Int = CallExecutor(vstack, context, instruction, returnIp, activationHeader, resultDestinationSlot)
 }
 
 private class ResultCallRefDispatcher(
@@ -1046,11 +1012,9 @@ private class ResultCallRefDispatcher(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
-    ): Int = CallExecutor(vstack, store, context, instruction, returnIp, activationHeader, resultDestinationSlot)
+    ): Int = CallExecutor(vstack, context, instruction, returnIp, activationHeader, resultDestinationSlot)
 }
 
 fun ReturnCallDispatcher(
@@ -1078,8 +1042,6 @@ private class UnlinkedReturnWasmCall(
 
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int = error("unlinked Wasm tail call cannot be dispatched")
@@ -1180,7 +1142,7 @@ private inline fun linkedReturnWasmCallDispatcher(
     val third = sources.getOrNull(2)
     val fourth = sources.getOrNull(3)
     return when {
-        operands.isInPlace -> DispatchableInstruction { vstack, _, _, _, _ ->
+        operands.isInPlace -> DispatchableInstruction { vstack, _, _ ->
             linkedReturnWasmFunctionCall(
                 vstack,
                 frameSlots,
@@ -1193,7 +1155,7 @@ private inline fun linkedReturnWasmCallDispatcher(
         sources.size == 2 && first is TransferSource.Slot && second is TransferSource.Slot -> {
             val firstSlot = first.slot
             val secondSlot = second.slot
-            DispatchableInstruction { vstack, _, _, _, _ ->
+            DispatchableInstruction { vstack, _, _ ->
                 linkedReturnWasmFunctionCall(
                     vstack,
                     frameSlots,
@@ -1216,7 +1178,7 @@ private inline fun linkedReturnWasmCallDispatcher(
             val firstSlot = first.slot
             val secondSlot = second.slot
             val thirdSlot = third.slot
-            DispatchableInstruction { vstack, _, _, _, _ ->
+            DispatchableInstruction { vstack, _, _ ->
                 linkedReturnWasmFunctionCall(
                     vstack,
                     frameSlots,
@@ -1243,7 +1205,7 @@ private inline fun linkedReturnWasmCallDispatcher(
             val secondSlot = second.slot
             val thirdSlot = third.slot
             val fourthSlot = fourth.slot
-            DispatchableInstruction { vstack, _, _, _, _ ->
+            DispatchableInstruction { vstack, _, _ ->
                 linkedReturnWasmFunctionCall(
                     vstack,
                     frameSlots,
@@ -1265,7 +1227,7 @@ private inline fun linkedReturnWasmCallDispatcher(
         }
         operand is TransferSource.Immediate -> {
             val value = operand.value
-            DispatchableInstruction { vstack, _, _, _, _ ->
+            DispatchableInstruction { vstack, _, _ ->
                 linkedReturnWasmFunctionCall(
                     vstack,
                     frameSlots,
@@ -1278,7 +1240,7 @@ private inline fun linkedReturnWasmCallDispatcher(
         }
         operand is TransferSource.Slot -> {
             val slot = operand.slot
-            DispatchableInstruction { vstack, _, _, _, _ ->
+            DispatchableInstruction { vstack, _, _ ->
                 linkedReturnWasmFunctionCall(
                     vstack,
                     frameSlots,
@@ -1289,7 +1251,7 @@ private inline fun linkedReturnWasmCallDispatcher(
                 ) { fp -> vstack.setFrameSlot(fp, 0, vstack.getFrameSlot(fp, slot)) }
             }
         }
-        else -> DispatchableInstruction { vstack, _, _, _, _ ->
+        else -> DispatchableInstruction { vstack, _, _ ->
             linkedReturnWasmFunctionCall(
                 vstack,
                 frameSlots,
@@ -1329,13 +1291,13 @@ fun FunctionReturnDispatcher(
     val activationHeaderSlot = instruction.activationHeaderSlot
     if (results.isInPlace) {
         return when (resultCount) {
-            0 -> DispatchableInstruction { vstack, _, _, _, _ ->
+            0 -> DispatchableInstruction { vstack, _, _ ->
                 vstack.restoreCallerFrame(0, activationHeaderSlot)
             }
-            1 -> DispatchableInstruction { vstack, _, store, _, _ ->
-                returnToCaller(vstack, store, 1, activationHeaderSlot)
+            1 -> DispatchableInstruction { vstack, context, _ ->
+                returnToCaller(vstack, context.store, 1, activationHeaderSlot)
             }
-            else -> DispatchableInstruction { vstack, _, _, _, _ ->
+            else -> DispatchableInstruction { vstack, _, _ ->
                 vstack.restoreCallerFrame(resultCount, activationHeaderSlot)
             }
         }
@@ -1344,26 +1306,26 @@ fun FunctionReturnDispatcher(
     return when (result) {
         is TransferSource.Immediate -> {
             val value = result.value
-            DispatchableInstruction { vstack, _, store, _, _ ->
+            DispatchableInstruction { vstack, context, _ ->
                 vstack.setFrameSlot(0, value)
-                returnToCaller(vstack, store, 1, activationHeaderSlot)
+                returnToCaller(vstack, context.store, 1, activationHeaderSlot)
             }
         }
         is TransferSource.Slot -> {
             val sourceSlot = result.slot
-            DispatchableInstruction { vstack, _, store, _, _ ->
+            DispatchableInstruction { vstack, context, _ ->
                 vstack.setFrameSlot(0, vstack.getFrameSlot(sourceSlot))
-                returnToCaller(vstack, store, 1, activationHeaderSlot)
+                returnToCaller(vstack, context.store, 1, activationHeaderSlot)
             }
         }
-        null -> DispatchableInstruction { vstack, _, store, _, _ ->
+        null -> DispatchableInstruction { vstack, context, _ ->
             val fp = vstack.fp
             vstack.transferOperands(
                 currentFp = fp,
                 destinationFp = fp,
                 transfer = results,
             )
-            ReturnExecutor(vstack, store, resultCount, activationHeaderSlot)
+            ReturnExecutor(vstack, context, resultCount, activationHeaderSlot)
         }
     }
 }
@@ -1379,27 +1341,27 @@ fun ReturnCallDispatcher(
     val operand = operands.sources.singleOrNull()
 
     return when {
-        operands.isInPlace -> DispatchableInstruction { vstack, _, store, context, _ ->
+        operands.isInPlace -> DispatchableInstruction { vstack, context, _ ->
             HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
-            ReturnExecutor(vstack, store, function.functionType.results.types.size, activationHeaderSlot)
+            ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
         }
         operand is TransferSource.Immediate -> {
             val value = operand.value
-            DispatchableInstruction { vstack, _, store, context, _ ->
+            DispatchableInstruction { vstack, context, _ ->
                 vstack.setFrameSlot(callFrameOffset, value)
                 HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
-                ReturnExecutor(vstack, store, function.functionType.results.types.size, activationHeaderSlot)
+                ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
             }
         }
         operand is TransferSource.Slot -> {
             val sourceSlot = operand.slot
-            DispatchableInstruction { vstack, _, store, context, _ ->
+            DispatchableInstruction { vstack, context, _ ->
                 vstack.setFrameSlot(callFrameOffset, vstack.getFrameSlot(sourceSlot))
                 HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
-                ReturnExecutor(vstack, store, function.functionType.results.types.size, activationHeaderSlot)
+                ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
             }
         }
-        else -> DispatchableInstruction { vstack, _, store, context, _ ->
+        else -> DispatchableInstruction { vstack, context, _ ->
             val fp = vstack.fp
             vstack.transferOperands(
                 currentFp = fp,
@@ -1407,37 +1369,37 @@ fun ReturnCallDispatcher(
                 transfer = operands,
             )
             HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
-            ReturnExecutor(vstack, store, function.functionType.results.types.size, activationHeaderSlot)
+            ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
         }
     }
 }
 
 fun ReturnCallDispatcher(
     instruction: ControlSuperInstruction.ReturnCallIndirectI,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, store, context, _ ->
-    ReturnCallExecutor(vstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
+    ReturnCallExecutor(vstack, context, instruction)
 }
 
 fun ReturnCallDispatcher(
     instruction: ControlSuperInstruction.ReturnCallIndirectS,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, store, context, _ ->
-    ReturnCallExecutor(vstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
+    ReturnCallExecutor(vstack, context, instruction)
 }
 
 fun ReturnCallDispatcher(
     instruction: ControlSuperInstruction.ReturnCallRefS,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, store, context, _ ->
-    ReturnCallExecutor(vstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
+    ReturnCallExecutor(vstack, context, instruction)
 }
 
 fun ThrowDispatcher(
     instruction: ControlSuperInstruction.Throw,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, _ ->
-    ThrowExecutor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
+    ThrowExecutor(vstack, context, instruction)
 }
 
 fun ThrowRefDispatcher(
     instruction: ControlSuperInstruction.ThrowRefS,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, _, _ ->
-    ThrowRefExecutor(vstack, cstack, store, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
+    ThrowRefExecutor(vstack, context, instruction)
 }

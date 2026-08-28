@@ -2,15 +2,13 @@ package io.github.charlietap.chasm.fixture.runtime.dispatch
 
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 fun dispatchableInstruction(
-    executor: ((ValueStack, ControlStack, Store, ExecutionContext) -> Unit)? = null,
+    executor: ((ValueStack, ExecutionContext) -> Unit)? = null,
 ): DispatchableInstruction = executor?.let {
-    DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-        executor(vstack, cstack, store, context)
+    DispatchableInstruction { vstack, context, nextIp ->
+        executor(vstack, context)
         nextIp
     }
 } ?: NoOpDispatchableInstruction
@@ -18,8 +16,6 @@ fun dispatchableInstruction(
 private object NoOpDispatchableInstruction : DispatchableInstruction() {
     override fun invoke(
         vstack: ValueStack,
-        cstack: ControlStack,
-        store: Store,
         context: ExecutionContext,
         nextIp: Int,
     ): Int = nextIp

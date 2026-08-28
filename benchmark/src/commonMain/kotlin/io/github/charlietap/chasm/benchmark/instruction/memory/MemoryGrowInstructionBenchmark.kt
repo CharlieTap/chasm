@@ -78,7 +78,7 @@ class MemoryGrowInstructionBenchmark : StabilizedBenchmark() {
     @Benchmark
     fun benchmark(blackhole: Blackhole) {
         context.vstack.pushI32(pagesToGrow)
-        val result = MemoryGrowExecutor(vstack, cstack, store, context, instruction)
+        val result = MemoryGrowExecutor(vstack, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

@@ -52,8 +52,6 @@ class StrictThrowExecutorTest {
 
         val continuationIp = ThrowExecutor(
             vstack,
-            cstack,
-            store,
             executionContext(store = store, vstack = vstack, cstack = cstack),
             ControlSuperInstruction.Throw(tagAddress, firstPayloadSlot = 0),
         )

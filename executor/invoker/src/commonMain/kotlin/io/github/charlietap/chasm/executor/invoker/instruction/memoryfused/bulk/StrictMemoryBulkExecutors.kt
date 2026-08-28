@@ -7,14 +7,10 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instruction.MemorySuperInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun MemoryGrowExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryGrowI,
 ) = executeMemoryGrow(
@@ -27,8 +23,6 @@ internal fun MemoryGrowExecutor(
 
 internal fun MemoryGrowExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryGrowS,
 ) = executeMemoryGrow(
@@ -41,14 +35,10 @@ internal fun MemoryGrowExecutor(
 
 internal fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitIii,
 ) = MemoryInitExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     linearMemoryInitialiser = ::LinearMemoryInitialiser,
@@ -56,8 +46,6 @@ internal fun MemoryInitExecutor(
 
 internal inline fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitIii,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
@@ -72,14 +60,10 @@ internal inline fun MemoryInitExecutor(
 
 internal fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitIis,
 ) = MemoryInitExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     linearMemoryInitialiser = ::LinearMemoryInitialiser,
@@ -87,8 +71,6 @@ internal fun MemoryInitExecutor(
 
 internal inline fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitIis,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
@@ -103,14 +85,10 @@ internal inline fun MemoryInitExecutor(
 
 internal fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitIsi,
 ) = MemoryInitExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     linearMemoryInitialiser = ::LinearMemoryInitialiser,
@@ -118,8 +96,6 @@ internal fun MemoryInitExecutor(
 
 internal inline fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitIsi,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
@@ -134,14 +110,10 @@ internal inline fun MemoryInitExecutor(
 
 internal fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitIss,
 ) = MemoryInitExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     linearMemoryInitialiser = ::LinearMemoryInitialiser,
@@ -149,8 +121,6 @@ internal fun MemoryInitExecutor(
 
 internal inline fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitIss,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
@@ -165,14 +135,10 @@ internal inline fun MemoryInitExecutor(
 
 internal fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitSii,
 ) = MemoryInitExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     linearMemoryInitialiser = ::LinearMemoryInitialiser,
@@ -180,8 +146,6 @@ internal fun MemoryInitExecutor(
 
 internal inline fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitSii,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
@@ -196,14 +160,10 @@ internal inline fun MemoryInitExecutor(
 
 internal fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitSis,
 ) = MemoryInitExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     linearMemoryInitialiser = ::LinearMemoryInitialiser,
@@ -211,8 +171,6 @@ internal fun MemoryInitExecutor(
 
 internal inline fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitSis,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
@@ -227,14 +185,10 @@ internal inline fun MemoryInitExecutor(
 
 internal fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitSsi,
 ) = MemoryInitExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     linearMemoryInitialiser = ::LinearMemoryInitialiser,
@@ -242,8 +196,6 @@ internal fun MemoryInitExecutor(
 
 internal inline fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitSsi,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
@@ -258,14 +210,10 @@ internal inline fun MemoryInitExecutor(
 
 internal fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitSss,
 ) = MemoryInitExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     linearMemoryInitialiser = ::LinearMemoryInitialiser,
@@ -273,8 +221,6 @@ internal fun MemoryInitExecutor(
 
 internal inline fun MemoryInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryInitSss,
     crossinline linearMemoryInitialiser: LinearMemoryInitialiser,
@@ -289,14 +235,10 @@ internal inline fun MemoryInitExecutor(
 
 internal fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopyIii,
 ) = MemoryCopyExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     copier = ::LinearMemoryCopier,
@@ -304,8 +246,6 @@ internal fun MemoryCopyExecutor(
 
 internal inline fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopyIii,
     crossinline copier: LinearMemoryCopier,
@@ -320,14 +260,10 @@ internal inline fun MemoryCopyExecutor(
 
 internal fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopyIis,
 ) = MemoryCopyExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     copier = ::LinearMemoryCopier,
@@ -335,8 +271,6 @@ internal fun MemoryCopyExecutor(
 
 internal inline fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopyIis,
     crossinline copier: LinearMemoryCopier,
@@ -351,14 +285,10 @@ internal inline fun MemoryCopyExecutor(
 
 internal fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopyIsi,
 ) = MemoryCopyExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     copier = ::LinearMemoryCopier,
@@ -366,8 +296,6 @@ internal fun MemoryCopyExecutor(
 
 internal inline fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopyIsi,
     crossinline copier: LinearMemoryCopier,
@@ -382,14 +310,10 @@ internal inline fun MemoryCopyExecutor(
 
 internal fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopyIss,
 ) = MemoryCopyExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     copier = ::LinearMemoryCopier,
@@ -397,8 +321,6 @@ internal fun MemoryCopyExecutor(
 
 internal inline fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopyIss,
     crossinline copier: LinearMemoryCopier,
@@ -413,14 +335,10 @@ internal inline fun MemoryCopyExecutor(
 
 internal fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopySii,
 ) = MemoryCopyExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     copier = ::LinearMemoryCopier,
@@ -428,8 +346,6 @@ internal fun MemoryCopyExecutor(
 
 internal inline fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopySii,
     crossinline copier: LinearMemoryCopier,
@@ -444,14 +360,10 @@ internal inline fun MemoryCopyExecutor(
 
 internal fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopySis,
 ) = MemoryCopyExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     copier = ::LinearMemoryCopier,
@@ -459,8 +371,6 @@ internal fun MemoryCopyExecutor(
 
 internal inline fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopySis,
     crossinline copier: LinearMemoryCopier,
@@ -475,14 +385,10 @@ internal inline fun MemoryCopyExecutor(
 
 internal fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopySsi,
 ) = MemoryCopyExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     copier = ::LinearMemoryCopier,
@@ -490,8 +396,6 @@ internal fun MemoryCopyExecutor(
 
 internal inline fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopySsi,
     crossinline copier: LinearMemoryCopier,
@@ -506,14 +410,10 @@ internal inline fun MemoryCopyExecutor(
 
 internal fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopySss,
 ) = MemoryCopyExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     copier = ::LinearMemoryCopier,
@@ -521,8 +421,6 @@ internal fun MemoryCopyExecutor(
 
 internal inline fun MemoryCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryCopySss,
     crossinline copier: LinearMemoryCopier,
@@ -537,14 +435,10 @@ internal inline fun MemoryCopyExecutor(
 
 internal fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillIii,
 ) = MemoryFillExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     filler = ::LinearMemoryFiller,
@@ -552,8 +446,6 @@ internal fun MemoryFillExecutor(
 
 internal inline fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillIii,
     crossinline filler: LinearMemoryFiller,
@@ -567,14 +459,10 @@ internal inline fun MemoryFillExecutor(
 
 internal fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillIis,
 ) = MemoryFillExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     filler = ::LinearMemoryFiller,
@@ -582,8 +470,6 @@ internal fun MemoryFillExecutor(
 
 internal inline fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillIis,
     crossinline filler: LinearMemoryFiller,
@@ -597,14 +483,10 @@ internal inline fun MemoryFillExecutor(
 
 internal fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillIsi,
 ) = MemoryFillExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     filler = ::LinearMemoryFiller,
@@ -612,8 +494,6 @@ internal fun MemoryFillExecutor(
 
 internal inline fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillIsi,
     crossinline filler: LinearMemoryFiller,
@@ -627,14 +507,10 @@ internal inline fun MemoryFillExecutor(
 
 internal fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillIss,
 ) = MemoryFillExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     filler = ::LinearMemoryFiller,
@@ -642,8 +518,6 @@ internal fun MemoryFillExecutor(
 
 internal inline fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillIss,
     crossinline filler: LinearMemoryFiller,
@@ -657,14 +531,10 @@ internal inline fun MemoryFillExecutor(
 
 internal fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillSii,
 ) = MemoryFillExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     filler = ::LinearMemoryFiller,
@@ -672,8 +542,6 @@ internal fun MemoryFillExecutor(
 
 internal inline fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillSii,
     crossinline filler: LinearMemoryFiller,
@@ -687,14 +555,10 @@ internal inline fun MemoryFillExecutor(
 
 internal fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillSis,
 ) = MemoryFillExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     filler = ::LinearMemoryFiller,
@@ -702,8 +566,6 @@ internal fun MemoryFillExecutor(
 
 internal inline fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillSis,
     crossinline filler: LinearMemoryFiller,
@@ -717,14 +579,10 @@ internal inline fun MemoryFillExecutor(
 
 internal fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillSsi,
 ) = MemoryFillExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     filler = ::LinearMemoryFiller,
@@ -732,8 +590,6 @@ internal fun MemoryFillExecutor(
 
 internal inline fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillSsi,
     crossinline filler: LinearMemoryFiller,
@@ -747,14 +603,10 @@ internal inline fun MemoryFillExecutor(
 
 internal fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillSss,
 ) = MemoryFillExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     filler = ::LinearMemoryFiller,
@@ -762,8 +614,6 @@ internal fun MemoryFillExecutor(
 
 internal inline fun MemoryFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemorySuperInstruction.MemoryFillSss,
     crossinline filler: LinearMemoryFiller,

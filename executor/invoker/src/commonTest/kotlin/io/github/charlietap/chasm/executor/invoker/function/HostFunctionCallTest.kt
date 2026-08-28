@@ -206,7 +206,7 @@ class HostFunctionCallTest {
             parameterSlotBase = 4,
             resultSlotBase = 0,
         )
-        val returnIp = ReturnExecutor(vstack, store, resultCount = 1, activationHeaderSlot = 1)
+        val returnIp = ReturnExecutor(vstack, context, resultCount = 1, activationHeaderSlot = 1)
 
         assertEquals(19, returnIp)
         assertEquals(0, vstack.fp)

@@ -6,6 +6,6 @@ import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 
 fun EndFunctionDispatcher(
     instruction: AdminInstruction.EndFunction,
-): DispatchableInstruction = DispatchableInstruction { vstack, _, store, _, _ ->
-    ReturnExecutor(vstack, store, instruction.resultCount, instruction.activationHeaderSlot)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
+    ReturnExecutor(vstack, context, instruction.resultCount, instruction.activationHeaderSlot)
 }

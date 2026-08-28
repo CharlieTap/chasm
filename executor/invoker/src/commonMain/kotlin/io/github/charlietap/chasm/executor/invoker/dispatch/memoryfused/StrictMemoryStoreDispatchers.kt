@@ -17,7 +17,7 @@ import io.github.charlietap.chasm.memory.write.I64ToI32Writer
 import io.github.charlietap.chasm.memory.write.I64Writer
 import io.github.charlietap.chasm.runtime.instruction.MemorySuperInstruction
 
-fun I32StoreDispatcher(instruction: MemorySuperInstruction.I32StoreIi) = dispatchInstruction(instruction, ::I32StoreExecutor)
+fun I32StoreDispatcher(instruction: MemorySuperInstruction.I32StoreIi) = dispatchInstruction { vstack, context -> I32StoreExecutor(vstack, context, instruction) }
 
 fun I32StoreDispatcher(instruction: MemorySuperInstruction.I32StoreIs) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -28,10 +28,10 @@ fun I32StoreDispatcher(instruction: MemorySuperInstruction.I32StoreIs) = if (ins
         I32Writer(data, address, value)
     }
 } else {
-    dispatchInstruction(instruction, ::I32StoreExecutor)
+    dispatchInstruction { vstack, context -> I32StoreExecutor(vstack, context, instruction) }
 }
 
-fun I32StoreDispatcher(instruction: MemorySuperInstruction.I32StoreSi) = dispatchInstruction(instruction, ::I32StoreExecutor)
+fun I32StoreDispatcher(instruction: MemorySuperInstruction.I32StoreSi) = dispatchInstruction { vstack, context -> I32StoreExecutor(vstack, context, instruction) }
 
 fun I32StoreDispatcher(instruction: MemorySuperInstruction.I32StoreSs) = if (instruction.memArg.offset == 0) {
     val memory = instruction.memory
@@ -43,10 +43,10 @@ fun I32StoreDispatcher(instruction: MemorySuperInstruction.I32StoreSs) = if (ins
         I32Writer(data, address, vstack.getFrameSlot(valueSlot).toInt())
     }
 } else {
-    dispatchInstruction(instruction, ::I32StoreExecutor)
+    dispatchInstruction { vstack, context -> I32StoreExecutor(vstack, context, instruction) }
 }
 
-fun I64StoreDispatcher(instruction: MemorySuperInstruction.I64StoreIi) = dispatchInstruction(instruction, ::I64StoreExecutor)
+fun I64StoreDispatcher(instruction: MemorySuperInstruction.I64StoreIi) = dispatchInstruction { vstack, context -> I64StoreExecutor(vstack, context, instruction) }
 
 fun I64StoreDispatcher(instruction: MemorySuperInstruction.I64StoreIs) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -57,7 +57,7 @@ fun I64StoreDispatcher(instruction: MemorySuperInstruction.I64StoreIs) = if (ins
         I64Writer(data, address, value)
     }
 } else {
-    dispatchInstruction(instruction, ::I64StoreExecutor)
+    dispatchInstruction { vstack, context -> I64StoreExecutor(vstack, context, instruction) }
 }
 
 fun I64StoreDispatcher(instruction: MemorySuperInstruction.I64StoreSi) = if (instruction.memArg.offset == 0) {
@@ -67,28 +67,28 @@ fun I64StoreDispatcher(instruction: MemorySuperInstruction.I64StoreSi) = if (ins
         I64Writer(data, effectiveAddress, vstack.getFrameSlot(valueSlot))
     }
 } else {
-    dispatchInstruction(instruction, ::I64StoreExecutor)
+    dispatchInstruction { vstack, context -> I64StoreExecutor(vstack, context, instruction) }
 }
 
-fun I64StoreDispatcher(instruction: MemorySuperInstruction.I64StoreSs) = dispatchInstruction(instruction, ::I64StoreExecutor)
+fun I64StoreDispatcher(instruction: MemorySuperInstruction.I64StoreSs) = dispatchInstruction { vstack, context -> I64StoreExecutor(vstack, context, instruction) }
 
-fun F32StoreDispatcher(instruction: MemorySuperInstruction.F32StoreIi) = dispatchInstruction(instruction, ::F32StoreExecutor)
+fun F32StoreDispatcher(instruction: MemorySuperInstruction.F32StoreIi) = dispatchInstruction { vstack, context -> F32StoreExecutor(vstack, context, instruction) }
 
-fun F32StoreDispatcher(instruction: MemorySuperInstruction.F32StoreIs) = dispatchInstruction(instruction, ::F32StoreExecutor)
+fun F32StoreDispatcher(instruction: MemorySuperInstruction.F32StoreIs) = dispatchInstruction { vstack, context -> F32StoreExecutor(vstack, context, instruction) }
 
-fun F32StoreDispatcher(instruction: MemorySuperInstruction.F32StoreSi) = dispatchInstruction(instruction, ::F32StoreExecutor)
+fun F32StoreDispatcher(instruction: MemorySuperInstruction.F32StoreSi) = dispatchInstruction { vstack, context -> F32StoreExecutor(vstack, context, instruction) }
 
-fun F32StoreDispatcher(instruction: MemorySuperInstruction.F32StoreSs) = dispatchInstruction(instruction, ::F32StoreExecutor)
+fun F32StoreDispatcher(instruction: MemorySuperInstruction.F32StoreSs) = dispatchInstruction { vstack, context -> F32StoreExecutor(vstack, context, instruction) }
 
-fun F64StoreDispatcher(instruction: MemorySuperInstruction.F64StoreIi) = dispatchInstruction(instruction, ::F64StoreExecutor)
+fun F64StoreDispatcher(instruction: MemorySuperInstruction.F64StoreIi) = dispatchInstruction { vstack, context -> F64StoreExecutor(vstack, context, instruction) }
 
-fun F64StoreDispatcher(instruction: MemorySuperInstruction.F64StoreIs) = dispatchInstruction(instruction, ::F64StoreExecutor)
+fun F64StoreDispatcher(instruction: MemorySuperInstruction.F64StoreIs) = dispatchInstruction { vstack, context -> F64StoreExecutor(vstack, context, instruction) }
 
-fun F64StoreDispatcher(instruction: MemorySuperInstruction.F64StoreSi) = dispatchInstruction(instruction, ::F64StoreExecutor)
+fun F64StoreDispatcher(instruction: MemorySuperInstruction.F64StoreSi) = dispatchInstruction { vstack, context -> F64StoreExecutor(vstack, context, instruction) }
 
-fun F64StoreDispatcher(instruction: MemorySuperInstruction.F64StoreSs) = dispatchInstruction(instruction, ::F64StoreExecutor)
+fun F64StoreDispatcher(instruction: MemorySuperInstruction.F64StoreSs) = dispatchInstruction { vstack, context -> F64StoreExecutor(vstack, context, instruction) }
 
-fun I32Store8Dispatcher(instruction: MemorySuperInstruction.I32Store8Ii) = dispatchInstruction(instruction, ::I32Store8Executor)
+fun I32Store8Dispatcher(instruction: MemorySuperInstruction.I32Store8Ii) = dispatchInstruction { vstack, context -> I32Store8Executor(vstack, context, instruction) }
 
 fun I32Store8Dispatcher(instruction: MemorySuperInstruction.I32Store8Is) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -99,10 +99,10 @@ fun I32Store8Dispatcher(instruction: MemorySuperInstruction.I32Store8Is) = if (i
         I32ToI8Writer(data, address, value)
     }
 } else {
-    dispatchInstruction(instruction, ::I32Store8Executor)
+    dispatchInstruction { vstack, context -> I32Store8Executor(vstack, context, instruction) }
 }
 
-fun I32Store8Dispatcher(instruction: MemorySuperInstruction.I32Store8Si) = dispatchInstruction(instruction, ::I32Store8Executor)
+fun I32Store8Dispatcher(instruction: MemorySuperInstruction.I32Store8Si) = dispatchInstruction { vstack, context -> I32Store8Executor(vstack, context, instruction) }
 
 fun I32Store8Dispatcher(instruction: MemorySuperInstruction.I32Store8Ss) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -113,10 +113,10 @@ fun I32Store8Dispatcher(instruction: MemorySuperInstruction.I32Store8Ss) = if (i
         I32ToI8Writer(data, address, vstack.getFrameSlot(valueSlot).toInt())
     }
 } else {
-    dispatchInstruction(instruction, ::I32Store8Executor)
+    dispatchInstruction { vstack, context -> I32Store8Executor(vstack, context, instruction) }
 }
 
-fun I32Store16Dispatcher(instruction: MemorySuperInstruction.I32Store16Ii) = dispatchInstruction(instruction, ::I32Store16Executor)
+fun I32Store16Dispatcher(instruction: MemorySuperInstruction.I32Store16Ii) = dispatchInstruction { vstack, context -> I32Store16Executor(vstack, context, instruction) }
 
 fun I32Store16Dispatcher(instruction: MemorySuperInstruction.I32Store16Is) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -127,10 +127,10 @@ fun I32Store16Dispatcher(instruction: MemorySuperInstruction.I32Store16Is) = if 
         I32ToI16Writer(data, address, value)
     }
 } else {
-    dispatchInstruction(instruction, ::I32Store16Executor)
+    dispatchInstruction { vstack, context -> I32Store16Executor(vstack, context, instruction) }
 }
 
-fun I32Store16Dispatcher(instruction: MemorySuperInstruction.I32Store16Si) = dispatchInstruction(instruction, ::I32Store16Executor)
+fun I32Store16Dispatcher(instruction: MemorySuperInstruction.I32Store16Si) = dispatchInstruction { vstack, context -> I32Store16Executor(vstack, context, instruction) }
 
 fun I32Store16Dispatcher(instruction: MemorySuperInstruction.I32Store16Ss) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -141,26 +141,26 @@ fun I32Store16Dispatcher(instruction: MemorySuperInstruction.I32Store16Ss) = if 
         I32ToI16Writer(data, address, vstack.getFrameSlot(valueSlot).toInt())
     }
 } else {
-    dispatchInstruction(instruction, ::I32Store16Executor)
+    dispatchInstruction { vstack, context -> I32Store16Executor(vstack, context, instruction) }
 }
 
-fun I64Store8Dispatcher(instruction: MemorySuperInstruction.I64Store8Ii) = dispatchInstruction(instruction, ::I64Store8Executor)
+fun I64Store8Dispatcher(instruction: MemorySuperInstruction.I64Store8Ii) = dispatchInstruction { vstack, context -> I64Store8Executor(vstack, context, instruction) }
 
-fun I64Store8Dispatcher(instruction: MemorySuperInstruction.I64Store8Is) = dispatchInstruction(instruction, ::I64Store8Executor)
+fun I64Store8Dispatcher(instruction: MemorySuperInstruction.I64Store8Is) = dispatchInstruction { vstack, context -> I64Store8Executor(vstack, context, instruction) }
 
-fun I64Store8Dispatcher(instruction: MemorySuperInstruction.I64Store8Si) = dispatchInstruction(instruction, ::I64Store8Executor)
+fun I64Store8Dispatcher(instruction: MemorySuperInstruction.I64Store8Si) = dispatchInstruction { vstack, context -> I64Store8Executor(vstack, context, instruction) }
 
-fun I64Store8Dispatcher(instruction: MemorySuperInstruction.I64Store8Ss) = dispatchInstruction(instruction, ::I64Store8Executor)
+fun I64Store8Dispatcher(instruction: MemorySuperInstruction.I64Store8Ss) = dispatchInstruction { vstack, context -> I64Store8Executor(vstack, context, instruction) }
 
-fun I64Store16Dispatcher(instruction: MemorySuperInstruction.I64Store16Ii) = dispatchInstruction(instruction, ::I64Store16Executor)
+fun I64Store16Dispatcher(instruction: MemorySuperInstruction.I64Store16Ii) = dispatchInstruction { vstack, context -> I64Store16Executor(vstack, context, instruction) }
 
-fun I64Store16Dispatcher(instruction: MemorySuperInstruction.I64Store16Is) = dispatchInstruction(instruction, ::I64Store16Executor)
+fun I64Store16Dispatcher(instruction: MemorySuperInstruction.I64Store16Is) = dispatchInstruction { vstack, context -> I64Store16Executor(vstack, context, instruction) }
 
-fun I64Store16Dispatcher(instruction: MemorySuperInstruction.I64Store16Si) = dispatchInstruction(instruction, ::I64Store16Executor)
+fun I64Store16Dispatcher(instruction: MemorySuperInstruction.I64Store16Si) = dispatchInstruction { vstack, context -> I64Store16Executor(vstack, context, instruction) }
 
-fun I64Store16Dispatcher(instruction: MemorySuperInstruction.I64Store16Ss) = dispatchInstruction(instruction, ::I64Store16Executor)
+fun I64Store16Dispatcher(instruction: MemorySuperInstruction.I64Store16Ss) = dispatchInstruction { vstack, context -> I64Store16Executor(vstack, context, instruction) }
 
-fun I64Store32Dispatcher(instruction: MemorySuperInstruction.I64Store32Ii) = dispatchInstruction(instruction, ::I64Store32Executor)
+fun I64Store32Dispatcher(instruction: MemorySuperInstruction.I64Store32Ii) = dispatchInstruction { vstack, context -> I64Store32Executor(vstack, context, instruction) }
 
 fun I64Store32Dispatcher(instruction: MemorySuperInstruction.I64Store32Is) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -171,9 +171,9 @@ fun I64Store32Dispatcher(instruction: MemorySuperInstruction.I64Store32Is) = if 
         I64ToI32Writer(data, address, value)
     }
 } else {
-    dispatchInstruction(instruction, ::I64Store32Executor)
+    dispatchInstruction { vstack, context -> I64Store32Executor(vstack, context, instruction) }
 }
 
-fun I64Store32Dispatcher(instruction: MemorySuperInstruction.I64Store32Si) = dispatchInstruction(instruction, ::I64Store32Executor)
+fun I64Store32Dispatcher(instruction: MemorySuperInstruction.I64Store32Si) = dispatchInstruction { vstack, context -> I64Store32Executor(vstack, context, instruction) }
 
-fun I64Store32Dispatcher(instruction: MemorySuperInstruction.I64Store32Ss) = dispatchInstruction(instruction, ::I64Store32Executor)
+fun I64Store32Dispatcher(instruction: MemorySuperInstruction.I64Store32Ss) = dispatchInstruction { vstack, context -> I64Store32Executor(vstack, context, instruction) }

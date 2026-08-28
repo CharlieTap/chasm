@@ -7,82 +7,82 @@ import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.bino
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.binop.I64Sub128Executor
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Iiii) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Iiii) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Iiis) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Iiis) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Iisi) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Iisi) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Iiss) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Iiss) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Isii) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Isii) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Isis) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Isis) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Issi) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Issi) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Isss) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Isss) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Siii) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Siii) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Siis) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Siis) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Sisi) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Sisi) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Siss) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Siss) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Ssii) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Ssii) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Ssis) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Ssis) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Sssi) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Sssi) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Ssss) = dispatchInstruction(instruction, ::I64Add128Executor)
+fun I64Add128Dispatcher(instruction: NumericSuperInstruction.I64Add128Ssss) = dispatchInstruction { vstack, context -> I64Add128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Iiii) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Iiii) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Iiis) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Iiis) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Iisi) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Iisi) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Iiss) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Iiss) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Isii) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Isii) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Isis) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Isis) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Issi) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Issi) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Isss) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Isss) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Siii) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Siii) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Siis) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Siis) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Sisi) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Sisi) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Siss) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Siss) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Ssii) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Ssii) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Ssis) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Ssis) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Sssi) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Sssi) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Ssss) = dispatchInstruction(instruction, ::I64Sub128Executor)
+fun I64Sub128Dispatcher(instruction: NumericSuperInstruction.I64Sub128Ssss) = dispatchInstruction { vstack, context -> I64Sub128Executor(vstack, context, instruction) }
 
-fun I64MulWideSDispatcher(instruction: NumericSuperInstruction.I64MulWideSIi) = dispatchInstruction(instruction, ::I64MulWideSExecutor)
+fun I64MulWideSDispatcher(instruction: NumericSuperInstruction.I64MulWideSIi) = dispatchInstruction { vstack, context -> I64MulWideSExecutor(vstack, context, instruction) }
 
-fun I64MulWideSDispatcher(instruction: NumericSuperInstruction.I64MulWideSIs) = dispatchInstruction(instruction, ::I64MulWideSExecutor)
+fun I64MulWideSDispatcher(instruction: NumericSuperInstruction.I64MulWideSIs) = dispatchInstruction { vstack, context -> I64MulWideSExecutor(vstack, context, instruction) }
 
-fun I64MulWideSDispatcher(instruction: NumericSuperInstruction.I64MulWideSSi) = dispatchInstruction(instruction, ::I64MulWideSExecutor)
+fun I64MulWideSDispatcher(instruction: NumericSuperInstruction.I64MulWideSSi) = dispatchInstruction { vstack, context -> I64MulWideSExecutor(vstack, context, instruction) }
 
-fun I64MulWideSDispatcher(instruction: NumericSuperInstruction.I64MulWideSSs) = dispatchInstruction(instruction, ::I64MulWideSExecutor)
+fun I64MulWideSDispatcher(instruction: NumericSuperInstruction.I64MulWideSSs) = dispatchInstruction { vstack, context -> I64MulWideSExecutor(vstack, context, instruction) }
 
-fun I64MulWideUDispatcher(instruction: NumericSuperInstruction.I64MulWideUIi) = dispatchInstruction(instruction, ::I64MulWideUExecutor)
+fun I64MulWideUDispatcher(instruction: NumericSuperInstruction.I64MulWideUIi) = dispatchInstruction { vstack, context -> I64MulWideUExecutor(vstack, context, instruction) }
 
-fun I64MulWideUDispatcher(instruction: NumericSuperInstruction.I64MulWideUIs) = dispatchInstruction(instruction, ::I64MulWideUExecutor)
+fun I64MulWideUDispatcher(instruction: NumericSuperInstruction.I64MulWideUIs) = dispatchInstruction { vstack, context -> I64MulWideUExecutor(vstack, context, instruction) }
 
-fun I64MulWideUDispatcher(instruction: NumericSuperInstruction.I64MulWideUSi) = dispatchInstruction(instruction, ::I64MulWideUExecutor)
+fun I64MulWideUDispatcher(instruction: NumericSuperInstruction.I64MulWideUSi) = dispatchInstruction { vstack, context -> I64MulWideUExecutor(vstack, context, instruction) }
 
-fun I64MulWideUDispatcher(instruction: NumericSuperInstruction.I64MulWideUSs) = dispatchInstruction(instruction, ::I64MulWideUExecutor)
+fun I64MulWideUDispatcher(instruction: NumericSuperInstruction.I64MulWideUSs) = dispatchInstruction { vstack, context -> I64MulWideUExecutor(vstack, context, instruction) }

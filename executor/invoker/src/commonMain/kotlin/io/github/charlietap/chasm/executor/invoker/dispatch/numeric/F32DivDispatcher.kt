@@ -2,20 +2,11 @@ package io.github.charlietap.chasm.executor.invoker.dispatch.numeric
 
 import io.github.charlietap.chasm.executor.invoker.instruction.numeric.binop.F32DivExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.execution.Executor
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 
 fun F32DivDispatcher(
     instruction: NumericInstruction.F32Div,
-) = F32DivDispatcher(
-    instruction = instruction,
-    executor = ::F32DivExecutor,
-)
-
-internal inline fun F32DivDispatcher(
-    instruction: NumericInstruction.F32Div,
-    crossinline executor: Executor<NumericInstruction.F32Div>,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    F32DivExecutor(vstack, context, instruction)
     nextIp
 }

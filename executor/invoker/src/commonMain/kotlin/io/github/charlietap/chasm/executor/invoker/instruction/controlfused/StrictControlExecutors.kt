@@ -10,22 +10,18 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.toFunctionAddress
-import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TailCallOperandTransfer
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor as ControlThrowRefExecutor
 
 internal fun CallExecutor(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.CallIndirectI,
     returnIp: Int,
@@ -33,7 +29,6 @@ internal fun CallExecutor(
     resultDestinationSlot: Int? = null,
 ): Int = strictIndirectCall(
     vstack = vstack,
-    store = store,
     context = context,
     elementIndex = instruction.elementIndex,
     operands = instruction.operands,
@@ -48,7 +43,6 @@ internal fun CallExecutor(
 
 internal fun CallExecutor(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.CallIndirectS,
     returnIp: Int,
@@ -56,7 +50,6 @@ internal fun CallExecutor(
     resultDestinationSlot: Int? = null,
 ): Int = strictIndirectCall(
     vstack = vstack,
-    store = store,
     context = context,
     elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
     operands = instruction.operands,
@@ -71,7 +64,6 @@ internal fun CallExecutor(
 
 internal fun CallExecutor(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.CallRefS,
     returnIp: Int,
@@ -79,7 +71,6 @@ internal fun CallExecutor(
     resultDestinationSlot: Int? = null,
 ): Int = strictReferenceCall(
     vstack = vstack,
-    store = store,
     context = context,
     functionSlot = instruction.functionSlot,
     operands = instruction.operands,
@@ -92,12 +83,10 @@ internal fun CallExecutor(
 
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnCallIndirectI,
 ): Int = strictIndirectReturnCall(
     vstack = vstack,
-    store = store,
     context = context,
     elementIndex = instruction.elementIndex,
     operands = instruction.operands,
@@ -110,12 +99,10 @@ internal fun ReturnCallExecutor(
 
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnCallIndirectS,
 ): Int = strictIndirectReturnCall(
     vstack = vstack,
-    store = store,
     context = context,
     elementIndex = vstack.getFrameSlot(instruction.elementIndexSlot).toInt(),
     operands = instruction.operands,
@@ -128,12 +115,10 @@ internal fun ReturnCallExecutor(
 
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnCallRefS,
 ): Int = strictReferenceReturnCall(
     vstack = vstack,
-    store = store,
     context = context,
     functionSlot = instruction.functionSlot,
     operands = instruction.operands,
@@ -144,34 +129,28 @@ internal fun ReturnCallExecutor(
 
 internal fun ThrowExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.Throw,
 ): Int {
     return ControlThrowRefExecutor(
         vstack = vstack,
-        cstack = cstack,
-        store = store,
+        context = context,
         ref = context.heap.allocateExceptionFromFrame(context, instruction.tagAddress, instruction.firstPayloadSlot),
     )
 }
 
 internal fun ThrowRefExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
+    context: ExecutionContext,
     instruction: ControlSuperInstruction.ThrowRefS,
 ) = ControlThrowRefExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
+    context = context,
     ref = vstack.getFrameSlot(instruction.exceptionSlot),
 )
 
 private fun strictIndirectCall(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     elementIndex: Int,
     operands: OperandTransfer,
@@ -183,7 +162,7 @@ private fun strictIndirectCall(
     activationHeader: Long,
     resultDestinationSlot: Int?,
 ): Int {
-    val functionInstance = strictResolveIndirectFunction(store, context.heap, table, type, elementIndex)
+    val functionInstance = strictResolveIndirectFunction(context, table, type, elementIndex)
     return strictInvokeFunction(
         vstack = vstack,
         context = context,
@@ -199,7 +178,6 @@ private fun strictIndirectCall(
 
 private fun strictReferenceCall(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     functionSlot: Int,
     operands: OperandTransfer,
@@ -213,7 +191,7 @@ private fun strictReferenceCall(
     return strictInvokeFunction(
         vstack = vstack,
         context = context,
-        functionInstance = store.function(address),
+        functionInstance = context.store.function(address),
         caller = caller,
         operands = operands,
         callFrameOffset = callFrameOffset,
@@ -225,7 +203,6 @@ private fun strictReferenceCall(
 
 private fun strictIndirectReturnCall(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     elementIndex: Int,
     operands: TailCallOperandTransfer,
@@ -235,7 +212,7 @@ private fun strictIndirectReturnCall(
     callFrameOffset: Int,
     callerActivationHeaderSlot: Int,
 ): Int {
-    val functionInstance = strictResolveIndirectFunction(store, context.heap, table, type, elementIndex)
+    val functionInstance = strictResolveIndirectFunction(context, table, type, elementIndex)
     return strictInvokeReturnFunction(
         vstack = vstack,
         context = context,
@@ -249,7 +226,6 @@ private fun strictIndirectReturnCall(
 
 private fun strictReferenceReturnCall(
     vstack: ValueStack,
-    store: Store,
     context: ExecutionContext,
     functionSlot: Int,
     operands: TailCallOperandTransfer,
@@ -261,7 +237,7 @@ private fun strictReferenceReturnCall(
     return strictInvokeReturnFunction(
         vstack = vstack,
         context = context,
-        functionInstance = store.function(address),
+        functionInstance = context.store.function(address),
         caller = caller,
         operands = operands,
         callFrameOffset = callFrameOffset,
@@ -270,15 +246,14 @@ private fun strictReferenceReturnCall(
 }
 
 private fun strictResolveIndirectFunction(
-    store: Store,
-    heap: WasmHeap,
+    context: ExecutionContext,
     table: TableInstance,
     type: RTT,
     elementIndex: Int,
 ): FunctionInstance {
     val address = table.element(elementIndex).toFunctionAddress()
-    val functionInstance = store.function(address)
-    if (!heap.matchesRuntimeType(functionInstance.rtt, type)) {
+    val functionInstance = context.store.function(address)
+    if (!context.heap.matchesRuntimeType(functionInstance.rtt, type)) {
         throw InvocationException(InvocationError.IndirectCallHasIncorrectFunctionType)
     }
     return functionInstance
@@ -348,7 +323,7 @@ private fun strictInvokeReturnFunction(
         )
         ReturnExecutor(
             vstack,
-            context.store,
+            context,
             functionInstance.functionType.results.types.size,
             callerActivationHeaderSlot,
         )

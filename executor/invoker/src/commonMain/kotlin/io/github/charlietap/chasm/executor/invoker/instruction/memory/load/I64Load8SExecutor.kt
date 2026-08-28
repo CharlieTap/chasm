@@ -7,21 +7,15 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I64Load8SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load8S,
 ) =
     I64Load8SExecutor(
         vstack = vstack,
-        cstack = cstack,
-        store = store,
         context = context,
         instruction = instruction,
         boundsChecker = ::OptimisticBoundsChecker,
@@ -30,8 +24,6 @@ internal inline fun I64Load8SExecutor(
 
 internal inline fun I64Load8SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load8S,
     crossinline boundsChecker: BoundsChecker<Long>,

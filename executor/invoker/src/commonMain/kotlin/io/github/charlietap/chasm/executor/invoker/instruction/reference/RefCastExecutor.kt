@@ -5,20 +5,14 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun RefCastExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefCast,
 ) = RefCastExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     caster = ::Caster,
@@ -26,14 +20,12 @@ internal fun RefCastExecutor(
 
 internal inline fun RefCastExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceInstruction.RefCast,
     crossinline caster: Caster,
 ) {
     val referenceValue = vstack.pop()
-    val casted = caster(referenceValue, instruction.typeTest, store)
+    val casted = caster(referenceValue, instruction.typeTest, context)
 
     if (casted) {
         vstack.push(referenceValue)

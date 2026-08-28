@@ -152,4 +152,4 @@ private fun programWithSize(size: Int): Program = Program(maxOf(size, 1)).apply 
     }
 }
 
-private val noOpInstruction = DispatchableInstruction { _, _, _, _, nextIp -> nextIp }
+private val noOpInstruction = DispatchableInstruction { _, _, nextIp -> nextIp }

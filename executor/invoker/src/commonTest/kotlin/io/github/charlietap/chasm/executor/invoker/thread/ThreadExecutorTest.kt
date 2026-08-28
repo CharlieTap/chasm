@@ -69,8 +69,8 @@ class ThreadExecutorTest {
         )
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, cstack, _, context, _ ->
-                    cstack.push(
+                DispatchableInstruction { vstack, context, _ ->
+                    context.cstack.push(
                         ExceptionHandler(
                             handlers = listOf(catchCatchHandler(tagIndex(0u), labelIndex(0u))),
                             payloadDestinationSlots = listOf(intArrayOf(0)),
@@ -119,7 +119,7 @@ class ThreadExecutorTest {
             },
         )
         val entryIp = program.append(
-            DispatchableInstruction { vstack, _, _, context, _ ->
+            DispatchableInstruction { vstack, context, _ ->
                 HostFunctionCall(vstack, context, module, hostFunction, 0, 0)
                 error("raised exception returned to the host call site")
             },
@@ -140,7 +140,7 @@ class ThreadExecutorTest {
         val program = Program()
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { _, _, _, _, _ ->
+                DispatchableInstruction { _, _, _ ->
                     throw GuestHeapOutOfMemoryException("injected configured capacity exhaustion")
                 },
             ),
@@ -161,7 +161,7 @@ class ThreadExecutorTest {
         val program = Program()
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, _, _, _, nextIp ->
+                DispatchableInstruction { vstack, _, nextIp ->
                     vstack.setFrameSlot(0, 0L)
                     nextIp
                 },
@@ -196,7 +196,7 @@ class ThreadExecutorTest {
         val program = Program()
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, _, _, _, nextIp ->
+                DispatchableInstruction { vstack, _, nextIp ->
                     vstack.setFrameSlot(0, 41L)
                     vstack.setFrameSlot(1, 42L)
                     nextIp
@@ -230,7 +230,7 @@ class ThreadExecutorTest {
         val program = Program()
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, _, _, _, nextIp ->
+                DispatchableInstruction { vstack, _, nextIp ->
                     vstack.setFrameSlot(0, 117L)
                     vstack.setFrameSlot(2, 999L)
                     nextIp

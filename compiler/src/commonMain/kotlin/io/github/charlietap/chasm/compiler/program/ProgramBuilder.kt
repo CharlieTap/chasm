@@ -283,6 +283,6 @@ internal fun interface TargetInstructionFactory {
     fun create(targetIp: Int): DispatchableInstruction
 }
 
-private val unresolvedInstruction = DispatchableInstruction { _, _, _, _, _ ->
+private val unresolvedInstruction = DispatchableInstruction { _, _, _ ->
     error("unresolved instruction cannot be dispatched")
 }

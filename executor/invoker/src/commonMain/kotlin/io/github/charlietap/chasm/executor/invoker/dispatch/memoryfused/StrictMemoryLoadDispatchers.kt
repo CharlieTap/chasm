@@ -29,7 +29,7 @@ fun I32LoadDispatcher(instruction: MemorySuperInstruction.I32LoadI) = if (instru
         I32Reader(data, effectiveAddress).toLong()
     }
 } else {
-    dispatchInstruction(instruction, ::I32LoadExecutor)
+    dispatchInstruction { vstack, context -> I32LoadExecutor(vstack, context, instruction) }
 }
 
 fun I32LoadDispatcher(instruction: MemorySuperInstruction.I32LoadS) = if (instruction.memArg.offset == 0) {
@@ -41,7 +41,7 @@ fun I32LoadDispatcher(instruction: MemorySuperInstruction.I32LoadS) = if (instru
         I32Reader(data, address).toLong()
     }
 } else {
-    dispatchInstruction(instruction, ::I32LoadExecutor)
+    dispatchInstruction { vstack, context -> I32LoadExecutor(vstack, context, instruction) }
 }
 
 fun I64LoadDispatcher(instruction: MemorySuperInstruction.I64LoadI) = if (instruction.memArg.offset == 0) {
@@ -50,24 +50,24 @@ fun I64LoadDispatcher(instruction: MemorySuperInstruction.I64LoadI) = if (instru
         I64Reader(data, effectiveAddress)
     }
 } else {
-    dispatchInstruction(instruction, ::I64LoadExecutor)
+    dispatchInstruction { vstack, context -> I64LoadExecutor(vstack, context, instruction) }
 }
 
-fun I64LoadDispatcher(instruction: MemorySuperInstruction.I64LoadS) = dispatchInstruction(instruction, ::I64LoadExecutor)
+fun I64LoadDispatcher(instruction: MemorySuperInstruction.I64LoadS) = dispatchInstruction { vstack, context -> I64LoadExecutor(vstack, context, instruction) }
 
-fun F32LoadDispatcher(instruction: MemorySuperInstruction.F32LoadI) = dispatchInstruction(instruction, ::F32LoadExecutor)
+fun F32LoadDispatcher(instruction: MemorySuperInstruction.F32LoadI) = dispatchInstruction { vstack, context -> F32LoadExecutor(vstack, context, instruction) }
 
-fun F32LoadDispatcher(instruction: MemorySuperInstruction.F32LoadS) = dispatchInstruction(instruction, ::F32LoadExecutor)
+fun F32LoadDispatcher(instruction: MemorySuperInstruction.F32LoadS) = dispatchInstruction { vstack, context -> F32LoadExecutor(vstack, context, instruction) }
 
-fun F64LoadDispatcher(instruction: MemorySuperInstruction.F64LoadI) = dispatchInstruction(instruction, ::F64LoadExecutor)
+fun F64LoadDispatcher(instruction: MemorySuperInstruction.F64LoadI) = dispatchInstruction { vstack, context -> F64LoadExecutor(vstack, context, instruction) }
 
-fun F64LoadDispatcher(instruction: MemorySuperInstruction.F64LoadS) = dispatchInstruction(instruction, ::F64LoadExecutor)
+fun F64LoadDispatcher(instruction: MemorySuperInstruction.F64LoadS) = dispatchInstruction { vstack, context -> F64LoadExecutor(vstack, context, instruction) }
 
-fun I32Load8SDispatcher(instruction: MemorySuperInstruction.I32Load8SI) = dispatchInstruction(instruction, ::I32Load8SExecutor)
+fun I32Load8SDispatcher(instruction: MemorySuperInstruction.I32Load8SI) = dispatchInstruction { vstack, context -> I32Load8SExecutor(vstack, context, instruction) }
 
-fun I32Load8SDispatcher(instruction: MemorySuperInstruction.I32Load8SS) = dispatchInstruction(instruction, ::I32Load8SExecutor)
+fun I32Load8SDispatcher(instruction: MemorySuperInstruction.I32Load8SS) = dispatchInstruction { vstack, context -> I32Load8SExecutor(vstack, context, instruction) }
 
-fun I32Load8UDispatcher(instruction: MemorySuperInstruction.I32Load8UI) = dispatchInstruction(instruction, ::I32Load8UExecutor)
+fun I32Load8UDispatcher(instruction: MemorySuperInstruction.I32Load8UI) = dispatchInstruction { vstack, context -> I32Load8UExecutor(vstack, context, instruction) }
 
 fun I32Load8UDispatcher(instruction: MemorySuperInstruction.I32Load8US) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -77,10 +77,10 @@ fun I32Load8UDispatcher(instruction: MemorySuperInstruction.I32Load8US) = if (in
         I328UReader(data, address).toLong()
     }
 } else {
-    dispatchInstruction(instruction, ::I32Load8UExecutor)
+    dispatchInstruction { vstack, context -> I32Load8UExecutor(vstack, context, instruction) }
 }
 
-fun I32Load16SDispatcher(instruction: MemorySuperInstruction.I32Load16SI) = dispatchInstruction(instruction, ::I32Load16SExecutor)
+fun I32Load16SDispatcher(instruction: MemorySuperInstruction.I32Load16SI) = dispatchInstruction { vstack, context -> I32Load16SExecutor(vstack, context, instruction) }
 
 fun I32Load16SDispatcher(instruction: MemorySuperInstruction.I32Load16SS) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -90,10 +90,10 @@ fun I32Load16SDispatcher(instruction: MemorySuperInstruction.I32Load16SS) = if (
         I3216SReader(data, address).toLong()
     }
 } else {
-    dispatchInstruction(instruction, ::I32Load16SExecutor)
+    dispatchInstruction { vstack, context -> I32Load16SExecutor(vstack, context, instruction) }
 }
 
-fun I32Load16UDispatcher(instruction: MemorySuperInstruction.I32Load16UI) = dispatchInstruction(instruction, ::I32Load16UExecutor)
+fun I32Load16UDispatcher(instruction: MemorySuperInstruction.I32Load16UI) = dispatchInstruction { vstack, context -> I32Load16UExecutor(vstack, context, instruction) }
 
 fun I32Load16UDispatcher(instruction: MemorySuperInstruction.I32Load16US) = if (instruction.memArg.offset == 0) {
     val addressSlot = instruction.addressSlot
@@ -103,31 +103,31 @@ fun I32Load16UDispatcher(instruction: MemorySuperInstruction.I32Load16US) = if (
         I3216UReader(data, address).toLong()
     }
 } else {
-    dispatchInstruction(instruction, ::I32Load16UExecutor)
+    dispatchInstruction { vstack, context -> I32Load16UExecutor(vstack, context, instruction) }
 }
 
-fun I64Load8SDispatcher(instruction: MemorySuperInstruction.I64Load8SI) = dispatchInstruction(instruction, ::I64Load8SExecutor)
+fun I64Load8SDispatcher(instruction: MemorySuperInstruction.I64Load8SI) = dispatchInstruction { vstack, context -> I64Load8SExecutor(vstack, context, instruction) }
 
-fun I64Load8SDispatcher(instruction: MemorySuperInstruction.I64Load8SS) = dispatchInstruction(instruction, ::I64Load8SExecutor)
+fun I64Load8SDispatcher(instruction: MemorySuperInstruction.I64Load8SS) = dispatchInstruction { vstack, context -> I64Load8SExecutor(vstack, context, instruction) }
 
-fun I64Load8UDispatcher(instruction: MemorySuperInstruction.I64Load8UI) = dispatchInstruction(instruction, ::I64Load8UExecutor)
+fun I64Load8UDispatcher(instruction: MemorySuperInstruction.I64Load8UI) = dispatchInstruction { vstack, context -> I64Load8UExecutor(vstack, context, instruction) }
 
-fun I64Load8UDispatcher(instruction: MemorySuperInstruction.I64Load8US) = dispatchInstruction(instruction, ::I64Load8UExecutor)
+fun I64Load8UDispatcher(instruction: MemorySuperInstruction.I64Load8US) = dispatchInstruction { vstack, context -> I64Load8UExecutor(vstack, context, instruction) }
 
-fun I64Load16SDispatcher(instruction: MemorySuperInstruction.I64Load16SI) = dispatchInstruction(instruction, ::I64Load16SExecutor)
+fun I64Load16SDispatcher(instruction: MemorySuperInstruction.I64Load16SI) = dispatchInstruction { vstack, context -> I64Load16SExecutor(vstack, context, instruction) }
 
-fun I64Load16SDispatcher(instruction: MemorySuperInstruction.I64Load16SS) = dispatchInstruction(instruction, ::I64Load16SExecutor)
+fun I64Load16SDispatcher(instruction: MemorySuperInstruction.I64Load16SS) = dispatchInstruction { vstack, context -> I64Load16SExecutor(vstack, context, instruction) }
 
-fun I64Load16UDispatcher(instruction: MemorySuperInstruction.I64Load16UI) = dispatchInstruction(instruction, ::I64Load16UExecutor)
+fun I64Load16UDispatcher(instruction: MemorySuperInstruction.I64Load16UI) = dispatchInstruction { vstack, context -> I64Load16UExecutor(vstack, context, instruction) }
 
-fun I64Load16UDispatcher(instruction: MemorySuperInstruction.I64Load16US) = dispatchInstruction(instruction, ::I64Load16UExecutor)
+fun I64Load16UDispatcher(instruction: MemorySuperInstruction.I64Load16US) = dispatchInstruction { vstack, context -> I64Load16UExecutor(vstack, context, instruction) }
 
-fun I64Load32SDispatcher(instruction: MemorySuperInstruction.I64Load32SI) = dispatchInstruction(instruction, ::I64Load32SExecutor)
+fun I64Load32SDispatcher(instruction: MemorySuperInstruction.I64Load32SI) = dispatchInstruction { vstack, context -> I64Load32SExecutor(vstack, context, instruction) }
 
-fun I64Load32SDispatcher(instruction: MemorySuperInstruction.I64Load32SS) = dispatchInstruction(instruction, ::I64Load32SExecutor)
+fun I64Load32SDispatcher(instruction: MemorySuperInstruction.I64Load32SS) = dispatchInstruction { vstack, context -> I64Load32SExecutor(vstack, context, instruction) }
 
-fun I64Load32UDispatcher(instruction: MemorySuperInstruction.I64Load32UI) = dispatchInstruction(instruction, ::I64Load32UExecutor)
+fun I64Load32UDispatcher(instruction: MemorySuperInstruction.I64Load32UI) = dispatchInstruction { vstack, context -> I64Load32UExecutor(vstack, context, instruction) }
 
-fun I64Load32UDispatcher(instruction: MemorySuperInstruction.I64Load32US) = dispatchInstruction(instruction, ::I64Load32UExecutor)
+fun I64Load32UDispatcher(instruction: MemorySuperInstruction.I64Load32US) = dispatchInstruction { vstack, context -> I64Load32UExecutor(vstack, context, instruction) }
 
-fun MemorySizeDispatcher(instruction: MemorySuperInstruction.MemorySizeS) = dispatchInstruction(instruction, ::MemorySizeExecutor)
+fun MemorySizeDispatcher(instruction: MemorySuperInstruction.MemorySizeS) = dispatchInstruction { vstack, context -> MemorySizeExecutor(vstack, context, instruction) }

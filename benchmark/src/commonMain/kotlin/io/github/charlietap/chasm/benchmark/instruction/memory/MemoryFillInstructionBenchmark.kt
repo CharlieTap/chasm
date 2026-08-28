@@ -82,7 +82,7 @@ class MemoryFillInstructionBenchmark : StabilizedBenchmark() {
         context.vstack.pushI32(offset)
         context.vstack.pushI32(fillValue)
         context.vstack.pushI32(bytesToFill)
-        val result = MemoryFillExecutor(vstack, cstack, store, context, instruction)
+        val result = MemoryFillExecutor(vstack, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

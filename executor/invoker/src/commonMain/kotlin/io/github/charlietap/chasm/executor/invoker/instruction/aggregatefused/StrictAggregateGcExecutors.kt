@@ -15,17 +15,13 @@ import io.github.charlietap.chasm.runtime.ext.toReferenceValue
 import io.github.charlietap.chasm.runtime.ext.wrapI31
 import io.github.charlietap.chasm.runtime.heap.WasmHeap
 import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 
 internal inline fun ArrayNewDefaultExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewDefaultI,
 ) = executeArrayNewDefault(
@@ -40,8 +36,6 @@ internal inline fun ArrayNewDefaultExecutor(
 
 internal inline fun ArrayNewDefaultExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewDefaultS,
 ) = executeArrayNewDefault(
@@ -56,8 +50,6 @@ internal inline fun ArrayNewDefaultExecutor(
 
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewDataIi,
 ) = executeArrayNewData(
@@ -74,8 +66,6 @@ internal inline fun ArrayNewDataExecutor(
 
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewDataIs,
 ) = executeArrayNewData(
@@ -92,8 +82,6 @@ internal inline fun ArrayNewDataExecutor(
 
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewDataSi,
 ) = executeArrayNewData(
@@ -110,8 +98,6 @@ internal inline fun ArrayNewDataExecutor(
 
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewDataSs,
 ) = executeArrayNewData(
@@ -128,8 +114,6 @@ internal inline fun ArrayNewDataExecutor(
 
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewElementIi,
 ) = executeArrayNewElement(
@@ -145,8 +129,6 @@ internal inline fun ArrayNewElementExecutor(
 
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewElementIs,
 ) = executeArrayNewElement(
@@ -162,8 +144,6 @@ internal inline fun ArrayNewElementExecutor(
 
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewElementSi,
 ) = executeArrayNewElement(
@@ -179,8 +159,6 @@ internal inline fun ArrayNewElementExecutor(
 
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayNewElementSs,
 ) = executeArrayNewElement(
@@ -196,8 +174,6 @@ internal inline fun ArrayNewElementExecutor(
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataIii,
 ) = executeArrayInitData(
@@ -212,8 +188,6 @@ internal inline fun ArrayInitDataExecutor(
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataIis,
 ) = executeArrayInitData(
@@ -228,8 +202,6 @@ internal inline fun ArrayInitDataExecutor(
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataIsi,
 ) = executeArrayInitData(
@@ -244,8 +216,6 @@ internal inline fun ArrayInitDataExecutor(
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataIss,
 ) = executeArrayInitData(
@@ -260,8 +230,6 @@ internal inline fun ArrayInitDataExecutor(
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataSii,
 ) = executeArrayInitData(
@@ -276,8 +244,6 @@ internal inline fun ArrayInitDataExecutor(
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataSis,
 ) = executeArrayInitData(
@@ -292,8 +258,6 @@ internal inline fun ArrayInitDataExecutor(
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataSsi,
 ) = executeArrayInitData(
@@ -308,8 +272,6 @@ internal inline fun ArrayInitDataExecutor(
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitDataSss,
 ) = executeArrayInitData(
@@ -324,8 +286,6 @@ internal inline fun ArrayInitDataExecutor(
 
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementIii,
 ) = executeArrayInitElement(
@@ -339,8 +299,6 @@ internal inline fun ArrayInitElementExecutor(
 
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementIis,
 ) = executeArrayInitElement(
@@ -354,8 +312,6 @@ internal inline fun ArrayInitElementExecutor(
 
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementIsi,
 ) = executeArrayInitElement(
@@ -369,8 +325,6 @@ internal inline fun ArrayInitElementExecutor(
 
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementIss,
 ) = executeArrayInitElement(
@@ -384,8 +338,6 @@ internal inline fun ArrayInitElementExecutor(
 
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementSii,
 ) = executeArrayInitElement(
@@ -399,8 +351,6 @@ internal inline fun ArrayInitElementExecutor(
 
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementSis,
 ) = executeArrayInitElement(
@@ -414,8 +364,6 @@ internal inline fun ArrayInitElementExecutor(
 
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementSsi,
 ) = executeArrayInitElement(
@@ -429,8 +377,6 @@ internal inline fun ArrayInitElementExecutor(
 
 internal inline fun ArrayInitElementExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ArrayInitElementSss,
 ) = executeArrayInitElement(
@@ -444,8 +390,6 @@ internal inline fun ArrayInitElementExecutor(
 
 internal inline fun RefI31Executor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.RefI31I,
 ) = executeRefI31(
@@ -456,8 +400,6 @@ internal inline fun RefI31Executor(
 
 internal inline fun RefI31Executor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.RefI31S,
 ) = executeRefI31(
@@ -468,8 +410,6 @@ internal inline fun RefI31Executor(
 
 internal inline fun I31GetSignedExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.I31GetSignedS,
 ) = executeI31Get(
@@ -481,8 +421,6 @@ internal inline fun I31GetSignedExecutor(
 
 internal inline fun I31GetUnsignedExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.I31GetUnsignedS,
 ) = executeI31Get(
@@ -494,8 +432,6 @@ internal inline fun I31GetUnsignedExecutor(
 
 internal inline fun AnyConvertExternExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.AnyConvertExternS,
 ) = executeAnyConvertExtern(
@@ -506,8 +442,6 @@ internal inline fun AnyConvertExternExecutor(
 
 internal inline fun ExternConvertAnyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: AggregateSuperInstruction.ExternConvertAnyS,
 ) = executeExternConvertAny(

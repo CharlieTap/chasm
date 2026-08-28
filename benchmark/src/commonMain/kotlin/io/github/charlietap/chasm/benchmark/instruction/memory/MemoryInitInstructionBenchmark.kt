@@ -91,7 +91,7 @@ class MemoryInitInstructionBenchmark : StabilizedBenchmark() {
         context.vstack.pushI32(destOffset)
         context.vstack.pushI32(srcOffset)
         context.vstack.pushI32(bytesToCopy)
-        val result = MemoryInitExecutor(vstack, cstack, store, context, instruction)
+        val result = MemoryInitExecutor(vstack, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

@@ -2,20 +2,11 @@ package io.github.charlietap.chasm.executor.invoker.dispatch.aggregate
 
 import io.github.charlietap.chasm.executor.invoker.instruction.aggregate.ArrayFillExecutor
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
-import io.github.charlietap.chasm.runtime.execution.Executor
 import io.github.charlietap.chasm.runtime.instruction.AggregateInstruction
 
 fun ArrayFillDispatcher(
     instruction: AggregateInstruction.ArrayFill,
-) = ArrayFillDispatcher(
-    instruction = instruction,
-    executor = ::ArrayFillExecutor,
-)
-
-internal inline fun ArrayFillDispatcher(
-    instruction: AggregateInstruction.ArrayFill,
-    crossinline executor: Executor<AggregateInstruction.ArrayFill>,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-    executor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    ArrayFillExecutor(vstack, context, instruction)
     nextIp
 }

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.type
 
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXCEPTION
@@ -32,6 +33,7 @@ class CasterTest {
 
     @Test
     fun `abstract reference tests use the expected runtime tags`() {
+        val context = executionContext()
         val cases = listOf(
             AbstractHeapType.Func to setOf(RV_TYPE_FUNCTION),
             AbstractHeapType.Extern to setOf(RV_TYPE_EXTERN),
@@ -50,23 +52,25 @@ class CasterTest {
         cases.forEach { (heapType, acceptedTags) ->
             val test = ReferenceTypeTest.from(ReferenceType.Ref(heapType), RuntimeTypeMap.Empty)
             REFERENCE_TAGS.forEach { tag ->
-                assertEquals(tag in acceptedTags, Caster(tag, test, Store()), "$heapType against tag $tag")
+                assertEquals(tag in acceptedTags, Caster(tag, test, context), "$heapType against tag $tag")
             }
         }
     }
 
     @Test
     fun `null only passes nullable reference tests`() {
+        val context = executionContext()
         val nonNull = ReferenceTypeTest.from(ReferenceType.Ref(AbstractHeapType.Any), RuntimeTypeMap.Empty)
         val nullable = ReferenceTypeTest.from(ReferenceType.RefNull(AbstractHeapType.Any), RuntimeTypeMap.Empty)
 
-        assertEquals(false, Caster(RV_TYPE_NULL, nonNull, Store()))
-        assertEquals(true, Caster(RV_TYPE_NULL, nullable, Store()))
+        assertEquals(false, Caster(RV_TYPE_NULL, nonNull, context))
+        assertEquals(true, Caster(RV_TYPE_NULL, nullable, context))
     }
 
     @Test
     fun `concrete reference tests use canonical subtype displays`() {
         val store = Store()
+        val context = executionContext(store = store)
         val runtimeTypes = store.heap.registerRuntimeTypes(structChain())
         val leafReference = store.heap.allocateStruct(runtimeTypes[1], LongArray(0))
         val rootReference = store.heap.allocateStruct(runtimeTypes[0], LongArray(0))
@@ -79,14 +83,15 @@ class CasterTest {
             runtimeTypes,
         )
 
-        assertEquals(true, Caster(leafReference, rootTest, store))
-        assertEquals(true, Caster(leafReference, leafTest, store))
-        assertEquals(false, Caster(rootReference, leafTest, store))
+        assertEquals(true, Caster(leafReference, rootTest, context))
+        assertEquals(true, Caster(leafReference, leafTest, context))
+        assertEquals(false, Caster(rootReference, leafTest, context))
     }
 
     @Test
     fun `concrete struct casts reject wrong kind forged interior and stale values`() {
         val store = Store()
+        val context = executionContext(store = store)
         val runtimeTypes = store.heap.registerRuntimeTypes(twoFieldStruct())
         val reference = store.heap.allocateStruct(runtimeTypes[0], longArrayOf(1L, 2L))
         val test = ReferenceTypeTest.from(
@@ -97,18 +102,18 @@ class CasterTest {
         val forged = (500_000L shl RV_SHIFT_BITS) or RV_TYPE_STRUCT
         val wrongKind = (reference and RV_TYPE_STRUCT.inv()) or RV_TYPE_ARRAY
 
-        assertEquals(true, Caster(reference, test, store))
+        assertEquals(true, Caster(reference, test, context))
         assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(interior))
         assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(forged))
         assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(wrongKind))
-        assertEquals(false, Caster(interior, test, store))
-        assertEquals(false, Caster(forged, test, store))
-        assertEquals(false, Caster(wrongKind, test, store))
+        assertEquals(false, Caster(interior, test, context))
+        assertEquals(false, Caster(forged, test, context))
+        assertEquals(false, Caster(wrongKind, test, context))
 
         store.heap.collectGarbage(store)
 
         assertEquals(-1, store.heap.structRuntimeTypeIdOrNegative(reference))
-        assertEquals(false, Caster(reference, test, store))
+        assertEquals(false, Caster(reference, test, context))
     }
 
     private companion object {

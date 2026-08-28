@@ -9,7 +9,7 @@ internal fun PackedArrayGetSignedDispatcher(instruction: AggregateSuperInstructi
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
     val field = instruction.field
-    return DispatchableInstruction { vstack, _, _, context, nextIp ->
+    return DispatchableInstruction { vstack, context, nextIp ->
         val packed = context.heap.getArrayElementTrusted(vstack.getFrameSlot(addressSlot), field)
         vstack.setFrameSlot(destinationSlot, (packed shl shift) shr shift)
         nextIp
@@ -21,7 +21,7 @@ internal fun PackedArrayGetSignedDispatcher(instruction: AggregateSuperInstructi
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
     val fieldSlot = instruction.fieldSlot
-    return DispatchableInstruction { vstack, _, _, context, nextIp ->
+    return DispatchableInstruction { vstack, context, nextIp ->
         val address = vstack.getFrameSlot(addressSlot)
         val packed = context.heap.getArrayElementTrusted(address, vstack.getFrameSlot(fieldSlot).toInt())
         vstack.setFrameSlot(destinationSlot, (packed shl shift) shr shift)
@@ -34,7 +34,7 @@ internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruc
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
     val field = instruction.field
-    return DispatchableInstruction { vstack, _, _, context, nextIp ->
+    return DispatchableInstruction { vstack, context, nextIp ->
         val packed = context.heap.getArrayElementTrusted(vstack.getFrameSlot(addressSlot), field)
         vstack.setFrameSlot(destinationSlot, packed and mask)
         nextIp
@@ -46,7 +46,7 @@ internal fun PackedArrayGetUnsignedDispatcher(instruction: AggregateSuperInstruc
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
     val fieldSlot = instruction.fieldSlot
-    return DispatchableInstruction { vstack, _, _, context, nextIp ->
+    return DispatchableInstruction { vstack, context, nextIp ->
         val address = vstack.getFrameSlot(addressSlot)
         val packed = context.heap.getArrayElementTrusted(address, vstack.getFrameSlot(fieldSlot).toInt())
         vstack.setFrameSlot(destinationSlot, packed and mask)
@@ -59,7 +59,7 @@ internal fun PackedStructGetSignedDispatcher(instruction: AggregateSuperInstruct
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
     val fieldIndex = instruction.fieldIndex
-    return DispatchableInstruction { vstack, _, _, context, nextIp ->
+    return DispatchableInstruction { vstack, context, nextIp ->
         val reference = vstack.getFrameSlot(addressSlot)
         val packed = context.heap.getStructFieldTrusted(reference, fieldIndex)
         vstack.setFrameSlot(destinationSlot, (packed shl shift) shr shift)
@@ -72,7 +72,7 @@ internal fun PackedStructGetUnsignedDispatcher(instruction: AggregateSuperInstru
     val addressSlot = instruction.addressSlot
     val destinationSlot = instruction.destinationSlot
     val fieldIndex = instruction.fieldIndex
-    return DispatchableInstruction { vstack, _, _, context, nextIp ->
+    return DispatchableInstruction { vstack, context, nextIp ->
         val reference = vstack.getFrameSlot(addressSlot)
         val packed = context.heap.getStructFieldTrusted(reference, fieldIndex)
         vstack.setFrameSlot(destinationSlot, packed and mask)

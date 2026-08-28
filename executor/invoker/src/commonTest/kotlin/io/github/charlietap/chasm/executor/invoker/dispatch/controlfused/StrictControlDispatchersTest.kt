@@ -58,7 +58,7 @@ class StrictControlDispatchersTest {
         )
         val program = Program().apply {
             append(CallDispatcher(call, resultDestinationSlot = 0))
-            append(DispatchableInstruction { _, _, _, _, nextIp -> nextIp })
+            append(DispatchableInstruction { _, _, nextIp -> nextIp })
             append(FunctionReturnDispatcher(returnInstruction))
         }
         LinkWasmCallDispatchers(program, firstIp = 0)
@@ -67,9 +67,9 @@ class StrictControlDispatchersTest {
         val cstack = cstack()
         val context = executionContext(cstack, vstack, store)
 
-        val calleeEntryIp = program.instructions[0](vstack, cstack, store, context, 1)
+        val calleeEntryIp = program.instructions[0](vstack, context, 1)
         vstack.setFrameSlot(0, 42)
-        val continuationIp = program.instructions[calleeEntryIp](vstack, cstack, store, context, calleeEntryIp + 1)
+        val continuationIp = program.instructions[calleeEntryIp](vstack, context, calleeEntryIp + 1)
 
         assertEquals(1, continuationIp)
         assertEquals(0, vstack.fp)
@@ -129,7 +129,7 @@ class StrictControlDispatchersTest {
         )
         val program = Program().apply {
             append(CallDispatcher(call))
-            append(DispatchableInstruction { _, _, _, _, nextIp -> nextIp })
+            append(DispatchableInstruction { _, _, nextIp -> nextIp })
         }
 
         strategy.entryIp = 1
@@ -145,7 +145,7 @@ class StrictControlDispatchersTest {
         val cstack = cstack()
         val context = executionContext(cstack, vstack, store)
 
-        assertEquals(1, program.instructions[0](vstack, cstack, store, context, 1))
+        assertEquals(1, program.instructions[0](vstack, context, 1))
         assertEquals(2, vstack.fp)
         assertEquals(0, vstack.getFrameSlot(1))
     }
@@ -182,8 +182,6 @@ class StrictControlDispatchersTest {
 
         val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
             vstack,
-            cstack,
-            store,
             executionContext(cstack, vstack, store, module),
             11,
         )
@@ -232,8 +230,6 @@ class StrictControlDispatchersTest {
 
         val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
             vstack,
-            cstack,
-            store,
             executionContext(cstack, vstack, store, module),
             11,
         )
@@ -280,8 +276,6 @@ class StrictControlDispatchersTest {
 
         val nextIp = CallDispatcher(instruction, callSiteIp = 10, resultDestinationSlot = 0)(
             vstack,
-            cstack,
-            store,
             executionContext(cstack, vstack, store, module),
             11,
         )
@@ -325,19 +319,19 @@ class StrictControlDispatchersTest {
             ),
             activationHeaderSlot = 1,
         )
-        program.append(DispatchableInstruction { _, _, _, _, nextIp -> nextIp })
-        program.append(DispatchableInstruction { _, _, _, _, nextIp -> nextIp })
+        program.append(DispatchableInstruction { _, _, nextIp -> nextIp })
+        program.append(DispatchableInstruction { _, _, nextIp -> nextIp })
         program.append(CallDispatcher(call, resultDestinationSlot = 0))
-        program.append(DispatchableInstruction { _, _, _, _, nextIp -> nextIp })
+        program.append(DispatchableInstruction { _, _, nextIp -> nextIp })
         program.append(FunctionReturnDispatcher(returnInstruction))
         LinkWasmCallDispatchers(program, firstIp = 2)
         val vstack = vstack().apply { reserveDepth(4) }
         val cstack = cstack()
         val context = executionContext(cstack, vstack, store, module)
 
-        val calleeEntryIp = program.instructions[2](vstack, cstack, store, context, 3)
+        val calleeEntryIp = program.instructions[2](vstack, context, 3)
         vstack.setFrameSlot(0, 42)
-        val continuationIp = program.instructions[calleeEntryIp](vstack, cstack, store, context, calleeEntryIp + 1)
+        val continuationIp = program.instructions[calleeEntryIp](vstack, context, calleeEntryIp + 1)
 
         assertEquals(3, continuationIp)
         assertEquals(0, vstack.fp)
@@ -374,8 +368,6 @@ class StrictControlDispatchersTest {
 
         val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
             vstack,
-            cstack,
-            store,
             executionContext(cstack, vstack, store, module),
             11,
         )

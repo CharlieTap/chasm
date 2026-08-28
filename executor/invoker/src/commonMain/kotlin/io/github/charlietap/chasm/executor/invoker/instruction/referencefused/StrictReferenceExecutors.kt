@@ -6,15 +6,11 @@ import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
 import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
 internal inline fun RefEqExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefEqSs,
 ) = executeRefEq(
@@ -26,8 +22,6 @@ internal inline fun RefEqExecutor(
 
 internal inline fun RefIsNullExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefIsNullS,
 ) = executeRefIsNull(
@@ -38,8 +32,6 @@ internal inline fun RefIsNullExecutor(
 
 internal inline fun RefAsNonNullExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefAsNonNullS,
 ) {
@@ -52,8 +44,6 @@ internal inline fun RefAsNonNullExecutor(
 
 internal inline fun RefNullExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefNullS,
 ) {
@@ -62,8 +52,6 @@ internal inline fun RefNullExecutor(
 
 internal inline fun RefFuncExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefFuncS,
 ) {
@@ -72,14 +60,10 @@ internal inline fun RefFuncExecutor(
 
 internal fun RefTestExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefTestS,
 ) = RefTestExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     caster = ::Caster,
@@ -87,14 +71,12 @@ internal fun RefTestExecutor(
 
 internal inline fun RefTestExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefTestS,
     crossinline caster: Caster,
 ) = executeRefTest(
     vstack = vstack,
-    store = store,
+    context = context,
     referenceValue = vstack.getFrameSlot(instruction.referenceSlot),
     typeTest = instruction.typeTest,
     destinationSlot = instruction.destinationSlot,
@@ -103,14 +85,10 @@ internal inline fun RefTestExecutor(
 
 internal fun RefCastExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefCastS,
 ) = RefCastExecutor(
     vstack = vstack,
-    cstack = cstack,
-    store = store,
     context = context,
     instruction = instruction,
     caster = ::Caster,
@@ -118,14 +96,12 @@ internal fun RefCastExecutor(
 
 internal inline fun RefCastExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: ReferenceSuperInstruction.RefCastS,
     crossinline caster: Caster,
 ) = executeRefCast(
     vstack = vstack,
-    store = store,
+    context = context,
     referenceValue = vstack.getFrameSlot(instruction.referenceSlot),
     typeTest = instruction.typeTest,
     destinationSlot = instruction.destinationSlot,
@@ -160,13 +136,13 @@ private inline fun executeRefIsNull(
 
 private inline fun executeRefTest(
     vstack: ValueStack,
-    store: Store,
+    context: ExecutionContext,
     referenceValue: Long,
     typeTest: ReferenceTypeTest,
     destinationSlot: Int,
     crossinline caster: Caster,
 ) {
-    if (caster(referenceValue, typeTest, store)) {
+    if (caster(referenceValue, typeTest, context)) {
         vstack.setFrameSlot(destinationSlot, 1L)
     } else {
         vstack.setFrameSlot(destinationSlot, 0L)
@@ -175,13 +151,13 @@ private inline fun executeRefTest(
 
 private inline fun executeRefCast(
     vstack: ValueStack,
-    store: Store,
+    context: ExecutionContext,
     referenceValue: Long,
     typeTest: ReferenceTypeTest,
     destinationSlot: Int,
     crossinline caster: Caster,
 ) {
-    if (caster(referenceValue, typeTest, store)) {
+    if (caster(referenceValue, typeTest, context)) {
         vstack.setFrameSlot(destinationSlot, referenceValue)
     } else {
         throw InvocationException(InvocationError.FailedToCastReference)

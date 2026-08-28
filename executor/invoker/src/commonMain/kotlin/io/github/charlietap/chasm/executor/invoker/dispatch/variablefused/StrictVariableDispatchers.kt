@@ -6,12 +6,12 @@ import io.github.charlietap.chasm.executor.invoker.instruction.variablefused.Glo
 import io.github.charlietap.chasm.executor.invoker.instruction.variablefused.LocalSetExecutor
 import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
 
-fun GlobalGetDispatcher(instruction: VariableSuperInstruction.GlobalGetS) = dispatchInstruction(instruction, ::GlobalGetExecutor)
+fun GlobalGetDispatcher(instruction: VariableSuperInstruction.GlobalGetS) = dispatchInstruction { vstack, context -> GlobalGetExecutor(vstack, context, instruction) }
 
-fun GlobalSetDispatcher(instruction: VariableSuperInstruction.GlobalSetI) = dispatchInstruction(instruction, ::GlobalSetExecutor)
+fun GlobalSetDispatcher(instruction: VariableSuperInstruction.GlobalSetI) = dispatchInstruction { vstack, context -> GlobalSetExecutor(vstack, context, instruction) }
 
-fun GlobalSetDispatcher(instruction: VariableSuperInstruction.GlobalSetS) = dispatchInstruction(instruction, ::GlobalSetExecutor)
+fun GlobalSetDispatcher(instruction: VariableSuperInstruction.GlobalSetS) = dispatchInstruction { vstack, context -> GlobalSetExecutor(vstack, context, instruction) }
 
-fun LocalSetDispatcher(instruction: VariableSuperInstruction.LocalSetI) = dispatchInstruction(instruction, ::LocalSetExecutor)
+fun LocalSetDispatcher(instruction: VariableSuperInstruction.LocalSetI) = dispatchInstruction { vstack, context -> LocalSetExecutor(vstack, context, instruction) }
 
-fun LocalSetDispatcher(instruction: VariableSuperInstruction.LocalSetS) = dispatchInstruction(instruction, ::LocalSetExecutor)
+fun LocalSetDispatcher(instruction: VariableSuperInstruction.LocalSetS) = dispatchInstruction { vstack, context -> LocalSetExecutor(vstack, context, instruction) }

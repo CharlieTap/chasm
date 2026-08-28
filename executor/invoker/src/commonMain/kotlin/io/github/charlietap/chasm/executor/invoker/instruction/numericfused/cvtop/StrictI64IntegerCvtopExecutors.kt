@@ -2,14 +2,10 @@ package io.github.charlietap.chasm.executor.invoker.instruction.numericfused.cvt
 
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal inline fun I64ExtendI32SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64ExtendI32SI,
 ) {
@@ -18,8 +14,6 @@ internal inline fun I64ExtendI32SExecutor(
 
 internal inline fun I64ExtendI32SExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64ExtendI32SS,
 ) {
@@ -28,8 +22,6 @@ internal inline fun I64ExtendI32SExecutor(
 
 internal inline fun I64ExtendI32UExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64ExtendI32UI,
 ) {
@@ -38,8 +30,6 @@ internal inline fun I64ExtendI32UExecutor(
 
 internal inline fun I64ExtendI32UExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: NumericSuperInstruction.I64ExtendI32US,
 ) {

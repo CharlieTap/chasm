@@ -10,16 +10,16 @@ import io.github.charlietap.chasm.executor.invoker.instruction.referencefused.Re
 import io.github.charlietap.chasm.executor.invoker.instruction.referencefused.RefTestExecutor
 import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
 
-fun RefCastDispatcher(instruction: ReferenceSuperInstruction.RefCastS) = dispatchInstruction(instruction, ::RefCastExecutor)
+fun RefCastDispatcher(instruction: ReferenceSuperInstruction.RefCastS) = dispatchInstruction { vstack, context -> RefCastExecutor(vstack, context, instruction) }
 
-fun RefEqDispatcher(instruction: ReferenceSuperInstruction.RefEqSs) = dispatchInstruction(instruction, ::RefEqExecutor)
+fun RefEqDispatcher(instruction: ReferenceSuperInstruction.RefEqSs) = dispatchInstruction { vstack, context -> RefEqExecutor(vstack, context, instruction) }
 
-fun RefIsNullDispatcher(instruction: ReferenceSuperInstruction.RefIsNullS) = dispatchInstruction(instruction, ::RefIsNullExecutor)
+fun RefIsNullDispatcher(instruction: ReferenceSuperInstruction.RefIsNullS) = dispatchInstruction { vstack, context -> RefIsNullExecutor(vstack, context, instruction) }
 
-fun RefAsNonNullDispatcher(instruction: ReferenceSuperInstruction.RefAsNonNullS) = dispatchInstruction(instruction, ::RefAsNonNullExecutor)
+fun RefAsNonNullDispatcher(instruction: ReferenceSuperInstruction.RefAsNonNullS) = dispatchInstruction { vstack, context -> RefAsNonNullExecutor(vstack, context, instruction) }
 
-fun RefNullDispatcher(instruction: ReferenceSuperInstruction.RefNullS) = dispatchInstruction(instruction, ::RefNullExecutor)
+fun RefNullDispatcher(instruction: ReferenceSuperInstruction.RefNullS) = dispatchInstruction { vstack, context -> RefNullExecutor(vstack, context, instruction) }
 
-fun RefFuncDispatcher(instruction: ReferenceSuperInstruction.RefFuncS) = dispatchInstruction(instruction, ::RefFuncExecutor)
+fun RefFuncDispatcher(instruction: ReferenceSuperInstruction.RefFuncS) = dispatchInstruction { vstack, context -> RefFuncExecutor(vstack, context, instruction) }
 
-fun RefTestDispatcher(instruction: ReferenceSuperInstruction.RefTestS) = dispatchInstruction(instruction, ::RefTestExecutor)
+fun RefTestDispatcher(instruction: ReferenceSuperInstruction.RefTestS) = dispatchInstruction { vstack, context -> RefTestExecutor(vstack, context, instruction) }

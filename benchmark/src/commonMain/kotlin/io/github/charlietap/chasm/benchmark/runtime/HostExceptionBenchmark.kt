@@ -130,16 +130,16 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
             )
         } else {
             val throwInstruction = ThrowRefDispatcher(ControlSuperInstruction.ThrowRefS(exceptionSlot = 0))
-            DispatchableInstruction { vstack, cstack, store, context, nextIp ->
+            DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(0, exception.rawReference)
-                throwInstruction(vstack, cstack, store, context, nextIp)
+                throwInstruction(vstack, context, nextIp)
             }
         }
         val continuationIp = program.size + 2
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, cstack, _, _, nextIp ->
-                    cstack.push(
+                DispatchableInstruction { vstack, context, nextIp ->
+                    context.cstack.push(
                         ExceptionHandler(
                             handlers = listOf(catchAllHandler(labelIndex(0u))),
                             payloadDestinationSlots = listOf(IntArray(0)),
@@ -228,8 +228,8 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         val continuationIp = program.size + 2
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, cstack, _, _, nextIp ->
-                    cstack.push(
+                DispatchableInstruction { vstack, context, nextIp ->
+                    context.cstack.push(
                         ExceptionHandler(
                             handlers = listOf(catchAllRefHandler(labelIndex(0u))),
                             payloadDestinationSlots = listOf(intArrayOf(0)),
@@ -276,9 +276,9 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
             function = runtimeFunction(
                 body = runtimeExpression(
                     program.append(
-                        DispatchableInstruction { vstack, cstack, store, context, nextIp ->
+                        DispatchableInstruction { vstack, context, nextIp ->
                             vstack.setFrameSlot(0, exceptionReference)
-                            throwInstruction(vstack, cstack, store, context, nextIp)
+                            throwInstruction(vstack, context, nextIp)
                         },
                     ),
                 ),

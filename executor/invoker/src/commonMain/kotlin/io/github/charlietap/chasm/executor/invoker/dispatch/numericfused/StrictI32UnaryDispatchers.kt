@@ -8,22 +8,22 @@ import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.unop
 import io.github.charlietap.chasm.executor.invoker.instruction.numericfused.unop.I32PopcntExecutor
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 
-fun I32ClzDispatcher(instruction: NumericSuperInstruction.I32ClzI) = dispatchInstruction(instruction, ::I32ClzExecutor)
+fun I32ClzDispatcher(instruction: NumericSuperInstruction.I32ClzI) = dispatchInstruction { vstack, context -> I32ClzExecutor(vstack, context, instruction) }
 
-fun I32ClzDispatcher(instruction: NumericSuperInstruction.I32ClzS) = dispatchInstruction(instruction, ::I32ClzExecutor)
+fun I32ClzDispatcher(instruction: NumericSuperInstruction.I32ClzS) = dispatchInstruction { vstack, context -> I32ClzExecutor(vstack, context, instruction) }
 
-fun I32CtzDispatcher(instruction: NumericSuperInstruction.I32CtzI) = dispatchInstruction(instruction, ::I32CtzExecutor)
+fun I32CtzDispatcher(instruction: NumericSuperInstruction.I32CtzI) = dispatchInstruction { vstack, context -> I32CtzExecutor(vstack, context, instruction) }
 
-fun I32CtzDispatcher(instruction: NumericSuperInstruction.I32CtzS) = dispatchInstruction(instruction, ::I32CtzExecutor)
+fun I32CtzDispatcher(instruction: NumericSuperInstruction.I32CtzS) = dispatchInstruction { vstack, context -> I32CtzExecutor(vstack, context, instruction) }
 
-fun I32PopcntDispatcher(instruction: NumericSuperInstruction.I32PopcntI) = dispatchInstruction(instruction, ::I32PopcntExecutor)
+fun I32PopcntDispatcher(instruction: NumericSuperInstruction.I32PopcntI) = dispatchInstruction { vstack, context -> I32PopcntExecutor(vstack, context, instruction) }
 
-fun I32PopcntDispatcher(instruction: NumericSuperInstruction.I32PopcntS) = dispatchInstruction(instruction, ::I32PopcntExecutor)
+fun I32PopcntDispatcher(instruction: NumericSuperInstruction.I32PopcntS) = dispatchInstruction { vstack, context -> I32PopcntExecutor(vstack, context, instruction) }
 
-fun I32Extend8SDispatcher(instruction: NumericSuperInstruction.I32Extend8SI) = dispatchInstruction(instruction, ::I32Extend8SExecutor)
+fun I32Extend8SDispatcher(instruction: NumericSuperInstruction.I32Extend8SI) = dispatchInstruction { vstack, context -> I32Extend8SExecutor(vstack, context, instruction) }
 
-fun I32Extend8SDispatcher(instruction: NumericSuperInstruction.I32Extend8SS) = dispatchInstruction(instruction, ::I32Extend8SExecutor)
+fun I32Extend8SDispatcher(instruction: NumericSuperInstruction.I32Extend8SS) = dispatchInstruction { vstack, context -> I32Extend8SExecutor(vstack, context, instruction) }
 
-fun I32Extend16SDispatcher(instruction: NumericSuperInstruction.I32Extend16SI) = dispatchInstruction(instruction, ::I32Extend16SExecutor)
+fun I32Extend16SDispatcher(instruction: NumericSuperInstruction.I32Extend16SI) = dispatchInstruction { vstack, context -> I32Extend16SExecutor(vstack, context, instruction) }
 
-fun I32Extend16SDispatcher(instruction: NumericSuperInstruction.I32Extend16SS) = dispatchInstruction(instruction, ::I32Extend16SExecutor)
+fun I32Extend16SDispatcher(instruction: NumericSuperInstruction.I32Extend16SS) = dispatchInstruction { vstack, context -> I32Extend16SExecutor(vstack, context, instruction) }

@@ -15,160 +15,160 @@ import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 
 fun I32EqDispatcher(
     instruction: NumericSuperInstruction.I32EqIi,
-) = dispatchInstruction(instruction, ::I32EqExecutor)
+) = dispatchInstruction { vstack, context -> I32EqExecutor(vstack, context, instruction) }
 
 fun I32EqDispatcher(
     instruction: NumericSuperInstruction.I32EqIs,
-) = dispatchInstruction(instruction, ::I32EqExecutor)
+) = dispatchInstruction { vstack, context -> I32EqExecutor(vstack, context, instruction) }
 
 fun I32EqDispatcher(
     instruction: NumericSuperInstruction.I32EqSi,
-) = dispatchInstruction(instruction, ::I32EqExecutor)
+) = dispatchInstruction { vstack, context -> I32EqExecutor(vstack, context, instruction) }
 
 fun I32EqDispatcher(
     instruction: NumericSuperInstruction.I32EqSs,
-) = dispatchInstruction(instruction, ::I32EqExecutor)
+) = dispatchInstruction { vstack, context -> I32EqExecutor(vstack, context, instruction) }
 
 fun I32NeDispatcher(
     instruction: NumericSuperInstruction.I32NeIi,
-) = dispatchInstruction(instruction, ::I32NeExecutor)
+) = dispatchInstruction { vstack, context -> I32NeExecutor(vstack, context, instruction) }
 
 fun I32NeDispatcher(
     instruction: NumericSuperInstruction.I32NeIs,
-) = dispatchInstruction(instruction, ::I32NeExecutor)
+) = dispatchInstruction { vstack, context -> I32NeExecutor(vstack, context, instruction) }
 
 fun I32NeDispatcher(
     instruction: NumericSuperInstruction.I32NeSi,
-) = dispatchInstruction(instruction, ::I32NeExecutor)
+) = dispatchInstruction { vstack, context -> I32NeExecutor(vstack, context, instruction) }
 
 fun I32NeDispatcher(
     instruction: NumericSuperInstruction.I32NeSs,
-) = dispatchInstruction(instruction, ::I32NeExecutor)
+) = dispatchInstruction { vstack, context -> I32NeExecutor(vstack, context, instruction) }
 
 fun I32LtSDispatcher(
     instruction: NumericSuperInstruction.I32LtSIi,
-) = dispatchInstruction(instruction, ::I32LtSExecutor)
+) = dispatchInstruction { vstack, context -> I32LtSExecutor(vstack, context, instruction) }
 
 fun I32LtSDispatcher(
     instruction: NumericSuperInstruction.I32LtSIs,
-) = dispatchInstruction(instruction, ::I32LtSExecutor)
+) = dispatchInstruction { vstack, context -> I32LtSExecutor(vstack, context, instruction) }
 
 fun I32LtSDispatcher(
     instruction: NumericSuperInstruction.I32LtSSi,
-) = dispatchInstruction(instruction, ::I32LtSExecutor)
+) = dispatchInstruction { vstack, context -> I32LtSExecutor(vstack, context, instruction) }
 
 fun I32LtSDispatcher(
     instruction: NumericSuperInstruction.I32LtSSs,
-) = dispatchInstruction(instruction, ::I32LtSExecutor)
+) = dispatchInstruction { vstack, context -> I32LtSExecutor(vstack, context, instruction) }
 
 fun I32LtUDispatcher(
     instruction: NumericSuperInstruction.I32LtUIi,
-) = dispatchInstruction(instruction, ::I32LtUExecutor)
+) = dispatchInstruction { vstack, context -> I32LtUExecutor(vstack, context, instruction) }
 
 fun I32LtUDispatcher(
     instruction: NumericSuperInstruction.I32LtUIs,
-) = dispatchInstruction(instruction, ::I32LtUExecutor)
+) = dispatchInstruction { vstack, context -> I32LtUExecutor(vstack, context, instruction) }
 
 fun I32LtUDispatcher(
     instruction: NumericSuperInstruction.I32LtUSi,
-) = dispatchInstruction(instruction, ::I32LtUExecutor)
+) = dispatchInstruction { vstack, context -> I32LtUExecutor(vstack, context, instruction) }
 
 fun I32LtUDispatcher(
     instruction: NumericSuperInstruction.I32LtUSs,
-) = dispatchInstruction(instruction, ::I32LtUExecutor)
+) = dispatchInstruction { vstack, context -> I32LtUExecutor(vstack, context, instruction) }
 
 fun I32GtSDispatcher(
     instruction: NumericSuperInstruction.I32GtSIi,
-) = dispatchInstruction(instruction, ::I32GtSExecutor)
+) = dispatchInstruction { vstack, context -> I32GtSExecutor(vstack, context, instruction) }
 
 fun I32GtSDispatcher(
     instruction: NumericSuperInstruction.I32GtSIs,
-) = dispatchInstruction(instruction, ::I32GtSExecutor)
+) = dispatchInstruction { vstack, context -> I32GtSExecutor(vstack, context, instruction) }
 
 fun I32GtSDispatcher(
     instruction: NumericSuperInstruction.I32GtSSi,
-) = dispatchInstruction(instruction, ::I32GtSExecutor)
+) = dispatchInstruction { vstack, context -> I32GtSExecutor(vstack, context, instruction) }
 
 fun I32GtSDispatcher(
     instruction: NumericSuperInstruction.I32GtSSs,
-) = dispatchInstruction(instruction, ::I32GtSExecutor)
+) = dispatchInstruction { vstack, context -> I32GtSExecutor(vstack, context, instruction) }
 
 fun I32GtUDispatcher(
     instruction: NumericSuperInstruction.I32GtUIi,
-) = dispatchInstruction(instruction, ::I32GtUExecutor)
+) = dispatchInstruction { vstack, context -> I32GtUExecutor(vstack, context, instruction) }
 
 fun I32GtUDispatcher(
     instruction: NumericSuperInstruction.I32GtUIs,
-) = dispatchInstruction(instruction, ::I32GtUExecutor)
+) = dispatchInstruction { vstack, context -> I32GtUExecutor(vstack, context, instruction) }
 
 fun I32GtUDispatcher(
     instruction: NumericSuperInstruction.I32GtUSi,
-) = dispatchInstruction(instruction, ::I32GtUExecutor)
+) = dispatchInstruction { vstack, context -> I32GtUExecutor(vstack, context, instruction) }
 
 fun I32GtUDispatcher(
     instruction: NumericSuperInstruction.I32GtUSs,
-) = dispatchInstruction(instruction, ::I32GtUExecutor)
+) = dispatchInstruction { vstack, context -> I32GtUExecutor(vstack, context, instruction) }
 
 fun I32LeSDispatcher(
     instruction: NumericSuperInstruction.I32LeSIi,
-) = dispatchInstruction(instruction, ::I32LeSExecutor)
+) = dispatchInstruction { vstack, context -> I32LeSExecutor(vstack, context, instruction) }
 
 fun I32LeSDispatcher(
     instruction: NumericSuperInstruction.I32LeSIs,
-) = dispatchInstruction(instruction, ::I32LeSExecutor)
+) = dispatchInstruction { vstack, context -> I32LeSExecutor(vstack, context, instruction) }
 
 fun I32LeSDispatcher(
     instruction: NumericSuperInstruction.I32LeSSi,
-) = dispatchInstruction(instruction, ::I32LeSExecutor)
+) = dispatchInstruction { vstack, context -> I32LeSExecutor(vstack, context, instruction) }
 
 fun I32LeSDispatcher(
     instruction: NumericSuperInstruction.I32LeSSs,
-) = dispatchInstruction(instruction, ::I32LeSExecutor)
+) = dispatchInstruction { vstack, context -> I32LeSExecutor(vstack, context, instruction) }
 
 fun I32LeUDispatcher(
     instruction: NumericSuperInstruction.I32LeUIi,
-) = dispatchInstruction(instruction, ::I32LeUExecutor)
+) = dispatchInstruction { vstack, context -> I32LeUExecutor(vstack, context, instruction) }
 
 fun I32LeUDispatcher(
     instruction: NumericSuperInstruction.I32LeUIs,
-) = dispatchInstruction(instruction, ::I32LeUExecutor)
+) = dispatchInstruction { vstack, context -> I32LeUExecutor(vstack, context, instruction) }
 
 fun I32LeUDispatcher(
     instruction: NumericSuperInstruction.I32LeUSi,
-) = dispatchInstruction(instruction, ::I32LeUExecutor)
+) = dispatchInstruction { vstack, context -> I32LeUExecutor(vstack, context, instruction) }
 
 fun I32LeUDispatcher(
     instruction: NumericSuperInstruction.I32LeUSs,
-) = dispatchInstruction(instruction, ::I32LeUExecutor)
+) = dispatchInstruction { vstack, context -> I32LeUExecutor(vstack, context, instruction) }
 
 fun I32GeSDispatcher(
     instruction: NumericSuperInstruction.I32GeSIi,
-) = dispatchInstruction(instruction, ::I32GeSExecutor)
+) = dispatchInstruction { vstack, context -> I32GeSExecutor(vstack, context, instruction) }
 
 fun I32GeSDispatcher(
     instruction: NumericSuperInstruction.I32GeSIs,
-) = dispatchInstruction(instruction, ::I32GeSExecutor)
+) = dispatchInstruction { vstack, context -> I32GeSExecutor(vstack, context, instruction) }
 
 fun I32GeSDispatcher(
     instruction: NumericSuperInstruction.I32GeSSi,
-) = dispatchInstruction(instruction, ::I32GeSExecutor)
+) = dispatchInstruction { vstack, context -> I32GeSExecutor(vstack, context, instruction) }
 
 fun I32GeSDispatcher(
     instruction: NumericSuperInstruction.I32GeSSs,
-) = dispatchInstruction(instruction, ::I32GeSExecutor)
+) = dispatchInstruction { vstack, context -> I32GeSExecutor(vstack, context, instruction) }
 
 fun I32GeUDispatcher(
     instruction: NumericSuperInstruction.I32GeUIi,
-) = dispatchInstruction(instruction, ::I32GeUExecutor)
+) = dispatchInstruction { vstack, context -> I32GeUExecutor(vstack, context, instruction) }
 
 fun I32GeUDispatcher(
     instruction: NumericSuperInstruction.I32GeUIs,
-) = dispatchInstruction(instruction, ::I32GeUExecutor)
+) = dispatchInstruction { vstack, context -> I32GeUExecutor(vstack, context, instruction) }
 
 fun I32GeUDispatcher(
     instruction: NumericSuperInstruction.I32GeUSi,
-) = dispatchInstruction(instruction, ::I32GeUExecutor)
+) = dispatchInstruction { vstack, context -> I32GeUExecutor(vstack, context, instruction) }
 
 fun I32GeUDispatcher(
     instruction: NumericSuperInstruction.I32GeUSs,
-) = dispatchInstruction(instruction, ::I32GeUExecutor)
+) = dispatchInstruction { vstack, context -> I32GeUExecutor(vstack, context, instruction) }

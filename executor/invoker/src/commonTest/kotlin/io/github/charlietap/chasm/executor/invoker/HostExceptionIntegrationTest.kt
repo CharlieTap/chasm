@@ -69,7 +69,7 @@ class HostExceptionIntegrationTest {
         )
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, _, _, context, nextIp ->
+                DispatchableInstruction { vstack, context, nextIp ->
                     HostFunctionCall(
                         vstack = vstack,
                         context = context,
@@ -120,8 +120,8 @@ class HostExceptionIntegrationTest {
         val continuationIp = program.size + 1
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, cstack, _, context, _ ->
-                    cstack.push(
+                DispatchableInstruction { vstack, context, _ ->
+                    context.cstack.push(
                         ExceptionHandler(
                             handlers = listOf(catchAllRefHandler(labelIndex(0u))),
                             payloadDestinationSlots = listOf(intArrayOf(0)),
@@ -161,8 +161,8 @@ class HostExceptionIntegrationTest {
         function = runtimeFunction(
             body = runtimeExpression(
                 program.append(
-                    DispatchableInstruction { vstack, cstack, store, _, _ ->
-                        ThrowRefValueExecutor(vstack, cstack, store, exceptionReference)
+                    DispatchableInstruction { vstack, context, _ ->
+                        ThrowRefValueExecutor(vstack, context, exceptionReference)
                     },
                 ),
             ),

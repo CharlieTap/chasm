@@ -7,14 +7,10 @@ import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.instance.ElementInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.instruction.TableSuperInstruction
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
-import io.github.charlietap.chasm.runtime.store.Store
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableCopyIii,
 ) = executeTableCopy(
@@ -27,8 +23,6 @@ internal fun TableCopyExecutor(
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableCopyIis,
 ) = executeTableCopy(
@@ -41,8 +35,6 @@ internal fun TableCopyExecutor(
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableCopyIsi,
 ) = executeTableCopy(
@@ -55,8 +47,6 @@ internal fun TableCopyExecutor(
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableCopyIss,
 ) = executeTableCopy(
@@ -69,8 +59,6 @@ internal fun TableCopyExecutor(
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableCopySii,
 ) = executeTableCopy(
@@ -83,8 +71,6 @@ internal fun TableCopyExecutor(
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableCopySis,
 ) = executeTableCopy(
@@ -97,8 +83,6 @@ internal fun TableCopyExecutor(
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableCopySsi,
 ) = executeTableCopy(
@@ -111,8 +95,6 @@ internal fun TableCopyExecutor(
 
 internal fun TableCopyExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableCopySss,
 ) = executeTableCopy(
@@ -125,8 +107,6 @@ internal fun TableCopyExecutor(
 
 internal fun TableFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableFillIii,
 ) = executeTableFill(
@@ -138,8 +118,6 @@ internal fun TableFillExecutor(
 
 internal fun TableFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableFillIis,
 ) = executeTableFill(
@@ -151,8 +129,6 @@ internal fun TableFillExecutor(
 
 internal fun TableFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableFillIsi,
 ) = executeTableFill(
@@ -164,8 +140,6 @@ internal fun TableFillExecutor(
 
 internal fun TableFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableFillIss,
 ) = executeTableFill(
@@ -177,8 +151,6 @@ internal fun TableFillExecutor(
 
 internal fun TableFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableFillSii,
 ) = executeTableFill(
@@ -190,8 +162,6 @@ internal fun TableFillExecutor(
 
 internal fun TableFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableFillSis,
 ) = executeTableFill(
@@ -203,8 +173,6 @@ internal fun TableFillExecutor(
 
 internal fun TableFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableFillSsi,
 ) = executeTableFill(
@@ -216,8 +184,6 @@ internal fun TableFillExecutor(
 
 internal fun TableFillExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableFillSss,
 ) = executeTableFill(
@@ -229,8 +195,6 @@ internal fun TableFillExecutor(
 
 internal fun TableGrowExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableGrowIi,
 ) = executeTableGrow(
@@ -244,8 +208,6 @@ internal fun TableGrowExecutor(
 
 internal fun TableGrowExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableGrowIs,
 ) = executeTableGrow(
@@ -259,8 +221,6 @@ internal fun TableGrowExecutor(
 
 internal fun TableGrowExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableGrowSi,
 ) = executeTableGrow(
@@ -274,8 +234,6 @@ internal fun TableGrowExecutor(
 
 internal fun TableGrowExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableGrowSs,
 ) = executeTableGrow(
@@ -289,8 +247,6 @@ internal fun TableGrowExecutor(
 
 internal fun TableInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableInitIii,
 ) = executeTableInit(
@@ -303,8 +259,6 @@ internal fun TableInitExecutor(
 
 internal fun TableInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableInitIis,
 ) = executeTableInit(
@@ -317,8 +271,6 @@ internal fun TableInitExecutor(
 
 internal fun TableInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableInitIsi,
 ) = executeTableInit(
@@ -331,8 +283,6 @@ internal fun TableInitExecutor(
 
 internal fun TableInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableInitIss,
 ) = executeTableInit(
@@ -345,8 +295,6 @@ internal fun TableInitExecutor(
 
 internal fun TableInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableInitSii,
 ) = executeTableInit(
@@ -359,8 +307,6 @@ internal fun TableInitExecutor(
 
 internal fun TableInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableInitSis,
 ) = executeTableInit(
@@ -373,8 +319,6 @@ internal fun TableInitExecutor(
 
 internal fun TableInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableInitSsi,
 ) = executeTableInit(
@@ -387,8 +331,6 @@ internal fun TableInitExecutor(
 
 internal fun TableInitExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableInitSss,
 ) = executeTableInit(
@@ -401,8 +343,6 @@ internal fun TableInitExecutor(
 
 internal inline fun TableGetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableGetI,
 ) = executeTableGet(
@@ -414,8 +354,6 @@ internal inline fun TableGetExecutor(
 
 internal inline fun TableGetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableGetS,
 ) = executeTableGet(
@@ -427,8 +365,6 @@ internal inline fun TableGetExecutor(
 
 internal inline fun TableSetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableSetIi,
 ) = executeTableSet(
@@ -439,8 +375,6 @@ internal inline fun TableSetExecutor(
 
 internal inline fun TableSetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableSetIs,
 ) = executeTableSet(
@@ -451,8 +385,6 @@ internal inline fun TableSetExecutor(
 
 internal inline fun TableSetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableSetSi,
 ) = executeTableSet(
@@ -463,8 +395,6 @@ internal inline fun TableSetExecutor(
 
 internal inline fun TableSetExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableSetSs,
 ) = executeTableSet(
@@ -475,8 +405,6 @@ internal inline fun TableSetExecutor(
 
 internal inline fun TableSizeExecutor(
     vstack: ValueStack,
-    cstack: ControlStack,
-    store: Store,
     context: ExecutionContext,
     instruction: TableSuperInstruction.TableSizeS,
 ) {

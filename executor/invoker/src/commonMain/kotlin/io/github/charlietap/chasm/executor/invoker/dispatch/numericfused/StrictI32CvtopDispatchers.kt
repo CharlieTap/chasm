@@ -15,80 +15,82 @@ import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 
 fun I32ReinterpretF32Dispatcher(
     instruction: NumericSuperInstruction.I32ReinterpretF32I,
-) = dispatchInstruction(instruction, ::I32ReinterpretF32Executor)
+) = dispatchInstruction { vstack, context -> I32ReinterpretF32Executor(vstack, context, instruction) }
 
 fun I32ReinterpretF32Dispatcher(
     instruction: NumericSuperInstruction.I32ReinterpretF32S,
-) = dispatchInstruction(instruction, ::I32ReinterpretF32Executor)
+) = dispatchInstruction { vstack, context -> I32ReinterpretF32Executor(vstack, context, instruction) }
 
 fun I32TruncF32SDispatcher(
     instruction: NumericSuperInstruction.I32TruncF32SI,
-) = dispatchInstruction(instruction, ::I32TruncF32SExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncF32SExecutor(vstack, context, instruction) }
 
 fun I32TruncF32SDispatcher(
     instruction: NumericSuperInstruction.I32TruncF32SS,
-) = dispatchInstruction(instruction, ::I32TruncF32SExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncF32SExecutor(vstack, context, instruction) }
 
 fun I32TruncF32UDispatcher(
     instruction: NumericSuperInstruction.I32TruncF32UI,
-) = dispatchInstruction(instruction, ::I32TruncF32UExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncF32UExecutor(vstack, context, instruction) }
 
 fun I32TruncF32UDispatcher(
     instruction: NumericSuperInstruction.I32TruncF32US,
-) = dispatchInstruction(instruction, ::I32TruncF32UExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncF32UExecutor(vstack, context, instruction) }
 
 fun I32TruncF64SDispatcher(
     instruction: NumericSuperInstruction.I32TruncF64SI,
-) = dispatchInstruction(instruction, ::I32TruncF64SExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncF64SExecutor(vstack, context, instruction) }
 
 fun I32TruncF64SDispatcher(
     instruction: NumericSuperInstruction.I32TruncF64SS,
-) = dispatchInstruction(instruction, ::I32TruncF64SExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncF64SExecutor(vstack, context, instruction) }
 
 fun I32TruncF64UDispatcher(
     instruction: NumericSuperInstruction.I32TruncF64UI,
-) = dispatchInstruction(instruction, ::I32TruncF64UExecutor)
+) = dispatchInstruction { vstack, context ->
+    I32TruncF64UExecutor(vstack, context, instruction)
+}
 
 fun I32TruncF64UDispatcher(
     instruction: NumericSuperInstruction.I32TruncF64US,
-) = dispatchInstruction(instruction, ::I32TruncF64UExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncF64UExecutor(vstack, context, instruction) }
 
 fun I32TruncSatF32SDispatcher(
     instruction: NumericSuperInstruction.I32TruncSatF32SI,
-) = dispatchInstruction(instruction, ::I32TruncSatF32SExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncSatF32SExecutor(vstack, context, instruction) }
 
 fun I32TruncSatF32SDispatcher(
     instruction: NumericSuperInstruction.I32TruncSatF32SS,
-) = dispatchInstruction(instruction, ::I32TruncSatF32SExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncSatF32SExecutor(vstack, context, instruction) }
 
 fun I32TruncSatF32UDispatcher(
     instruction: NumericSuperInstruction.I32TruncSatF32UI,
-) = dispatchInstruction(instruction, ::I32TruncSatF32UExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncSatF32UExecutor(vstack, context, instruction) }
 
 fun I32TruncSatF32UDispatcher(
     instruction: NumericSuperInstruction.I32TruncSatF32US,
-) = dispatchInstruction(instruction, ::I32TruncSatF32UExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncSatF32UExecutor(vstack, context, instruction) }
 
 fun I32TruncSatF64SDispatcher(
     instruction: NumericSuperInstruction.I32TruncSatF64SI,
-) = dispatchInstruction(instruction, ::I32TruncSatF64SExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncSatF64SExecutor(vstack, context, instruction) }
 
 fun I32TruncSatF64SDispatcher(
     instruction: NumericSuperInstruction.I32TruncSatF64SS,
-) = dispatchInstruction(instruction, ::I32TruncSatF64SExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncSatF64SExecutor(vstack, context, instruction) }
 
 fun I32TruncSatF64UDispatcher(
     instruction: NumericSuperInstruction.I32TruncSatF64UI,
-) = dispatchInstruction(instruction, ::I32TruncSatF64UExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncSatF64UExecutor(vstack, context, instruction) }
 
 fun I32TruncSatF64UDispatcher(
     instruction: NumericSuperInstruction.I32TruncSatF64US,
-) = dispatchInstruction(instruction, ::I32TruncSatF64UExecutor)
+) = dispatchInstruction { vstack, context -> I32TruncSatF64UExecutor(vstack, context, instruction) }
 
 fun I32WrapI64Dispatcher(
     instruction: NumericSuperInstruction.I32WrapI64I,
-) = dispatchInstruction(instruction, ::I32WrapI64Executor)
+) = dispatchInstruction { vstack, context -> I32WrapI64Executor(vstack, context, instruction) }
 
 fun I32WrapI64Dispatcher(
     instruction: NumericSuperInstruction.I32WrapI64S,
-) = dispatchInstruction(instruction, ::I32WrapI64Executor)
+) = dispatchInstruction { vstack, context -> I32WrapI64Executor(vstack, context, instruction) }

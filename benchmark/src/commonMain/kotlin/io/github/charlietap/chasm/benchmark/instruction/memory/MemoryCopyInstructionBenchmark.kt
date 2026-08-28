@@ -83,7 +83,7 @@ class MemoryCopyInstructionBenchmark : StabilizedBenchmark() {
         context.vstack.pushI32(dstOffset)
         context.vstack.pushI32(srcOffset)
         context.vstack.pushI32(bytesToCopy)
-        val result = MemoryCopyExecutor(vstack, cstack, store, context, instruction)
+        val result = MemoryCopyExecutor(vstack, context, instruction)
         context.vstack.clear()
         blackhole.consume(result)
     }

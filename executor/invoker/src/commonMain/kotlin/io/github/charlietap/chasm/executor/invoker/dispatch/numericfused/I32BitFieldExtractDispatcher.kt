@@ -10,7 +10,7 @@ fun I32BitFieldExtractDispatcher(
     val shift = instruction.shift
     val mask = instruction.mask
     val destinationSlot = instruction.destinationSlot
-    return DispatchableInstruction { vstack, _, _, _, nextIp ->
+    return DispatchableInstruction { vstack, _, nextIp ->
         val value = (vstack.getFrameSlot(operandSlot).toInt() ushr shift) and mask
         vstack.setFrameSlot(destinationSlot, value.toLong())
         nextIp
