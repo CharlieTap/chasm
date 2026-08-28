@@ -14,6 +14,10 @@ import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.host.withGlobal
+import io.github.charlietap.chasm.host.withMemory
+import io.github.charlietap.chasm.host.withTable
+import io.github.charlietap.chasm.host.withTag
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -56,6 +60,13 @@ class ExecutionContextHostTest {
         assertSame(targetTable, table)
         assertSame(targetGlobal, global)
         assertEquals(HostTag(targetTagAddress.address), context.tag(caller, 0))
+
+        context(caller, context) {
+            withMemory(0) { assertSame(targetMemory, this) }
+            withTable(0) { assertSame(targetTable, this) }
+            withGlobal(0) { assertSame(targetGlobal, this) }
+            withTag(0) { assertEquals(targetTagAddress.address, rawAddress) }
+        }
 
         table.writeRaw(1, 31L)
         global.rawValue = 47L
