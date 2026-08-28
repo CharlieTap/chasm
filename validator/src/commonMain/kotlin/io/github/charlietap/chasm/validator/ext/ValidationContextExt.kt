@@ -17,7 +17,7 @@ import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
-import io.github.charlietap.chasm.type.expansion.LegacyBlockTypeExpander
+import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.validator.context.CoreTypeValidationContext
 import io.github.charlietap.chasm.validator.context.ModuleValidationContext
@@ -66,7 +66,7 @@ internal inline fun ModuleValidationContext.functionType(
 
 internal inline fun ModuleValidationContext.functionType(
     blockType: BlockType,
-    blockTypeExpander: LegacyBlockTypeExpander = ::LegacyBlockTypeExpander,
+    blockTypeExpander: BlockTypeExpander = ::BlockTypeExpander,
 ): Result<FunctionType, ModuleValidatorError> {
     return blockTypeExpander(types, blockType).toResultOr {
         FunctionValidatorError.UnknownType

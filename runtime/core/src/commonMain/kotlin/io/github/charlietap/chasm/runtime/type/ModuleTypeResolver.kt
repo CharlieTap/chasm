@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.type.GlobalType
 import io.github.charlietap.chasm.type.ReferenceType
 import io.github.charlietap.chasm.type.TableType
 import io.github.charlietap.chasm.type.TagType
-import io.github.charlietap.chasm.type.expansion.LegacyBlockTypeExpander
+import io.github.charlietap.chasm.type.expansion.BlockTypeExpander
 import io.github.charlietap.chasm.type.ext.functionType
 import io.github.charlietap.chasm.type.rolling.substitution.GlobalTypeSubstitutor
 import io.github.charlietap.chasm.type.rolling.substitution.ReferenceTypeSubstitutor
@@ -36,7 +36,7 @@ class ModuleTypeResolver(
     fun functionType(index: Index.FunctionIndex): DefinedType =
         definedType(functionTypeIndices[index.toInt()])
 
-    fun blockType(type: BlockType): FunctionType = LegacyBlockTypeExpander(module.definedTypes, type)
+    fun blockType(type: BlockType): FunctionType = BlockTypeExpander(module.definedTypes, type)
         ?: error("block type is not a function type: $type")
 
     fun resolve(type: TableType): TableType = TableTypeSubstitutor(type, substitution)

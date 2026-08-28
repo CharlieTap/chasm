@@ -6,9 +6,9 @@ import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ResultType
 import io.github.charlietap.chasm.type.ext.functionType
 
-typealias LegacyBlockTypeExpander = (List<DefinedType>, BlockType) -> FunctionType?
+typealias BlockTypeExpander = (List<DefinedType>, BlockType) -> FunctionType?
 
-inline fun LegacyBlockTypeExpander(
+inline fun BlockTypeExpander(
     definedTypes: List<DefinedType>,
     type: BlockType,
 ): FunctionType? {

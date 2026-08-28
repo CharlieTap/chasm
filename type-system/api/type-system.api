@@ -1549,7 +1549,7 @@ public final class io/github/charlietap/chasm/type/differ/ReferenceTypeDifferKt 
 }
 
 public final class io/github/charlietap/chasm/type/expansion/BlockTypeExpanderKt {
-	public static final fun LegacyBlockTypeExpander (Ljava/util/List;Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/FunctionType;
+	public static final fun BlockTypeExpander (Ljava/util/List;Lio/github/charlietap/chasm/type/BlockType;)Lio/github/charlietap/chasm/type/FunctionType;
 }
 
 public final class io/github/charlietap/chasm/type/expansion/DefinedTypeExpanderKt {
