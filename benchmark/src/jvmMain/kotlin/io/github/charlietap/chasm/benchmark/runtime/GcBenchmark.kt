@@ -1,8 +1,11 @@
-package comparison
+package io.github.charlietap.chasm.benchmark.runtime
 
+import io.github.charlietap.chasm.host.HostReferenceRoot
+import io.github.charlietap.chasm.runtime.encoder.ReferenceValueEncoder
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RTT
+import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FieldType
@@ -72,7 +75,7 @@ private fun registeredStruct(fields: Int): RegisteredStruct {
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 3, time = 300, timeUnit = TimeUnit.MILLISECONDS)
 @Measurement(iterations = 5, time = 300, timeUnit = TimeUnit.MILLISECONDS)
-open class NewGcComparisonBenchmark {
+open class GcBenchmark {
 
     @State(Scope.Thread)
     open class AllocationState {
@@ -202,6 +205,84 @@ open class NewGcComparisonBenchmark {
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     @Warmup(iterations = 3)
     @Measurement(iterations = 10)
+    @Benchmark
+    open fun collect(state: CollectionState): Long {
+        state.store.heap.collectGarbage(state.store, state.roots)
+        return state.store.heap.allocatedGuestBytes()
+    }
+}
+
+@BenchmarkMode(Mode.SingleShotTime)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Warmup(iterations = 3)
+@Measurement(iterations = 10)
+open class ManagedHeapRetainedRootCollectionBenchmark {
+
+    @State(Scope.Thread)
+    open class CollectionState {
+        @JvmField
+        @Param("10000", "100000")
+        final var objects = 10_000
+
+        @JvmField
+        @Param("0", "10", "100")
+        final var livePercent = 0
+
+        @JvmField
+        @Param("0", "256", "4096", "65536")
+        final var rootCount = 0
+
+        @JvmField
+        @Param("LIVE_EXTERN", "LIVE_REFERENCE", "RELEASED_EXTERN")
+        final var rootPopulation = "LIVE_EXTERN"
+
+        lateinit var store: Store
+        lateinit var roots: ValueStack
+
+        @Setup(Level.Invocation)
+        fun setup() {
+            val registered = registeredStruct(4)
+            store = registered.store
+            populateRetainedRoots()
+
+            val live = objects * livePercent / 100
+            roots = ValueStack(maxOf(32, live))
+            repeat(objects) { objectIndex ->
+                val payload = registered.payload
+                payload[0] = (objectIndex.toLong() shl 16) or 0x55L
+                val reference = store.heap.allocateStruct(registered.type, payload)
+                if (objectIndex < live) roots.push(reference)
+            }
+        }
+
+        private fun populateRetainedRoots() {
+            when (rootPopulation) {
+                "LIVE_EXTERN" -> repeat(rootCount) {
+                    store.heap.createRetainedExtern(store, it)
+                }
+                "LIVE_REFERENCE" -> repeat(rootCount) {
+                    store.heap.retain(ReferenceValueEncoder(ReferenceValue.I31((it + 1).toUInt())))
+                }
+                "RELEASED_EXTERN" -> {
+                    val retainedRoots = Array(rootCount) {
+                        store.heap.createRetainedExtern(store, it)
+                    }
+                    release(retainedRoots)
+                    store.heap.collectGarbage(store)
+                }
+                else -> error("Unexpected root population: $rootPopulation")
+            }
+        }
+
+        private fun release(retainedRoots: Array<HostReferenceRoot>) {
+            var index = 0
+            while (index < retainedRoots.size) {
+                store.heap.release(retainedRoots[index])
+                index++
+            }
+        }
+    }
+
     @Benchmark
     open fun collect(state: CollectionState): Long {
         state.store.heap.collectGarbage(state.store, state.roots)

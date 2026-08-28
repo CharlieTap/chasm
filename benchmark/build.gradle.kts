@@ -34,8 +34,11 @@ benchmark {
         register("hostException") {
             include(".*HostExceptionBenchmark.*")
         }
-        register("gcComparison") {
-            include(".*NewGcComparisonBenchmark.*")
+        register("managedHeapRetainedRootCollection") {
+            include(".*ManagedHeapRetainedRootCollectionBenchmark.*")
+        }
+        register("gc") {
+            include(".*GcBenchmark.*")
         }
     }
 
