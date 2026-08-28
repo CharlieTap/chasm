@@ -320,6 +320,24 @@ class WasmHeap internal constructor(
         return reference
     }
 
+    fun createRetainedExtern(
+        store: Store,
+        value: Any,
+    ): HostReferenceRoot {
+        try {
+            prepareRetainedExternAllocation(store)
+        } catch (failure: GuestHeapOutOfMemoryException) {
+            throw InvocationException(
+                InvocationError.GarbageCollectionFailed(
+                    failure.message ?: "collection exhausted host memory",
+                ),
+            )
+        }
+        val slot = allocateExternSlot(value)
+        val reference = HostExternReference(encodeExternHostSlot(slot))
+        return retain(reference.raw)
+    }
+
     override fun nullReference(): HostExternReference = HostExternReference(NULL_EXTERN_REFERENCE)
 
     override fun kind(reference: HostExternReference): HostExternKind {
@@ -1382,6 +1400,11 @@ class WasmHeap internal constructor(
     private fun prepareExternAllocation(resources: HostResources) {
         if (externFreeHead != NO_SLOT || externTop < nextAutomaticExternThreshold) return
         collectFromHost(resources as ExecutionContext)
+    }
+
+    private fun prepareRetainedExternAllocation(store: Store) {
+        if (externFreeHead != NO_SLOT || externTop < nextAutomaticExternThreshold) return
+        collectGarbage(store)
     }
 
     private fun hostFieldInfo(fieldType: FieldType): HostGcFieldInfo {

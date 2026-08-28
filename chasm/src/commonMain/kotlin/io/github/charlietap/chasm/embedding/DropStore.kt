@@ -20,6 +20,8 @@ internal fun dropStore(
     memoryDropper: MemoryInstanceDropper,
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
 
+    store.isDropped = true
+
     val store = store.store
 
     store.data.forEach { data ->

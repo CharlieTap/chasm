@@ -312,6 +312,10 @@ public final class io/github/charlietap/chasm/embedding/error/ChasmError$Validat
 	public final synthetic fun unbox-impl ()Ljava/lang/String;
 }
 
+public final class io/github/charlietap/chasm/embedding/extern/CreateExternRefKt {
+	public static final fun createExternRef (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;)Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+}
+
 public final class io/github/charlietap/chasm/embedding/extern/ExternRefKt {
 	public static final fun externRef (Lio/github/charlietap/chasm/embedding/shapes/Store;Ljava/lang/Object;)Lio/github/charlietap/chasm/runtime/value/ReferenceValue;
 }
@@ -510,6 +514,12 @@ public final class io/github/charlietap/chasm/embedding/shapes/ExportDefinition 
 	public final fun getType ()Lio/github/charlietap/chasm/runtime/type/ExternalType;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/charlietap/chasm/embedding/shapes/ExternRef : java/lang/AutoCloseable {
+	public final fun asValue ()Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
+	public fun close ()V
+	public final fun hostValue ()Lio/github/charlietap/chasm/embedding/shapes/ChasmResult;
 }
 
 public final class io/github/charlietap/chasm/embedding/shapes/Function : io/github/charlietap/chasm/embedding/shapes/Importable {
