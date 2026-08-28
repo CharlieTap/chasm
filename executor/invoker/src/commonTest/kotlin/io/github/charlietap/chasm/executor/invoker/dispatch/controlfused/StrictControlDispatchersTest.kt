@@ -21,6 +21,8 @@ import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.toLong
+import io.github.charlietap.chasm.runtime.function.LocalInitialization
+import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
 import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
@@ -115,6 +117,37 @@ class StrictControlDispatchersTest {
         )
         assertEquals(localInitialValues.size * 2, linkedSources.size)
         assertEquals(0, LinkWasmCallDispatchers(program, firstIp = 0))
+    }
+
+    @Test
+    fun `selects local initialization after the callee strategy is installed`() {
+        val strategy = WasmFunctionCallStrategy(interfaceSlotCount = 0)
+        val call = ControlSuperInstruction.WasmCall(
+            strategy = strategy,
+            operands = OperandTransfer(emptyArray(), destinationSlotBase = 2),
+            callFrameOffset = 2,
+        )
+        val program = Program().apply {
+            append(CallDispatcher(call))
+            append(DispatchableInstruction { _, _, _, _, nextIp -> nextIp })
+        }
+
+        strategy.entryIp = 1
+        strategy.frameSlots = 2
+        strategy.localInitialization = LocalInitialization.Zero1
+        LinkWasmCallDispatchers(program, firstIp = 0)
+
+        val store = store(program = program)
+        val vstack = vstack().apply {
+            reserveDepth(4)
+            setFrameSlot(3, 42)
+        }
+        val cstack = cstack()
+        val context = executionContext(cstack, vstack, store)
+
+        assertEquals(1, program.instructions[0](vstack, cstack, store, context, 1))
+        assertEquals(2, vstack.fp)
+        assertEquals(0, vstack.getFrameSlot(1))
     }
 
     @Test

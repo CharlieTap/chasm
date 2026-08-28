@@ -30,27 +30,18 @@ private const val CALLER_FRAME_DELTA_LIMIT = 1 shl 25
 fun CallDispatcher(
     instruction: ControlSuperInstruction.WasmCall,
     resultDestinationSlot: Int? = null,
-): DispatchableInstruction {
-    val strategy = instruction.strategy
-    val operands = instruction.operands
-    val callFrameOffset = instruction.callFrameOffset
-    return when (strategy.localInitialization) {
-        LocalInitialization.None -> wasmCallWithoutLocalsDispatcher(
-            instruction,
-            operands,
-            callFrameOffset,
-            resultDestinationSlot,
-        )
-        else -> UnlinkedWasmCallWithLocals(instruction, callFrameOffset, resultDestinationSlot)
-    }
-}
+): DispatchableInstruction = UnlinkedWasmCallByStrategy(
+    instruction,
+    instruction.callFrameOffset,
+    resultDestinationSlot,
+)
 
 private fun wasmCallWithoutLocalsDispatcher(
     instruction: ControlSuperInstruction.WasmCall,
     operands: OperandTransfer,
     callFrameOffset: Int,
     resultDestinationSlot: Int?,
-): DispatchableInstruction {
+): UnlinkedWasmCall {
     val sources = operands.sources
     val operand = sources.singleOrNull()
     val firstOperand = sources.getOrNull(0)
@@ -202,13 +193,21 @@ private class UnlinkedWasmCallWithOperands(
     }
 }
 
-private class UnlinkedWasmCallWithLocals(
+private class UnlinkedWasmCallByStrategy(
     instruction: ControlSuperInstruction.WasmCall,
     private val callFrameOffset: Int,
     resultDestinationSlot: Int?,
 ) : UnlinkedWasmCall(instruction, resultDestinationSlot) {
 
     override fun link(callSiteIp: Int): DispatchableInstruction {
+        if (strategy.localInitialization == LocalInitialization.None) {
+            return wasmCallWithoutLocalsDispatcher(
+                source,
+                source.operands,
+                callFrameOffset,
+                resultDestinationSlot,
+            ).link(callSiteIp)
+        }
         val (frameSlots, entryIp, activationHeaderSlot) = linkedTarget()
         return linkedWasmCallDispatcher(
             operands = source.operands,
