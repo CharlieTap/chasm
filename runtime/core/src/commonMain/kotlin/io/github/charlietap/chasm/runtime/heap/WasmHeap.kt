@@ -3,8 +3,12 @@ package io.github.charlietap.chasm.runtime.heap
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.gc.AllocationAvailability
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
+import io.github.charlietap.chasm.gc.GcHostReferenceMarker
 import io.github.charlietap.chasm.gc.GcRootSink
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
+import io.github.charlietap.chasm.host.HostExternKind
+import io.github.charlietap.chasm.host.HostExternReference
+import io.github.charlietap.chasm.host.HostExterns
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.HostGc
 import io.github.charlietap.chasm.host.HostGcFieldInfo
@@ -15,10 +19,14 @@ import io.github.charlietap.chasm.host.HostReferenceRoot
 import io.github.charlietap.chasm.host.HostReferences
 import io.github.charlietap.chasm.host.HostResources
 import io.github.charlietap.chasm.runtime.address.Address
+import io.github.charlietap.chasm.runtime.encoder.HEAP_TYPE_EXTERN
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXCEPTION
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_EXTERN
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_HOST
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_MASK
+import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_NULL
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
@@ -45,7 +53,7 @@ import io.github.charlietap.chasm.type.VectorType
 
 class WasmHeap internal constructor(
     private val garbageCollectedHeap: GarbageCollectedHeap,
-) : HostReferences, HostGc {
+) : HostReferences, HostGc, HostExterns, GcHostReferenceMarker {
     constructor() : this(GarbageCollectedHeap())
 
     private val runtimeTypes = RuntimeTypeRegistry()
@@ -66,6 +74,14 @@ class WasmHeap internal constructor(
     private var retainedRootNext = IntArray(0)
     private var retainedRootTop = 0
     private var retainedRootFreeHead = NO_SLOT
+
+    private var externValues = arrayOfNulls<Any>(0)
+    private var externAllocated = BooleanArray(0)
+    private var externMarks = BooleanArray(0)
+    private var externNext = IntArray(0)
+    private var externTop = 0
+    private var externFreeHead = NO_SLOT
+    private var nextAutomaticExternThreshold = MINIMUM_EXTERN_COLLECTION_THRESHOLD
 
     override val allocatedBytes: Long
         get() = allocatedGuestBytes()
@@ -283,6 +299,60 @@ class WasmHeap internal constructor(
             endScope(marker)
         }
         return rootScoped(result)
+    }
+
+    context(resources: HostResources)
+    override fun create(value: Any): HostExternReference {
+        prepareExternAllocation(resources)
+        val slot = allocateExternSlot(value)
+        val reference = HostExternReference(encodeExternHostSlot(slot))
+        rootScoped(reference.raw)
+        return reference
+    }
+
+    override fun nullReference(): HostExternReference = HostExternReference(NULL_EXTERN_REFERENCE)
+
+    override fun kind(reference: HostExternReference): HostExternKind {
+        if (reference.raw and RV_TYPE_MASK == RV_TYPE_NULL) return HostExternKind.NULL
+        val inner = reference.raw shr RV_SHIFT_BITS
+        return if (inner and RV_TYPE_MASK == RV_TYPE_HOST) {
+            HostExternKind.HOST_VALUE
+        } else {
+            HostExternKind.EXTERNALIZED_REFERENCE
+        }
+    }
+
+    override fun value(reference: HostExternReference): Any {
+        val inner = reference.raw shr RV_SHIFT_BITS
+        val slot = (inner shr RV_SHIFT_BITS).toInt()
+        return checkNotNull(externValues[slot])
+    }
+
+    override fun externalizedReference(reference: HostExternReference): HostReference =
+        reference.raw shr RV_SHIFT_BITS
+
+    override fun externalize(reference: HostReference): HostExternReference {
+        if (reference and RV_TYPE_MASK == RV_TYPE_NULL) return nullReference()
+        val result = HostExternReference((reference shl RV_SHIFT_BITS) or RV_TYPE_EXTERN)
+        rootScoped(result.raw)
+        return result
+    }
+
+    override fun markHostReference(rawReference: Long) {
+        val slot = (rawReference shr RV_SHIFT_BITS).toInt()
+        if (slot >= 0 && slot < externTop && externAllocated[slot]) {
+            externMarks[slot] = true
+        }
+    }
+
+    internal fun countLiveExterns(): Int {
+        var count = 0
+        var slot = 0
+        while (slot < externTop) {
+            if (externAllocated[slot]) count++
+            slot++
+        }
+        return count
     }
 
     fun registerTag(
@@ -854,6 +924,13 @@ class WasmHeap internal constructor(
         retainedRootNext = IntArray(0)
         retainedRootTop = 0
         retainedRootFreeHead = NO_SLOT
+        externValues = arrayOfNulls(0)
+        externAllocated = BooleanArray(0)
+        externMarks = BooleanArray(0)
+        externNext = IntArray(0)
+        externTop = 0
+        externFreeHead = NO_SLOT
+        nextAutomaticExternThreshold = MINIMUM_EXTERN_COLLECTION_THRESHOLD
     }
 
     fun shouldCollectGarbage(thresholdBytes: Long): Boolean {
@@ -1013,14 +1090,16 @@ class WasmHeap internal constructor(
         supplementalStack: ValueStack?,
         pendingSlotWords: Long,
     ) {
-        garbageCollectedHeap.beginCollection()
+        garbageCollectedHeap.beginCollection(this)
         try {
             supplementalStack?.visitGcRoots(garbageCollectedHeap)
             visitGcRoots(store, garbageCollectedHeap)
             garbageCollectedHeap.finishCollection()
+            updateAutomaticExternThreshold(sweepExterns())
             updateAutomaticGcThreshold(pendingSlotWords)
         } catch (failure: Throwable) {
             garbageCollectedHeap.abortCollection()
+            clearExternMarks()
             throw failure
         }
     }
@@ -1216,6 +1295,11 @@ class WasmHeap internal constructor(
         }
     }
 
+    private fun prepareExternAllocation(resources: HostResources) {
+        if (externFreeHead != NO_SLOT || externTop < nextAutomaticExternThreshold) return
+        collectFromHost(resources as ExecutionContext)
+    }
+
     private fun hostFieldInfo(fieldType: FieldType): HostGcFieldInfo {
         val storageKind = when (val storageType = fieldType.storageType) {
             is StorageType.Packed -> when (storageType.type) {
@@ -1261,6 +1345,68 @@ class WasmHeap internal constructor(
         retainedRootNext = retainedRootNext.copyOf(capacity)
     }
 
+    private fun allocateExternSlot(value: Any): Int {
+        val slot = if (externFreeHead == NO_SLOT) {
+            ensureExternCapacity(externTop + 1)
+            externTop++
+        } else {
+            externFreeHead.also { externFreeHead = externNext[it] }
+        }
+        externValues[slot] = value
+        externAllocated[slot] = true
+        externMarks[slot] = false
+        return slot
+    }
+
+    private fun ensureExternCapacity(requiredCapacity: Int) {
+        if (requiredCapacity <= externValues.size) return
+        val capacity = grownCapacity(externValues.size, requiredCapacity)
+        externValues = externValues.copyOf(capacity)
+        externAllocated = externAllocated.copyOf(capacity)
+        externMarks = externMarks.copyOf(capacity)
+        externNext = externNext.copyOf(capacity)
+    }
+
+    private fun sweepExterns(): Int {
+        var liveCount = 0
+        var slot = 0
+        while (slot < externTop) {
+            if (externAllocated[slot]) {
+                if (externMarks[slot]) {
+                    externMarks[slot] = false
+                    liveCount++
+                } else {
+                    externValues[slot] = null
+                    externAllocated[slot] = false
+                    externNext[slot] = externFreeHead
+                    externFreeHead = slot
+                }
+            }
+            slot++
+        }
+        return liveCount
+    }
+
+    private fun updateAutomaticExternThreshold(liveCount: Int) {
+        nextAutomaticExternThreshold = maxOf(
+            MINIMUM_EXTERN_COLLECTION_THRESHOLD,
+            liveCount * 2,
+        )
+    }
+
+    private fun clearExternMarks() {
+        var slot = 0
+        while (slot < externTop) {
+            externMarks[slot] = false
+            slot++
+        }
+    }
+
+    private fun encodeExternHostSlot(slot: Int): Long {
+        val hostReference = (slot.toLong() shl RV_SHIFT_BITS) or RV_TYPE_HOST
+        return (hostReference shl RV_SHIFT_BITS) or RV_TYPE_EXTERN
+    }
+
     private fun grownCapacity(currentCapacity: Int, requiredCapacity: Int): Int {
         var capacity = maxOf(MINIMUM_ROOT_REGISTRY_CAPACITY, currentCapacity)
         while (capacity < requiredCapacity) capacity = capacity shl 1
@@ -1279,7 +1425,10 @@ class WasmHeap internal constructor(
         if (value > Long.MAX_VALUE / 2L) Long.MAX_VALUE else value * 2L
 
     private companion object {
+        const val MINIMUM_EXTERN_COLLECTION_THRESHOLD = 64
         const val MINIMUM_ROOT_REGISTRY_CAPACITY = 4
         const val NO_SLOT = -1
+        val NULL_EXTERN_REFERENCE =
+            (HEAP_TYPE_EXTERN.toLong() shl RV_SHIFT_BITS) or RV_TYPE_NULL
     }
 }
