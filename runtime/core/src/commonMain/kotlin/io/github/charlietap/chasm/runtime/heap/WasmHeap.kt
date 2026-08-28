@@ -5,6 +5,9 @@ import io.github.charlietap.chasm.gc.AllocationAvailability
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcRootSink
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
+import io.github.charlietap.chasm.host.HostReference
+import io.github.charlietap.chasm.host.HostReferenceRoot
+import io.github.charlietap.chasm.host.HostReferences
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
@@ -31,7 +34,7 @@ import io.github.charlietap.chasm.type.ValueType
 
 class WasmHeap internal constructor(
     private val garbageCollectedHeap: GarbageCollectedHeap,
-) {
+) : HostReferences {
     constructor() : this(GarbageCollectedHeap())
 
     private val runtimeTypes = RuntimeTypeRegistry()
@@ -44,6 +47,50 @@ class WasmHeap internal constructor(
     private var exceptionDescriptorKeys = IntArray(0)
 
     private var nextAutomaticGcThresholdWords = 0L
+
+    private var scopedRoots = LongArray(0)
+    private var scopedRootTop = 0
+
+    private var retainedRoots = LongArray(0)
+    private var retainedRootNext = IntArray(0)
+    private var retainedRootTop = 0
+    private var retainedRootFreeHead = NO_SLOT
+
+    override fun beginScope(capacity: Int): Int {
+        val marker = scopedRootTop
+        if (capacity != 0) ensureScopedRootCapacity(scopedRootTop + capacity)
+        return marker
+    }
+
+    override fun rootScoped(reference: HostReference): HostReference {
+        ensureScopedRootCapacity(scopedRootTop + 1)
+        scopedRoots[scopedRootTop++] = reference
+        return reference
+    }
+
+    override fun endScope(marker: Int) {
+        scopedRootTop = marker
+    }
+
+    override fun retain(reference: HostReference): HostReferenceRoot {
+        val slot = if (retainedRootFreeHead == NO_SLOT) {
+            ensureRetainedRootCapacity(retainedRootTop + 1)
+            retainedRootTop++
+        } else {
+            retainedRootFreeHead.also { retainedRootFreeHead = retainedRootNext[it] }
+        }
+        retainedRoots[slot] = reference
+        return HostReferenceRoot(slot)
+    }
+
+    override fun reference(root: HostReferenceRoot): HostReference = retainedRoots[root.slot]
+
+    override fun release(root: HostReferenceRoot) {
+        val slot = root.slot
+        retainedRoots[slot] = 0L
+        retainedRootNext[slot] = retainedRootFreeHead
+        retainedRootFreeHead = slot
+    }
 
     fun registerTag(
         rtt: RTT,
@@ -579,6 +626,12 @@ class WasmHeap internal constructor(
 
     fun drop() {
         garbageCollectedHeap.drop()
+        scopedRoots = LongArray(0)
+        scopedRootTop = 0
+        retainedRoots = LongArray(0)
+        retainedRootNext = IntArray(0)
+        retainedRootTop = 0
+        retainedRootFreeHead = NO_SLOT
     }
 
     fun shouldCollectGarbage(thresholdBytes: Long): Boolean {
@@ -681,6 +734,19 @@ class WasmHeap internal constructor(
     }
 
     private fun visitGcRoots(store: Store, rootSink: GcRootSink) {
+        var rootIndex = 0
+        while (rootIndex < scopedRootTop) {
+            rootSink.markRoot(scopedRoots[rootIndex])
+            rootIndex++
+        }
+
+        rootIndex = 0
+        while (rootIndex < retainedRootTop) {
+            val reference = retainedRoots[rootIndex]
+            if (reference != 0L) rootSink.markRoot(reference)
+            rootIndex++
+        }
+
         var globalIndex = 0
         while (globalIndex < store.globals.size) {
             val global = store.globals[globalIndex]
@@ -920,6 +986,24 @@ class WasmHeap internal constructor(
         }
     }
 
+    private fun ensureScopedRootCapacity(requiredCapacity: Int) {
+        if (requiredCapacity <= scopedRoots.size) return
+        scopedRoots = scopedRoots.copyOf(grownCapacity(scopedRoots.size, requiredCapacity))
+    }
+
+    private fun ensureRetainedRootCapacity(requiredCapacity: Int) {
+        if (requiredCapacity <= retainedRoots.size) return
+        val capacity = grownCapacity(retainedRoots.size, requiredCapacity)
+        retainedRoots = retainedRoots.copyOf(capacity)
+        retainedRootNext = retainedRootNext.copyOf(capacity)
+    }
+
+    private fun grownCapacity(currentCapacity: Int, requiredCapacity: Int): Int {
+        var capacity = maxOf(MINIMUM_ROOT_REGISTRY_CAPACITY, currentCapacity)
+        while (capacity < requiredCapacity) capacity = capacity shl 1
+        return capacity
+    }
+
     private fun bytesToWordsCeiling(bytes: Long): Long =
         bytes / Long.SIZE_BYTES + if (bytes % Long.SIZE_BYTES == 0L) 0L else 1L
 
@@ -933,5 +1017,6 @@ class WasmHeap internal constructor(
 
     private companion object {
         const val MINIMUM_ROOT_REGISTRY_CAPACITY = 4
+        const val NO_SLOT = -1
     }
 }
