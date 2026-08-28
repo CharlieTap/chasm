@@ -14,6 +14,92 @@ public final class io/github/charlietap/chasm/host/HostFunctionException : java/
 	public final fun getReason ()Ljava/lang/String;
 }
 
+public abstract interface class io/github/charlietap/chasm/host/HostGc {
+	public abstract fun allocateArray-ZQKKFEA (Lio/github/charlietap/chasm/host/HostResources;I[JII)J
+	public static synthetic fun allocateArray-ZQKKFEA$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;I[JIIILjava/lang/Object;)J
+	public abstract fun allocateArray-jKMjgpE (Lio/github/charlietap/chasm/host/HostResources;IIJ)J
+	public abstract fun allocateStruct-jKMjgpE (Lio/github/charlietap/chasm/host/HostResources;I[JI)J
+	public static synthetic fun allocateStruct-jKMjgpE$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;I[JIILjava/lang/Object;)J
+	public abstract fun arrayElementInfo-hoROfXE (I)I
+	public abstract fun arrayLength (J)I
+	public abstract fun arrayType-QF3mtew (J)I
+	public abstract fun collect (Lio/github/charlietap/chasm/host/HostResources;)V
+	public abstract fun collect (Lio/github/charlietap/chasm/host/HostResources;[JII)V
+	public static synthetic fun collect$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;[JIIILjava/lang/Object;)V
+	public abstract fun copyArray (JIJII)V
+	public abstract fun fillArray (JIIJ)V
+	public abstract fun getAllocatedBytes ()J
+	public abstract fun isSubtype-hm7B2HE (II)Z
+	public abstract fun readArrayElement (JI)J
+	public abstract fun readArrayElements (JI[JII)[J
+	public abstract fun readStructField (JI)J
+	public abstract fun runtimeType-y4m60lM (Lio/github/charlietap/chasm/host/HostModuleInstance;I)I
+	public abstract fun structFieldCount-wsPCB8A (I)I
+	public abstract fun structFieldInfo-JSNsNYI (II)I
+	public abstract fun structType-QF3mtew (J)I
+	public abstract fun writeArrayElement (JIJ)V
+	public abstract fun writeArrayElements (JI[JII)V
+	public abstract fun writeStructField (JIJ)V
+}
+
+public final class io/github/charlietap/chasm/host/HostGc$DefaultImpls {
+	public static synthetic fun allocateArray-ZQKKFEA$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;I[JIIILjava/lang/Object;)J
+	public static synthetic fun allocateStruct-jKMjgpE$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;I[JIILjava/lang/Object;)J
+	public static synthetic fun collect$default (Lio/github/charlietap/chasm/host/HostGc;Lio/github/charlietap/chasm/host/HostResources;[JIIILjava/lang/Object;)V
+}
+
+public final class io/github/charlietap/chasm/host/HostGcFieldInfo {
+	public static final field Companion Lio/github/charlietap/chasm/host/HostGcFieldInfo$Companion;
+	public static final field F32 I
+	public static final field F64 I
+	public static final field I32 I
+	public static final field I64 I
+	public static final field MUTABLE_MASK I
+	public static final field PACKED_I16 I
+	public static final field PACKED_I8 I
+	public static final field REFERENCE I
+	public static final field STORAGE_KIND_MASK I
+	public static final field V128 I
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostGcFieldInfo;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getEncoding ()I
+	public static final fun getMutable-impl (I)Z
+	public static final fun getStorageKind-impl (I)I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public static final fun isF32-impl (I)Z
+	public static final fun isF64-impl (I)Z
+	public static final fun isI32-impl (I)Z
+	public static final fun isI64-impl (I)Z
+	public static final fun isPackedI16-impl (I)Z
+	public static final fun isPackedI8-impl (I)Z
+	public static final fun isReference-impl (I)Z
+	public static final fun isV128-impl (I)Z
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/charlietap/chasm/host/HostGcFieldInfo$Companion {
+}
+
+public final class io/github/charlietap/chasm/host/HostGcType {
+	public static final synthetic fun box-impl (I)Lio/github/charlietap/chasm/host/HostGcType;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getId ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
 public abstract interface class io/github/charlietap/chasm/host/HostGlobal {
 	public abstract fun getRawValue ()J
 	public abstract fun setRawValue (J)V

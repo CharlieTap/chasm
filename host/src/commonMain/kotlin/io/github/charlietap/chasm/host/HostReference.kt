@@ -28,6 +28,15 @@ import kotlin.jvm.JvmInline
 typealias HostReference = Long
 
 /**
+ * Identifies a Wasm GC type within one Chasm store.
+ *
+ * Obtain one through [HostGc.runtimeType], [HostGc.structType], or
+ * [HostGc.arrayType]. It is not valid with another store.
+ */
+@JvmInline
+value class HostGcType(val id: Int)
+
+/**
  * An opaque handle which keeps a Chasm reference alive until it is released
  * through the [HostReferences] that created it. Use [HostReferences.reference]
  * to retrieve the raw reference.
@@ -36,3 +45,55 @@ typealias HostReference = Long
  */
 @JvmInline
 value class HostReferenceRoot(val slot: Int)
+
+/**
+ * Describes the storage type and mutability of a struct field or array
+ * element. Use the type properties to interpret its raw value.
+ */
+@JvmInline
+value class HostGcFieldInfo(val encoding: Int) {
+
+    val storageKind: Int
+        get() = encoding and STORAGE_KIND_MASK
+
+    val mutable: Boolean
+        get() = encoding and MUTABLE_MASK != 0
+
+    val isPackedI8: Boolean
+        get() = storageKind == PACKED_I8
+
+    val isPackedI16: Boolean
+        get() = storageKind == PACKED_I16
+
+    val isI32: Boolean
+        get() = storageKind == I32
+
+    val isI64: Boolean
+        get() = storageKind == I64
+
+    val isF32: Boolean
+        get() = storageKind == F32
+
+    val isF64: Boolean
+        get() = storageKind == F64
+
+    val isReference: Boolean
+        get() = storageKind == REFERENCE
+
+    val isV128: Boolean
+        get() = storageKind == V128
+
+    companion object {
+        const val PACKED_I8 = 0
+        const val PACKED_I16 = 1
+        const val I32 = 2
+        const val I64 = 3
+        const val F32 = 4
+        const val F64 = 5
+        const val REFERENCE = 6
+        const val V128 = 7
+
+        const val MUTABLE_MASK = 1 shl 3
+        const val STORAGE_KIND_MASK = MUTABLE_MASK - 1
+    }
+}
