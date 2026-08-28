@@ -8,7 +8,6 @@ import io.github.charlietap.chasm.runtime.instruction.ControlSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
-import io.github.charlietap.chasm.runtime.instruction.MemorySuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
@@ -26,8 +25,8 @@ class CompilerInstructionTagTranslator {
         is VariableSuperInstruction -> variable(instruction)
         is ParametricSuperInstruction -> variant(instruction, "parametric", parametricOperations)
         is NumericSuperInstruction -> variant(instruction, "numeric", numericOperations)
-        is MemorySuperInstruction -> variant(instruction, "memory", memoryOperations)
         is MemoryInstruction.DataDrop -> "memory.data_drop"
+        is MemoryInstruction -> variant(instruction, "memory", memoryOperations)
         is TableSuperInstruction -> variant(instruction, "table", tableOperations)
         is TableInstruction.ElemDrop -> "table.elem_drop"
         is ReferenceSuperInstruction -> reference(instruction)
@@ -40,7 +39,8 @@ class CompilerInstructionTagTranslator {
             variant(instructionClass.simpleName, "parametric", parametricOperations)
         NumericSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "numeric", numericOperations)
-        MemorySuperInstruction::class.java.isAssignableFrom(instructionClass) ->
+        instructionClass == MemoryInstruction.DataDrop::class.java -> "memory.data_drop"
+        MemoryInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "memory", memoryOperations)
         TableSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "table", tableOperations)

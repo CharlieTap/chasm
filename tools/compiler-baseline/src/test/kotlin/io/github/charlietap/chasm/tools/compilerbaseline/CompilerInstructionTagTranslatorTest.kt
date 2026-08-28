@@ -3,7 +3,7 @@ package io.github.charlietap.chasm.tools.compilerbaseline
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.AggregateSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
-import io.github.charlietap.chasm.runtime.instruction.MemorySuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
@@ -72,7 +72,7 @@ class CompilerInstructionTagTranslatorTest {
 private val variantFamilies = listOf(
     ParametricSuperInstruction::class.java,
     NumericSuperInstruction::class.java,
-    MemorySuperInstruction::class.java,
+    MemoryInstruction::class.java,
     TableSuperInstruction::class.java,
     AggregateSuperInstruction::class.java,
 )

@@ -1,4 +1,4 @@
-package io.github.charlietap.chasm.executor.invoker.dispatch.memoryfused
+package io.github.charlietap.chasm.executor.invoker.dispatch.memory
 
 import io.github.charlietap.chasm.memory.OptimisticBoundsChecker
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
