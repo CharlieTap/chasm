@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.gc.AllocationAvailability
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcRootSink
-import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryError
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
@@ -761,7 +761,7 @@ class WasmHeap internal constructor(
                 supplementalStack = valueStack,
                 pendingSlotWords = pendingSlotWords.toLong(),
             )
-        } catch (failure: GuestHeapOutOfMemoryError) {
+        } catch (failure: GuestHeapOutOfMemoryException) {
             throw InvocationException(
                 InvocationError.GarbageCollectionFailed(
                     failure.message ?: "automatic collection exhausted host memory",

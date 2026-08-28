@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.ast.instruction.VectorInstruction
 import io.github.charlietap.chasm.ast.module.toInt
 import io.github.charlietap.chasm.executor.instantiator.ext.functionAddress
 import io.github.charlietap.chasm.executor.instantiator.ext.globalAddress
-import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryError
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.HeapTypeEncoder
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
@@ -54,7 +54,7 @@ fun ConstantExpressionEvaluator(
             expression = expression,
             stack = ValueStack(),
         )
-    } catch (_: GuestHeapOutOfMemoryError) {
+    } catch (_: GuestHeapOutOfMemoryException) {
         Err(InvocationError.GuestHeapOutOfMemory)
     }
 }

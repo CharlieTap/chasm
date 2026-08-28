@@ -164,7 +164,7 @@ class StructAllocationTest {
         val reference = heap.allocateStruct(descriptorKey, LongArray(2048) { it.toLong() })
         val before = heap.snapshotStatistics()
 
-        assertFailsWith<GuestHeapOutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryException> {
             heap.allocateStruct(descriptorKey, LongArray(2048))
         }
 

@@ -177,7 +177,7 @@ class MarkingTest {
         val reference = heap.allocateStruct(descriptor, longArrayOf())
 
         heap.beginMarkingForTesting()
-        assertFailsWith<GuestHeapOutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryException> {
             heap.markRootForTesting(reference, maximumWorklistCapacity = 0)
         }
         heap.abortMarkingForTesting()
@@ -239,7 +239,7 @@ class MarkingTest {
 
         heap.beginMarkingForTesting()
         heap.markRootForTesting(root, maximumWorklistCapacity = 4)
-        assertFailsWith<GuestHeapOutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryException> {
             heap.drainMarkWorklistForTesting(maximumWorklistCapacity = 4)
         }
 

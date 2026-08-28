@@ -70,9 +70,9 @@ enum class AllocationAvailability {
     EXHAUSTED,
 }
 
-class GuestHeapOutOfMemoryError(
+class GuestHeapOutOfMemoryException(
     message: String,
-) : Error(message)
+) : Exception(message)
 
 interface GcRootSink {
     fun markRoot(rawValue: Long)
@@ -1039,7 +1039,7 @@ class GarbageCollectedHeap(
     ) {
         if (requiredCapacity <= markWorklist.size) return
         if (requiredCapacity < 0 || requiredCapacity > maximumCapacity) {
-            throw GuestHeapOutOfMemoryError("mark worklist capacity exhausted")
+            throw GuestHeapOutOfMemoryException("mark worklist capacity exhausted")
         }
         markWorklist = markWorklist.copyOf(
             grownPrimitiveCapacity(markWorklist.size, requiredCapacity, maximumCapacity),
@@ -1462,7 +1462,7 @@ class GarbageCollectedHeap(
         slotWords: Int,
     ): Int {
         if (recycledPageCount == 0 && pageIdTop > maximumPageCount) {
-            throw GuestHeapOutOfMemoryError("maximum ordinary page count exhausted")
+            throw GuestHeapOutOfMemoryException("maximum ordinary page count exhausted")
         }
         val preparedActivePageIds = activePageIdsWithCapacity(activePageCount + 1)
         if (recycledPageCount > 0) {
@@ -1550,7 +1550,7 @@ class GarbageCollectedHeap(
     private fun requireDedicatedCapacity(requestedWords: Int) {
         val retainedWordLimit = maximumPageCount.toLong() * PAGE_WORDS
         if (payloadWords.size + dedicatedPayloadWords + requestedWords > retainedWordLimit) {
-            throw GuestHeapOutOfMemoryError("retained guest payload capacity exhausted")
+            throw GuestHeapOutOfMemoryException("retained guest payload capacity exhausted")
         }
     }
 
@@ -1564,7 +1564,7 @@ class GarbageCollectedHeap(
             dedicatedIds[dedicatedActiveCount] = dedicatedId
         } else {
             if (dedicatedIdTop > DEDICATED_ID_MASK) {
-                throw GuestHeapOutOfMemoryError("maximum dedicated array ID exhausted")
+                throw GuestHeapOutOfMemoryException("maximum dedicated array ID exhausted")
             }
             dedicatedId = dedicatedIdTop
             val preparedPayloads = dedicatedPayloadDirectoryWithCapacity(dedicatedId + 1)
@@ -1863,7 +1863,7 @@ class GarbageCollectedHeap(
             val doubled = capacity.toLong() shl 1
             capacity = minOf(maximumCapacity.toLong(), doubled).toInt()
             if (capacity < requiredCapacity && capacity == maximumCapacity) {
-                throw GuestHeapOutOfMemoryError("heap metadata capacity exhausted")
+                throw GuestHeapOutOfMemoryException("heap metadata capacity exhausted")
             }
         }
         return capacity
@@ -1895,7 +1895,7 @@ class GarbageCollectedHeap(
             "descriptorKey does not identify a registered fixed descriptor"
         }
         if (recycledPageCount == 0 && pageIdTop > maximumPageCount) {
-            throw GuestHeapOutOfMemoryError("maximum logical page count exhausted")
+            throw GuestHeapOutOfMemoryException("maximum logical page count exhausted")
         }
         val preparedActivePageIds = activePageIdsWithCapacity(activePageCount + 1)
 
@@ -1945,14 +1945,14 @@ class GarbageCollectedHeap(
         val retainedWordLimit = maximumPageCount.toLong() * PAGE_WORDS
         val maximumWords = retainedWordLimit - dedicatedPayloadWords
         if (requiredWords > maximumWords) {
-            throw GuestHeapOutOfMemoryError("retained guest payload capacity exhausted")
+            throw GuestHeapOutOfMemoryException("retained guest payload capacity exhausted")
         }
         val maximumArenaPages = maximumWords / PAGE_WORDS
         var capacityPages = maxOf(1L, payloadWords.size.toLong() ushr PAGE_SHIFT)
         while (capacityPages * PAGE_WORDS < requiredWords) {
             capacityPages = minOf(maximumArenaPages, capacityPages shl 1)
             if (capacityPages * PAGE_WORDS < requiredWords && capacityPages == maximumArenaPages) {
-                throw GuestHeapOutOfMemoryError("ordinary payload capacity exhausted")
+                throw GuestHeapOutOfMemoryException("ordinary payload capacity exhausted")
             }
         }
         val capacityWords = capacityPages * PAGE_WORDS
@@ -1982,7 +1982,7 @@ class GarbageCollectedHeap(
     ) {
         if (requiredCapacity <= recycledPageIds.size) return
         if (requiredCapacity > maximumCapacity) {
-            throw GuestHeapOutOfMemoryError("recycled page capacity exhausted")
+            throw GuestHeapOutOfMemoryException("recycled page capacity exhausted")
         }
         recycledPageIds = recycledPageIds.copyOf(
             grownPrimitiveCapacity(recycledPageIds.size, requiredCapacity, maximumCapacity),

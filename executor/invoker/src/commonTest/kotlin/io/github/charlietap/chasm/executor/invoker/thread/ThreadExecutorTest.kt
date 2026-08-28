@@ -21,7 +21,7 @@ import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.structCompositeType
-import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryError
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
@@ -39,7 +39,7 @@ class ThreadExecutorTest {
         val entryIp = program.append(
             arrayOf(
                 DispatchableInstruction { _, _, _, _, _ ->
-                    throw GuestHeapOutOfMemoryError("injected configured capacity exhaustion")
+                    throw GuestHeapOutOfMemoryException("injected configured capacity exhaustion")
                 },
             ),
         )

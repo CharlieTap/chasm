@@ -187,7 +187,7 @@ class CollectionTest {
 
         heap.beginCollection()
         heap.markRoot(first)
-        assertFailsWith<GuestHeapOutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryException> {
             heap.finishCollectionForTesting(maximumRecycledPageCapacity = 1)
         }
         assertTrue(heap.isAllocatedReferenceForTesting(first))

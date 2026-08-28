@@ -6,7 +6,7 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
-import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryError
+import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -96,7 +96,7 @@ internal inline fun ThreadExecutor(
         }
     } catch (exception: InvocationException) {
         Err(exception.error).bind()
-    } catch (_: GuestHeapOutOfMemoryError) {
+    } catch (_: GuestHeapOutOfMemoryException) {
         Err(InvocationError.GuestHeapOutOfMemory).bind()
     }
 

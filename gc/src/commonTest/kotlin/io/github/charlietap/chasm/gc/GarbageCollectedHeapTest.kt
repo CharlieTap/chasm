@@ -372,7 +372,7 @@ class GarbageCollectedHeapTest {
         val descriptorKey = heap.registerException(0, 0, intArrayOf())
         heap.commitFixedPageForTesting(descriptorKey)
 
-        assertFailsWith<GuestHeapOutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryException> {
             heap.commitFixedPageForTesting(descriptorKey)
         }
 
@@ -397,7 +397,7 @@ class GarbageCollectedHeapTest {
         val before = heap.snapshotStatistics()
         assertEquals(6_144L, before.committedWords)
 
-        assertFailsWith<GuestHeapOutOfMemoryError> {
+        assertFailsWith<GuestHeapOutOfMemoryException> {
             heap.commitFixedPageForTesting(descriptorKey)
         }
 
