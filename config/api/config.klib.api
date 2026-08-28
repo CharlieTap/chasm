@@ -147,10 +147,8 @@ final class io.github.charlietap.chasm.config/ModuleConfig { // io.github.charli
 }
 
 final class io.github.charlietap.chasm.config/RuntimeConfig { // io.github.charlietap.chasm.config/RuntimeConfig|null[0]
-    constructor <init>(kotlin/Boolean = ..., kotlin/Boolean = ..., io.github.charlietap.chasm.config/GCStrategy = ..., io.github.charlietap.chasm.config/GCThreshold = ...) // io.github.charlietap.chasm.config/RuntimeConfig.<init>|<init>(kotlin.Boolean;kotlin.Boolean;io.github.charlietap.chasm.config.GCStrategy;io.github.charlietap.chasm.config.GCThreshold){}[0]
+    constructor <init>(kotlin/Boolean = ..., io.github.charlietap.chasm.config/GCStrategy = ..., io.github.charlietap.chasm.config/GCThreshold = ...) // io.github.charlietap.chasm.config/RuntimeConfig.<init>|<init>(kotlin.Boolean;io.github.charlietap.chasm.config.GCStrategy;io.github.charlietap.chasm.config.GCThreshold){}[0]
 
-    final val bytecodeFusion // io.github.charlietap.chasm.config/RuntimeConfig.bytecodeFusion|{}bytecodeFusion[0]
-        final fun <get-bytecodeFusion>(): kotlin/Boolean // io.github.charlietap.chasm.config/RuntimeConfig.bytecodeFusion.<get-bytecodeFusion>|<get-bytecodeFusion>(){}[0]
     final val debugInfo // io.github.charlietap.chasm.config/RuntimeConfig.debugInfo|{}debugInfo[0]
         final fun <get-debugInfo>(): kotlin/Boolean // io.github.charlietap.chasm.config/RuntimeConfig.debugInfo.<get-debugInfo>|<get-debugInfo>(){}[0]
     final val gcStrategy // io.github.charlietap.chasm.config/RuntimeConfig.gcStrategy|{}gcStrategy[0]
@@ -159,10 +157,9 @@ final class io.github.charlietap.chasm.config/RuntimeConfig { // io.github.charl
         final fun <get-gcThreshold>(): io.github.charlietap.chasm.config/GCThreshold // io.github.charlietap.chasm.config/RuntimeConfig.gcThreshold.<get-gcThreshold>|<get-gcThreshold>(){}[0]
 
     final fun component1(): kotlin/Boolean // io.github.charlietap.chasm.config/RuntimeConfig.component1|component1(){}[0]
-    final fun component2(): kotlin/Boolean // io.github.charlietap.chasm.config/RuntimeConfig.component2|component2(){}[0]
-    final fun component3(): io.github.charlietap.chasm.config/GCStrategy // io.github.charlietap.chasm.config/RuntimeConfig.component3|component3(){}[0]
-    final fun component4(): io.github.charlietap.chasm.config/GCThreshold // io.github.charlietap.chasm.config/RuntimeConfig.component4|component4(){}[0]
-    final fun copy(kotlin/Boolean = ..., kotlin/Boolean = ..., io.github.charlietap.chasm.config/GCStrategy = ..., io.github.charlietap.chasm.config/GCThreshold = ...): io.github.charlietap.chasm.config/RuntimeConfig // io.github.charlietap.chasm.config/RuntimeConfig.copy|copy(kotlin.Boolean;kotlin.Boolean;io.github.charlietap.chasm.config.GCStrategy;io.github.charlietap.chasm.config.GCThreshold){}[0]
+    final fun component2(): io.github.charlietap.chasm.config/GCStrategy // io.github.charlietap.chasm.config/RuntimeConfig.component2|component2(){}[0]
+    final fun component3(): io.github.charlietap.chasm.config/GCThreshold // io.github.charlietap.chasm.config/RuntimeConfig.component3|component3(){}[0]
+    final fun copy(kotlin/Boolean = ..., io.github.charlietap.chasm.config/GCStrategy = ..., io.github.charlietap.chasm.config/GCThreshold = ...): io.github.charlietap.chasm.config/RuntimeConfig // io.github.charlietap.chasm.config/RuntimeConfig.copy|copy(kotlin.Boolean;io.github.charlietap.chasm.config.GCStrategy;io.github.charlietap.chasm.config.GCThreshold){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // io.github.charlietap.chasm.config/RuntimeConfig.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // io.github.charlietap.chasm.config/RuntimeConfig.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // io.github.charlietap.chasm.config/RuntimeConfig.toString|toString(){}[0]
