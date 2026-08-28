@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.host
 
 /** Grows the memory at [index] and returns its previous size in pages, or `-1` on failure. */

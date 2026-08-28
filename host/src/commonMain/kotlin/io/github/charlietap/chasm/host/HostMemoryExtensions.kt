@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package io.github.charlietap.chasm.host
 
 inline fun HostMemory.readU8(memoryPointer: Int): UByte = readI8(memoryPointer).toUByte()

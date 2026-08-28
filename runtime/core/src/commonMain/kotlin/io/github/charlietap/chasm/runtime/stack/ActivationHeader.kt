@@ -45,10 +45,8 @@ fun activationHeader(
         (callerFrameDelta.toLong() shl REFERENCE_TAG_BITS)
 
 /** Returns the dynamic-link displacement from the callee's FP to its caller's FP. */
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun activationCallerFrameDelta(header: Long): Int =
     ((header ushr REFERENCE_TAG_BITS) and CALLER_FRAME_DELTA_MASK).toInt()
 
 /** Returns the encoded return-IP field. */
-@Suppress("NOTHING_TO_INLINE")
 internal inline fun activationReturnIp(header: Long): Int = (header ushr RETURN_IP_SHIFT).toInt()
