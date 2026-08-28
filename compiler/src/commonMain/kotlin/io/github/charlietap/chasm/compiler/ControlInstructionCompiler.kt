@@ -42,9 +42,12 @@ import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramTarget
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.UnreachableDispatcher
+import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
+import io.github.charlietap.chasm.type.BlockType
+import io.github.charlietap.chasm.type.ValueType
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction as RuntimeControlInstruction
 
 internal fun beginFunctionControl(state: FunctionCompilationContext) {
@@ -157,7 +160,7 @@ internal fun compileControlInstruction(
 private fun enterBlock(
     state: FunctionCompilationContext,
     kind: BlockKind,
-    blockType: io.github.charlietap.chasm.type.BlockType,
+    blockType: BlockType,
 ) {
     if (!state.reachable) {
         state.controls.pushInert(kind)
@@ -691,8 +694,12 @@ private fun compileReturnCall(
 ) {
     val function = state.compiler.function(instruction.functionIndex)
     val operands = state.pop(function.functionType.params.types.size)
+    val callFrameSlot = state.callFrameSlot()
+    if (function is FunctionInstance.HostFunction) {
+        reserveCallInterface(state, callFrameSlot, function.functionType.params.types.size)
+    }
     repeat(state.handlerDepth) { state.emitPopHandler() }
-    state.emitReturnCall(function, operands)
+    state.emitReturnCall(function, operands, callFrameSlot)
     state.reachable = false
 }
 
@@ -703,12 +710,15 @@ private fun compileReturnCallIndirect(
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val elementIndex = state.pop()
     val operands = state.pop(type.params.types.size)
+    val callFrameSlot = state.callFrameSlot()
+    reserveCallInterface(state, callFrameSlot, type.params.types.size)
     repeat(state.handlerDepth) { state.emitPopHandler() }
     state.emitReturnCallIndirect(
         elementIndex = elementIndex,
         operands = operands,
         type = state.compiler.rtt(instruction.typeIndex),
         table = state.compiler.table(instruction.tableIndex),
+        callFrameSlot = callFrameSlot,
     )
     state.reachable = false
 }
@@ -720,10 +730,13 @@ private fun compileReturnCallRef(
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val functionReference = state.pop()
     val operands = state.pop(type.params.types.size)
+    val callFrameSlot = state.callFrameSlot()
+    reserveCallInterface(state, callFrameSlot, type.params.types.size)
     repeat(state.handlerDepth) { state.emitPopHandler() }
     state.emitReturnCallRef(
         functionSlot = state.materialize(functionReference),
         operands = operands,
+        callFrameSlot = callFrameSlot,
     )
     state.reachable = false
 }
@@ -735,8 +748,13 @@ internal fun compileKnownReferenceReturnCall(
 ) {
     val type = state.compiler.types.functionType(instruction.typeIndex)
     val operands = state.pop(type.params.types.size)
+    val function = state.compiler.function(reference.funcIdx)
+    val callFrameSlot = state.callFrameSlot()
+    if (function is FunctionInstance.HostFunction) {
+        reserveCallInterface(state, callFrameSlot, function.functionType.params.types.size)
+    }
     repeat(state.handlerDepth) { state.emitPopHandler() }
-    state.emitReturnCall(state.compiler.function(reference.funcIdx), operands)
+    state.emitReturnCall(function, operands, callFrameSlot)
     state.reachable = false
 }
 
@@ -746,7 +764,7 @@ private fun reserveCallInterface(state: FunctionCompilationContext, base: Int, s
 
 private fun pushCallResults(
     state: FunctionCompilationContext,
-    types: List<io.github.charlietap.chasm.type.ValueType>,
+    types: List<ValueType>,
     slotBase: Int,
 ) {
     for (index in types.indices) {
@@ -756,13 +774,13 @@ private fun pushCallResults(
 
 private fun callResultDestination(
     state: FunctionCompilationContext,
-    types: List<io.github.charlietap.chasm.type.ValueType>,
+    types: List<ValueType>,
     nextInstruction: Instruction?,
 ): Destination? = if (types.size == 1) destination(state, null, nextInstruction) else null
 
 private fun completeCallResults(
     state: FunctionCompilationContext,
-    types: List<io.github.charlietap.chasm.type.ValueType>,
+    types: List<ValueType>,
     slotBase: Int,
     destination: Destination?,
 ): Boolean {

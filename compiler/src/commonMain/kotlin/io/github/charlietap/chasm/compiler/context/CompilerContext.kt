@@ -26,6 +26,7 @@ internal class CompilerContext(
     val module: Module,
     val types: ModuleTypeResolver,
     val runtimeTypes: RuntimeTypeMap,
+    val instance: ModuleInstance = ModuleInstance(runtimeTypes),
     diagnostics: CompilerDiagnostics? = null,
     val functionAddresses: IntArray = intArrayOf(),
     val functions: Array<FunctionInstance> = emptyArray(),
@@ -51,6 +52,7 @@ internal fun createCompilerContext(
     diagnostics: CompilerDiagnostics? = null,
 ): CompilerContext = CompilerContext(
     module = module,
+    instance = instance,
     types = types,
     runtimeTypes = runtimeTypes,
     diagnostics = diagnostics,

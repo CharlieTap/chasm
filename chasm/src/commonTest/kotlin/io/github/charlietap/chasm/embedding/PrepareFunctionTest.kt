@@ -16,7 +16,12 @@ import io.github.charlietap.chasm.fixture.runtime.value.i32
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.host.HostModuleInstance
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.writeI32
+import io.github.charlietap.chasm.host.writeI64
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import kotlin.contextOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -38,9 +43,10 @@ class PrepareFunctionTest {
                         params = resultType(listOf(i32ValueType())),
                         results = resultType(listOf(i32ValueType())),
                     ),
-                ) { params ->
-                    assertEquals(moduleInstance, instance)
-                    params
+                ) { parameters, results ->
+                    val caller = contextOf<HostModuleInstance>()
+                    assertEquals(moduleInstance, caller)
+                    results.writeI32(0, parameters.readI32(0))
                 },
             ),
         )
@@ -129,7 +135,7 @@ class PrepareFunctionTest {
         )
         assertEquals(expected, prepared())
 
-        internalStore.functions += hostFunctionInstance { listOf(i32(9)) }
+        internalStore.functions += hostFunctionInstance { _, results -> results.writeI64(0, 9L) }
         assertEquals(expected, prepared())
     }
 }

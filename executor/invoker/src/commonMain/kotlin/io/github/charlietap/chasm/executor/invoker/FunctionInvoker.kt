@@ -7,13 +7,17 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.host.HostFunctionException
+import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.toExecutionValue
+import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.instance.HostFunctionContext
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.stack.ControlStack
+import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 
@@ -49,6 +53,7 @@ fun FunctionInvoker(
         threadExecutor = ::ThreadExecutor,
     )
 
+@OptIn(UnsafeHostApi::class)
 internal inline fun FunctionInvoker(
     config: RuntimeConfig,
     store: Store,
@@ -65,6 +70,7 @@ internal inline fun FunctionInvoker(
     threadExecutor = threadExecutor,
 )
 
+@OptIn(UnsafeHostApi::class)
 internal inline fun FunctionInvoker(
     config: RuntimeConfig,
     store: Store,
@@ -72,19 +78,32 @@ internal inline fun FunctionInvoker(
     function: FunctionInstance,
     values: List<ExecutionValue>,
     crossinline threadExecutor: ThreadExecutor,
-): Result<List<ExecutionValue>, InvocationError> = when (function) {
-    is FunctionInstance.HostFunction -> {
-        val context = HostFunctionContext(config, store, instance)
-        try {
-            Ok(function.function(context, values))
-        } catch (e: HostFunctionException) {
-            Err(InvocationError.HostFunctionError(e.reason))
+): Result<List<ExecutionValue>, InvocationError> {
+    return when (function) {
+        is FunctionInstance.HostFunction -> {
+            val resultCount = function.functionType.results.types.size
+            val stack = ValueStack(maxOf(values.size, resultCount))
+            stack.push(LongArray(values.size) { index -> values[index].toLongFromBoxed() })
+            stack.reserveDepth(resultCount)
+            val context = ExecutionContext(ControlStack(), stack, store, instance, config)
+            try {
+                context(stack.unsafeElements(), instance, context) {
+                    function.function.invoke(0, 0)
+                }
+                Ok(
+                    List(resultCount) { index ->
+                        stack.unsafeElements()[index].toExecutionValue(function.functionType.results.types[index])
+                    },
+                )
+            } catch (e: HostFunctionException) {
+                Err(InvocationError.HostFunctionError(e.reason))
+            }
         }
-    }
-    is FunctionInstance.WasmFunction -> binding {
-        threadExecutor(config, store, function, values).bind().mapIndexed { idx, result ->
-            val expected = function.functionType.results.types[idx]
-            result.toExecutionValue(expected)
+        is FunctionInstance.WasmFunction -> binding {
+            threadExecutor(config, store, function, values).bind().mapIndexed { idx, result ->
+                val expected = function.functionType.results.types[idx]
+                result.toExecutionValue(expected)
+            }
         }
     }
 }

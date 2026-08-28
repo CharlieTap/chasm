@@ -46,9 +46,7 @@ class ImportTest {
                 ),
             ),
         )
-        val hostFunction: HostFunction = {
-            emptyList()
-        }
+        val hostFunction = HostFunction { _, _ -> }
         val functionExternal = function(store, functionType, hostFunction)
         val functionImport = Import(
             "env",

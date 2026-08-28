@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.runtime.instruction
 import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.type.RTT
 
@@ -17,6 +18,7 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class HostCall(
         val instance: FunctionInstance.HostFunction,
+        val caller: ModuleInstance,
         val operands: OperandCopyPlan,
         val resultSlotBase: Int,
         val callFrameSlot: Int,
@@ -29,7 +31,9 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
 
     data class ReturnHostCall(
         val instance: FunctionInstance.HostFunction,
-        val operands: List<CopyOperand>,
+        val caller: ModuleInstance,
+        val operands: OperandCopyPlan,
+        val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
     data class CallIndirectI(
@@ -62,6 +66,7 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
         val operands: List<CopyOperand>,
         val type: RTT,
         val table: TableInstance,
+        val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
     data class ReturnCallIndirectS(
@@ -69,11 +74,13 @@ sealed interface ControlSuperInstruction : LinkedInstruction {
         val operands: List<CopyOperand>,
         val type: RTT,
         val table: TableInstance,
+        val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
     data class ReturnCallRefS(
         val functionSlot: Int,
         val operands: List<CopyOperand>,
+        val callFrameSlot: Int,
     ) : ControlSuperInstruction
 
     data class FunctionReturn(

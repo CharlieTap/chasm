@@ -36,6 +36,7 @@ internal fun FunctionCompilationContext.emitCall(
         is FunctionInstance.HostFunction -> {
             val instruction = ControlSuperInstruction.HostCall(
                 instance = function,
+                caller = compiler.instance,
                 operands = operandCopyPlan,
                 resultSlotBase = resultSlotBase,
                 callFrameSlot = callFrameSlot,
@@ -95,6 +96,7 @@ internal fun FunctionCompilationContext.emitCallRef(
 internal fun FunctionCompilationContext.emitReturnCall(
     function: FunctionInstance,
     operands: List<OperandSource>,
+    callFrameSlot: Int,
 ) {
     val copyOperands = operands.toCopyOperands()
     when (function) {
@@ -103,7 +105,12 @@ internal fun FunctionCompilationContext.emitReturnCall(
             emit(instruction, ::ReturnCallDispatcher)
         }
         is FunctionInstance.HostFunction -> {
-            val instruction = ControlSuperInstruction.ReturnHostCall(function, copyOperands)
+            val instruction = ControlSuperInstruction.ReturnHostCall(
+                instance = function,
+                caller = compiler.instance,
+                operands = operands.toOperandCopyPlan(callFrameSlot),
+                callFrameSlot = callFrameSlot,
+            )
             emit(instruction, ::ReturnCallDispatcher)
         }
     }
@@ -114,6 +121,7 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
     operands: List<OperandSource>,
     type: RTT,
     table: TableInstance,
+    callFrameSlot: Int,
 ) {
     val copyOperands = operands.toCopyOperands()
     if (elementIndex.sourceKind == OperandSourceKind.I32Immediate) {
@@ -122,6 +130,7 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
             copyOperands,
             type,
             table,
+            callFrameSlot,
         )
         emit(instruction, ::ReturnCallDispatcher)
     } else {
@@ -130,6 +139,7 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
             copyOperands,
             type,
             table,
+            callFrameSlot,
         )
         emit(instruction, ::ReturnCallDispatcher)
     }
@@ -138,10 +148,12 @@ internal fun FunctionCompilationContext.emitReturnCallIndirect(
 internal fun FunctionCompilationContext.emitReturnCallRef(
     functionSlot: Int,
     operands: List<OperandSource>,
+    callFrameSlot: Int,
 ) {
     val instruction = ControlSuperInstruction.ReturnCallRefS(
         functionSlot,
         operands.toCopyOperands(),
+        callFrameSlot,
     )
     emit(instruction, ::ReturnCallDispatcher)
 }

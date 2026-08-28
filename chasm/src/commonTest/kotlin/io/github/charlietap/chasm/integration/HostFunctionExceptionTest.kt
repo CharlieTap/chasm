@@ -31,7 +31,7 @@ class HostFunctionExceptionTest {
         )
         val reason = "Fail gracefully"
         val exception = HostFunctionException(reason)
-        val hostFunction: HostFunction = {
+        val hostFunction = HostFunction { _, _ ->
             throw exception
         }
         val functionExternal = function(store, functionType, hostFunction)

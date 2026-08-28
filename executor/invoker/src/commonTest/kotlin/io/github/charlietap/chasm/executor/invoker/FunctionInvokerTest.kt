@@ -12,7 +12,13 @@ import io.github.charlietap.chasm.fixture.runtime.value.i32
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
+import io.github.charlietap.chasm.host.HostModuleInstance
+import io.github.charlietap.chasm.host.HostResources
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.writeI32
+import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import kotlin.contextOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -76,13 +82,15 @@ class FunctionInvokerTest {
         val runtimeStore = store()
         val functionInstance = hostFunctionInstance(
             functionType = functionType,
-            function = { args ->
-                assertEquals(config, this.config)
-                assertEquals(runtimeStore, this.store)
-                assertEquals(moduleInstance, this.instance)
-                assertEquals(params, args)
-
-                listOf(i32(118))
+            function = { parameters, results ->
+                val caller = contextOf<HostModuleInstance>()
+                val context = contextOf<HostResources>()
+                context as ExecutionContext
+                assertEquals(config, context.config)
+                assertEquals(runtimeStore, context.store)
+                assertEquals(moduleInstance, caller)
+                assertEquals(117, parameters.readI32(0))
+                results.writeI32(0, 118)
             },
         )
         runtimeStore.functions += functionInstance
@@ -109,12 +117,20 @@ class FunctionInvokerTest {
         val params = listOf<ExecutionValue>(i32(117))
         val moduleInstance = moduleInstance()
         val runtimeStore = store()
-        val functionInstance = hostFunctionInstance { args ->
-            assertEquals(config, this.config)
-            assertEquals(runtimeStore, this.store)
-            assertEquals(moduleInstance, this.instance)
-            assertEquals(params, args)
-            listOf(i32(118))
+        val functionInstance = hostFunctionInstance(
+            functionType = functionType(
+                params = resultType(listOf(i32ValueType())),
+                results = resultType(listOf(i32ValueType())),
+            ),
+        ) { parameters, results ->
+            val caller = contextOf<HostModuleInstance>()
+            val context = contextOf<HostResources>()
+            context as ExecutionContext
+            assertEquals(config, context.config)
+            assertEquals(runtimeStore, context.store)
+            assertEquals(moduleInstance, caller)
+            assertEquals(117, parameters.readI32(0))
+            results.writeI32(0, 118)
         }
         val threadExecutor: ThreadExecutor = { _, _, _, _ ->
             error("thread executor should not be called for host functions")

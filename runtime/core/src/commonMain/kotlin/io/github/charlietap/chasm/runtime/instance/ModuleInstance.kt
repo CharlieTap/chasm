@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.runtime.instance
 
+import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 
@@ -14,4 +15,4 @@ data class ModuleInstance(
     val dataAddresses: MutableList<Address.Data> = [],
     val exports: MutableList<ExportInstance> = [],
     var deallocated: Boolean = false,
-)
+) : HostModuleInstance

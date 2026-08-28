@@ -16,9 +16,11 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.expect
 import io.github.charlietap.chasm.embedding.shapes.map
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.host.HostStack
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Result
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Result.Ok
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value
+import kotlin.contextOf
 import io.github.charlietap.chasm.embedding.shapes.Function as ChasmFunction
 import io.github.charlietap.chasm.embedding.shapes.Global as ChasmGlobal
 import io.github.charlietap.chasm.embedding.shapes.Memory as ChasmMemory
@@ -62,10 +64,15 @@ object NonJsVirtualMachine : WasmVirtualMachine {
 
         val functionType = FunctionTypeMapper.from(type)
 
-        val hostFunction = hostFunction { params ->
-            val mappedParams = params.map(ValueMapper::to)
-            val results = function(mappedParams)
-            results.map(ValueMapper::from)
+        val hostFunction = hostFunction { parameters, results ->
+            val stack = contextOf<HostStack>()
+            val mappedParams = List(type.params.size) { index ->
+                ValueMapper.fromRaw(stack[parameters + index], type.params[index])
+            }
+            val resultValues = function(mappedParams)
+            resultValues.forEachIndexed { index, value ->
+                stack[results + index] = ValueMapper.toRaw(value)
+            }
         }
 
         val result = function(store.reference, functionType, hostFunction)

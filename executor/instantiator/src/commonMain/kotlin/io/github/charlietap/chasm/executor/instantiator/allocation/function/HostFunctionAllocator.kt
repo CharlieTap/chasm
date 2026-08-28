@@ -1,9 +1,9 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.function
 
+import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.instance.HostFunction
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.FunctionType
 import io.github.charlietap.chasm.type.ext.definedType

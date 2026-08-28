@@ -37,7 +37,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -51,7 +51,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -66,7 +66,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -82,7 +82,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -97,7 +97,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -108,7 +108,7 @@ class WehTest {
                     }
                     results { }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -124,7 +124,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -139,7 +139,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -153,7 +153,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -167,7 +167,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -181,7 +181,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -196,7 +196,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -217,7 +217,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -231,7 +231,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -247,7 +247,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -264,7 +264,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -277,7 +277,7 @@ class WehTest {
                         i32()
                     }
                 }
-                reference { emptyList() }
+                reference { _, _ -> }
             }
         }
 

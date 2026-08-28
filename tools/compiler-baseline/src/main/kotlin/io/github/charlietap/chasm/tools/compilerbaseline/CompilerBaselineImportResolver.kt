@@ -3,11 +3,12 @@ package io.github.charlietap.chasm.tools.compilerbaseline
 import io.github.charlietap.chasm.ast.module.Import.Descriptor
 import io.github.charlietap.chasm.ast.module.Module
 import io.github.charlietap.chasm.executor.instantiator.allocation.function.HostFunctionAllocator
+import io.github.charlietap.chasm.host.HostFunction
+import io.github.charlietap.chasm.host.writeI64
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.instance.Import
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
-import io.github.charlietap.chasm.runtime.value.NumberValue
 import io.github.charlietap.chasm.type.FunctionType
 
 fun interface CompilerBaselineImportResolver {
@@ -18,7 +19,7 @@ fun interface CompilerHostFunctionAllocator {
     fun allocate(
         store: Store,
         type: FunctionType,
-        function: io.github.charlietap.chasm.runtime.instance.HostFunction,
+        function: HostFunction,
     ): ExternalValue.Function
 }
 
@@ -26,7 +27,7 @@ class ChasmHostFunctionAllocator : CompilerHostFunctionAllocator {
     override fun allocate(
         store: Store,
         type: FunctionType,
-        function: io.github.charlietap.chasm.runtime.instance.HostFunction,
+        function: HostFunction,
     ): ExternalValue.Function = HostFunctionAllocator(store, type, function)
 }
 
@@ -52,7 +53,7 @@ class CoremarkImportResolver(
             val externalValue = hostFunctionAllocator.allocate(
                 store,
                 types.functionType(descriptor.typeIndex),
-            ) { _ -> listOf(NumberValue.I64(0L)) }
+            ) { _, results -> results.writeI64(0, 0L) }
             Import(import.moduleName.name, import.entityName.name, externalValue)
         }
     }

@@ -4,9 +4,9 @@ import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.runtime.function.Function
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.instance.HostFunction
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.DefinedType
@@ -17,7 +17,7 @@ fun functionInstance(): FunctionInstance = hostFunctionInstance()
 fun hostFunctionInstance(
     rtt: RTT = rtt(),
     functionType: FunctionType = functionType(),
-    function: HostFunction = { emptyList() },
+    function: HostFunction = HostFunction { _, _ -> },
 ) = FunctionInstance.HostFunction(
     rtt = rtt,
     functionType = functionType,

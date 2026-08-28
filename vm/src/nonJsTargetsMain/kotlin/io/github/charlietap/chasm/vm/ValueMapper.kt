@@ -9,6 +9,23 @@ import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value.I32
 import io.github.charlietap.chasm.vm.WasmVirtualMachine.Value.I64
 
 object ValueMapper {
+    internal fun fromRaw(value: Long, type: ValueType): Value = when (type) {
+        is ValueType.Number -> when (type.numberType) {
+            NumberType.I32 -> I32(value.toInt())
+            NumberType.I64 -> I64(value)
+            NumberType.F32 -> F32(Float.fromBits(value.toInt()))
+            NumberType.F64 -> F64(Double.fromBits(value))
+        }
+        else -> throw IllegalArgumentException("Failed to map raw chasm value with type: $type")
+    }
+
+    internal fun toRaw(value: Value): Long = when (value) {
+        is I32 -> value.value.toLong()
+        is I64 -> value.value
+        is F32 -> value.value.toRawBits().toLong()
+        is F64 -> value.value.toRawBits()
+    }
+
     fun from(value: Value): ExecutionValue {
         return when (value) {
             is I32 -> NumberValue.I32(value.value)

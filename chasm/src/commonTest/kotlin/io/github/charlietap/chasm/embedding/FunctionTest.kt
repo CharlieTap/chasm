@@ -18,9 +18,7 @@ class FunctionTest {
 
         val store = publicStore()
         val funcType = functionType()
-        val hostFunction: HostFunction = {
-            emptyList()
-        }
+        val hostFunction = HostFunction { _, _ -> }
 
         val expectedType = functionType()
         val expected = publicFunction(functionExternalValue(functionAddress(0)))

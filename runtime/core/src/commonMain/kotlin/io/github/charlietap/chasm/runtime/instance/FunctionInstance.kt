@@ -4,7 +4,7 @@ import io.github.charlietap.chasm.runtime.function.Function
 import io.github.charlietap.chasm.runtime.function.WasmFunctionCallPlan
 import io.github.charlietap.chasm.runtime.type.RTT
 import io.github.charlietap.chasm.type.FunctionType
-import io.github.charlietap.chasm.runtime.instance.HostFunction as HostFunctionImpl
+import io.github.charlietap.chasm.host.HostFunction as HostCallback
 
 sealed class FunctionInstance {
 
@@ -33,6 +33,6 @@ sealed class FunctionInstance {
     data class HostFunction(
         override val rtt: RTT,
         override val functionType: FunctionType,
-        val function: HostFunctionImpl,
+        val function: HostCallback,
     ) : FunctionInstance()
 }

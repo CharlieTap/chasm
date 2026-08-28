@@ -2,9 +2,11 @@ package io.github.charlietap.chasm.executor.invoker.instruction.controlfused
 
 import io.github.charlietap.chasm.executor.invoker.ext.tagAddress
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
-import io.github.charlietap.chasm.executor.invoker.function.ReturnHostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.copyOperands
+import io.github.charlietap.chasm.executor.invoker.function.operandCopyOrder
+import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -31,13 +33,20 @@ internal fun CallExecutor(
     instruction: ControlSuperInstruction.HostCall,
     returnIp: Int,
 ): Int {
+    val framePointer = vstack.framePointer
+    copyOperands(
+        vstack = vstack,
+        currentFramePointer = framePointer,
+        destinationFramePointer = framePointer + instruction.callFrameSlot,
+        operands = instruction.operands.operands,
+        order = instruction.operands.order,
+    )
     HostFunctionCall(
         vstack = vstack,
-        cstack = cstack,
-        store = store,
         context = context,
+        caller = instruction.caller,
         function = instruction.instance,
-        operands = instruction.operands,
+        parameterSlotBase = instruction.callFrameSlot,
         resultSlotBase = instruction.resultSlotBase,
     )
     return returnIp
@@ -123,14 +132,26 @@ internal fun ReturnCallExecutor(
     store: Store,
     context: ExecutionContext,
     instruction: ControlSuperInstruction.ReturnHostCall,
-): Int = ReturnHostFunctionCall(
-    vstack = vstack,
-    cstack = cstack,
-    store = store,
-    context = context,
-    function = instruction.instance,
-    operands = instruction.operands,
-)
+): Int {
+    val framePointer = vstack.framePointer
+    val parameterBase = framePointer + instruction.callFrameSlot
+    copyOperands(
+        vstack = vstack,
+        currentFramePointer = framePointer,
+        destinationFramePointer = parameterBase,
+        operands = instruction.operands.operands,
+        order = instruction.operands.order,
+    )
+    HostFunctionCall(
+        vstack = vstack,
+        context = context,
+        caller = instruction.caller,
+        function = instruction.instance,
+        parameterSlotBase = instruction.callFrameSlot,
+        resultSlotBase = 0,
+    )
+    return ReturnExecutor(vstack, cstack)
+}
 
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
@@ -147,6 +168,7 @@ internal fun ReturnCallExecutor(
     operands = instruction.operands,
     type = instruction.type,
     table = instruction.table,
+    callFrameSlot = instruction.callFrameSlot,
 )
 
 internal fun ReturnCallExecutor(
@@ -164,6 +186,7 @@ internal fun ReturnCallExecutor(
     operands = instruction.operands,
     type = instruction.type,
     table = instruction.table,
+    callFrameSlot = instruction.callFrameSlot,
 )
 
 internal fun ReturnCallExecutor(
@@ -179,6 +202,7 @@ internal fun ReturnCallExecutor(
     context = context,
     functionSlot = instruction.functionSlot,
     operands = instruction.operands,
+    callFrameSlot = instruction.callFrameSlot,
 )
 
 internal fun ThrowExecutor(
@@ -270,6 +294,7 @@ private fun strictIndirectReturnCall(
     operands: List<CopyOperand>,
     type: RTT,
     table: TableInstance,
+    callFrameSlot: Int,
 ): Int {
     val functionInstance = strictResolveIndirectFunction(store, context.heap, table, type, elementIndex)
     return strictInvokeReturnFunction(
@@ -279,6 +304,7 @@ private fun strictIndirectReturnCall(
         context = context,
         functionInstance = functionInstance,
         operands = operands,
+        callFrameSlot = callFrameSlot,
     )
 }
 
@@ -289,6 +315,7 @@ private fun strictReferenceReturnCall(
     context: ExecutionContext,
     functionSlot: Int,
     operands: List<CopyOperand>,
+    callFrameSlot: Int,
 ): Int {
     val address = vstack.getFrameSlot(functionSlot).toFunctionAddress()
     return strictInvokeReturnFunction(
@@ -298,6 +325,7 @@ private fun strictReferenceReturnCall(
         context = context,
         functionInstance = store.function(address),
         operands = operands,
+        callFrameSlot = callFrameSlot,
     )
 }
 
@@ -328,13 +356,20 @@ private fun strictInvokeFunction(
     returnIp: Int,
 ): Int = when (functionInstance) {
     is FunctionInstance.HostFunction -> {
+        val framePointer = vstack.framePointer
+        copyOperands(
+            vstack = vstack,
+            currentFramePointer = framePointer,
+            destinationFramePointer = framePointer + callFrameSlot,
+            operands = operands.operands,
+            order = operands.order,
+        )
         HostFunctionCall(
             vstack = vstack,
-            cstack = cstack,
-            store = store,
             context = context,
+            caller = cstack.frameInstance(),
             function = functionInstance,
-            operands = operands,
+            parameterSlotBase = callFrameSlot,
             resultSlotBase = resultSlotBase,
         )
         returnIp
@@ -359,15 +394,28 @@ private fun strictInvokeReturnFunction(
     context: ExecutionContext,
     functionInstance: FunctionInstance,
     operands: List<CopyOperand>,
+    callFrameSlot: Int,
 ): Int = when (functionInstance) {
-    is FunctionInstance.HostFunction -> ReturnHostFunctionCall(
-        vstack = vstack,
-        cstack = cstack,
-        store = store,
-        context = context,
-        function = functionInstance,
-        operands = operands,
-    )
+    is FunctionInstance.HostFunction -> {
+        val framePointer = vstack.framePointer
+        val parameterBase = framePointer + callFrameSlot
+        copyOperands(
+            vstack = vstack,
+            currentFramePointer = framePointer,
+            destinationFramePointer = parameterBase,
+            operands = operands,
+            order = operandCopyOrder(framePointer, parameterBase, operands),
+        )
+        HostFunctionCall(
+            vstack = vstack,
+            context = context,
+            caller = cstack.frameInstance(),
+            function = functionInstance,
+            parameterSlotBase = callFrameSlot,
+            resultSlotBase = 0,
+        )
+        ReturnExecutor(vstack, cstack)
+    }
     is FunctionInstance.WasmFunction -> ReturnWasmFunctionCall(
         vstack = vstack,
         cstack = cstack,

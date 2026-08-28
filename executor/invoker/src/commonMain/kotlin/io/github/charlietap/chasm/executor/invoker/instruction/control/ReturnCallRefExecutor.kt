@@ -18,6 +18,6 @@ internal fun ReturnCallRefExecutor(
     context: ExecutionContext,
     instruction: ControlInstruction.ReturnCallRef,
 ): Int = when (val function = store.function(vstack.popFunctionAddress())) {
-    is FunctionInstance.HostFunction -> ReturnHostFunctionCall(vstack, cstack, store, context, function)
+    is FunctionInstance.HostFunction -> ReturnHostFunctionCall(vstack, cstack, context, function)
     is FunctionInstance.WasmFunction -> ReturnWasmFunctionCall(vstack, cstack, store, context, function)
 }

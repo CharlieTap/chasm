@@ -1,5 +1,5 @@
 package io.github.charlietap.chasm.embedding.shapes
 
-import io.github.charlietap.chasm.runtime.value.ExecutionValue
+import io.github.charlietap.chasm.host.HostFunction as ChasmHostFunction
 
-typealias HostFunction = HostFunctionContext.(List<ExecutionValue>) -> List<ExecutionValue>
+typealias HostFunction = ChasmHostFunction

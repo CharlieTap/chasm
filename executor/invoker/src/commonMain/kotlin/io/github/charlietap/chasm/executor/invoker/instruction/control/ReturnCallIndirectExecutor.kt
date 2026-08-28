@@ -29,7 +29,7 @@ internal fun ReturnCallIndirectExecutor(
     }
 
     return when (function) {
-        is FunctionInstance.HostFunction -> ReturnHostFunctionCall(vstack, cstack, store, context, function)
+        is FunctionInstance.HostFunction -> ReturnHostFunctionCall(vstack, cstack, context, function)
         is FunctionInstance.WasmFunction -> ReturnWasmFunctionCall(vstack, cstack, store, context, function)
     }
 }

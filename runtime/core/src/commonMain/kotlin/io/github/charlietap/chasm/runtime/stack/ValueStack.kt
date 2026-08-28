@@ -2,6 +2,7 @@ package io.github.charlietap.chasm.runtime.stack
 
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcRootSink
+import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 
@@ -57,6 +58,19 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
             destinationOffset = destinationFramePointer + destinationSlot,
             startIndex = sourceFramePointer + sourceSlot,
             endIndex = sourceFramePointer + sourceSlot + count,
+        )
+    }
+
+    fun copySlots(
+        source: Int,
+        destination: Int,
+        count: Int,
+    ) {
+        elements.copyInto(
+            destination = elements,
+            destinationOffset = destination,
+            startIndex = source,
+            endIndex = source + count,
         )
     }
 
@@ -243,6 +257,15 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
     }
 
     fun depth(): Int = top
+
+    /**
+     * Returns the live backing storage for trusted host functions.
+     *
+     * The returned array must not be retained. Any operation that grows this
+     * stack can replace it.
+     */
+    @UnsafeHostApi
+    fun unsafeElements(): LongArray = elements
 
     internal fun replaceTopFieldsWithStruct(
         heap: GarbageCollectedHeap,

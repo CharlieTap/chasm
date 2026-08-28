@@ -28,11 +28,15 @@ import io.github.charlietap.chasm.embedding.memory.writeBytes
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.Global
 import io.github.charlietap.chasm.embedding.shapes.Import
+import io.github.charlietap.chasm.embedding.shapes.ImportDefinition
+import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Memory
 import io.github.charlietap.chasm.embedding.shapes.Module
 import io.github.charlietap.chasm.embedding.shapes.Store
 import io.github.charlietap.chasm.embedding.shapes.fold
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.host.HostStack
+import io.github.charlietap.chasm.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.ExternalValue
 import io.github.charlietap.chasm.runtime.type.ExternalType
@@ -53,7 +57,9 @@ import io.github.charlietap.corpus.lib.CorpusTimings
 import io.github.charlietap.corpus.lib.fixture.Fixture
 import io.github.charlietap.corpus.lib.fixture.FixtureBytes
 import io.github.charlietap.corpus.lib.fixture.FixtureImport
+import io.github.charlietap.corpus.lib.fixture.FixtureImportCapture
 import io.github.charlietap.corpus.lib.fixture.FixtureTest
+import io.github.charlietap.corpus.lib.fixture.FixtureValue
 import io.github.charlietap.corpus.lib.fixture.FixtureWasiPreview1Host
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.Buffer
@@ -68,6 +74,7 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.contextOf
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.TimeSource
@@ -290,12 +297,18 @@ class ChasmCorpusRunner(
                     imports += Import(
                         definition.moduleName,
                         definition.entityName,
-                        function(store, type.functionType) { params ->
+                        function(store, type.functionType) { parameters, results ->
+                            val stack = contextOf<HostStack>()
+                            val params = List(type.functionType.params.types.size) { index ->
+                                stack[parameters + index].toExecutionValue(type.functionType.params.types[index])
+                            }
                             fixtureImport?.stub?.capture?.let { capture ->
                                 importCaptures.getValue(capture.name).append(capture, params)
                             }
                             fixtureImport?.stub?.trap?.let(::error)
-                            defaultResults(type.functionType, fixtureImport)
+                            defaultResults(type.functionType, fixtureImport).forEachIndexed { index, value ->
+                                stack[results + index] = value.toLongFromBoxed()
+                            }
                         },
                     )
                 }
@@ -696,7 +709,7 @@ class ChasmCorpusRunner(
         else -> ExecutionValue.Uninitialised
     }
 
-    private fun parseFixtureValue(value: io.github.charlietap.corpus.lib.fixture.FixtureValue): ExecutionValue {
+    private fun parseFixtureValue(value: FixtureValue): ExecutionValue {
         return parseValue(
             JsonObject(
                 buildMap {
@@ -811,7 +824,7 @@ class ChasmCorpusRunner(
         return imports.firstOrNull { import -> import.module == module && import.name == name }
     }
 
-    private fun io.github.charlietap.chasm.embedding.shapes.ImportDefinition.importKey(): String {
+    private fun ImportDefinition.importKey(): String {
         return "$moduleName.$entityName"
     }
 
@@ -882,7 +895,7 @@ class ChasmCorpusRunner(
     )
 
     private data class RuntimeSetup(
-        val instance: io.github.charlietap.chasm.embedding.shapes.Instance,
+        val instance: Instance,
         val importMemories: Map<String, Memory>,
         val importGlobals: Map<String, Global>,
         val hosts: List<EmbedderHost>,
@@ -970,7 +983,7 @@ class ChasmCorpusRunner(
         var maxCalls: Int,
     ) {
         fun append(
-            capture: io.github.charlietap.corpus.lib.fixture.FixtureImportCapture,
+            capture: FixtureImportCapture,
             params: List<ExecutionValue>,
         ) {
             if (calls < maxCalls) {

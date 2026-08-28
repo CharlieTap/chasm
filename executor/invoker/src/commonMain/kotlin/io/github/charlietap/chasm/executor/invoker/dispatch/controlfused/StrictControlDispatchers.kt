@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.controlfused
 
+import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithImmediateOperand
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCallWithSlotOperand
@@ -74,8 +75,48 @@ fun CallDispatcher(
 
 fun CallDispatcher(
     instruction: ControlSuperInstruction.HostCall,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, nextIp ->
-    CallExecutor(vstack, cstack, store, context, instruction, nextIp)
+): DispatchableInstruction {
+    val function = instruction.instance
+    val caller = instruction.caller
+    val operands = instruction.operands
+    val callFrameSlot = instruction.callFrameSlot
+    val resultSlotBase = instruction.resultSlotBase
+    val operand = operands.operands.singleOrNull()
+
+    return when {
+        operands.order == OperandCopyOrder.None -> DispatchableInstruction { vstack, _, _, context, nextIp ->
+            HostFunctionCall(vstack, context, caller, function, callFrameSlot, resultSlotBase)
+            nextIp
+        }
+        operand is CopyOperand.Immediate -> {
+            val value = operand.value
+            DispatchableInstruction { vstack, _, _, context, nextIp ->
+                vstack.setFrameSlot(callFrameSlot, value)
+                HostFunctionCall(vstack, context, caller, function, callFrameSlot, resultSlotBase)
+                nextIp
+            }
+        }
+        operand is CopyOperand.Slot -> {
+            val sourceSlot = operand.slot
+            DispatchableInstruction { vstack, _, _, context, nextIp ->
+                vstack.setFrameSlot(callFrameSlot, vstack.getFrameSlot(sourceSlot))
+                HostFunctionCall(vstack, context, caller, function, callFrameSlot, resultSlotBase)
+                nextIp
+            }
+        }
+        else -> DispatchableInstruction { vstack, _, _, context, nextIp ->
+            val framePointer = vstack.framePointer
+            copyOperands(
+                vstack = vstack,
+                currentFramePointer = framePointer,
+                destinationFramePointer = framePointer + callFrameSlot,
+                operands = operands.operands,
+                order = operands.order,
+            )
+            HostFunctionCall(vstack, context, caller, function, callFrameSlot, resultSlotBase)
+            nextIp
+        }
+    }
 }
 
 fun CallDispatcher(
@@ -138,8 +179,47 @@ fun FunctionReturnDispatcher(
 
 fun ReturnCallDispatcher(
     instruction: ControlSuperInstruction.ReturnHostCall,
-): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, _ ->
-    ReturnCallExecutor(vstack, cstack, store, context, instruction)
+): DispatchableInstruction {
+    val function = instruction.instance
+    val caller = instruction.caller
+    val operands = instruction.operands
+    val callFrameSlot = instruction.callFrameSlot
+    val operand = operands.operands.singleOrNull()
+
+    return when {
+        operands.order == OperandCopyOrder.None -> DispatchableInstruction { vstack, cstack, _, context, _ ->
+            HostFunctionCall(vstack, context, caller, function, callFrameSlot, 0)
+            ReturnExecutor(vstack, cstack)
+        }
+        operand is CopyOperand.Immediate -> {
+            val value = operand.value
+            DispatchableInstruction { vstack, cstack, _, context, _ ->
+                vstack.setFrameSlot(callFrameSlot, value)
+                HostFunctionCall(vstack, context, caller, function, callFrameSlot, 0)
+                ReturnExecutor(vstack, cstack)
+            }
+        }
+        operand is CopyOperand.Slot -> {
+            val sourceSlot = operand.slot
+            DispatchableInstruction { vstack, cstack, _, context, _ ->
+                vstack.setFrameSlot(callFrameSlot, vstack.getFrameSlot(sourceSlot))
+                HostFunctionCall(vstack, context, caller, function, callFrameSlot, 0)
+                ReturnExecutor(vstack, cstack)
+            }
+        }
+        else -> DispatchableInstruction { vstack, cstack, _, context, _ ->
+            val framePointer = vstack.framePointer
+            copyOperands(
+                vstack = vstack,
+                currentFramePointer = framePointer,
+                destinationFramePointer = framePointer + callFrameSlot,
+                operands = operands.operands,
+                order = operands.order,
+            )
+            HostFunctionCall(vstack, context, caller, function, callFrameSlot, 0)
+            ReturnExecutor(vstack, cstack)
+        }
+    }
 }
 
 fun ReturnCallDispatcher(

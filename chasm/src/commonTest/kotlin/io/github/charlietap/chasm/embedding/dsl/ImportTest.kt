@@ -51,9 +51,7 @@ class ImportTest {
 
         val store = publicStore()
 
-        val hostFunction = hostFunction {
-            emptyList()
-        }
+        val hostFunction = hostFunction { _, _ -> }
 
         val actual = imports(store) {
             function {
@@ -81,6 +79,39 @@ class ImportTest {
 
         assertEquals(expected, actual)
         assertEquals(1, store.store.functions.size)
+    }
+
+    @Test
+    fun `can create a function import using an existing function type`() {
+        val store = publicStore()
+        val type = functionType(
+            params = resultType(listOf(i32ValueType())),
+            results = resultType(listOf(i32ValueType())),
+        )
+
+        val actual = imports(store) {
+            function {
+                moduleName = "wasi_preview_1"
+                entityName = "fd_write"
+                type(type)
+                reference(hostFunction { _, _ -> })
+            }
+        }
+
+        val expected = listOf<Import>(
+            publicImport(
+                moduleName = "wasi_preview_1",
+                entityName = "fd_write",
+                value = publicFunction(
+                    reference = functionExternalValue(
+                        address = functionAddress(0),
+                    ),
+                ),
+            ),
+        )
+
+        assertEquals(expected, actual)
+        assertEquals(type, store.store.functions.single().functionType)
     }
 
     @Test

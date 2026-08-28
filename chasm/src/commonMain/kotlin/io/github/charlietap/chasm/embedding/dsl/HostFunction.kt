@@ -1,5 +1,5 @@
 package io.github.charlietap.chasm.embedding.dsl
 
-import io.github.charlietap.chasm.embedding.shapes.HostFunction
+import io.github.charlietap.chasm.host.HostFunction
 
-fun hostFunction(function: HostFunction) = function
+fun hostFunction(function: HostFunction): HostFunction = function

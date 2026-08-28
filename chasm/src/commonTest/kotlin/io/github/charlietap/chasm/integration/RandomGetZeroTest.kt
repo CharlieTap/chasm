@@ -10,6 +10,8 @@ import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.fake.decoder.FakeSourceReader
 import io.github.charlietap.chasm.host.HostFunctionException
+import io.github.charlietap.chasm.host.readI32
+import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
@@ -37,7 +39,7 @@ class RandomGetZeroTest {
                     }
                     results { i32() }
                 }
-                reference { _ -> listOf(NumberValue.I32(0)) }
+                reference { _, results -> results.writeI32(0, 0) }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
@@ -49,13 +51,15 @@ class RandomGetZeroTest {
                     }
                     results { i32() }
                 }
-                reference { _ -> listOf(NumberValue.I32(0)) }
+                reference { _, results -> results.writeI32(0, 0) }
             }
             function {
                 moduleName = "wasi_snapshot_preview1"
                 entityName = "proc_exit"
                 type { params { i32() } }
-                reference { values -> throw HostFunctionException("proc_exit: ${values[0]}") }
+                reference { parameters, _ ->
+                    throw HostFunctionException("proc_exit: ${parameters.readI32(0)}")
+                }
             }
         }
 

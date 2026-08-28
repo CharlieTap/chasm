@@ -28,6 +28,9 @@ benchmark {
         register("preparedFunction") {
             include(".*PreparedFunctionBenchmark.*")
         }
+        register("hostFunction") {
+            include(".*HostFunctionBenchmark.*")
+        }
         register("gcComparison") {
             include(".*NewGcComparisonBenchmark.*")
         }

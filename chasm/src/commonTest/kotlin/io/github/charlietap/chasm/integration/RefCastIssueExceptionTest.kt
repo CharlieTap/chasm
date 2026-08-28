@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.integration
 import io.github.charlietap.chasm.embedding.dsl.imports
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.test.Test
 import kotlin.test.assertIs
@@ -24,7 +25,7 @@ class RefCastIssueExceptionTest {
                     }
                     results { i32() }
                 }
-                reference { params -> listOf(NumberValue.I32(0)) }
+                reference { _, results -> results.writeI32(0, 0) }
             }
         }
 

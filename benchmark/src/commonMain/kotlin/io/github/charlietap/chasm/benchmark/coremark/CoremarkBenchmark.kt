@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.embedding.module
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
 import io.github.charlietap.chasm.embedding.shapes.flatMap
 import io.github.charlietap.chasm.embedding.store
+import io.github.charlietap.chasm.host.writeI64
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
 import io.github.charlietap.chasm.runtime.value.NumberValue
 import kotlin.time.Clock
@@ -49,9 +50,9 @@ class CoremarkBenchmark {
                     results { i64() }
                 }
 
-                reference {
+                reference { _, results ->
                     val time = Clock.System.now()
-                    listOf(NumberValue.I64(time.toEpochMilliseconds()))
+                    results.writeI64(0, time.toEpochMilliseconds())
                 }
             }
         }

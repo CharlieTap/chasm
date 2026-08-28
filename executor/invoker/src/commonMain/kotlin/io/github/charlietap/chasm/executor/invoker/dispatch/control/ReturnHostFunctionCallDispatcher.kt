@@ -7,5 +7,5 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 fun ReturnHostFunctionCallDispatcher(
     instruction: ControlInstruction.ReturnHostFunctionCall,
 ): DispatchableInstruction = DispatchableInstruction { vstack, cstack, store, context, _ ->
-    ReturnHostFunctionCall(vstack, cstack, store, context, instruction.instance)
+    ReturnHostFunctionCall(vstack, cstack, context, instruction.instance)
 }
