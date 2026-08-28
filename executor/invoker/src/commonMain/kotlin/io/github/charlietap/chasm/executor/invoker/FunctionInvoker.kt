@@ -5,11 +5,13 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.executor.invoker.function.withHostCallbackScope
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.function
 import io.github.charlietap.chasm.runtime.ext.toExecutionValue
@@ -88,14 +90,18 @@ internal inline fun FunctionInvoker(
             stack.reserveDepth(resultCount)
             val context = ExecutionContext(ControlStack(), stack, store, instance, config)
             try {
-                context(stack.unsafeElements(), instance, context) {
-                    function.function.invoke(0, 0)
+                context.withHostCallbackScope {
+                    context(stack.unsafeElements(), instance, context) {
+                        function.function.invoke(0, 0)
+                    }
+                    Ok(
+                        List(resultCount) { index ->
+                            stack.unsafeElements()[index].toExecutionValue(function.functionType.results.types[index])
+                        },
+                    )
                 }
-                Ok(
-                    List(resultCount) { index ->
-                        stack.unsafeElements()[index].toExecutionValue(function.functionType.results.types[index])
-                    },
-                )
+            } catch (_: HostRaisedWasmException) {
+                Err(InvocationError.ThrownException)
             } catch (e: HostFunctionException) {
                 Err(InvocationError.HostFunctionError(e.reason))
             }

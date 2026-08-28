@@ -7,9 +7,14 @@ import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
+import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
+import io.github.charlietap.chasm.fixture.ast.instruction.catchCatchHandler
+import io.github.charlietap.chasm.fixture.ast.module.labelIndex
+import io.github.charlietap.chasm.fixture.ast.module.tagIndex
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
+import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.store
@@ -18,20 +23,117 @@ import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i32ValueType
+import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.recursiveType
 import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.fixture.type.structCompositeType
+import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
+import io.github.charlietap.chasm.host.HostException
+import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.program.Program
+import io.github.charlietap.chasm.runtime.store.Store
+import io.github.charlietap.chasm.runtime.type.RTT
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ThreadExecutorTest {
+
+    @Test
+    fun `host raised exception resumes at a matching guest catch`() {
+        val program = Program()
+        val store = store(program = program)
+        val tagAddress = store.heap.registerTag(
+            rtt = RTT(0),
+            type = tagType(
+                functionType = functionType(
+                    params = resultType(listOf(i64ValueType())),
+                ),
+            ),
+        )
+        val exceptionReference = store.heap.allocateException(
+            tagAddress = tagAddress,
+            fields = longArrayOf(0x123456789ABCDEFL),
+        )
+        val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
+        val hostFunction = hostFunctionInstance(
+            function = HostFunction { _, _ ->
+                store.heap.raise(HostException(exceptionReference))
+            },
+        )
+        val entryIp = program.append(
+            arrayOf(
+                DispatchableInstruction { vstack, cstack, _, context, _ ->
+                    cstack.push(
+                        ExceptionHandler(
+                            handlers = listOf(catchCatchHandler(tagIndex(0u), labelIndex(0u))),
+                            payloadDestinationSlots = listOf(intArrayOf(0)),
+                            continuationIps = intArrayOf(1),
+                            framesDepth = 1,
+                            framePointer = 0,
+                            valueDepth = 1,
+                        ),
+                    )
+                    HostFunctionCall(vstack, context, module, hostFunction)
+                    error("raised exception returned to the host call site")
+                },
+                EndFunctionDispatcher(AdminInstruction.EndFunction),
+            ),
+        )
+        val function = wasmFunctionInstance(
+            module = module,
+            functionType = functionType(results = resultType(listOf(i64ValueType()))),
+            function = runtimeFunction(
+                body = runtimeExpression(entryIp),
+                frameSlots = 1,
+            ),
+        )
+
+        val actual = ThreadExecutor(runtimeConfig(), store, function, emptyList())
+
+        assertEquals(Ok(listOf(0x123456789ABCDEFL)), actual)
+        assertFalse(store.heap.hasPending)
+    }
+
+    @Test
+    fun `uncaught host raised exception returns to the host`() {
+        val program = Program()
+        val store = store(program = program)
+        val exceptionReference = store.heap.allocateException(
+            tagAddress = store.heap.registerTag(
+                rtt = RTT(0),
+                type = tagType(),
+            ),
+            fields = LongArray(0),
+        )
+        val module = moduleInstance()
+        val hostFunction = hostFunctionInstance(
+            function = HostFunction { _, _ ->
+                store.heap.raise(HostException(exceptionReference))
+            },
+        )
+        val entryIp = program.append(
+            DispatchableInstruction { vstack, _, _, context, _ ->
+                HostFunctionCall(vstack, context, module, hostFunction)
+                error("raised exception returned to the host call site")
+            },
+        )
+        val function = wasmFunctionInstance(
+            module = module,
+            function = runtimeFunction(body = runtimeExpression(entryIp)),
+        )
+
+        val actual = ThreadExecutor(runtimeConfig(), store, function, emptyList())
+
+        assertEquals(Err(InvocationError.ThrownException), actual)
+        assertEquals(exceptionReference, store.heap.takePendingExceptionReference())
+    }
 
     @Test
     fun `guest heap exhaustion becomes a deterministic invocation error`() {
@@ -203,7 +305,7 @@ class ThreadExecutorTest {
         assertEquals(Err(failure), actual)
     }
 
-    private fun allocateUnreachableGuestObject(store: io.github.charlietap.chasm.runtime.store.Store) {
+    private fun allocateUnreachableGuestObject(store: Store) {
         val types = listOf(
             definedType(
                 recursiveType = recursiveType(

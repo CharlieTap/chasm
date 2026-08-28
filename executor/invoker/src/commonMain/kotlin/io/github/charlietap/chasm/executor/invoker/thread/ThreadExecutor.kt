@@ -6,8 +6,10 @@ import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
+import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
@@ -75,23 +77,32 @@ internal inline fun ThreadExecutor(
         var ip = instance.function.body.entryIp
         val instructions = store.program.instructions
         dispatch@ while (true) {
-            // Three may seem arbitrary, but it is intentional. Executing several
-            // instructions per iteration amortises the cost of the jump back to the
-            // top of the loop.
-            // Adding iterations is not free: every slot adds another indirect call site,
-            // exit branch, and more compiled code. On HotSpot these call sites are
-            // megamorphic and also require their own profiling and safepoint metadata.
-            ip = instructions[ip](vstack, cstack, store, context, ip + 1)
-            if (ip == EXIT_IP) {
-                break@dispatch
-            }
-            ip = instructions[ip](vstack, cstack, store, context, ip + 1)
-            if (ip == EXIT_IP) {
-                break@dispatch
-            }
-            ip = instructions[ip](vstack, cstack, store, context, ip + 1)
-            if (ip == EXIT_IP) {
-                break@dispatch
+            try {
+                // Three may seem arbitrary, but it is intentional. Executing several
+                // instructions per iteration amortises the cost of the jump back to the
+                // top of the loop.
+                // Adding iterations is not free: every slot adds another indirect call site,
+                // exit branch, and more compiled code. On HotSpot these call sites are
+                // megamorphic and also require their own profiling and safepoint metadata.
+                ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+                if (ip == EXIT_IP) {
+                    break@dispatch
+                }
+                ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+                if (ip == EXIT_IP) {
+                    break@dispatch
+                }
+                ip = instructions[ip](vstack, cstack, store, context, ip + 1)
+                if (ip == EXIT_IP) {
+                    break@dispatch
+                }
+            } catch (_: HostRaisedWasmException) {
+                ip = ThrowRefValueExecutor(
+                    vstack = vstack,
+                    cstack = cstack,
+                    store = store,
+                    ref = store.heap.takePendingExceptionReference(),
+                )
             }
         }
     } catch (exception: InvocationException) {
