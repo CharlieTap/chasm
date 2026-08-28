@@ -1,18 +1,18 @@
-package io.github.charlietap.chasm.executor.invoker.instruction.referencefused
+package io.github.charlietap.chasm.executor.invoker.instruction.reference
 
 import io.github.charlietap.chasm.executor.invoker.type.Caster
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.isNullableReference
-import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
 internal inline fun RefEqExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefEqSs,
+    instruction: ReferenceInstruction.RefEqSs,
 ) = executeRefEq(
     vstack = vstack,
     reference1 = vstack.getFrameSlot(instruction.reference1Slot),
@@ -23,7 +23,7 @@ internal inline fun RefEqExecutor(
 internal inline fun RefIsNullExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefIsNullS,
+    instruction: ReferenceInstruction.RefIsNullS,
 ) = executeRefIsNull(
     vstack = vstack,
     value = vstack.getFrameSlot(instruction.valueSlot),
@@ -33,7 +33,7 @@ internal inline fun RefIsNullExecutor(
 internal inline fun RefAsNonNullExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefAsNonNullS,
+    instruction: ReferenceInstruction.RefAsNonNullS,
 ) {
     val value = vstack.getFrameSlot(instruction.valueSlot)
     if (value.isNullableReference()) {
@@ -45,7 +45,7 @@ internal inline fun RefAsNonNullExecutor(
 internal inline fun RefNullExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefNullS,
+    instruction: ReferenceInstruction.RefNullS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.reference)
 }
@@ -53,7 +53,7 @@ internal inline fun RefNullExecutor(
 internal inline fun RefFuncExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefFuncS,
+    instruction: ReferenceInstruction.RefFuncS,
 ) {
     vstack.setFrameSlot(instruction.destinationSlot, instruction.reference)
 }
@@ -61,7 +61,7 @@ internal inline fun RefFuncExecutor(
 internal fun RefTestExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefTestS,
+    instruction: ReferenceInstruction.RefTestS,
 ) = RefTestExecutor(
     vstack = vstack,
     context = context,
@@ -72,7 +72,7 @@ internal fun RefTestExecutor(
 internal inline fun RefTestExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefTestS,
+    instruction: ReferenceInstruction.RefTestS,
     crossinline caster: Caster,
 ) = executeRefTest(
     vstack = vstack,
@@ -86,7 +86,7 @@ internal inline fun RefTestExecutor(
 internal fun RefCastExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefCastS,
+    instruction: ReferenceInstruction.RefCastS,
 ) = RefCastExecutor(
     vstack = vstack,
     context = context,
@@ -97,7 +97,7 @@ internal fun RefCastExecutor(
 internal inline fun RefCastExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
-    instruction: ReferenceSuperInstruction.RefCastS,
+    instruction: ReferenceInstruction.RefCastS,
     crossinline caster: Caster,
 ) = executeRefCast(
     vstack = vstack,

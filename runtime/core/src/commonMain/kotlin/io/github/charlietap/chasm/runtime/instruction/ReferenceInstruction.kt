@@ -1,24 +1,44 @@
 package io.github.charlietap.chasm.runtime.instruction
 
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
-import kotlin.jvm.JvmInline
 
 sealed interface ReferenceInstruction : LinkedInstruction {
-    @JvmInline
-    value class RefNull(val reference: Long) : ReferenceInstruction
 
-    data object RefIsNull : ReferenceInstruction
+    data class RefCastS(
+        val referenceSlot: Int,
+        val destinationSlot: Int,
+        val typeTest: ReferenceTypeTest,
+    ) : ReferenceInstruction
 
-    data object RefAsNonNull : ReferenceInstruction
+    data class RefEqSs(
+        val reference1Slot: Int,
+        val reference2Slot: Int,
+        val destinationSlot: Int,
+    ) : ReferenceInstruction
 
-    @JvmInline
-    value class RefFunc(val reference: Long) : ReferenceInstruction
+    data class RefIsNullS(
+        val valueSlot: Int,
+        val destinationSlot: Int,
+    ) : ReferenceInstruction
 
-    data object RefEq : ReferenceInstruction
+    data class RefAsNonNullS(
+        val valueSlot: Int,
+        val destinationSlot: Int,
+    ) : ReferenceInstruction
 
-    @JvmInline
-    value class RefTest(val typeTest: ReferenceTypeTest) : ReferenceInstruction
+    data class RefNullS(
+        val reference: Long,
+        val destinationSlot: Int,
+    ) : ReferenceInstruction
 
-    @JvmInline
-    value class RefCast(val typeTest: ReferenceTypeTest) : ReferenceInstruction
+    data class RefFuncS(
+        val reference: Long,
+        val destinationSlot: Int,
+    ) : ReferenceInstruction
+
+    data class RefTestS(
+        val referenceSlot: Int,
+        val destinationSlot: Int,
+        val typeTest: ReferenceTypeTest,
+    ) : ReferenceInstruction
 }

@@ -1,39 +1,39 @@
 package io.github.charlietap.chasm.compiler.instruction
 
 import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
-import io.github.charlietap.chasm.executor.invoker.dispatch.referencefused.ReferenceSuperInstructionDispatcher
-import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
+import io.github.charlietap.chasm.executor.invoker.dispatch.reference.ReferenceInstructionDispatcher
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
 internal fun FunctionCompilationContext.emitReferenceInstruction(
-    instruction: ReferenceSuperInstruction,
+    instruction: ReferenceInstruction,
 ) {
-    emit(instruction, ::ReferenceSuperInstructionDispatcher)
+    emit(instruction, ::ReferenceInstructionDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitRefNull(reference: Long, destinationSlot: Int) =
-    emitReferenceInstruction(ReferenceSuperInstruction.RefNullS(reference, destinationSlot))
+    emitReferenceInstruction(ReferenceInstruction.RefNullS(reference, destinationSlot))
 
 internal fun FunctionCompilationContext.emitRefFunc(reference: Long, destinationSlot: Int) =
-    emitReferenceInstruction(ReferenceSuperInstruction.RefFuncS(reference, destinationSlot))
+    emitReferenceInstruction(ReferenceInstruction.RefFuncS(reference, destinationSlot))
 
 internal fun FunctionCompilationContext.emitRefIsNull(sourceSlot: Int, destinationSlot: Int) =
-    emitReferenceInstruction(ReferenceSuperInstruction.RefIsNullS(sourceSlot, destinationSlot))
+    emitReferenceInstruction(ReferenceInstruction.RefIsNullS(sourceSlot, destinationSlot))
 
 internal fun FunctionCompilationContext.emitRefAsNonNull(sourceSlot: Int, destinationSlot: Int) =
-    emitReferenceInstruction(ReferenceSuperInstruction.RefAsNonNullS(sourceSlot, destinationSlot))
+    emitReferenceInstruction(ReferenceInstruction.RefAsNonNullS(sourceSlot, destinationSlot))
 
 internal fun FunctionCompilationContext.emitRefEq(firstSlot: Int, secondSlot: Int, destinationSlot: Int) =
-    emitReferenceInstruction(ReferenceSuperInstruction.RefEqSs(firstSlot, secondSlot, destinationSlot))
+    emitReferenceInstruction(ReferenceInstruction.RefEqSs(firstSlot, secondSlot, destinationSlot))
 
 internal fun FunctionCompilationContext.emitRefTest(
     sourceSlot: Int,
     destinationSlot: Int,
     typeTest: ReferenceTypeTest,
-) = emitReferenceInstruction(ReferenceSuperInstruction.RefTestS(sourceSlot, destinationSlot, typeTest))
+) = emitReferenceInstruction(ReferenceInstruction.RefTestS(sourceSlot, destinationSlot, typeTest))
 
 internal fun FunctionCompilationContext.emitRefCast(
     sourceSlot: Int,
     destinationSlot: Int,
     typeTest: ReferenceTypeTest,
-) = emitReferenceInstruction(ReferenceSuperInstruction.RefCastS(sourceSlot, destinationSlot, typeTest))
+) = emitReferenceInstruction(ReferenceInstruction.RefCastS(sourceSlot, destinationSlot, typeTest))

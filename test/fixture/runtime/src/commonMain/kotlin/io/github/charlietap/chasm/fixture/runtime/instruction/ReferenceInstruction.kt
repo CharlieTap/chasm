@@ -4,34 +4,66 @@ import io.github.charlietap.chasm.fixture.runtime.type.referenceTypeTest
 import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
 
-fun referenceRuntimeInstruction() = refEqRuntimeInstruction()
+fun referenceRuntimeInstruction(): ReferenceInstruction = refCastSRuntimeInstruction()
 
-fun refEqRuntimeInstruction() = ReferenceInstruction.RefEq
-
-fun refTestRuntimeInstruction(
+fun refCastSRuntimeInstruction(
+    referenceSlot: Int = 0,
+    destinationSlot: Int = 0,
     typeTest: ReferenceTypeTest = referenceTypeTest(),
-) = ReferenceInstruction.RefTest(
+) = ReferenceInstruction.RefCastS(
+    referenceSlot = referenceSlot,
+    destinationSlot = destinationSlot,
     typeTest = typeTest,
 )
 
-fun refNullRuntimeInstruction(
-    reference: Long = 0L,
-) = ReferenceInstruction.RefNull(
-    reference = reference,
+fun refEqSsRuntimeInstruction(
+    reference1Slot: Int = 0,
+    reference2Slot: Int = 0,
+    destinationSlot: Int = 0,
+) = ReferenceInstruction.RefEqSs(
+    reference1Slot = reference1Slot,
+    reference2Slot = reference2Slot,
+    destinationSlot = destinationSlot,
 )
 
-fun refIsNullRuntimeInstruction() = ReferenceInstruction.RefIsNull
-
-fun refAsNonNullRuntimeInstruction() = ReferenceInstruction.RefAsNonNull
-
-fun refFuncRuntimeInstruction(
-    reference: Long = 0L,
-) = ReferenceInstruction.RefFunc(
-    reference = reference,
+fun refIsNullSRuntimeInstruction(
+    valueSlot: Int = 0,
+    destinationSlot: Int = 0,
+) = ReferenceInstruction.RefIsNullS(
+    valueSlot = valueSlot,
+    destinationSlot = destinationSlot,
 )
 
-fun refCastRuntimeInstruction(
+fun refAsNonNullSRuntimeInstruction(
+    valueSlot: Int = 0,
+    destinationSlot: Int = 0,
+) = ReferenceInstruction.RefAsNonNullS(
+    valueSlot = valueSlot,
+    destinationSlot = destinationSlot,
+)
+
+fun refNullSRuntimeInstruction(
+    reference: Long = 0L,
+    destinationSlot: Int = 0,
+) = ReferenceInstruction.RefNullS(
+    reference = reference,
+    destinationSlot = destinationSlot,
+)
+
+fun refFuncSRuntimeInstruction(
+    reference: Long = 0L,
+    destinationSlot: Int = 0,
+) = ReferenceInstruction.RefFuncS(
+    reference = reference,
+    destinationSlot = destinationSlot,
+)
+
+fun refTestSRuntimeInstruction(
+    referenceSlot: Int = 0,
+    destinationSlot: Int = 0,
     typeTest: ReferenceTypeTest = referenceTypeTest(),
-) = ReferenceInstruction.RefCast(
+) = ReferenceInstruction.RefTestS(
+    referenceSlot = referenceSlot,
+    destinationSlot = destinationSlot,
     typeTest = typeTest,
 )

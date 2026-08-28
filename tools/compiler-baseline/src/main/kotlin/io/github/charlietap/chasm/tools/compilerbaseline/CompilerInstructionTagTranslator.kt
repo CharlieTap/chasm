@@ -11,7 +11,7 @@ import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricInstruction
-import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.ReferenceInstruction
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
 import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
 
@@ -28,7 +28,7 @@ class CompilerInstructionTagTranslator {
         is MemoryInstruction -> variant(instruction, "memory", memoryOperations)
         is TableInstruction.ElemDrop -> "table.elem_drop"
         is TableInstruction -> variant(instruction, "table", tableOperations)
-        is ReferenceSuperInstruction -> reference(instruction)
+        is ReferenceInstruction -> reference(instruction)
         is AggregateSuperInstruction -> variant(instruction, "aggregate", aggregateOperations)
         else -> error("unsupported compiler instruction: ${instruction.javaClass.name}")
     }
@@ -110,14 +110,14 @@ class CompilerInstructionTagTranslator {
         is ControlSuperInstruction.ThrowRefS -> "control.throw_ref"
     }
 
-    private fun reference(instruction: ReferenceSuperInstruction): String = when (instruction) {
-        is ReferenceSuperInstruction.RefCastS -> "reference.ref_cast"
-        is ReferenceSuperInstruction.RefEqSs -> "reference.ref_eq"
-        is ReferenceSuperInstruction.RefIsNullS -> "reference.ref_is_null"
-        is ReferenceSuperInstruction.RefAsNonNullS -> "reference.ref_as_non_null"
-        is ReferenceSuperInstruction.RefNullS -> "reference.ref_null"
-        is ReferenceSuperInstruction.RefFuncS -> "reference.ref_func"
-        is ReferenceSuperInstruction.RefTestS -> "reference.ref_test"
+    private fun reference(instruction: ReferenceInstruction): String = when (instruction) {
+        is ReferenceInstruction.RefCastS -> "reference.ref_cast"
+        is ReferenceInstruction.RefEqSs -> "reference.ref_eq"
+        is ReferenceInstruction.RefIsNullS -> "reference.ref_is_null"
+        is ReferenceInstruction.RefAsNonNullS -> "reference.ref_as_non_null"
+        is ReferenceInstruction.RefNullS -> "reference.ref_null"
+        is ReferenceInstruction.RefFuncS -> "reference.ref_func"
+        is ReferenceInstruction.RefTestS -> "reference.ref_test"
     }
 
     private fun numericCondition(instruction: NumericCondition, polarity: String): String {
