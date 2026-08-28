@@ -1,3 +1,12 @@
 package io.github.charlietap.chasm.host
 
-interface HostResources
+interface HostResources {
+
+    fun memory(module: HostModuleInstance, index: Int): HostMemory
+
+    fun table(module: HostModuleInstance, index: Int): HostTable
+
+    fun global(module: HostModuleInstance, index: Int): HostGlobal
+
+    fun tag(module: HostModuleInstance, index: Int): HostTag
+}

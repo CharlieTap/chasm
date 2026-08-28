@@ -58,6 +58,10 @@ public abstract interface class io/github/charlietap/chasm/host/HostModuleInstan
 }
 
 public abstract interface class io/github/charlietap/chasm/host/HostResources {
+	public abstract fun global (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostGlobal;
+	public abstract fun memory (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostMemory;
+	public abstract fun table (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostTable;
+	public abstract fun tag-tFeqfqs (Lio/github/charlietap/chasm/host/HostModuleInstance;I)I
 }
 
 public final class io/github/charlietap/chasm/host/HostStackExtensionsKt {
