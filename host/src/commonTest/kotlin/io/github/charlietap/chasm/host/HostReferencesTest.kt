@@ -33,6 +33,36 @@ class HostReferencesTest {
 
         assertEquals(0, references.top)
     }
+
+    @Test
+    fun `withReferences opens and closes a scope on the caller references`() {
+        val references = RecordingHostReferences()
+        val resources = ReferenceHostResources(references)
+
+        val result = context(resources) {
+            withReferences(capacity = 3) {
+                rootScoped(42L)
+                117
+            }
+        }
+
+        assertEquals(117, result)
+        assertEquals(3, references.requestedCapacity)
+        assertEquals(0, references.top)
+    }
+}
+
+private class ReferenceHostResources(
+    override val references: HostReferences,
+) : HostResources {
+
+    override fun memory(module: HostModuleInstance, index: Int): HostMemory = error("unused")
+
+    override fun table(module: HostModuleInstance, index: Int): HostTable = error("unused")
+
+    override fun global(module: HostModuleInstance, index: Int): HostGlobal = error("unused")
+
+    override fun tag(module: HostModuleInstance, index: Int): HostTag = error("unused")
 }
 
 private class RecordingHostReferences : HostReferences {

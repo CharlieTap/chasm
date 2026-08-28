@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.host.HostGlobal
 import io.github.charlietap.chasm.host.HostMemory
 import io.github.charlietap.chasm.host.HostModuleInstance
+import io.github.charlietap.chasm.host.HostReferences
 import io.github.charlietap.chasm.host.HostResources
 import io.github.charlietap.chasm.host.HostTable
 import io.github.charlietap.chasm.host.HostTag
@@ -21,6 +22,9 @@ data class ExecutionContext(
     val config: RuntimeConfig,
 ) : HostResources {
     val heap: WasmHeap = store.heap
+
+    override val references: HostReferences
+        get() = heap
 
     override fun memory(module: HostModuleInstance, index: Int): HostMemory {
         val address = (module as ModuleInstance).memAddresses[index]

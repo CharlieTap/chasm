@@ -1,6 +1,8 @@
 public final class io/github/charlietap/chasm/host/HostContextExtensionsKt {
 	public static final fun withGlobal (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun withMemory (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun withReferences (Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun withReferences$default (Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun withTable (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun withTag (Lio/github/charlietap/chasm/host/HostModuleInstance;Lio/github/charlietap/chasm/host/HostResources;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
@@ -184,6 +186,7 @@ public final class io/github/charlietap/chasm/host/HostReferencesKt {
 }
 
 public abstract interface class io/github/charlietap/chasm/host/HostResources {
+	public abstract fun getReferences ()Lio/github/charlietap/chasm/host/HostReferences;
 	public abstract fun global (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostGlobal;
 	public abstract fun memory (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostMemory;
 	public abstract fun table (Lio/github/charlietap/chasm/host/HostModuleInstance;I)Lio/github/charlietap/chasm/host/HostTable;

@@ -27,3 +27,10 @@ inline fun <T> withTag(
     index: Int,
     block: HostTag.() -> T,
 ): T = resources.tag(module, index).block()
+
+/** Runs [block] in a nested reference scope owned by the calling store. */
+context(resources: HostResources)
+inline fun <T> withReferences(
+    capacity: Int = 0,
+    block: HostReferences.() -> T,
+): T = resources.references.withScope(capacity, block)

@@ -59,6 +59,7 @@ class ExecutionContextHostTest {
         assertSame(targetMemory, memory)
         assertSame(targetTable, table)
         assertSame(targetGlobal, global)
+        assertSame(store.heap, context.references)
         assertEquals(HostTag(targetTagAddress.address), context.tag(caller, 0))
 
         context(caller, context) {
