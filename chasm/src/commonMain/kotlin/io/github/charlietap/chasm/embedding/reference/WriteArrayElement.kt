@@ -47,7 +47,7 @@ internal fun internalWriteArrayElement(
     if (fieldType.mutability != Mutability.Var) {
         throw InvocationException(InvocationError.ArrayCopyOnAConstArray)
     }
-    if (index !in 0 until store.store.heap.arrayLength(rawReference)) {
+    if (index !in 0 until store.store.heap.arrayLengthChecked(rawReference)) {
         throw InvocationException(InvocationError.ArrayFieldLookupFailed(index))
     }
 

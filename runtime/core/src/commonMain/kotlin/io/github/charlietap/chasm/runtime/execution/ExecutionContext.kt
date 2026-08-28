@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.execution
 
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.host.HostGc
 import io.github.charlietap.chasm.host.HostGlobal
 import io.github.charlietap.chasm.host.HostMemory
 import io.github.charlietap.chasm.host.HostModuleInstance
@@ -24,6 +25,9 @@ data class ExecutionContext(
     val heap: WasmHeap = store.heap
 
     override val references: HostReferences
+        get() = heap
+
+    override val gc: HostGc
         get() = heap
 
     override fun memory(module: HostModuleInstance, index: Int): HostMemory {

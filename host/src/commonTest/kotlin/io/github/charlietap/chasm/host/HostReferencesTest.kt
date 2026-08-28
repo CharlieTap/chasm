@@ -56,6 +56,9 @@ private class ReferenceHostResources(
     override val references: HostReferences,
 ) : HostResources {
 
+    override val gc: HostGc
+        get() = error("unused")
+
     override fun memory(module: HostModuleInstance, index: Int): HostMemory = error("unused")
 
     override fun table(module: HostModuleInstance, index: Int): HostTable = error("unused")

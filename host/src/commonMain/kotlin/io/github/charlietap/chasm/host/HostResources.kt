@@ -4,6 +4,8 @@ interface HostResources {
 
     val references: HostReferences
 
+    val gc: HostGc
+
     fun memory(module: HostModuleInstance, index: Int): HostMemory
 
     fun table(module: HostModuleInstance, index: Int): HostTable

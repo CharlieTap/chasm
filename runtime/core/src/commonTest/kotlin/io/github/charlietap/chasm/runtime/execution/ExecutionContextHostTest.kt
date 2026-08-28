@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.type.tagType
 import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.host.UnsafeHostApi
+import io.github.charlietap.chasm.host.withGc
 import io.github.charlietap.chasm.host.withGlobal
 import io.github.charlietap.chasm.host.withMemory
 import io.github.charlietap.chasm.host.withTable
@@ -60,9 +61,11 @@ class ExecutionContextHostTest {
         assertSame(targetTable, table)
         assertSame(targetGlobal, global)
         assertSame(store.heap, context.references)
+        assertSame(store.heap, context.gc)
         assertEquals(HostTag(targetTagAddress.address), context.tag(caller, 0))
 
         context(caller, context) {
+            withGc { assertSame(store.heap, this) }
             withMemory(0) { assertSame(targetMemory, this) }
             withTable(0) { assertSame(targetTable, this) }
             withGlobal(0) { assertSame(targetGlobal, this) }

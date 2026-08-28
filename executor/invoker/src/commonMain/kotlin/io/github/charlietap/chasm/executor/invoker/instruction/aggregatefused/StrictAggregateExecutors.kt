@@ -743,7 +743,7 @@ private fun executeArrayCopy(
     destinationAddress: Long,
 ) {
     try {
-        heap.copyArray(sourceAddress, sourceOffset, destinationAddress, destinationOffset, elementsToCopy)
+        heap.copyArrayChecked(sourceAddress, sourceOffset, destinationAddress, destinationOffset, elementsToCopy)
     } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }
@@ -757,7 +757,7 @@ private fun executeArrayFill(
     address: Long,
 ) {
     try {
-        heap.fillArray(address, arrayElementOffset, elementsToFill, fillValue)
+        heap.fillArrayChecked(address, arrayElementOffset, elementsToFill, fillValue)
     } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }

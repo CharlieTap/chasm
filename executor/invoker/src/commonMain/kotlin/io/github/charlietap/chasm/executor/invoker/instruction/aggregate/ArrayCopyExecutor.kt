@@ -27,7 +27,7 @@ internal inline fun ArrayCopyExecutor(
     val destinationReference = vstack.pop()
 
     try {
-        context.heap.copyArray(
+        context.heap.copyArrayChecked(
             sourceReference,
             sourceOffset,
             destinationReference,

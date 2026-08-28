@@ -21,7 +21,7 @@ internal inline fun ArrayFillExecutor(
     val reference = vstack.pop()
 
     try {
-        context.heap.fillArray(reference, arrayElementOffset, elementsToFill, fillValue)
+        context.heap.fillArrayChecked(reference, arrayElementOffset, elementsToFill, fillValue)
     } catch (_: IllegalArgumentException) {
         throw InvocationException(InvocationError.ArrayOperationOutOfBounds)
     }

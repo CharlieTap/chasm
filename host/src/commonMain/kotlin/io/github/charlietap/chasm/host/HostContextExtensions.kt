@@ -34,3 +34,7 @@ inline fun <T> withReferences(
     capacity: Int = 0,
     block: HostReferences.() -> T,
 ): T = resources.references.withScope(capacity, block)
+
+/** Makes the calling store's garbage collector the receiver. */
+context(resources: HostResources)
+inline fun <T> withGc(block: HostGc.() -> T): T = resources.gc.block()

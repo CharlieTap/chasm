@@ -5,9 +5,15 @@ import io.github.charlietap.chasm.gc.AllocationAvailability
 import io.github.charlietap.chasm.gc.GarbageCollectedHeap
 import io.github.charlietap.chasm.gc.GcRootSink
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
+import io.github.charlietap.chasm.host.HostFunctionException
+import io.github.charlietap.chasm.host.HostGc
+import io.github.charlietap.chasm.host.HostGcFieldInfo
+import io.github.charlietap.chasm.host.HostGcType
+import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.HostReference
 import io.github.charlietap.chasm.host.HostReferenceRoot
 import io.github.charlietap.chasm.host.HostReferences
+import io.github.charlietap.chasm.host.HostResources
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.encoder.RV_SHIFT_BITS
 import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_ARRAY
@@ -17,6 +23,7 @@ import io.github.charlietap.chasm.runtime.encoder.RV_TYPE_STRUCT
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
+import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TagInstance
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
@@ -27,14 +34,18 @@ import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.DefinedType
 import io.github.charlietap.chasm.type.FieldType
+import io.github.charlietap.chasm.type.Mutability
+import io.github.charlietap.chasm.type.NumberType
+import io.github.charlietap.chasm.type.PackedType
 import io.github.charlietap.chasm.type.StorageType
 import io.github.charlietap.chasm.type.StructType
 import io.github.charlietap.chasm.type.TagType
 import io.github.charlietap.chasm.type.ValueType
+import io.github.charlietap.chasm.type.VectorType
 
 class WasmHeap internal constructor(
     private val garbageCollectedHeap: GarbageCollectedHeap,
-) : HostReferences {
+) : HostReferences, HostGc {
     constructor() : this(GarbageCollectedHeap())
 
     private val runtimeTypes = RuntimeTypeRegistry()
@@ -55,6 +66,9 @@ class WasmHeap internal constructor(
     private var retainedRootNext = IntArray(0)
     private var retainedRootTop = 0
     private var retainedRootFreeHead = NO_SLOT
+
+    override val allocatedBytes: Long
+        get() = allocatedGuestBytes()
 
     override fun beginScope(capacity: Int): Int {
         val marker = scopedRootTop
@@ -90,6 +104,185 @@ class WasmHeap internal constructor(
         retainedRoots[slot] = 0L
         retainedRootNext[slot] = retainedRootFreeHead
         retainedRootFreeHead = slot
+    }
+
+    context(resources: HostResources)
+    override fun collect() {
+        collectFromHost(resources as ExecutionContext)
+    }
+
+    context(resources: HostResources)
+    override fun collect(
+        additionalRoots: LongArray,
+        rootOffset: Int,
+        rootCount: Int,
+    ) {
+        val marker = beginScope(rootCount)
+        var index = 0
+        while (index < rootCount) {
+            rootScoped(additionalRoots[rootOffset + index])
+            index++
+        }
+        try {
+            collectFromHost(resources as ExecutionContext)
+        } finally {
+            endScope(marker)
+        }
+    }
+
+    override fun structType(reference: HostReference): HostGcType =
+        HostGcType(structRuntimeTypeIdOrNegative(reference))
+
+    override fun structFieldCount(type: HostGcType): Int =
+        checkNotNull(structTypes[type.id]).fields.size
+
+    override fun structFieldInfo(
+        type: HostGcType,
+        fieldIndex: Int,
+    ): HostGcFieldInfo = hostFieldInfo(checkNotNull(structTypes[type.id]).fields[fieldIndex])
+
+    override fun readStructField(reference: HostReference, fieldIndex: Int): Long =
+        garbageCollectedHeap.getStructField(reference, fieldIndex)
+
+    override fun writeStructField(
+        reference: HostReference,
+        fieldIndex: Int,
+        value: Long,
+    ) {
+        garbageCollectedHeap.setStructField(reference, fieldIndex, value)
+    }
+
+    override fun arrayType(reference: HostReference): HostGcType =
+        HostGcType(arrayRuntimeTypeIdOrNegative(reference))
+
+    override fun arrayElementInfo(type: HostGcType): HostGcFieldInfo =
+        hostFieldInfo(checkNotNull(arrayTypes[type.id]).fieldType)
+
+    override fun readArrayElement(reference: HostReference, index: Int): Long =
+        garbageCollectedHeap.getArrayElement(reference, index)
+
+    override fun writeArrayElement(
+        reference: HostReference,
+        index: Int,
+        value: Long,
+    ) {
+        garbageCollectedHeap.setArrayElement(reference, index, value)
+    }
+
+    override fun readArrayElements(
+        reference: HostReference,
+        sourceOffset: Int,
+        destination: LongArray,
+        destinationOffset: Int,
+        length: Int,
+    ): LongArray = garbageCollectedHeap.readArrayElements(
+        rawReference = reference,
+        sourceOffset = sourceOffset,
+        destination = destination,
+        destinationOffset = destinationOffset,
+        length = length,
+    )
+
+    override fun writeArrayElements(
+        reference: HostReference,
+        destinationOffset: Int,
+        source: LongArray,
+        sourceOffset: Int,
+        length: Int,
+    ) {
+        garbageCollectedHeap.initializeArrayFromElements(
+            rawReference = reference,
+            destinationOffset = destinationOffset,
+            source = source,
+            sourceOffset = sourceOffset,
+            length = length,
+        )
+    }
+
+    override fun runtimeType(module: HostModuleInstance, typeIndex: Int): HostGcType =
+        HostGcType((module as ModuleInstance).runtimeTypes[typeIndex].value)
+
+    override fun isSubtype(actual: HostGcType, expected: HostGcType): Boolean =
+        matchesRuntimeType(RTT(actual.id), RTT(expected.id))
+
+    context(resources: HostResources)
+    override fun allocateStruct(
+        type: HostGcType,
+        fields: LongArray,
+        fieldOffset: Int,
+    ): HostReference {
+        val runtimeType = RTT(type.id)
+        val structType = checkNotNull(structTypes[type.id])
+        val marker = beginScope(structType.fields.size)
+        val result = try {
+            var fieldIndex = 0
+            while (fieldIndex < structType.fields.size) {
+                if (structType.fields[fieldIndex].containsReference()) {
+                    rootScoped(fields[fieldOffset + fieldIndex])
+                }
+                fieldIndex++
+            }
+            prepareStructAllocation(resources as ExecutionContext, runtimeType)
+            garbageCollectedHeap.allocateStruct(
+                descriptorKey = structDescriptorKey(runtimeType),
+                source = fields,
+                sourceOffset = fieldOffset,
+            )
+        } finally {
+            endScope(marker)
+        }
+        return rootScoped(result)
+    }
+
+    context(resources: HostResources)
+    override fun allocateArray(
+        type: HostGcType,
+        length: Int,
+        initialValue: Long,
+    ): HostReference {
+        val runtimeType = RTT(type.id)
+        val marker = beginScope(1)
+        val result = try {
+            if (checkNotNull(arrayTypes[type.id]).fieldType.containsReference()) {
+                rootScoped(initialValue)
+            }
+            prepareArrayAllocation(resources as ExecutionContext, runtimeType, length)
+            allocateArrayFilled(runtimeType, length, initialValue)
+        } finally {
+            endScope(marker)
+        }
+        return rootScoped(result)
+    }
+
+    context(resources: HostResources)
+    override fun allocateArray(
+        type: HostGcType,
+        elements: LongArray,
+        elementOffset: Int,
+        elementCount: Int,
+    ): HostReference {
+        val runtimeType = RTT(type.id)
+        val containsReferences = checkNotNull(arrayTypes[type.id]).fieldType.containsReference()
+        val marker = beginScope(if (containsReferences) elementCount else 0)
+        val result = try {
+            if (containsReferences) {
+                var elementIndex = 0
+                while (elementIndex < elementCount) {
+                    rootScoped(elements[elementOffset + elementIndex])
+                    elementIndex++
+                }
+            }
+            prepareArrayAllocation(resources as ExecutionContext, runtimeType, elementCount)
+            allocateArrayFromElements(
+                runtimeType = runtimeType,
+                source = elements,
+                sourceOffset = elementOffset,
+                length = elementCount,
+            )
+        } finally {
+            endScope(marker)
+        }
+        return rootScoped(result)
     }
 
     fun registerTag(
@@ -492,9 +685,13 @@ class WasmHeap internal constructor(
         return allocateArrayFromData(runtimeType, source, sourceByteOffset, length, elementByteWidth)
     }
 
-    fun arrayLength(rawReference: Long): Int {
-        resolveArrayType(rawReference)
-        return garbageCollectedHeap.arrayLength(rawReference)
+    override fun arrayLength(reference: HostReference): Int {
+        return garbageCollectedHeap.arrayLength(reference)
+    }
+
+    fun arrayLengthChecked(reference: Long): Int {
+        resolveArrayType(reference)
+        return garbageCollectedHeap.arrayLength(reference)
     }
 
     fun arrayLengthTrusted(rawReference: Long): Int {
@@ -550,29 +747,54 @@ class WasmHeap internal constructor(
 
     fun arrayFieldType(rawReference: Long): FieldType = resolveArrayType(rawReference).fieldType
 
-    fun fillArray(
-        rawReference: Long,
+    override fun fillArray(
+        reference: HostReference,
         offset: Int,
         length: Int,
         value: Long,
     ) {
-        requireArrayTag(rawReference)
-        garbageCollectedHeap.fillArray(rawReference, offset, length, value)
+        garbageCollectedHeap.fillArray(reference, offset, length, value)
     }
 
-    fun copyArray(
-        sourceReference: Long,
+    fun fillArrayChecked(
+        reference: Long,
+        offset: Int,
+        length: Int,
+        value: Long,
+    ) {
+        requireArrayTag(reference)
+        garbageCollectedHeap.fillArray(reference, offset, length, value)
+    }
+
+    override fun copyArray(
+        source: HostReference,
         sourceOffset: Int,
-        destinationReference: Long,
+        destination: HostReference,
         destinationOffset: Int,
         length: Int,
     ) {
-        requireArrayTag(sourceReference)
-        requireArrayTag(destinationReference)
         garbageCollectedHeap.copyArray(
-            sourceReference,
+            source,
             sourceOffset,
-            destinationReference,
+            destination,
+            destinationOffset,
+            length,
+        )
+    }
+
+    fun copyArrayChecked(
+        source: Long,
+        sourceOffset: Int,
+        destination: Long,
+        destinationOffset: Int,
+        length: Int,
+    ) {
+        requireArrayTag(source)
+        requireArrayTag(destination)
+        garbageCollectedHeap.copyArray(
+            source,
+            sourceOffset,
+            destination,
             destinationOffset,
             length,
         )
@@ -984,6 +1206,47 @@ class WasmHeap internal constructor(
         return checkNotNull(arrayTypes.getOrNull(runtimeTypeId)) {
             "live array has no registered semantic metadata"
         }
+    }
+
+    private fun collectFromHost(context: ExecutionContext) {
+        try {
+            collectGarbage(context.store, context.vstack)
+        } catch (failure: GuestHeapOutOfMemoryException) {
+            throw HostFunctionException(failure.message ?: "collection exhausted host memory")
+        }
+    }
+
+    private fun hostFieldInfo(fieldType: FieldType): HostGcFieldInfo {
+        val storageKind = when (val storageType = fieldType.storageType) {
+            is StorageType.Packed -> when (storageType.type) {
+                PackedType.I8 -> HostGcFieldInfo.PACKED_I8
+                PackedType.I16 -> HostGcFieldInfo.PACKED_I16
+            }
+            is StorageType.Value -> when (val valueType = storageType.type) {
+                is ValueType.Number -> when (valueType.numberType) {
+                    NumberType.I32 -> HostGcFieldInfo.I32
+                    NumberType.I64 -> HostGcFieldInfo.I64
+                    NumberType.F32 -> HostGcFieldInfo.F32
+                    NumberType.F64 -> HostGcFieldInfo.F64
+                }
+                is ValueType.Reference -> HostGcFieldInfo.REFERENCE
+                is ValueType.Vector -> when (valueType.vectorType) {
+                    VectorType.V128 -> HostGcFieldInfo.V128
+                }
+                is ValueType.Bottom -> error("bottom fields have no runtime representation")
+            }
+        }
+        val mutability = if (fieldType.mutability == Mutability.Var) {
+            HostGcFieldInfo.MUTABLE_MASK
+        } else {
+            0
+        }
+        return HostGcFieldInfo(storageKind or mutability)
+    }
+
+    private fun FieldType.containsReference(): Boolean {
+        val storageType = storageType
+        return storageType is StorageType.Value && storageType.type is ValueType.Reference
     }
 
     private fun ensureScopedRootCapacity(requiredCapacity: Int) {

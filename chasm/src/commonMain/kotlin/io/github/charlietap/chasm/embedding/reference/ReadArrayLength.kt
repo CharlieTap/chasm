@@ -30,7 +30,7 @@ internal fun internalReadArrayLength(
     store: Store,
     array: ReferenceValue.Array,
 ): Result<Int, ModuleTrapError> = runCatching {
-    store.store.heap.arrayLength(array.toLong())
+    store.store.heap.arrayLengthChecked(array.toLong())
 }.mapError { e ->
     when (e) {
         is InvocationException -> e.error
