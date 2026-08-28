@@ -4,34 +4,28 @@ import io.github.charlietap.chasm.fixture.runtime.instance.globalInstance
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
 import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
 
-fun variableRuntimeInstruction(): VariableInstruction = localGetRuntimeInstruction()
+fun variableRuntimeInstruction(): VariableInstruction = globalGetSRuntimeInstruction()
 
-fun localGetRuntimeInstruction(
-    localIdx: Int = 0,
-) = VariableInstruction.LocalGet(
-    localIdx = localIdx,
-)
-
-fun localSetRuntimeInstruction(
-    localIdx: Int = 0,
-) = VariableInstruction.LocalSet(
-    localIdx = localIdx,
-)
-
-fun localTeeRuntimeInstruction(
-    localIdx: Int = 0,
-) = VariableInstruction.LocalTee(
-    localIdx = localIdx,
-)
-
-fun globalGetRuntimeInstruction(
+fun globalGetSRuntimeInstruction(
     global: GlobalInstance = globalInstance(),
-) = VariableInstruction.GlobalGet(
+    destinationSlot: Int = 0,
+) = VariableInstruction.GlobalGetS(
+    global = global,
+    destinationSlot = destinationSlot,
+)
+
+fun globalSetIRuntimeInstruction(
+    value: Long = 0L,
+    global: GlobalInstance = globalInstance(),
+) = VariableInstruction.GlobalSetI(
+    value = value,
     global = global,
 )
 
-fun globalSetRuntimeInstruction(
+fun globalSetSRuntimeInstruction(
+    sourceSlot: Int = 0,
     global: GlobalInstance = globalInstance(),
-) = VariableInstruction.GlobalSet(
+) = VariableInstruction.GlobalSetS(
+    sourceSlot = sourceSlot,
     global = global,
 )

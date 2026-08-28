@@ -4,16 +4,16 @@ import io.github.charlietap.chasm.compiler.context.FunctionCompilationContext
 import io.github.charlietap.chasm.compiler.operand.OperandSource
 import io.github.charlietap.chasm.compiler.operand.isImmediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
-import io.github.charlietap.chasm.executor.invoker.dispatch.variablefused.VariableSuperInstructionDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.variable.VariableInstructionDispatcher
 import io.github.charlietap.chasm.runtime.instance.GlobalInstance
-import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
 
 internal fun FunctionCompilationContext.emitGlobalGet(
     global: GlobalInstance,
     destinationSlot: Int,
 ) {
-    val instruction = VariableSuperInstruction.GlobalGetS(global, destinationSlot)
-    emit(instruction, ::VariableSuperInstructionDispatcher)
+    val instruction = VariableInstruction.GlobalGetS(global, destinationSlot)
+    emit(instruction, ::VariableInstructionDispatcher)
 }
 
 internal fun FunctionCompilationContext.emitGlobalSet(
@@ -21,9 +21,9 @@ internal fun FunctionCompilationContext.emitGlobalSet(
     source: OperandSource,
 ) {
     val instruction = if (source.isImmediate) {
-        VariableSuperInstruction.GlobalSetI(source.sourceBits, global)
+        VariableInstruction.GlobalSetI(source.sourceBits, global)
     } else {
-        VariableSuperInstruction.GlobalSetS(source.sourceSlot, global)
+        VariableInstruction.GlobalSetS(source.sourceSlot, global)
     }
-    emit(instruction, ::VariableSuperInstructionDispatcher)
+    emit(instruction, ::VariableInstructionDispatcher)
 }

@@ -13,7 +13,7 @@ import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.ReferenceSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
-import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
 
 class CompilerInstructionTagTranslator {
 
@@ -21,7 +21,7 @@ class CompilerInstructionTagTranslator {
         is AdminInstruction -> admin(instruction)
         is ControlInstruction -> control(instruction)
         is ControlSuperInstruction -> control(instruction)
-        is VariableSuperInstruction -> variable(instruction)
+        is VariableInstruction -> variant(instruction, "variable", variableOperations)
         is ParametricSuperInstruction -> variant(instruction, "parametric", parametricOperations)
         is NumericInstruction -> variant(instruction, "numeric", numericOperations)
         is MemoryInstruction.DataDrop -> "memory.data_drop"
@@ -36,6 +36,8 @@ class CompilerInstructionTagTranslator {
     internal fun translateVariant(instructionClass: Class<*>): String = when {
         ParametricSuperInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "parametric", parametricOperations)
+        VariableInstruction::class.java.isAssignableFrom(instructionClass) ->
+            variant(instructionClass.simpleName, "variable", variableOperations)
         NumericInstruction::class.java.isAssignableFrom(instructionClass) ->
             variant(instructionClass.simpleName, "numeric", numericOperations)
         instructionClass == MemoryInstruction.DataDrop::class.java -> "memory.data_drop"
@@ -106,14 +108,6 @@ class CompilerInstructionTagTranslator {
         is ControlSuperInstruction.FunctionReturn -> "control.return"
         is ControlSuperInstruction.Throw -> "control.throw"
         is ControlSuperInstruction.ThrowRefS -> "control.throw_ref"
-    }
-
-    private fun variable(instruction: VariableSuperInstruction): String = when (instruction) {
-        is VariableSuperInstruction.GlobalGetS -> "variable.global_get"
-        is VariableSuperInstruction.GlobalSetI -> "variable.global_set.i"
-        is VariableSuperInstruction.GlobalSetS -> "variable.global_set.s"
-        is VariableSuperInstruction.LocalSetI -> "variable.local_set.i"
-        is VariableSuperInstruction.LocalSetS -> "variable.local_set.s"
     }
 
     private fun reference(instruction: ReferenceSuperInstruction): String = when (instruction) {
@@ -227,6 +221,11 @@ private fun operation(
 
 private val parametricOperations = listOf(
     operation("Select", "select", 3),
+)
+
+private val variableOperations = listOf(
+    operation("GlobalGet", "global_get", 0, 1),
+    operation("GlobalSet", "global_set", 1),
 )
 
 private val numericOperations = listOf(

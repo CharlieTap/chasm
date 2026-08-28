@@ -8,7 +8,7 @@ import io.github.charlietap.chasm.runtime.instruction.NumericCondition
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 import io.github.charlietap.chasm.runtime.instruction.ParametricSuperInstruction
 import io.github.charlietap.chasm.runtime.instruction.TableInstruction
-import io.github.charlietap.chasm.runtime.instruction.VariableSuperInstruction
+import io.github.charlietap.chasm.runtime.instruction.VariableInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -32,8 +32,8 @@ class CompilerInstructionTagTranslatorTest {
             translator.translate(ParametricSuperInstruction.SelectSis(1, 2L, 3, 4)),
         )
         assertEquals(
-            "variable.local_set.s",
-            translator.translate(VariableSuperInstruction.LocalSetS(1, 2)),
+            "variable.global_set.s",
+            translator.translateVariant(VariableInstruction.GlobalSetS::class.java),
         )
     }
 
@@ -71,6 +71,7 @@ class CompilerInstructionTagTranslatorTest {
 
 private val variantFamilies = listOf(
     ParametricSuperInstruction::class.java,
+    VariableInstruction::class.java,
     NumericInstruction::class.java,
     MemoryInstruction::class.java,
     TableInstruction::class.java,
