@@ -20,8 +20,8 @@ class ChasmPluginFunctionalTest {
         val publicationDirectory = repository.resolve(
             "io/github/charlietap/chasm/chasm-gradle-plugin/$pluginVersion",
         )
-        val module = publicationDirectory.resolve("chasm-gradle-plugin-$pluginVersion.module")
-        val pom = publicationDirectory.resolve("chasm-gradle-plugin-$pluginVersion.pom")
+        val module = publicationDirectory.publicationFile(".module")
+        val pom = publicationDirectory.publicationFile(".pom")
 
         assertTrue(Files.isRegularFile(module), "Missing Gradle module metadata at $module")
         val moduleContent = Files.readString(module)
@@ -64,10 +64,6 @@ class ChasmPluginFunctionalTest {
                     id("org.jetbrains.kotlin.jvm")
                 }
 
-                repositories {
-                    mavenCentral()
-                }
-
                 chasm {
                     modules.create("JvmService") {
                         packageName.set("test.chasm")
@@ -89,10 +85,6 @@ class ChasmPluginFunctionalTest {
                 plugins {
                     id("$pluginId")
                     id("org.jetbrains.kotlin.multiplatform")
-                }
-
-                repositories {
-                    mavenCentral()
                 }
 
                 kotlin {
@@ -124,10 +116,6 @@ class ChasmPluginFunctionalTest {
                         id("org.jetbrains.kotlin.jvm")
                     }
 
-                    repositories {
-                        mavenCentral()
-                    }
-
                     chasm {
                         runtimeDependencyConfiguration.set(RuntimeDependencyConfiguration.${selection.name})
                     }
@@ -146,10 +134,6 @@ class ChasmPluginFunctionalTest {
                 plugins {
                     id("org.jetbrains.kotlin.jvm")
                     id("$pluginId")
-                }
-
-                repositories {
-                    mavenCentral()
                 }
 
                 chasm {
@@ -176,10 +160,6 @@ class ChasmPluginFunctionalTest {
                 plugins {
                     id("$pluginId")
                     id("org.jetbrains.kotlin.jvm")
-                }
-
-                repositories {
-                    mavenCentral()
                 }
 
                 chasm {
@@ -261,11 +241,6 @@ class ChasmPluginFunctionalTest {
                     id("com.android.kotlin.multiplatform.library")
                 }
 
-                repositories {
-                    google()
-                    mavenCentral()
-                }
-
                 kotlin {
                     jvm()
                     androidLibrary {
@@ -321,11 +296,6 @@ class ChasmPluginFunctionalTest {
                 plugins {
                     id("$pluginId")
                     id("$androidPluginId")
-                }
-
-                repositories {
-                    google()
-                    mavenCentral()
                 }
 
                 android {
@@ -406,6 +376,7 @@ class ChasmPluginFunctionalTest {
     ): String {
         val agpVersion = if (minimumAgp) minimumAgpPluginVersion else androidPluginVersion
         return """
+            import org.gradle.api.initialization.resolve.RepositoriesMode
             import org.gradle.util.GradleVersion
 
             pluginManagement {
@@ -433,8 +404,9 @@ class ChasmPluginFunctionalTest {
             }
 
             dependencyResolutionManagement {
+                repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
                 repositories {
-                    maven {
+                    mavenLocal {
                         url = uri("$functionalTestRepository")
                         metadataSources {
                             mavenPom()
@@ -535,4 +507,14 @@ private fun Path.write(
     content: String,
 ) {
     Files.writeString(resolve(relativePath), content.trimIndent())
+}
+
+private fun Path.publicationFile(extension: String): Path {
+    return Files.list(this).use { paths ->
+        paths
+            .filter { path -> path.fileName.toString().endsWith(extension) }
+            .toList()
+            .maxByOrNull(Files::getLastModifiedTime)
+            ?: throw AssertionError("Missing $extension publication in $this")
+    }
 }
