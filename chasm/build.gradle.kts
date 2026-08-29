@@ -80,7 +80,7 @@ corpus {
     phase = io.github.charlietap.corpus.lib.CorpusPhase.INVOCATION
     versions = listOf("1.0", "2.0", "3.0")
     excludedFeatures = listOf("memory64", "simd", "relaxed-simd")
-    excludedTags = listOf("stress-test", "benchmark")
+    excludedTags = listOf("stress-test", "benchmark", "duration-extra-long")
     excludedTargets = listOf(
         // Execution-heavy fixtures; keep the normal corpus run suitable for the development loop.
         "esbuild",
