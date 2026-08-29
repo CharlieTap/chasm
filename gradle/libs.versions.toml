@@ -14,7 +14,8 @@ java-library-bytecode-version = "11"
 java-plugin-bytecode-version = "17"
 
 android-build-tools-plugin = "9.3.1"
-android-build-tools-plugin-8 = "8.13.2"
+minimum-android-build-tools-plugin = "9.0.1"
+minimum-android-compile-sdk = "36"
 build-config-plugin = "6.0.10"
 versions-plugin = "0.61.0"
 
@@ -113,6 +114,8 @@ androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-
 
 chasm-jvm = { module = "io.github.charlietap.chasm:chasm-jvm", version.ref = "version-name"}
 chasm-kmp = { module = "io.github.charlietap.chasm:chasm", version.ref = "version-name"}
+vm-jvm = { module = "io.github.charlietap.chasm:vm-jvm", version.ref = "version-name"}
+vm-kmp = { module = "io.github.charlietap.chasm:vm", version.ref = "version-name"}
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger"}
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "dagger"}
@@ -125,6 +128,7 @@ jna = { module = "net.java.dev.jna:jna", version.ref = "jna"}
 kotlin-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin"}
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "k-poet"}
 kotlin-reflection = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin"}
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin"}
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin"}
 
 kotlinx-atomic-fu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomic-fu"}
@@ -149,7 +153,6 @@ wasi-emscripten-host-chasm-emscripten = { module = "at.released.weh:bindings-cha
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-build-tools-plugin" }
-android-gradle-plugin8 = { module = "com.android.tools.build:gradle", version.ref = "android-build-tools-plugin-8" }
 dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradle-maven-publish-plugin" }
 gradle-versions-plugin = { module = "io.github.ben-manes:gradle-versions-plugin", version.ref = "versions-plugin" }

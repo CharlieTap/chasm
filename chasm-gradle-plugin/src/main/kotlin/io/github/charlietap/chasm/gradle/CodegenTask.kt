@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.gradle
 
-import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -55,9 +54,6 @@ abstract class CodegenTask
         abstract val implementationVisibility: Property<TypeVisibility>
 
         @get:Input
-        abstract val generateSuspendingFactories: Property<Boolean>
-
-        @get:Input
         abstract val initializers: SetProperty<String>
 
         @get:Input
@@ -71,45 +67,22 @@ abstract class CodegenTask
 
         @TaskAction
         fun generate() {
-            val binaryFile = binary.get().asFile
-            val outputDir = outputDirectory.get().asFile
-            val interfaceNameValue = interfaceName.get()
-            val packageNameValue = packageName.get()
-            val interfaceVisibilityValue = interfaceVisibility.get()
-            val implementationVisibilityValue = implementationVisibility.get()
-            val generateSuspendingFactoriesValue = generateSuspendingFactories.get()
-            val codegenConfigValue = config.get()
-            val allocatorValue = allocator.orNull
-            val initializerNames = initializers.get()
-            val wasmFunctions = functions.get()
-            val ignoredExportNames = ignoredExports.get()
-
             val workQueue = workerExecutor.classLoaderIsolation { spec: ClassLoaderWorkerSpec ->
                 spec.classpath.from(workerClasspath)
             }
 
             workQueue.submit(CodegenWorkAction::class.java) { workParameters ->
-
-                workParameters.binaryPath.set(binaryFile.absolutePath)
-                workParameters.outputDirectoryPath.set(outputDir.absolutePath)
-                workParameters.interfaceName.set(interfaceNameValue)
-                workParameters.packageName.set(packageNameValue)
-                workParameters.interfaceVisibility.set(interfaceVisibilityValue.name)
-                workParameters.implementationVisibility.set(implementationVisibilityValue.name)
-                workParameters.generateSuspendingFactories.set(generateSuspendingFactoriesValue)
-
-                workParameters.configGenerateTypesafeGlobalProperties.set(codegenConfigValue.generateTypesafeGlobalProperties)
-                workParameters.configGenerateTypesafeMemoryProperties.set(codegenConfigValue.generateTypesafeMemoryProperties)
-
-                workParameters.hasAllocator.set(allocatorValue != null)
-                allocatorValue?.let {
-                    workParameters.allocatorAllocationFunction.set(it.allocationFunction)
-                    workParameters.allocatorDeallocationFunction.set(it.deallocationFunction)
-                }
-
-                workParameters.initializers.set(initializerNames)
-                workParameters.functions.set(wasmFunctions.map { it.toWorkData() })
-                workParameters.ignoredExports.set(ignoredExportNames)
+                workParameters.binary.set(this@CodegenTask.binary)
+                workParameters.outputDirectory.set(this@CodegenTask.outputDirectory)
+                workParameters.interfaceName.set(this@CodegenTask.interfaceName)
+                workParameters.packageName.set(this@CodegenTask.packageName)
+                workParameters.interfaceVisibility.set(this@CodegenTask.interfaceVisibility)
+                workParameters.implementationVisibility.set(this@CodegenTask.implementationVisibility)
+                workParameters.config.set(this@CodegenTask.config)
+                workParameters.allocator.set(this@CodegenTask.allocator)
+                workParameters.initializers.set(this@CodegenTask.initializers)
+                workParameters.functions.set(this@CodegenTask.functions)
+                workParameters.ignoredExports.set(this@CodegenTask.ignoredExports)
             }
         }
     }

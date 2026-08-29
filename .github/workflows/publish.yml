@@ -10,7 +10,7 @@ on:
         type: choice
         options:
           - ''
-          - ':chasm-gradle-plugin:publishToMavenCentral :chasm-gradle-plugin-api:publishToMavenCentral :chasm-gradle-plugin-compat:publishToMavenCentral :chasm-gradle-plugin-codegen:publishToMavenCentral :chasm-gradle-plugin-agp8:publishToMavenCentral :chasm-gradle-plugin-agp9:'
+          - ':chasm-gradle-plugin:'
         default: ''
 jobs:
   publish:
@@ -34,3 +34,4 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
+          ORG_GRADLE_PROJECT_signAllPublications: 'true'

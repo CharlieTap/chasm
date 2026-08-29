@@ -36,3 +36,4 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "sweet-gradle-plugin"
 enableFeaturePreview("ENHANCED_GRAPH_ORDERING")
+enableFeaturePreview("NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS")

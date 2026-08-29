@@ -1,94 +1,91 @@
 package io.github.charlietap.chasm.gradle
 
 import io.github.charlietap.chasm.chasm_gradle_plugin.BuildConfig
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
+import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import kotlin.jvm.java
 
 class ChasmPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-
         val extension = project.extensions.create("chasm", ChasmExtension::class.java, project.objects)
-
         val workerClasspath = createWorkerClasspathConfiguration(project)
 
-        project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
-            val mpp = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
+        project.pluginManager.withPlugin(KOTLIN_MULTIPLATFORM_PLUGIN_ID) {
+            val multiplatform = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
+            val commonMain = multiplatform.sourceSets.getByName(COMMON_MAIN_SOURCE_SET_NAME)
 
-            project.afterEvaluate {
-                extension.modules.configureEach { module ->
-                    val commonMainSourceSet = mpp.sourceSets.getByName("commonMain")
-                    addVMRuntimeForKmp(project, extension.runtimeDependencyConfiguration.get(), commonMainSourceSet)
-
-                    val task = registerCodegenTask(
-                        project,
-                        module,
-                        "commonMain",
-                        workerClasspath,
-                    )
-                    commonMainSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
-                }
-            }
-        }
-
-        project.plugins.withId("org.jetbrains.kotlin.jvm") {
-            val jvmExtension = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
-            val mainCompilation = jvmExtension.target.compilations.getByName(MAIN_COMPILATION_NAME)
-
-            addVMRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
-
-            project.afterEvaluate {
-                extension.modules.configureEach { module ->
-                    val task = registerCodegenTask(
-                        project,
-                        module,
-                        MAIN_COMPILATION_NAME,
-                        workerClasspath,
-                    )
-                    mainCompilation.defaultSourceSet.kotlin.srcDir(task.flatMap { it.outputDirectory })
-                }
-            }
-        }
-
-        project.plugins.withId("com.android.base") {
-            val agpVersion = AgpVersion.detect()
-                ?: throw GradleException("Chasm Gradle plugin requires Android Gradle Plugin on the classpath.")
-            val configurer = loadAndroidConfigurer(agpVersion)
-
-            addVMRuntimeForJvmOrAndroid(project, extension.runtimeDependencyConfiguration.get())
-
-            val androidComponents = project.extensions.getByName("androidComponents")
-            configurer.configure(
-                androidComponents = androidComponents,
-                context = AndroidConfigContext(
-                    project = project,
-                    extension = extension,
-                    workerClasspath = workerClasspath,
-                ),
+            addVMRuntime(
+                project = project,
+                selection = extension.runtimeDependencyConfiguration,
+                apiConfigurationName = commonMain.apiConfigurationName,
+                implementationConfigurationName = commonMain.implementationConfigurationName,
             )
+
+            extension.modules.configureEach { module ->
+                val task = registerCodegenTask(
+                    project,
+                    module,
+                    COMMON_MAIN_SOURCE_SET_NAME,
+                    workerClasspath,
+                )
+                commonMain.kotlin.srcDir(task.flatMap(CodegenTask::outputDirectory))
+            }
+        }
+
+        project.pluginManager.withPlugin(KOTLIN_JVM_PLUGIN_ID) {
+            val kotlin = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
+            val mainCompilation = kotlin.target.compilations.getByName(MAIN_COMPILATION_NAME)
+
+            addVMRuntime(
+                project = project,
+                selection = extension.runtimeDependencyConfiguration,
+                apiConfigurationName = API_CONFIGURATION_NAME,
+                implementationConfigurationName = IMPLEMENTATION_CONFIGURATION_NAME,
+                jvmArtifact = true,
+            )
+
+            extension.modules.configureEach { module ->
+                val task = registerCodegenTask(
+                    project,
+                    module,
+                    MAIN_COMPILATION_NAME,
+                    workerClasspath,
+                )
+                mainCompilation.defaultSourceSet.kotlin.srcDir(task.flatMap(CodegenTask::outputDirectory))
+            }
+        }
+
+        project.pluginManager.withPlugin(ANDROID_BASE_PLUGIN_ID) {
+            addVMRuntime(
+                project = project,
+                selection = extension.runtimeDependencyConfiguration,
+                apiConfigurationName = API_CONFIGURATION_NAME,
+                implementationConfigurationName = IMPLEMENTATION_CONFIGURATION_NAME,
+                jvmArtifact = true,
+            )
+            configureAndroid(project, extension, workerClasspath)
         }
     }
 
-    private fun createWorkerClasspathConfiguration(project: Project): Configuration {
+    private fun createWorkerClasspathConfiguration(project: Project): Provider<out Configuration> {
         val dependencies = project.configurations.dependencyScope(WORKER_DEPENDENCIES_CONFIGURATION_NAME) { configuration ->
-            configuration.description = "Dependencies for the chasm codegen worker"
+            configuration.description = "Dependencies for the Chasm codegen worker"
         }
         project.dependencies.add(dependencies.name, resolveChasmRuntimeNotation())
-        project.dependencies.add(dependencies.name, resolveVMRuntimeNotation())
+        project.dependencies.add(dependencies.name, resolveVMRuntimeNotation(jvmArtifact = true))
+        project.dependencies.add(dependencies.name, resolveKotlinPoetNotation())
 
         return project.configurations.resolvable(WORKER_CLASSPATH_CONFIGURATION_NAME) { configuration ->
-            configuration.description = "Classpath for the chasm codegen worker"
+            configuration.description = "Classpath for the Chasm codegen worker"
             configuration.extendsFrom(dependencies.get())
-
             configuration.attributes { attributes ->
                 attributes.attribute(
                     Usage.USAGE_ATTRIBUTE,
@@ -99,94 +96,46 @@ class ChasmPlugin : Plugin<Project> {
                     project.objects.named(Category::class.java, Category.LIBRARY),
                 )
             }
-        }.get()
-    }
-
-    private fun loadAndroidConfigurer(agpVersion: AgpVersion): AndroidConfigurer {
-        if (agpVersion.major < 8) {
-            throw GradleException("Chasm Gradle plugin requires AGP 8.x or newer. Found $agpVersion.")
-        }
-
-        val implementationClass = when (agpVersion.major) {
-            8 -> "io.github.charlietap.chasm.gradle.agp.Agp8AndroidConfigurer"
-            9 -> "io.github.charlietap.chasm.gradle.agp.Agp9AndroidConfigurer"
-            else -> null
-        } ?: throw GradleException("Chasm Gradle plugin does not support AGP $agpVersion.")
-
-        return runCatching {
-            val implClass = Class.forName(implementationClass, true, javaClass.classLoader)
-            implClass.getDeclaredConstructor().newInstance() as AndroidConfigurer
-        }.getOrElse { error ->
-            throw GradleException(
-                "Failed to load Android integration for AGP $agpVersion. " +
-                    "Ensure the chasm Gradle plugin artifacts are on the classpath.",
-                error,
-            )
         }
     }
 
-    private fun addVMRuntimeForKmp(
+    private fun addVMRuntime(
         project: Project,
-        configuration: RuntimeDependencyConfiguration,
-        commonMain: KotlinSourceSet,
+        selection: Provider<RuntimeDependencyConfiguration>,
+        apiConfigurationName: String,
+        implementationConfigurationName: String,
+        jvmArtifact: Boolean = false,
     ) {
-        val notation = resolveVMRuntimeNotation()
-        val configurationName = when (configuration) {
-            RuntimeDependencyConfiguration.API -> commonMain.apiConfigurationName
-            RuntimeDependencyConfiguration.IMPLEMENTATION -> commonMain.implementationConfigurationName
-        }
-        val exists = project.configurations.getByName(configurationName).dependencies.any {
-            it.group == RUNTIME_GROUP && it.name == RUNTIME_ARTIFACT
-        }
-        if (!exists) {
-            project.dependencies.add(configurationName, notation)
-        }
+        val notation = resolveVMRuntimeNotation(jvmArtifact)
+        project.dependencies.addProvider(
+            apiConfigurationName,
+            selection.filter { it == RuntimeDependencyConfiguration.API }.map { notation },
+        )
+        project.dependencies.addProvider(
+            implementationConfigurationName,
+            selection.filter { it == RuntimeDependencyConfiguration.IMPLEMENTATION }.map { notation },
+        )
     }
 
-    private fun addVMRuntimeForJvmOrAndroid(
-        project: Project,
-        configuration: RuntimeDependencyConfiguration,
-    ) {
-        val configurationName = configuration.name.lowercase()
-        val notation = resolveVMRuntimeNotation(RUNTIME_JVM_ARTIFACT_SUFFIX)
-        if (!runtimeDependencyExists(project, configurationName)) {
-            project.dependencies.add(configurationName, notation)
-        }
+    private fun resolveVMRuntimeNotation(jvmArtifact: Boolean = false): String {
+        return if (jvmArtifact) BuildConfig.VM_JVM_DEPENDENCY else BuildConfig.VM_DEPENDENCY
     }
 
-    private fun resolveVMRuntimeNotation(
-        suffix: String? = null,
-    ): Any {
-        val group = RUNTIME_GROUP
-        val artifact = suffix?.let {
-            "$RUNTIME_ARTIFACT-$suffix"
-        } ?: RUNTIME_ARTIFACT
-        val version = BuildConfig.RUNTIME_VERSION
-        return "$group:$artifact:$version"
+    private fun resolveChasmRuntimeNotation(): String {
+        return BuildConfig.CHASM_JVM_DEPENDENCY
     }
 
-    private fun resolveChasmRuntimeNotation(): Any {
-        val group = RUNTIME_GROUP
-        val artifact = CHASM_ARTIFACT
-        val version = BuildConfig.RUNTIME_VERSION
-        return "$group:$artifact:$version"
-    }
-
-    private fun runtimeDependencyExists(
-        project: Project,
-        configurationName: String,
-    ): Boolean {
-        val dependencies = project.configurations.findByName(configurationName)?.allDependencies.orEmpty()
-        return dependencies.any { dep ->
-            dep.group == RUNTIME_GROUP && (dep.name == RUNTIME_ARTIFACT || dep.name == "$RUNTIME_ARTIFACT-$RUNTIME_JVM_ARTIFACT_SUFFIX")
-        }
+    private fun resolveKotlinPoetNotation(): String {
+        return BuildConfig.KOTLIN_POET_DEPENDENCY
     }
 
     private companion object {
-        private const val RUNTIME_GROUP = "io.github.charlietap.chasm"
-        private const val RUNTIME_ARTIFACT = "vm"
-        private const val RUNTIME_JVM_ARTIFACT_SUFFIX = "jvm"
-        private const val CHASM_ARTIFACT = "chasm"
+        private const val KOTLIN_MULTIPLATFORM_PLUGIN_ID = "org.jetbrains.kotlin.multiplatform"
+        private const val KOTLIN_JVM_PLUGIN_ID = "org.jetbrains.kotlin.jvm"
+        private const val ANDROID_BASE_PLUGIN_ID = "com.android.base"
+        private const val COMMON_MAIN_SOURCE_SET_NAME = "commonMain"
+        private const val API_CONFIGURATION_NAME = "api"
+        private const val IMPLEMENTATION_CONFIGURATION_NAME = "implementation"
         private const val WORKER_DEPENDENCIES_CONFIGURATION_NAME = "chasmCodegenWorkerDependencies"
         private const val WORKER_CLASSPATH_CONFIGURATION_NAME = "chasmCodegenWorkerClasspath"
     }

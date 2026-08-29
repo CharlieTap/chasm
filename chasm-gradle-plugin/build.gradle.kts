@@ -1,7 +1,14 @@
+import org.gradle.api.artifacts.MinimalExternalModuleDependency
+import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.attributes.plugin.GradlePluginApiVersion
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.tasks.testing.Test
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinx.test.resources)
     alias(libs.plugins.build.config)
     `java-gradle-plugin`
 
@@ -13,21 +20,44 @@ plugins {
 group = "io.github.charlietap.chasm"
 version = libs.versions.plugin.version.name.get()
 
-buildConfig {
-    buildConfigField("RUNTIME_VERSION", libs.versions.version.name.get())
+fun MinimalExternalModuleDependency.notation(): String {
+    return "$module:${versionConstraint.requiredVersion}"
 }
 
-configure<PublishingConventionsExtension> {
+buildConfig {
+    buildConfigField("CHASM_JVM_DEPENDENCY", libs.chasm.jvm.get().notation())
+    buildConfigField("VM_DEPENDENCY", libs.vm.kmp.get().notation())
+    buildConfigField("VM_JVM_DEPENDENCY", libs.vm.jvm.get().notation())
+    buildConfigField("KOTLIN_POET_DEPENDENCY", libs.kotlin.poet.get().notation())
+}
+
+val publishingConventions = extensions.getByType<PublishingConventionsExtension>()
+publishingConventions.apply {
     name = "chasm-gradle-plugin"
     description = "A gradle plugin for generating a typesafe Kotlin interface from a wasm binary"
 }
 
+val chasmPluginId = libs.plugins.chasm.get().pluginId
+val minimumGradleVersion = "9.1"
+val minimumAgpGradleVersion = "9.1.0"
+val testedGradleVersions = listOf("9.5.0", "9.6.1", "9.7.1")
+val kotlinStdlibModule = libs.kotlin.stdlib.get().module
+
 gradlePlugin {
     plugins {
         create("chasm-gradle-plugin") {
-            id = "io.github.charlietap.chasm.gradle"
+            id = chasmPluginId
             implementationClass = "io.github.charlietap.chasm.gradle.ChasmPlugin"
         }
+    }
+}
+
+listOf("apiElements", "runtimeElements").forEach { configurationName ->
+    configurations.named(configurationName) {
+        attributes.attribute(
+            GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+            objects.named(minimumGradleVersion),
+        )
     }
 }
 
@@ -40,12 +70,97 @@ kotlin {
     }
 
     dependencies {
-        api(projects.chasmGradlePluginApi)
-        api(projects.chasmGradlePluginCodegen)
-        implementation(projects.chasmGradlePluginCompat)
-        implementation(projects.chasmGradlePluginAgp8)
-        implementation(projects.chasmGradlePluginAgp9)
+        compileOnly(libs.kotlin.gradle.plugin)
+        compileOnly(libs.android.gradle.plugin)
+        compileOnly(libs.kotlin.stdlib)
 
-        implementation(libs.kotlin.gradle.plugin)
+        compileOnly(projects.chasm) {
+            because("We use the module and moduleInfo calls during codegen")
+        }
+        compileOnly(projects.vm)
+        compileOnly(libs.kotlin.poet)
+
+        testImplementation(libs.kotlin.test)
+        testImplementation(libs.kotlinx.test.resources)
+        testImplementation(projects.chasm)
+        testImplementation(projects.vm)
+        testImplementation(libs.kotlin.poet)
+        testImplementation(projects.test.fixture.chasm)
     }
+}
+
+configurations.named("implementation") {
+    dependencies.removeIf { dependency ->
+        dependency.group == kotlinStdlibModule.group && dependency.name == kotlinStdlibModule.name
+    }
+}
+
+val functionalTestSourceSet = sourceSets.create("functionalTest")
+
+dependencies {
+    add(
+        functionalTestSourceSet.implementationConfigurationName,
+        sourceSets.main.get().output,
+    )
+    add(functionalTestSourceSet.implementationConfigurationName, gradleTestKit())
+    add(functionalTestSourceSet.implementationConfigurationName, libs.kotlin.junit)
+}
+
+val functionalTest = tasks.register<Test>("functionalTest") {
+    description = "Runs the Gradle plugin functional tests"
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = functionalTestSourceSet.output.classesDirs
+    classpath = functionalTestSourceSet.runtimeClasspath
+    shouldRunAfter(tasks.test)
+}
+
+tasks.check {
+    dependsOn(functionalTest)
+}
+
+val functionalTestRepository = publishingConventions.functionalTestRepository
+val pluginVersion = project.version.toString()
+val minimumAgpVersion = libs.versions.minimum.android.build.tools.plugin.get()
+
+extensions.configure<PublishingExtension> {
+    repositories.maven {
+        name = "functionalTest"
+        setUrl(functionalTestRepository)
+    }
+}
+
+val publishPluginToFunctionalTestRepository = tasks.register("publishPluginToFunctionalTestRepository") {
+    dependsOn(
+        "publishPluginMavenPublicationToFunctionalTestRepository",
+        "publishChasm-gradle-pluginPluginMarkerMavenPublicationToFunctionalTestRepository",
+    )
+}
+configurations.named("compileOnly") {
+    allDependencies.withType(ProjectDependency::class.java).configureEach {
+        val dependencyPublication = "$path:publishJvmRuntimeToFunctionalTestRepository"
+        publishPluginToFunctionalTestRepository.configure {
+            dependsOn(dependencyPublication)
+        }
+    }
+}
+
+functionalTest.configure {
+    dependsOn(publishPluginToFunctionalTestRepository)
+
+    inputs.dir(functionalTestRepository)
+    systemProperty("chasm.functionalTest.repository", functionalTestRepository.get().asFile.toURI().toString())
+    systemProperty("chasm.functionalTest.pluginId", chasmPluginId)
+    systemProperty("chasm.functionalTest.pluginVersion", pluginVersion)
+    systemProperty("chasm.functionalTest.kotlinPluginVersion", libs.versions.kotlin.get())
+    systemProperty("chasm.functionalTest.androidPluginVersion", libs.versions.android.build.tools.plugin.get())
+    systemProperty("chasm.functionalTest.minimumAgpPluginVersion", minimumAgpVersion)
+    systemProperty("chasm.functionalTest.minimumGradleVersion", minimumGradleVersion)
+    systemProperty("chasm.functionalTest.minimumAgpGradleVersion", minimumAgpGradleVersion)
+    systemProperty("chasm.functionalTest.testedGradleVersions", testedGradleVersions.joinToString(","))
+    systemProperty("chasm.functionalTest.compileSdk", libs.versions.compile.sdk.get())
+    systemProperty(
+        "chasm.functionalTest.minimumAgpCompileSdk",
+        libs.versions.minimum.android.compile.sdk.get(),
+    )
+    systemProperty("chasm.functionalTest.minSdk", libs.versions.min.sdk.get())
 }

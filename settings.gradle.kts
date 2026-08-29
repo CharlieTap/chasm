@@ -56,11 +56,6 @@ include(":benchmark")
 include(":chasm")
 include(":chasm-coroutines")
 include(":chasm-gradle-plugin")
-include(":chasm-gradle-plugin-api")
-include(":chasm-gradle-plugin-compat")
-include(":chasm-gradle-plugin-codegen")
-include(":chasm-gradle-plugin-agp8")
-include(":chasm-gradle-plugin-agp9")
 include(":config")
 
 include(":decoder")
@@ -111,3 +106,4 @@ rootProject.name = "chasm-multiplatform"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("ENHANCED_GRAPH_ORDERING")
+enableFeaturePreview("NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS")

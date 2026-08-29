@@ -12,3 +12,4 @@ plugins {
 
 rootProject.name = "kotlin-conventions"
 enableFeaturePreview("ENHANCED_GRAPH_ORDERING")
+enableFeaturePreview("NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS")

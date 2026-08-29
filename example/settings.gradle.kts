@@ -61,3 +61,4 @@ rootProject.name = "chasm-example"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("ENHANCED_GRAPH_ORDERING")
+enableFeaturePreview("NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS")

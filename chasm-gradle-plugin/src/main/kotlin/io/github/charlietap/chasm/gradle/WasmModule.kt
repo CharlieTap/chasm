@@ -1,6 +1,6 @@
 package io.github.charlietap.chasm.gradle
 
-import org.gradle.api.Project
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -11,7 +11,7 @@ import javax.inject.Inject
 abstract class WasmModule
     @Inject
     constructor(
-        val project: Project,
+        projectLayout: ProjectLayout,
         val name: String,
     ) {
         abstract val binary: RegularFileProperty
@@ -25,7 +25,7 @@ abstract class WasmModule
         abstract val ignoredExports: SetProperty<String>
 
         init {
-            binary.convention(project.layout.projectDirectory.file(DEFAULT_MODULE_FILE_PATH))
+            binary.convention(projectLayout.projectDirectory.file(DEFAULT_MODULE_FILE_PATH))
             codegenConfig.convention(CodegenConfig())
             functions.convention([])
             interfaceVisibility.convention(TypeVisibility.PUBLIC)

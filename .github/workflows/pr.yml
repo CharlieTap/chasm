@@ -38,7 +38,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04-arm
-            task: test corpus
+            task: test corpus :chasm-gradle-plugin:check
           - os: ubuntu-24.04-arm
             task: jsTest
           - os: ubuntu-24.04-arm
