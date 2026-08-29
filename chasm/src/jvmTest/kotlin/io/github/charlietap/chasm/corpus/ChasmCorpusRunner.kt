@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.corpus
 
-import at.released.weh.bindings.chasm.ChasmEmscriptenHostBuilder
 import at.released.weh.bindings.chasm.wasip1.ChasmWasiPreview1Builder
 import at.released.weh.filesystem.stdio.StdioSink
 import at.released.weh.filesystem.stdio.StdioSource
@@ -202,12 +201,6 @@ class ChasmCorpusRunner(
                 if (importResolution.memories.isEmpty() && exportedMemory != null) {
                     importResolution.memories["memory"] = exportedMemory
                 }
-                importResolution.emscriptenFinalizers.forEach { finalizer ->
-                    val memory = importResolution.memories["$EMSCRIPTEN_ENV.memory"] ?: exportedMemory
-                    if (memory != null) {
-                        finalizer.finalize(instance, memory)
-                    }
-                }
                 RunnerResult.Success(
                     RuntimeSetup(
                         instance = instance,
@@ -240,20 +233,16 @@ class ChasmCorpusRunner(
         val stdout = mutableListOf<Byte>()
         val stderr = mutableListOf<Byte>()
         val importCaptures = mutableMapOf<String, ImportCapture>()
-        val emscriptenFinalizers = mutableListOf<ChasmEmscriptenHostBuilder.ChasmEmscriptenSetupFinalizer>()
         val wasiImportModules = setOf(WASI_SNAPSHOT_PREVIEW_1, WASI_UNSTABLE)
         val hasWasiImports = module.imports.any { it.moduleName in wasiImportModules }
-        val hasEmscriptenImports = module.imports.any { it.moduleName == EMSCRIPTEN_ENV }
 
         val wasiHost = test?.host?.wasiPreview1
         if (wasiHost == null && hasWasiImports) {
             return RunnerResult.Error(CorpusResult.Skipped(fixture.name, "WASI Preview 1 imports require fixture host config"))
         }
 
-        val wasi = if (wasiHost != null && (hasWasiImports || hasEmscriptenImports)) {
+        val wasi = if (wasiHost != null && hasWasiImports) {
             createWasiHost(wasiHost, stdout, stderr)
-        } else if (hasEmscriptenImports) {
-            createWasiHost(FixtureWasiPreview1Host(), stdout, stderr)
         } else {
             null
         }
@@ -266,15 +255,6 @@ class ChasmCorpusRunner(
             imports += ChasmWasiPreview1Builder(store, module) {
                 host = wasi.host
             }.build()
-        }
-
-        if (wasi != null && hasEmscriptenImports) {
-            val emscriptenBuilder = ChasmEmscriptenHostBuilder(store, module) {
-                host = wasi.host
-            }
-            val finalizer = emscriptenBuilder.setupEmscriptenFunctions(EMSCRIPTEN_ENV)
-            emscriptenFinalizers += finalizer
-            imports += finalizer.emscriptenFunctions
         }
 
         val providedImports = imports.map { import -> import.moduleName to import.entityName }.toMutableSet()
@@ -336,7 +316,7 @@ class ChasmCorpusRunner(
         }
 
         return RunnerResult.Success(
-            ImportResolution(imports, memories, globals, hosts, stdout, stderr, importCaptures, emscriptenFinalizers),
+            ImportResolution(imports, memories, globals, hosts, stdout, stderr, importCaptures),
         )
     }
 
@@ -888,7 +868,6 @@ class ChasmCorpusRunner(
         val stdout: MutableList<Byte>,
         val stderr: MutableList<Byte>,
         val importCaptures: MutableMap<String, ImportCapture>,
-        val emscriptenFinalizers: List<ChasmEmscriptenHostBuilder.ChasmEmscriptenSetupFinalizer>,
     )
 
     private data class WasiRuntime(
@@ -1013,7 +992,6 @@ class ChasmCorpusRunner(
     private companion object {
         const val WASI_SNAPSHOT_PREVIEW_1 = "wasi_snapshot_preview1"
         const val WASI_UNSTABLE = "wasi_unstable"
-        const val EMSCRIPTEN_ENV = "env"
         const val MAX_FAILURE_OUTPUT = 2048
     }
 }

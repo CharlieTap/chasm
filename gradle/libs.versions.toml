@@ -57,7 +57,7 @@ kotlinx-test-resources = "0.15.0"
 metro = "1.4.2"
 
 result = "2.2.0"
-wasi-emscripten-host = "0.6.0"
+wasi-emscripten-host-chasm-wasip1 = "0.7.0-SNAPSHOT"
 wasm-corpus-ref = "d25bf9a24871ece102c93f5997e798ce796f8524"
 
 [plugins]
@@ -147,8 +147,7 @@ result = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref 
 
 sweet-lib = { module = "io.github.charlietap.sweet:lib" }
 corpus-lib = { module = "io.github.charlietap.corpus:lib" }
-wasi-emscripten-host-chasm-wasip1 = { module = "at.released.weh:bindings-chasm-wasip1", version.ref = "wasi-emscripten-host" }
-wasi-emscripten-host-chasm-emscripten = { module = "at.released.weh:bindings-chasm-emscripten", version.ref = "wasi-emscripten-host" }
+wasi-emscripten-host-chasm-wasip1 = { module = "io.github.charlietap.wasi.emscripten.host:bindings-chasm-wasip1", version.ref = "wasi-emscripten-host-chasm-wasip1" }
 
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 
