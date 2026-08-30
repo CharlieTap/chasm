@@ -2,7 +2,6 @@ package io.github.charlietap.chasm.gradle
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Comparator
@@ -16,15 +15,11 @@ class ChasmPluginFunctionalTest {
 
     @Test
     fun `plugin metadata declares compatibility without runtime dependencies`() {
-        val repository = Path.of(URI(functionalTestRepository))
-        val publicationDirectory = repository.resolve(
-            "io/github/charlietap/chasm/chasm-gradle-plugin/$pluginVersion",
+        assertTrue(
+            Files.isRegularFile(pluginModuleMetadata),
+            "Missing Gradle module metadata at $pluginModuleMetadata",
         )
-        val module = publicationDirectory.publicationFile(".module")
-        val pom = publicationDirectory.publicationFile(".pom")
-
-        assertTrue(Files.isRegularFile(module), "Missing Gradle module metadata at $module")
-        val moduleContent = Files.readString(module)
+        val moduleContent = Files.readString(pluginModuleMetadata)
         assertContains(
             moduleContent,
             "\"org.gradle.plugin.api-version\": \"$minimumGradleVersion\"",
@@ -33,9 +28,9 @@ class ChasmPluginFunctionalTest {
             moduleContent.contains("\"dependencies\""),
             "Gradle module metadata must not publish codegen dependencies",
         )
-        assertTrue(Files.isRegularFile(pom), "Missing Maven POM at $pom")
+        assertTrue(Files.isRegularFile(pluginPom), "Missing Maven POM at $pluginPom")
         assertFalse(
-            Files.readString(pom).contains("<dependencies>"),
+            Files.readString(pluginPom).contains("<dependencies>"),
             "The Gradle plugin must not publish codegen dependencies on its runtime classpath",
         )
     }
@@ -382,7 +377,7 @@ class ChasmPluginFunctionalTest {
             pluginManagement {
                 repositories {
                     maven {
-                        url = uri("$functionalTestRepository")
+                        url = uri("$pluginRepository")
                         metadataSources {
                             mavenPom()
                             artifact()
@@ -406,7 +401,7 @@ class ChasmPluginFunctionalTest {
             dependencyResolutionManagement {
                 repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
                 repositories {
-                    mavenLocal {
+                    maven {
                         url = uri("$functionalTestRepository")
                         metadataSources {
                             mavenPom()
@@ -484,6 +479,11 @@ class ChasmPluginFunctionalTest {
     private companion object {
         val MINIMAL_WASM_MODULE = byteArrayOf(0, 97, 115, 109, 1, 0, 0, 0)
         val functionalTestRepository = requiredSystemProperty("chasm.functionalTest.repository")
+        val pluginRepository = requiredSystemProperty("chasm.functionalTest.pluginRepository")
+        val pluginPom = Path.of(requiredSystemProperty("chasm.functionalTest.pluginPom"))
+        val pluginModuleMetadata = Path.of(
+            requiredSystemProperty("chasm.functionalTest.pluginModuleMetadata"),
+        )
         val pluginId = requiredSystemProperty("chasm.functionalTest.pluginId")
         val pluginVersion = requiredSystemProperty("chasm.functionalTest.pluginVersion")
         val kotlinPluginVersion = requiredSystemProperty("chasm.functionalTest.kotlinPluginVersion")
@@ -507,14 +507,4 @@ private fun Path.write(
     content: String,
 ) {
     Files.writeString(resolve(relativePath), content.trimIndent())
-}
-
-private fun Path.publicationFile(extension: String): Path {
-    return Files.list(this).use { paths ->
-        paths
-            .filter { path -> path.fileName.toString().endsWith(extension) }
-            .toList()
-            .maxByOrNull(Files::getLastModifiedTime)
-            ?: throw AssertionError("Missing $extension publication in $this")
-    }
 }

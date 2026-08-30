@@ -1,6 +1,5 @@
 
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
     id("kotlin-conventions")
@@ -27,9 +26,7 @@ fun KotlinMultiplatformExtension.nativeTargets() = setOf(
 
 kotlin {
     jvm()
-    if (HostManager.hostIsSupported) {
-        nativeTargets()
-    }
+    nativeTargets()
 }
 
 tasks.register("test") {

@@ -1,7 +1,7 @@
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
-import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.plugin.GradlePluginApiVersion
-import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.testing.Test
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
@@ -118,37 +118,78 @@ tasks.check {
     dependsOn(functionalTest)
 }
 
-val functionalTestRepository = publishingConventions.functionalTestRepository
-val pluginVersion = project.version.toString()
-val minimumAgpVersion = libs.versions.minimum.android.build.tools.plugin.get()
-
-extensions.configure<PublishingExtension> {
-    repositories.maven {
-        name = "functionalTest"
-        setUrl(functionalTestRepository)
+val functionalTestRepositoryDependencies = configurations.dependencyScope("functionalTestRepositoryDependencies")
+val functionalTestRepositories = configurations.resolvable("functionalTestRepositories") {
+    description = "JVM repositories consumed by the Gradle plugin functional tests"
+    extendsFrom(functionalTestRepositoryDependencies.get())
+    attributes {
+        attribute(
+            Category.CATEGORY_ATTRIBUTE,
+            objects.named(Category::class.java, "functional-test-repository"),
+        )
     }
 }
 
-val publishPluginToFunctionalTestRepository = tasks.register("publishPluginToFunctionalTestRepository") {
-    dependsOn(
-        "publishPluginMavenPublicationToFunctionalTestRepository",
-        "publishChasm-gradle-pluginPluginMarkerMavenPublicationToFunctionalTestRepository",
-    )
+dependencies {
+    add(functionalTestRepositoryDependencies.name, projects.chasm)
+    add(functionalTestRepositoryDependencies.name, projects.vm)
 }
-configurations.named("compileOnly") {
-    allDependencies.withType(ProjectDependency::class.java).configureEach {
-        val dependencyPublication = "$path:publishJvmRuntimeToFunctionalTestRepository"
-        publishPluginToFunctionalTestRepository.configure {
-            dependsOn(dependencyPublication)
-        }
+
+val minimumAgpVersion = libs.versions.minimum.android.build.tools.plugin.get()
+val functionalTestRepository = layout.buildDirectory.dir("functional-test-repository")
+val stageFunctionalTestRepository = tasks.register<Sync>("stageFunctionalTestRepository") {
+    from(functionalTestRepositories)
+    into(functionalTestRepository)
+}
+val pluginVersion = project.version.toString()
+val pluginRepository = layout.buildDirectory.dir("functional-test-plugin-repository")
+val pluginPom = layout.buildDirectory.file("publications/pluginMaven/pom-default.xml")
+val pluginMarkerPom = layout.buildDirectory.file(
+    "publications/chasm-gradle-pluginPluginMarkerMaven/pom-default.xml",
+)
+val pluginModuleMetadata = layout.buildDirectory.file("publications/pluginMaven/module.json")
+val pluginArtifactPath = "${project.group.toString().replace('.', '/')}/${project.name}/$pluginVersion"
+val pluginMarkerArtifactPath = "${chasmPluginId.replace('.', '/')}/${chasmPluginId}.gradle.plugin/$pluginVersion"
+val pluginJarName = "${project.name}-$pluginVersion.jar"
+val pluginPomName = "${project.name}-$pluginVersion.pom"
+val pluginMarkerPomName = "${chasmPluginId}.gradle.plugin-$pluginVersion.pom"
+val stagePluginForFunctionalTest = tasks.register<Sync>("stagePluginForFunctionalTest") {
+    dependsOn(
+        "generatePomFileForChasm-gradle-pluginPluginMarkerMavenPublication",
+        "generatePomFileForPluginMavenPublication",
+    )
+    into(pluginRepository)
+    from(tasks.jar.flatMap { task -> task.archiveFile }) {
+        into(pluginArtifactPath)
+        rename(".*\\.jar", pluginJarName)
+    }
+    from(pluginPom) {
+        into(pluginArtifactPath)
+        rename("pom-default.xml", pluginPomName)
+    }
+    from(pluginMarkerPom) {
+        into(pluginMarkerArtifactPath)
+        rename("pom-default.xml", pluginMarkerPomName)
     }
 }
 
 functionalTest.configure {
-    dependsOn(publishPluginToFunctionalTestRepository)
-
+    dependsOn(
+        "generateMetadataFileForPluginMavenPublication",
+        stageFunctionalTestRepository,
+        stagePluginForFunctionalTest,
+    )
     inputs.dir(functionalTestRepository)
+    inputs.dir(pluginRepository)
+    inputs.file(pluginPom)
+    inputs.file(pluginModuleMetadata)
     systemProperty("chasm.functionalTest.repository", functionalTestRepository.get().asFile.toURI().toString())
+    systemProperty("chasm.functionalTest.pluginRepository", pluginRepository.get().asFile.toURI().toString())
+    systemProperty("chasm.functionalTest.pluginPom", pluginPom.get().asFile.absolutePath)
+    systemProperty(
+        "chasm.functionalTest.pluginModuleMetadata",
+        pluginModuleMetadata.get().asFile.absolutePath,
+    )
     systemProperty("chasm.functionalTest.pluginId", chasmPluginId)
     systemProperty("chasm.functionalTest.pluginVersion", pluginVersion)
     systemProperty("chasm.functionalTest.kotlinPluginVersion", libs.versions.kotlin.get())
