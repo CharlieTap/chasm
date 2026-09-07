@@ -62,36 +62,7 @@ internal inline fun ThreadExecutor(
     }
     initializeLocals(vstack, callStrategy, ROOT_FP)
     try {
-        var ip = callStrategy.entryIp
-        val instructions = store.program.instructions
-        dispatch@ while (true) {
-            try {
-                // Three may seem arbitrary, but it is intentional. Executing several
-                // instructions per iteration amortises the cost of the jump back to the
-                // top of the loop.
-                // Adding iterations is not free: every slot adds another indirect call site,
-                // exit branch, and more compiled code. On HotSpot these call sites are
-                // megamorphic and also require their own profiling and safepoint metadata.
-                ip = instructions[ip](vstack, context, ip + 1)
-                if (ip.toUInt() >= instructions.size.toUInt()) {
-                    break@dispatch
-                }
-                ip = instructions[ip](vstack, context, ip + 1)
-                if (ip.toUInt() >= instructions.size.toUInt()) {
-                    break@dispatch
-                }
-                ip = instructions[ip](vstack, context, ip + 1)
-                if (ip.toUInt() >= instructions.size.toUInt()) {
-                    break@dispatch
-                }
-            } catch (_: HostRaisedWasmException) {
-                ip = ThrowRefValueExecutor(
-                    vstack = vstack,
-                    context = context,
-                    ref = store.heap.takePendingExceptionReference(),
-                )
-            }
-        }
+        interpret(callStrategy.entryIp, context)
     } catch (exception: InvocationException) {
         Err(exception.error).bind()
     } catch (_: GuestHeapOutOfMemoryException) {
@@ -115,6 +86,45 @@ internal inline fun ThreadExecutor(
         vstack.pop()
     }
         .asReversed()
+}
+
+// Keep dispatch separate so HotSpot OSR need not preserve invocation setup
+// and result processing state across every handler call
+private fun interpret(
+    entryIp: Int,
+    context: ExecutionContext,
+) {
+    var ip = entryIp
+    val vstack = context.vstack
+    val instructions = context.store.program.instructions
+    dispatch@ while (true) {
+        try {
+            // Three may seem arbitrary, but it is intentional. Executing several
+            // instructions per iteration amortises the cost of the jump back to the
+            // top of the loop.
+            // Adding iterations is not free: every slot adds another indirect call site,
+            // exit branch, and more compiled code. On HotSpot these call sites are
+            // megamorphic and also require their own profiling and safepoint metadata.
+            ip = instructions[ip](vstack, context, ip + 1)
+            if (ip < 0 || ip >= instructions.size) {
+                break@dispatch
+            }
+            ip = instructions[ip](vstack, context, ip + 1)
+            if (ip < 0 || ip >= instructions.size) {
+                break@dispatch
+            }
+            ip = instructions[ip](vstack, context, ip + 1)
+            if (ip < 0 || ip >= instructions.size) {
+                break@dispatch
+            }
+        } catch (_: HostRaisedWasmException) {
+            ip = ThrowRefValueExecutor(
+                vstack = vstack,
+                context = context,
+                ref = context.heap.takePendingExceptionReference(),
+            )
+        }
+    }
 }
 
 private const val ROOT_FP = 0
