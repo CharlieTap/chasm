@@ -140,6 +140,12 @@ internal class ProgramBuilder(
         finished = true
     }
 
+    fun targetOffset(targetIndex: Int): Int {
+        check(finished)
+        checkTargetIndex(targetIndex)
+        return targetIps[targetIndex] - baseIp
+    }
+
     private fun checkNotFinished() {
         check(!finished) {
             "program is already finished"
@@ -208,6 +214,7 @@ internal class ProgramBuilder(
             relocationTargetIps = relocationTargetIps.copyOf(relocationFactories.size),
             relocationFactories = relocationFactories.toTypedArray(),
             multiTargetRelocations = multiTargetRelocations?.toTypedArray() ?: emptyArray(),
+            exceptionTable = program.exceptionTable(0),
         )
     }
 

@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler.context
 
+import io.github.charlietap.chasm.compiler.ExceptionTableBuilder
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserver
 import io.github.charlietap.chasm.compiler.emptyIntArray
 import io.github.charlietap.chasm.compiler.instruction.CopyInstructionBuffer
@@ -42,6 +43,7 @@ internal class FunctionCompilationContext(
     var rootControl: BlockContext? = null
     var reachable = true
     var handlerDepth = 0
+    var exceptionTableBuilder: ExceptionTableBuilder? = null
 
     fun blockType(type: io.github.charlietap.chasm.type.BlockType): io.github.charlietap.chasm.type.FunctionType =
         workspace.blockType(compiler, type)
@@ -155,7 +157,7 @@ internal class FunctionCompilationContext(
         program.finish()
     }
 
-    private fun flushCopies() {
+    fun flushCopies() {
         copyInstructionBuffer?.flush()
     }
 

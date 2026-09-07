@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.compiler.program
 
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.exception.FunctionExceptionTable
 import io.github.charlietap.chasm.runtime.program.Program
 
 internal class ProgramFragment(
@@ -9,6 +10,7 @@ internal class ProgramFragment(
     private val relocationTargetIps: IntArray,
     private val relocationFactories: Array<TargetInstructionFactory>,
     private val multiTargetRelocations: Array<ProgramBuilder.MultiTargetRelocation>,
+    private val exceptionTable: FunctionExceptionTable? = null,
 ) {
 
     private var linked = false
@@ -21,6 +23,7 @@ internal class ProgramFragment(
         val baseIp = program.size
         if (baseIp != 0) relocate(baseIp)
         program.append(instructions)
+        exceptionTable?.let { program.registerExceptionTable(it.relocated(baseIp)) }
         return baseIp
     }
 

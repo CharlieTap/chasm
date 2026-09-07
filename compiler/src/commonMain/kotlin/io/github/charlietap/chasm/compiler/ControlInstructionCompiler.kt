@@ -45,6 +45,7 @@ import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramTarget
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.UnreachableDispatcher
+import io.github.charlietap.chasm.runtime.exception.CompiledCatch
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
@@ -305,13 +306,19 @@ private fun enterTryTable(
     }
     val targetIndices = IntArray(instruction.handlers.size)
     val payloadDestinationSlots = ArrayList<IntArray>(instruction.handlers.size)
-    for (index in instruction.handlers.indices) {
+    val catches = Array(instruction.handlers.size) { index ->
         val handler = instruction.handlers[index]
         val target = state.target(handler.labelIndex.toInt())
+        val tagAddress = when (handler) {
+            is ControlInstruction.CatchHandler.Catch -> state.compiler.instance.tagAddresses[handler.tagIndex.toInt()].address
+            is ControlInstruction.CatchHandler.CatchRef -> state.compiler.instance.tagAddresses[handler.tagIndex.toInt()].address
+            else -> CompiledCatch.CATCH_ALL_TAG
+        }
+        val includeReference = handler is ControlInstruction.CatchHandler.CatchRef ||
+            handler is ControlInstruction.CatchHandler.CatchAllRef
         val payloadArity = when (handler) {
             is ControlInstruction.CatchHandler.Catch -> state.compiler.tag(handler.tagIndex).type.functionType.params.types.size
-            is ControlInstruction.CatchHandler.CatchRef ->
-                state.compiler.tag(handler.tagIndex).type.functionType.params.types.size + 1
+            is ControlInstruction.CatchHandler.CatchRef -> state.compiler.tag(handler.tagIndex).type.functionType.params.types.size + 1
             is ControlInstruction.CatchHandler.CatchAll -> 0
             is ControlInstruction.CatchHandler.CatchAllRef -> 1
         }
@@ -319,6 +326,15 @@ private fun enterTryTable(
         target.reachedByBranch = true
         targetIndices[index] = target.branchTarget.index
         payloadDestinationSlots.add(target.branchSlots)
+        val prefixEnd = state.operands.highestReservedSlot(target.baseHeight) + 1
+        val payloadEnd = (target.branchSlots.maxOrNull() ?: -1) + 1
+        CatchTarget(
+            tagAddress = tagAddress,
+            target = target.branchTarget,
+            payloadSlots = target.branchSlots,
+            includeExceptionReference = includeReference,
+            stackSlotCount = maxOf(state.layout.temporarySlotBase, prefixEnd, payloadEnd),
+        )
     }
     state.handlerDepth++
     enterBlock(state, BlockKind.TryTable, instruction.blockType)
@@ -327,6 +343,7 @@ private fun enterTryTable(
         targetIndices = targetIndices,
         payloadDestinationSlots = payloadDestinationSlots,
     )
+    enterExceptionRegion(state, catches)
 }
 
 private fun enterElse(state: FunctionCompilationContext) {
@@ -384,6 +401,7 @@ private fun exitStructured(
     if (!state.reachable && continuesFromBranch) {
         restoreBlockResults(state, block)
     }
+    if (block.kind == BlockKind.TryTable) exitExceptionRegion(state)
     state.bind(block.continuationTarget)
     if (block.kind == BlockKind.TryTable) {
         state.emitPopHandler()
@@ -716,6 +734,7 @@ private fun compileReturnCall(
             state.emitReturnHostCall(function, operands, callFrameOffset)
         }
     }
+    state.exceptionTableBuilder?.excludeTailCall(state.program.size - 1)
     state.reachable = false
 }
 
@@ -736,6 +755,7 @@ private fun compileReturnCallIndirect(
         table = state.compiler.table(instruction.tableIndex),
         callFrameOffset = callFrameOffset,
     )
+    state.exceptionTableBuilder?.excludeTailCall(state.program.size - 1)
     state.reachable = false
 }
 
@@ -754,6 +774,7 @@ private fun compileReturnCallRef(
         operands = operands,
         callFrameOffset = callFrameOffset,
     )
+    state.exceptionTableBuilder?.excludeTailCall(state.program.size - 1)
     state.reachable = false
 }
 
@@ -774,6 +795,7 @@ internal fun compileKnownReferenceReturnCall(
             state.emitReturnHostCall(function, operands, callFrameOffset)
         }
     }
+    state.exceptionTableBuilder?.excludeTailCall(state.program.size - 1)
     state.reachable = false
 }
 

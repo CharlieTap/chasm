@@ -196,6 +196,9 @@ internal fun FunctionCompiler(
 
         state.emitDeferredBranchPaths()
         state.finishProgram()
+        state.exceptionTableBuilder?.let { builder ->
+            program.registerExceptionTable(builder.finish(programBuilder, layout.activationHeaderSlot, layout.resultTypes.size))
+        }
         Ok(
             CompiledFunction(
                 frameSlots = state.frame.maxSlotExclusive,
