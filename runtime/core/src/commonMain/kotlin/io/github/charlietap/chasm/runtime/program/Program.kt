@@ -1,6 +1,7 @@
 package io.github.charlietap.chasm.runtime.program
 
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.exception.FunctionExceptionTable
 import kotlin.jvm.JvmOverloads
 
 class Program
@@ -12,6 +13,34 @@ class Program
 
         var size: Int = 0
             private set
+
+        private var exceptionTables: ArrayList<FunctionExceptionTable>? = null
+
+        val hasExceptionHandlers: Boolean
+            get() = exceptionTables != null
+
+        fun registerExceptionTable(table: FunctionExceptionTable) {
+            require(table.entryIp >= 0 && table.instructionCount > 0 && table.endIp <= size)
+            val tables = exceptionTables ?: ArrayList<FunctionExceptionTable>().also { exceptionTables = it }
+            require(tables.isEmpty() || tables.last().endIp <= table.entryIp)
+            tables.add(table)
+        }
+
+        fun exceptionTable(ip: Int): FunctionExceptionTable? {
+            val tables = exceptionTables ?: return null
+            var low = 0
+            var high = tables.lastIndex
+            while (low <= high) {
+                val middle = (low + high) ushr 1
+                val table = tables[middle]
+                when {
+                    ip < table.entryIp -> high = middle - 1
+                    ip >= table.endIp -> low = middle + 1
+                    else -> return table
+                }
+            }
+            return null
+        }
 
         fun append(value: DispatchableInstruction): Int {
             ensureCapacity(size + 1)
@@ -43,6 +72,10 @@ class Program
             }
             for (index in size until this.size) {
                 instructions[index] = unavailableInstruction
+            }
+            exceptionTables?.let { tables ->
+                while (tables.isNotEmpty() && tables.last().endIp > size) tables.removeAt(tables.lastIndex)
+                if (tables.isEmpty()) exceptionTables = null
             }
             this.size = size
         }
