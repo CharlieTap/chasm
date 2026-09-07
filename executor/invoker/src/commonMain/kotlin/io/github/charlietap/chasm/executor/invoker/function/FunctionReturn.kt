@@ -12,6 +12,14 @@ internal interface CallSiteResultDestination {
 /** Encodes the calling instruction, rather than its successor, in the saved return field. */
 internal fun resultCallSiteIp(nextIp: Int): Int = (nextIp - 1) or RESULT_CALL_SITE_FLAG
 
+/** The caller is protected at its call instruction, not at the normal continuation. */
+internal fun exceptionalCallSiteIp(returnIp: Int, resultCount: Int): Int =
+    if (resultCount == 1 && returnIp and RESULT_CALL_SITE_FLAG != 0) {
+        returnIp and RESULT_CALL_SITE_IP_MASK
+    } else {
+        returnIp - 1
+    }
+
 /**
  * Restores a Wasm caller and publishes a selectively placed single result.
  *

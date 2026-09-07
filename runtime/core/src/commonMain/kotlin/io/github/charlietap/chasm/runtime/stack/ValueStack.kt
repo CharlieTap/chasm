@@ -481,6 +481,24 @@ class ValueStack(minCapacity: Int = MIN_CAPACITY) {
         return activationReturnIp(header)
     }
 
+    /** Walks an exceptional return without copying results or running the ordinary return path. */
+    fun unwindCallerFrame(activationHeaderSlot: Int): Int {
+        val calleeFp = fp
+        val slot = calleeFp + activationHeaderSlot
+        if (slot !in elements.indices) {
+            throw InvocationException(InvocationError.ProgramFinishedInconsistentState)
+        }
+        val header = elements[slot]
+        val returnIp = activationReturnIp(header)
+        val delta = activationCallerFrameDelta(header)
+        if (if (returnIp == Int.MAX_VALUE) delta != 0 || calleeFp != 0 else delta <= 0 || delta > calleeFp) {
+            throw InvocationException(InvocationError.ProgramFinishedInconsistentState)
+        }
+        fp = calleeFp - delta
+        sp = calleeFp
+        return returnIp
+    }
+
     /**
      * Returns the live backing storage for trusted host functions.
      *
