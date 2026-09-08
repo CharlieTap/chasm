@@ -446,9 +446,7 @@
                         "admin.jump_if.s",
                         "control.return",
                         "admin.end_function",
-                        "numeric.i32.const",
-                        "admin.copy_slot",
-                        "admin.jump"
+                        "admin.jump_copies"
                     ]
                 },
                 {
@@ -458,8 +456,7 @@
                         "admin.jump_if.s",
                         "numeric.i32.const",
                         "control.return",
-                        "numeric.i32.const",
-                        "admin.jump"
+                        "admin.jump_copies"
                     ]
                 },
                 {
