@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.admin
 
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
-import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import kotlin.test.Test
@@ -17,7 +16,6 @@ class CopySlotsDispatcherTest {
             setFrameSlot(1, 2)
             setFrameSlot(2, 3)
         }
-        val cstack = cstack()
         val store = store()
 
         val nextIp = CopySlotSequenceDispatcher(
@@ -25,7 +23,7 @@ class CopySlotsDispatcherTest {
             destinationSlots = intArrayOf(1, 2),
         )(
             vstack,
-            executionContext(cstack, vstack, store),
+            executionContext(vstack, store),
             17,
         )
 

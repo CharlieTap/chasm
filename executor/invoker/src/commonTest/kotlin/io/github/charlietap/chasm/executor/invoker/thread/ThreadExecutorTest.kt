@@ -7,17 +7,20 @@ import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
-import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
-import io.github.charlietap.chasm.fixture.ast.instruction.catchCatchHandler
-import io.github.charlietap.chasm.fixture.ast.module.labelIndex
-import io.github.charlietap.chasm.fixture.ast.module.tagIndex
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
 import io.github.charlietap.chasm.fixture.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.runtime.exception.compiledCatch
+import io.github.charlietap.chasm.fixture.runtime.exception.exceptionRegion
+import io.github.charlietap.chasm.fixture.runtime.exception.functionExceptionTable
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
+import io.github.charlietap.chasm.fixture.runtime.instruction.endFunctionAdminInstruction
+import io.github.charlietap.chasm.fixture.runtime.instruction.hostCallRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.runtime.value.i32
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.finalSubType
@@ -33,11 +36,9 @@ import io.github.charlietap.chasm.host.HostException
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.RTT
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -50,7 +51,7 @@ class ThreadExecutorTest {
         val program = Program()
         val store = store(program = program)
         val tagAddress = store.heap.registerTag(
-            rtt = RTT(0),
+            rtt = rtt(),
             type = tagType(
                 functionType = functionType(
                     params = resultType(listOf(i64ValueType())),
@@ -69,21 +70,27 @@ class ThreadExecutorTest {
         )
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, context, _ ->
-                    context.cstack.push(
-                        ExceptionHandler(
-                            handlers = listOf(catchCatchHandler(tagIndex(0u), labelIndex(0u))),
-                            payloadDestinationSlots = listOf(intArrayOf(0)),
-                            continuationIps = intArrayOf(1),
-                            instance = module,
-                            fp = vstack.fp,
-                            sp = vstack.sp,
+                CallDispatcher(hostCallRuntimeInstruction(instance = hostFunction, caller = module)),
+                EndFunctionDispatcher(endFunctionAdminInstruction(resultCount = 1)),
+            ),
+        )
+        program.registerExceptionTable(
+            functionExceptionTable(
+                entryIp,
+                2,
+                1,
+                1,
+                arrayOf(
+                    exceptionRegion(
+                        0,
+                        1,
+                        -1,
+                        arrayOf(
+                            compiledCatch(tagAddress.address, 1, intArrayOf(0), false, 2),
                         ),
-                    )
-                    HostFunctionCall(vstack, context, module, hostFunction, 0, 0)
-                    error("raised exception returned to the host call site")
-                },
-                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
+                    ),
+                ),
+                intArrayOf(),
             ),
         )
         val function = wasmFunctionInstance(
@@ -107,7 +114,7 @@ class ThreadExecutorTest {
         val store = store(program = program)
         val exceptionReference = store.heap.allocateException(
             tagAddress = store.heap.registerTag(
-                rtt = RTT(0),
+                rtt = rtt(),
                 type = tagType(),
             ),
             fields = LongArray(0),
@@ -119,10 +126,7 @@ class ThreadExecutorTest {
             },
         )
         val entryIp = program.append(
-            DispatchableInstruction { vstack, context, _ ->
-                HostFunctionCall(vstack, context, module, hostFunction, 0, 0)
-                error("raised exception returned to the host call site")
-            },
+            CallDispatcher(hostCallRuntimeInstruction(instance = hostFunction, caller = module)),
         )
         val function = wasmFunctionInstance(
             module = module,

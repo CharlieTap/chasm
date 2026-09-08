@@ -79,5 +79,4 @@ private fun ControlStack.pushBlock(kind: BlockKind): BlockContext = push(
     parameterTypes = emptyList(),
     branchTarget = ProgramTarget(0),
     continuationTarget = ProgramTarget(0),
-    handlerDepth = 0,
 )

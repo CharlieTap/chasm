@@ -1,9 +1,6 @@
 package io.github.charlietap.chasm.fixture.runtime.instruction
 
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
-import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.type.referenceTypeTest
-import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.FusedOperand
 import io.github.charlietap.chasm.runtime.instruction.NumericCondition
@@ -203,21 +200,5 @@ fun jumpOnCastFailSAdminInstruction(
     targetIp = targetIp,
     typeTest = typeTest,
 )
-
-fun pushHandlerAdminInstruction(
-    handlers: List<CatchHandler> = emptyList(),
-    continuationIps: IntArray = intArrayOf(),
-    payloadDestinationSlots: List<IntArray> = emptyList(),
-    instance: ModuleInstance = moduleInstance(),
-) = AdminInstruction.PushHandler(
-    handlers = handlers,
-    continuationIps = continuationIps,
-    payloadDestinationSlots = payloadDestinationSlots,
-    instance = instance,
-)
-
-fun popHandlerAdminInstruction() = AdminInstruction.PopHandler
-
-private fun operandTransfer() = OperandTransfer(emptyArray(), destinationSlotBase = 0)
 
 private fun numericCondition(): NumericCondition = NumericCondition.I32Eqz(FusedOperand.I32Const(0))

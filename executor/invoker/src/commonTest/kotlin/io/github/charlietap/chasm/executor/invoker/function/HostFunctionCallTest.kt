@@ -4,7 +4,6 @@ import io.github.charlietap.chasm.executor.invoker.fixture.executionContext
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
-import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.f32ValueType
@@ -35,9 +34,8 @@ class HostFunctionCallTest {
     fun `zero parameter and result call invokes the host directly`() {
         val caller = moduleInstance()
         val store = store()
-        val cstack = cstack()
         val vstack = vstack()
-        val context = executionContext(store = store, cstack = cstack, vstack = vstack)
+        val context = executionContext(store = store, vstack = vstack)
         var invocations = 0
         val function = hostFunctionInstance(
             function = HostFunction { _, _ ->
@@ -59,9 +57,8 @@ class HostFunctionCallTest {
     fun `nested host callbacks own independent reference scopes`() {
         val caller = moduleInstance()
         val store = store()
-        val cstack = cstack()
         val vstack = vstack()
-        val context = executionContext(store = store, cstack = cstack, vstack = vstack)
+        val context = executionContext(store = store, vstack = vstack)
         val nestedFunction = hostFunctionInstance(
             function = HostFunction { _, _ ->
                 val references = contextOf<HostResources>().references
@@ -93,13 +90,12 @@ class HostFunctionCallTest {
     fun `strict call exposes raw parameter and result slots`() {
         val caller = moduleInstance()
         val store = store()
-        val cstack = cstack()
         val vstack = vstack().apply {
             reserveDepth(4)
             setFrameSlot(1, 41L)
             setFrameSlot(2, 1L)
         }
-        val context = executionContext(store = store, cstack = cstack, vstack = vstack)
+        val context = executionContext(store = store, vstack = vstack)
         val function = hostFunctionInstance(
             functionType = functionType(
                 params = resultType(listOf(i32ValueType(), i32ValueType())),
@@ -131,7 +127,6 @@ class HostFunctionCallTest {
     fun `strict call preserves all numeric encodings and multiple results`() {
         val caller = moduleInstance()
         val store = store()
-        val cstack = cstack()
         val int32 = -123456789
         val int64 = Long.MIN_VALUE + 17
         val float = Float.fromBits(0x7FC01234)
@@ -143,7 +138,7 @@ class HostFunctionCallTest {
             setFrameSlot(3, float.toRawBits().toLong())
             setFrameSlot(4, double.toRawBits())
         }
-        val context = executionContext(store = store, cstack = cstack, vstack = vstack)
+        val context = executionContext(store = store, vstack = vstack)
         val numericTypes = listOf(i32ValueType(), i64ValueType(), f32ValueType(), f64ValueType())
         val function = hostFunctionInstance(
             functionType = functionType(
@@ -176,7 +171,6 @@ class HostFunctionCallTest {
     @Test
     fun `tail call writes raw results into the caller frame`() {
         val store = store()
-        val cstack = cstack()
         val vstack = vstack().apply {
             reserveDepth(6)
             writeActivationHeader(
@@ -187,7 +181,7 @@ class HostFunctionCallTest {
             activateFrame(fp = 1, frameSlots = 5)
             setFrameSlot(4, 41L)
         }
-        val context = executionContext(store = store, cstack = cstack, vstack = vstack)
+        val context = executionContext(store = store, vstack = vstack)
         val function = hostFunctionInstance(
             functionType = functionType(
                 params = resultType(listOf(i32ValueType())),

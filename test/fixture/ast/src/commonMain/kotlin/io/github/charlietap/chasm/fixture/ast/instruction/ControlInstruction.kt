@@ -65,6 +65,14 @@ fun unreachableInstruction() = ControlInstruction.Unreachable
 
 fun nopInstruction() = ControlInstruction.Nop
 
+fun tryTableInstruction(
+    blockType: BlockType = blockType(),
+    handlers: List<ControlInstruction.CatchHandler> = emptyList(),
+) = ControlInstruction.TryTable(
+    blockType = blockType,
+    handlers = handlers,
+)
+
 fun blockInstruction(
     blockType: BlockType = blockType(),
 ) = ControlInstruction.Block(

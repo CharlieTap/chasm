@@ -65,7 +65,7 @@ class ContrivedCompilerBaselineTest {
 
         val takenOnlyBranch = functions.getValue("lowering.taken_only_branch_copy").instructions
         assertTrue(takenOnlyBranch.indexOf("admin.end_function") < takenOnlyBranch.lastIndex)
-        assertEquals("admin.jump", takenOnlyBranch.last())
+        assertEquals("admin.jump_copies", takenOnlyBranch.last())
     }
 
     private fun generateContrivedBaseline(): CompilerBaseline {

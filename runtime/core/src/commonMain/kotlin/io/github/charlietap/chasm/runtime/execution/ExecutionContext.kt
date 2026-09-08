@@ -18,12 +18,10 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instance.TableInstance
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 
 data class ExecutionContext(
-    val cstack: ControlStack,
     val vstack: ValueStack,
     val store: Store,
     val instance: ModuleInstance,

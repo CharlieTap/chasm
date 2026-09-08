@@ -183,8 +183,6 @@ fun throwRefSRuntimeInstruction(
 
 private fun wasmFunctionCallStrategy() = WasmFunctionCallStrategy(interfaceSlotCount = 0)
 
-private fun operandTransfer() = OperandTransfer(emptyArray(), destinationSlotBase = 0)
-
 private fun tailCallOperandTransfer() = TailCallOperandTransfer(
     wasm = operandTransfer(),
     host = operandTransfer(),

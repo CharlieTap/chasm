@@ -1,9 +1,11 @@
 package io.github.charlietap.chasm.executor.invoker.function
 
+import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
 import io.github.charlietap.chasm.host.HostFunction
 import io.github.charlietap.chasm.host.HostFunctionException
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.error.InvocationError
+import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
@@ -45,4 +47,16 @@ internal inline fun HostFunction.invokeHost(
     } catch (exception: HostFunctionException) {
         throw InvocationException(InvocationError.HostFunctionError(exception.reason))
     }
+}
+
+// Catch here so the dispatch loop does not need to preserve the current IP.
+internal inline fun withHostExceptionHandling(
+    vstack: ValueStack,
+    context: ExecutionContext,
+    nextIp: Int,
+    call: () -> Int,
+): Int = try {
+    call()
+} catch (_: HostRaisedWasmException) {
+    ThrowRefValueExecutor(vstack, context, context.heap.takePendingExceptionReference(), nextIp - 1)
 }

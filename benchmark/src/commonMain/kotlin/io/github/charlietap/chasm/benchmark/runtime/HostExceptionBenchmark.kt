@@ -8,9 +8,6 @@ import io.github.charlietap.chasm.executor.invoker.FunctionInvoker
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.ThrowRefDispatcher
-import io.github.charlietap.chasm.fixture.ast.instruction.catchAllHandler
-import io.github.charlietap.chasm.fixture.ast.instruction.catchAllRefHandler
-import io.github.charlietap.chasm.fixture.ast.module.labelIndex
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
@@ -30,7 +27,9 @@ import io.github.charlietap.chasm.host.withExceptions
 import io.github.charlietap.chasm.host.withTag
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.runtime.exception.CompiledCatch
+import io.github.charlietap.chasm.runtime.exception.ExceptionRegion
+import io.github.charlietap.chasm.runtime.exception.FunctionExceptionTable
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
@@ -129,30 +128,36 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
                 ),
             )
         } else {
-            val throwInstruction = ThrowRefDispatcher(ControlInstruction.ThrowRefS(exceptionSlot = 0))
+            val throwInstruction = ThrowRefDispatcher(ControlInstruction.ThrowRefS(exceptionSlot = 1))
             DispatchableInstruction { vstack, context, nextIp ->
-                vstack.setFrameSlot(0, exception.rawReference)
+                vstack.setFrameSlot(1, exception.rawReference)
                 throwInstruction(vstack, context, nextIp)
             }
         }
-        val continuationIp = program.size + 2
+        val interfaceSlotCount = if (hostRaised) payloadSize else 0
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, context, nextIp ->
-                    context.cstack.push(
-                        ExceptionHandler(
-                            handlers = listOf(catchAllHandler(labelIndex(0u))),
-                            payloadDestinationSlots = listOf(IntArray(0)),
-                            continuationIps = intArrayOf(continuationIp),
-                            instance = module,
-                            fp = vstack.fp,
-                            sp = vstack.sp,
-                        ),
-                    )
-                    nextIp
-                },
                 invocation,
-                EndFunctionDispatcher(AdminInstruction.EndFunction(0, 0)),
+                EndFunctionDispatcher(AdminInstruction.EndFunction(resultCount = 0, activationHeaderSlot = interfaceSlotCount)),
+            ),
+        )
+        program.registerExceptionTable(
+            FunctionExceptionTable(
+                entryIp = entryIp,
+                instructionCount = 2,
+                interfaceSlotCount = interfaceSlotCount,
+                resultCount = 0,
+                regions = arrayOf(
+                    ExceptionRegion(
+                        startOffset = 0,
+                        endOffset = 1,
+                        parentRegion = -1,
+                        catches = arrayOf(
+                            CompiledCatch(CompiledCatch.CATCH_ALL_TAG, 1, intArrayOf(), false, interfaceSlotCount + 1),
+                        ),
+                    ),
+                ),
+                tailCallOffsets = intArrayOf(),
             ),
         )
         val function = wasmFunctionInstance(
@@ -160,7 +165,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
             functionType = if (hostRaised) payloadFunctionType() else functionType(),
             function = runtimeFunction(
                 body = runtimeExpression(entryIp),
-                frameSlots = if (hostRaised) payloadSize else 1,
+                frameSlots = if (hostRaised) payloadSize + 1 else 2,
             ),
         )
         val parameters = if (hostRaised) {
@@ -216,6 +221,7 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         )
         runtimeStore.heap.retain(exception.rawReference)
         val nested = escapingFunction(program, module, exception.rawReference)
+        runtimeStore.functions.add(nested)
         val bridge = hostFunctionInstance(
             function = HostFunction { _, _ ->
                 val invocation = FunctionInvoker(config, runtimeStore, module, nested, emptyList())
@@ -225,22 +231,8 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
                 }
             },
         )
-        val continuationIp = program.size + 2
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, context, nextIp ->
-                    context.cstack.push(
-                        ExceptionHandler(
-                            handlers = listOf(catchAllRefHandler(labelIndex(0u))),
-                            payloadDestinationSlots = listOf(intArrayOf(0)),
-                            continuationIps = intArrayOf(continuationIp),
-                            instance = module,
-                            fp = vstack.fp,
-                            sp = vstack.sp,
-                        ),
-                    )
-                    nextIp
-                },
                 CallDispatcher(
                     ControlInstruction.HostCall(
                         instance = bridge,
@@ -250,6 +242,25 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
                     ),
                 ),
                 EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
+            ),
+        )
+        program.registerExceptionTable(
+            FunctionExceptionTable(
+                entryIp = entryIp,
+                instructionCount = 2,
+                interfaceSlotCount = 1,
+                resultCount = 1,
+                regions = arrayOf(
+                    ExceptionRegion(
+                        startOffset = 0,
+                        endOffset = 1,
+                        parentRegion = -1,
+                        catches = arrayOf(
+                            CompiledCatch(CompiledCatch.CATCH_ALL_TAG, 1, intArrayOf(0), true, 2),
+                        ),
+                    ),
+                ),
+                tailCallOffsets = intArrayOf(),
             ),
         )
         val outer = wasmFunctionInstance(
@@ -270,19 +281,19 @@ class HostExceptionBenchmark : StabilizedBenchmark() {
         module: ModuleInstance,
         exceptionReference: Long,
     ): FunctionInstance.WasmFunction {
-        val throwInstruction = ThrowRefDispatcher(ControlInstruction.ThrowRefS(exceptionSlot = 0))
+        val throwInstruction = ThrowRefDispatcher(ControlInstruction.ThrowRefS(exceptionSlot = 1))
         return wasmFunctionInstance(
             module = module,
             function = runtimeFunction(
                 body = runtimeExpression(
                     program.append(
                         DispatchableInstruction { vstack, context, nextIp ->
-                            vstack.setFrameSlot(0, exceptionReference)
+                            vstack.setFrameSlot(1, exceptionReference)
                             throwInstruction(vstack, context, nextIp)
                         },
                     ),
                 ),
-                frameSlots = 1,
+                frameSlots = 2,
             ),
         )
     }

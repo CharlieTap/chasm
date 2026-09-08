@@ -1,16 +1,21 @@
 package io.github.charlietap.chasm.executor.invoker.dispatch.control
 
+import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
-import io.github.charlietap.chasm.fixture.runtime.instance.functionAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tableInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.runtime.stack.cstack
+import io.github.charlietap.chasm.fixture.runtime.instruction.callIndirectIRuntimeInstruction
+import io.github.charlietap.chasm.fixture.runtime.instruction.callRefSRuntimeInstruction
+import io.github.charlietap.chasm.fixture.runtime.instruction.functionReturnRuntimeInstruction
+import io.github.charlietap.chasm.fixture.runtime.instruction.operandTransfer
+import io.github.charlietap.chasm.fixture.runtime.instruction.wasmCallRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.value.functionReferenceValue
 import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.fixture.type.functionType
@@ -19,15 +24,12 @@ import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.host.HostModuleInstance
 import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.writeI32
-import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.ext.toLong
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
-import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
 import io.github.charlietap.chasm.runtime.instruction.TransferSource
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import kotlin.contextOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -44,13 +46,13 @@ class StrictControlDispatchersTest {
                 frameSlots = 2,
             ),
         )
-        val call = ControlInstruction.WasmCall(
+        val call = wasmCallRuntimeInstruction(
             strategy = function.callStrategy,
-            operands = OperandTransfer(emptyArray(), destinationSlotBase = 2),
+            operands = operandTransfer(emptyArray(), destinationSlotBase = 2),
             callFrameOffset = 2,
         )
-        val returnInstruction = ControlInstruction.FunctionReturn(
-            results = OperandTransfer(
+        val returnInstruction = functionReturnRuntimeInstruction(
+            results = operandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
                 destinationSlotBase = 0,
             ),
@@ -58,14 +60,13 @@ class StrictControlDispatchersTest {
         )
         val program = Program().apply {
             append(CallDispatcher(call, resultDestinationSlot = 0))
-            append(DispatchableInstruction { _, _, nextIp -> nextIp })
+            append(dispatchableInstruction())
             append(FunctionReturnDispatcher(returnInstruction))
         }
         LinkWasmCallDispatchers(program, firstIp = 0)
         val store = store(program = program)
         val vstack = vstack().apply { reserveDepth(4) }
-        val cstack = cstack()
-        val context = executionContext(cstack, vstack, store)
+        val context = executionContext(vstack, store)
 
         val calleeEntryIp = program.instructions[0](vstack, context, 1)
         vstack.setFrameSlot(0, 42)
@@ -121,15 +122,15 @@ class StrictControlDispatchersTest {
 
     @Test
     fun `selects local initialization after the callee strategy is installed`() {
-        val strategy = WasmFunctionCallStrategy(interfaceSlotCount = 0)
-        val call = ControlInstruction.WasmCall(
+        val strategy = wasmFunctionInstance(function = runtimeFunction(body = runtimeExpression(entryIp = -1))).callStrategy
+        val call = wasmCallRuntimeInstruction(
             strategy = strategy,
-            operands = OperandTransfer(emptyArray(), destinationSlotBase = 2),
+            operands = operandTransfer(emptyArray(), destinationSlotBase = 2),
             callFrameOffset = 2,
         )
         val program = Program().apply {
             append(CallDispatcher(call))
-            append(DispatchableInstruction { _, _, nextIp -> nextIp })
+            append(dispatchableInstruction())
         }
 
         strategy.entryIp = 1
@@ -142,8 +143,7 @@ class StrictControlDispatchersTest {
             reserveDepth(4)
             setFrameSlot(3, 42)
         }
-        val cstack = cstack()
-        val context = executionContext(cstack, vstack, store)
+        val context = executionContext(vstack, store)
 
         assertEquals(1, program.instructions[0](vstack, context, 1))
         assertEquals(2, vstack.fp)
@@ -167,12 +167,11 @@ class StrictControlDispatchersTest {
         val vstack = vstack().apply {
             reserveDepth(3)
             setFrameSlot(0, 41)
-            setFrameSlot(1, ReferenceValue.Function(functionAddress()).toLong())
+            setFrameSlot(1, functionReferenceValue().toLong())
         }
-        val cstack = cstack()
-        val instruction = ControlInstruction.CallRefS(
+        val instruction = callRefSRuntimeInstruction(
             functionSlot = 1,
-            operands = OperandTransfer(
+            operands = operandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
                 destinationSlotBase = 2,
             ),
@@ -182,7 +181,7 @@ class StrictControlDispatchersTest {
 
         val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
             vstack,
-            executionContext(cstack, vstack, store, module),
+            executionContext(vstack, store, module),
             11,
         )
 
@@ -209,16 +208,15 @@ class StrictControlDispatchersTest {
         }
         store.functions += function
         val table = tableInstance(
-            elements = longArrayOf(ReferenceValue.Function(functionAddress()).toLong()),
+            elements = longArrayOf(functionReferenceValue().toLong()),
         )
         val vstack = vstack().apply {
             reserveDepth(2)
             setFrameSlot(0, 41)
         }
-        val cstack = cstack()
-        val instruction = ControlInstruction.CallIndirectI(
+        val instruction = callIndirectIRuntimeInstruction(
             elementIndex = 0,
-            operands = OperandTransfer(
+            operands = operandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
                 destinationSlotBase = 1,
             ),
@@ -230,7 +228,7 @@ class StrictControlDispatchersTest {
 
         val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
             vstack,
-            executionContext(cstack, vstack, store, module),
+            executionContext(vstack, store, module),
             11,
         )
 
@@ -255,16 +253,15 @@ class StrictControlDispatchersTest {
         }
         store.functions += function
         val table = tableInstance(
-            elements = longArrayOf(ReferenceValue.Function(functionAddress()).toLong()),
+            elements = longArrayOf(functionReferenceValue().toLong()),
         )
         val vstack = vstack().apply {
             reserveDepth(2)
             setFrameSlot(0, 41)
         }
-        val cstack = cstack()
-        val instruction = ControlInstruction.CallIndirectI(
+        val instruction = callIndirectIRuntimeInstruction(
             elementIndex = 0,
-            operands = OperandTransfer(
+            operands = operandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
                 destinationSlotBase = 1,
             ),
@@ -276,7 +273,7 @@ class StrictControlDispatchersTest {
 
         val nextIp = CallDispatcher(instruction, callSiteIp = 10, resultDestinationSlot = 0)(
             vstack,
-            executionContext(cstack, vstack, store, module),
+            executionContext(vstack, store, module),
             11,
         )
 
@@ -302,32 +299,31 @@ class StrictControlDispatchersTest {
         )
         store.functions += function
         val table = tableInstance(
-            elements = longArrayOf(ReferenceValue.Function(functionAddress()).toLong()),
+            elements = longArrayOf(functionReferenceValue().toLong()),
         )
-        val call = ControlInstruction.CallIndirectI(
+        val call = callIndirectIRuntimeInstruction(
             elementIndex = 0,
-            operands = OperandTransfer(emptyArray(), destinationSlotBase = 2),
+            operands = operandTransfer(emptyArray(), destinationSlotBase = 2),
             type = runtimeType,
             table = table,
             callFrameOffset = 2,
             caller = module,
         )
-        val returnInstruction = ControlInstruction.FunctionReturn(
-            results = OperandTransfer(
+        val returnInstruction = functionReturnRuntimeInstruction(
+            results = operandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
                 destinationSlotBase = 0,
             ),
             activationHeaderSlot = 1,
         )
-        program.append(DispatchableInstruction { _, _, nextIp -> nextIp })
-        program.append(DispatchableInstruction { _, _, nextIp -> nextIp })
+        program.append(dispatchableInstruction())
+        program.append(dispatchableInstruction())
         program.append(CallDispatcher(call, resultDestinationSlot = 0))
-        program.append(DispatchableInstruction { _, _, nextIp -> nextIp })
+        program.append(dispatchableInstruction())
         program.append(FunctionReturnDispatcher(returnInstruction))
         LinkWasmCallDispatchers(program, firstIp = 2)
         val vstack = vstack().apply { reserveDepth(4) }
-        val cstack = cstack()
-        val context = executionContext(cstack, vstack, store, module)
+        val context = executionContext(vstack, store, module)
 
         val calleeEntryIp = program.instructions[2](vstack, context, 3)
         vstack.setFrameSlot(0, 42)
@@ -353,12 +349,11 @@ class StrictControlDispatchersTest {
         val vstack = vstack().apply {
             reserveDepth(2)
             setFrameSlot(0, 42)
-            setFrameSlot(1, ReferenceValue.Function(functionAddress()).toLong())
+            setFrameSlot(1, functionReferenceValue().toLong())
         }
-        val cstack = cstack()
-        val instruction = ControlInstruction.CallRefS(
+        val instruction = callRefSRuntimeInstruction(
             functionSlot = 1,
-            operands = OperandTransfer(
+            operands = operandTransfer(
                 sources = arrayOf(TransferSource.Slot(0)),
                 destinationSlotBase = 2,
             ),
@@ -368,7 +363,7 @@ class StrictControlDispatchersTest {
 
         val nextIp = CallDispatcher(instruction, callSiteIp = 10)(
             vstack,
-            executionContext(cstack, vstack, store, module),
+            executionContext(vstack, store, module),
             11,
         )
 

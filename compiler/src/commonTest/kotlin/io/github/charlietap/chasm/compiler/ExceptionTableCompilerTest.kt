@@ -7,8 +7,17 @@ import io.github.charlietap.chasm.ast.module.Index
 import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserver
+import io.github.charlietap.chasm.fixture.ast.instruction.blockInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.callInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.catchAllHandler
+import io.github.charlietap.chasm.fixture.ast.instruction.catchCatchHandler
+import io.github.charlietap.chasm.fixture.ast.instruction.endInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.expression
+import io.github.charlietap.chasm.fixture.ast.instruction.tryTableInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.unreachableInstruction
 import io.github.charlietap.chasm.fixture.ast.module.function
 import io.github.charlietap.chasm.fixture.ast.module.module
+import io.github.charlietap.chasm.fixture.ast.module.tagIndex
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.tagAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.tagInstance
@@ -18,7 +27,6 @@ import io.github.charlietap.chasm.fixture.type.definedType
 import io.github.charlietap.chasm.fixture.type.functionRecursiveType
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.exception.CompiledCatch
-import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
@@ -32,7 +40,7 @@ import kotlin.test.assertTrue
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction as RuntimeControlInstruction
 
 class ExceptionTableCompilerTest {
-    private val catchAll = ControlInstruction.CatchHandler.CatchAll(Index.LabelIndex(0u))
+    private val catchAll = catchAllHandler()
 
     @Test
     fun `functions without catches publish no exception table`() {
@@ -51,15 +59,19 @@ class ExceptionTableCompilerTest {
     @Test
     fun `nested empty try does not close its enclosing region`() {
         val fixture = compile(
-            Expression(
-                ControlInstruction.Block(BlockType.Empty),
-                ControlInstruction.TryTable(BlockType.Empty, listOf(catchAll)),
-                ControlInstruction.TryTable(BlockType.Empty, emptyList()),
-                ControlInstruction.Nop,
-                ControlInstruction.End(1),
-                ControlInstruction.TryTable(BlockType.Empty, listOf(catchAll)),
-                ControlInstruction.Nop,
-                ControlInstruction.End(3),
+            expression(
+                instructions = listOf(
+                    blockInstruction(),
+                    tryTableInstruction(handlers = listOf(catchAll)),
+                    tryTableInstruction(handlers = emptyList()),
+                    callInstruction(),
+                    endInstruction(1),
+                    tryTableInstruction(handlers = listOf(catchAll)),
+                    callInstruction(),
+                    endInstruction(1),
+                    callInstruction(),
+                    endInstruction(2),
+                ),
             ),
         )
         val table = assertNotNull(fixture.program.exceptionTable(0))
@@ -72,33 +84,32 @@ class ExceptionTableCompilerTest {
         assertTrue(inner.endOffset < outer.endOffset)
         assertEquals(0, table.innermostRegion(inner.endOffset))
         assertEquals(-1, table.innermostRegion(outer.endOffset))
-        assertEquals(3, fixture.instructions.count { it is AdminInstruction.PushHandler })
-        assertEquals(3, fixture.instructions.count { it is AdminInstruction.PopHandler })
     }
 
     @Test
-    fun `catch order uses resolved tag addresses and matches legacy targets`() {
+    fun `catch order uses resolved tag addresses and a shared continuation`() {
         val fixture = compile(
-            Expression(
-                ControlInstruction.Block(BlockType.Empty),
-                ControlInstruction.TryTable(
-                    BlockType.Empty,
-                    listOf(
-                        ControlInstruction.CatchHandler.Catch(Index.TagIndex(1u), Index.LabelIndex(0u)),
-                        ControlInstruction.CatchHandler.Catch(Index.TagIndex(0u), Index.LabelIndex(0u)),
-                        catchAll,
+            expression(
+                instructions = listOf(
+                    blockInstruction(),
+                    tryTableInstruction(
+                        handlers = listOf(
+                            catchCatchHandler(tagIndex = tagIndex(1u)),
+                            catchCatchHandler(tagIndex = tagIndex(0u)),
+                            catchAll,
+                        ),
                     ),
+                    unreachableInstruction(),
+                    endInstruction(2),
                 ),
-                ControlInstruction.Unreachable,
-                ControlInstruction.End(2),
             ),
         )
         val region = assertNotNull(fixture.program.exceptionTable(0)).regions.single()
-        val legacy = fixture.instructions.filterIsInstance<AdminInstruction.PushHandler>().single()
         assertEquals(listOf(42, 17, CompiledCatch.CATCH_ALL_TAG), region.catches.map { it.tagAddress })
-        for ((index, handler) in region.catches.withIndex()) {
-            assertEquals(legacy.continuationIps[index], handler.targetOffset)
-            assertContentEquals(legacy.payloadDestinationSlots[index], handler.payloadSlots)
+        for (handler in region.catches) {
+            assertEquals(region.catches.first().targetOffset, handler.targetOffset)
+            assertTrue(handler.targetOffset >= region.endOffset)
+            assertContentEquals(intArrayOf(), handler.payloadSlots)
             assertFalse(handler.includeExceptionReference)
         }
     }

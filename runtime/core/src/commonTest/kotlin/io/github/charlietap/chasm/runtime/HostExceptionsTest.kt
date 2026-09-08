@@ -2,18 +2,20 @@ package io.github.charlietap.chasm.runtime
 
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
-import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.runtime.stack.vstack
+import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.type.rtt
+import io.github.charlietap.chasm.fixture.type.functionType
+import io.github.charlietap.chasm.fixture.type.refNullReferenceType
+import io.github.charlietap.chasm.fixture.type.referenceValueType
+import io.github.charlietap.chasm.fixture.type.resultType
 import io.github.charlietap.chasm.host.HostException
 import io.github.charlietap.chasm.host.HostTag
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
-import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.stack.ControlStack
-import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.RTT
-import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.CompositeType
 import io.github.charlietap.chasm.type.FunctionType
@@ -34,6 +36,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext as executionContextFixture
+import io.github.charlietap.chasm.fixture.type.tagType as tagTypeFixture
 
 class HostExceptionsTest {
 
@@ -142,20 +146,22 @@ class HostExceptionsTest {
     @Test
     @OptIn(UnsafeHostApi::class)
     fun `traditional collection sees references in the host stack payload`() {
-        val store = Store()
+        val store = store()
         val runtimeType = store.heap.registerRuntimeType(emptyStructType())
         val struct = store.heap.allocateStruct(runtimeType, LongArray(0))
         val tagAddress = store.heap.registerTag(
-            RTT(1),
-            tagType(ValueType.Reference(ReferenceType.RefNull(AbstractHeapType.Any))),
+            rtt(1),
+            tagTypeFixture(
+                functionType = functionType(
+                    params = resultType(listOf(referenceValueType(refNullReferenceType(AbstractHeapType.Any)))),
+                ),
+            ),
         )
-        val stack = ValueStack().apply { push(struct) }
-        val context = ExecutionContext(
-            cstack = ControlStack(),
+        val stack = vstack().apply { push(struct) }
+        val context = executionContextFixture(
             vstack = stack,
             store = store,
-            instance = ModuleInstance(RuntimeTypeMap.Empty),
-            config = RuntimeConfig(
+            config = runtimeConfig(
                 gcStrategy = GCStrategy.TRADITIONAL,
                 gcThreshold = GCThreshold.KB(0),
             ),
@@ -171,13 +177,7 @@ class HostExceptionsTest {
         store.heap.endScope(marker)
     }
 
-    private fun executionContext(store: Store) = ExecutionContext(
-        cstack = ControlStack(),
-        vstack = ValueStack(),
-        store = store,
-        instance = ModuleInstance(RuntimeTypeMap.Empty),
-        config = RuntimeConfig(),
-    )
+    private fun executionContext(store: Store) = executionContextFixture(store = store)
 
     private fun emptyStructType() = DefinedTypeFactory(
         listOf(

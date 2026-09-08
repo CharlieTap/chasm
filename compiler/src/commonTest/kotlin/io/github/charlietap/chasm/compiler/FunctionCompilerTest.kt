@@ -16,12 +16,19 @@ import io.github.charlietap.chasm.ast.module.Local
 import io.github.charlietap.chasm.compiler.context.CompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerInstructionObserver
+import io.github.charlietap.chasm.fixture.ast.instruction.brIfInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.dropInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.expression
+import io.github.charlietap.chasm.fixture.ast.instruction.i32AddInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.i32ConstInstruction
+import io.github.charlietap.chasm.fixture.ast.instruction.localGetInstruction
 import io.github.charlietap.chasm.fixture.ast.module.export
 import io.github.charlietap.chasm.fixture.ast.module.function
+import io.github.charlietap.chasm.fixture.ast.module.labelIndex
+import io.github.charlietap.chasm.fixture.ast.module.localIndex
 import io.github.charlietap.chasm.fixture.ast.module.module
 import io.github.charlietap.chasm.fixture.runtime.execution.executionContext
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
-import io.github.charlietap.chasm.fixture.runtime.stack.cstack
 import io.github.charlietap.chasm.fixture.runtime.stack.vstack
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.fixture.type.arrayCompositeType
@@ -174,10 +181,12 @@ class FunctionCompilerTest {
             ),
         )
         val function = function(
-            body = Expression(
-                VariableInstruction.LocalGet(Index.LocalIndex(0u)),
-                VariableInstruction.LocalGet(Index.LocalIndex(1u)),
-                NumericInstruction.I32Add,
+            body = expression(
+                instructions = listOf(
+                    localGetInstruction(localIndex(0u)),
+                    localGetInstruction(localIndex(1u)),
+                    i32AddInstruction(),
+                ),
             ),
         )
 
@@ -187,9 +196,8 @@ class FunctionCompilerTest {
             setFrameSlot(0, 20)
             setFrameSlot(1, 22)
         }
-        val cstack = cstack()
         val store = store()
-        val executionContext = executionContext(vstack = vstack, cstack = cstack, store = store)
+        val executionContext = executionContext(vstack = vstack, store = store)
 
         compiled.instructions.first()(vstack, executionContext, 1)
 
@@ -770,6 +778,43 @@ class FunctionCompilerTest {
         val vstack = execute(compiled)
 
         assertEquals(42, vstack.getFrameSlot(0).toInt())
+    }
+
+    @Test
+    fun `branches directly when the result is already in place`() {
+        val module = module(
+            definedTypes = listOf(
+                definedType(
+                    recursiveType = functionRecursiveType(
+                        functionType = functionType(
+                            params = resultType(listOf(i32ValueType(), i32ValueType())),
+                            results = resultType(listOf(i32ValueType())),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val function = function(
+            body = expression(
+                instructions = listOf(
+                    localGetInstruction(localIndex(0u)),
+                    localGetInstruction(localIndex(1u)),
+                    brIfInstruction(labelIndex(0u)),
+                    dropInstruction(),
+                    i32ConstInstruction(7),
+                ),
+            ),
+        )
+
+        val compiled = compileFunction(compilerContext(module), function, baseIp = 0)
+        for (condition in listOf(0L, 1L)) {
+            val stack = execute(compiled) {
+                setFrameSlot(0, 42L)
+                setFrameSlot(1, condition)
+            }
+            assertEquals(if (condition == 0L) 7 else 42, stack.getFrameSlot(0).toInt())
+        }
+        assertEquals(3, compiled.instructions.size)
     }
 
     @Test
@@ -1503,8 +1548,7 @@ private fun execute(
         activateFrame(fp = 0, frameSlots = compiled.frameSlots)
         configure()
     }
-    val cstack = cstack()
-    val executionContext = executionContext(vstack = vstack, cstack = cstack, store = store)
+    val executionContext = executionContext(vstack = vstack, store = store)
     var ip = 0
     while (ip != EXIT_IP) {
         ip = compiled.instructions[ip](vstack, executionContext, ip + 1)

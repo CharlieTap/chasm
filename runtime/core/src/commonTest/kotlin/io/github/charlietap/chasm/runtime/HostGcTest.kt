@@ -3,14 +3,12 @@ package io.github.charlietap.chasm.runtime
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.GCThreshold
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.host.HostGc
 import io.github.charlietap.chasm.host.HostGcType
-import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.stack.ControlStack
-import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.type.AbstractHeapType
 import io.github.charlietap.chasm.type.ArrayType
 import io.github.charlietap.chasm.type.CompositeType
@@ -30,6 +28,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext as executionContextFixture
 
 class HostGcTest {
 
@@ -174,9 +173,9 @@ class HostGcTest {
 
     private fun executionContext(
         store: Store,
-        module: ModuleInstance = ModuleInstance(RuntimeTypeMap.Empty),
-        config: RuntimeConfig = RuntimeConfig(),
-    ) = ExecutionContext(ControlStack(), ValueStack(), store, module, config)
+        module: ModuleInstance = moduleInstance(),
+        config: RuntimeConfig = runtimeConfig(),
+    ) = executionContextFixture(store = store, instance = module, config = config)
 
     private companion object {
         const val EMPTY_STRUCT_TYPE_INDEX = 0

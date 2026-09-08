@@ -15,7 +15,6 @@ internal class BlockContext(
     var parameterTypes: List<ValueType>,
     var branchTarget: ProgramTarget,
     var continuationTarget: ProgramTarget,
-    var handlerDepth: Int,
 ) {
     var inert = false
     var reachedByBranch = false
@@ -37,7 +36,6 @@ internal class BlockContext(
         parameterTypes: List<ValueType>,
         branchTarget: ProgramTarget,
         continuationTarget: ProgramTarget,
-        handlerDepth: Int,
     ): BlockContext {
         this.kind = kind
         this.baseHeight = baseHeight
@@ -49,7 +47,6 @@ internal class BlockContext(
         this.parameterTypes = parameterTypes
         this.branchTarget = branchTarget
         this.continuationTarget = continuationTarget
-        this.handlerDepth = handlerDepth
         inert = false
         reachedByBranch = false
         elseTarget = continuationTarget
@@ -73,7 +70,6 @@ internal class BlockContext(
             parameterTypes = emptyList(),
             branchTarget = inertProgramTarget,
             continuationTarget = inertProgramTarget,
-            handlerDepth = 0,
         )
         inert = true
         return this
@@ -103,7 +99,6 @@ internal class ControlStack(
         parameterTypes: List<ValueType>,
         branchTarget: ProgramTarget,
         continuationTarget: ProgramTarget,
-        handlerDepth: Int,
     ): BlockContext {
         val block = if (size < pool.size) {
             pool[size].reset(
@@ -117,7 +112,6 @@ internal class ControlStack(
                 parameterTypes = parameterTypes,
                 branchTarget = branchTarget,
                 continuationTarget = continuationTarget,
-                handlerDepth = handlerDepth,
             )
         } else {
             BlockContext(
@@ -131,7 +125,6 @@ internal class ControlStack(
                 parameterTypes = parameterTypes,
                 branchTarget = branchTarget,
                 continuationTarget = continuationTarget,
-                handlerDepth = handlerDepth,
             ).also(pool::add)
         }
         size++
@@ -153,7 +146,6 @@ internal class ControlStack(
                 parameterTypes = emptyList(),
                 branchTarget = inertProgramTarget,
                 continuationTarget = inertProgramTarget,
-                handlerDepth = 0,
             ).also(pool::add).resetInert(kind)
         }
         size++

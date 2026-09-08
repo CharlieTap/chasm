@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.executor.invoker.function.CallSiteResultDestin
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.resultCallSiteIp
 import io.github.charlietap.chasm.executor.invoker.function.returnToCaller
+import io.github.charlietap.chasm.executor.invoker.function.withHostExceptionHandling
 import io.github.charlietap.chasm.executor.invoker.instruction.control.CallExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnCallExecutor
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ReturnExecutor
@@ -12,7 +13,6 @@ import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefE
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.function.LocalInitialization
-import io.github.charlietap.chasm.runtime.function.WasmFunctionCallStrategy
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.OperandTransfer
@@ -809,23 +809,29 @@ fun CallDispatcher(
 
     return when {
         operands.isInPlace -> DispatchableInstruction { vstack, context, nextIp ->
-            HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
-            nextIp
+            withHostExceptionHandling(vstack, context, nextIp) {
+                HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
+                nextIp
+            }
         }
         operand is TransferSource.Immediate -> {
             val value = operand.value
             DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(callFrameOffset, value)
-                HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
-                nextIp
+                withHostExceptionHandling(vstack, context, nextIp) {
+                    HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
+                    nextIp
+                }
             }
         }
         operand is TransferSource.Slot -> {
             val sourceSlot = operand.slot
             DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(callFrameOffset, vstack.getFrameSlot(sourceSlot))
-                HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
-                nextIp
+                withHostExceptionHandling(vstack, context, nextIp) {
+                    HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
+                    nextIp
+                }
             }
         }
         else -> DispatchableInstruction { vstack, context, nextIp ->
@@ -835,8 +841,10 @@ fun CallDispatcher(
                 destinationFp = fp + callFrameOffset,
                 transfer = operands,
             )
-            HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
-            nextIp
+            withHostExceptionHandling(vstack, context, nextIp) {
+                HostFunctionCall(vstack, context, caller, function, callFrameOffset, resultSlotBase)
+                nextIp
+            }
         }
     }
 }
@@ -1341,65 +1349,73 @@ fun ReturnCallDispatcher(
     val operand = operands.sources.singleOrNull()
 
     return when {
-        operands.isInPlace -> DispatchableInstruction { vstack, context, _ ->
-            HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
-            ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
+        operands.isInPlace -> DispatchableInstruction { vstack, context, nextIp ->
+            withHostExceptionHandling(vstack, context, nextIp) {
+                HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
+                ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
+            }
         }
         operand is TransferSource.Immediate -> {
             val value = operand.value
-            DispatchableInstruction { vstack, context, _ ->
+            DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(callFrameOffset, value)
-                HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
-                ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
+                withHostExceptionHandling(vstack, context, nextIp) {
+                    HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
+                    ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
+                }
             }
         }
         operand is TransferSource.Slot -> {
             val sourceSlot = operand.slot
-            DispatchableInstruction { vstack, context, _ ->
+            DispatchableInstruction { vstack, context, nextIp ->
                 vstack.setFrameSlot(callFrameOffset, vstack.getFrameSlot(sourceSlot))
-                HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
-                ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
+                withHostExceptionHandling(vstack, context, nextIp) {
+                    HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
+                    ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
+                }
             }
         }
-        else -> DispatchableInstruction { vstack, context, _ ->
+        else -> DispatchableInstruction { vstack, context, nextIp ->
             val fp = vstack.fp
             vstack.transferOperands(
                 currentFp = fp,
                 destinationFp = fp + callFrameOffset,
                 transfer = operands,
             )
-            HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
-            ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
+            withHostExceptionHandling(vstack, context, nextIp) {
+                HostFunctionCall(vstack, context, caller, function, callFrameOffset, 0)
+                ReturnExecutor(vstack, context, function.functionType.results.types.size, activationHeaderSlot)
+            }
         }
     }
 }
 
 fun ReturnCallDispatcher(
     instruction: ControlInstruction.ReturnCallIndirectI,
-): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
-    ReturnCallExecutor(vstack, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    ReturnCallExecutor(vstack, context, instruction, nextIp)
 }
 
 fun ReturnCallDispatcher(
     instruction: ControlInstruction.ReturnCallIndirectS,
-): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
-    ReturnCallExecutor(vstack, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    ReturnCallExecutor(vstack, context, instruction, nextIp)
 }
 
 fun ReturnCallDispatcher(
     instruction: ControlInstruction.ReturnCallRefS,
-): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
-    ReturnCallExecutor(vstack, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    ReturnCallExecutor(vstack, context, instruction, nextIp)
 }
 
 fun ThrowDispatcher(
     instruction: ControlInstruction.Throw,
-): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
-    ThrowExecutor(vstack, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    ThrowExecutor(vstack, context, instruction, nextIp - 1)
 }
 
 fun ThrowRefDispatcher(
     instruction: ControlInstruction.ThrowRefS,
-): DispatchableInstruction = DispatchableInstruction { vstack, context, _ ->
-    ThrowRefExecutor(vstack, context, instruction)
+): DispatchableInstruction = DispatchableInstruction { vstack, context, nextIp ->
+    ThrowRefExecutor(vstack, context, instruction, nextIp - 1)
 }

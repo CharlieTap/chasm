@@ -34,10 +34,6 @@ internal class SlotTransfer private constructor(
 
     fun destinationSlot(index: Int): Int = destinationSlots?.get(index) ?: firstDestinationSlot
 
-    fun sourceSlots(): IntArray = checkNotNull(sourceSlots)
-
-    fun destinationSlots(): IntArray = checkNotNull(destinationSlots)
-
     fun isIdentity(): Boolean {
         for (index in 0 until size) {
             val sourceSlot = when (sourceKind(index)) {

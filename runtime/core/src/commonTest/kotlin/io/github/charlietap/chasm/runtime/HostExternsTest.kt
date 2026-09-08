@@ -2,22 +2,19 @@ package io.github.charlietap.chasm.runtime
 
 import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
 import io.github.charlietap.chasm.host.HostExternKind
 import io.github.charlietap.chasm.host.HostExternReference
 import io.github.charlietap.chasm.host.withExterns
 import io.github.charlietap.chasm.runtime.encoder.ReferenceValueEncoder
-import io.github.charlietap.chasm.runtime.execution.ExecutionContext
-import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.stack.ControlStack
-import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
-import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
 import io.github.charlietap.chasm.runtime.value.ReferenceValue
 import io.github.charlietap.chasm.type.AbstractHeapType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
+import io.github.charlietap.chasm.fixture.runtime.execution.executionContext as executionContextFixture
 
 class HostExternsTest {
 
@@ -115,12 +112,6 @@ class HostExternsTest {
 
     private fun executionContext(
         store: Store,
-        config: RuntimeConfig = RuntimeConfig(),
-    ) = ExecutionContext(
-        cstack = ControlStack(),
-        vstack = ValueStack(),
-        store = store,
-        instance = ModuleInstance(RuntimeTypeMap.Empty),
-        config = config,
-    )
+        config: RuntimeConfig = runtimeConfig(),
+    ) = executionContextFixture(store = store, config = config)
 }

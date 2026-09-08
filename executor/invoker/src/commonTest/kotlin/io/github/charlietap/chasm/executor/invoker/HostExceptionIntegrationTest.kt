@@ -2,19 +2,25 @@ package io.github.charlietap.chasm.executor.invoker
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
-import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.dispatch.admin.EndFunctionDispatcher
+import io.github.charlietap.chasm.executor.invoker.dispatch.control.CallDispatcher
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
 import io.github.charlietap.chasm.executor.invoker.thread.ThreadExecutor
-import io.github.charlietap.chasm.fixture.ast.instruction.catchAllRefHandler
-import io.github.charlietap.chasm.fixture.ast.module.labelIndex
+import io.github.charlietap.chasm.fixture.config.runtimeConfig
+import io.github.charlietap.chasm.fixture.runtime.dispatch.dispatchableInstruction
+import io.github.charlietap.chasm.fixture.runtime.exception.compiledCatch
+import io.github.charlietap.chasm.fixture.runtime.exception.exceptionRegion
+import io.github.charlietap.chasm.fixture.runtime.exception.functionExceptionTable
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeExpression
 import io.github.charlietap.chasm.fixture.runtime.function.runtimeFunction
 import io.github.charlietap.chasm.fixture.runtime.instance.hostFunctionInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.moduleInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.wasmFunctionInstance
+import io.github.charlietap.chasm.fixture.runtime.instruction.endFunctionAdminInstruction
+import io.github.charlietap.chasm.fixture.runtime.instruction.hostCallRuntimeInstruction
 import io.github.charlietap.chasm.fixture.runtime.store
+import io.github.charlietap.chasm.fixture.runtime.type.rtt
 import io.github.charlietap.chasm.fixture.type.functionType
 import io.github.charlietap.chasm.fixture.type.i64ValueType
 import io.github.charlietap.chasm.fixture.type.resultType
@@ -24,11 +30,9 @@ import io.github.charlietap.chasm.host.withExceptions
 import io.github.charlietap.chasm.host.writeI64
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.exception.ExceptionHandler
+import io.github.charlietap.chasm.runtime.exception.CompiledCatch
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.program.Program
-import io.github.charlietap.chasm.runtime.type.RTT
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -38,11 +42,11 @@ class HostExceptionIntegrationTest {
 
     @Test
     fun `host can inspect and swallow an exception from a nested guest invocation`() {
-        val config = RuntimeConfig()
+        val config = runtimeConfig()
         val program = Program()
         val runtimeStore = store(program = program)
         val tagAddress = runtimeStore.heap.registerTag(
-            RTT(0),
+            rtt(),
             tagType(
                 functionType = functionType(
                     params = resultType(listOf(i64ValueType())),
@@ -52,6 +56,7 @@ class HostExceptionIntegrationTest {
         val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val exceptionReference = runtimeStore.heap.allocateException(tagAddress, longArrayOf(42L))
         val nested = escapingFunction(program, module, exceptionReference)
+        runtimeStore.functions.add(nested)
         val bridge = hostFunctionInstance(
             functionType = functionType(results = resultType(listOf(i64ValueType()))),
             function = HostFunction { _, results ->
@@ -69,7 +74,7 @@ class HostExceptionIntegrationTest {
         )
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, context, nextIp ->
+                dispatchableInstruction { vstack, context ->
                     HostFunctionCall(
                         vstack = vstack,
                         context = context,
@@ -78,9 +83,8 @@ class HostExceptionIntegrationTest {
                         parameterSlotBase = 0,
                         resultSlotBase = 0,
                     )
-                    nextIp
                 },
-                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
+                EndFunctionDispatcher(endFunctionAdminInstruction(resultCount = 1)),
             ),
         )
         val outer = wasmFunctionInstance(
@@ -100,13 +104,14 @@ class HostExceptionIntegrationTest {
 
     @Test
     fun `host can pass the same pending exception back to an outer guest`() {
-        val config = RuntimeConfig()
+        val config = runtimeConfig()
         val program = Program()
         val runtimeStore = store(program = program)
-        val tagAddress = runtimeStore.heap.registerTag(RTT(0), tagType())
+        val tagAddress = runtimeStore.heap.registerTag(rtt(), tagType())
         val module = moduleInstance(tagAddresses = mutableListOf(tagAddress))
         val exceptionReference = runtimeStore.heap.allocateException(tagAddress, LongArray(0))
         val nested = escapingFunction(program, module, exceptionReference)
+        runtimeStore.functions.add(nested)
         val bridge = hostFunctionInstance(
             function = HostFunction { _, _ ->
                 val invocation = FunctionInvoker(config, runtimeStore, module, nested, emptyList())
@@ -117,24 +122,29 @@ class HostExceptionIntegrationTest {
                 }
             },
         )
-        val continuationIp = program.size + 1
         val entryIp = program.append(
             arrayOf(
-                DispatchableInstruction { vstack, context, _ ->
-                    context.cstack.push(
-                        ExceptionHandler(
-                            handlers = listOf(catchAllRefHandler(labelIndex(0u))),
-                            payloadDestinationSlots = listOf(intArrayOf(0)),
-                            continuationIps = intArrayOf(continuationIp),
-                            instance = module,
-                            fp = vstack.fp,
-                            sp = vstack.sp,
+                CallDispatcher(hostCallRuntimeInstruction(instance = bridge, caller = module)),
+                EndFunctionDispatcher(endFunctionAdminInstruction(resultCount = 1)),
+            ),
+        )
+        program.registerExceptionTable(
+            functionExceptionTable(
+                entryIp,
+                2,
+                1,
+                1,
+                arrayOf(
+                    exceptionRegion(
+                        0,
+                        1,
+                        -1,
+                        arrayOf(
+                            compiledCatch(CompiledCatch.CATCH_ALL_TAG, 1, intArrayOf(0), true, 2),
                         ),
-                    )
-                    HostFunctionCall(vstack, context, module, bridge, 0, 0)
-                    error("pending exception returned to the host call site")
-                },
-                EndFunctionDispatcher(AdminInstruction.EndFunction(1, 1)),
+                    ),
+                ),
+                intArrayOf(),
             ),
         )
         val outer = wasmFunctionInstance(
@@ -161,8 +171,8 @@ class HostExceptionIntegrationTest {
         function = runtimeFunction(
             body = runtimeExpression(
                 program.append(
-                    DispatchableInstruction { vstack, context, _ ->
-                        ThrowRefValueExecutor(vstack, context, exceptionReference)
+                    DispatchableInstruction { vstack, context, nextIp ->
+                        ThrowRefValueExecutor(vstack, context, exceptionReference, nextIp - 1)
                     },
                 ),
             ),

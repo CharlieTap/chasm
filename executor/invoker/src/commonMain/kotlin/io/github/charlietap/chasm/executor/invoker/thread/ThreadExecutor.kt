@@ -7,15 +7,12 @@ import io.github.charlietap.chasm.config.GCStrategy
 import io.github.charlietap.chasm.config.RuntimeConfig
 import io.github.charlietap.chasm.executor.invoker.GarbageCollector
 import io.github.charlietap.chasm.executor.invoker.function.initializeLocals
-import io.github.charlietap.chasm.executor.invoker.instruction.control.ThrowRefValueExecutor
 import io.github.charlietap.chasm.gc.GuestHeapOutOfMemoryException
 import io.github.charlietap.chasm.runtime.error.InvocationError
-import io.github.charlietap.chasm.runtime.exception.HostRaisedWasmException
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
@@ -44,10 +41,8 @@ internal inline fun ThreadExecutor(
     crossinline garbageCollector: GarbageCollector,
 ): Result<List<Long>, InvocationError> = binding {
     val callStrategy = instance.callStrategy
-    val cstack = ControlStack()
     val vstack = ValueStack(callStrategy.frameSlots)
     val context = ExecutionContext(
-        cstack = cstack,
         vstack = vstack,
         store = store,
         instance = instance.module,
@@ -69,9 +64,7 @@ internal inline fun ThreadExecutor(
         Err(InvocationError.GuestHeapOutOfMemory).bind()
     }
 
-    vstack.shrink(preserveTopN = 0, depth = results)
-
-    if (cstack.handlersDepth() != 0 || vstack.sp != results) {
+    if (vstack.fp != ROOT_FP || vstack.sp != results) {
         Err(InvocationError.ProgramFinishedInconsistentState).bind<List<Long>>()
     }
 
@@ -98,31 +91,19 @@ private fun interpret(
     val vstack = context.vstack
     val instructions = context.store.program.instructions
     dispatch@ while (true) {
-        try {
-            // Three may seem arbitrary, but it is intentional. Executing several
-            // instructions per iteration amortises the cost of the jump back to the
-            // top of the loop.
-            // Adding iterations is not free: every slot adds another indirect call site,
-            // exit branch, and more compiled code. On HotSpot these call sites are
-            // megamorphic and also require their own profiling and safepoint metadata.
-            ip = instructions[ip](vstack, context, ip + 1)
-            if (ip < 0 || ip >= instructions.size) {
-                break@dispatch
-            }
-            ip = instructions[ip](vstack, context, ip + 1)
-            if (ip < 0 || ip >= instructions.size) {
-                break@dispatch
-            }
-            ip = instructions[ip](vstack, context, ip + 1)
-            if (ip < 0 || ip >= instructions.size) {
-                break@dispatch
-            }
-        } catch (_: HostRaisedWasmException) {
-            ip = ThrowRefValueExecutor(
-                vstack = vstack,
-                context = context,
-                ref = context.heap.takePendingExceptionReference(),
-            )
+        // Dispatch three instructions per iteration to amortise the loop branch.
+        // Larger unrolls add indirect-call sites and safepoint metadata.
+        ip = instructions[ip](vstack, context, ip + 1)
+        if (ip < 0 || ip >= instructions.size) {
+            break@dispatch
+        }
+        ip = instructions[ip](vstack, context, ip + 1)
+        if (ip < 0 || ip >= instructions.size) {
+            break@dispatch
+        }
+        ip = instructions[ip](vstack, context, ip + 1)
+        if (ip < 0 || ip >= instructions.size) {
+            break@dispatch
         }
     }
 }

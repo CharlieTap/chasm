@@ -1,9 +1,6 @@
 package io.github.charlietap.chasm.runtime.instruction
 
-import io.github.charlietap.chasm.ast.instruction.ControlInstruction.CatchHandler
-import io.github.charlietap.chasm.runtime.instance.ModuleInstance
 import io.github.charlietap.chasm.runtime.type.ReferenceTypeTest
-import kotlin.jvm.JvmInline
 
 sealed interface AdminInstruction : LinkedInstruction {
 
@@ -122,13 +119,4 @@ sealed interface AdminInstruction : LinkedInstruction {
         val targetIp: Int,
         val typeTest: ReferenceTypeTest,
     ) : AdminInstruction
-
-    data class PushHandler(
-        val handlers: List<CatchHandler>,
-        val continuationIps: IntArray,
-        val payloadDestinationSlots: List<IntArray> = [],
-        val instance: ModuleInstance,
-    ) : AdminInstruction
-
-    data object PopHandler : AdminInstruction
 }

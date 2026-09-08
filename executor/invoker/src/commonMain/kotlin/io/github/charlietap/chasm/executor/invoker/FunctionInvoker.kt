@@ -18,7 +18,6 @@ import io.github.charlietap.chasm.runtime.ext.toExecutionValue
 import io.github.charlietap.chasm.runtime.ext.toLongFromBoxed
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
-import io.github.charlietap.chasm.runtime.stack.ControlStack
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
@@ -88,7 +87,7 @@ internal inline fun FunctionInvoker(
             val stack = ValueStack(maxOf(values.size, resultCount))
             stack.push(LongArray(values.size) { index -> values[index].toLongFromBoxed() })
             stack.reserveDepth(resultCount)
-            val context = ExecutionContext(ControlStack(), stack, store, instance, config)
+            val context = ExecutionContext(stack, store, instance, config)
             try {
                 context.withHostCallbackScope {
                     context(stack.unsafeElements(), instance, context) {

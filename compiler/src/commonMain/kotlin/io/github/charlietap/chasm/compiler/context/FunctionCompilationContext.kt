@@ -15,8 +15,6 @@ import io.github.charlietap.chasm.compiler.operand.FrameAllocator
 import io.github.charlietap.chasm.compiler.operand.FunctionFrameLayout
 import io.github.charlietap.chasm.compiler.operand.Operand
 import io.github.charlietap.chasm.compiler.operand.OperandSourceKind
-import io.github.charlietap.chasm.compiler.operand.f32Immediate
-import io.github.charlietap.chasm.compiler.operand.f64Immediate
 import io.github.charlietap.chasm.compiler.operand.i32Immediate
 import io.github.charlietap.chasm.compiler.operand.i64Immediate
 import io.github.charlietap.chasm.compiler.operand.sourceSlot
@@ -42,7 +40,6 @@ internal class FunctionCompilationContext(
     val controls = ControlStack(workspace.controlPool)
     var rootControl: BlockContext? = null
     var reachable = true
-    var handlerDepth = 0
     var exceptionTableBuilder: ExceptionTableBuilder? = null
 
     fun blockType(type: io.github.charlietap.chasm.type.BlockType): io.github.charlietap.chasm.type.FunctionType =

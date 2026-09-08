@@ -72,8 +72,6 @@ class CompilerInstructionTagTranslator {
         is AdminInstruction.JumpOnCastS -> "admin.jump_on_cast.s"
         is AdminInstruction.JumpOnCastFailI -> "admin.jump_on_cast_fail.i"
         is AdminInstruction.JumpOnCastFailS -> "admin.jump_on_cast_fail.s"
-        is AdminInstruction.PushHandler -> "admin.push_handler"
-        AdminInstruction.PopHandler -> "admin.pop_handler"
     }
 
     private fun control(instruction: ControlInstruction): String = when (instruction) {

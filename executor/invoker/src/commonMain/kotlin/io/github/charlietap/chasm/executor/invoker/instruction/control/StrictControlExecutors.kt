@@ -3,6 +3,7 @@ package io.github.charlietap.chasm.executor.invoker.instruction.control
 import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
+import io.github.charlietap.chasm.executor.invoker.function.withHostExceptionHandling
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -83,6 +84,7 @@ internal fun ReturnCallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: ControlInstruction.ReturnCallIndirectI,
+    nextIp: Int,
 ): Int = strictIndirectReturnCall(
     vstack = vstack,
     context = context,
@@ -93,12 +95,14 @@ internal fun ReturnCallExecutor(
     caller = instruction.caller,
     callFrameOffset = instruction.callFrameOffset,
     callerActivationHeaderSlot = instruction.callerActivationHeaderSlot,
+    nextIp = nextIp,
 )
 
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: ControlInstruction.ReturnCallIndirectS,
+    nextIp: Int,
 ): Int = strictIndirectReturnCall(
     vstack = vstack,
     context = context,
@@ -109,12 +113,14 @@ internal fun ReturnCallExecutor(
     caller = instruction.caller,
     callFrameOffset = instruction.callFrameOffset,
     callerActivationHeaderSlot = instruction.callerActivationHeaderSlot,
+    nextIp = nextIp,
 )
 
 internal fun ReturnCallExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: ControlInstruction.ReturnCallRefS,
+    nextIp: Int,
 ): Int = strictReferenceReturnCall(
     vstack = vstack,
     context = context,
@@ -123,17 +129,20 @@ internal fun ReturnCallExecutor(
     caller = instruction.caller,
     callFrameOffset = instruction.callFrameOffset,
     callerActivationHeaderSlot = instruction.callerActivationHeaderSlot,
+    nextIp = nextIp,
 )
 
 internal fun ThrowExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: ControlInstruction.Throw,
+    faultIp: Int,
 ): Int {
     return ThrowRefValueExecutor(
         vstack = vstack,
         context = context,
         ref = context.heap.allocateExceptionFromFrame(context, instruction.tagAddress, instruction.firstPayloadSlot),
+        faultIp = faultIp,
     )
 }
 
@@ -141,10 +150,12 @@ internal fun ThrowRefExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: ControlInstruction.ThrowRefS,
+    faultIp: Int,
 ) = ThrowRefValueExecutor(
     vstack = vstack,
     context = context,
     ref = vstack.getFrameSlot(instruction.exceptionSlot),
+    faultIp = faultIp,
 )
 
 private fun strictIndirectCall(
@@ -209,6 +220,7 @@ private fun strictIndirectReturnCall(
     caller: ModuleInstance,
     callFrameOffset: Int,
     callerActivationHeaderSlot: Int,
+    nextIp: Int,
 ): Int {
     val functionInstance = strictResolveIndirectFunction(context, table, type, elementIndex)
     return strictInvokeReturnFunction(
@@ -219,6 +231,7 @@ private fun strictIndirectReturnCall(
         operands = operands,
         callFrameOffset = callFrameOffset,
         callerActivationHeaderSlot = callerActivationHeaderSlot,
+        nextIp = nextIp,
     )
 }
 
@@ -230,6 +243,7 @@ private fun strictReferenceReturnCall(
     caller: ModuleInstance,
     callFrameOffset: Int,
     callerActivationHeaderSlot: Int,
+    nextIp: Int,
 ): Int {
     val address = vstack.getFrameSlot(functionSlot).toFunctionAddress()
     return strictInvokeReturnFunction(
@@ -240,6 +254,7 @@ private fun strictReferenceReturnCall(
         operands = operands,
         callFrameOffset = callFrameOffset,
         callerActivationHeaderSlot = callerActivationHeaderSlot,
+        nextIp = nextIp,
     )
 }
 
@@ -275,15 +290,17 @@ private fun strictInvokeFunction(
             destinationFp = fp + callFrameOffset,
             transfer = operands,
         )
-        HostFunctionCall(
-            vstack = vstack,
-            context = context,
-            caller = caller,
-            function = functionInstance,
-            parameterSlotBase = callFrameOffset,
-            resultSlotBase = resultDestinationSlot ?: callFrameOffset,
-        )
-        returnIp
+        withHostExceptionHandling(vstack, context, returnIp) {
+            HostFunctionCall(
+                vstack = vstack,
+                context = context,
+                caller = caller,
+                function = functionInstance,
+                parameterSlotBase = callFrameOffset,
+                resultSlotBase = resultDestinationSlot ?: callFrameOffset,
+            )
+            returnIp
+        }
     }
     is FunctionInstance.WasmFunction -> WasmFunctionCall(
         vstack = vstack,
@@ -302,6 +319,7 @@ private fun strictInvokeReturnFunction(
     operands: TailCallOperandTransfer,
     callFrameOffset: Int,
     callerActivationHeaderSlot: Int,
+    nextIp: Int,
 ): Int = when (functionInstance) {
     is FunctionInstance.HostFunction -> {
         val fp = vstack.fp
@@ -311,20 +329,22 @@ private fun strictInvokeReturnFunction(
             destinationFp = parameterBase,
             transfer = operands.host,
         )
-        HostFunctionCall(
-            vstack = vstack,
-            context = context,
-            caller = caller,
-            function = functionInstance,
-            parameterSlotBase = callFrameOffset,
-            resultSlotBase = 0,
-        )
-        ReturnExecutor(
-            vstack,
-            context,
-            functionInstance.functionType.results.types.size,
-            callerActivationHeaderSlot,
-        )
+        withHostExceptionHandling(vstack, context, nextIp) {
+            HostFunctionCall(
+                vstack = vstack,
+                context = context,
+                caller = caller,
+                function = functionInstance,
+                parameterSlotBase = callFrameOffset,
+                resultSlotBase = 0,
+            )
+            ReturnExecutor(
+                vstack,
+                context,
+                functionInstance.functionType.results.types.size,
+                callerActivationHeaderSlot,
+            )
+        }
     }
     is FunctionInstance.WasmFunction -> ReturnWasmFunctionCall(
         vstack = vstack,
