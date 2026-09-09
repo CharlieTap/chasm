@@ -10,6 +10,10 @@ configure<PublishingConventionsExtension> {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.runtime.value"
+    }
+
     sourceSets {
         commonMain {
             dependencies {

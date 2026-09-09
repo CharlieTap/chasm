@@ -5,7 +5,17 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.libs.benchmark"
+    }
+
     sourceSets {
+        androidMain {
+            dependencies {
+                implementation(libs.jna)
+            }
+        }
+
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)

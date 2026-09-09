@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
     alias(libs.plugins.conventions.kmp)
@@ -12,6 +13,10 @@ plugins {
 val isCi = !System.getenv("GITHUB_ACTIONS").isNullOrEmpty()
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.vm"
+    }
+
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 
@@ -24,6 +29,7 @@ kotlin {
             }
             group("nonJs") {
                 withJvm()
+                withCompilations { it.target.platformType == KotlinPlatformType.androidJvm }
                 withNative()
             }
         }

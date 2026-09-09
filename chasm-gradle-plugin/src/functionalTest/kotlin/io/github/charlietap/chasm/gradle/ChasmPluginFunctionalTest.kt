@@ -173,6 +173,18 @@ class ChasmPluginFunctionalTest {
     }
 
     @Test
+    fun `Android runtime selects the multiplatform coordinate`() {
+        val project = androidProject(
+            androidPluginId = "com.android.library",
+            moduleName = "AndroidService",
+            compileSdk = currentCompileSdk,
+        )
+        val result = project.build("dependencies", "--configuration=implementation")
+        assertContains(result.output, "io.github.charlietap.chasm:vm:")
+        assertFalse(result.output.contains("io.github.charlietap.chasm:vm-jvm:"))
+    }
+
+    @Test
     fun `current AGP 9 registers generated Kotlin sources on supported Gradle versions`() {
         testedGradleVersions.forEach { gradleVersion ->
             val project = androidProject(

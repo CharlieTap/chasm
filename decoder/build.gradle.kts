@@ -7,6 +7,9 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.decoder"
+    }
 
     compilerOptions {
         freeCompilerArgs.add("-Xwarning-level=ASSIGNED_VALUE_IS_NEVER_READ:disabled")

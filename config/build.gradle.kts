@@ -7,6 +7,10 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.config"
+    }
+
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()
 }

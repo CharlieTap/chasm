@@ -91,6 +91,9 @@ corpus {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm"
+    }
 
     @OptIn(ExperimentalAbiValidation::class)
     abiValidation()

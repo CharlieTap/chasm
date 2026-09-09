@@ -69,7 +69,6 @@ class ChasmPlugin : Plugin<Project> {
                 selection = extension.runtimeDependencyConfiguration,
                 apiConfigurationName = API_CONFIGURATION_NAME,
                 implementationConfigurationName = IMPLEMENTATION_CONFIGURATION_NAME,
-                jvmArtifact = true,
             )
             configureAndroid(project, extension, workerClasspath)
         }

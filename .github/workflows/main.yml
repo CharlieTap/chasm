@@ -47,6 +47,8 @@ jobs:
             task: macosArm64Test
           - os: macos-latest
             task: iosSimulatorArm64Test
+          - os: macos-latest
+            task: testAndroidHostTest
           - os: ubuntu-latest
             task: linuxX64Test
           - os: windows-latest
@@ -66,4 +68,4 @@ jobs:
     uses: ./.github/workflows/task-runner.yml
     with:
       runner: macos-latest
-      task: -p example :android:assembleDebug
+      task: -p example :android:assembleDebug :android:assembleRelease

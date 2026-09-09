@@ -27,6 +27,10 @@ android {
     compileSdk = libs.versions.compile.sdk.get().toInt()
     namespace = "com.tap.chasm.consumer.fibonacci"
 
+    defaultConfig {
+        minSdk = libs.versions.min.sdk.get().toInt()
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.java.library.bytecode.version.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.java.library.bytecode.version.get())

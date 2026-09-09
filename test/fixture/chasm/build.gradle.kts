@@ -4,6 +4,10 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.fixture.chasm"
+    }
+
     sourceSets {
        commonMain {
             dependencies {

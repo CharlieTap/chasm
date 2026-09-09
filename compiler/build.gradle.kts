@@ -5,6 +5,9 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.compiler"
+    }
 
     sourceSets {
 

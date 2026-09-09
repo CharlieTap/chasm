@@ -40,7 +40,7 @@ kotlin {
 
 dependencies {
 
-    androidTestImplementation(libs.chasm.jvm)
+    androidTestImplementation(libs.chasm.kmp)
 
     androidTestImplementation(libs.androidx.benchmark)
     androidTestImplementation(libs.androidx.test.junit)

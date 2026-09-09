@@ -8,6 +8,9 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.sse2"
+    }
 
     mingwX64 {
         compilations.getByName("main") {

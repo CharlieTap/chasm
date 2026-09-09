@@ -93,7 +93,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             kotlinExtension.sourceSets.getByName("commonTest").kotlin.srcDir(extension.testsDirectory)
             kotlinExtension.targets.configureEach {
                 compilations.configureEach {
-                    if (name == TEST_COMPILATION_NAME) {
+                    if (name == TEST_COMPILATION_NAME || name == "hostTest") {
                         compileTaskProvider.configure {
                             dependsOn(generateTestsTask)
                         }

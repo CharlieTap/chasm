@@ -10,6 +10,9 @@ group = "io.github.charlietap.sweet"
 
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.sweet.lib"
+    }
 
     sourceSets {
        commonMain {

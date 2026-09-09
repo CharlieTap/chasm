@@ -54,11 +54,20 @@ benchmark {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.benchmark"
+    }
 
     jvm()
     macosArm64()
 
     sourceSets {
+        androidMain {
+            dependencies {
+                implementation(libs.jmh.core)
+            }
+        }
+
         commonMain {
             dependencies {
                 implementation(projects.chasm)

@@ -5,6 +5,10 @@ plugins {
 }
 
 kotlin {
+    android {
+        namespace = "io.github.charlietap.chasm.runtime"
+    }
+
     sourceSets {
        commonMain {
             dependencies {

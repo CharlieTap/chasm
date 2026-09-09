@@ -1,10 +1,14 @@
-
+import org.gradle.accessors.dm.LibrariesForLibs
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
     id("kotlin-conventions")
     id("org.jetbrains.kotlin.multiplatform")
+    id("com.android.kotlin.multiplatform.library")
 }
+
+val libs = the<LibrariesForLibs>()
 
 fun KotlinMultiplatformExtension.unixTargets() = setOf(
     macosArm64 {
@@ -27,6 +31,19 @@ fun KotlinMultiplatformExtension.nativeTargets() = setOf(
 kotlin {
     jvm()
     nativeTargets()
+
+    android {
+        compileSdk = libs.versions.compile.sdk.get().toInt()
+        minSdk = libs.versions.min.sdk.get().toInt()
+        withHostTest {}
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.library.bytecode.version.get()))
+        }
+    }
+
+    sourceSets.named("androidMain") {
+        kotlin.srcDir("src/jvmMain/kotlin")
+    }
 }
 
 tasks.register("test") {
