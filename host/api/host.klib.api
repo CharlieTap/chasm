@@ -14,6 +14,10 @@ abstract fun interface io.github.charlietap.chasm.host/HostFunction { // io.gith
     abstract fun (context(kotlin/LongArray, io.github.charlietap.chasm.host/HostModuleInstance, io.github.charlietap.chasm.host/HostResources)).invoke(kotlin/Int, kotlin/Int) // io.github.charlietap.chasm.host/HostFunction.invoke|invoke(kotlin.LongArray;io.github.charlietap.chasm.host.HostModuleInstance;io.github.charlietap.chasm.host.HostResources)(kotlin.Int;kotlin.Int){}[0]
 }
 
+abstract interface io.github.charlietap.chasm.host/ByteArrayHostMemory : io.github.charlietap.chasm.host/HostMemory { // io.github.charlietap.chasm.host/ByteArrayHostMemory|null[0]
+    abstract fun unsafeBorrowByteArray(): kotlin/ByteArray // io.github.charlietap.chasm.host/ByteArrayHostMemory.unsafeBorrowByteArray|unsafeBorrowByteArray(){}[0]
+}
+
 abstract interface io.github.charlietap.chasm.host/HostExceptions { // io.github.charlietap.chasm.host/HostExceptions|null[0]
     abstract val hasPending // io.github.charlietap.chasm.host/HostExceptions.hasPending|{}hasPending[0]
         abstract fun <get-hasPending>(): kotlin/Boolean // io.github.charlietap.chasm.host/HostExceptions.hasPending.<get-hasPending>|<get-hasPending>(){}[0]
@@ -134,10 +138,6 @@ abstract interface io.github.charlietap.chasm.host/HostTable { // io.github.char
     abstract fun unsafeBorrowElements(): kotlin/LongArray // io.github.charlietap.chasm.host/HostTable.unsafeBorrowElements|unsafeBorrowElements(){}[0]
     abstract fun write(kotlin/Int, kotlin/LongArray, kotlin/Int = ..., kotlin/Int = ...) // io.github.charlietap.chasm.host/HostTable.write|write(kotlin.Int;kotlin.LongArray;kotlin.Int;kotlin.Int){}[0]
     abstract fun writeRaw(kotlin/Int, kotlin/Long) // io.github.charlietap.chasm.host/HostTable.writeRaw|writeRaw(kotlin.Int;kotlin.Long){}[0]
-}
-
-abstract interface io.github.charlietap.chasm.host/NativeHostMemory : io.github.charlietap.chasm.host/HostMemory { // io.github.charlietap.chasm.host/NativeHostMemory|null[0]
-    abstract fun unsafeBorrowByteArray(): kotlin/ByteArray // io.github.charlietap.chasm.host/NativeHostMemory.unsafeBorrowByteArray|unsafeBorrowByteArray(){}[0]
 }
 
 sealed interface io.github.charlietap.chasm.host/ModuleIndex { // io.github.charlietap.chasm.host/ModuleIndex|null[0]

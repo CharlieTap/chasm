@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.memory
 
+import io.github.charlietap.chasm.host.ByteArrayHostMemory
 import io.github.charlietap.chasm.host.HostMemory
-import io.github.charlietap.chasm.host.NativeHostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.memory.ext.copyInto
 import io.github.charlietap.chasm.memory.ext.toDoubleLittleEndian
@@ -14,7 +14,7 @@ import io.github.charlietap.chasm.runtime.memory.LinearMemory
 @OptIn(UnsafeHostApi::class)
 class ByteArrayLinearMemory(
     var memory: ByteArray,
-) : LinearMemory, NativeHostMemory {
+) : LinearMemory, ByteArrayHostMemory {
     constructor(
         pages: LinearMemory.Pages,
     ) : this(
@@ -95,7 +95,7 @@ class ByteArrayLinearMemory(
         bytesToCopy: Int,
         source: HostMemory,
     ) {
-        val sourceArray = (source as NativeHostMemory).unsafeBorrowByteArray()
+        val sourceArray = (source as ByteArrayHostMemory).unsafeBorrowByteArray()
         sourceArray.copyInto(memory, destinationPointer, sourcePointer, sourcePointer + bytesToCopy)
     }
 
@@ -105,7 +105,7 @@ class ByteArrayLinearMemory(
         bytesToMove: Int,
         source: HostMemory,
     ) {
-        val sourceArray = (source as NativeHostMemory).unsafeBorrowByteArray()
+        val sourceArray = (source as ByteArrayHostMemory).unsafeBorrowByteArray()
         sourceArray.copyInto(memory, destinationPointer, sourcePointer, sourcePointer + bytesToMove)
     }
 

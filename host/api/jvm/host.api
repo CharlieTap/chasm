@@ -1,3 +1,11 @@
+public abstract interface class io/github/charlietap/chasm/host/ByteArrayHostMemory : io/github/charlietap/chasm/host/HostMemory {
+	public abstract fun unsafeBorrowByteArray ()[B
+}
+
+public abstract interface class io/github/charlietap/chasm/host/ByteBufferHostMemory : io/github/charlietap/chasm/host/HostMemory {
+	public abstract fun unsafeBorrowByteBuffer ()Ljava/nio/ByteBuffer;
+}
+
 public final class io/github/charlietap/chasm/host/HostContextExtensionsKt {
 	public static final fun withExceptions (Lio/github/charlietap/chasm/host/HostResources;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun withExterns (Lio/github/charlietap/chasm/host/HostResources;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -354,10 +362,6 @@ public final class io/github/charlietap/chasm/host/HostTag {
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (I)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()I
-}
-
-public abstract interface class io/github/charlietap/chasm/host/JvmHostMemory : io/github/charlietap/chasm/host/HostMemory {
-	public abstract fun unsafeBorrowByteBuffer ()Ljava/nio/ByteBuffer;
 }
 
 public abstract interface class io/github/charlietap/chasm/host/ModuleIndex {

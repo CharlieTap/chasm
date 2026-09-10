@@ -10,12 +10,6 @@ kotlin {
     }
 
     sourceSets {
-        androidMain {
-            dependencies {
-                implementation(libs.jna)
-            }
-        }
-
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)

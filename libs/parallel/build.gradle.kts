@@ -8,6 +8,12 @@ kotlin {
     android {
         namespace = "io.github.charlietap.chasm.parallel"
     }
+
+    sourceSets {
+        androidMain {
+            kotlin.srcDir("src/jvmMain/kotlin")
+        }
+    }
 }
 
 configure<PublishingConventionsExtension> {

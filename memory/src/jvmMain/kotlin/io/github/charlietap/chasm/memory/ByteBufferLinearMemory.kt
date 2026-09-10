@@ -1,7 +1,7 @@
 package io.github.charlietap.chasm.memory
 
+import io.github.charlietap.chasm.host.ByteBufferHostMemory
 import io.github.charlietap.chasm.host.HostMemory
-import io.github.charlietap.chasm.host.JvmHostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import java.nio.ByteBuffer
@@ -10,7 +10,7 @@ import java.nio.ByteOrder
 @OptIn(UnsafeHostApi::class)
 class ByteBufferLinearMemory(
     memory: ByteBuffer,
-) : LinearMemory, JvmHostMemory {
+) : LinearMemory, ByteBufferHostMemory {
 
     var memory: ByteBuffer = memory
         set(value) {
@@ -151,7 +151,7 @@ class ByteBufferLinearMemory(
         bytesToCopy: Int,
         source: HostMemory,
     ) {
-        val sourceBuffer = (source as JvmHostMemory).unsafeBorrowByteBuffer()
+        val sourceBuffer = (source as ByteBufferHostMemory).unsafeBorrowByteBuffer()
         checkRange(sourcePointer, bytesToCopy, sourceBuffer.limit())
         checkRange(destinationPointer, bytesToCopy, memory.limit())
         copy(sourceBuffer, sourcePointer, destinationPointer, bytesToCopy)
@@ -163,7 +163,7 @@ class ByteBufferLinearMemory(
         bytesToMove: Int,
         source: HostMemory,
     ) {
-        val sourceBuffer = (source as JvmHostMemory).unsafeBorrowByteBuffer()
+        val sourceBuffer = (source as ByteBufferHostMemory).unsafeBorrowByteBuffer()
         checkRange(sourcePointer, bytesToMove, sourceBuffer.limit())
         checkRange(destinationPointer, bytesToMove, memory.limit())
 

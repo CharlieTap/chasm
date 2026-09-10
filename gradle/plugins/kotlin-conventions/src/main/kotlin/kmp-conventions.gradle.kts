@@ -40,10 +40,6 @@ kotlin {
             jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.library.bytecode.version.get()))
         }
     }
-
-    sourceSets.named("androidMain") {
-        kotlin.srcDir("src/jvmMain/kotlin")
-    }
 }
 
 tasks.register("test") {
