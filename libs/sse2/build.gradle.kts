@@ -1,5 +1,8 @@
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.konan.target.Family
 
 plugins {
     alias(libs.plugins.conventions.kmp)
@@ -10,6 +13,17 @@ plugins {
 kotlin {
     android {
         namespace = "io.github.charlietap.chasm.sse2"
+    }
+
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    applyDefaultHierarchyTemplate {
+        common {
+            group("nonWindows") {
+                withCompilations {
+                    (it.target as? KotlinNativeTarget)?.konanTarget?.family != Family.MINGW
+                }
+            }
+        }
     }
 
     mingwX64 {
@@ -23,10 +37,6 @@ kotlin {
     }
 
     sourceSets {
-       commonMain {
-            dependencies {}
-        }
-
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
