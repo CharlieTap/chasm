@@ -164,6 +164,7 @@ class WasmTestSuiteGenPlugin : Plugin<Project> {
             sourceName.set(source.name)
             phaseSupport.set(source.phaseSupport)
             phaseLimits.set(source.phaseLimits)
+            lineExcludes.set(source.lineExcludes)
             scriptRunner.set(extension.scriptRunner)
             testPackageName.set(extension.testPackageName)
             outputDirectory.set(extension.testsDirectory.dir(source.name))

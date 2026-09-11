@@ -19,8 +19,13 @@ import io.github.charlietap.sweet.lib.command.AssertMalformedCommand
 import io.github.charlietap.sweet.lib.command.Command
 import io.github.charlietap.sweet.lib.command.ModuleCommand
 import io.github.charlietap.sweet.lib.command.ModuleDefinitionCommand
+import kotlinx.serialization.json.Json
 
 class ChasmScriptRunner(
+    private val directory: String,
+    private val scriptFilename: String,
+    private val phaseSupport: SemanticPhase,
+    private val excludedLines: Set<Int> = emptySet(),
     private val store: Store = Store(),
     private val instances: MutableMap<String?, Instance> = mutableMapOf(),
     private val modules: MutableMap<String?, Module> = mutableMapOf(),
@@ -33,11 +38,13 @@ class ChasmScriptRunner(
         SemanticPhase.VALIDATION to setOf(ModuleCommand::class, ModuleDefinitionCommand::class, AssertMalformedCommand::class, AssertInvalidCommand::class),
     )
 
-    override fun readFile(path: String): String {
-        return path.readTextFromPath()
+    override fun run(): ScriptResult {
+        val file = (directory + "/" + scriptFilename).readTextFromPath()
+        val script = Json.decodeFromString<Script>(file)
+        return execute(script)
     }
 
-    override fun execute(directory: String, script: Script, phaseSupport: SemanticPhase): ScriptResult {
+    private fun execute(script: Script): ScriptResult {
 
         val config = Config(
             runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
@@ -55,6 +62,10 @@ class ChasmScriptRunner(
         context.registerImports(HOST_MODULE_NAME, hostModule)
 
         script.commands.forEach { command ->
+
+            if (command.line in excludedLines) {
+                return@forEach
+            }
 
             if (shouldSkipCommand(command, phaseSupport)) {
                 return@forEach

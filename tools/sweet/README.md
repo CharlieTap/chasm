@@ -21,6 +21,7 @@ semantic phase.
 
 ```kotlin
 import io.github.charlietap.sweet.lib.SemanticPhase
+import io.github.charlietap.sweet.plugin.LineExclude
 import io.github.charlietap.sweet.plugin.PhaseLimit
 
 sweet {
@@ -41,7 +42,14 @@ sweet {
             phaseLimits = listOf(
                 PhaseLimit(
                     patterns = setOf("proposals/threads/**"),
-                    phaseSupport = SemanticPhase.DECODING,
+                    phaseSupport = SemanticPhase.VALIDATION,
+                ),
+            )
+            lineExcludes = listOf(
+                LineExclude(
+                    filePath = "proposals/threads/imports.wast",
+                    lines = setOf(310, 314),
+                    phase = SemanticPhase.VALIDATION,
                 ),
             )
         }
@@ -62,6 +70,11 @@ sweet {
 forward-slash paths relative to `testDirectory`. When multiple phase limits
 match, Sweet chooses the lowest phase. A phase limit can reduce source support,
 but cannot raise it.
+
+`LineExclude.filePath` uses the same source-relative path. Its one-based command
+lines are passed to the runtime's `ScriptRunner`, which skips them without
+changing the parsed script. A line exclusion with no phase applies at every
+phase.
 
 Use full commits for reproducible suites. The repository revision and
 `wasmToolsVersion` should be upgraded together because newer WAST syntax may

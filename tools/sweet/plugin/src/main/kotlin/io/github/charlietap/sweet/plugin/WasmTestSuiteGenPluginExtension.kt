@@ -17,6 +17,12 @@ data class PhaseLimit(
     val phaseSupport: SemanticPhase,
 ) : Serializable
 
+data class LineExclude(
+    val filePath: String,
+    val lines: Set<Int>,
+    val phase: SemanticPhase? = null,
+) : Serializable
+
 open class SuiteSource
     @Inject
     constructor(
@@ -40,6 +46,9 @@ open class SuiteSource
             .convention(SemanticPhase.EXECUTION)
 
         val phaseLimits: ListProperty<PhaseLimit> = objects.listProperty(PhaseLimit::class.java).convention(emptyList())
+
+        val lineExcludes: ListProperty<LineExclude> =
+            objects.listProperty(LineExclude::class.java).convention(emptyList())
     }
 
 open class WasmTestSuiteGenPluginExtension

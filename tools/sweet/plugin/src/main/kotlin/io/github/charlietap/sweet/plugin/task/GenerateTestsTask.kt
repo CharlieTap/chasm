@@ -1,11 +1,13 @@
 package io.github.charlietap.sweet.plugin.task
 
 import io.github.charlietap.sweet.lib.SemanticPhase
+import io.github.charlietap.sweet.plugin.LineExclude
 import io.github.charlietap.sweet.plugin.PhaseLimit
 import io.github.charlietap.sweet.plugin.action.GenerateTestAction
 import io.github.charlietap.sweet.plugin.ext.deleteAndPruneEmptyParents
 import io.github.charlietap.sweet.plugin.ext.generatedTestLocation
 import io.github.charlietap.sweet.plugin.ext.relativeSuitePath
+import io.github.charlietap.sweet.plugin.ext.resolveExcludedLines
 import io.github.charlietap.sweet.plugin.ext.resolvePhaseSupport
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
@@ -47,6 +49,9 @@ abstract class GenerateTestsTask : DefaultTask() {
 
     @get:Input
     abstract val phaseLimits: ListProperty<PhaseLimit>
+
+    @get:Input
+    abstract val lineExcludes: ListProperty<LineExclude>
 
     @get:Input
     abstract val scriptRunner: Property<String>
@@ -98,12 +103,18 @@ abstract class GenerateTestsTask : DefaultTask() {
         testPackage: String,
         sourceRelativeWastPath: String,
     ) {
+        val resolvedPhaseSupport = resolvePhaseSupport(
+            sourceRelativePath = sourceRelativeWastPath,
+            defaultPhaseSupport = phaseSupport.get(),
+            phaseLimits = phaseLimits.get(),
+        )
         workerExecutor.noIsolation().submit(GenerateTestAction::class.java) {
-            phaseSupport.set(
-                resolvePhaseSupport(
+            phaseSupport.set(resolvedPhaseSupport)
+            excludedLines.set(
+                resolveExcludedLines(
                     sourceRelativePath = sourceRelativeWastPath,
-                    defaultPhaseSupport = this@GenerateTestsTask.phaseSupport.get(),
-                    phaseLimits = this@GenerateTestsTask.phaseLimits.get(),
+                    phaseSupport = resolvedPhaseSupport,
+                    excludes = lineExcludes.get(),
                 ),
             )
             runner.set(scriptRunner)

@@ -1,6 +1,7 @@
 package io.github.charlietap.sweet.plugin.ext
 
 import io.github.charlietap.sweet.lib.SemanticPhase
+import io.github.charlietap.sweet.plugin.LineExclude
 import io.github.charlietap.sweet.plugin.PhaseLimit
 
 internal data class GeneratedTestLocation(
@@ -58,6 +59,39 @@ internal fun resolvePhaseSupport(
         .minBy(SemanticPhase::ordinal)
 }
 
+internal fun resolveExcludedLines(
+    sourceRelativePath: String,
+    phaseSupport: SemanticPhase,
+    excludes: List<LineExclude>,
+): Set<Int> {
+    val normalizedPath = sourceRelativePath.normalizedSuitePath()
+    return excludes
+        .asSequence()
+        .onEach(LineExclude::validate)
+        .filter { exclude ->
+            exclude.filePath.normalizedSuitePath() == normalizedPath &&
+                (exclude.phase == null || exclude.phase == phaseSupport)
+        }
+        .flatMap { exclude -> exclude.lines.asSequence() }
+        .toSet()
+}
+
+private fun LineExclude.validate() {
+    val normalizedPath = filePath.replace('\\', '/')
+    require(
+        normalizedPath.isNotBlank() &&
+            !normalizedPath.startsWith('/') &&
+            !WINDOWS_ABSOLUTE_PATH.matches(normalizedPath) &&
+            normalizedPath.split('/').none { segment -> segment == ".." } &&
+            normalizedPath.endsWith(".wast"),
+    ) {
+        "Line exclude path must be a safe relative .wast path: $filePath"
+    }
+    require(lines.isNotEmpty() && lines.all { line -> line > 0 }) {
+        "Line excludes must contain positive one-based line numbers: $filePath"
+    }
+}
+
 internal fun String.matchesSuitePattern(pattern: String): Boolean {
     val normalizedPath = normalizedSuitePath()
     val normalizedPattern = pattern.normalizedSuitePath()
@@ -112,3 +146,4 @@ private fun suitePatternRegex(pattern: String): Regex {
 
 private const val REGEX_META_CHARACTERS = ".()[]{}+$^|\\"
 private val REPEATED_SEPARATOR = Regex("/+")
+private val WINDOWS_ABSOLUTE_PATH = Regex("^[A-Za-z]:/")
