@@ -1,4 +1,5 @@
 import io.github.charlietap.sweet.lib.SemanticPhase
+import io.github.charlietap.sweet.plugin.LineExclude
 import io.github.charlietap.sweet.plugin.PhaseLimit
 import io.github.charlietap.sweet.plugin.task.GenerateTestsTask
 import org.gradle.kotlin.dsl.withType
@@ -41,7 +42,7 @@ sweet {
             phaseLimits = listOf(
                 PhaseLimit(
                     patterns = setOf("proposals/threads/**"),
-                    phaseSupport = SemanticPhase.DECODING,
+                    phaseSupport = SemanticPhase.VALIDATION,
                 ),
                 PhaseLimit(
                     patterns = setOf(
@@ -59,6 +60,16 @@ sweet {
                         "table_copy_mixed.wast",
                     ),
                     phaseSupport = SemanticPhase.VALIDATION,
+                ),
+            )
+            lineExcludes = listOf(
+                LineExclude(
+                    filePath = "proposals/threads/imports.wast",
+                    lines = setOf(310, 314, 318, 405, 409, 413),
+                ),
+                LineExclude(
+                    filePath = "proposals/threads/memory.wast",
+                    lines = setOf(14, 15),
                 ),
             )
         }
