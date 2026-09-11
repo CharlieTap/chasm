@@ -19,4 +19,5 @@ internal fun MemoryTypeMatcher(
     type2: MemoryType,
     context: TypeMatcherContext,
     limitsMatcher: TypeMatcher<Limits>,
-): Boolean = limitsMatcher(type1.limits, type2.limits, context)
+): Boolean = type1.shared == type2.shared &&
+    limitsMatcher(type1.limits, type2.limits, context)
