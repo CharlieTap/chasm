@@ -36,7 +36,12 @@ internal inline fun AtomicMemoryInstructionDecoder(
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
             AtomicMemoryInstruction.I64Wait(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)
         }
-        ATOMIC_FENCE -> AtomicMemoryInstruction.Fence
+        ATOMIC_FENCE -> {
+            if (context.reader.ubyte() != 0u.toUByte()) {
+                Err(InstructionDecodeError.ReservedByteNotZero).bind()
+            }
+            AtomicMemoryInstruction.Fence
+        }
         I32_ATOMIC_LOAD -> {
             val memArgWithIndex = memArgWithIndexDecoder(context).bind()
             AtomicMemoryInstruction.Load.I32.I32Load(memArgWithIndex.memoryIndex, memArgWithIndex.memArg)

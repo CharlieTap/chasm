@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.decoder.decoder.instruction.memory.MemArgWithI
 import io.github.charlietap.chasm.decoder.error.InstructionDecodeError
 import io.github.charlietap.chasm.decoder.error.WasmDecodeError
 import io.github.charlietap.chasm.decoder.fixture.decoderContext
+import io.github.charlietap.chasm.decoder.reader.BufferedWasmBinaryReader
 import io.github.charlietap.chasm.decoder.reader.FakeUIntReader
 import io.github.charlietap.chasm.decoder.reader.FakeWasmBinaryReader
 import io.github.charlietap.chasm.fixture.ast.instruction.atomicFenceInstruction
@@ -81,6 +82,7 @@ import io.github.charlietap.chasm.fixture.ast.instruction.memArg
 import io.github.charlietap.chasm.fixture.ast.module.memoryIndex
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.fail
 
 class AtomicMemoryInstructionDecoderTest {
@@ -88,23 +90,31 @@ class AtomicMemoryInstructionDecoderTest {
     @Test
     fun `can decode an ATOMIC_FENCE instruction`() {
 
-        val opcode = ATOMIC_FENCE
-        val expected = Ok(atomicFenceInstruction())
+        val reader = BufferedWasmBinaryReader(byteArrayOf(3, 0, 0x41, 42))
+        val actual = AtomicMemoryInstructionDecoder(decoderContext(reader))
 
-        val fakeOpcodeReader: () -> Result<UInt, WasmDecodeError> = {
-            Ok(opcode)
+        assertEquals(Ok(atomicFenceInstruction()), actual)
+        assertEquals(2u, reader.position())
+        assertEquals(0x41u.toUByte(), reader.ubyte())
+    }
+
+    @Test
+    fun `rejects a nonzero atomic fence reserved byte`() {
+        for (reserved in listOf(1, 128, 255)) {
+            val reader = BufferedWasmBinaryReader(byteArrayOf(3, reserved.toByte()))
+            assertEquals(
+                Err(InstructionDecodeError.ReservedByteNotZero),
+                AtomicMemoryInstructionDecoder(decoderContext(reader)),
+            )
         }
-        val reader = FakeWasmBinaryReader(
-            fakeUIntReader = fakeOpcodeReader,
-        )
-        val context = decoderContext(reader)
+    }
 
-        val actual = AtomicMemoryInstructionDecoder(
-            context = context,
-            memArgWithIndexDecoder = neverMemArgWithIndexDecoder,
-        )
-
-        assertEquals(expected, actual)
+    @Test
+    fun `does not accept an atomic fence without its reserved byte`() {
+        val reader = BufferedWasmBinaryReader(byteArrayOf(3))
+        assertFailsWith<NoSuchElementException> {
+            AtomicMemoryInstructionDecoder(decoderContext(reader))
+        }
     }
 
     @Test
