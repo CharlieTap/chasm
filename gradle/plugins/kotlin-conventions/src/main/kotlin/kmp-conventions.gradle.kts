@@ -37,7 +37,7 @@ kotlin {
         minSdk = libs.versions.min.sdk.get().toInt()
         withHostTest {}
         compilerOptions {
-            jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.library.bytecode.version.get()))
+            jvmTarget.set(JvmTarget.fromTarget(libs.versions.android.library.bytecode.version.get()))
         }
     }
 }

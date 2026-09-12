@@ -32,14 +32,14 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.library.bytecode.version.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.java.library.bytecode.version.get())
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.android.library.bytecode.version.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.android.library.bytecode.version.get())
     }
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.library.bytecode.version.get()))
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.android.library.bytecode.version.get()))
     }
 }
 

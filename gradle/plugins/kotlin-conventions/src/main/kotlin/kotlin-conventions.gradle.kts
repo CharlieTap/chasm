@@ -1,10 +1,12 @@
 import org.gradle.accessors.dm.LibrariesForLibs
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 val libs = the<LibrariesForLibs>()
 val conventions = extensions.create<KotlinConventionsExtension>("kotlinConventions")
@@ -13,18 +15,44 @@ conventions.jvmBytecodeVersion.convention(
     libs.versions.java.library.bytecode.version.map(String::toInt),
 )
 
-plugins.withId("org.jetbrains.kotlin.jvm") {
-    extensions.configure<KotlinBaseExtension>("kotlin") {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))
+fun JavaCompile.targetBytecodeVersion(version: Provider<Int>) {
+    val targetVersion = version.get().toString()
+    sourceCompatibility = targetVersion
+    targetCompatibility = targetVersion
+}
+
+fun KotlinJvmTarget.targetBytecodeVersion(version: Provider<Int>) {
+    compilerOptions {
+        jvmTarget.set(version.map { target -> JvmTarget.fromTarget(target.toString()) })
+    }
+    compilations.configureEach {
+        compileJavaTaskProvider?.configure {
+            targetBytecodeVersion(version)
         }
     }
 }
 
-plugins.withId("org.jetbrains.kotlin.multiplatform") {
-    extensions.configure<KotlinBaseExtension>("kotlin") {
+plugins.withId("org.jetbrains.kotlin.jvm") {
+    extensions.configure<KotlinJvmExtension>("kotlin") {
         jvmToolchain {
             languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))
+        }
+        compilerOptions {
+            jvmTarget.set(conventions.jvmBytecodeVersion.map { target -> JvmTarget.fromTarget(target.toString()) })
+        }
+    }
+    tasks.withType<JavaCompile>().configureEach {
+        targetBytecodeVersion(conventions.jvmBytecodeVersion)
+    }
+}
+
+plugins.withId("org.jetbrains.kotlin.multiplatform") {
+    extensions.configure<KotlinMultiplatformExtension>("kotlin") {
+        jvmToolchain {
+            languageVersion.set(JavaLanguageVersion.of(libs.versions.java.compiler.version.get().toInt()))
+        }
+        targets.withType<KotlinJvmTarget>().configureEach {
+            targetBytecodeVersion(conventions.jvmBytecodeVersion)
         }
     }
 }
@@ -53,16 +81,5 @@ tasks.withType<KotlinJvmCompile>().configureEach {
             "-Xno-receiver-assertions",
             "-XIntrinsic-const-evaluation",
         )
-        freeCompilerArgs.add(conventions.jvmBytecodeVersion.map { version -> "-Xjdk-release=$version" })
     }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget.set(conventions.jvmBytecodeVersion.map { version -> JvmTarget.fromTarget(version.toString()) })
-    }
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.release.set(conventions.jvmBytecodeVersion)
 }
