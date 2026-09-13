@@ -10,6 +10,25 @@ import kotlin.test.assertTrue
 
 class KotlinSourceGeneratorTest {
     @Test
+    fun `numeric intermediates stay in locals until block exit`() {
+        val source = KotlinSourceGenerator().generate(
+            firstIp = 0,
+            instructions = listOf(
+                NumericInstruction.I32ConstS(5, 0),
+                NumericInstruction.I32ConstS(7, 1),
+                NumericInstruction.I32AddSs(0, 1, 0),
+                NumericInstruction.I32MulSs(0, 1, 2),
+            ),
+            functionEntryIps = intArrayOf(0),
+        )
+        val body = source.groups.single().source
+        assertEquals(4, source.promotedInstructionCount)
+        assertEquals(0, Regex("vstack.getFrameSlot").findAll(body).count())
+        assertEquals(3, Regex("vstack.setFrameSlot").findAll(body).count())
+        assertTrue(body.indexOf("valueI32Mul") < body.indexOf("vstack.setFrameSlot"))
+    }
+
+    @Test
     fun `branch targets and size limits split generated bodies`() {
         val source = KotlinSourceGenerator(maxBlockInstructions = 2, maxClassInstructions = 3).generate(
             firstIp = 100,

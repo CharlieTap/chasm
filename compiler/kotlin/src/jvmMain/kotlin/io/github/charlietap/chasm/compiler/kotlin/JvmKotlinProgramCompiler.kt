@@ -35,6 +35,7 @@ data class KotlinCompilationReport(
     val sourceBytes: Long,
     val cacheHit: Boolean,
     val compilationNanos: Long,
+    val promotedInstructionCount: Int = 0,
 )
 
 /**
@@ -111,6 +112,7 @@ class JvmKotlinProgramCompiler(
                     sourceBytes = source.groups.sumOf { it.source.toByteArray().size.toLong() },
                     cacheHit = cacheHit,
                     compilationNanos = compilationNanos,
+                    promotedInstructionCount = source.promotedInstructionCount,
                 ),
             )
             null

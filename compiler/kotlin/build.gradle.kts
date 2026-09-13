@@ -36,6 +36,61 @@ val generateExecutorCatalogue = tasks.register("generateExecutorCatalogue") {
             appendLine("    else -> null")
             appendLine("}")
         })
+
+        // The scalar adapters declare their operand/result types and refer to
+        // canonical value operations. Derive slot effects from those adapters,
+        // without copying arithmetic or conversion semantics into this module.
+        val scalarTypes = mapOf("Int" to "I32", "Long" to "I64", "Float" to "F32", "Double" to "F64", "Boolean" to "BOOL")
+        val adapterTypes = mutableMapOf<String, Pair<List<String>, String>>()
+        val supportSignature = Regex("internal inline fun (execute\\w+)\\((.*?)\\) \\{", RegexOption.DOT_MATCHES_ALL)
+        val operationSignature = Regex("operation: \\(([^)]+)\\) -> (\\w+)")
+        executorSources.asFile.walkTopDown().filter { it.name.endsWith("Support.kt") }.forEach { file ->
+            supportSignature.findAll(file.readText()).forEach { match ->
+                operationSignature.find(match.groupValues[2])?.let { operation ->
+                    adapterTypes[match.groupValues[1]] = operation.groupValues[1].split(", ") to operation.groupValues[2]
+                }
+            }
+        }
+        val scalarEntries = sortedMapOf<String, String>()
+        val scalarAdapter = Regex("internal\\s+inline\\s+fun\\s+\\w+\\(\\s*vstack:\\s*ValueStack,\\s*context:\\s*ExecutionContext,\\s*instruction:\\s*(NumericInstruction\\.\\w+),\\s*\\)\\s*=\\s*(execute\\w+)\\(([^\\n]+)\\)")
+        executorSources.asFile.walkTopDown().filter { it.extension == "kt" }.forEach { file ->
+            val source = file.readText()
+            val packageName = Regex("(?m)^package (.+)$").find(source)!!.groupValues[1]
+            val imports = Regex("(?m)^import (.+)$").findAll(source).associate { it.groupValues[1].substringAfterLast('.') to it.groupValues[1] }
+            scalarAdapter.findAll(source).forEach adapter@{ match ->
+                val (inputTypes, resultType) = adapterTypes[match.groupValues[2]] ?: return@adapter
+                val arguments = match.groupValues[3].split(", ")
+                val operation = arguments.last()
+                if (!operation.contains("::")) return@adapter
+                check(arguments.size == inputTypes.size + 3 && arguments[0] == "vstack" && arguments[1] == "instruction.destinationSlot")
+                val operands = arguments.subList(2, arguments.lastIndex).zip(inputTypes).map { (argument, type) ->
+                    val field = argument.removePrefix("instruction.")
+                    check(argument == "instruction.$field" && field.all { it.isLetterOrDigit() })
+                    val kind = scalarTypes.getValue(type)
+                    if (field.endsWith("Slot")) "KotlinValueInput.Slot(instruction.$field, KotlinValueType.$kind)" else "KotlinValueInput.Field(\"$field\", KotlinValueType.$kind)"
+                }
+                val expression = if (operation.startsWith("::")) {
+                    val name = operation.removePrefix("::")
+                    "${imports[name] ?: "$packageName.$name"}(${inputTypes.indices.joinToString { "@$it@" }})"
+                } else {
+                    // Existing floating-point extensions retain their Wasm
+                    // NaN and signed-zero behavior through the same functions.
+                    val name = operation.substringAfter("::")
+                    "(@0@).$name(${inputTypes.indices.drop(1).joinToString { "@$it@" }})"
+                }
+                scalarEntries[match.groupValues[1]] = "KotlinValueInstruction(instruction.destinationSlot, listOf(${operands.joinToString()}), \"$expression\", KotlinValueType.${scalarTypes.getValue(resultType)})"
+            }
+        }
+        check(scalarEntries.size > 250) { "Missing scalar adapters: ${scalarEntries.size}" }
+        output.resolveSibling("ValueCatalogue.kt").writeText(buildString {
+            appendLine("// Generated from scalar adapter declarations. Do not edit.")
+            appendLine("package io.github.charlietap.chasm.compiler.kotlin")
+            appendLine("import io.github.charlietap.chasm.runtime.instruction.*")
+            appendLine("internal fun numericValueInstruction(instruction: LinkedInstruction): KotlinValueInstruction? = when (instruction) {")
+            scalarEntries.forEach { (type, expression) -> appendLine("    is $type -> $expression") }
+            appendLine("    else -> null")
+            appendLine("}")
+        })
     }
 }
 

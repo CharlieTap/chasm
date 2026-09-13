@@ -8,6 +8,7 @@ import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 class KotlinSourceGenerator(
     private val maxBlockInstructions: Int = 16,
     private val maxClassInstructions: Int = 192,
+    private val promoteBlockValues: Boolean = true,
 ) {
     init {
         require(maxBlockInstructions > 0 && maxClassInstructions >= maxBlockInstructions)
@@ -68,7 +69,7 @@ class KotlinSourceGenerator(
         fun flush() {
             if (pending.isEmpty()) return
             val name = "Generated${groups.size}"
-            groups.add(KotlinSourceGroup(name, source(name, pending, calls), pending.toList()))
+            groups.add(KotlinSourceGroup(name, source(name, pending, calls, instructions), pending.toList()))
             pending = mutableListOf()
             pendingSize = 0
         }
@@ -84,16 +85,18 @@ class KotlinSourceGenerator(
             instructionCount = instructions.size,
             generatedInstructionCount = calls.count { it != null },
             controlInstructionCount = calls.count { it == null },
+            promotedInstructionCount = if (promoteBlockValues) instructions.count { valueInstruction(it) != null } else 0,
         )
     }
 
-    private fun source(name: String, blocks: List<KotlinBlock>, calls: List<ExecutorCall?>): String = buildString {
+    private fun source(name: String, blocks: List<KotlinBlock>, calls: List<ExecutorCall?>, instructions: List<LinkedInstruction>): String = buildString {
         appendLine("@file:Suppress(\"UNUSED_PARAMETER\")")
         appendLine("package $GENERATED_PACKAGE")
         appendLine("import io.github.charlietap.chasm.runtime.instruction.*")
         appendLine("import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction")
         appendLine("import io.github.charlietap.chasm.runtime.execution.ExecutionContext")
         appendLine("import io.github.charlietap.chasm.runtime.stack.ValueStack")
+        appendLine("import io.github.charlietap.chasm.executor.invoker.ext.*")
         appendLine("class $name(bindings: Array<LinkedInstruction>, private val baseIp: Int) : DispatchableInstruction() {")
         for (block in blocks) {
             for (index in block.startOffset until block.endOffset) {
@@ -114,9 +117,20 @@ class KotlinSourceGenerator(
         // when every inline executor is expanded inside one when expression.
         for (block in blocks) {
             appendLine("    private fun block${block.startOffset}(vstack: ValueStack, context: ExecutionContext): Int {")
+            val values = KotlinBlockValues(this)
             for (index in block.startOffset until block.endOffset) {
-                appendLine("        ${checkNotNull(calls[index]).function}(vstack, context, i$index)")
+                val value = if (promoteBlockValues) valueInstruction(instructions[index]) else null
+                if (value != null) {
+                    values.emit(index, value)
+                } else {
+                    // Unpromoted helpers observe the canonical guest frame.
+                    // They may change slots, memory, globals or reference roots.
+                    values.flush()
+                    appendLine("        ${checkNotNull(calls[index]).function}(vstack, context, i$index)")
+                    values.invalidate()
+                }
             }
+            values.flush()
             appendLine("        return baseIp + ${block.endOffset}")
             appendLine("    }")
         }
@@ -160,6 +174,7 @@ data class KotlinProgramSource(
     val instructionCount: Int,
     val generatedInstructionCount: Int,
     val controlInstructionCount: Int,
+    val promotedInstructionCount: Int = 0,
 ) {
     val blockCount: Int get() = groups.sumOf { it.blocks.size }
 }

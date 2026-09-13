@@ -128,6 +128,7 @@ internal fun compilationJson(report: KotlinCompilationReport): JsonObject = Json
         "key" to JsonPrimitive(report.key),
         "instructions" to JsonPrimitive(report.instructionCount),
         "generatedInstructions" to JsonPrimitive(report.generatedInstructionCount),
+        "promotedInstructions" to JsonPrimitive(report.promotedInstructionCount),
         "controlInstructions" to JsonPrimitive(report.controlInstructionCount),
         "blocks" to JsonPrimitive(report.blockCount),
         "classes" to JsonPrimitive(report.classCount),
