@@ -58,10 +58,10 @@ internal inline fun F32DemoteF64Executor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32DemoteF64I,
-) = executeF64ToF32I(vstack, instruction.destinationSlot, instruction.operand) { operand -> operand.toFloat() }
+) = executeF64ToF32I(vstack, instruction.destinationSlot, instruction.operand, ::valueF32DemoteF64)
 
 internal inline fun F32DemoteF64Executor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32DemoteF64S,
-) = executeF64ToF32S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> operand.toFloat() }
+) = executeF64ToF32S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueF32DemoteF64)

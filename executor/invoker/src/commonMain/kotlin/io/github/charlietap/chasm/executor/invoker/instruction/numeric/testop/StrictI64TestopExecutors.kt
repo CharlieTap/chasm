@@ -10,14 +10,10 @@ internal inline fun I64EqzExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64EqzI,
-) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    if (operand == 0L) 1L else 0L
-}
+) = executeI64UnaryI(vstack, instruction.destinationSlot, instruction.operand, ::valueI64Eqz)
 
 internal inline fun I64EqzExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64EqzS,
-) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    if (operand == 0L) 1L else 0L
-}
+) = executeI64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64Eqz)

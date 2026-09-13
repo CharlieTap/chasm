@@ -14,25 +14,25 @@ internal inline fun F32AbsExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32AbsI,
-) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand -> operand.absoluteValue }
+) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand, ::valueF32Abs)
 
 internal inline fun F32AbsExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32AbsS,
-) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> operand.absoluteValue }
+) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueF32Abs)
 
 internal inline fun F32NegExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32NegI,
-) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand -> -operand }
+) = executeF32UnaryI(vstack, instruction.destinationSlot, instruction.operand, ::valueF32Neg)
 
 internal inline fun F32NegExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32NegS,
-) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> -operand }
+) = executeF32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueF32Neg)
 
 internal inline fun F32CeilExecutor(
     vstack: ValueStack,

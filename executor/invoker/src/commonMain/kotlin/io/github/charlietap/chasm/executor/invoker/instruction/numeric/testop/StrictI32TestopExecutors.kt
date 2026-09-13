@@ -10,14 +10,10 @@ internal inline fun I32EqzExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32EqzI,
-) = executeI32UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    if (operand == 0) 1 else 0
-}
+) = executeI32UnaryI(vstack, instruction.destinationSlot, instruction.operand, ::valueI32Eqz)
 
 internal inline fun I32EqzExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32EqzS,
-) = executeI32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    if (operand == 0) 1 else 0
-}
+) = executeI32UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI32Eqz)

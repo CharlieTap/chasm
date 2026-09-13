@@ -8,67 +8,67 @@ internal inline fun I32AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32AddIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left + right }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32Add)
 
 internal inline fun I32AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32AddSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left + right }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32Add)
 
 internal inline fun I32AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32AddSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left + right }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32Add)
 
 internal inline fun I32SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32SubIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left - right }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32Sub)
 
 internal inline fun I32SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32SubIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left - right }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32Sub)
 
 internal inline fun I32SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32SubSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left - right }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32Sub)
 
 internal inline fun I32SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32SubSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left - right }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32Sub)
 
 internal inline fun I32MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32MulIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left * right }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32Mul)
 
 internal inline fun I32MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32MulIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left * right }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32Mul)
 
 internal inline fun I32MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32MulSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left * right }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32Mul)
 
 internal inline fun I32MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32MulSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left * right }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32Mul)
 
 internal inline fun I32DivSExecutor(
     vstack: ValueStack,
@@ -170,190 +170,190 @@ internal inline fun I32AndExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32AndIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left and right }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32And)
 
 internal inline fun I32AndExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32AndIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left and right }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32And)
 
 internal inline fun I32AndExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32AndSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left and right }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32And)
 
 internal inline fun I32AndExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32AndSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left and right }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32And)
 
 internal inline fun I32OrExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32OrIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left or right }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32Or)
 
 internal inline fun I32OrExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32OrIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left or right }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32Or)
 
 internal inline fun I32OrExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32OrSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left or right }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32Or)
 
 internal inline fun I32OrExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32OrSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left or right }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32Or)
 
 internal inline fun I32XorExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32XorIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left xor right }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32Xor)
 
 internal inline fun I32XorExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32XorIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left xor right }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32Xor)
 
 internal inline fun I32XorExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32XorSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left xor right }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32Xor)
 
 internal inline fun I32XorExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32XorSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left xor right }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32Xor)
 
 internal inline fun I32ShlExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShlIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left shl right }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32Shl)
 
 internal inline fun I32ShlExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShlIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left shl right }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32Shl)
 
 internal inline fun I32ShlExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShlSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left shl right }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32Shl)
 
 internal inline fun I32ShlExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShlSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left shl right }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32Shl)
 
 internal inline fun I32ShrSExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrSIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left shr right }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32ShrS)
 
 internal inline fun I32ShrSExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrSIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left shr right }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32ShrS)
 
 internal inline fun I32ShrSExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrSSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left shr right }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32ShrS)
 
 internal inline fun I32ShrSExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrSSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left shr right }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32ShrS)
 
 internal inline fun I32ShrUExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrUIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left.toUInt().shr(right).toInt() }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32ShrU)
 
 internal inline fun I32ShrUExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrUIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left.toUInt().shr(right).toInt() }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32ShrU)
 
 internal inline fun I32ShrUExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrUSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left.toUInt().shr(right).toInt() }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32ShrU)
 
 internal inline fun I32ShrUExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32ShrUSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left.toUInt().shr(right).toInt() }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32ShrU)
 
 internal inline fun I32RotlExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RotlIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left.rotateLeft(right) }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32Rotl)
 
 internal inline fun I32RotlExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RotlIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left.rotateLeft(right) }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32Rotl)
 
 internal inline fun I32RotlExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RotlSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left.rotateLeft(right) }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32Rotl)
 
 internal inline fun I32RotlExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RotlSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left.rotateLeft(right) }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32Rotl)
 
 internal inline fun I32RotrExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RotrIi,
-) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left.rotateRight(right) }
+) = executeI32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueI32Rotr)
 
 internal inline fun I32RotrExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RotrIs,
-) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left.rotateRight(right) }
+) = executeI32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueI32Rotr)
 
 internal inline fun I32RotrExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RotrSi,
-) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left.rotateRight(right) }
+) = executeI32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueI32Rotr)
 
 internal inline fun I32RotrExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I32RotrSs,
-) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left.rotateRight(right) }
+) = executeI32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueI32Rotr)

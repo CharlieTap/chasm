@@ -10,16 +10,18 @@ import subprocess
 parser = argparse.ArgumentParser()
 parser.add_argument("--pairs", type=int, default=5)
 parser.add_argument("--seed", type=int, default=20260913)
+parser.add_argument("--output", default="tools/kotlin-aot/build/results")
+parser.add_argument("--artifacts", default="tools/kotlin-aot/build/coremark-artifacts")
 options = parser.parse_args()
 assert options.pairs > 0
 root = pathlib.Path(__file__).resolve().parents[2]
-output = root / "tools/kotlin-aot/build/results"
+output = root / options.output
 output.mkdir(parents=True, exist_ok=True)
 classpath = (root / "tools/kotlin-aot/build/runtime-classpath.txt").read_text()
 heap = ["-Xms1g", "-Xmx8g", "-XX:+UseCompressedOops", "-XX:+UseCompressedClassPointers"]
 command = ["java", *heap, "-cp", classpath, "io.github.charlietap.chasm.tools.aot.MainKt", "coremark"]
 common = ["--wasm", "benchmark/src/commonMain/resources/benchmark/coremark.wasm",
-          "--artifacts", "tools/kotlin-aot/build/coremark-artifacts", "--verify", "false"]
+          "--artifacts", options.artifacts, "--verify", "false"]
 randomizer = random.Random(options.seed)
 trials = []
 for pair in range(1, options.pairs + 1):

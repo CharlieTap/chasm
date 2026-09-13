@@ -11,97 +11,97 @@ internal inline fun F32AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32AddIi,
-) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left + right }
+) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueF32Add)
 
 internal inline fun F32AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32AddIs,
-) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left + right }
+) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueF32Add)
 
 internal inline fun F32AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32AddSi,
-) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left + right }
+) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueF32Add)
 
 internal inline fun F32AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32AddSs,
-) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left + right }
+) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueF32Add)
 
 internal inline fun F32SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32SubIi,
-) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left - right }
+) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueF32Sub)
 
 internal inline fun F32SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32SubIs,
-) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left - right }
+) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueF32Sub)
 
 internal inline fun F32SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32SubSi,
-) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left - right }
+) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueF32Sub)
 
 internal inline fun F32SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32SubSs,
-) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left - right }
+) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueF32Sub)
 
 internal inline fun F32MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32MulIi,
-) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left * right }
+) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueF32Mul)
 
 internal inline fun F32MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32MulIs,
-) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left * right }
+) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueF32Mul)
 
 internal inline fun F32MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32MulSi,
-) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left * right }
+) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueF32Mul)
 
 internal inline fun F32MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32MulSs,
-) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left * right }
+) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueF32Mul)
 
 internal inline fun F32DivExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32DivIi,
-) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left / right }
+) = executeF32BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueF32Div)
 
 internal inline fun F32DivExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32DivIs,
-) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left / right }
+) = executeF32BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueF32Div)
 
 internal inline fun F32DivExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32DivSi,
-) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left / right }
+) = executeF32BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueF32Div)
 
 internal inline fun F32DivExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F32DivSs,
-) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left / right }
+) = executeF32BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueF32Div)
 
 internal inline fun F32MinExecutor(
     vstack: ValueStack,

@@ -58,10 +58,10 @@ internal inline fun F64PromoteF32Executor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64PromoteF32I,
-) = executeF32ToF64I(vstack, instruction.destinationSlot, instruction.operand) { operand -> operand.toDouble() }
+) = executeF32ToF64I(vstack, instruction.destinationSlot, instruction.operand, ::valueF64PromoteF32)
 
 internal inline fun F64PromoteF32Executor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64PromoteF32S,
-) = executeF32ToF64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> operand.toDouble() }
+) = executeF32ToF64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueF64PromoteF32)

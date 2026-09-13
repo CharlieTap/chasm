@@ -14,25 +14,25 @@ internal inline fun F64AbsExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64AbsI,
-) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand -> operand.absoluteValue }
+) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand, ::valueF64Abs)
 
 internal inline fun F64AbsExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64AbsS,
-) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> operand.absoluteValue }
+) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueF64Abs)
 
 internal inline fun F64NegExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64NegI,
-) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand) { operand -> -operand }
+) = executeF64UnaryI(vstack, instruction.destinationSlot, instruction.operand, ::valueF64Neg)
 
 internal inline fun F64NegExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64NegS,
-) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot) { operand -> -operand }
+) = executeF64UnaryS(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueF64Neg)
 
 internal inline fun F64CeilExecutor(
     vstack: ValueStack,

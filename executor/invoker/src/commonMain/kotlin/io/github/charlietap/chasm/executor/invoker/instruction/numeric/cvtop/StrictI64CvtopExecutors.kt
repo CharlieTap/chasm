@@ -14,158 +14,94 @@ internal inline fun I64TruncF32SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF32SI,
-) = executeF32ToI64I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    try {
-        operand.truncI64sTrapping()
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.ConvertOperationFailed)
-    }
-}
+) = executeF32ToI64I(vstack, instruction.destinationSlot, instruction.operand, ::valueI64TruncF32S)
 
 internal inline fun I64TruncF32SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF32SS,
-) = executeF32ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    try {
-        operand.truncI64sTrapping()
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.ConvertOperationFailed)
-    }
-}
+) = executeF32ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64TruncF32S)
 
 internal inline fun I64TruncF32UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF32UI,
-) = executeF32ToI64I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    try {
-        operand.truncI64uTrapping()
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.ConvertOperationFailed)
-    }
-}
+) = executeF32ToI64I(vstack, instruction.destinationSlot, instruction.operand, ::valueI64TruncF32U)
 
 internal inline fun I64TruncF32UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF32US,
-) = executeF32ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    try {
-        operand.truncI64uTrapping()
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.ConvertOperationFailed)
-    }
-}
+) = executeF32ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64TruncF32U)
 
 internal inline fun I64TruncF64SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF64SI,
-) = executeF64ToI64I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    try {
-        operand.truncI64sTrapping()
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.ConvertOperationFailed)
-    }
-}
+) = executeF64ToI64I(vstack, instruction.destinationSlot, instruction.operand, ::valueI64TruncF64S)
 
 internal inline fun I64TruncF64SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF64SS,
-) = executeF64ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    try {
-        operand.truncI64sTrapping()
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.ConvertOperationFailed)
-    }
-}
+) = executeF64ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64TruncF64S)
 
 internal inline fun I64TruncF64UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF64UI,
-) = executeF64ToI64I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    try {
-        operand.truncI64uTrapping()
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.ConvertOperationFailed)
-    }
-}
+) = executeF64ToI64I(vstack, instruction.destinationSlot, instruction.operand, ::valueI64TruncF64U)
 
 internal inline fun I64TruncF64UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncF64US,
-) = executeF64ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    try {
-        operand.truncI64uTrapping()
-    } catch (_: IllegalArgumentException) {
-        throw InvocationException(InvocationError.ConvertOperationFailed)
-    }
-}
+) = executeF64ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64TruncF64U)
 
 internal inline fun I64TruncSatF32SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF32SI,
-) = executeF32ToI64I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    operand.truncI64s()
-}
+) = executeF32ToI64I(vstack, instruction.destinationSlot, instruction.operand, ::valueI64TruncSatF32S)
 
 internal inline fun I64TruncSatF32SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF32SS,
-) = executeF32ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    operand.truncI64s()
-}
+) = executeF32ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64TruncSatF32S)
 
 internal inline fun I64TruncSatF32UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF32UI,
-) = executeF32ToI64I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    operand.truncI64u()
-}
+) = executeF32ToI64I(vstack, instruction.destinationSlot, instruction.operand, ::valueI64TruncSatF32U)
 
 internal inline fun I64TruncSatF32UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF32US,
-) = executeF32ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    operand.truncI64u()
-}
+) = executeF32ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64TruncSatF32U)
 
 internal inline fun I64TruncSatF64SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF64SI,
-) = executeF64ToI64I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    operand.truncI64s()
-}
+) = executeF64ToI64I(vstack, instruction.destinationSlot, instruction.operand, ::valueI64TruncSatF64S)
 
 internal inline fun I64TruncSatF64SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF64SS,
-) = executeF64ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    operand.truncI64s()
-}
+) = executeF64ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64TruncSatF64S)
 
 internal inline fun I64TruncSatF64UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF64UI,
-) = executeF64ToI64I(vstack, instruction.destinationSlot, instruction.operand) { operand ->
-    operand.truncI64u()
-}
+) = executeF64ToI64I(vstack, instruction.destinationSlot, instruction.operand, ::valueI64TruncSatF64U)
 
 internal inline fun I64TruncSatF64UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.I64TruncSatF64US,
-) = executeF64ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot) { operand ->
-    operand.truncI64u()
-}
+) = executeF64ToI64S(vstack, instruction.destinationSlot, instruction.operandSlot, ::valueI64TruncSatF64U)

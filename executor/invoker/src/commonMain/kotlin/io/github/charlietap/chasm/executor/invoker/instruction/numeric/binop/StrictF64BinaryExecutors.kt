@@ -11,97 +11,97 @@ internal inline fun F64AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64AddIi,
-) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left + right }
+) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueF64Add)
 
 internal inline fun F64AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64AddIs,
-) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left + right }
+) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueF64Add)
 
 internal inline fun F64AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64AddSi,
-) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left + right }
+) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueF64Add)
 
 internal inline fun F64AddExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64AddSs,
-) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left + right }
+) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueF64Add)
 
 internal inline fun F64SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64SubIi,
-) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left - right }
+) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueF64Sub)
 
 internal inline fun F64SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64SubIs,
-) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left - right }
+) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueF64Sub)
 
 internal inline fun F64SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64SubSi,
-) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left - right }
+) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueF64Sub)
 
 internal inline fun F64SubExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64SubSs,
-) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left - right }
+) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueF64Sub)
 
 internal inline fun F64MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64MulIi,
-) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left * right }
+) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueF64Mul)
 
 internal inline fun F64MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64MulIs,
-) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left * right }
+) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueF64Mul)
 
 internal inline fun F64MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64MulSi,
-) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left * right }
+) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueF64Mul)
 
 internal inline fun F64MulExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64MulSs,
-) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left * right }
+) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueF64Mul)
 
 internal inline fun F64DivExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64DivIi,
-) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right) { left, right -> left / right }
+) = executeF64BinaryIi(vstack, instruction.destinationSlot, instruction.left, instruction.right, ::valueF64Div)
 
 internal inline fun F64DivExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64DivIs,
-) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot) { left, right -> left / right }
+) = executeF64BinaryIs(vstack, instruction.destinationSlot, instruction.left, instruction.rightSlot, ::valueF64Div)
 
 internal inline fun F64DivExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64DivSi,
-) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right) { left, right -> left / right }
+) = executeF64BinarySi(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.right, ::valueF64Div)
 
 internal inline fun F64DivExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: NumericInstruction.F64DivSs,
-) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot) { left, right -> left / right }
+) = executeF64BinarySs(vstack, instruction.destinationSlot, instruction.leftSlot, instruction.rightSlot, ::valueF64Div)
 
 internal inline fun F64MinExecutor(
     vstack: ValueStack,
