@@ -1,0 +1,31 @@
+package io.github.charlietap.chasm.compiler.kotlin
+
+import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
+import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
+
+class KotlinSourceGeneratorTest {
+    @Test
+    fun `branch targets and size limits split generated bodies`() {
+        val source = KotlinSourceGenerator(maxBlockInstructions = 2, maxClassInstructions = 3).generate(
+            firstIp = 100,
+            instructions = List(6) { NumericInstruction.I32ConstS(it, it) } + AdminInstruction.Jump(101),
+            functionEntryIps = intArrayOf(100),
+        )
+        assertEquals(listOf(0, 1, 3, 5), source.groups.flatMap { it.blocks }.map { it.startOffset })
+        assertTrue(source.groups.all { it.blocks.sumOf(KotlinBlock::size) <= 3 })
+        assertEquals(6, source.generatedInstructionCount)
+        assertEquals(1, source.controlInstructionCount)
+    }
+
+    @Test
+    fun `unsupported post MVP instructions fail without interpreter fallback`() {
+        assertFailsWith<IllegalArgumentException> {
+            KotlinSourceGenerator().generate(0, listOf(ControlInstruction.ThrowRefS(0)), intArrayOf(0))
+        }
+    }
+}

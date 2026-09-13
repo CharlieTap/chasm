@@ -68,6 +68,8 @@ include(":libs:parallel")
 include(":memory")
 
 include(":compiler")
+include(":compiler:kotlin")
+include(":tools:kotlin-aot")
 
 include(":runtime:address")
 include(":runtime:core")

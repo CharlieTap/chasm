@@ -17,6 +17,7 @@ sealed interface AdminInstruction : LinkedInstruction {
     data class CopySlots(
         val sourceSlots: IntArray,
         val destinationSlots: IntArray,
+        val sequential: Boolean = false,
     ) : AdminInstruction
 
     data class Jump(val targetIp: Int) : AdminInstruction

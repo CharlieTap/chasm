@@ -32,6 +32,9 @@ fun CopySlotSequenceDispatcher(
 fun CopySlotsDispatcher(
     instruction: AdminInstruction.CopySlots,
 ): DispatchableInstruction {
+    if (instruction.sequential) {
+        return CopySlotSequenceDispatcher(instruction.sourceSlots, instruction.destinationSlots)
+    }
     if (instruction.sourceSlots.size == 1) {
         val sourceSlot = instruction.sourceSlots[0]
         val destinationSlot = instruction.destinationSlots[0]

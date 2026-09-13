@@ -83,6 +83,7 @@ class ChasmCorpusRunner(
     private val config: Config = Config(
         runtimeConfig = RuntimeConfig(gcStrategy = GCStrategy.TRADITIONAL),
     ),
+    private val storeFactory: () -> Store = ::store,
 ) : CorpusRunner {
 
     override fun readText(path: String): String = fileReader.readText(path)
@@ -134,7 +135,7 @@ class ChasmCorpusRunner(
 
         if (fixture.tests.isEmpty()) {
             val setup = timings.instantiate {
-                val store = store()
+                val store = storeFactory()
                 instantiate(fixture, store, validated, null)
             }
             return setup.fold(
@@ -149,7 +150,7 @@ class ChasmCorpusRunner(
 
         fixture.tests.forEachIndexed { testIndex, test ->
             val (store, setupResult) = timings.instantiate {
-                val store = store()
+                val store = storeFactory()
                 store to instantiate(fixture, store, validated, test)
             }
             val setup = setupResult.fold(

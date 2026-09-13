@@ -45,7 +45,7 @@ internal class CopyInstructionBuffer(
             val dispatchableInstruction = CopySlotSequenceDispatcher(sources, destinations)
             instructionObserver?.onInstruction(
                 dispatchableInstruction,
-                AdminInstruction.CopySlots(sources, destinations),
+                AdminInstruction.CopySlots(sources, destinations, sequential = true),
             )
             program.append(dispatchableInstruction)
         }

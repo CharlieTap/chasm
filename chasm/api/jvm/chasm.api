@@ -66,6 +66,7 @@ public final class io/github/charlietap/chasm/embedding/PrepareFunctionKt {
 
 public final class io/github/charlietap/chasm/embedding/StoreKt {
 	public static final fun store ()Lio/github/charlietap/chasm/embedding/shapes/Store;
+	public static final fun store (Lio/github/charlietap/chasm/runtime/program/ProgramCompiler;)Lio/github/charlietap/chasm/embedding/shapes/Store;
 }
 
 public final class io/github/charlietap/chasm/embedding/TableKt {

@@ -6,6 +6,8 @@ import kotlin.jvm.JvmInline
 
 sealed interface InstantiationError : ModuleTrapError {
 
+    data class ProgramCompilationFailed(val message: String) : InstantiationError
+
     @JvmInline
     value class FailedToResolveFunctionType(val index: Index.TypeIndex) : InstantiationError
 

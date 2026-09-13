@@ -6,7 +6,10 @@ import kotlin.jvm.JvmOverloads
 
 class Program
     @JvmOverloads
-    constructor(initialCapacity: Int = INITIAL_CAPACITY) {
+    constructor(
+        initialCapacity: Int = INITIAL_CAPACITY,
+        val compiler: ProgramCompiler? = null,
+    ) {
 
         var instructions: Array<DispatchableInstruction> = dispatchableArray(initialCapacity)
             private set

@@ -28,7 +28,7 @@ suspend fun ParallelModuleCompiler(
     diagnostics: CompilerDiagnostics? = null,
     taskExecutor: ParallelTaskExecutor,
 ): Result<Unit, ModuleTrapError> {
-    val strategy = if (diagnostics == null) {
+    val strategy = if (diagnostics == null && store.program.compiler == null) {
         selectCompilationStrategy(module.functions, CompilationMode.AUTO)
     } else {
         CompilationStrategy.Serial

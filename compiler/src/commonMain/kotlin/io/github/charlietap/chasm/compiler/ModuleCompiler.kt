@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.compiler
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import io.github.charlietap.chasm.ast.module.Module
@@ -8,10 +9,12 @@ import io.github.charlietap.chasm.compiler.context.FunctionCompilerWorkspace
 import io.github.charlietap.chasm.compiler.context.createCompilerContext
 import io.github.charlietap.chasm.compiler.diagnostic.CompilerDiagnostics
 import io.github.charlietap.chasm.executor.invoker.dispatch.control.LinkWasmCallDispatchers
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.function.classifyLocalInitialization
 import io.github.charlietap.chasm.runtime.instance.FunctionInstance
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.runtime.type.ModuleTypeResolver
 import io.github.charlietap.chasm.runtime.type.RuntimeTypeMap
@@ -25,6 +28,17 @@ fun ModuleCompiler(
     diagnostics: CompilerDiagnostics? = null,
 ): Result<Unit, ModuleTrapError> {
     val firstModuleIp = store.program.size
+    val backend = store.program.compiler
+    val linkedInstructions = if (backend != null) mutableMapOf<DispatchableInstruction, LinkedInstruction>() else null
+    val activeDiagnostics = if (linkedInstructions == null) {
+        diagnostics
+    } else {
+        CompilerDiagnostics { dispatchable, instruction ->
+            linkedInstructions[dispatchable] = instruction
+            diagnostics?.instructionObserver?.onInstruction(dispatchable, instruction)
+        }
+    }
+    val functionEntries = if (backend != null) IntArray(module.functions.size) else null
     val result = binding<Unit, ModuleTrapError> {
         val context = createCompilerContext(
             module = module,
@@ -32,7 +46,7 @@ fun ModuleCompiler(
             store = store,
             instance = instance,
             runtimeTypes = runtimeTypes,
-            diagnostics = diagnostics,
+            diagnostics = activeDiagnostics,
         )
         val workspace = FunctionCompilerWorkspace()
 
@@ -40,6 +54,7 @@ fun ModuleCompiler(
             val function = module.functions[functionIndex]
             val functionInstance = context.functions[function.idx.toInt()] as FunctionInstance.WasmFunction
             val entryIp = store.program.size
+            functionEntries?.set(functionIndex, entryIp)
             val compiled = FunctionCompiler(context, function, store.program, workspace).bind()
 
             val callStrategy = functionInstance.callStrategy
@@ -47,11 +62,21 @@ fun ModuleCompiler(
             callStrategy.localInitialization = classifyLocalInitialization(compiled.localInitialValues)
             callStrategy.entryIp = entryIp
         }
-        val instructionObserver = diagnostics?.instructionObserver
+        val instructionObserver = activeDiagnostics?.instructionObserver
         if (instructionObserver == null) {
             LinkWasmCallDispatchers(store.program, firstModuleIp)
         } else {
             LinkWasmCallDispatchers(store.program, firstModuleIp, instructionObserver::onInstruction)
+        }
+        if (backend != null) {
+            val instructions = (firstModuleIp until store.program.size).map { ip ->
+                checkNotNull(linkedInstructions?.get(store.program.instructions[ip])) {
+                    "missing linked instruction at IP $ip"
+                }
+            }
+            backend.compile(store.program, firstModuleIp, instructions, checkNotNull(functionEntries))?.let { error ->
+                Err(error).bind()
+            }
         }
     }
     if (result.isErr) {
