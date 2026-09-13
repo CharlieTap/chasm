@@ -101,7 +101,51 @@ class GrowMemoryTest {
         assertSame(initialMemory, instance.data)
     }
 
+    @Test
+    fun `returns minus one for negative and overflowing growth`() {
+        val initialMemory = RecordingLinearMemory()
+        val instance = memoryInstance(
+            type = memoryType(limits = limits(min = 1u)),
+            data = initialMemory,
+        )
+        val store = publicStore(store(memories = mutableListOf(instance)))
+        val memory = publicMemory(memoryExternalValue(memoryAddress()))
+
+        assertEquals(ChasmResult.Success(-1), growMemory(store, memory, -1))
+        assertEquals(ChasmResult.Success(-1), growMemory(store, memory, Int.MAX_VALUE))
+
+        assertEquals(0, initialMemory.growCalls)
+        assertEquals(1u, instance.type.limits.min)
+        assertSame(initialMemory, instance.data)
+    }
+
+    @Test
+    fun `returns minus one when backing memory rejects growth`() {
+        listOf(IllegalArgumentException(), OutOfMemoryError()).forEach { failure ->
+            val initialMemory = FailingLinearMemory(failure)
+            val instance = memoryInstance(
+                type = memoryType(limits = limits(min = 1u, max = 3u)),
+                data = initialMemory,
+            )
+            val store = publicStore(store(memories = mutableListOf(instance)))
+            val memory = publicMemory(memoryExternalValue(memoryAddress()))
+
+            assertEquals(ChasmResult.Success(-1), growMemory(store, memory, 1))
+            assertEquals(1u, instance.type.limits.min)
+            assertEquals(PAGE_SIZE, instance.size)
+            assertSame(initialMemory, instance.data)
+        }
+    }
+
     private object FakeLinearMemory : LinearMemory by NoOpLinearMemory
+
+    private class FailingLinearMemory(
+        private val failure: Throwable,
+    ) : LinearMemory by NoOpLinearMemory {
+        override val byteSize: Int = PAGE_SIZE
+
+        override fun grow(pagesToAdd: Int): LinearMemory = throw failure
+    }
 
     private class RecordingLinearMemory(
         private val grownMemory: LinearMemory? = null,

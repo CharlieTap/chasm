@@ -131,7 +131,7 @@ internal inline fun AllocateModuleContents(
     }
 
     module.memories.forEach { memory ->
-        val address = memoryAllocator(store, memory.type)
+        val address = memoryAllocator(store, memory.type, context.config.linearMemory)
         instance.addMemoryAddress(address)
     }
 

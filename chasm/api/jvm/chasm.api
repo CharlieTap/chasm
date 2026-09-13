@@ -46,6 +46,7 @@ public final class io/github/charlietap/chasm/embedding/InvokeKt {
 
 public final class io/github/charlietap/chasm/embedding/MemoryKt {
 	public static final fun memory (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/MemoryType;)Lio/github/charlietap/chasm/embedding/shapes/Memory;
+	public static final fun memory (Lio/github/charlietap/chasm/embedding/shapes/Store;Lio/github/charlietap/chasm/type/MemoryType;Lio/github/charlietap/chasm/config/LinearMemoryConfig;)Lio/github/charlietap/chasm/embedding/shapes/Memory;
 }
 
 public final class io/github/charlietap/chasm/embedding/ModuleInfoKt {

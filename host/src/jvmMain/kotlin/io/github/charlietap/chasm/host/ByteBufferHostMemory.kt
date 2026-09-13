@@ -5,8 +5,8 @@ import java.nio.ByteBuffer
 interface ByteBufferHostMemory : HostMemory {
 
     /**
-     * Borrows the backing buffer. Use absolute access and do not change its byte
-     * order, position, or limit. It becomes stale when memory is replaced.
+     * Borrows the current logical memory buffer. Use absolute access and do not
+     * change its byte order, position, or limit. It becomes stale after growth.
      */
     @UnsafeHostApi
     fun unsafeBorrowByteBuffer(): ByteBuffer

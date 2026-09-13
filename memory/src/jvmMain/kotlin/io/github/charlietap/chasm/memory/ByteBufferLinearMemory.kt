@@ -1,79 +1,79 @@
 package io.github.charlietap.chasm.memory
 
+import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.host.ByteBufferHostMemory
 import io.github.charlietap.chasm.host.HostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+import java.nio.channels.FileChannel.MapMode.READ_WRITE
+import java.nio.file.Files
+import java.nio.file.StandardOpenOption.CREATE_NEW
+import java.nio.file.StandardOpenOption.DELETE_ON_CLOSE
+import java.nio.file.StandardOpenOption.READ
+import java.nio.file.StandardOpenOption.SPARSE
+import java.nio.file.StandardOpenOption.WRITE
+
+internal const val MAX_JVM_MEMORY_PAGES = Int.MAX_VALUE / LinearMemory.PAGE_SIZE
+internal const val MAX_JVM_MEMORY_BYTES = MAX_JVM_MEMORY_PAGES * LinearMemory.PAGE_SIZE
 
 @OptIn(UnsafeHostApi::class)
-class ByteBufferLinearMemory(
-    memory: ByteBuffer,
+class ByteBufferLinearMemory private constructor(
+    state: ByteBufferState,
 ) : LinearMemory, ByteBufferHostMemory {
 
-    var memory: ByteBuffer = memory
-        set(value) {
-            field = value
-            copySource = value.duplicate().order(value.order())
-        }
+    internal var mapping: ByteBuffer = state.mapping
+        private set
 
-    private var copySource = memory.duplicate().order(memory.order())
+    private var maximumByteSize: Long = state.maximumByteSize
+    private var prefault: Boolean = state.prefault
+    private var logicalMemory: ByteBuffer = state.memory
+    private var copySource: ByteBuffer = duplicate(state.memory)
+
+    @PublishedApi
+    internal val memory: ByteBuffer
+        get() = logicalMemory
 
     constructor(
         pages: LinearMemory.Pages,
-    ) : this(
-        ByteBuffer.allocateDirect(pages.amount.toInt() * LinearMemory.PAGE_SIZE).apply {
-            order(ByteOrder.LITTLE_ENDIAN)
-        },
-    )
+        maximumPages: LinearMemory.Pages? = null,
+        config: LinearMemoryConfig = LinearMemoryConfig(),
+    ) : this(createMappedByteBufferState(pages, maximumPages, config))
 
     override val byteSize: Int
-        get() = memory.limit()
+        get() = logicalMemory.limit()
 
     override fun grow(pagesToAdd: Int): LinearMemory {
-        val buffer = memory
-        val currentSize = buffer.limit()
-        val newSize = currentSize + (pagesToAdd * LinearMemory.PAGE_SIZE)
+        require(pagesToAdd >= 0) { "Linear memory cannot shrink" }
+        if (pagesToAdd == 0) return this
 
-        if (newSize <= buffer.capacity()) {
-            buffer.limit(newSize)
-            return this
+        val previousByteSize = byteSize
+        val nextByteSize = previousByteSize.toLong() + pagesToAdd.toLong() * LinearMemory.PAGE_SIZE
+        require(nextByteSize <= maximumByteSize) {
+            "JVM linear memory cannot exceed ${maximumByteSize / LinearMemory.PAGE_SIZE} pages"
         }
 
-        val doubledCapacity = minOf(buffer.capacity().toLong() * 2, Int.MAX_VALUE.toLong()).toInt()
-        val reservedCapacity = minOf(newSize.toLong() + (newSize / 2), Int.MAX_VALUE.toLong()).toInt()
-        val newCapacity = maxOf(doubledCapacity, reservedCapacity)
-        val newBuffer = try {
-            ByteBuffer.allocateDirect(newCapacity)
-        } catch (error: OutOfMemoryError) {
-            if (newCapacity == newSize) throw error
-            ByteBuffer.allocateDirect(newSize)
-        }.order(ByteOrder.LITTLE_ENDIAN)
-
-        buffer.duplicate().apply {
-            position(0)
-            limit(currentSize)
-            newBuffer.put(this)
+        if (prefault) {
+            loadMappedRange(mapping, previousByteSize, (nextByteSize - previousByteSize).toInt())
         }
-        newBuffer.position(0)
-        newBuffer.limit(newSize)
-        memory = newBuffer
-
+        replaceLogicalMemory(bufferForSize(mapping, nextByteSize.toInt()))
         return this
     }
 
-    override fun readI8(memoryPointer: Int): Byte = memory.get(memoryPointer)
+    override fun readI8(memoryPointer: Int): Byte = logicalMemory.get(memoryPointer)
 
-    override fun readI16(memoryPointer: Int): Short = memory.getShort(memoryPointer)
+    override fun readI16(memoryPointer: Int): Short = logicalMemory.getShort(memoryPointer)
 
-    override fun readI32(memoryPointer: Int): Int = memory.getInt(memoryPointer)
+    override fun readI32(memoryPointer: Int): Int = logicalMemory.getInt(memoryPointer)
 
-    override fun readI64(memoryPointer: Int): Long = memory.getLong(memoryPointer)
+    override fun readI64(memoryPointer: Int): Long = logicalMemory.getLong(memoryPointer)
 
-    override fun readF32(memoryPointer: Int): Float = memory.getFloat(memoryPointer)
+    override fun readF32(memoryPointer: Int): Float = logicalMemory.getFloat(memoryPointer)
 
-    override fun readF64(memoryPointer: Int): Double = memory.getDouble(memoryPointer)
+    override fun readF64(memoryPointer: Int): Double = logicalMemory.getDouble(memoryPointer)
 
     override fun read(
         buffer: ByteArray,
@@ -81,35 +81,34 @@ class ByteBufferLinearMemory(
         bytesToRead: Int,
         bufferPointer: Int,
     ): ByteArray {
-        checkRange(memoryPointer, bytesToRead, memory.limit())
+        checkRange(memoryPointer, bytesToRead, byteSize)
         checkRange(bufferPointer, bytesToRead, buffer.size)
-        memory.position(memoryPointer)
-        memory.get(buffer, bufferPointer, bytesToRead)
+        logicalMemory.get(memoryPointer, buffer, bufferPointer, bytesToRead)
         return buffer
     }
 
     override fun writeI8(memoryPointer: Int, value: Byte) {
-        memory.put(memoryPointer, value)
+        logicalMemory.put(memoryPointer, value)
     }
 
     override fun writeI16(memoryPointer: Int, value: Short) {
-        memory.putShort(memoryPointer, value)
+        logicalMemory.putShort(memoryPointer, value)
     }
 
     override fun writeI32(memoryPointer: Int, value: Int) {
-        memory.putInt(memoryPointer, value)
+        logicalMemory.putInt(memoryPointer, value)
     }
 
     override fun writeI64(memoryPointer: Int, value: Long) {
-        memory.putLong(memoryPointer, value)
+        logicalMemory.putLong(memoryPointer, value)
     }
 
     override fun writeF32(memoryPointer: Int, value: Float) {
-        memory.putFloat(memoryPointer, value)
+        logicalMemory.putFloat(memoryPointer, value)
     }
 
     override fun writeF64(memoryPointer: Int, value: Double) {
-        memory.putDouble(memoryPointer, value)
+        logicalMemory.putDouble(memoryPointer, value)
     }
 
     override fun write(
@@ -118,29 +117,28 @@ class ByteBufferLinearMemory(
         bufferPointer: Int,
         bytesToWrite: Int,
     ) {
-        checkRange(memoryPointer, bytesToWrite, memory.limit())
+        checkRange(memoryPointer, bytesToWrite, byteSize)
         checkRange(bufferPointer, bytesToWrite, buffer.size)
-        memory.position(memoryPointer)
-        memory.put(buffer, bufferPointer, bytesToWrite)
+        logicalMemory.put(memoryPointer, buffer, bufferPointer, bytesToWrite)
     }
 
     override fun fill(memoryPointer: Int, value: Byte, bytesToFill: Int) {
-        checkRange(memoryPointer, bytesToFill, memory.limit())
+        checkRange(memoryPointer, bytesToFill, byteSize)
         val repeatedValue = (value.toLong() and 0xFFL) * REPEATED_BYTE_MASK
         var index = 0
         while (index <= bytesToFill - UNROLLED_BYTES) {
-            memory.putLong(memoryPointer + index, repeatedValue)
-            memory.putLong(memoryPointer + index + 8, repeatedValue)
-            memory.putLong(memoryPointer + index + 16, repeatedValue)
-            memory.putLong(memoryPointer + index + 24, repeatedValue)
+            logicalMemory.putLong(memoryPointer + index, repeatedValue)
+            logicalMemory.putLong(memoryPointer + index + 8, repeatedValue)
+            logicalMemory.putLong(memoryPointer + index + 16, repeatedValue)
+            logicalMemory.putLong(memoryPointer + index + 24, repeatedValue)
             index += UNROLLED_BYTES
         }
         while (index <= bytesToFill - Long.SIZE_BYTES) {
-            memory.putLong(memoryPointer + index, repeatedValue)
+            logicalMemory.putLong(memoryPointer + index, repeatedValue)
             index += Long.SIZE_BYTES
         }
         while (index < bytesToFill) {
-            memory.put(memoryPointer + index, value)
+            logicalMemory.put(memoryPointer + index, value)
             index++
         }
     }
@@ -151,10 +149,14 @@ class ByteBufferLinearMemory(
         bytesToCopy: Int,
         source: HostMemory,
     ) {
-        val sourceBuffer = (source as ByteBufferHostMemory).unsafeBorrowByteBuffer()
+        val sourceBuffer = if (source === this) {
+            copySource
+        } else {
+            (source as ByteBufferHostMemory).unsafeBorrowByteBuffer()
+        }
         checkRange(sourcePointer, bytesToCopy, sourceBuffer.limit())
-        checkRange(destinationPointer, bytesToCopy, memory.limit())
-        copy(sourceBuffer, sourcePointer, destinationPointer, bytesToCopy)
+        checkRange(destinationPointer, bytesToCopy, byteSize)
+        copyForward(sourceBuffer, sourcePointer, destinationPointer, bytesToCopy)
     }
 
     override fun move(
@@ -163,47 +165,41 @@ class ByteBufferLinearMemory(
         bytesToMove: Int,
         source: HostMemory,
     ) {
-        val sourceBuffer = (source as ByteBufferHostMemory).unsafeBorrowByteBuffer()
+        val sourceBuffer = if (source === this) {
+            copySource
+        } else {
+            (source as ByteBufferHostMemory).unsafeBorrowByteBuffer()
+        }
         checkRange(sourcePointer, bytesToMove, sourceBuffer.limit())
-        checkRange(destinationPointer, bytesToMove, memory.limit())
+        checkRange(destinationPointer, bytesToMove, byteSize)
 
         if (
-            sourceBuffer !== memory ||
+            source !== this ||
             destinationPointer >= sourcePointer + bytesToMove ||
             sourcePointer >= destinationPointer + bytesToMove
         ) {
-            copy(sourceBuffer, sourcePointer, destinationPointer, bytesToMove)
+            copyForward(sourceBuffer, sourcePointer, destinationPointer, bytesToMove)
         } else if (destinationPointer > sourcePointer) {
             copyBackward(sourcePointer, destinationPointer, bytesToMove)
         } else if (destinationPointer < sourcePointer) {
-            copyForward(sourceBuffer, sourcePointer, destinationPointer, bytesToMove)
+            copyForwardUnrolled(sourceBuffer, sourcePointer, destinationPointer, bytesToMove)
         }
     }
 
     @UnsafeHostApi
-    override fun unsafeBorrowByteBuffer(): ByteBuffer = memory
+    override fun unsafeBorrowByteBuffer(): ByteBuffer = duplicate(logicalMemory)
 
-    private fun copy(
-        source: ByteBuffer,
-        sourcePointer: Int,
-        destinationPointer: Int,
-        bytesToCopy: Int,
-    ) {
-        if (bytesToCopy < BULK_COPY_THRESHOLD) {
-            copyForward(source, sourcePointer, destinationPointer, bytesToCopy)
-        } else if (source === memory) {
-            copySource.limit(sourcePointer + bytesToCopy)
-            copySource.position(sourcePointer)
-            memory.position(destinationPointer)
-            memory.put(copySource)
-        } else {
-            val sourceLimit = source.limit()
-            source.limit(sourcePointer + bytesToCopy)
-            source.position(sourcePointer)
-            memory.position(destinationPointer)
-            memory.put(source)
-            source.limit(sourceLimit)
-        }
+    internal fun release() {
+        val empty = ByteBuffer.allocateDirect(0).order(ByteOrder.LITTLE_ENDIAN)
+        mapping = empty
+        maximumByteSize = 0
+        prefault = false
+        replaceLogicalMemory(empty)
+    }
+
+    private fun replaceLogicalMemory(value: ByteBuffer) {
+        logicalMemory = value
+        copySource = duplicate(value)
     }
 
     private fun copyForward(
@@ -212,20 +208,33 @@ class ByteBufferLinearMemory(
         destinationPointer: Int,
         bytesToCopy: Int,
     ) {
+        if (bytesToCopy < BULK_COPY_THRESHOLD) {
+            copyForwardUnrolled(source, sourcePointer, destinationPointer, bytesToCopy)
+        } else {
+            logicalMemory.put(destinationPointer, source, sourcePointer, bytesToCopy)
+        }
+    }
+
+    private fun copyForwardUnrolled(
+        source: ByteBuffer,
+        sourcePointer: Int,
+        destinationPointer: Int,
+        bytesToCopy: Int,
+    ) {
         var index = 0
         while (index <= bytesToCopy - UNROLLED_BYTES) {
-            memory.putLong(destinationPointer + index, source.getLong(sourcePointer + index))
-            memory.putLong(destinationPointer + index + 8, source.getLong(sourcePointer + index + 8))
-            memory.putLong(destinationPointer + index + 16, source.getLong(sourcePointer + index + 16))
-            memory.putLong(destinationPointer + index + 24, source.getLong(sourcePointer + index + 24))
+            logicalMemory.putLong(destinationPointer + index, source.getLong(sourcePointer + index))
+            logicalMemory.putLong(destinationPointer + index + 8, source.getLong(sourcePointer + index + 8))
+            logicalMemory.putLong(destinationPointer + index + 16, source.getLong(sourcePointer + index + 16))
+            logicalMemory.putLong(destinationPointer + index + 24, source.getLong(sourcePointer + index + 24))
             index += UNROLLED_BYTES
         }
         while (index <= bytesToCopy - Long.SIZE_BYTES) {
-            memory.putLong(destinationPointer + index, source.getLong(sourcePointer + index))
+            logicalMemory.putLong(destinationPointer + index, source.getLong(sourcePointer + index))
             index += Long.SIZE_BYTES
         }
         while (index < bytesToCopy) {
-            memory.put(destinationPointer + index, source.get(sourcePointer + index))
+            logicalMemory.put(destinationPointer + index, source.get(sourcePointer + index))
             index++
         }
     }
@@ -234,18 +243,27 @@ class ByteBufferLinearMemory(
         var remaining = bytesToCopy
         while (remaining >= UNROLLED_BYTES) {
             remaining -= UNROLLED_BYTES
-            memory.putLong(destinationPointer + remaining + 24, memory.getLong(sourcePointer + remaining + 24))
-            memory.putLong(destinationPointer + remaining + 16, memory.getLong(sourcePointer + remaining + 16))
-            memory.putLong(destinationPointer + remaining + 8, memory.getLong(sourcePointer + remaining + 8))
-            memory.putLong(destinationPointer + remaining, memory.getLong(sourcePointer + remaining))
+            logicalMemory.putLong(
+                destinationPointer + remaining + 24,
+                logicalMemory.getLong(sourcePointer + remaining + 24),
+            )
+            logicalMemory.putLong(
+                destinationPointer + remaining + 16,
+                logicalMemory.getLong(sourcePointer + remaining + 16),
+            )
+            logicalMemory.putLong(
+                destinationPointer + remaining + 8,
+                logicalMemory.getLong(sourcePointer + remaining + 8),
+            )
+            logicalMemory.putLong(destinationPointer + remaining, logicalMemory.getLong(sourcePointer + remaining))
         }
         while (remaining >= Long.SIZE_BYTES) {
             remaining -= Long.SIZE_BYTES
-            memory.putLong(destinationPointer + remaining, memory.getLong(sourcePointer + remaining))
+            logicalMemory.putLong(destinationPointer + remaining, logicalMemory.getLong(sourcePointer + remaining))
         }
         while (remaining > 0) {
             remaining--
-            memory.put(destinationPointer + remaining, memory.get(sourcePointer + remaining))
+            logicalMemory.put(destinationPointer + remaining, logicalMemory.get(sourcePointer + remaining))
         }
     }
 
@@ -259,5 +277,85 @@ class ByteBufferLinearMemory(
         const val BULK_COPY_THRESHOLD = 64
         const val REPEATED_BYTE_MASK = 0x0101010101010101L
         const val UNROLLED_BYTES = 4 * Long.SIZE_BYTES
+
+        fun duplicate(buffer: ByteBuffer): ByteBuffer = buffer.duplicate().order(buffer.order())
+    }
+}
+
+private class ByteBufferState(
+    val mapping: ByteBuffer,
+    val memory: ByteBuffer,
+    val maximumByteSize: Long,
+    val prefault: Boolean,
+)
+
+private fun createMappedByteBufferState(
+    pages: LinearMemory.Pages,
+    maximumPages: LinearMemory.Pages?,
+    config: LinearMemoryConfig,
+): ByteBufferState {
+    val initialPages = pages.amount.toLong()
+    require(initialPages <= MAX_JVM_MEMORY_PAGES) {
+        "JVM linear memory cannot exceed $MAX_JVM_MEMORY_PAGES pages"
+    }
+    val declaredMaximumPages = maximumPages?.amount?.toLong()
+    require(declaredMaximumPages == null || declaredMaximumPages >= initialPages) {
+        "Linear memory maximum cannot be smaller than its initial size"
+    }
+
+    val maximumPageCount = minOf(declaredMaximumPages ?: MAX_JVM_MEMORY_PAGES.toLong(), MAX_JVM_MEMORY_PAGES.toLong())
+    val initialByteSize = (initialPages * LinearMemory.PAGE_SIZE).toInt()
+    val maximumByteSize = (maximumPageCount * LinearMemory.PAGE_SIZE).toInt()
+
+    // SPARSE is only considered while creating a file. Reserve a unique name
+    // with the default provider, then recreate that path through FileChannel.
+    val backingFile = Files.createTempFile("chasm-memory-", ".bin")
+    Files.delete(backingFile)
+    val channel = FileChannel.open(backingFile, READ, WRITE, CREATE_NEW, SPARSE, DELETE_ON_CLOSE)
+
+    try {
+        val mapping = mapBackingFile(channel, maximumByteSize)
+        channel.close()
+        if (config.prefault) loadMappedRange(mapping, 0, initialByteSize)
+        return ByteBufferState(
+            mapping = mapping,
+            memory = bufferForSize(mapping, initialByteSize),
+            maximumByteSize = maximumByteSize.toLong(),
+            prefault = config.prefault,
+        )
+    } catch (error: Throwable) {
+        try {
+            channel.close()
+        } catch (closeError: Throwable) {
+            error.addSuppressed(closeError)
+        }
+        try {
+            Files.deleteIfExists(backingFile)
+        } catch (deleteError: Throwable) {
+            error.addSuppressed(deleteError)
+        }
+        throw error
+    }
+}
+
+private fun mapBackingFile(
+    channel: FileChannel,
+    byteSize: Int,
+): ByteBuffer = if (byteSize == 0) {
+    ByteBuffer.allocateDirect(0).order(ByteOrder.LITTLE_ENDIAN)
+} else {
+    channel.map(READ_WRITE, 0, byteSize.toLong()).order(ByteOrder.LITTLE_ENDIAN)
+}
+
+private fun bufferForSize(
+    mapping: ByteBuffer,
+    byteSize: Int,
+): ByteBuffer = mapping
+    .slice(0, byteSize)
+    .order(ByteOrder.LITTLE_ENDIAN)
+
+private fun loadMappedRange(mapping: ByteBuffer, offset: Int, byteCount: Int) {
+    if (byteCount > 0 && mapping is MappedByteBuffer) {
+        mapping.slice(offset, byteCount).load()
     }
 }

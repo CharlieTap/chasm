@@ -43,6 +43,9 @@ benchmark {
         register("gc") {
             include(".*GcBenchmark.*")
         }
+        register("linearMemory") {
+            include(".*LinearMemory(Benchmark|LifecycleBenchmark|DeferredPageBenchmark).*")
+        }
     }
 
     targets {

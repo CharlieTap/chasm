@@ -91,7 +91,15 @@ private fun MemoryInstance.grow(pagesToAdd: Int): Int {
         return -1
     }
 
-    data = data.grow(pagesToAdd)
+    val grown = try {
+        data.grow(pagesToAdd)
+    } catch (_: IllegalArgumentException) {
+        return -1
+    } catch (_: OutOfMemoryError) {
+        return -1
+    }
+
+    data = grown
     type.limits.min = newSize.toULong()
     refresh()
 

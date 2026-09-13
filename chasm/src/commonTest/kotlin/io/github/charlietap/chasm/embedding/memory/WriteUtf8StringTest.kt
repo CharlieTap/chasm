@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.embedding.memory
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import io.github.charlietap.chasm.embedding.fixture.publicMemory
@@ -9,6 +10,7 @@ import io.github.charlietap.chasm.fixture.runtime.instance.memoryExternalValue
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.store
 import io.github.charlietap.chasm.memory.write.StringWriter
+import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,5 +47,22 @@ class WriteUtf8StringTest {
         )
 
         assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `maps a string writer bounds failure to a memory trap`() {
+        val store = publicStore(store(memories = mutableListOf(memoryInstance())))
+        val memory = publicMemory(memoryExternalValue(memoryAddress()))
+        val stringWriter: StringWriter = { _, _, _ -> throw IndexOutOfBoundsException() }
+
+        val actual = writeUtf8String(
+            store = store,
+            memory = memory,
+            pointer = 0,
+            string = "hi",
+            stringWriter = stringWriter,
+        )
+
+        assertEquals(Err(InvocationError.MemoryOperationOutOfBounds), actual)
     }
 }

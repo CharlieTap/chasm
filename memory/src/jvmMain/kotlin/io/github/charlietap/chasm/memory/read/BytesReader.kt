@@ -13,9 +13,7 @@ actual inline fun BytesReader(
     bufferPointer: Int,
 ): ByteArray {
     val byteBuffer = (memory as ByteBufferLinearMemory).memory
-
-    byteBuffer.position(memoryPointer)
-    byteBuffer.get(buffer, bufferPointer, bytesToRead)
+    byteBuffer.get(memoryPointer, buffer, bufferPointer, bytesToRead)
 
     return buffer
 }

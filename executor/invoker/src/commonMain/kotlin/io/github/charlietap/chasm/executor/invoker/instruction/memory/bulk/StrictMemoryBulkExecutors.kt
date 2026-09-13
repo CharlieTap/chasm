@@ -635,11 +635,21 @@ private inline fun executeMemoryGrow(
     val originalSizeInPages = memory.type.limits.min.toInt()
     val newSizeInPages = originalSizeInPages + pagesToAdd
 
-    if (newSizeInPages > max) {
+    if (pagesToAdd < 0 || newSizeInPages < originalSizeInPages || newSizeInPages > max) {
         vstack.setFrameSlot(destinationSlot, -1L)
     } else {
+        val grown = try {
+            memory.data.grow(pagesToAdd)
+        } catch (_: IllegalArgumentException) {
+            vstack.setFrameSlot(destinationSlot, -1L)
+            return
+        } catch (_: OutOfMemoryError) {
+            vstack.setFrameSlot(destinationSlot, -1L)
+            return
+        }
+
+        memory.data = grown
         memory.type.limits.min = newSizeInPages.toULong()
-        memory.data = memory.data.grow(pagesToAdd)
         memory.refresh()
         vstack.setFrameSlot(destinationSlot, originalSizeInPages.toLong())
     }

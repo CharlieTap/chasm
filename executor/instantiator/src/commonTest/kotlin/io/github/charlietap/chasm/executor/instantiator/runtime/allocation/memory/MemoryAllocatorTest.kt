@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.runtime.allocation.memory
 
+import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.executor.instantiator.allocation.memory.MemoryAllocator
 import io.github.charlietap.chasm.fixture.runtime.instance.memoryInstance
 import io.github.charlietap.chasm.fixture.runtime.memory.linearMemory
@@ -12,6 +13,7 @@ import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class MemoryAllocatorTest {
 
@@ -24,12 +26,15 @@ class MemoryAllocatorTest {
         )
 
         val min = 3
-        val limits = limits(min.toULong())
+        val maximum = 8uL
+        val limits = limits(min.toULong(), maximum)
         val type = memoryType(limits = limits)
 
         val memory = linearMemory()
-        val memoryFactory: LinearMemoryFactory = { pages ->
+        val memoryFactory: LinearMemoryFactory = { pages, maximumPages, config ->
             assertEquals(LinearMemory.Pages(min.toUInt()), pages)
+            assertEquals(LinearMemory.Pages(maximum.toUInt()), maximumPages)
+            assertTrue(config.prefault)
             memory
         }
 
@@ -38,7 +43,12 @@ class MemoryAllocatorTest {
             data = memory,
         )
 
-        val address = MemoryAllocator(store, type, memoryFactory)
+        val address = MemoryAllocator(
+            store = store,
+            type = type,
+            config = LinearMemoryConfig(prefault = true),
+            memoryFactory = memoryFactory,
+        )
 
         assertEquals(Address.Memory(0), address)
         assertEquals(expected, memories[0])

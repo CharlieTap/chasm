@@ -13,9 +13,7 @@ actual inline fun StringReader(
 ): String {
     val buffer = (memory as ByteBufferLinearMemory).memory
     val bytes = ByteArray(stringLengthInBytes)
-
-    buffer.position(memoryPointer)
-    buffer.get(bytes, 0, stringLengthInBytes)
+    buffer.get(memoryPointer, bytes, 0, stringLengthInBytes)
 
     return String(bytes, StandardCharsets.UTF_8)
 }

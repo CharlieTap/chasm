@@ -75,6 +75,27 @@ class ExecutionContextHostTest {
     }
 
     @Test
+    fun `returns minus one when backing memory rejects growth`() {
+        val targetMemory = object : LinearMemory by NoOpLinearMemory {
+            override val byteSize: Int = PAGE_SIZE
+
+            override fun grow(pagesToAdd: Int): LinearMemory = throw OutOfMemoryError()
+        }
+        val targetInstance = memoryInstance(
+            type = memoryType(limits = limits(min = 1u, max = 3u)),
+            data = targetMemory,
+        )
+        val store = store(memories = mutableListOf(targetInstance))
+        val context = executionContext(store = store)
+        val caller = moduleInstance(memAddresses = mutableListOf(memoryAddress()))
+
+        assertEquals(-1, context.growMemory(caller, ModuleIndex.MemoryIndex(0), 1))
+        assertSame(targetMemory, targetInstance.data)
+        assertEquals(1u, targetInstance.type.limits.min)
+        assertEquals(PAGE_SIZE, targetInstance.size)
+    }
+
+    @Test
     fun `grows table by the callers module index`() {
         val decoyElements = longArrayOf(3L)
         val targetInstance = tableInstance(

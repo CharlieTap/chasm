@@ -14,6 +14,5 @@ actual inline fun BytesWriter(
     bufferPointer: Int,
 ) {
     val byteBuffer = (memory as ByteBufferLinearMemory).memory
-    byteBuffer.position(memoryPointer)
-    byteBuffer.put(buffer, bufferPointer, bytesToWrite)
+    byteBuffer.put(memoryPointer, buffer, bufferPointer, bytesToWrite)
 }

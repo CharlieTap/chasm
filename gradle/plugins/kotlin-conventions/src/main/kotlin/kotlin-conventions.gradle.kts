@@ -16,14 +16,13 @@ conventions.jvmBytecodeVersion.convention(
 )
 
 fun JavaCompile.targetBytecodeVersion(version: Provider<Int>) {
-    val targetVersion = version.get().toString()
-    sourceCompatibility = targetVersion
-    targetCompatibility = targetVersion
+    options.release.set(version)
 }
 
 fun KotlinJvmTarget.targetBytecodeVersion(version: Provider<Int>) {
     compilerOptions {
         jvmTarget.set(version.map { target -> JvmTarget.fromTarget(target.toString()) })
+        freeCompilerArgs.add(version.map { target -> "-Xjdk-release=$target" })
     }
     compilations.configureEach {
         compileJavaTaskProvider?.configure {
@@ -39,6 +38,7 @@ plugins.withId("org.jetbrains.kotlin.jvm") {
         }
         compilerOptions {
             jvmTarget.set(conventions.jvmBytecodeVersion.map { target -> JvmTarget.fromTarget(target.toString()) })
+            freeCompilerArgs.add(conventions.jvmBytecodeVersion.map { target -> "-Xjdk-release=$target" })
         }
     }
     tasks.withType<JavaCompile>().configureEach {

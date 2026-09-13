@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.instantiator.allocation.memory
 
+import io.github.charlietap.chasm.config.LinearMemoryConfig
 import io.github.charlietap.chasm.memory.factory.LinearMemoryFactory
 import io.github.charlietap.chasm.runtime.address.Address
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
@@ -7,24 +8,32 @@ import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.store.Store
 import io.github.charlietap.chasm.type.MemoryType
 
-typealias MemoryAllocator = (Store, MemoryType) -> Address.Memory
+typealias MemoryAllocator = (
+    Store,
+    MemoryType,
+    LinearMemoryConfig,
+) -> Address.Memory
 
 fun MemoryAllocator(
     store: Store,
     type: MemoryType,
+    config: LinearMemoryConfig = LinearMemoryConfig(),
 ): Address.Memory = MemoryAllocator(
     store = store,
     type = type,
+    config = config,
     memoryFactory = ::LinearMemoryFactory,
 )
 
 internal inline fun MemoryAllocator(
     store: Store,
     type: MemoryType,
+    config: LinearMemoryConfig,
     crossinline memoryFactory: LinearMemoryFactory,
 ): Address.Memory {
     val pages = LinearMemory.Pages(type.limits.min.toUInt())
-    val memory = memoryFactory(pages)
+    val maximumPages = type.limits.max?.let { maximum -> LinearMemory.Pages(maximum.toUInt()) }
+    val memory = memoryFactory(pages, maximumPages, config)
     val instance = MemoryInstance(type, memory)
 
     store.memories.add(instance)

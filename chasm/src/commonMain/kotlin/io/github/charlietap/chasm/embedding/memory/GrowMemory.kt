@@ -55,7 +55,13 @@ internal inline fun growMemoryInstance(
         return -1
     }
 
-    val grown = instance.data.grow(pagesToAdd)
+    val grown = try {
+        instance.data.grow(pagesToAdd)
+    } catch (_: IllegalArgumentException) {
+        return -1
+    } catch (_: OutOfMemoryError) {
+        return -1
+    }
 
     instance.data = grown
     instance.type.limits.min = new.toULong()
