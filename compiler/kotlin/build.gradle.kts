@@ -82,6 +82,32 @@ val generateExecutorCatalogue = tasks.register("generateExecutorCatalogue") {
             }
         }
         check(scalarEntries.size > 250) { "Missing scalar adapters: ${scalarEntries.size}" }
+        val memoryAdapter = Regex("internal inline fun \\w+Executor\\(.*?instruction: (MemoryInstruction\\.\\w+),\\s*\\) \\{(.*?)\\n\\}", RegexOption.DOT_MATCHES_ALL)
+        executorSources.asFile.walkTopDown().filter { it.name == "StrictMemoryLoadExecutors.kt" || it.name == "StrictMemoryStoreExecutors.kt" }.forEach { file ->
+            val source = file.readText()
+            val packageName = Regex("(?m)^package (.+)$").find(source)!!.groupValues[1]
+            memoryAdapter.findAll(source).forEach adapter@{ match ->
+                val body = match.groupValues[2]
+                val valueCall = Regex("(value\\w+)\\(instruction.memory,").find(body) ?: return@adapter
+                val load = body.contains("vstack.setFrameSlot")
+                val address = if (body.contains("instruction.addressSlot")) "KotlinValueInput.Slot(instruction.addressSlot, KotlinValueType.I32)" else "KotlinValueInput.Field(\"address\", KotlinValueType.I32)"
+                val inputs = mutableListOf(address)
+                if (!load) {
+                    val type = valueCall.groupValues[1].removePrefix("value").take(3)
+                    inputs.add(if (body.contains("instruction.valueSlot")) "KotlinValueInput.Slot(instruction.valueSlot, KotlinValueType.$type)" else "KotlinValueInput.Field(\"value\", KotlinValueType.$type)")
+                }
+                val expression = "$packageName.${valueCall.groupValues[1]}(%binding%.memory, @0@, %binding%.memArg.offset${if (load) "" else ", @1@"})"
+                scalarEntries[match.groupValues[1]] = "KotlinValueInstruction(${if (load) "instruction.destinationSlot" else "null"}, listOf(${inputs.joinToString()}), \"$expression\", KotlinValueType.${if (load) "I64" else "UNIT"})"
+            }
+        }
+        val parametricSource = executorSources.asFile.resolve("parametric/StrictParametricExecutors.kt").readText()
+        val parametricAdapter = Regex("internal inline fun SelectExecutor\\(.*?instruction: (ParametricInstruction\\.\\w+),\\s*\\) = executeSelect\\((.*?)\\n\\)", RegexOption.DOT_MATCHES_ALL)
+        parametricAdapter.findAll(parametricSource).forEach { match ->
+            val inputs = listOf("condition", "val1", "val2").map { field ->
+                if (match.groupValues[2].contains("instruction.${field}Slot")) "KotlinValueInput.Slot(instruction.${field}Slot, KotlinValueType.I64)" else "KotlinValueInput.Field(\"$field\", KotlinValueType.I64)"
+            }
+            scalarEntries[match.groupValues[1]] = "KotlinValueInstruction(instruction.destinationSlot, listOf(${inputs.joinToString()}), \"io.github.charlietap.chasm.executor.invoker.instruction.parametric.valueSelect(@0@, @1@, @2@)\", KotlinValueType.I64)"
+        }
         output.resolveSibling("ValueCatalogue.kt").writeText(buildString {
             appendLine("// Generated from scalar adapter declarations. Do not edit.")
             appendLine("package io.github.charlietap.chasm.compiler.kotlin")

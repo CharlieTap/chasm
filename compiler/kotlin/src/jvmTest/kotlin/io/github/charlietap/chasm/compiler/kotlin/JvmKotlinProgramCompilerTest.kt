@@ -1,10 +1,14 @@
 package io.github.charlietap.chasm.compiler.kotlin
 
 import io.github.charlietap.chasm.config.RuntimeConfig
+import io.github.charlietap.chasm.executor.invoker.dispatch.admin.JumpDispatcher
 import io.github.charlietap.chasm.executor.invoker.dispatch.numeric.NumericInstructionDispatcher
+import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
 import io.github.charlietap.chasm.runtime.error.InstantiationError
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.ModuleInstance
+import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
+import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.stack.ValueStack
@@ -19,6 +23,44 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class JvmKotlinProgramCompilerTest {
+    @Test
+    fun `region keeps a loop in one invocation and counts every internal block`() {
+        val directory = Files.createTempDirectory("chasm-kotlin-region").toFile()
+        val instructions = listOf<LinkedInstruction>(
+            NumericInstruction.I32ConstS(3, 0),
+            NumericInstruction.I32ConstS(0, 1),
+            NumericInstruction.I32AddSs(1, 0, 1),
+            NumericInstruction.I32SubSi(0, 1, 0),
+            AdminInstruction.JumpIfS(0, 102),
+        )
+        try {
+            JvmKotlinProgramCompiler(directory, KotlinCompilationMode.PREPARE, countExecutions = true).use { compiler ->
+                val program = Program(compiler = compiler)
+                repeat(100) { program.append(DispatchableInstruction { _, _, nextIp -> nextIp }) }
+                instructions.forEach { instruction ->
+                    program.append(
+                        when (instruction) {
+                            is NumericInstruction -> NumericInstructionDispatcher(instruction)
+                            is AdminInstruction.JumpIfS -> JumpDispatcher(instruction)
+                            else -> error("Unexpected fixture instruction")
+                        },
+                    )
+                }
+                assertNull(compiler.compile(program, 100, instructions, intArrayOf(100)))
+                val stack = ValueStack(2)
+                stack.activateFrame(0, 2)
+                val context = ExecutionContext(stack, Store(program = program), ModuleInstance(RuntimeTypeMap.Empty), RuntimeConfig())
+                assertEquals(105, program.instructions[100](stack, context, 101))
+                assertEquals(6, stack.getFrameSlot(1))
+                assertEquals(0, stack.getFrameSlot(0))
+                assertEquals(4, compiler.generatedBlockExecutions)
+                assertEquals(11, compiler.generatedInstructionExecutions)
+            }
+        } finally {
+            directory.deleteRecursively()
+        }
+    }
+
     @Test
     fun `cache miss leaves original program intact`() {
         val directory = Files.createTempDirectory("chasm-cache-miss").toFile()

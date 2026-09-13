@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 class KotlinSourceGeneratorTest {
     @Test
     fun `numeric intermediates stay in locals until block exit`() {
-        val source = KotlinSourceGenerator().generate(
+        val source = KotlinSourceGenerator(tier = KotlinGenerationTier.BLOCK_LOCALS).generate(
             firstIp = 0,
             instructions = listOf(
                 NumericInstruction.I32ConstS(5, 0),
@@ -30,7 +30,7 @@ class KotlinSourceGeneratorTest {
 
     @Test
     fun `branch targets and size limits split generated bodies`() {
-        val source = KotlinSourceGenerator(maxBlockInstructions = 2, maxClassInstructions = 3).generate(
+        val source = KotlinSourceGenerator(maxBlockInstructions = 2, maxClassInstructions = 3, tier = KotlinGenerationTier.BLOCK_LOCALS).generate(
             firstIp = 100,
             instructions = List(6) { NumericInstruction.I32ConstS(it, it) } + AdminInstruction.Jump(101),
             functionEntryIps = intArrayOf(100),

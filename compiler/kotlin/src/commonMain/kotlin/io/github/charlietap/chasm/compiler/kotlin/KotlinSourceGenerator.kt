@@ -4,14 +4,22 @@ import io.github.charlietap.chasm.runtime.instruction.AdminInstruction
 import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 
+enum class KotlinGenerationTier {
+    BLOCKS,
+    BLOCK_LOCALS,
+    REGIONS,
+}
+
 /** Source generation has no JVM dependencies; only compilation/loading is platform specific. */
 class KotlinSourceGenerator(
     private val maxBlockInstructions: Int = 16,
     private val maxClassInstructions: Int = 192,
-    private val promoteBlockValues: Boolean = true,
+    private val tier: KotlinGenerationTier = KotlinGenerationTier.REGIONS,
+    private val maxRegionInstructions: Int = 96,
 ) {
     init {
         require(maxBlockInstructions > 0 && maxClassInstructions >= maxBlockInstructions)
+        require(maxRegionInstructions > 0)
     }
 
     fun generate(
@@ -19,6 +27,14 @@ class KotlinSourceGenerator(
         instructions: List<LinkedInstruction>,
         functionEntryIps: IntArray,
     ): KotlinProgramSource {
+        if (tier == KotlinGenerationTier.REGIONS) {
+            instructions.forEach { instruction ->
+                require(executorCall(instruction) != null || isControlBoundary(instruction)) {
+                    "No Kotlin executor for ${instruction::class.simpleName}"
+                }
+            }
+            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions)
+        }
         val entries = functionEntryIps.mapTo(mutableSetOf()) { it - firstIp }
         instructions.forEach { instruction ->
             when (instruction) {
@@ -85,7 +101,7 @@ class KotlinSourceGenerator(
             instructionCount = instructions.size,
             generatedInstructionCount = calls.count { it != null },
             controlInstructionCount = calls.count { it == null },
-            promotedInstructionCount = if (promoteBlockValues) instructions.count { valueInstruction(it) != null } else 0,
+            promotedInstructionCount = if (tier != KotlinGenerationTier.BLOCKS) instructions.count { valueInstruction(it) != null } else 0,
         )
     }
 
@@ -119,7 +135,7 @@ class KotlinSourceGenerator(
             appendLine("    private fun block${block.startOffset}(vstack: ValueStack, context: ExecutionContext): Int {")
             val values = KotlinBlockValues(this)
             for (index in block.startOffset until block.endOffset) {
-                val value = if (promoteBlockValues) valueInstruction(instructions[index]) else null
+                val value = if (tier != KotlinGenerationTier.BLOCKS) valueInstruction(instructions[index]) else null
                 if (value != null) {
                     values.emit(index, value)
                 } else {

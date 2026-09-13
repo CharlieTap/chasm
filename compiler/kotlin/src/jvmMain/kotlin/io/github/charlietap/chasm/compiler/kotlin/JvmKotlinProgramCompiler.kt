@@ -123,10 +123,18 @@ class JvmKotlinProgramCompiler(
 
     private fun counted(body: DispatchableInstruction, group: KotlinSourceGroup, firstIp: Int): DispatchableInstruction {
         val sizes = group.blocks.associate { firstIp + it.startOffset to it.size }
-        return DispatchableInstruction { vstack, context, nextIp ->
+        val onBlock: (Int) -> Unit = { size ->
             generatedBlockExecutions++
-            generatedInstructionExecutions += checkNotNull(sizes[nextIp - 1])
-            body(vstack, context, nextIp)
+            generatedInstructionExecutions += size
+        }
+        return DispatchableInstruction { vstack, context, nextIp ->
+            if (body is KotlinGeneratedInstruction) {
+                body.invokeCounted(vstack, context, nextIp, onBlock)
+            } else {
+                generatedBlockExecutions++
+                generatedInstructionExecutions += checkNotNull(sizes[nextIp - 1])
+                body(vstack, context, nextIp)
+            }
         }
     }
 

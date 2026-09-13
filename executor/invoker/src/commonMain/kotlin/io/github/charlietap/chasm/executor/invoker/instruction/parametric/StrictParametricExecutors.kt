@@ -107,9 +107,7 @@ private inline fun executeSelect(
     val2: Long,
     destinationSlot: Int,
 ) {
-    if (condition == 0L) {
-        vstack.setFrameSlot(destinationSlot, val2)
-    } else {
-        vstack.setFrameSlot(destinationSlot, val1)
-    }
+    vstack.setFrameSlot(destinationSlot, valueSelect(condition, val1, val2))
 }
+
+internal inline fun valueSelect(condition: Long, val1: Long, val2: Long): Long = if (condition == 0L) val2 else val1

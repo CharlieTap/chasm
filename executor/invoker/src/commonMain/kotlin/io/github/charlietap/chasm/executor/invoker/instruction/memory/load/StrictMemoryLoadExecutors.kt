@@ -34,243 +34,239 @@ internal inline fun I32LoadExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32LoadI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Int.SIZE_BYTES) { effectiveAddress ->
-    I32Reader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I32LoadExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32LoadS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Int.SIZE_BYTES) { effectiveAddress ->
-    I32Reader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I64LoadExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64LoadI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Long.SIZE_BYTES) { effectiveAddress ->
-    I64Reader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I64LoadExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64LoadS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Long.SIZE_BYTES) { effectiveAddress ->
-    I64Reader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun F32LoadExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.F32LoadI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Float.SIZE_BYTES) { effectiveAddress ->
-    F32Reader(instruction.memory.data, effectiveAddress).toRawBits().toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueF32Load(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun F32LoadExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.F32LoadS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Float.SIZE_BYTES) { effectiveAddress ->
-    F32Reader(instruction.memory.data, effectiveAddress).toRawBits().toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueF32Load(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun F64LoadExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.F64LoadI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Double.SIZE_BYTES) { effectiveAddress ->
-    F64Reader(instruction.memory.data, effectiveAddress).toRawBits()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueF64Load(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun F64LoadExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.F64LoadS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Double.SIZE_BYTES) { effectiveAddress ->
-    F64Reader(instruction.memory.data, effectiveAddress).toRawBits()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueF64Load(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I32Load8SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load8SI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Byte.SIZE_BYTES) { effectiveAddress ->
-    I328SReader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load8S(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I32Load8SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load8SS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Byte.SIZE_BYTES) { effectiveAddress ->
-    I328SReader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load8S(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I32Load8UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load8UI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Byte.SIZE_BYTES) { effectiveAddress ->
-    I328UReader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load8U(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I32Load8UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load8US,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Byte.SIZE_BYTES) { effectiveAddress ->
-    I328UReader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load8U(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I32Load16SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load16SI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Short.SIZE_BYTES) { effectiveAddress ->
-    I3216SReader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load16S(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I32Load16SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load16SS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Short.SIZE_BYTES) { effectiveAddress ->
-    I3216SReader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load16S(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I32Load16UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load16UI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Short.SIZE_BYTES) { effectiveAddress ->
-    I3216UReader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load16U(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I32Load16UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I32Load16US,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Short.SIZE_BYTES) { effectiveAddress ->
-    I3216UReader(instruction.memory.data, effectiveAddress).toLong()
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI32Load16U(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I64Load8SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load8SI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Byte.SIZE_BYTES) { effectiveAddress ->
-    I648SReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load8S(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I64Load8SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load8SS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Byte.SIZE_BYTES) { effectiveAddress ->
-    I648SReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load8S(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I64Load8UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load8UI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Byte.SIZE_BYTES) { effectiveAddress ->
-    I648UReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load8U(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I64Load8UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load8US,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Byte.SIZE_BYTES) { effectiveAddress ->
-    I648UReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load8U(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I64Load16SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load16SI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Short.SIZE_BYTES) { effectiveAddress ->
-    I6416SReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load16S(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I64Load16SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load16SS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Short.SIZE_BYTES) { effectiveAddress ->
-    I6416SReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load16S(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I64Load16UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load16UI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Short.SIZE_BYTES) { effectiveAddress ->
-    I6416UReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load16U(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I64Load16UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load16US,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Short.SIZE_BYTES) { effectiveAddress ->
-    I6416UReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load16U(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I64Load32SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load32SI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Int.SIZE_BYTES) { effectiveAddress ->
-    I6432SReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load32S(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I64Load32SExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load32SS,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Int.SIZE_BYTES) { effectiveAddress ->
-    I6432SReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load32S(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
 internal inline fun I64Load32UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load32UI,
-) = executeMemoryLoad(vstack, instruction.memory, instruction.address, instruction.memArg.offset, instruction.destinationSlot, Int.SIZE_BYTES) { effectiveAddress ->
-    I6432UReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load32U(instruction.memory, instruction.address, instruction.memArg.offset))
 }
 
 internal inline fun I64Load32UExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: MemoryInstruction.I64Load32US,
-) = executeMemoryLoad(vstack, instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset, instruction.destinationSlot, Int.SIZE_BYTES) { effectiveAddress ->
-    I6432UReader(instruction.memory.data, effectiveAddress)
+) {
+    vstack.setFrameSlot(instruction.destinationSlot, valueI64Load32U(instruction.memory, vstack.getFrameSlot(instruction.addressSlot).toInt(), instruction.memArg.offset))
 }
 
-private inline fun executeMemoryLoad(
-    vstack: ValueStack,
+internal inline fun memoryLoadValue(
     memory: MemoryInstance,
     address: Int,
     offset: Int,
-    destinationSlot: Int,
     bytes: Int,
     crossinline operation: (Int) -> Long,
-) {
+): Long {
     if (address < 0 || offset < 0) {
         throw InvocationException(InvocationError.MemoryOperationOutOfBounds)
     }
 
     val effectiveAddress = address + offset
-    val result = OptimisticBoundsChecker(effectiveAddress, bytes, memory.size) {
+    return OptimisticBoundsChecker(effectiveAddress, bytes, memory.size) {
         operation(effectiveAddress)
     }
-
-    vstack.setFrameSlot(destinationSlot, result)
 }

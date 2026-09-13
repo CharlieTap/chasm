@@ -15,7 +15,7 @@ Commit each completed stage before beginning the next.
 | --- | --- | --- |
 | 1 | Shared scalar semantics used by frame wrappers and source generation | Complete |
 | 2 | Promote frame slots to Kotlin locals inside bounded blocks | Complete |
-| 3 | Keep locals across branches and loops in generated regions | Pending |
+| 3 | Keep locals across branches and loops in generated regions | Complete |
 | 4 | Resume generated function bodies around existing guest and host calls | Pending |
 | 5 | Reference/GC and exception synchronization; supported Wasm 3.0 corpus | Pending |
 | 6 | Structured Kotlin loops and function bodies with explicit eligibility | Pending |
@@ -43,6 +43,7 @@ differences between stages should not be treated as isolated optimization gains.
 | 0: bounded blocks | 1531.39 | 2018.44 | 1.318x | 209 Wasm 1.0 fixtures; deterministic CoreMark match |
 | 1: shared values | 1507.95 | 1962.84 | 1.302x | Same 209 fixtures in three modes; deterministic CoreMark match |
 | 2: block locals | 1395.77 | 2149.77 | 1.540x | Same 209 fixtures in three modes; deterministic CoreMark match |
+| 3: local regions | 1560.06 | 4184.68 | 2.682x | Same 209 fixtures in three modes; deterministic CoreMark match |
 
 Stage 1 extracts 86 scalar operations from 271 frame wrappers. Existing
 value-based helpers remain in use. It changes semantic factoring, with no new
@@ -58,3 +59,19 @@ and slots reused for different Wasm types. Seven focused tests and ABI checks
 pass. Generated scores ranged from 1908.64 to 2271.69; paired interpreter scores
 also varied, so compare the within-stage ratio rather than absolute scores from
 different stages.
+
+Stage 3 keeps raw slot locals across branches and loops in bounded regions.
+Calls, returns and traps that transfer control remain at their original program
+addresses. The same 23 scalar memory operations serve the frame wrappers and
+generated code, preserving their existing bounds checks. Copy sequences retain
+their sequential or parallel semantics. All 1024 CoreMark data operations are
+promoted; 258 branches execute inside generated regions, leaving 85 retained
+control operations. There are 99 region classes and 421 basic blocks.
+
+Instrumentation uses a separate inlined body. A bytecode audit found no counter
+or per-instruction dispatcher calls in measured `invoke` methods; the largest
+ends at bytecode offset 3486. Classes total 2,486,868 bytes, including the counted
+and uncounted bodies. Eight focused generated-execution tests, the compiler and
+invoker tests, and ABI checks pass. Generated scores ranged from 4176.82 to
+4298.92. This is a CoreMark result; instrumented corpus timings are not used as
+performance claims for other workloads.

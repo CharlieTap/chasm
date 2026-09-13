@@ -9,6 +9,8 @@ internal inline fun I32BitFieldExtractExecutor(
     context: ExecutionContext,
     instruction: NumericInstruction.I32BitFieldExtractS,
 ) {
-    val value = (vstack.getFrameSlot(instruction.operandSlot).toInt() ushr instruction.shift) and instruction.mask
+    val value = valueI32BitFieldExtract(vstack.getFrameSlot(instruction.operandSlot).toInt(), instruction.shift, instruction.mask)
     vstack.setFrameSlot(instruction.destinationSlot, value.toLong())
 }
+
+internal inline fun valueI32BitFieldExtract(operand: Int, shift: Int, mask: Int): Int = (operand ushr shift) and mask
