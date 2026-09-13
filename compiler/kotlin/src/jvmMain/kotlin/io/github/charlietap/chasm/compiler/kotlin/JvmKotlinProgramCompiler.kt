@@ -36,6 +36,8 @@ data class KotlinCompilationReport(
     val cacheHit: Boolean,
     val compilationNanos: Long,
     val promotedInstructionCount: Int = 0,
+    val resumableFunctionCount: Int = 0,
+    val regionFallbackFunctionCount: Int = 0,
 )
 
 /**
@@ -113,6 +115,8 @@ class JvmKotlinProgramCompiler(
                     cacheHit = cacheHit,
                     compilationNanos = compilationNanos,
                     promotedInstructionCount = source.promotedInstructionCount,
+                    resumableFunctionCount = source.resumableFunctionCount,
+                    regionFallbackFunctionCount = source.regionFallbackFunctionCount,
                 ),
             )
             null

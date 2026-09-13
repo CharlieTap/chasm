@@ -8,13 +8,14 @@ enum class KotlinGenerationTier {
     BLOCKS,
     BLOCK_LOCALS,
     REGIONS,
+    RESUMABLE,
 }
 
 /** Source generation has no JVM dependencies; only compilation/loading is platform specific. */
 class KotlinSourceGenerator(
     private val maxBlockInstructions: Int = 16,
     private val maxClassInstructions: Int = 192,
-    private val tier: KotlinGenerationTier = KotlinGenerationTier.REGIONS,
+    private val tier: KotlinGenerationTier = KotlinGenerationTier.RESUMABLE,
     private val maxRegionInstructions: Int = 96,
 ) {
     init {
@@ -27,13 +28,13 @@ class KotlinSourceGenerator(
         instructions: List<LinkedInstruction>,
         functionEntryIps: IntArray,
     ): KotlinProgramSource {
-        if (tier == KotlinGenerationTier.REGIONS) {
+        if (tier == KotlinGenerationTier.REGIONS || tier == KotlinGenerationTier.RESUMABLE) {
             instructions.forEach { instruction ->
                 require(executorCall(instruction) != null || isControlBoundary(instruction)) {
                     "No Kotlin executor for ${instruction::class.simpleName}"
                 }
             }
-            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions)
+            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions, tier == KotlinGenerationTier.RESUMABLE)
         }
         val entries = functionEntryIps.mapTo(mutableSetOf()) { it - firstIp }
         instructions.forEach { instruction ->
@@ -191,6 +192,8 @@ data class KotlinProgramSource(
     val generatedInstructionCount: Int,
     val controlInstructionCount: Int,
     val promotedInstructionCount: Int = 0,
+    val resumableFunctionCount: Int = 0,
+    val regionFallbackFunctionCount: Int = 0,
 ) {
     val blockCount: Int get() = groups.sumOf { it.blocks.size }
 }

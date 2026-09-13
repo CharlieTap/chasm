@@ -11,6 +11,7 @@ import io.github.charlietap.chasm.embedding.store
 import io.github.charlietap.chasm.host.readI32
 import io.github.charlietap.chasm.host.writeI32
 import io.github.charlietap.chasm.runtime.error.InstantiationError
+import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.program.Program
 import io.github.charlietap.chasm.runtime.program.ProgramCompiler
 import io.github.charlietap.chasm.runtime.value.ExecutionValue
@@ -19,6 +20,7 @@ import java.nio.file.Files
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class GeneratedWasmExecutionTest {
@@ -66,7 +68,22 @@ class GeneratedWasmExecutionTest {
         val reports = mutableListOf<KotlinCompilationReport>()
         try {
             JvmKotlinProgramCompiler(directory, KotlinCompilationMode.PREPARE, countExecutions = true, onCompilation = reports::add).use { compiler ->
-                val store = store(compiler)
+                var sharedContinuations = 0
+                val store = store(
+                    ProgramCompiler { program, firstIp, instructions, entries ->
+                        val calls = instructions.indices.filter { instructions[it] is ControlInstruction.WasmCall || instructions[it] is ControlInstruction.HostCall }
+                        val original = calls.associateWith { program.instructions[firstIp + it] }
+                        val error = compiler.compile(program, firstIp, instructions, entries)
+                        if (error == null) {
+                            original.forEach { (index, dispatcher) -> assertSame(dispatcher, program.instructions[firstIp + index], "Call-site metadata must remain installed") }
+                            calls.forEach { index ->
+                                val entry = entries.last { it <= firstIp + index }
+                                if (index + 1 < instructions.size && program.instructions[entry] === program.instructions[firstIp + index + 1]) sharedContinuations++
+                            }
+                        }
+                        error
+                    },
+                )
                 try {
                     fun bindings(delta: Int) = imports(store) {
                         function {
@@ -88,6 +105,9 @@ class GeneratedWasmExecutionTest {
                     assertEquals(1243, i32("started"))
                     assertEquals(5050, i32("sum", 100))
                     assertEquals(3628800, i32("factorial", 10))
+                    assertEquals(20000, i32("depth", 20000))
+                    assertTrue(sharedContinuations > 0, "Function entry and call continuation must share a resumable body")
+                    assertTrue(reports.last().resumableFunctionCount > 0)
                     assertEquals(15, i32("indirect", 11, 4, 0))
                     assertEquals(7, i32("indirect", 11, 4, 1))
                     assertEquals(45, i32("host", 5))

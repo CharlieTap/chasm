@@ -70,4 +70,17 @@
     local.get 0 i32.trunc_f64_s)
   (func (export "float") (param f32 f32) (result f32)
     local.get 0 local.get 1 f32.min)
+  (func $depth (export "depth") (param $n i32) (result i32)
+    local.get $n
+    i32.eqz
+    if (result i32)
+      i32.const 0
+    else
+      local.get $n
+      i32.const 1
+      i32.sub
+      call $depth
+      i32.const 1
+      i32.add
+    end)
 )

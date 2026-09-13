@@ -8,6 +8,7 @@ internal fun generateRegions(
     instructions: List<LinkedInstruction>,
     functionEntryIps: IntArray,
     maxInstructions: Int,
+    resumeFunctions: Boolean = false,
 ): KotlinProgramSource {
     val calls = instructions.map(::executorCall)
     val values = instructions.map(::valueInstruction)
@@ -25,7 +26,15 @@ internal fun generateRegions(
         }
         if (branches[index] != null || !eligible(index)) entries.add(index + 1)
     }
-    val groups = mutableListOf<KotlinSourceGroup>()
+
+    fun instructionCost(index: Int) = when {
+        branches[index] != null -> 80
+        calls[index]?.instructionType?.startsWith("MemoryInstruction") == true -> 200
+        values[index] != null || copies[index] != null -> 40
+        !eligible(index) -> 0
+        else -> 1200
+    }
+    val regions = mutableListOf<List<KotlinBlock>>()
     var index = 0
     while (index < instructions.size) {
         if (!eligible(index)) {
@@ -35,19 +44,36 @@ internal fun generateRegions(
         val start = index
         var cost = 0
         do {
-            cost += when {
-                branches[index] != null -> 80
-                calls[index]?.instructionType?.startsWith("MemoryInstruction") == true -> 200
-                values[index] != null || copies[index] != null -> 40
-                else -> 1200
-            }
+            cost += instructionCost(index)
             index++
         } while (index < instructions.size && eligible(index) && index !in functionEntries && index - start < maxInstructions && cost < 3000)
         val end = index
         val blockEntries = (listOf(start) + entries.filter { it > start && it < end }).sorted()
         val blocks = blockEntries.mapIndexed { blockIndex, entry -> KotlinBlock(entry, blockEntries.getOrElse(blockIndex + 1) { end }) }
-        val name = "Generated${groups.size}"
+        regions.add(blocks)
+    }
+    val groups = mutableListOf<KotlinSourceGroup>()
+    var resumableFunctions = 0
+    var fallbackFunctions = 0
+    val orderedFunctions = functionEntries.sorted()
+
+    fun emit(name: String, blocks: List<KotlinBlock>) {
         groups.add(KotlinSourceGroup(name, regionSource(name, firstIp, blocks, instructions, calls, values, branches, copies), blocks))
+    }
+    orderedFunctions.forEachIndexed { functionIndex, start ->
+        val end = orderedFunctions.getOrElse(functionIndex + 1) { instructions.size }
+        val functionRegions = regions.filter { it.first().startOffset in start until end }
+        if (functionRegions.isEmpty()) return@forEachIndexed
+        // Keep a complete function body where its emitted work remains bounded.
+        // Large functions retain the previous region tier rather than producing
+        // a monolithic JVM method that cannot be optimized effectively.
+        if (resumeFunctions && end - start <= maxInstructions * 2 && (start until end).sumOf(::instructionCost) <= 6000) {
+            emit("GeneratedFunction$functionIndex", functionRegions.flatten())
+            resumableFunctions++
+        } else {
+            functionRegions.forEachIndexed { regionIndex, blocks -> emit("GeneratedFunction${functionIndex}Region$regionIndex", blocks) }
+            if (resumeFunctions) fallbackFunctions++
+        }
     }
     val generated = instructions.indices.count(::eligible)
     return KotlinProgramSource(
@@ -56,6 +82,8 @@ internal fun generateRegions(
         generated,
         instructions.size - generated,
         values.count { it != null } + copies.count { it != null },
+        resumableFunctions,
+        fallbackFunctions,
     )
 }
 
@@ -69,7 +97,10 @@ private fun regionSource(
     branches: List<KotlinBranch?>,
     copies: List<KotlinCopies?>,
 ): String = buildString {
-    val range = blocks.first().startOffset until blocks.last().endOffset
+    // Calls and returns are holes in a resumable body. Their original
+    // dispatchers stay installed; reaching one exits to the runtime and the
+    // saved successor IP re-enters this body after the callee returns.
+    val range = blocks.flatMap { (it.startOffset until it.endOffset).toList() }
     val slots = mutableSetOf<Int>()
     val modified = mutableSetOf<Int>()
 
