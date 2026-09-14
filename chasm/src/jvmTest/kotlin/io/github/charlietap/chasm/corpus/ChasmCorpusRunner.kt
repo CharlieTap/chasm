@@ -238,7 +238,11 @@ class ChasmCorpusRunner(
         val hasWasiImports = module.imports.any { it.moduleName in wasiImportModules }
 
         val wasiHost = test?.host?.wasiPreview1
-        if (wasiHost == null && hasWasiImports) {
+        val requiresWasiHost = module.imports.any { definition ->
+            definition.moduleName in wasiImportModules &&
+                (definition.type !is ExternalType.Function || fixture.findImport(definition.moduleName, definition.entityName)?.stub == null)
+        }
+        if (wasiHost == null && requiresWasiHost) {
             return RunnerResult.Error(CorpusResult.Skipped(fixture.name, "WASI Preview 1 imports require fixture host config"))
         }
 
@@ -261,7 +265,6 @@ class ChasmCorpusRunner(
         val providedImports = imports.map { import -> import.moduleName to import.entityName }.toMutableSet()
 
         module.imports.forEach { definition ->
-            if (definition.moduleName in wasiImportModules) return@forEach
             if ((definition.moduleName to definition.entityName) in providedImports) return@forEach
 
             when (val type = definition.type) {

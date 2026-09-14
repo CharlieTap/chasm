@@ -17,7 +17,7 @@ Commit each completed stage before beginning the next.
 | 2 | Promote frame slots to Kotlin locals inside bounded blocks | Complete |
 | 3 | Keep locals across branches and loops in generated regions | Complete |
 | 4 | Resume generated function bodies around existing guest and host calls | Complete |
-| 5 | Reference/GC and exception synchronization; supported Wasm 3.0 corpus | Pending |
+| 5 | Reference/GC and exception synchronization; supported Wasm 3.0 corpus | Complete |
 | 6 | Structured Kotlin loops and function bodies with explicit eligibility | Pending |
 | 7 | Typed generated values, including safe handling of reused physical slots | Pending |
 | 8 | Optional direct compiled calls with explicit eligibility and runtime fallback | Pending |
@@ -45,6 +45,7 @@ differences between stages should not be treated as isolated optimization gains.
 | 2: block locals | 1395.77 | 2149.77 | 1.540x | Same 209 fixtures in three modes; deterministic CoreMark match |
 | 3: local regions | 1560.06 | 4184.68 | 2.682x | Same 209 fixtures in three modes; deterministic CoreMark match |
 | 4: resumable functions | 1583.16 | 4215.85 | 2.663x | Same 209 fixtures in three modes; deterministic CoreMark match |
+| 5: GC and exceptions | 1582.90 | 4255.92 | 2.689x | 386 supported fixtures in three modes; deterministic CoreMark match |
 
 Stage 1 extracts 86 scalar operations from 271 frame wrappers. Existing
 value-based helpers remain in use. It changes semantic factoring, with no new
@@ -91,3 +92,44 @@ classes; the largest measured method ends at bytecode offset 5044, with no
 counter or per-instruction dispatcher calls. Generated scores ranged from
 4197.86 to 4239.08. This stage establishes resumable function structure; the
 measurements show no additional speed gain over stage 3.
+
+Stage 5 adds 109 executor bindings for reference, table and aggregate operations.
+Every such helper observes the saved canonical frame; generated locals reload
+afterward. Reference branches, all call variants and exception transfers retain
+the original dispatchers. Both explicit branch targets and catch continuations
+are generated entry points.
+
+Forced-GC regressions exposed an existing interpreter bug after both calls and
+exception unwinding: the restored stack depth excluded reference temporaries
+written later. A catch case returned 189 instead of 579. Allocating instructions
+now carry the compiled frame size, and their existing preflight restores the
+complete frame root range before collection. No extra dispatch instruction is
+introduced. Generated code saves its local values before calling these helpers.
+The regressions pass in interpreter, preparation and cached modes, with an
+independent runtime GC regression test.
+
+The corpus runner also honors explicitly declared WASI function stubs when no
+full host configuration is supplied. Previously it skipped 39 Kotlin fixtures
+before considering their deterministic stubs. Unstubbed WASI imports still
+require a host configuration. A runner regression test covers both cases.
+The focused suite has nine generated-backend tests, 90 compiler tests, 64 invoker
+tests, four runtime GC integration tests and one runner test.
+
+Large supported modules also require bounded source compilation. Prisma expands
+to about 114 MiB of source across more than 26,000 region classes. The JVM driver
+now compiles independent classes in batches of at most 128 classes or 1 MiB of
+source. All batches must complete before the artifact is marked ready. This
+bounds the compiler working set; it does not remove the source/class-size cost.
+
+All 386 selected fixtures pass in preparation, cached and interpreter modes:
+209 Wasm 1.0, 60 Wasm 2.0 and 117 Wasm 3.0. There are no skipped fixtures.
+The selection retains the repository's `esbuild` exclusion, recorded explicitly
+in the result file. Every cached compilation reports a cache hit and zero
+compilation time. CoreMark output, clock calls and full memory SHA-256 match.
+
+CoreMark's generated coverage remains 1282 instructions, including all 1024
+data operations, across 92 classes. The largest measured method ends at bytecode
+offset 5044, with no counter or per-instruction dispatcher calls. Class files
+total 2,443,557 bytes. Five generated scores range from 4220.30 to 4322.14.
+The result preserves the previous stage's performance while adding the GC and
+exception support; it does not establish a separate speed gain over stage 4.

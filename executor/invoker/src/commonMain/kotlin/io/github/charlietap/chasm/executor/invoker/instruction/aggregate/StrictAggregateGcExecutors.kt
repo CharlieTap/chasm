@@ -1,5 +1,6 @@
 package io.github.charlietap.chasm.executor.invoker.instruction.aggregate
 
+import io.github.charlietap.chasm.executor.invoker.instruction.ensureFrameRoots
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -24,153 +25,183 @@ internal inline fun ArrayNewDefaultExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewDefaultI,
-) = executeArrayNewDefault(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    size = instruction.size,
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    field = instruction.field,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewDefault(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        size = instruction.size,
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        field = instruction.field,
+    )
+}
 
 internal inline fun ArrayNewDefaultExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewDefaultS,
-) = executeArrayNewDefault(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    size = vstack.getFrameSlot(instruction.sizeSlot).toInt(),
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    field = instruction.field,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewDefault(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        size = vstack.getFrameSlot(instruction.sizeSlot).toInt(),
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        field = instruction.field,
+    )
+}
 
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewDataIi,
-) = executeArrayNewData(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    sourceOffset = instruction.sourceOffset,
-    arrayLength = instruction.arrayLength,
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    dataInstance = instruction.dataInstance,
-    fieldWidthInBytes = instruction.fieldWidthInBytes,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewData(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = instruction.sourceOffset,
+        arrayLength = instruction.arrayLength,
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        dataInstance = instruction.dataInstance,
+        fieldWidthInBytes = instruction.fieldWidthInBytes,
+    )
+}
 
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewDataIs,
-) = executeArrayNewData(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    sourceOffset = instruction.sourceOffset,
-    arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    dataInstance = instruction.dataInstance,
-    fieldWidthInBytes = instruction.fieldWidthInBytes,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewData(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = instruction.sourceOffset,
+        arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        dataInstance = instruction.dataInstance,
+        fieldWidthInBytes = instruction.fieldWidthInBytes,
+    )
+}
 
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewDataSi,
-) = executeArrayNewData(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
-    arrayLength = instruction.arrayLength,
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    dataInstance = instruction.dataInstance,
-    fieldWidthInBytes = instruction.fieldWidthInBytes,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewData(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
+        arrayLength = instruction.arrayLength,
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        dataInstance = instruction.dataInstance,
+        fieldWidthInBytes = instruction.fieldWidthInBytes,
+    )
+}
 
 internal inline fun ArrayNewDataExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewDataSs,
-) = executeArrayNewData(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
-    arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    dataInstance = instruction.dataInstance,
-    fieldWidthInBytes = instruction.fieldWidthInBytes,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewData(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
+        arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        dataInstance = instruction.dataInstance,
+        fieldWidthInBytes = instruction.fieldWidthInBytes,
+    )
+}
 
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElementIi,
-) = executeArrayNewElement(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    sourceOffset = instruction.sourceOffset,
-    arrayLength = instruction.arrayLength,
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    elementInstance = instruction.elementInstance,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewElement(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = instruction.sourceOffset,
+        arrayLength = instruction.arrayLength,
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        elementInstance = instruction.elementInstance,
+    )
+}
 
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElementIs,
-) = executeArrayNewElement(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    sourceOffset = instruction.sourceOffset,
-    arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    elementInstance = instruction.elementInstance,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewElement(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = instruction.sourceOffset,
+        arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        elementInstance = instruction.elementInstance,
+    )
+}
 
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElementSi,
-) = executeArrayNewElement(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
-    arrayLength = instruction.arrayLength,
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    elementInstance = instruction.elementInstance,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewElement(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
+        arrayLength = instruction.arrayLength,
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        elementInstance = instruction.elementInstance,
+    )
+}
 
 internal inline fun ArrayNewElementExecutor(
     vstack: ValueStack,
     context: ExecutionContext,
     instruction: AggregateInstruction.ArrayNewElementSs,
-) = executeArrayNewElement(
-    vstack = vstack,
-    heap = context.heap,
-    context = context,
-    sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
-    arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
-    destinationSlot = instruction.destinationSlot,
-    rtt = instruction.rtt,
-    elementInstance = instruction.elementInstance,
-)
+) {
+    ensureFrameRoots(vstack, instruction)
+    return executeArrayNewElement(
+        vstack = vstack,
+        heap = context.heap,
+        context = context,
+        sourceOffset = vstack.getFrameSlot(instruction.sourceOffsetSlot).toInt(),
+        arrayLength = vstack.getFrameSlot(instruction.arrayLengthSlot).toInt(),
+        destinationSlot = instruction.destinationSlot,
+        rtt = instruction.rtt,
+        elementInstance = instruction.elementInstance,
+    )
+}
 
 internal inline fun ArrayInitDataExecutor(
     vstack: ValueStack,

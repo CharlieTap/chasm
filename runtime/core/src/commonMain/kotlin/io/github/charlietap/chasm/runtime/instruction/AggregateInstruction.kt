@@ -176,42 +176,54 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val value: Long,
         val destinationSlot: Int,
         val rtt: RTT,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewIs(
         val size: Int,
         val valueSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewSi(
         val sizeSlot: Int,
         val value: Long,
         val destinationSlot: Int,
         val rtt: RTT,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewSs(
         val sizeSlot: Int,
         val valueSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewDefaultI(
         val size: Int,
         val destinationSlot: Int,
         val rtt: RTT,
         val field: Long,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewDefaultS(
         val sizeSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
         val field: Long,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewDataIi(
         val sourceOffset: Int,
@@ -220,7 +232,9 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val rtt: RTT,
         val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewDataIs(
         val sourceOffset: Int,
@@ -229,7 +243,9 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val rtt: RTT,
         val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewDataSi(
         val sourceOffsetSlot: Int,
@@ -238,7 +254,9 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val rtt: RTT,
         val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewDataSs(
         val sourceOffsetSlot: Int,
@@ -247,7 +265,9 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val rtt: RTT,
         val dataInstance: io.github.charlietap.chasm.runtime.instance.DataInstance,
         val fieldWidthInBytes: Int,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewElementIi(
         val sourceOffset: Int,
@@ -255,7 +275,9 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val destinationSlot: Int,
         val rtt: RTT,
         val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewElementIs(
         val sourceOffset: Int,
@@ -263,7 +285,9 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val destinationSlot: Int,
         val rtt: RTT,
         val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewElementSi(
         val sourceOffsetSlot: Int,
@@ -271,7 +295,9 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val destinationSlot: Int,
         val rtt: RTT,
         val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewElementSs(
         val sourceOffsetSlot: Int,
@@ -279,14 +305,18 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val destinationSlot: Int,
         val rtt: RTT,
         val elementInstance: io.github.charlietap.chasm.runtime.instance.ElementInstance,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArrayNewFixedS(
         val firstElementSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
         val size: Int,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ArraySetIi(
         val value: Long,
@@ -523,13 +553,17 @@ sealed interface AggregateInstruction : LinkedInstruction {
         val firstFieldSlot: Int,
         val destinationSlot: Int,
         val rtt: RTT,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class StructNewDefaultS(
         val destinationSlot: Int,
         val rtt: RTT,
         val fields: LongArray,
-    ) : AggregateInstruction
+    ) : AggregateInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class StructSetI(
         val value: Long,

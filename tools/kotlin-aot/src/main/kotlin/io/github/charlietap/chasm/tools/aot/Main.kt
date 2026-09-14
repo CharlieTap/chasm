@@ -51,8 +51,8 @@ internal fun backend(options: Map<String, String>, reports: MutableList<KotlinCo
 private fun runCorpus(options: Map<String, String>) {
     val root = File(options.getValue("root")).canonicalFile
     val fixtures = json.decodeFromString<List<Fixture>>(File(options.getValue("index")).readText())
-        .filter { it.version == "1.0" && (options["filter"]?.let(it.name::contains) ?: true) }
-    require(fixtures.isNotEmpty()) { "No Wasm 1.0 fixtures selected" }
+        .filter { options["filter"]?.let(it.name::contains) ?: true }
+    require(fixtures.isNotEmpty()) { "No corpus fixtures selected" }
     val compilations = mutableListOf<KotlinCompilationReport>()
     val compiler = backend(options, compilations, count = true)
     val stores = mutableListOf<Store>()
@@ -107,7 +107,7 @@ private fun runCorpus(options: Map<String, String>) {
                 JsonObject(
                     mapOf(
                         "mode" to JsonPrimitive(options["mode"] ?: "cached"),
-                        "version" to JsonPrimitive("1.0"),
+                        "versions" to JsonArray(fixtures.map { it.version }.distinct().map(::JsonPrimitive)),
                         "selected" to JsonPrimitive(fixtures.size),
                         "results" to JsonArray(results),
                     ),
@@ -117,7 +117,7 @@ private fun runCorpus(options: Map<String, String>) {
             if (status != "passed") println(result.result)
         }
         check(results.all { it["status"] == JsonPrimitive("passed") }) { "Corpus had failures or skips; see ${options["report"]}" }
-        println("PASS: ${fixtures.size} Wasm 1.0 fixtures; generated block executions=${compiler?.generatedBlockExecutions ?: 0}")
+        println("PASS: ${fixtures.size} corpus fixtures; generated block executions=${compiler?.generatedBlockExecutions ?: 0}")
     } finally {
         compiler?.close()
     }

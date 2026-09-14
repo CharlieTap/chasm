@@ -73,7 +73,12 @@ class JvmKotlinProgramCompiler(
     ): ModuleTrapError? {
         if (closed) return InstantiationError.ProgramCompilationFailed("Kotlin compiler is closed")
         return try {
-            val source = generator.generate(firstIp, instructions, functionEntryIps)
+            val handlerEntries = functionEntryIps.flatMap { entry ->
+                program.exceptionTable(entry)?.let { table ->
+                    table.regions.flatMap { region -> region.catches.map { table.entryIp + it.targetOffset } }
+                } ?: emptyList()
+            }.distinct().toIntArray()
+            val source = generator.generate(firstIp, instructions, functionEntryIps, handlerEntries)
             val digest = MessageDigest.getInstance("SHA-256")
             digest.update("chasm-kotlin-source-v1\n$classpathIdentity\n".toByteArray())
             source.groups.forEach { digest.update(it.source.toByteArray()) }
@@ -151,7 +156,6 @@ class JvmKotlinProgramCompiler(
         if (files.isEmpty()) return
         val invoker = Class.forName("io.github.charlietap.chasm.executor.invoker.FunctionInvokerKt")
             .protectionDomain.codeSource.location.toURI().let(::File)
-        val output = ByteArrayOutputStream()
         val arguments = listOf(
             "-no-stdlib",
             "-no-reflect",
@@ -167,10 +171,36 @@ class JvmKotlinProgramCompiler(
             "-Xwarning-level=NOTHING_TO_INLINE:disabled",
             "-d",
             classes.absolutePath,
-        ) + files.map { it.absolutePath }
-        val exitCode = PrintStream(output).use { K2JVMCompiler().exec(it, *arguments.toTypedArray()) }
-        File(target, "compiler.log").writeText(output.toString(Charsets.UTF_8))
-        check(exitCode == ExitCode.OK) { "Kotlin compilation failed in $target:\n${output.toString(Charsets.UTF_8).takeLast(12000)}" }
+        )
+        // Each generated class is independent. Large modules can contain tens
+        // of thousands of regions; retaining every source tree and IR graph in
+        // one compiler invocation needlessly makes preparation heap-bound.
+        val batches = mutableListOf<List<File>>()
+        var pending = mutableListOf<File>()
+        var pendingBytes = 0L
+        files.forEach { file ->
+            if (pending.isNotEmpty() && (pending.size >= 128 || pendingBytes + file.length() > 1024 * 1024)) {
+                batches.add(pending)
+                pending = mutableListOf()
+                pendingBytes = 0
+            }
+            pending.add(file)
+            pendingBytes += file.length()
+        }
+        if (pending.isNotEmpty()) batches.add(pending)
+        File(target, "compiler.log").bufferedWriter().use { log ->
+            batches.forEachIndexed { index, batch ->
+                log.appendLine("Batch ${index + 1}/${batches.size}: ${batch.size} classes")
+                log.flush()
+                val output = ByteArrayOutputStream()
+                val batchArguments = arguments + listOf("-module-name", "chasm_generated_$index") + batch.map { it.absolutePath }
+                val exitCode = PrintStream(output).use { K2JVMCompiler().exec(it, *batchArguments.toTypedArray()) }
+                val messages = output.toString(Charsets.UTF_8)
+                log.append(messages)
+                log.flush()
+                check(exitCode == ExitCode.OK) { "Kotlin compilation failed in $target, batch ${index + 1}:\n${messages.takeLast(12000)}" }
+            }
+        }
     }
 
     private fun load(source: KotlinProgramSource, target: File): LoadedArtifact {

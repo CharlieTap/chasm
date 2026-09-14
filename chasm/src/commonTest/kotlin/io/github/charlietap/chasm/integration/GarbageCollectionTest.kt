@@ -72,11 +72,28 @@ class GarbageCollectionTest {
         context.assertReachableObjects()
     }
 
+    @Test
+    fun `traditional gc roots new reference temporaries after calls and catches`() {
+        val context = instantiate(
+            strategy = GCStrategy.TRADITIONAL,
+            threshold = GCThreshold.KB(0),
+            fixture = "integration/exception_gc_temporaries.wasm",
+        )
+        for (function in listOf("handler-temporaries", "call-temporaries")) {
+            assertEquals(
+                listOf(NumberValue.I32(579)),
+                invoke(context.store, context.instance, function)
+                    .expect("expected new references to survive collection in $function"),
+            )
+        }
+    }
+
     private fun instantiate(
         strategy: GCStrategy,
         threshold: GCThreshold = GCThreshold.MB(8),
+        fixture: String = FIXTURE,
     ): TestContext {
-        val module = module(Resource(FIXTURE).readBytes())
+        val module = module(Resource(fixture).readBytes())
             .expect("expected garbage collection fixture to decode")
             .let(::validate)
             .expect("expected garbage collection fixture to validate")

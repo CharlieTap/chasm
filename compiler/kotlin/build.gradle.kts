@@ -11,7 +11,7 @@ val generateExecutorCatalogue = tasks.register("generateExecutorCatalogue") {
     inputs.dir(executorSources)
     outputs.dir(generatedCatalogue)
     doLast {
-        val signature = Regex("internal\\s+(?:inline\\s+)?fun\\s+(\\w+)\\(\\s*vstack:\\s*ValueStack,\\s*context:\\s*ExecutionContext,\\s*instruction:\\s*((?:Numeric|Memory|Parametric|Variable|Admin)Instruction\\.\\w+),", RegexOption.MULTILINE)
+        val signature = Regex("internal\\s+(?:inline\\s+)?fun\\s+(\\w+)\\(\\s*vstack:\\s*ValueStack,\\s*context:\\s*ExecutionContext,\\s*instruction:\\s*((?:Numeric|Memory|Parametric|Variable|Admin|Reference|Table|Aggregate)Instruction\\.\\w+),", RegexOption.MULTILINE)
         val entries = sortedMapOf<String, String>()
         executorSources.asFile.walkTopDown().filter { it.extension == "kt" }.forEach { file ->
             val source = file.readText()

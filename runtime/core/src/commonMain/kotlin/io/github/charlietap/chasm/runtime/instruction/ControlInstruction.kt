@@ -99,7 +99,9 @@ sealed interface ControlInstruction : LinkedInstruction {
     data class Throw(
         val tagAddress: Address.Tag,
         val firstPayloadSlot: Int,
-    ) : ControlInstruction
+    ) : ControlInstruction, GcAllocationInstruction {
+        override var frameSlots: Int = 0
+    }
 
     data class ThrowRefS(
         val exceptionSlot: Int,

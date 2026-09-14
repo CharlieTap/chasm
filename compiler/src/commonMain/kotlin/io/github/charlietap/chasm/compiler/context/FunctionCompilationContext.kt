@@ -21,6 +21,7 @@ import io.github.charlietap.chasm.compiler.operand.sourceSlot
 import io.github.charlietap.chasm.compiler.program.ProgramBuilder
 import io.github.charlietap.chasm.compiler.program.ProgramTarget
 import io.github.charlietap.chasm.runtime.dispatch.DispatchableInstruction
+import io.github.charlietap.chasm.runtime.instruction.GcAllocationInstruction
 import io.github.charlietap.chasm.runtime.instruction.LinkedInstruction
 import io.github.charlietap.chasm.type.ValueType
 
@@ -41,6 +42,7 @@ internal class FunctionCompilationContext(
     var rootControl: BlockContext? = null
     var reachable = true
     var exceptionTableBuilder: ExceptionTableBuilder? = null
+    var allocatingInstructions: MutableList<GcAllocationInstruction>? = null
 
     fun blockType(type: io.github.charlietap.chasm.type.BlockType): io.github.charlietap.chasm.type.FunctionType =
         workspace.blockType(compiler, type)
@@ -50,6 +52,10 @@ internal class FunctionCompilationContext(
         dispatcher: (T) -> DispatchableInstruction,
     ) {
         flushCopies()
+        if (instruction is GcAllocationInstruction) {
+            val allocations = allocatingInstructions ?: mutableListOf<GcAllocationInstruction>().also { allocatingInstructions = it }
+            allocations.add(instruction)
+        }
         val dispatchableInstruction = dispatcher(instruction)
         compiler.instructionObserver?.onInstruction(dispatchableInstruction, instruction)
         program.append(dispatchableInstruction)

@@ -23,12 +23,24 @@ current instance's instruction operands. The key includes generated source and
 the contents of the runtime/compiler classpath. Rebuilding code can invalidate
 artifacts; preparation must use the same classpath as execution.
 
-Each block contains at most 16 lowered operations by default; classes group up
-to 192 operations. Small private block methods allow HotSpot to optimize them
-independently. The existing dispatch loop enters each block once. Branches,
-calls, returns and their original instruction positions remain in the program.
-This preserves guest call frames, indirect/host calls and return metadata.
-Function entries, branch targets and call boundaries split generated bodies.
+The default tier keeps scalar values in Kotlin locals across generated branches
+and loops. Bounded regions contain at most 96 lowered instructions, with a
+separate expansion-cost limit. Eligible functions combine their regions into
+one resumable body. Original guest/host call and return instructions remain
+installed, so execution saves the frame before a call and resumes afterward.
+See [the stage record](../../KOTLIN_AOT_STAGES.md) for eligibility, coverage and
+measurements. Earlier tiers remain selectable through `KotlinGenerationTier`.
+
+Reference, table and aggregate operations use the existing frame helpers.
+Generated locals are saved before these helpers and reloaded afterward, so
+allocations see the canonical reference roots. Allocating instructions carry
+the finalized function frame size; preflight restores the complete root range
+after a call or catch has reduced the active stack depth. Exception transfers
+and reference branches retain their original dispatchers; catch targets are
+generated entry points. The backend preserves original call-site and throw
+addresses.
+Preparation compiles independent classes in batches of at most 128 classes or
+1 MiB of source, keeping large modules within a bounded compiler working set.
 
 The generator derives executor names from existing function declarations rather
 than copying semantic implementations. Generated JVM source is compiled as a
@@ -67,6 +79,27 @@ assertions, host bindings and WASI adapter. Every test gets a fresh instance;
 stores are dropped after each fixture. Failures and skips make the tool fail.
 Reports contain per-fixture outcomes, compile/cache statistics and dynamic
 generated execution counts. The official spec suite is not invoked.
+
+## Include supported Wasm 2.0 and 3.0 fixtures
+
+The corpus command runs every fixture in the supplied index. To include all
+versions supported by the repository configuration while retaining its
+execution-heavy `esbuild` exclusion:
+
+```sh
+python3 tools/kotlin-aot/select_corpus.py \
+  chasm/build/wasm-corpus-fixtures/fixtures.json \
+  tools/kotlin-aot/build/corpus-supported.json \
+  --versions all --exclude-target esbuild
+python3 tools/kotlin-aot/run_stage.py --stage stage5-gc-exceptions \
+  --index tools/kotlin-aot/build/corpus-supported.json --command-timeout 3600
+```
+
+The stage runner requires the corpus and deterministic CoreMark checks to pass
+in preparation, cached and interpreter modes before starting timed trials.
+The pinned supported index contains 209 Wasm 1.0, 60 Wasm 2.0 and 117 Wasm 3.0
+fixtures after this exclusion. It does not enable unsupported SIMD, threads or
+memory64 proposals.
 
 ## Verify and measure CoreMark
 
@@ -107,20 +140,24 @@ The focused Wasm module covers start, branches/loops, recursion, direct and
 indirect calls, host bindings, aliased slot transfers, mutable globals,
 loads/stores, memory growth and failure, integer and floating-point operations,
 traps, and multiple instances. Other tests cover artifact rebinding, cache
-misses, compilation rollback, block boundaries and unsupported instructions.
-Its checked-in `.wasm` can be rebuilt from `compiler/kotlin/src/jvmTest/resources/wasm1.wat`
-with `wasm-tools parse`, then checked with `wasm-tools validate --features=mvp`.
+misses, compilation rollback, block boundaries and retained control transfers.
+The Wasm 3.0 fixture adds observed automatic GC with live references, cross-call
+throw/rethrow, generated catch continuations, tables, typed calls and tail calls.
+The checked-in `.wasm` files can be rebuilt from `wasm1.wat` and `wasm3.wat`
+in `compiler/kotlin/src/jvmTest/resources/` with `wasm-tools parse`. Validate
+`wasm1.wasm` with `wasm-tools validate --features=mvp`; `wasm3.wasm` uses the
+validator's supported reference, GC and exception features.
 
 ## Current limits
 
-This is a JVM prototype validated against the selected Wasm 1.0 corpus and
-focused tests, not a claim of complete spec conformance. The source generator
+This is a JVM prototype with corpus and focused validation recorded per stage.
+These checks do not establish complete spec conformance. The source generator
 uses common Kotlin, but other platforms still need a build-time compilation and
 registration pipeline; JVM class loading is platform specific.
 
-The backend retains ValueStack traffic, linked operand objects, control
-dispatch, and ordinary lowering at instantiation. It does not promote values
-to virtual registers or generate whole functions with Kotlin control flow.
+The backend retains ValueStack traffic at region and helper boundaries, linked
+operand objects, runtime call/exception dispatch and ordinary lowering at
+instantiation. Generated scalar locals currently retain raw Long slot bits.
 The prototype driver also retains the Kotlin compiler dependency in cached
 processes. Splitting preparation into a separate distributable tool, compact
 operand binding, and tuning compilation/code size remain future work.

@@ -9,6 +9,7 @@ internal fun generateRegions(
     functionEntryIps: IntArray,
     maxInstructions: Int,
     resumeFunctions: Boolean = false,
+    additionalEntryIps: IntArray = intArrayOf(),
 ): KotlinProgramSource {
     val calls = instructions.map(::executorCall)
     val values = instructions.map(::valueInstruction)
@@ -17,10 +18,14 @@ internal fun generateRegions(
     val functionEntries = functionEntryIps.mapTo(mutableSetOf()) { it - firstIp }
     require(functionEntries.all { it in instructions.indices }) { "Invalid generated function entry" }
     val entries = functionEntries.toMutableSet()
+    additionalEntryIps.forEach {
+        require(it - firstIp in instructions.indices) { "Invalid generated handler entry" }
+        entries.add(it - firstIp)
+    }
 
     fun eligible(index: Int) = calls[index] != null || branches[index] != null
     instructions.indices.forEach { index ->
-        branches[index]?.targets?.forEach {
+        controlTargets(instructions[index]).forEach {
             require(it - firstIp in instructions.indices) { "Invalid generated branch target" }
             entries.add(it - firstIp)
         }

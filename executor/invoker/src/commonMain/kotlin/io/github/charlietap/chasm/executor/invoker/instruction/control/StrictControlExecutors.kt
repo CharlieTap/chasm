@@ -4,6 +4,7 @@ import io.github.charlietap.chasm.executor.invoker.function.HostFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.ReturnWasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.WasmFunctionCall
 import io.github.charlietap.chasm.executor.invoker.function.withHostExceptionHandling
+import io.github.charlietap.chasm.executor.invoker.instruction.ensureFrameRoots
 import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.execution.ExecutionContext
@@ -138,6 +139,7 @@ internal fun ThrowExecutor(
     instruction: ControlInstruction.Throw,
     faultIp: Int,
 ): Int {
+    ensureFrameRoots(vstack, instruction)
     return ThrowRefValueExecutor(
         vstack = vstack,
         context = context,

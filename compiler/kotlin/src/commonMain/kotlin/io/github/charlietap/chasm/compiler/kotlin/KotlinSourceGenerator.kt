@@ -27,6 +27,7 @@ class KotlinSourceGenerator(
         firstIp: Int,
         instructions: List<LinkedInstruction>,
         functionEntryIps: IntArray,
+        additionalEntryIps: IntArray = intArrayOf(),
     ): KotlinProgramSource {
         if (tier == KotlinGenerationTier.REGIONS || tier == KotlinGenerationTier.RESUMABLE) {
             instructions.forEach { instruction ->
@@ -34,25 +35,11 @@ class KotlinSourceGenerator(
                     "No Kotlin executor for ${instruction::class.simpleName}"
                 }
             }
-            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions, tier == KotlinGenerationTier.RESUMABLE)
+            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions, tier == KotlinGenerationTier.RESUMABLE, additionalEntryIps)
         }
         val entries = functionEntryIps.mapTo(mutableSetOf()) { it - firstIp }
-        instructions.forEach { instruction ->
-            when (instruction) {
-                is AdminInstruction.Jump -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpCopies -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpIfI -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpIfS -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpIfZeroI -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpIfZeroS -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpIfCopyI -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpIfCopyS -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpIfCondition -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpIfConditionMismatch -> entries.add(instruction.targetIp - firstIp)
-                is AdminInstruction.JumpTableS -> instruction.targetIps.forEach { entries.add(it - firstIp) }
-                else -> Unit
-            }
-        }
+        additionalEntryIps.forEach { entries.add(it - firstIp) }
+        instructions.forEach { instruction -> controlTargets(instruction).forEach { entries.add(it - firstIp) } }
         require(entries.all { it in instructions.indices }) { "Invalid generated block entry" }
 
         val calls = instructions.map { instruction ->
@@ -168,12 +155,15 @@ private fun isControlBoundary(instruction: LinkedInstruction): Boolean = when (i
     is AdminInstruction.JumpIfCondition,
     is AdminInstruction.JumpIfConditionMismatch,
     is AdminInstruction.JumpTableS,
-    is ControlInstruction.WasmCall,
-    is ControlInstruction.HostCall,
-    is ControlInstruction.CallIndirectI,
-    is ControlInstruction.CallIndirectS,
-    is ControlInstruction.FunctionReturn,
-    ControlInstruction.Unreachable,
+    is AdminInstruction.JumpOnNullI,
+    is AdminInstruction.JumpOnNullS,
+    is AdminInstruction.JumpOnNonNullI,
+    is AdminInstruction.JumpOnNonNullS,
+    is AdminInstruction.JumpOnCastI,
+    is AdminInstruction.JumpOnCastS,
+    is AdminInstruction.JumpOnCastFailI,
+    is AdminInstruction.JumpOnCastFailS,
+    is ControlInstruction,
     -> true
     else -> false
 }
@@ -199,3 +189,27 @@ data class KotlinProgramSource(
 }
 
 const val GENERATED_PACKAGE = "io.github.charlietap.chasm.compiler.kotlin.generated"
+
+/** Includes retained reference branches as well as branches lowered into Kotlin. */
+internal fun controlTargets(instruction: LinkedInstruction): IntArray = when (instruction) {
+    is AdminInstruction.Jump -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpCopies -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpIfI -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpIfS -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpIfZeroI -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpIfZeroS -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpIfCopyI -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpIfCopyS -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpIfCondition -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpIfConditionMismatch -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpOnNullI -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpOnNullS -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpOnNonNullI -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpOnNonNullS -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpOnCastI -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpOnCastS -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpOnCastFailI -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpOnCastFailS -> intArrayOf(instruction.targetIp)
+    is AdminInstruction.JumpTableS -> instruction.targetIps
+    else -> intArrayOf()
+}

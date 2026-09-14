@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validate a built stage, then measure it; never benchmark a failing stage."""
 import argparse
+import collections
 import hashlib
 import json
 import pathlib
@@ -11,6 +12,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--stage", required=True)
 parser.add_argument("--pairs", type=int, default=5)
 parser.add_argument("--index", default="tools/kotlin-aot/build/corpus-1.0.json")
+parser.add_argument("--command-timeout", type=int, default=1200)
 options = parser.parse_args()
 assert options.stage.replace("-", "").replace("_", "").isalnum()
 root = pathlib.Path(__file__).resolve().parents[2]
@@ -23,11 +25,11 @@ java = ["java", "-Xms1g", "-Xmx8g", "-XX:+UseCompressedOops",
         "io.github.charlietap.chasm.tools.aot.MainKt"]
 
 
-def run(command, log, timeout=600):
+def run(command, log):
     print("Running", log.name, flush=True)
     with log.open("w") as stream:
         subprocess.run(command, cwd=root, stdout=stream, stderr=subprocess.STDOUT,
-                       check=True, timeout=timeout)
+                       check=True, timeout=options.command_timeout)
 
 
 corpus = {}
@@ -64,7 +66,22 @@ subprocess.run([sys.executable, "tools/kotlin-aot/measure_coremark.py", "--pairs
 summary = json.loads((output / "coremark-summary.json").read_text())
 for trial in summary["trials"]:
     trial["result"] = json.loads((output / trial["report"]).read_text())
+selected_index = root / options.index
+selected_fixtures = json.loads(selected_index.read_text())
+selected_ids = {(f["version"], f["name"]) for f in selected_fixtures}
+resolved_index = root / "chasm/build/wasm-corpus-fixtures/fixtures.json"
+omitted_fixtures = [
+    {"version": f["version"], "name": f["name"]}
+    for f in json.loads(resolved_index.read_text())
+    if (f["version"], f["name"]) not in selected_ids
+]
 record = {
+    "corpusSelection": {
+        "index": options.index,
+        "indexSHA256": hashlib.sha256(selected_index.read_bytes()).hexdigest(),
+        "versions": dict(collections.Counter(f["version"] for f in selected_fixtures)),
+        "omittedFromResolvedIndex": omitted_fixtures,
+    },
     "stage": options.stage,
     "parentCommit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
     "trackedDiffSHA256": hashlib.sha256(subprocess.check_output(["git", "diff", "HEAD"], cwd=root)).hexdigest(),

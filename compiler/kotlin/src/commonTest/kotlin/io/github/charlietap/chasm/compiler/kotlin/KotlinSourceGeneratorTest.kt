@@ -5,7 +5,6 @@ import io.github.charlietap.chasm.runtime.instruction.ControlInstruction
 import io.github.charlietap.chasm.runtime.instruction.NumericInstruction
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class KotlinSourceGeneratorTest {
@@ -42,9 +41,20 @@ class KotlinSourceGeneratorTest {
     }
 
     @Test
-    fun `unsupported post MVP instructions fail without interpreter fallback`() {
-        assertFailsWith<IllegalArgumentException> {
-            KotlinSourceGenerator().generate(0, listOf(ControlInstruction.ThrowRefS(0)), intArrayOf(0))
-        }
+    fun `exception transfers remain at original IPs and handlers are generated entries`() {
+        val source = KotlinSourceGenerator().generate(
+            100,
+            listOf(
+                ControlInstruction.ThrowRefS(0),
+                NumericInstruction.I32ConstS(1, 1),
+                NumericInstruction.I32ConstS(2, 1),
+                AdminInstruction.JumpOnNullS(0, 104),
+                NumericInstruction.I32ConstS(3, 1),
+            ),
+            intArrayOf(100),
+            intArrayOf(102),
+        )
+        assertEquals(listOf(1, 2, 4), source.groups.flatMap { it.blocks }.map { it.startOffset })
+        assertEquals(2, source.controlInstructionCount)
     }
 }
