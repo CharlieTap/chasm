@@ -27,5 +27,9 @@ gradlePlugin {
             id = "publishing-conventions"
             implementationClass = "PublishingConventionsPlugin"
         }
+        create("jvmFunctionalTestConventions") {
+            id = "jvm-functional-test-conventions"
+            implementationClass = "JvmFunctionalTestConventionsPlugin"
+        }
     }
 }

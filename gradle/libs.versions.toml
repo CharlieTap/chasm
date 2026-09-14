@@ -91,6 +91,7 @@ wasm-corpus = { id = "io.github.charlietap.corpus.plugin" }
 conventions-kmp  = { id = "kmp-conventions" }
 conventions-kotlin = { id = "kotlin-conventions" }
 conventions-gradle-plugin = { id = "gradle-plugin-conventions" }
+conventions-jvm-functional-test = { id = "jvm-functional-test-conventions" }
 conventions-linting  = { id = "linting-conventions" }
 conventions-publishing  = { id = "publishing-conventions" }
 conventions-versions  = { id = "versions-conventions" }

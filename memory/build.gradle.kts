@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.conventions.kmp)
     alias(libs.plugins.conventions.linting)
     alias(libs.plugins.conventions.publishing)
+    alias(libs.plugins.conventions.jvm.functional.test)
 }
 
 kotlin {
@@ -10,7 +11,7 @@ kotlin {
     }
 
     sourceSets {
-       commonMain {
+        commonMain {
             dependencies {
                 api(projects.runtime.core)
             }
@@ -19,6 +20,12 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
+            }
+        }
+
+        nativeMain {
+            dependencies {
+                implementation(projects.libs.mmap)
             }
         }
     }
