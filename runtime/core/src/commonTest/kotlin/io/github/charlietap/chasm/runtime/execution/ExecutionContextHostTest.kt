@@ -25,6 +25,7 @@ import io.github.charlietap.chasm.host.withTable
 import io.github.charlietap.chasm.host.withTag
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

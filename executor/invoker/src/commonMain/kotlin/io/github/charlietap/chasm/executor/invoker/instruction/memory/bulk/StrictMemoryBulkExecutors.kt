@@ -7,6 +7,7 @@ import io.github.charlietap.chasm.runtime.execution.ExecutionContext
 import io.github.charlietap.chasm.runtime.instance.DataInstance
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import io.github.charlietap.chasm.runtime.stack.ValueStack
 
 internal fun MemoryGrowExecutor(

@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.runtime.instruction.MemoryInstruction
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame

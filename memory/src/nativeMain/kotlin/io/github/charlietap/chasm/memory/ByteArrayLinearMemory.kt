@@ -10,6 +10,8 @@ import io.github.charlietap.chasm.memory.ext.toIntLittleEndian
 import io.github.charlietap.chasm.memory.ext.toLongLittleEndian
 import io.github.charlietap.chasm.memory.ext.toShortLittleEndian
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
+import kotlin.OutOfMemoryError as PlatformOutOfMemoryError
 
 @OptIn(UnsafeHostApi::class)
 class ByteArrayLinearMemory(
@@ -25,7 +27,11 @@ class ByteArrayLinearMemory(
         get() = memory.size
 
     override fun grow(pagesToAdd: Int): LinearMemory {
-        memory = memory.copyOf(memory.size + (pagesToAdd * LinearMemory.PAGE_SIZE))
+        memory = try {
+            memory.copyOf(memory.size + (pagesToAdd * LinearMemory.PAGE_SIZE))
+        } catch (error: PlatformOutOfMemoryError) {
+            throw OutOfMemoryError(error.message, error)
+        }
         return this
     }
 

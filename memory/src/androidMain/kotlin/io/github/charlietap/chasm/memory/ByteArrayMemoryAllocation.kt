@@ -1,6 +1,8 @@
 package io.github.charlietap.chasm.memory
 
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
+import java.lang.OutOfMemoryError as PlatformOutOfMemoryError
 
 internal fun initialArrayCapacity(size: Int, maximumPages: Int): Int {
     val pages = size / LinearMemory.PAGE_SIZE
@@ -17,9 +19,13 @@ internal fun grownArrayCapacity(capacity: Int, required: Int, maximumPages: Int)
 internal fun allocateMemoryArray(capacity: Int, required: Int, allocate: (Int) -> ByteArray = ::ByteArray): ByteArray =
     try {
         allocate(capacity)
-    } catch (error: OutOfMemoryError) {
+    } catch (error: PlatformOutOfMemoryError) {
         // If reserving headroom fails, fall back to the required size and accept
         // more expensive future growth.
-        if (capacity == required) throw error
-        allocate(required)
+        if (capacity == required) throw OutOfMemoryError(error.message, error)
+        try {
+            allocate(required)
+        } catch (fallbackError: PlatformOutOfMemoryError) {
+            throw OutOfMemoryError(fallbackError.message, fallbackError)
+        }
     }

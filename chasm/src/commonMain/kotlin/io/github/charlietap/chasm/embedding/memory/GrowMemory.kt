@@ -14,6 +14,7 @@ import io.github.charlietap.chasm.runtime.error.ModuleTrapError
 import io.github.charlietap.chasm.runtime.ext.memory
 import io.github.charlietap.chasm.runtime.instance.MemoryInstance
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.MAX_PAGES
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 
 fun growMemory(
     store: Store,

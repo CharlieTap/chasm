@@ -5,6 +5,7 @@ package io.github.charlietap.chasm.memory
 import io.github.charlietap.chasm.mmap.commit
 import io.github.charlietap.chasm.mmap.release
 import io.github.charlietap.chasm.mmap.reserve
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.plus
@@ -14,7 +15,7 @@ import kotlinx.cinterop.toCPointer
 internal fun reserveVirtualMemory(bytes: Long): CPointer<ByteVar> = try {
     requireNotNull(reserve(bytes).toLong().toCPointer())
 } catch (error: IllegalStateException) {
-    throw OutOfMemoryError(error.message)
+    throw OutOfMemoryError(error.message, error)
 }
 
 internal fun commitVirtualMemory(
@@ -25,7 +26,7 @@ internal fun commitVirtualMemory(
     try {
         commit((base + offset).rawValue, bytes.toLong())
     } catch (error: IllegalStateException) {
-        throw OutOfMemoryError(error.message)
+        throw OutOfMemoryError(error.message, error)
     }
 }
 

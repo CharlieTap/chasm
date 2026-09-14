@@ -37,6 +37,7 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -44,6 +45,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import java.lang.OutOfMemoryError as PlatformOutOfMemoryError
 
 class AndroidMemoryAccessTest {
 
@@ -172,6 +174,25 @@ class AndroidMemoryAccessTest {
         assertEquals(42, I32Reader(memory, PAGE_SIZE))
         assertEquals(0, I32Reader(memory, 2 * PAGE_SIZE))
         assertFailsWith<IndexOutOfBoundsException> { I32Writer(memory, memory.byteSize, 99) }
+    }
+
+    @Test
+    fun `failed allocation is reported without publishing partial growth`() {
+        val memory = ByteArrayLinearMemory(LinearMemory.Pages(8u), maximumPages = 20)
+        val original = memory.bytes
+        var allocationAttempts = 0
+
+        val failure = assertFailsWith<OutOfMemoryError> {
+            memory.growStorage(PAGE_SIZE * 10) {
+                allocationAttempts++
+                throw PlatformOutOfMemoryError("expected allocation failure")
+            }
+        }
+
+        assertTrue(failure.cause is PlatformOutOfMemoryError)
+        assertEquals(2, allocationAttempts)
+        assertSame(original, memory.bytes)
+        assertEquals(PAGE_SIZE * 8, memory.byteSize)
     }
 
     @Test

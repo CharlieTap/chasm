@@ -5,6 +5,7 @@ import io.github.charlietap.chasm.host.ByteBufferHostMemory
 import io.github.charlietap.chasm.host.HostMemory
 import io.github.charlietap.chasm.host.UnsafeHostApi
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
@@ -16,6 +17,7 @@ import java.nio.file.StandardOpenOption.DELETE_ON_CLOSE
 import java.nio.file.StandardOpenOption.READ
 import java.nio.file.StandardOpenOption.SPARSE
 import java.nio.file.StandardOpenOption.WRITE
+import java.lang.OutOfMemoryError as PlatformOutOfMemoryError
 
 internal const val MAX_JVM_MEMORY_PAGES = Int.MAX_VALUE / LinearMemory.PAGE_SIZE
 internal const val MAX_JVM_MEMORY_BYTES = MAX_JVM_MEMORY_PAGES * LinearMemory.PAGE_SIZE
@@ -56,10 +58,14 @@ class ByteBufferLinearMemory private constructor(
             "JVM linear memory cannot exceed ${maximumByteSize / LinearMemory.PAGE_SIZE} pages"
         }
 
-        if (prefault) {
-            loadMappedRange(mapping, previousByteSize, (nextByteSize - previousByteSize).toInt())
+        try {
+            if (prefault) {
+                loadMappedRange(mapping, previousByteSize, (nextByteSize - previousByteSize).toInt())
+            }
+            replaceLogicalMemory(bufferForSize(mapping, nextByteSize.toInt()))
+        } catch (error: PlatformOutOfMemoryError) {
+            throw OutOfMemoryError(error.message, error)
         }
-        replaceLogicalMemory(bufferForSize(mapping, nextByteSize.toInt()))
         return this
     }
 
@@ -333,6 +339,9 @@ private fun createMappedByteBufferState(
             Files.deleteIfExists(backingFile)
         } catch (deleteError: Throwable) {
             error.addSuppressed(deleteError)
+        }
+        if (error is PlatformOutOfMemoryError) {
+            throw OutOfMemoryError(error.message, error)
         }
         throw error
     }

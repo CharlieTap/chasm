@@ -41,6 +41,7 @@ import io.github.charlietap.chasm.runtime.error.InvocationError
 import io.github.charlietap.chasm.runtime.exception.InvocationException
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import platform.posix.usleep
 import kotlin.concurrent.AtomicInt
 import kotlin.native.runtime.GC

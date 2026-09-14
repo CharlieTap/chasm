@@ -10,6 +10,7 @@ import io.github.charlietap.chasm.memory.ext.toIntLittleEndian
 import io.github.charlietap.chasm.memory.ext.toLongLittleEndian
 import io.github.charlietap.chasm.memory.ext.toShortLittleEndian
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 
 private const val MAX_ANDROID_MEMORY_PAGES = Int.MAX_VALUE / LinearMemory.PAGE_SIZE
 
@@ -29,7 +30,8 @@ class ByteArrayLinearMemory(
         private set
 
     override fun grow(pagesToAdd: Int): LinearMemory {
-        val newSize = checkedGrowthSize(pagesToAdd) ?: throw OutOfMemoryError("Memory growth exceeds limits")
+        val newSize = checkedGrowthSize(pagesToAdd)
+            ?: throw OutOfMemoryError("Memory growth exceeds limits")
         if (newSize != byteSize) growStorage(newSize)
         return this
     }

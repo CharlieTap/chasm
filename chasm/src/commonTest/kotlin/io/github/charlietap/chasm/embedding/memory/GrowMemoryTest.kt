@@ -12,6 +12,7 @@ import io.github.charlietap.chasm.fixture.type.limits
 import io.github.charlietap.chasm.fixture.type.memoryType
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory.Companion.PAGE_SIZE
+import io.github.charlietap.chasm.runtime.memory.OutOfMemoryError
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
