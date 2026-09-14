@@ -40,6 +40,9 @@ See [the stage record](../../KOTLIN_AOT_STAGES.md) for eligibility, coverage and
 measurements. Earlier tiers remain selectable through `KotlinGenerationTier`.
 The typed-local stage passed correctness but regressed CoreMark relative to
 STRUCTURED; see the recorded comparisons before choosing a tier for performance.
+The [stage 7 investigation](REGRESSION_STAGE7.md) reproduces that regression in
+the same runtime and traces it to additional representation state and native
+stack spills. `compare_tiers.py` reproduces the tier comparison.
 
 Reference, table and aggregate operations use the existing frame helpers.
 Generated locals are saved before these helpers and reloaded afterward, so

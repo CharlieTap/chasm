@@ -3,6 +3,8 @@ package io.github.charlietap.chasm.tools.aot
 import io.github.charlietap.chasm.compiler.kotlin.JvmKotlinProgramCompiler
 import io.github.charlietap.chasm.compiler.kotlin.KotlinCompilationMode
 import io.github.charlietap.chasm.compiler.kotlin.KotlinCompilationReport
+import io.github.charlietap.chasm.compiler.kotlin.KotlinGenerationTier
+import io.github.charlietap.chasm.compiler.kotlin.KotlinSourceGenerator
 import io.github.charlietap.chasm.corpus.ChasmCorpusRunner
 import io.github.charlietap.chasm.embedding.dropStore
 import io.github.charlietap.chasm.embedding.shapes.Store
@@ -43,6 +45,7 @@ internal fun backend(options: Map<String, String>, reports: MutableList<KotlinCo
             "cached" -> KotlinCompilationMode.CACHED
             else -> error("Unknown mode $mode")
         },
+        generator = KotlinSourceGenerator(tier = KotlinGenerationTier.valueOf(options["tier"] ?: "TYPED")),
         countExecutions = count,
         onCompilation = reports::add,
     )

@@ -1,0 +1,1772 @@
+{
+  "jvmArguments": [
+    "-Xms1g",
+    "-Xmx8g",
+    "-XX:+UseCompressedOops",
+    "-XX:+UseCompressedClassPointers"
+  ],
+  "verification": {
+    "STRUCTURED": {
+      "mode": "prepare",
+      "tier": "STRUCTURED",
+      "verify": true,
+      "score": 2.0,
+      "clockCalls": 4,
+      "memorySHA256": "754b7bce23d2bb90730596ec38f99eb1a6036dbf1a022d947dc197a4ed537169",
+      "memoryBytes": 65536,
+      "preparationNanos": 5646382166,
+      "executionNanos": 92591875,
+      "startCpu": 14,
+      "endCpu": 14,
+      "placementSupported": true,
+      "placementValid": true,
+      "javaVersion": "25.0.4",
+      "generatedBlocksExecuted": 2321727,
+      "generatedInstructionsExecuted": 8677806,
+      "compilations": [
+        {
+          "key": "e93c824c917665cf3bfbba01ea4a34d8b4af5958dcef352d2e19b992a9183a33",
+          "instructions": 1367,
+          "generatedInstructions": 1282,
+          "promotedInstructions": 1024,
+          "resumableFunctions": 9,
+          "regionFallbackFunctions": 6,
+          "structuredLoops": 27,
+          "structuredBlocks": 33,
+          "linearBodies": 43,
+          "nativeI32Locals": 0,
+          "nativeF32Locals": 0,
+          "nativeF64Locals": 0,
+          "rawLocals": 560,
+          "mixedSlots": 0,
+          "controlInstructions": 85,
+          "blocks": 421,
+          "classes": 92,
+          "sourceBytes": 446713,
+          "cacheHit": false,
+          "compilationNanos": 5368879500
+        }
+      ]
+    },
+    "TYPED": {
+      "mode": "prepare",
+      "tier": "TYPED",
+      "verify": true,
+      "score": 2.0,
+      "clockCalls": 4,
+      "memorySHA256": "754b7bce23d2bb90730596ec38f99eb1a6036dbf1a022d947dc197a4ed537169",
+      "memoryBytes": 65536,
+      "preparationNanos": 6388831125,
+      "executionNanos": 101012875,
+      "startCpu": 14,
+      "endCpu": 12,
+      "placementSupported": true,
+      "placementValid": true,
+      "javaVersion": "25.0.4",
+      "generatedBlocksExecuted": 2321727,
+      "generatedInstructionsExecuted": 8677806,
+      "compilations": [
+        {
+          "key": "e9f56268dde9f319967340b4fbfdaaca31550dace7a31a2d65d750f89b86367e",
+          "instructions": 1367,
+          "generatedInstructions": 1282,
+          "promotedInstructions": 1024,
+          "resumableFunctions": 9,
+          "regionFallbackFunctions": 6,
+          "structuredLoops": 27,
+          "structuredBlocks": 33,
+          "linearBodies": 43,
+          "nativeI32Locals": 501,
+          "nativeF32Locals": 1,
+          "nativeF64Locals": 4,
+          "rawLocals": 54,
+          "mixedSlots": 5,
+          "controlInstructions": 85,
+          "blocks": 421,
+          "classes": 92,
+          "sourceBytes": 508713,
+          "cacheHit": false,
+          "compilationNanos": 6116203209
+        }
+      ]
+    }
+  },
+  "trials": [
+    {
+      "pair": 1,
+      "tier": "STRUCTURED",
+      "score": 4857.9062,
+      "result": {
+        "mode": "cached",
+        "tier": "STRUCTURED",
+        "verify": false,
+        "score": 4857.9062,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 260978500,
+        "executionNanos": 14731599167,
+        "startCpu": 13,
+        "endCpu": 15,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e93c824c917665cf3bfbba01ea4a34d8b4af5958dcef352d2e19b992a9183a33",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 0,
+            "nativeF32Locals": 0,
+            "nativeF64Locals": 0,
+            "rawLocals": 560,
+            "mixedSlots": 0,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 446713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 1,
+      "tier": "TYPED",
+      "score": 3382.95,
+      "result": {
+        "mode": "cached",
+        "tier": "TYPED",
+        "verify": false,
+        "score": 3382.95,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 264174417,
+        "executionNanos": 21120853666,
+        "startCpu": 14,
+        "endCpu": 16,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e9f56268dde9f319967340b4fbfdaaca31550dace7a31a2d65d750f89b86367e",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 501,
+            "nativeF32Locals": 1,
+            "nativeF64Locals": 4,
+            "rawLocals": 54,
+            "mixedSlots": 5,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 508713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "tier": "STRUCTURED",
+      "score": 4888.7803,
+      "result": {
+        "mode": "cached",
+        "tier": "STRUCTURED",
+        "verify": false,
+        "score": 4888.7803,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 272731417,
+        "executionNanos": 14659564916,
+        "startCpu": 13,
+        "endCpu": 17,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e93c824c917665cf3bfbba01ea4a34d8b4af5958dcef352d2e19b992a9183a33",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 0,
+            "nativeF32Locals": 0,
+            "nativeF64Locals": 0,
+            "rawLocals": 560,
+            "mixedSlots": 0,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 446713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "tier": "TYPED",
+      "score": 3361.7212,
+      "result": {
+        "mode": "cached",
+        "tier": "TYPED",
+        "verify": false,
+        "score": 3361.7212,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 283069041,
+        "executionNanos": 21272759167,
+        "startCpu": 15,
+        "endCpu": 13,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e9f56268dde9f319967340b4fbfdaaca31550dace7a31a2d65d750f89b86367e",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 501,
+            "nativeF32Locals": 1,
+            "nativeF64Locals": 4,
+            "rawLocals": 54,
+            "mixedSlots": 5,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 508713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 3,
+      "tier": "STRUCTURED",
+      "score": 4906.37,
+      "result": {
+        "mode": "cached",
+        "tier": "STRUCTURED",
+        "verify": false,
+        "score": 4906.37,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 281587875,
+        "executionNanos": 14600797208,
+        "startCpu": 17,
+        "endCpu": 17,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e93c824c917665cf3bfbba01ea4a34d8b4af5958dcef352d2e19b992a9183a33",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 0,
+            "nativeF32Locals": 0,
+            "nativeF64Locals": 0,
+            "rawLocals": 560,
+            "mixedSlots": 0,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 446713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 3,
+      "tier": "TYPED",
+      "score": 3375.5273,
+      "result": {
+        "mode": "cached",
+        "tier": "TYPED",
+        "verify": false,
+        "score": 3375.5273,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 283855917,
+        "executionNanos": 21189369584,
+        "startCpu": 16,
+        "endCpu": 12,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e9f56268dde9f319967340b4fbfdaaca31550dace7a31a2d65d750f89b86367e",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 501,
+            "nativeF32Locals": 1,
+            "nativeF64Locals": 4,
+            "rawLocals": 54,
+            "mixedSlots": 5,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 508713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 4,
+      "tier": "TYPED",
+      "score": 3411.417,
+      "result": {
+        "mode": "cached",
+        "tier": "TYPED",
+        "verify": false,
+        "score": 3411.417,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 278031542,
+        "executionNanos": 20969423042,
+        "startCpu": 14,
+        "endCpu": 14,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e9f56268dde9f319967340b4fbfdaaca31550dace7a31a2d65d750f89b86367e",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 501,
+            "nativeF32Locals": 1,
+            "nativeF64Locals": 4,
+            "rawLocals": 54,
+            "mixedSlots": 5,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 508713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 4,
+      "tier": "STRUCTURED",
+      "score": 4861.4487,
+      "result": {
+        "mode": "cached",
+        "tier": "STRUCTURED",
+        "verify": false,
+        "score": 4861.4487,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 273386708,
+        "executionNanos": 14727177291,
+        "startCpu": 17,
+        "endCpu": 17,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e93c824c917665cf3bfbba01ea4a34d8b4af5958dcef352d2e19b992a9183a33",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 0,
+            "nativeF32Locals": 0,
+            "nativeF64Locals": 0,
+            "rawLocals": 560,
+            "mixedSlots": 0,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 446713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 5,
+      "tier": "STRUCTURED",
+      "score": 4895.162,
+      "result": {
+        "mode": "cached",
+        "tier": "STRUCTURED",
+        "verify": false,
+        "score": 4895.162,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 247742834,
+        "executionNanos": 14629789084,
+        "startCpu": 17,
+        "endCpu": 16,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e93c824c917665cf3bfbba01ea4a34d8b4af5958dcef352d2e19b992a9183a33",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 0,
+            "nativeF32Locals": 0,
+            "nativeF64Locals": 0,
+            "rawLocals": 560,
+            "mixedSlots": 0,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 446713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 5,
+      "tier": "TYPED",
+      "score": 3350.645,
+      "result": {
+        "mode": "cached",
+        "tier": "TYPED",
+        "verify": false,
+        "score": 3350.645,
+        "clockCalls": 10,
+        "memorySHA256": "",
+        "memoryBytes": 0,
+        "preparationNanos": 279802875,
+        "executionNanos": 21349462416,
+        "startCpu": 13,
+        "endCpu": 12,
+        "placementSupported": true,
+        "placementValid": true,
+        "javaVersion": "25.0.4",
+        "generatedBlocksExecuted": 0,
+        "generatedInstructionsExecuted": 0,
+        "compilations": [
+          {
+            "key": "e9f56268dde9f319967340b4fbfdaaca31550dace7a31a2d65d750f89b86367e",
+            "instructions": 1367,
+            "generatedInstructions": 1282,
+            "promotedInstructions": 1024,
+            "resumableFunctions": 9,
+            "regionFallbackFunctions": 6,
+            "structuredLoops": 27,
+            "structuredBlocks": 33,
+            "linearBodies": 43,
+            "nativeI32Locals": 501,
+            "nativeF32Locals": 1,
+            "nativeF64Locals": 4,
+            "rawLocals": 54,
+            "mixedSlots": 5,
+            "controlInstructions": 85,
+            "blocks": 421,
+            "classes": 92,
+            "sourceBytes": 508713,
+            "cacheHit": true,
+            "compilationNanos": 0
+          }
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "STRUCTURED": {
+      "median": 4888.7803,
+      "scores": [
+        4857.9062,
+        4888.7803,
+        4906.37,
+        4861.4487,
+        4895.162
+      ]
+    },
+    "TYPED": {
+      "median": 3375.5273,
+      "scores": [
+        3382.95,
+        3361.7212,
+        3375.5273,
+        3411.417,
+        3350.645
+      ]
+    }
+  },
+  "generatorCommit": "cbf8c1f9",
+  "coremarkWasmSHA256": "77da1d88a16d432a6c74d3e60d1e239003f2adc1e50b31125507bb8e175af05a",
+  "machine": {
+    "model": "Mac17,9",
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.1\nBuildVersion:\t\t25G76",
+    "cpu": "Apple M5 Pro"
+  },
+  "generatorSources": {
+    "compiler/kotlin/src/commonMain/kotlin/io/github/charlietap/chasm/compiler/kotlin/KotlinRegionValues.kt": "b811acca84dd4e7d8a9fdc022002da5ef3cfea6fc0e93c78d1a362f94985785d",
+    "compiler/kotlin/src/commonMain/kotlin/io/github/charlietap/chasm/compiler/kotlin/KotlinRegionSourceGenerator.kt": "0992770fd820120595255b00b625348f19ca12b294ed93793cd562f2c979510f"
+  },
+  "profiles": {
+    "STRUCTURED": {
+      "executionSamples": 1283,
+      "generatedSamples": 1039,
+      "methods": {
+        "GeneratedFunction4Region0.invoke": 11,
+        "GeneratedFunction4Region4.invoke": 32,
+        "GeneratedFunction4Region3.invoke": 30,
+        "GeneratedFunction6Region3.invoke": 37,
+        "GeneratedFunction1Region0.invoke": 188,
+        "GeneratedFunction7Region1.invoke": 220,
+        "GeneratedFunction1Region1.invoke": 119,
+        "GeneratedFunction1Region4.invoke": 11,
+        "GeneratedFunction9.invoke": 55,
+        "GeneratedFunction7Region4.invoke": 100,
+        "GeneratedFunction4Region2.invoke": 9,
+        "GeneratedFunction1Region8.invoke": 26,
+        "GeneratedFunction1Region7.invoke": 13,
+        "GeneratedFunction7Region2.invoke": 87,
+        "GeneratedFunction0.invoke": 11,
+        "GeneratedFunction1Region2.invoke": 6,
+        "GeneratedFunction7Region0.invoke": 25,
+        "GeneratedFunction6Region0.invoke": 5,
+        "GeneratedFunction6Region1.invoke": 34,
+        "GeneratedFunction4Region6.invoke": 3,
+        "GeneratedFunction1Region10.invoke": 2,
+        "GeneratedFunction6Region13.invoke": 1,
+        "GeneratedFunction7Region3.invoke": 2,
+        "GeneratedFunction1Region11.invoke": 4,
+        "GeneratedFunction1Region9.invoke": 5,
+        "GeneratedFunction4Region5.invoke": 1,
+        "GeneratedFunction6Region2.invoke": 1,
+        "GeneratedFunction1Region6.invoke": 1
+      },
+      "lines": [
+        {
+          "method": "GeneratedFunction7Region1.invoke",
+          "line": 169,
+          "bci": 25,
+          "samples": 135
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 354,
+          "bci": 2860,
+          "samples": 85
+        },
+        {
+          "method": "GeneratedFunction7Region1.invoke",
+          "line": 317,
+          "bci": 2854,
+          "samples": 85
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 243,
+          "bci": 3166,
+          "samples": 78
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 282,
+          "bci": 1637,
+          "samples": 61
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 154,
+          "bci": 785,
+          "samples": 56
+        },
+        {
+          "method": "GeneratedFunction9.invoke",
+          "line": 229,
+          "bci": 25,
+          "samples": 55
+        },
+        {
+          "method": "GeneratedFunction7Region2.invoke",
+          "line": 166,
+          "bci": 25,
+          "samples": 51
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 317,
+          "bci": 2452,
+          "samples": 39
+        },
+        {
+          "method": "GeneratedFunction7Region2.invoke",
+          "line": 314,
+          "bci": 2448,
+          "samples": 36
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 182,
+          "bci": 1380,
+          "samples": 32
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 255,
+          "bci": 2564,
+          "samples": 29
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 167,
+          "bci": 1043,
+          "samples": 28
+        },
+        {
+          "method": "GeneratedFunction6Region1.invoke",
+          "line": 295,
+          "bci": 2933,
+          "samples": 28
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 325,
+          "bci": 1396,
+          "samples": 26
+        },
+        {
+          "method": "GeneratedFunction7Region0.invoke",
+          "line": 85,
+          "bci": 581,
+          "samples": 23
+        },
+        {
+          "method": "GeneratedFunction1Region8.invoke",
+          "line": 139,
+          "bci": 25,
+          "samples": 21
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 314,
+          "bci": 1263,
+          "samples": 20
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 145,
+          "bci": 699,
+          "samples": 13
+        },
+        {
+          "method": "GeneratedFunction1Region4.invoke",
+          "line": 175,
+          "bci": 25,
+          "samples": 9
+        },
+        {
+          "method": "GeneratedFunction4Region0.invoke",
+          "line": 377,
+          "bci": 1740,
+          "samples": 6
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 167,
+          "bci": 1305,
+          "samples": 6
+        },
+        {
+          "method": "GeneratedFunction0.invoke",
+          "line": 347,
+          "bci": 4929,
+          "samples": 6
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 139,
+          "bci": 292,
+          "samples": 6
+        },
+        {
+          "method": "GeneratedFunction1Region7.invoke",
+          "line": 300,
+          "bci": 2791,
+          "samples": 6
+        },
+        {
+          "method": "GeneratedFunction4Region2.invoke",
+          "line": 342,
+          "bci": 2100,
+          "samples": 5
+        },
+        {
+          "method": "GeneratedFunction1Region7.invoke",
+          "line": 343,
+          "bci": 3035,
+          "samples": 5
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 413,
+          "bci": 2506,
+          "samples": 5
+        },
+        {
+          "method": "GeneratedFunction1Region8.invoke",
+          "line": 289,
+          "bci": 3090,
+          "samples": 5
+        },
+        {
+          "method": "GeneratedFunction4Region2.invoke",
+          "line": 281,
+          "bci": 1178,
+          "samples": 4
+        },
+        {
+          "method": "GeneratedFunction1Region2.invoke",
+          "line": 374,
+          "bci": 1261,
+          "samples": 4
+        },
+        {
+          "method": "GeneratedFunction6Region0.invoke",
+          "line": 173,
+          "bci": 2525,
+          "samples": 4
+        },
+        {
+          "method": "GeneratedFunction1Region11.invoke",
+          "line": 68,
+          "bci": 137,
+          "samples": 4
+        },
+        {
+          "method": "GeneratedFunction0.invoke",
+          "line": 291,
+          "bci": 2370,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction4Region6.invoke",
+          "line": 143,
+          "bci": 691,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction6Region1.invoke",
+          "line": 256,
+          "bci": 1978,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction6Region1.invoke",
+          "line": 192,
+          "bci": 2504,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 186,
+          "bci": 1331,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction4Region0.invoke",
+          "line": 320,
+          "bci": 958,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 183,
+          "bci": 1953,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region4.invoke",
+          "line": 331,
+          "bci": 2827,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region10.invoke",
+          "line": 88,
+          "bci": 350,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction7Region3.invoke",
+          "line": 102,
+          "bci": 789,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region7.invoke",
+          "line": 211,
+          "bci": 878,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction0.invoke",
+          "line": 291,
+          "bci": 4029,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region9.invoke",
+          "line": 158,
+          "bci": 478,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region2.invoke",
+          "line": 250,
+          "bci": 25,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 209,
+          "bci": 360,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 309,
+          "bci": 850,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction7Region0.invoke",
+          "line": 46,
+          "bci": 25,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 387,
+          "bci": 2302,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction4Region0.invoke",
+          "line": 365,
+          "bci": 1476,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 323,
+          "bci": 1368,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 323,
+          "bci": 1373,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region0.invoke",
+          "line": 418,
+          "bci": 2143,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 312,
+          "bci": 1243,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 302,
+          "bci": 828,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 271,
+          "bci": 1414,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 316,
+          "bci": 1206,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region13.invoke",
+          "line": 23,
+          "bci": 26,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 397,
+          "bci": 2430,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 183,
+          "bci": 2231,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region9.invoke",
+          "line": 124,
+          "bci": 228,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region5.invoke",
+          "line": 27,
+          "bci": 26,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 225,
+          "bci": 1910,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region9.invoke",
+          "line": 181,
+          "bci": 777,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region0.invoke",
+          "line": 109,
+          "bci": 797,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region9.invoke",
+          "line": 163,
+          "bci": 501,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 150,
+          "bci": 377,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region2.invoke",
+          "line": 23,
+          "bci": 26,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region6.invoke",
+          "line": 98,
+          "bci": 634,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 210,
+          "bci": 2765,
+          "samples": 1
+        }
+      ]
+    },
+    "TYPED": {
+      "executionSamples": 1844,
+      "generatedSamples": 1586,
+      "methods": {
+        "GeneratedFunction1Region1.invoke": 301,
+        "GeneratedFunction6Region3.invoke": 44,
+        "GeneratedFunction4Region3.invoke": 25,
+        "GeneratedFunction1Region7.invoke": 29,
+        "GeneratedFunction4Region4.invoke": 40,
+        "GeneratedFunction1Region11.invoke": 3,
+        "GeneratedFunction1Region8.invoke": 39,
+        "GeneratedFunction1Region0.invoke": 380,
+        "GeneratedFunction7Region1.invoke": 254,
+        "GeneratedFunction6Region1.invoke": 27,
+        "GeneratedFunction7Region4.invoke": 126,
+        "GeneratedFunction7Region0.invoke": 29,
+        "GeneratedFunction7Region2.invoke": 106,
+        "GeneratedFunction9.invoke": 66,
+        "GeneratedFunction0.invoke": 30,
+        "GeneratedFunction1Region4.invoke": 19,
+        "GeneratedFunction6Region0.invoke": 10,
+        "GeneratedFunction4Region0.invoke": 7,
+        "GeneratedFunction4Region2.invoke": 5,
+        "GeneratedFunction10.invoke": 1,
+        "GeneratedFunction1Region10.invoke": 2,
+        "GeneratedFunction1Region9.invoke": 11,
+        "GeneratedFunction1Region2.invoke": 22,
+        "GeneratedFunction1Region6.invoke": 1,
+        "GeneratedFunction6Region2.invoke": 2,
+        "GeneratedFunction4Region1.invoke": 1,
+        "GeneratedFunction7Region3.invoke": 1,
+        "GeneratedFunction1Region5.invoke": 2,
+        "GeneratedFunction11.invoke": 2,
+        "GeneratedFunction6Region14.invoke": 1
+      },
+      "lines": [
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 450,
+          "bci": 3053,
+          "samples": 187
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 315,
+          "bci": 3276,
+          "samples": 175
+        },
+        {
+          "method": "GeneratedFunction7Region1.invoke",
+          "line": 212,
+          "bci": 25,
+          "samples": 172
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 405,
+          "bci": 2599,
+          "samples": 163
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 239,
+          "bci": 1479,
+          "samples": 111
+        },
+        {
+          "method": "GeneratedFunction7Region1.invoke",
+          "line": 403,
+          "bci": 2970,
+          "samples": 82
+        },
+        {
+          "method": "GeneratedFunction7Region2.invoke",
+          "line": 211,
+          "bci": 25,
+          "samples": 73
+        },
+        {
+          "method": "GeneratedFunction9.invoke",
+          "line": 359,
+          "bci": 25,
+          "samples": 66
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 202,
+          "bci": 861,
+          "samples": 53
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 218,
+          "bci": 1142,
+          "samples": 39
+        },
+        {
+          "method": "GeneratedFunction1Region8.invoke",
+          "line": 174,
+          "bci": 25,
+          "samples": 33
+        },
+        {
+          "method": "GeneratedFunction7Region2.invoke",
+          "line": 404,
+          "bci": 2563,
+          "samples": 33
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 482,
+          "bci": 1647,
+          "samples": 32
+        },
+        {
+          "method": "GeneratedFunction7Region0.invoke",
+          "line": 101,
+          "bci": 610,
+          "samples": 28
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 311,
+          "bci": 2642,
+          "samples": 25
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 365,
+          "bci": 1774,
+          "samples": 23
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 457,
+          "bci": 1466,
+          "samples": 21
+        },
+        {
+          "method": "GeneratedFunction1Region7.invoke",
+          "line": 395,
+          "bci": 2963,
+          "samples": 19
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 200,
+          "bci": 853,
+          "samples": 17
+        },
+        {
+          "method": "GeneratedFunction6Region1.invoke",
+          "line": 365,
+          "bci": 3028,
+          "samples": 15
+        },
+        {
+          "method": "GeneratedFunction0.invoke",
+          "line": 385,
+          "bci": 4200,
+          "samples": 14
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 192,
+          "bci": 775,
+          "samples": 13
+        },
+        {
+          "method": "GeneratedFunction0.invoke",
+          "line": 284,
+          "bci": 489,
+          "samples": 13
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 193,
+          "bci": 362,
+          "samples": 13
+        },
+        {
+          "method": "GeneratedFunction1Region2.invoke",
+          "line": 492,
+          "bci": 1446,
+          "samples": 12
+        },
+        {
+          "method": "GeneratedFunction1Region4.invoke",
+          "line": 242,
+          "bci": 25,
+          "samples": 12
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 279,
+          "bci": 1989,
+          "samples": 9
+        },
+        {
+          "method": "GeneratedFunction1Region7.invoke",
+          "line": 447,
+          "bci": 3293,
+          "samples": 9
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 197,
+          "bci": 2525,
+          "samples": 8
+        },
+        {
+          "method": "GeneratedFunction1Region2.invoke",
+          "line": 598,
+          "bci": 2749,
+          "samples": 8
+        },
+        {
+          "method": "GeneratedFunction1Region4.invoke",
+          "line": 465,
+          "bci": 3102,
+          "samples": 7
+        },
+        {
+          "method": "GeneratedFunction1Region9.invoke",
+          "line": 238,
+          "bci": 1017,
+          "samples": 7
+        },
+        {
+          "method": "GeneratedFunction6Region1.invoke",
+          "line": 322,
+          "bci": 2073,
+          "samples": 6
+        },
+        {
+          "method": "GeneratedFunction6Region0.invoke",
+          "line": 215,
+          "bci": 2576,
+          "samples": 6
+        },
+        {
+          "method": "GeneratedFunction1Region8.invoke",
+          "line": 359,
+          "bci": 3223,
+          "samples": 6
+        },
+        {
+          "method": "GeneratedFunction6Region1.invoke",
+          "line": 251,
+          "bci": 2593,
+          "samples": 5
+        },
+        {
+          "method": "GeneratedFunction7Region4.invoke",
+          "line": 238,
+          "bci": 1429,
+          "samples": 4
+        },
+        {
+          "method": "GeneratedFunction1Region9.invoke",
+          "line": 266,
+          "bci": 1646,
+          "samples": 4
+        },
+        {
+          "method": "GeneratedFunction1Region11.invoke",
+          "line": 68,
+          "bci": 137,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction0.invoke",
+          "line": 455,
+          "bci": 5121,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 606,
+          "bci": 2924,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction4Region0.invoke",
+          "line": 528,
+          "bci": 1969,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction4Region2.invoke",
+          "line": 410,
+          "bci": 1355,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 267,
+          "bci": 1861,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction6Region0.invoke",
+          "line": 143,
+          "bci": 352,
+          "samples": 3
+        },
+        {
+          "method": "GeneratedFunction1Region10.invoke",
+          "line": 96,
+          "bci": 354,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction4Region2.invoke",
+          "line": 497,
+          "bci": 2353,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction4Region0.invoke",
+          "line": 452,
+          "bci": 1119,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region2.invoke",
+          "line": 317,
+          "bci": 25,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction6Region2.invoke",
+          "line": 28,
+          "bci": 26,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction11.invoke",
+          "line": 28,
+          "bci": 25,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction4Region0.invoke",
+          "line": 507,
+          "bci": 1569,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 267,
+          "bci": 1051,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region0.invoke",
+          "line": 277,
+          "bci": 439,
+          "samples": 2
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 320,
+          "bci": 3324,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 231,
+          "bci": 1131,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 442,
+          "bci": 1134,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region7.invoke",
+          "line": 288,
+          "bci": 492,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 443,
+          "bci": 933,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 454,
+          "bci": 1070,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 400,
+          "bci": 713,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 451,
+          "bci": 1082,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 454,
+          "bci": 1305,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction10.invoke",
+          "line": 35,
+          "bci": 25,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region3.invoke",
+          "line": 217,
+          "bci": 1385,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 589,
+          "bci": 2788,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region6.invoke",
+          "line": 124,
+          "bci": 680,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region3.invoke",
+          "line": 558,
+          "bci": 2581,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region1.invoke",
+          "line": 93,
+          "bci": 254,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction7Region3.invoke",
+          "line": 126,
+          "bci": 829,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region5.invoke",
+          "line": 355,
+          "bci": 2925,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region5.invoke",
+          "line": 224,
+          "bci": 3087,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region0.invoke",
+          "line": 143,
+          "bci": 828,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction1Region1.invoke",
+          "line": 240,
+          "bci": 2769,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region1.invoke",
+          "line": 251,
+          "bci": 1417,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction7Region0.invoke",
+          "line": 54,
+          "bci": 25,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction6Region14.invoke",
+          "line": 28,
+          "bci": 26,
+          "samples": 1
+        },
+        {
+          "method": "GeneratedFunction4Region4.invoke",
+          "line": 580,
+          "bci": 2749,
+          "samples": 1
+        }
+      ]
+    }
+  },
+  "jit": {
+    "STRUCTURED": {
+      "compilationFailures": {},
+      "generatedC2Compilations": 65,
+      "hotMethodInliningFailures": {
+        "GeneratedFunction1Region1": {
+          "low call site frequency": 16
+        },
+        "GeneratedFunction1Region0": {
+          "low call site frequency": 4
+        }
+      }
+    },
+    "TYPED": {
+      "compilationFailures": {},
+      "generatedC2Compilations": 63,
+      "hotMethodInliningFailures": {
+        "GeneratedFunction1Region0": {
+          "low call site frequency": 4
+        },
+        "GeneratedFunction1Region1": {
+          "low call site frequency": 16
+        }
+      }
+    }
+  },
+  "assembly": {
+    "STRUCTURED": [
+      {
+        "header": "Compiled method (c2) 1095 2070   !   4       io.github.charlietap.chasm.compiler.kotlin.generated.GeneratedFunction1Region0::invoke (2941 bytes)",
+        "method": "GeneratedFunction1Region0",
+        "mainCodeBytes": 7656,
+        "frameBytes": 160,
+        "instructions": 1914
+      },
+      {
+        "header": "Compiled method (c2) 1125 2073   !   4       io.github.charlietap.chasm.compiler.kotlin.generated.GeneratedFunction1Region1::invoke (3240 bytes)",
+        "method": "GeneratedFunction1Region1",
+        "mainCodeBytes": 10064,
+        "frameBytes": 160,
+        "instructions": 2516
+      }
+    ],
+    "TYPED": [
+      {
+        "header": "Compiled method (c2) 1019 2138   !   4       io.github.charlietap.chasm.compiler.kotlin.generated.GeneratedFunction1Region1::invoke (3416 bytes)",
+        "method": "GeneratedFunction1Region1",
+        "mainCodeBytes": 11920,
+        "frameBytes": 208,
+        "instructions": 2980
+      },
+      {
+        "header": "Compiled method (c2) 1072 2141   !   4       io.github.charlietap.chasm.compiler.kotlin.generated.GeneratedFunction1Region0::invoke (3211 bytes)",
+        "method": "GeneratedFunction1Region0",
+        "mainCodeBytes": 9536,
+        "frameBytes": 224,
+        "instructions": 2384
+      }
+    ]
+  },
+  "assemblySpanNote": "Static instructions in corresponding copy/load/dispatch spans; not dynamic execution counts.",
+  "assemblySpans": {
+    "STRUCTURED": {
+      "startOffset": 180,
+      "endOffset": 368,
+      "instructions": 48,
+      "stackLoads": 0,
+      "stackStores": 0,
+      "branch": "b.eq",
+      "disassembly": [
+        "00b4 108b40b9 ldr      w16, [x24, #0x88]",
+        "00b8 11f27dd3 lsl      x17, x16, #3",
+        "00bc 301a40b9 ldr      w16, [x17, #0x18]",
+        "00c0 fd030e2a mov      w29, w14",
+        "00c4 311640b9 ldr      w17, [x17, #0x14]",
+        "00c8 10f27dd3 lsl      x16, x16, #3",
+        "00cc 7d7bf837 tbnz     w29, #0x1f, #0x12da455b8",
+        "00d0 f17bf837 tbnz     w17, #0x1f, #0x12da455cc",
+        "00d4 b103110b add      w17, w29, w17",
+        "00d8 101640b9 ldr      w16, [x16, #0x14]",
+        "00dc 1df27dd3 lsl      x29, x16, #3",
+        "00e0 a20b40b9 ldr      w2, [x29, #8]",
+        "00e4 3021a0d2 mov      x16, #0x1090000",
+        "00e8 10eb9af2 movk     x16, #0xd758",
+        "00ec 5f00106b cmp      w2, w16",
+        "00f0 c1b80054 b.ne     #0x12da45d88",
+        "00f4 b01f40b9 ldr      w16, [x29, #0x1c]",
+        "00f8 01f27dd3 lsl      x1, x16, #3",
+        "00fc 200840b9 ldr      w0, [x1, #8]",
+        "0100 a205a0d2 mov      x2, #0x2d0000",
+        "0104 02369df2 movk     x2, #0xe9b0",
+        "0108 1f00026b cmp      w0, w2",
+        "010c 61680054 b.ne     #0x12da45398",
+        "0110 221c40b9 ldr      w2, [x1, #0x1c]",
+        "0114 5d0c0051 sub      w29, w2, #3",
+        "0118 200840f9 ldr      x0, [x1, #0x10]",
+        "011c 302440b9 ldr      w16, [x1, #0x24]",
+        "0120 9d69f837 tbnz     w29, #0x1f, #0x12da453d0",
+        "0124 3f021d6b cmp      w17, w29",
+        "0128 e2650054 b.hs     #0x12da45364",
+        "012c 10f27dd3 lsl      x16, x16, #3",
+        "0130 317e4093 sxtw     x17, w17",
+        "0134 907900b5 cbnz     x16, #0x12da455e4",
+        "0138 1000118b add      x16, x0, x17",
+        "013c 31c44039 ldrb     w17, [x1, #0x31]",
+        "0140 000240b9 ldr      w0, [x16]",
+        "0144 f1310035 cbnz     w17, #0x12da44d00",
+        "0148 107c4093 sxtw     x16, w0",
+        "014c f1030eaa mov      x17, x14",
+        "0150 60098052 mov      w0, #0x4b",
+        "0154 ee0310aa mov      x14, x16",
+        "0158 901b40f9 ldr      x16, [x28, #0x30]",
+        "015c 1f0240b9 ldr      wzr, [x16]",
+        "0160 850c40b9 ldr      w5, [x4, #0xc]",
+        "0164 901440b9 ldr      w16, [x4, #0x14]",
+        "0168 e203002a mov      w2, w0",
+        "016c 5f240171 cmp      w2, #0x49",
+        "0170 20faff54 b.eq     #0x12da44634"
+      ]
+    },
+    "TYPED": {
+      "startOffset": 336,
+      "endOffset": 596,
+      "instructions": 66,
+      "stackLoads": 10,
+      "stackStores": 7,
+      "branch": "b.eq",
+      "disassembly": [
+        "0150 ea3740f9 ldr      x10, [sp, #0x68]",
+        "0154 4a8940b9 ldr      w10, [x10, #0x88]",
+        "0158 4bf17dd3 lsl      x11, x10, #3",
+        "015c ea4f40b9 ldr      w10, [sp, #0x4c]",
+        "0160 8a940035 cbnz     w10, #0x133259330",
+        "0164 ea0340f9 ldr      x10, [sp]",
+        "0168 ea030a2a mov      w10, w10",
+        "016c 6e1940b9 ldr      w14, [x11, #0x18]",
+        "0170 7d1540b9 ldr      w29, [x11, #0x14]",
+        "0174 cbf17dd3 lsl      x11, x14, #3",
+        "0178 6a8ef837 tbnz     w10, #0x1f, #0x133259284",
+        "017c 5d96f837 tbnz     w29, #0x1f, #0x133259384",
+        "0180 4d011d0b add      w13, w10, w29",
+        "0184 ed7700b9 str      w13, [sp, #0x74]",
+        "0188 6d1540b9 ldr      w13, [x11, #0x14]",
+        "018c bdf17dd3 lsl      x29, x13, #3",
+        "0190 ab0b40b9 ldr      w11, [x29, #8]",
+        "0194 2e21a0d2 mov      x14, #0x1090000",
+        "0198 0eeb9af2 movk     x14, #0xd758",
+        "019c 7f010e6b cmp      w11, w14",
+        "01a0 c1d40054 b.ne     #0x133259b78",
+        "01a4 ab1f40b9 ldr      w11, [x29, #0x1c]",
+        "01a8 6bf17dd3 lsl      x11, x11, #3",
+        "01ac eb5300f9 str      x11, [sp, #0xa0]",
+        "01b0 6d0940b9 ldr      w13, [x11, #8]",
+        "01b4 ab05a0d2 mov      x11, #0x2d0000",
+        "01b8 0b369df2 movk     x11, #0xe9b0",
+        "01bc bf010b6b cmp      w13, w11",
+        "01c0 e1740054 b.ne     #0x133258f9c",
+        "01c4 eb5340f9 ldr      x11, [sp, #0xa0]",
+        "01c8 6d1d40b9 ldr      w13, [x11, #0x1c]",
+        "01cc eb5300f9 str      x11, [sp, #0xa0]",
+        "01d0 bd0d0051 sub      w29, w13, #3",
+        "01d4 6b0940f9 ldr      x11, [x11, #0x10]",
+        "01d8 ee5340f9 ldr      x14, [sp, #0xa0]",
+        "01dc ce2540b9 ldr      w14, [x14, #0x24]",
+        "01e0 9d76f837 tbnz     w29, #0x1f, #0x133258ff0",
+        "01e4 ef7740b9 ldr      w15, [sp, #0x74]",
+        "01e8 ff011d6b cmp      w15, w29",
+        "01ec a2700054 b.hs     #0x133258f40",
+        "01f0 ed030f2a mov      w13, w15",
+        "01f4 cef17dd3 lsl      x14, x14, #3",
+        "01f8 ad7d4093 sxtw     x13, w13",
+        "01fc ee5700f9 str      x14, [sp, #0xa8]",
+        "0200 ce9200b5 cbnz     x14, #0x133259398",
+        "0204 6b010d8b add      x11, x11, x13",
+        "0208 6d0140b9 ldr      w13, [x11]",
+        "020c eb5340f9 ldr      x11, [sp, #0xa0]",
+        "0210 6bc54039 ldrb     w11, [x11, #0x31]",
+        "0214 6b300035 cbnz     w11, #0x133258760",
+        "0218 ef030032 mov      w15, #1",
+        "021c e80340f9 ldr      x8, [sp]",
+        "0220 e81300f9 str      x8, [sp, #0x20]",
+        "0224 71098052 mov      w17, #0x4b",
+        "0228 eb031f2a mov      w11, wzr",
+        "022c ef4f00b9 str      w15, [sp, #0x4c]",
+        "0230 8e1b40f9 ldr      x14, [x28, #0x30]",
+        "0234 df0140b9 ldr      wzr, [x14]",
+        "0238 ef3340f9 ldr      x15, [sp, #0x60]",
+        "023c e21540b9 ldr      w2, [x15, #0x14]",
+        "0240 ee3340f9 ldr      x14, [sp, #0x60]",
+        "0244 ce0d40b9 ldr      w14, [x14, #0xc]",
+        "0248 ed0b00b9 str      w13, [sp, #8]",
+        "024c ef03112a mov      w15, w17",
+        "0250 ff250171 cmp      w15, #0x49",
+        "0254 e0f7ff54 b.eq     #0x133258090"
+      ]
+    }
+  }
+}

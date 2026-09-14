@@ -77,6 +77,7 @@ internal fun runCoremark(options: Map<String, String>) {
         val report = JsonObject(
             mapOf(
                 "mode" to JsonPrimitive(options["mode"] ?: "cached"),
+                "tier" to JsonPrimitive(options["tier"] ?: "TYPED"),
                 "verify" to JsonPrimitive(verify),
                 "score" to JsonPrimitive(score),
                 "clockCalls" to JsonPrimitive(clockCalls),
