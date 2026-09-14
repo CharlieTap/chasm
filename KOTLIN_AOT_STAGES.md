@@ -18,7 +18,7 @@ Commit each completed stage before beginning the next.
 | 3 | Keep locals across branches and loops in generated regions | Complete |
 | 4 | Resume generated function bodies around existing guest and host calls | Complete |
 | 5 | Reference/GC and exception synchronization; supported Wasm 3.0 corpus | Complete |
-| 6 | Structured Kotlin loops and function bodies with explicit eligibility | Pending |
+| 6 | Structured Kotlin loops and function bodies with explicit eligibility | Complete |
 | 7 | Typed generated values, including safe handling of reused physical slots | Pending |
 | 8 | Optional direct compiled calls with explicit eligibility and runtime fallback | Pending |
 
@@ -46,6 +46,7 @@ differences between stages should not be treated as isolated optimization gains.
 | 3: local regions | 1560.06 | 4184.68 | 2.682x | Same 209 fixtures in three modes; deterministic CoreMark match |
 | 4: resumable functions | 1583.16 | 4215.85 | 2.663x | Same 209 fixtures in three modes; deterministic CoreMark match |
 | 5: GC and exceptions | 1582.90 | 4255.92 | 2.689x | 386 supported fixtures in three modes; deterministic CoreMark match |
+| 6: structured control | 1580.65 | 4926.11 | 3.117x | Same 386 fixtures in three modes; deterministic CoreMark match |
 
 Stage 1 extracts 86 scalar operations from 271 frame wrappers. Existing
 value-based helpers remain in use. It changes semantic factoring, with no new
@@ -133,3 +134,27 @@ offset 5044, with no counter or per-instruction dispatcher calls. Class files
 total 2,443,557 bytes. Five generated scores range from 4220.30 to 4322.14.
 The result preserves the previous stage's performance while adding the GC and
 exception support; it does not establish a separate speed gain over stage 4.
+
+Stage 6 emits direct Kotlin loops for contiguous block chains whose internal
+edges go forward or back to the header. Exit branches keep their conditional
+copies. Branches from outside the loop and catch entries prevent removal of an
+interior entry. Other control flow retains the state machine. A complete body
+with one external entry and a linear sequence of blocks and loops also omits
+the outer program-counter switch. Original instructions remain installed at
+interior addresses that no legal incoming edge can reach.
+
+Reports count structured loops, their original basic blocks and bodies without
+a program-counter switch. Focused tests cover early exits with copies, exact
+internal execution counts, retained interior instructions and rejection of
+outside branches and catch entries, alongside the Wasm and forced-GC tests.
+
+All 386 fixtures pass in preparation, cached and interpreter modes. Every
+fixture's preparation block and instruction counts also match stage 5 exactly.
+CoreMark uses 27 structured loops covering 33 basic blocks; 43 of its 92
+generated bodies omit the outer program-counter switch. Source totals 446,713
+bytes and classes total 2,457,043 bytes. The largest measured method still ends
+at bytecode offset 5044, with no counters or instruction-dispatch calls.
+
+Eleven focused backend tests and ABI checks pass. Five generated scores range
+from 4874.09 to 4950.50, compared with 4220.30 to 4322.14 in stage 5. The paired
+interpreter median remains similar; the recorded within-stage ratio is 3.117x.

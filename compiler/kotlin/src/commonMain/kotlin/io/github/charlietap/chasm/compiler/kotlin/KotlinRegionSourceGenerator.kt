@@ -10,6 +10,7 @@ internal fun generateRegions(
     maxInstructions: Int,
     resumeFunctions: Boolean = false,
     additionalEntryIps: IntArray = intArrayOf(),
+    structureControl: Boolean = false,
 ): KotlinProgramSource {
     val calls = instructions.map(::executorCall)
     val values = instructions.map(::valueInstruction)
@@ -57,13 +58,27 @@ internal fun generateRegions(
         val blocks = blockEntries.mapIndexed { blockIndex, entry -> KotlinBlock(entry, blockEntries.getOrElse(blockIndex + 1) { end }) }
         regions.add(blocks)
     }
+    val predecessors = mutableMapOf<Int, MutableList<Int>>()
+    if (structureControl) {
+        instructions.forEachIndexed { source, instruction ->
+            controlTargets(instruction).forEach { target -> predecessors.getOrPut(target - firstIp) { mutableListOf() }.add(source) }
+        }
+    }
+    val forcedEntries = functionEntries + additionalEntryIps.map { it - firstIp }
+    var structuredLoops = 0
+    var structuredBlocks = 0
+    var linearBodies = 0
     val groups = mutableListOf<KotlinSourceGroup>()
     var resumableFunctions = 0
     var fallbackFunctions = 0
     val orderedFunctions = functionEntries.sorted()
 
     fun emit(name: String, blocks: List<KotlinBlock>) {
-        groups.add(KotlinSourceGroup(name, regionSource(name, firstIp, blocks, instructions, calls, values, branches, copies), blocks))
+        val plan = if (structureControl) structuredControl(blocks, branches, firstIp, predecessors, forcedEntries) else null
+        structuredLoops += plan?.loops?.size ?: 0
+        structuredBlocks += plan?.loops?.sumOf { it.blocks.size } ?: 0
+        if (plan?.linearExit != null) linearBodies++
+        groups.add(KotlinSourceGroup(name, regionSource(name, firstIp, blocks, instructions, calls, values, branches, copies, plan), blocks, plan?.entryOffsets ?: blocks.map { it.startOffset }))
     }
     orderedFunctions.forEachIndexed { functionIndex, start ->
         val end = orderedFunctions.getOrElse(functionIndex + 1) { instructions.size }
@@ -89,6 +104,9 @@ internal fun generateRegions(
         values.count { it != null } + copies.count { it != null },
         resumableFunctions,
         fallbackFunctions,
+        structuredLoops,
+        structuredBlocks,
+        linearBodies,
     )
 }
 
@@ -101,6 +119,7 @@ private fun regionSource(
     values: List<KotlinValueInstruction?>,
     branches: List<KotlinBranch?>,
     copies: List<KotlinCopies?>,
+    plan: KotlinStructuredPlan?,
 ): String = buildString {
     // Calls and returns are holes in a resumable body. Their original
     // dispatchers stay installed; reaching one exits to the runtime and the
@@ -174,12 +193,9 @@ private fun regionSource(
     // counter calls, conditionals, or per-block instruction dispatch.
     appendLine("    private inline fun region(vstack: ValueStack, context: ExecutionContext, entry: Int, onBlock: (Int) -> Unit): Int {")
     orderedSlots.forEach { appendLine("        var r$it = vstack.getFrameSlot($it)") }
-    appendLine("        var pc = entry")
-    appendLine("        execution@ while (true) {")
-    appendLine("            when (pc) {")
-    for (block in blocks) {
-        appendLine("                ${block.startOffset} -> {")
-        appendLine("                    onBlock(${block.size})")
+
+    fun emitBlock(block: KotlinBlock, indent: String, transition: (Int, String) -> Unit) {
+        appendLine("${indent}onBlock(${block.size})")
         for (index in block.startOffset until block.endOffset) {
             val value = values[index]
             val copy = copies[index]
@@ -187,41 +203,81 @@ private fun regionSource(
             when {
                 value != null -> {
                     val expression = value.expression(index) { "r$it" }
-                    appendLine("                    ${value.destinationSlot?.let { "r$it = " } ?: ""}$expression")
+                    appendLine("$indent${value.destinationSlot?.let { "r$it = " } ?: ""}$expression")
                 }
-                copy != null -> emitCopies(copy, index, "                    ")
+                copy != null -> emitCopies(copy, index, indent)
                 branch != null -> {
                     val condition = branch.condition?.expression(index) { "r$it" }
                     if (branch.table) {
-                        appendLine("                    val selector = ($condition).toInt()")
-                        appendLine("                    pc = if (selector >= 0 && selector < ${branch.targets.lastIndex}) i$index.targetIps[selector] - baseIp else ${branch.targets.last() - firstIp}")
+                        appendLine("${indent}val selector = ($condition).toInt()")
+                        appendLine("${indent}pc = if (selector >= 0 && selector < ${branch.targets.lastIndex}) i$index.targetIps[selector] - baseIp else ${branch.targets.last() - firstIp}")
                     } else if (condition == null) {
-                        branch.copies?.let { emitCopies(it, index, "                    ") }
-                        appendLine("                    pc = ${branch.targets.single() - firstIp}")
+                        branch.copies?.let { emitCopies(it, index, indent) }
+                        transition(branch.targets.single() - firstIp, indent)
                     } else {
-                        appendLine("                    if (($condition) ${if (branch.branchOnMatch) "!=" else "=="} 0L) {")
-                        branch.copies?.let { emitCopies(it, index, "                        ") }
-                        appendLine("                        pc = ${branch.targets.single() - firstIp}")
-                        appendLine("                    } else {")
-                        appendLine("                        pc = ${index + 1}")
-                        appendLine("                    }")
+                        appendLine("${indent}if (($condition) ${if (branch.branchOnMatch) "!=" else "=="} 0L) {")
+                        branch.copies?.let { emitCopies(it, index, "$indent    ") }
+                        transition(branch.targets.single() - firstIp, "$indent    ")
+                        appendLine("$indent} else {")
+                        transition(index + 1, "$indent    ")
+                        appendLine("$indent}")
                     }
                 }
                 else -> {
-                    save("                    ")
-                    appendLine("                    ${checkNotNull(calls[index]).function}(vstack, context, i$index)")
-                    reload("                    ")
+                    save(indent)
+                    appendLine("$indent${checkNotNull(calls[index]).function}(vstack, context, i$index)")
+                    reload(indent)
                 }
             }
         }
-        if (branches[block.endOffset - 1] == null) appendLine("                    pc = ${block.endOffset}")
-        appendLine("                }")
+        if (branches[block.endOffset - 1] == null) transition(block.endOffset, indent)
     }
-    appendLine("                else -> break@execution")
-    appendLine("            }")
-    appendLine("        }")
+
+    fun emitLoop(loop: KotlinStructuredLoop, indent: String, linear: Boolean) {
+        appendLine("${indent}loop${loop.start}@ while (true) {")
+        for (block in loop.blocks) {
+            emitBlock(block, "$indent    ") { target, lineIndent ->
+                when {
+                    target == loop.start -> appendLine("${lineIndent}continue@loop${loop.start}")
+                    target == block.endOffset && target < loop.end -> Unit
+                    else -> {
+                        if (!linear) appendLine("${lineIndent}pc = $target")
+                        appendLine("${lineIndent}break@loop${loop.start}")
+                    }
+                }
+            }
+        }
+        appendLine("$indent}")
+    }
+    if (plan?.linearExit != null) {
+        appendLine("        require(entry == ${blocks.first().startOffset}) { \"Invalid structured entry\" }")
+        for (node in plan.nodes) {
+            if (node.loop != null) {
+                emitLoop(node.loop, "        ", true)
+            } else {
+                emitBlock(node.blocks.single(), "        ") { _, _ -> }
+            }
+        }
+    } else {
+        appendLine("        var pc = entry")
+        appendLine("        execution@ while (true) {")
+        appendLine("            when (pc) {")
+        val nodes = plan?.nodes ?: blocks.map { KotlinStructuredNode(listOf(it)) }
+        for (node in nodes) {
+            appendLine("                ${node.start} -> {")
+            if (node.loop != null) {
+                emitLoop(node.loop, "                    ", false)
+            } else {
+                emitBlock(node.blocks.single(), "                    ") { target, indent -> appendLine("${indent}pc = $target") }
+            }
+            appendLine("                }")
+        }
+        appendLine("                else -> break@execution")
+        appendLine("            }")
+        appendLine("        }")
+    }
     save("        ")
-    appendLine("        return baseIp + pc")
+    appendLine("        return baseIp + ${plan?.linearExit?.toString() ?: "pc"}")
     appendLine("    }")
     appendLine("}")
 }

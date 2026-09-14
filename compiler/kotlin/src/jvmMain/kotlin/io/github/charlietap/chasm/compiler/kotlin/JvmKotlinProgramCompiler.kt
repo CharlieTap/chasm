@@ -38,6 +38,9 @@ data class KotlinCompilationReport(
     val promotedInstructionCount: Int = 0,
     val resumableFunctionCount: Int = 0,
     val regionFallbackFunctionCount: Int = 0,
+    val structuredLoopCount: Int = 0,
+    val structuredBlockCount: Int = 0,
+    val linearBodyCount: Int = 0,
 )
 
 /**
@@ -106,7 +109,7 @@ class JvmKotlinProgramCompiler(
                 group to dispatcher
             }
             replacements.forEach { (group, dispatcher) ->
-                group.blocks.forEach { block -> program.replace(firstIp + block.startOffset, dispatcher) }
+                group.entryOffsets.forEach { offset -> program.replace(firstIp + offset, dispatcher) }
             }
             onCompilation(
                 KotlinCompilationReport(
@@ -122,6 +125,9 @@ class JvmKotlinProgramCompiler(
                     promotedInstructionCount = source.promotedInstructionCount,
                     resumableFunctionCount = source.resumableFunctionCount,
                     regionFallbackFunctionCount = source.regionFallbackFunctionCount,
+                    structuredLoopCount = source.structuredLoopCount,
+                    structuredBlockCount = source.structuredBlockCount,
+                    linearBodyCount = source.linearBodyCount,
                 ),
             )
             null

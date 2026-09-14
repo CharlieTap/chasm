@@ -62,6 +62,61 @@ class JvmKotlinProgramCompilerTest {
     }
 
     @Test
+    fun `structured loop preserves early exit copies and internal block counts`() {
+        val directory = Files.createTempDirectory("chasm-structured-loop").toFile()
+        val instructions = listOf<LinkedInstruction>(
+            NumericInstruction.I32ConstS(3, 0),
+            NumericInstruction.I32AddSi(1, 2, 1),
+            AdminInstruction.JumpIfCopyS(2, 1, 3, 105),
+            NumericInstruction.I32SubSi(0, 1, 0),
+            AdminInstruction.JumpIfS(0, 101),
+            NumericInstruction.I32AddSi(1, 10, 4),
+        )
+        val source = KotlinSourceGenerator().generate(100, instructions, intArrayOf(100))
+        assertEquals(1, source.structuredLoopCount)
+        assertEquals(2, source.structuredBlockCount)
+        assertEquals(1, source.linearBodyCount)
+        assertEquals(listOf(0), source.groups.single().entryOffsets)
+        assertTrue("loop1@ while" in source.groups.single().source)
+        assertTrue("when (pc)" !in source.groups.single().source)
+        try {
+            JvmKotlinProgramCompiler(directory, KotlinCompilationMode.PREPARE, countExecutions = true).use { compiler ->
+                val program = Program(compiler = compiler)
+                repeat(100) { program.append(DispatchableInstruction { _, _, nextIp -> nextIp }) }
+                instructions.forEach { instruction ->
+                    program.append(
+                        when (instruction) {
+                            is NumericInstruction -> NumericInstructionDispatcher(instruction)
+                            is AdminInstruction.JumpIfCopyS -> JumpDispatcher(instruction)
+                            is AdminInstruction.JumpIfS -> JumpDispatcher(instruction)
+                            else -> error("Unexpected fixture instruction")
+                        },
+                    )
+                }
+                val interior = program.instructions[103]
+                assertNull(compiler.compile(program, 100, instructions, intArrayOf(100)))
+                assertSame(interior, program.instructions[103])
+                for (early in listOf(0L, 1L)) {
+                    val stack = ValueStack(5)
+                    stack.activateFrame(0, 5)
+                    stack.setFrameSlot(2, early)
+                    stack.setFrameSlot(3, -1L)
+                    val context = ExecutionContext(stack, Store(program = program), ModuleInstance(RuntimeTypeMap.Empty), RuntimeConfig())
+                    val beforeBlocks = compiler.generatedBlockExecutions
+                    val beforeInstructions = compiler.generatedInstructionExecutions
+                    assertEquals(106, program.instructions[100](stack, context, 101))
+                    assertEquals(if (early == 0L) 16L else 12L, stack.getFrameSlot(4))
+                    assertEquals(if (early == 0L) -1L else 2L, stack.getFrameSlot(3))
+                    assertEquals(if (early == 0L) 8L else 3L, compiler.generatedBlockExecutions - beforeBlocks)
+                    assertEquals(if (early == 0L) 14L else 4L, compiler.generatedInstructionExecutions - beforeInstructions)
+                }
+            }
+        } finally {
+            directory.deleteRecursively()
+        }
+    }
+
+    @Test
     fun `cache miss leaves original program intact`() {
         val directory = Files.createTempDirectory("chasm-cache-miss").toFile()
         try {

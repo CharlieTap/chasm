@@ -28,6 +28,10 @@ and loops. Bounded regions contain at most 96 lowered instructions, with a
 separate expansion-cost limit. Eligible functions combine their regions into
 one resumable body. Original guest/host call and return instructions remain
 installed, so execution saves the frame before a call and resumes afterward.
+Single-entry linear loops use Kotlin `while`, `continue` and `break` directly.
+Bodies with one entry and a linear sequence of blocks and loops also omit the
+outer program-counter switch. Other graphs retain the state machine, including
+loops with incoming branches or exception handlers in their interior.
 See [the stage record](../../KOTLIN_AOT_STAGES.md) for eligibility, coverage and
 measurements. Earlier tiers remain selectable through `KotlinGenerationTier`.
 

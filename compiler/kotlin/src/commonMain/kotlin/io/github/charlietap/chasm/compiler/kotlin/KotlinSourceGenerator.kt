@@ -9,13 +9,14 @@ enum class KotlinGenerationTier {
     BLOCK_LOCALS,
     REGIONS,
     RESUMABLE,
+    STRUCTURED,
 }
 
 /** Source generation has no JVM dependencies; only compilation/loading is platform specific. */
 class KotlinSourceGenerator(
     private val maxBlockInstructions: Int = 16,
     private val maxClassInstructions: Int = 192,
-    private val tier: KotlinGenerationTier = KotlinGenerationTier.RESUMABLE,
+    private val tier: KotlinGenerationTier = KotlinGenerationTier.STRUCTURED,
     private val maxRegionInstructions: Int = 96,
 ) {
     init {
@@ -29,13 +30,13 @@ class KotlinSourceGenerator(
         functionEntryIps: IntArray,
         additionalEntryIps: IntArray = intArrayOf(),
     ): KotlinProgramSource {
-        if (tier == KotlinGenerationTier.REGIONS || tier == KotlinGenerationTier.RESUMABLE) {
+        if (tier >= KotlinGenerationTier.REGIONS) {
             instructions.forEach { instruction ->
                 require(executorCall(instruction) != null || isControlBoundary(instruction)) {
                     "No Kotlin executor for ${instruction::class.simpleName}"
                 }
             }
-            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions, tier == KotlinGenerationTier.RESUMABLE, additionalEntryIps)
+            return generateRegions(firstIp, instructions, functionEntryIps, maxRegionInstructions, tier >= KotlinGenerationTier.RESUMABLE, additionalEntryIps, tier >= KotlinGenerationTier.STRUCTURED)
         }
         val entries = functionEntryIps.mapTo(mutableSetOf()) { it - firstIp }
         additionalEntryIps.forEach { entries.add(it - firstIp) }
@@ -174,7 +175,12 @@ data class KotlinBlock(val startOffset: Int, val endOffset: Int) {
     val size: Int get() = endOffset - startOffset
 }
 
-data class KotlinSourceGroup(val className: String, val source: String, val blocks: List<KotlinBlock>)
+data class KotlinSourceGroup(
+    val className: String,
+    val source: String,
+    val blocks: List<KotlinBlock>,
+    val entryOffsets: List<Int> = blocks.map { it.startOffset },
+)
 
 data class KotlinProgramSource(
     val groups: List<KotlinSourceGroup>,
@@ -184,6 +190,9 @@ data class KotlinProgramSource(
     val promotedInstructionCount: Int = 0,
     val resumableFunctionCount: Int = 0,
     val regionFallbackFunctionCount: Int = 0,
+    val structuredLoopCount: Int = 0,
+    val structuredBlockCount: Int = 0,
+    val linearBodyCount: Int = 0,
 ) {
     val blockCount: Int get() = groups.sumOf { it.blocks.size }
 }
