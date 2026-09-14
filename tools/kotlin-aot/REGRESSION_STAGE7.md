@@ -1,10 +1,15 @@
 # Stage 7 regression investigation
 
-Stage 7 is slower because its native locals add separate representations and
-selection flags that survive JIT optimization and increase register pressure.
+The original stage 7 was slower because its native locals added separate
+representations and selection flags that survived JIT optimization and increased
+register pressure.
 The generated code spills more state to the native stack. Changing Kotlin
 `Long` declarations to `Int` was not, by itself, a useful optimization: C2
 already emits 32-bit ARM integer operations for the relevant stage 6 code.
+
+The [repair below](#repair) removes the extra state across joins. Five fresh
+pairs now score 4876.07 for STRUCTURED and 4818.89 for repaired TYPED, a 1.2%
+difference. The original investigation and its measurements are retained here.
 
 The branch checkpoint is `cbf8c1f9`. The unfinished stage 8 changes were preserved
 in a named local stash before this investigation. No stage 8 code participates
@@ -91,14 +96,61 @@ for the relevant integer operations. The typed source removes explicit Kotlin
 conversions, but does not remove an equivalent amount of actual machine work;
 it introduces additional selection and spill traffic instead.
 
-## Consequence
+## Original conclusion
 
 Stage 6 remains the best validated performance baseline. Stage 7's current
 representation is an unsuccessful optimization, despite passing correctness.
 A repair needs to avoid carrying independent raw/native/flag state through
 joins, or prove which values can safely use a single native representation.
 Simply removing raw-word preservation would fail the existing regression tests.
-No optimizer repair or stage 8 continuation is included in this investigation.
+No optimizer repair or stage 8 continuation was included in the initial investigation.
+
+## Repair
+
+Each physical slot now carries exactly one canonical raw Long across branches
+and loops. A canonical numeric write creates an immutable native temporary and
+updates that word. Subsequent numeric reads in the same basic block can reuse
+the temporary. Raw copies invalidate the destination binding; frame-helper
+reloads and basic-block boundaries invalidate all temporary bindings.
+
+This keeps typed operations without carrying independent raw/native/flag state
+through control-flow joins. Untyped copies, skipped writes and reference words
+remain exact. Mixed numeric slots and noncanonical float words retain raw
+storage. Additional tests check raw overwrites, aliased arithmetic and numeric
+reads after helper reloads.
+
+The repaired generator was compared directly with STRUCTURED in the same
+runtime, using the controlled procedure above:
+
+| Pair | STRUCTURED | Repaired TYPED |
+| --- | ---: | ---: |
+| 1 | 4800.00 | 4818.89 |
+| 2 | 4832.86 | 4816.96 |
+| 3 | 4908.38 | 4812.71 |
+| 4 | 4876.07 | 5000.00 |
+| 5 | 4961.96 | 4858.69 |
+| Median | **4876.07** | **4818.89** |
+
+TYPED is 1.2% lower in these medians, with overlapping trial ranges. The large
+regression is removed; this comparison does not establish a gain over stage 6.
+The repair has not had another assembly or JFR capture, so the machine-code
+tables above describe the original regression only.
+
+Deterministic verification matches the interpreter's score of 2, four clock
+calls and complete 65,536-byte memory SHA-256. Both generated tiers execute
+8,677,806 counted instructions in verification. Timed trials have counters
+disabled, valid CPU placement, cache hits and zero source-compilation time.
+
+All 284 selected unit tests pass, including 15 generated-backend tests; formatting
+and ABI checks also pass. The corpus run passed 256 preparation/execution
+fixtures with no failures before the user explicitly requested stopping the
+remaining corpus and going directly to CoreMark. No full repaired corpus pass
+is claimed. Stage 8 remains parked.
+
+The [repair record](results/stages/stage7-repaired.json) contains the original
+paired reports, source fingerprints, code-size counts and partial corpus
+results. Raw local reports are under
+`tools/kotlin-aot/build/tier-comparison-stage7-repaired/`.
 
 ## Reproduce
 

@@ -41,6 +41,7 @@ data class KotlinCompilationReport(
     val structuredLoopCount: Int = 0,
     val structuredBlockCount: Int = 0,
     val linearBodyCount: Int = 0,
+    // These compatibility-named fields count emitted native value temporaries.
     val nativeI32SlotCount: Int = 0,
     val nativeF32SlotCount: Int = 0,
     val nativeF64SlotCount: Int = 0,

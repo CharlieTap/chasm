@@ -80,11 +80,13 @@ internal fun generateRegions(
     val orderedFunctions = functionEntries.sorted()
 
     fun emit(name: String, blocks: List<KotlinBlock>) {
-        val layout = regionValueLayout(blocks.flatMap { (it.startOffset until it.endOffset).toList() }, values, branches, copies, typedValues)
-        nativeI32Slots += layout.nativeTypes.count { it.value == KotlinValueType.I32 }
-        nativeF32Slots += layout.nativeTypes.count { it.value == KotlinValueType.F32 }
-        nativeF64Slots += layout.nativeTypes.count { it.value == KotlinValueType.F64 }
-        rawSlots += layout.slots.size - layout.nativeTypes.size
+        val indices = blocks.flatMap { (it.startOffset until it.endOffset).toList() }
+        val layout = regionValueLayout(indices, values, branches, copies, typedValues)
+        val nativeValues = indices.mapNotNull { index -> values[index]?.let(layout::nativeWriteType) }
+        nativeI32Slots += nativeValues.count { it == KotlinValueType.I32 }
+        nativeF32Slots += nativeValues.count { it == KotlinValueType.F32 }
+        nativeF64Slots += nativeValues.count { it == KotlinValueType.F64 }
+        rawSlots += layout.slots.size
         mixedSlots += layout.mixedSlotCount
         val plan = if (structureControl) structuredControl(blocks, branches, firstIp, predecessors, forcedEntries) else null
         structuredLoops += plan?.loops?.size ?: 0
@@ -183,6 +185,7 @@ private fun regionSource(
     locals.declarations("        ")
 
     fun emitBlock(block: KotlinBlock, indent: String, transition: (Int, String) -> Unit) {
+        locals.beginBlock()
         appendLine("${indent}onBlock(${block.size})")
         for (index in block.startOffset until block.endOffset) {
             val value = values[index]

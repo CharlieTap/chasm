@@ -26,6 +26,29 @@ import kotlin.test.assertTrue
 
 class TypedLocalsTest {
     @Test
+    fun `raw copies invalidate native values before subsequent numeric reads`() {
+        val instructions = listOf(
+            NumericInstruction.I32ConstS(7, 0),
+            AdminInstruction.CopySlot(1, 0),
+            NumericInstruction.I32AddSi(0, 1, 2),
+            NumericInstruction.I32MulSs(2, 2, 2),
+            NumericInstruction.I32AddSi(2, 1, 3),
+        )
+        val directory = Files.createTempDirectory("chasm-native-overwrite").toFile()
+        try {
+            for (mode in listOf(null, KotlinCompilationMode.PREPARE, KotlinCompilationMode.CACHED)) {
+                val word = (17L shl 32) or 3L
+                val result = execute(instructions, mode, directory, longArrayOf(0, word, 0, 0))
+                assertEquals(word, result[0], "$mode raw copy")
+                assertEquals(16L, result[2], "$mode aliased multiplication")
+                assertEquals(17L, result[3], "$mode numeric read after overwrite")
+            }
+        } finally {
+            directory.deleteRecursively()
+        }
+    }
+
+    @Test
     fun `skipped numeric writes preserve complete incoming words in typed slots`() {
         val instructions = listOf(
             AdminInstruction.JumpIfS(1, 3),
@@ -102,14 +125,16 @@ class TypedLocalsTest {
             NumericInstruction.I32ConstS(7, 0),
             ReferenceInstruction.RefAsNonNullS(1, 0),
             AdminInstruction.CopySlot(0, 2),
+            NumericInstruction.I32AddSi(0, 1, 3),
         )
-        assertEquals(1, KotlinSourceGenerator().generate(0, instructions, intArrayOf(0)).nativeI32SlotCount)
+        assertEquals(2, KotlinSourceGenerator().generate(0, instructions, intArrayOf(0)).nativeI32SlotCount)
         val directory = Files.createTempDirectory("chasm-native-reference").toFile()
         try {
             for (mode in listOf(null, KotlinCompilationMode.PREPARE, KotlinCompilationMode.CACHED)) {
-                val result = execute(instructions, mode, directory, longArrayOf(0, reference, 0))
+                val result = execute(instructions, mode, directory, longArrayOf(0, reference, 0, 0))
                 assertEquals(reference, result[0], "$mode helper result")
                 assertEquals(reference, result[2], "$mode reference copy")
+                assertEquals((reference.toInt() + 1).toLong(), result[3], "$mode numeric read after helper")
             }
         } finally {
             directory.deleteRecursively()

@@ -32,17 +32,20 @@ Single-entry linear loops use Kotlin `while`, `continue` and `break` directly.
 Bodies with one entry and a linear sequence of blocks and loops also omit the
 outer program-counter switch. Other graphs retain the state machine, including
 loops with incoming branches or exception handlers in their interior.
-Consistently typed numeric slots use Int, Float or Double locals. Each retains
-its original raw word until a numeric write, preserving all bits through
-unexecuted paths, raw copies and frame-helper reloads. Mixed numeric slots keep
-Long storage. Reports include the counts for each representation.
+Each physical slot has one raw Long local across control-flow joins. Within a
+basic block, canonical numeric writes expose immutable Int, Float or Double
+temporaries for subsequent reads. Copies, helper reloads and new blocks
+invalidate those temporary bindings. This preserves complete words through
+unexecuted paths and reused slots without carrying a second representation and
+selection flag through loops. Reports count raw slot locals and emitted native
+temporaries separately; mixed numeric slots remain raw.
 See [the stage record](../../KOTLIN_AOT_STAGES.md) for eligibility, coverage and
 measurements. Earlier tiers remain selectable through `KotlinGenerationTier`.
-The typed-local stage passed correctness but regressed CoreMark relative to
-STRUCTURED; see the recorded comparisons before choosing a tier for performance.
-The [stage 7 investigation](REGRESSION_STAGE7.md) reproduces that regression in
-the same runtime and traces it to additional representation state and native
-stack spills. `compare_tiers.py` reproduces the tier comparison.
+The original typed-local stage regressed CoreMark by 31% relative to STRUCTURED.
+The [stage 7 investigation and repair](REGRESSION_STAGE7.md) records the cause
+and the revised representation: five fresh pairs score 4876.07 for STRUCTURED
+and 4818.89 for repaired TYPED, a remaining difference of 1.2%.
+`compare_tiers.py` reproduces the tier comparison.
 
 Reference, table and aggregate operations use the existing frame helpers.
 Generated locals are saved before these helpers and reloaded afterward, so
@@ -170,8 +173,8 @@ registration pipeline; JVM class loading is platform specific.
 
 The backend retains ValueStack traffic at region and helper boundaries, linked
 operand objects, runtime call/exception dispatch and ordinary lowering at
-instantiation. Mixed numeric slots retain raw Long storage; native locals also
-keep a raw word and a flag where required to preserve untyped slot contents.
+instantiation. Raw Long locals cross control-flow joins; native temporaries are
+limited to consistently typed numeric writes within individual basic blocks.
 The prototype driver also retains the Kotlin compiler dependency in cached
 processes. Splitting preparation into a separate distributable tool, compact
 operand binding, and tuning compilation/code size remain future work.

@@ -59,51 +59,48 @@ internal fun regionValueLayout(
     return KotlinRegionValueLayout(slots.sorted(), modified.sorted(), native, types.count { it.value.size > 1 })
 }
 
+/** The native representation of a canonical numeric write, if eligible. */
+internal fun KotlinRegionValueLayout.nativeWriteType(value: KotlinValueInstruction): KotlinValueType? {
+    if (!value.canonicalResult || value.destinationType == null) return null
+    val type = nativeTypes[value.destinationSlot] ?: return null
+    check(type == value.destinationType.localType())
+    return type
+}
+
 /**
- * A native local is accompanied by its incoming raw word until a canonical
- * numeric write occurs. This preserves reused slots on paths which never
- * execute that write, and after a frame helper produces an untyped reference.
+ * Exactly one raw word survives control-flow joins for each physical slot.
+ * Native values are immutable temporaries produced within a basic block, so
+ * their types are known without retaining a second representation or a flag
+ * across a loop. Copies, helper reloads and new blocks invalidate the cache.
  */
 internal class KotlinRegionValues(private val output: StringBuilder, private val layout: KotlinRegionValueLayout) {
+    private data class NativeValue(val type: KotlinValueType, val name: String)
+
+    private val nativeValues = mutableMapOf<Int, NativeValue>()
+
     fun declarations(indent: String) {
-        layout.slots.forEach { slot ->
-            val type = layout.nativeTypes[slot]
-            if (type == null) {
-                output.appendLine("${indent}var r$slot = vstack.getFrameSlot($slot)")
-            } else {
-                output.appendLine("${indent}var b$slot = vstack.getFrameSlot($slot)")
-                output.appendLine("${indent}var r$slot = ${type.decode("b$slot")}")
-                output.appendLine("${indent}var n$slot = false")
-            }
-        }
+        layout.slots.forEach { slot -> output.appendLine("${indent}var r$slot = vstack.getFrameSlot($slot)") }
     }
 
-    fun word(slot: Int): String = layout.nativeTypes[slot]?.let { "(if (n$slot) ${it.encode("r$slot")} else b$slot)" } ?: "r$slot"
+    fun beginBlock() = nativeValues.clear()
 
-    fun read(input: KotlinValueInput.Slot): String = if (input.type == layout.nativeTypes[input.slot]) "r${input.slot}" else input.type.decode(word(input.slot))
+    fun word(slot: Int): String = "r$slot"
+
+    fun read(input: KotlinValueInput.Slot): String = nativeValues[input.slot]
+        ?.takeIf { !input.rawWord && it.type == input.type }
+        ?.name
+        ?: input.type.decode(word(input.slot))
 
     fun save(indent: String) = layout.modified.forEach { output.appendLine("${indent}vstack.setFrameSlot($it, ${word(it)})") }
 
-    fun reload(indent: String) = layout.slots.forEach { slot ->
-        val type = layout.nativeTypes[slot]
-        if (type == null) {
-            output.appendLine("${indent}r$slot = vstack.getFrameSlot($slot)")
-        } else {
-            output.appendLine("${indent}b$slot = vstack.getFrameSlot($slot)")
-            output.appendLine("${indent}r$slot = ${type.decode("b$slot")}")
-            output.appendLine("${indent}n$slot = false")
-        }
+    fun reload(indent: String) {
+        nativeValues.clear()
+        layout.slots.forEach { output.appendLine("${indent}r$it = vstack.getFrameSlot($it)") }
     }
 
     fun writeWord(slot: Int, expression: String, indent: String) {
-        val type = layout.nativeTypes[slot]
-        if (type == null) {
-            output.appendLine("${indent}r$slot = $expression")
-        } else {
-            output.appendLine("${indent}b$slot = $expression")
-            output.appendLine("${indent}r$slot = ${type.decode("b$slot")}")
-            output.appendLine("${indent}n$slot = false")
-        }
+        output.appendLine("${indent}r$slot = $expression")
+        nativeValues.remove(slot)
     }
 
     fun emit(index: Int, value: KotlinValueInstruction, indent: String) {
@@ -113,14 +110,15 @@ internal class KotlinRegionValues(private val output: StringBuilder, private val
             output.appendLine("$indent$expression")
             return
         }
-        val type = layout.nativeTypes[slot]
-        if (type == null || value.destinationType == null || !value.canonicalResult) {
+        val type = layout.nativeWriteType(value)
+        if (type == null) {
             writeWord(slot, value.resultType.encode(expression), indent)
         } else {
-            check(type == value.destinationType.localType())
             val native = if (value.resultType == type) expression else type.decode(value.resultType.encode(expression))
-            output.appendLine("${indent}r$slot = $native")
-            output.appendLine("${indent}n$slot = true")
+            val name = "v$index"
+            output.appendLine("${indent}val $name = $native")
+            output.appendLine("${indent}r$slot = ${type.encode(name)}")
+            nativeValues[slot] = NativeValue(type, name)
         }
     }
 }

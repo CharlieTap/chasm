@@ -19,7 +19,7 @@ Commit each completed stage before beginning the next.
 | 4 | Resume generated function bodies around existing guest and host calls | Complete |
 | 5 | Reference/GC and exception synchronization; supported Wasm 3.0 corpus | Complete |
 | 6 | Structured Kotlin loops and function bodies with explicit eligibility | Complete |
-| 7 | Typed generated values, including safe handling of reused physical slots | Complete |
+| 7 | Typed generated values, including safe handling of reused physical slots | Complete; regression repaired below |
 | 8 | Optional direct compiled calls with explicit eligibility and runtime fallback | Pending |
 
 The source compiler must preserve the existing Wasm call stack, traps, host
@@ -160,8 +160,8 @@ Eleven focused backend tests and ABI checks pass. Five generated scores range
 from 4874.09 to 4950.50, compared with 4220.30 to 4322.14 in stage 5. The paired
 interpreter median remains similar; the recorded within-stage ratio is 3.117x.
 
-Stage 7 uses Int, Float and Double locals when a region's numeric uses agree on
-the slot type. Slots with mixed numeric uses retain Long storage. Memory-load
+The original stage 7 uses Int, Float and Double locals when a region's numeric
+uses agree on the slot type. Slots with mixed numeric uses retain Long storage. Memory-load
 metadata distinguishes the logical value type from the helper's raw-word
 result, and untyped copies, selections and globals do not impose a numeric type.
 
@@ -192,3 +192,43 @@ similar. Native locals with conservative raw-word preservation do not produce
 a speed gain here. The earlier STRUCTURED tier remains selectable, and this
 stage is retained as a correctness-validated checkpoint rather than presented
 as a performance improvement.
+
+### Stage 7 repair
+
+The repair retains one canonical raw Long per physical slot across control-flow
+joins. Canonical numeric writes also expose immutable native temporaries inside
+their basic block. Later numeric reads reuse those temporaries; raw copies,
+helper reloads and new blocks invalidate the bindings. No independent raw,
+native and selection-flag states survive together around a loop. Skipped writes
+and untyped values still preserve every bit of the incoming word.
+
+The same-runtime comparison uses five fresh sequential JVM pairs with fixed
+heap/compressed-pointer settings, shuffled order, valid CPU placement and no
+execution counters or compilation in timed runs:
+
+| Tier | CoreMark median | Range |
+| --- | ---: | ---: |
+| Stage 6 / STRUCTURED | 4876.07 | 4800.00–4961.96 |
+| Repaired stage 7 / TYPED | 4818.89 | 4812.71–5000.00 |
+
+The remaining difference is 1.2%, with overlapping trial ranges, compared with
+the previous controlled 31% regression. This restores performance close to
+stage 6; it does not establish a speed gain over stage 6. The interpreter was
+used for deterministic verification, not timed in this follow-up.
+
+Deterministic score, clock calls, full memory SHA-256 and generated instruction
+counts match. All 15 backend tests, 90 compiler tests, 64 invoker tests and 115
+runtime tests pass, as do formatting and ABI checks. New cases exercise numeric
+reads after raw overwrites and frame-helper reloads, including aliased writes.
+Corpus preparation and execution passed 256 of 386 fixtures before the user
+requested stopping the remaining corpus and proceeding directly to CoreMark.
+The repair has no complete cached or interpreter corpus rerun; the earlier
+386-fixture records apply to the earlier checkpoints.
+
+CoreMark retains 92 classes, 27 structured loops, 43 bodies without an outer
+program-counter switch, and 1282 generated instructions. It emits 741 Int, one
+Float and three Double temporaries, plus 560 raw slot locals including five
+mixed slots. The compatibility-named native slot report fields now count
+temporaries, not persistent slot representations. Source totals 473,410 bytes;
+classes total 2,573,410 bytes. The [repair record](tools/kotlin-aot/results/stages/stage7-repaired.json)
+retains the paired reports and exact validation scope. Stage 8 remains pending.
