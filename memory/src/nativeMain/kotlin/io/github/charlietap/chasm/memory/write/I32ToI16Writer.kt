@@ -1,7 +1,6 @@
 package io.github.charlietap.chasm.memory.write
 
-import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
-import io.github.charlietap.chasm.memory.ext.copyInto
+import io.github.charlietap.chasm.memory.NativeMappedLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 actual inline fun I32ToI16Writer(
@@ -9,6 +8,5 @@ actual inline fun I32ToI16Writer(
     address: Int,
     value: Int,
 ) {
-    val array = (memory as ByteArrayLinearMemory).memory
-    value.copyInto(array, address, size = 2)
+    (memory as NativeMappedLinearMemory).storeI16Unchecked(address, value.toShort())
 }

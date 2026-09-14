@@ -1,5 +1,6 @@
 import kotlinx.benchmark.gradle.NativeSourceGeneratorTask
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
 
 plugins {
@@ -44,7 +45,7 @@ benchmark {
             include(".*GcBenchmark.*")
         }
         register("linearMemory") {
-            include(".*LinearMemory(Benchmark|LifecycleBenchmark|DeferredPageBenchmark).*")
+            include(".*LinearMemory(Benchmark|BulkBenchmark|LifecycleBenchmark|DeferredPageBenchmark).*")
         }
     }
 
@@ -108,4 +109,12 @@ tasks.withType<JavaExec>().configureEach {
 
 tasks.withType<ConfigurableKtLintTask>().configureEach {
     dependsOn(tasks.withType<NativeSourceGeneratorTask>())
+}
+
+tasks.withType<KotlinNativeCompile>().configureEach {
+    if (name.contains("Benchmark")) {
+        // kotlinx-benchmark copies the main compilation arguments after creating this task.
+        // Drop the convention-provided copy so each argument is supplied once.
+        compilerOptions.freeCompilerArgs.set(emptyList())
+    }
 }

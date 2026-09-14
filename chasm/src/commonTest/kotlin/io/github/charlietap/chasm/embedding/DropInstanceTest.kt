@@ -3,7 +3,6 @@ package io.github.charlietap.chasm.embedding
 import io.github.charlietap.chasm.embedding.fixture.publicInstance
 import io.github.charlietap.chasm.embedding.fixture.publicStore
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult
-import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.fixture.runtime.instance.dataAddress
 import io.github.charlietap.chasm.fixture.runtime.instance.dataInstance
 import io.github.charlietap.chasm.fixture.runtime.instance.elementAddress
@@ -83,18 +82,12 @@ class DropInstanceTest {
             moduleInstance = moduleInstance,
         )
 
-        var memoryDeallocated = false
-        val memoryDropper: MemoryInstanceDropper = { _memoryInstance ->
-            assertEquals(memoryInstance, _memoryInstance)
-            memoryDeallocated = true
-        }
-
         val expected = ChasmResult.Success(Unit)
-        val actual = dropInstance(store, instance, memoryDropper)
+        val actual = dropInstance(store, instance)
 
         assertEquals(expected, actual)
         assertEquals(true, moduleInstance.deallocated)
-        assertEquals(true, memoryDeallocated)
+        assertEquals(memoryInstance, store.store.memories.single())
         assertContentEquals(ubyteArrayOf(), dataInstance.bytes)
         assertContentEquals(longArrayOf(), elementInstance.elements)
         assertEquals(ExecutionValue.Uninitialised.toLongFromBoxed(), globalInstance.value)
@@ -110,7 +103,7 @@ class DropInstanceTest {
     }
 
     @Test
-    fun `shared memories are not deallocated during deinstantiation`() {
+    fun `instance drop leaves store owned memory allocated`() {
 
         val memoryInstance = memoryInstance(
             type = memoryType(
@@ -131,17 +124,11 @@ class DropInstanceTest {
             ),
         )
 
-        var memoryDropped = false
-        val memoryDropper: MemoryInstanceDropper = { _memoryInstance ->
-            assertEquals(memoryInstance, _memoryInstance)
-            memoryDropped = true
-        }
-
         val expected = ChasmResult.Success(Unit)
-        val actual = dropInstance(store, instance, memoryDropper)
+        val actual = dropInstance(store, instance)
 
         assertEquals(expected, actual)
         assertEquals(true, instance.instance.deallocated)
-        assertEquals(false, memoryDropped)
+        assertEquals(memoryInstance, store.store.memories.single())
     }
 }

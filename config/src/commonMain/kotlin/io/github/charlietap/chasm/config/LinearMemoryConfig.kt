@@ -5,8 +5,8 @@ package io.github.charlietap.chasm.config
  *
  * @property prefault asks supported backends to make newly exposed
  * linear-memory pages resident during construction and growth. The JVM
- * mapped-memory backend honors this setting. Android and Kotlin/Native
- * currently ignore it because their array-backed memories do not expose an
+ * and Kotlin/Native mapped-memory backends honor this setting. Android
+ * currently ignores it because its array-backed memory does not expose an
  * equivalent operation.
  */
 data class LinearMemoryConfig(

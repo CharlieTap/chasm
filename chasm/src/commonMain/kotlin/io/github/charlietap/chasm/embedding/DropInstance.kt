@@ -6,31 +6,15 @@ import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Error
 import io.github.charlietap.chasm.embedding.shapes.ChasmResult.Success
 import io.github.charlietap.chasm.embedding.shapes.Instance
 import io.github.charlietap.chasm.embedding.shapes.Store
-import io.github.charlietap.chasm.executor.invoker.drop.MemoryInstanceDropper
 import io.github.charlietap.chasm.runtime.ext.data
 import io.github.charlietap.chasm.runtime.ext.element
 import io.github.charlietap.chasm.runtime.ext.global
-import io.github.charlietap.chasm.runtime.ext.memory
 import io.github.charlietap.chasm.runtime.ext.table
-import io.github.charlietap.chasm.type.SharedStatus
 
 fun dropInstance(
     store: Store,
     instance: Instance,
 ): ChasmResult<Unit, ChasmError.ExecutionError> {
-    return dropInstance(
-        store = store,
-        instance = instance,
-        memoryDropper = ::MemoryInstanceDropper,
-    )
-}
-
-internal fun dropInstance(
-    store: Store,
-    instance: Instance,
-    memoryDropper: MemoryInstanceDropper,
-): ChasmResult<Unit, ChasmError.ExecutionError> {
-
     if (instance.store !== store.store) {
         return Error(ChasmError.ExecutionError("Instance belongs to a different Store"))
     }
@@ -61,13 +45,6 @@ internal fun dropInstance(
     }
     instance.globalAddresses.clear()
 
-    instance.memAddresses.forEach { address ->
-        store.memory(address).let { memory ->
-            if (memory.type.shared == SharedStatus.Unshared) {
-                memoryDropper(memory)
-            }
-        }
-    }
     instance.memAddresses.clear()
 
     instance.tableAddresses.forEach { address ->

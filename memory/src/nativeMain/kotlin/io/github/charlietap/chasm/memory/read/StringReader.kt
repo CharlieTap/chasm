@@ -1,6 +1,5 @@
 package io.github.charlietap.chasm.memory.read
 
-import io.github.charlietap.chasm.memory.ByteArrayLinearMemory
 import io.github.charlietap.chasm.runtime.memory.LinearMemory
 
 actual inline fun StringReader(
@@ -8,6 +7,7 @@ actual inline fun StringReader(
     memoryPointer: Int,
     stringLengthInBytes: Int,
 ): String {
-    val array = (memory as ByteArrayLinearMemory).memory
-    return array.copyOfRange(memoryPointer, memoryPointer + stringLengthInBytes).decodeToString()
+    val bytes = ByteArray(stringLengthInBytes)
+    memory.read(bytes, memoryPointer, stringLengthInBytes)
+    return bytes.decodeToString()
 }
